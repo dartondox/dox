@@ -1835,7 +1835,7 @@ The `dox make:*` commands add more folders when you need them:
 
 - `dox make:dto` adds `lib/app/dtos/<name>/<name>.dto.dart`. Then `build_runner` writes `lib/generated/dtos.g.dart`, the list of DTOs.
 - `dox make:middleware` adds `lib/app/http/middleware/`.
-- `dox make:serializer` adds `lib/app/http/serializers/`.
+- `dox make:serializer` adds `lib/app/serializers/`.
 
 The app makes `storage/` when it writes files (the local disk, the file cache, uploads).
 
@@ -1843,7 +1843,8 @@ The app makes `storage/` when it writes files (the local disk, the file cache, u
 | --- | --- |
 | `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. The other files are the entry points that the `dox migration:*`, `db:seed`, `queue:*` and `schedule:*` commands run. |
 | `db/` | Your migrations, factories and seeders. Dart migrations are listed in `db/migration/migrations.dart`, which the CLI writes. |
-| `lib/app/http/` | Everything about HTTP: controllers, middleware, serializers. |
+| `lib/app/http/` | Everything about HTTP: controllers and middleware. |
+| `lib/app/serializers/` | Serializers. They are not only for HTTP: MCP and websocket use them too. |
 | `lib/app/dtos/` | One folder per DTO: typed and checked input. |
 | `lib/app/jobs/` | Queue jobs. |
 | `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
@@ -4518,7 +4519,7 @@ It works with any Dart type: a model, a plain class, or a map.
 dox make:serializer Blog
 ```
 
-This makes `lib/app/http/serializers/blog.serializer.dart`.
+This makes `lib/app/serializers/blog.serializer.dart`.
 The file is for a model with the same name. Change the type to use it for something else.
 
 ## How it works
@@ -4526,10 +4527,10 @@ The file is for a model with the same name. Change the type to use it for someth
 Extend `Serializer<T>` and write `convert`.
 `convert` gets one value of type `T` and gives back one JSON object.
 
-```dart title="lib/app/http/serializers/blog.serializer.dart"
+```dart title="lib/app/serializers/blog.serializer.dart"
 import 'package:dox_core/dox_core.dart';
 
-import '../../../app/models/blog/blog.model.dart';
+import 'package:my_app/app/models/blog/blog.model.dart';
 
 class BlogSerializer extends Serializer<Blog> {
   BlogSerializer(super.data);
@@ -4589,7 +4590,7 @@ What you give, and what the client gets:
 
 `convert` is plain Dart. You can format dates, join fields and add new keys.
 
-```dart title="lib/app/http/serializers/user.serializer.dart"
+```dart title="lib/app/serializers/user.serializer.dart"
 class UserSerializer extends Serializer<User> {
   UserSerializer(super.data);
 
@@ -4610,7 +4611,7 @@ class UserSerializer extends Serializer<User> {
 Use one serializer for a relation inside another.
 Load the relation first, for example with [`preload`](../database/model/relationship/belongs-to.md#load-it).
 
-```dart title="lib/app/http/serializers/comment.serializer.dart"
+```dart title="lib/app/serializers/comment.serializer.dart"
 class CommentSerializer extends Serializer<Comment> {
   CommentSerializer(super.data);
 
@@ -4656,7 +4657,7 @@ See [Pagination](../guides/pagination.md) for the full example.
 
 ### A plain Dart class
 
-```dart title="lib/app/http/serializers/weather.serializer.dart"
+```dart title="lib/app/serializers/weather.serializer.dart"
 import 'package:dox_core/dox_core.dart';
 
 class Weather {
@@ -4691,7 +4692,7 @@ WeatherSerializer today(DoxRequest req) {
 `QueryBuilder.table(...)` gives rows as maps, not models.
 Use `Serializer<Map<String, dynamic>>` to pick and rename the keys.
 
-```dart title="lib/app/http/serializers/sales_report.serializer.dart"
+```dart title="lib/app/serializers/sales_report.serializer.dart"
 class SalesReportSerializer extends Serializer<Map<String, dynamic>> {
   SalesReportSerializer(super.data);
 
@@ -5911,6 +5912,8 @@ The Dart type decides. You do not write `required` or `nullable`.
 - Rules on an optional field run only when it has a value.
 - A default value is used only when the key is missing. The rules do not check it.
 - **An empty string counts as missing.** So a required `String` rejects `""`. Add `@AllowEmpty()` to keep `""`.
+- To read `""` as `null` instead (like Laravel's `ConvertEmptyStringsToNull`), use `@Dto(emptyStringsToNull: true)`. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`.
+- On a query field, `@OrDefault()` turns a bad value into the default, with no error: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` in the constructor reads `page=abc` and `page=0` as `1`. The field needs a default in the constructor or a nullable type.
 
 ### Missing or `null`? (for PATCH)
 
@@ -6091,6 +6094,8 @@ When a check fails, Dox answers `422` with one message per field:
 ```
 
 The key is the path to the value, with the input keys. List items use the index.
+
+For another error shape, read `error.issues` of the `ValidationException` in your `ExceptionHandler`. Each issue has its `dottedPath`, its rule `code` (like `min_length`), its `message` and its `params`.
 
 ## Messages
 
@@ -6291,6 +6296,7 @@ For `String` fields. Like the Laravel rules with the same names.
 | `@Digits(6)` | `digits` | `The {field} must be {digits} digits` | `pattern` |
 | `@DigitsBetween(4, 6)` | `digits_between` | `The {field} must be between {min} and {max} digits` | `pattern` |
 | `@DateFormatted('Y-m-d')` | `date_format` | `The {field} must match the format {format}` | |
+| `@HexColor()` | `hex_color` | `The {field} must be a hex color like #1a2b3c` | `pattern` |
 | `@Password(min: 8, ...)` | `password` | `The {field} must have {rules}` | `minLength` |
 
 - `@Digits` and `@DigitsBetween` take only `0-9`. No sign, no dot. Use a `String` field, so leading zeros stay.
@@ -6458,6 +6464,8 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(source: Source.query)` | where to read: `Source.auto` (default), `Source.query`, `Source.body`. |
 | `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
 | `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
+| `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
+| `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. |
 | `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.
@@ -9359,7 +9367,7 @@ dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
 dox make:controller Blog -r     # resource controller
 dox make:middleware Auth        # lib/app/http/middleware/auth.middleware.dart
 dox make:dto CreateBlog         # lib/app/dtos/create_blog/create_blog.dto.dart
-dox make:serializer Blog        # lib/app/http/serializers/blog.serializer.dart
+dox make:serializer Blog        # lib/app/serializers/blog.serializer.dart
 dox make:model Blog -m          # lib/app/models/blog/blog.model.dart and a create_blogs_table migration
 dox make:migration create_blogs_table          # .dart file (default)
 dox make:migration create_blogs_table --sql    # .sql file
@@ -17617,6 +17625,19 @@ To check an API key or a token, use `Hash.equals(given, expected)`, not `==`.
 bool ok = Hash.equals(req.header('X-Api-Key') ?? '', Env.get<String>('API_KEY'));
 ```
 
+## Store tokens
+
+For a long random secret that you keep in the database (an API key, an access token), store only `Hash.sha256(token)`.
+Find the row by the hash of what the client sends.
+SHA-256 is fast and gives the same hash for the same input, so a unique index works on it.
+
+```dart
+String stored = Hash.sha256(token);          // save this, never the token
+Token? row = await Token().where('hash', Hash.sha256(given)).getFirst();
+```
+
+Never use `Hash.sha256` for passwords. A password is short and can be guessed, so use `Hash.make` (bcrypt).
+
 ## With login
 
 You do not need `Hash.verify` for normal login.
@@ -19868,13 +19889,18 @@ McpTool.of(
 | `POST` a request with a valid `Mcp-Session-Id` | `200` with the JSON-RPC response (a list for a batch) |
 | `POST` only notifications or responses | `202`, no body |
 | `POST` with no session id | `400` |
-| `POST` with an unknown or ended session id, or one of another `scope` | `404`, so the client starts a new session |
+| `POST` with an unknown session id, or one of another `scope` | `404`, so the client starts a new session |
+| `POST` with an ended session id | `404`, only when `SignedMcpSessions` has an `ended` store. Without it, the id still works |
+| `POST` with a body that is not valid JSON | `400` with the JSON-RPC error `-32700` |
+| `POST` with an empty batch, or a message that is not JSON-RPC 2.0 | `400` with the JSON-RPC error `-32600` |
+| `POST` with `initialize` in a batch with other messages | `400` with the JSON-RPC error `-32600`. Send `initialize` alone |
 | `POST` with an unsupported `MCP-Protocol-Version` header | `400` |
 | `POST` with another `Content-Type` than JSON | `415` |
+| Any request with an `Origin` header that is not in `allowedOrigins` | `403` |
 | `GET` | `405`: there is no server-to-client stream |
 | `DELETE` with a valid session id | `200`. The session ends only if `SignedMcpSessions` has an `ended` store (see [Sessions](#sessions)) |
 | `DELETE` with no session id | `400` |
-| `DELETE` with an unknown session id, or one of another `scope` | `404` |
+| `DELETE` with an unknown session id, or one of another `scope` | `404`. An ended id also gets `404` when there is an `ended` store |
 
 Methods: `initialize`, `ping`, `tools/list`, `tools/call`. Others get `-32601 Method not found`.
 
@@ -19894,9 +19920,60 @@ Protocol versions: `2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05`. A 
 
 For another kind of session, implement `McpSessions`.
 
+## OAuth sign-in
+
+`McpOAuth` lets a client sign in by itself. You give the client only the address, like `https://my.app/mcp`. The client finds the rest. This is the sign-in the MCP spec asks for: OAuth 2.1 with PKCE.
+
+`dox_mcp` does the OAuth part. Your app does three things:
+
+1. **Tokens.** Implement `McpOAuthTokens`. `issue` makes a token for a grant. `verify` gives what a token stands for (like a user), or `null`. You choose the table and how a token is revoked. Keep only a hash of the token.
+2. **The consent page.** Serve it at `<issuer>/oauth/authorize`, or set `authorizePage`. It reads `client_id`, `redirect_uri`, `state`, `code_challenge`, `code_challenge_method` and `resource` from the query. The person signs in there the way your app always does.
+3. **The answer.** Your page calls a route of your own, behind your own login. On yes, the route calls `oauth.approve(subject: ...)` and gives the page the address to send the browser to. On no, it calls `oauth.deny(...)`. `oauth.checkClient(...)` gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere.
+
+```dart
+final McpOAuth oauth = McpOAuth(
+  issuer: 'https://my.app',
+  tokens: MyTokens(),
+  codes: Cache().store('file'), // all isolates must share it
+);
+
+class McpRouter extends Router {
+  @override
+  void register() {
+    oauth.routes(); // discovery, register and token
+    Route.match(<String>['GET', 'POST', 'DELETE'], '/mcp', handleMcp);
+  }
+}
+
+Future<DoxResponse> handleMcp(DoxRequest req) async {
+  Object? user = await oauth.authenticate(req); // reads Authorization: Bearer
+  if (user == null) return oauth.unauthorized(); // 401 with WWW-Authenticate
+  return mcp.handle(req, auth: user, scope: '$user');
+}
+```
+
+On the consent page, show the redirect host, so the person sees where the browser goes. Escape the client name before you print it. The client chose the name, so do not trust it.
+
+`oauth.routes()` adds these routes:
+
+| Route | What it does |
+| --- | --- |
+| `GET /.well-known/oauth-protected-resource` (also with `/mcp` after it) | Names the MCP address and the issuer. |
+| `GET /.well-known/oauth-authorization-server` | Lists the endpoints. PKCE `S256` only, `authorization_code` only, no client secret. |
+| `POST /oauth/register` | Dynamic client registration. Nothing is stored. The `client_id` is the name and the redirect addresses, signed with `APP_KEY`. |
+| `POST /oauth/token` | Swaps a code for a token. The body is a form or JSON. The code works once, for `codeTtl` (1 minute). The client, the redirect address and the PKCE verifier must all match. |
+
+Rules:
+
+- A redirect address must be `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`. It has no `#fragment`.
+- The codes live in `codes`, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates can not both swap it.
+- These routes answer any origin (CORS `*`) and read no cookie. They skip the CORS list of the app.
+- `issue` may throw `McpOAuthException`, like `access_denied` when a person has too many clients. The client gets it from the token endpoint.
+- There is no refresh token. To revoke a client, delete its token.
+
 ## Security
 
-- Check who calls before `handle`: the MCP route has no auth of its own.
+- Check who calls before `handle`: the MCP route has no auth of its own. `McpOAuth` is one way to do it.
 - `allowedOrigins` stops browser pages on other sites (DNS rebinding). Set it when the server runs on a local or private network.
 - Keep tokens out of logs. A token in the URL ends up in proxy logs, so prefer a header when your clients can send one.
 
@@ -20285,7 +20362,7 @@ curl 'http://localhost:3000/api/users?page=0&per_page=500'
 ## Change the shape of a row
 
 Return a serializer for each row, when the model has fields you do not want to send.
-`dox make:serializer User` makes `lib/app/http/serializers/user.serializer.dart`.
+`dox make:serializer User` makes `lib/app/serializers/user.serializer.dart`.
 `page.data` gives the typed rows (`List<User>`):
 
 ```dart
@@ -23405,7 +23482,7 @@ Each section links to its full page.
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
 | `lib/app/dtos/<name>/` | `<name>.dto.dart` |
 | `lib/app/http/middleware/` | `<name>.middleware.dart` |
-| `lib/app/http/serializers/` | `<name>.serializer.dart` |
+| `lib/app/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/app/jobs/` | `<name>.job.dart` |
 | `lib/providers/` | `DoxProvider` classes: ORM, storage, queue, schedule. You add others, like auth. |
@@ -24671,7 +24748,7 @@ Template: `_getSample` in `lib/src/tools/create_dto.dart`.
 dox make:serializer <name>
 ```
 
-Writes `lib/app/http/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model from `lib/app/models/<name>/<name>.model.dart`.
+Writes `lib/app/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model with `package:<app>/app/models/<name>/<name>.model.dart`.
 A trailing `Serializer` in the name is removed.
 
 Template: `_getSample` in `lib/src/tools/create_serializer.dart`.
@@ -25917,6 +25994,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_annotation
 
+### 3.1.1
+
+- Version bump only, to match the other packages.
+
 ### 3.1.0
 
 - New: `id()` on `IAuth`, so `req.auth?.id()` works. It gives the primary key of the logged-in user from the `id()` of the auth class (like `Auth().id()` of `dox_auth`), or null. It is an extension (`IAuthHelpers`), so a class that implements `IAuth` does not need to change. For a guest, `req.auth` is null.
@@ -26017,6 +26098,11 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_builder
+
+### 3.1.1
+
+- DTOs: `@Dto(emptyStringsToNull: true)` makes the generated code read `""` as `null` (needs the next dox_validation).
+- DTOs: `@OrDefault()` makes a bad value of that field give its default (or `null`) instead of an error. A field with `@OrDefault()` and no default that is not nullable stops the build.
 
 ### 3.1.0
 
@@ -26168,6 +26254,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.1.1
+
+- New: `flexible` takes a null `stale`. Then the value is kept until a refresh replaces it, so callers still get the last good value when `compute` fails.
+
 ### 3.1.0
 
 - New: the file driver can delete expired and broken files by itself. Set the `prune_every` option (or `FileDriver(pruneEvery: ...)`) to run `prune()` in the background once every that many writes. It is off by default (`0`). Only one prune runs at a time, and a failed prune is ignored.
@@ -26289,8 +26379,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_core
 
-### Unreleased
+### 3.1.1
 
+- `Cache().flexible` takes a null `stale`: keep the last good value until a refresh replaces it.
+- New: `Hash.sha256(value)` gives the SHA-256 hex of a value, to store API keys and access tokens as a hash (not for passwords).
+- New: `ValidationException.issues` keeps every issue of a failed DTO or schema check (path, rule code, message, params). An `ExceptionHandler` can use it for another 422 shape, like `[{field, message, rule}]`.
 - New: `RequestBody` and `BodyKind` are exported, so `req.requestBody.kind` can tell invalid JSON (`BodyKind.invalidJson`) from no body, without importing a file of `lib/http`.
 
 ### 3.1.0
