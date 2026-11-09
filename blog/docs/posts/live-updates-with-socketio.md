@@ -26,6 +26,20 @@ When one member adds a task, the other members should see it at once, with no re
 The official `socket.io-client` connects to it with no changes.
 It runs on the same port as your HTTP routes, at `/socket.io/`.
 
+## The steps in short
+
+It is four small files on the server and one on the client:
+
+1. `dart pub add dox_socketio`
+2. `lib/providers/socket_io_provider.dart`: starts Socket.IO. Three lines.
+3. `lib/config/socketio.dart`: websocket only, your own sites only.
+4. `lib/app/socket/live.namespace.dart`: signs in the user and joins their room.
+5. `lib/app/services/live.service.dart`: sends a `changed` event after a write.
+6. `src/lib/live.ts`: the client connects and loads the data again on each event.
+
+Many isolates work with no extra setup and no Redis.
+The rest of this post goes through each step.
+
 ## The plan
 
 - Each user signs in to the socket with the same token the app already uses for the API.
