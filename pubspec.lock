@@ -221,10 +221,10 @@ packages:
     dependency: transitive
     description:
       name: dox_http_native
-      sha256: d11d9d967a3f1cba999a2bc8f94327f794eeebd5b187ea51c0b02f791a1a33b1
+      sha256: "3b824e361391d45eb59bd2ae588bc5232c65a76bb932431a1a7c355d2c84d88c"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.3"
+    version: "3.0.4"
   dox_openapi:
     dependency: transitive
     description:
