@@ -268,7 +268,7 @@ Template: `_getSample` in `lib/src/tools/create_dto.dart`.
 dox make:serializer <name>
 ```
 
-Writes `lib/app/http/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model from `lib/app/models/<name>/<name>.model.dart`.
+Writes `lib/app/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model with `package:<app>/app/models/<name>/<name>.model.dart`.
 A trailing `Serializer` in the name is removed.
 
 Template: `_getSample` in `lib/src/tools/create_serializer.dart`.

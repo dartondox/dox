@@ -19,7 +19,7 @@ It works with any Dart type: a model, a plain class, or a map.
 dox make:serializer Blog
 ```
 
-This makes `lib/app/http/serializers/blog.serializer.dart`.
+This makes `lib/app/serializers/blog.serializer.dart`.
 The file is for a model with the same name. Change the type to use it for something else.
 
 ## How it works
@@ -27,10 +27,10 @@ The file is for a model with the same name. Change the type to use it for someth
 Extend `Serializer<T>` and write `convert`.
 `convert` gets one value of type `T` and gives back one JSON object.
 
-```dart title="lib/app/http/serializers/blog.serializer.dart"
+```dart title="lib/app/serializers/blog.serializer.dart"
 import 'package:dox_core/dox_core.dart';
 
-import '../../../app/models/blog/blog.model.dart';
+import 'package:my_app/app/models/blog/blog.model.dart';
 
 class BlogSerializer extends Serializer<Blog> {
   BlogSerializer(super.data);
@@ -90,7 +90,7 @@ What you give, and what the client gets:
 
 `convert` is plain Dart. You can format dates, join fields and add new keys.
 
-```dart title="lib/app/http/serializers/user.serializer.dart"
+```dart title="lib/app/serializers/user.serializer.dart"
 class UserSerializer extends Serializer<User> {
   UserSerializer(super.data);
 
@@ -111,7 +111,7 @@ class UserSerializer extends Serializer<User> {
 Use one serializer for a relation inside another.
 Load the relation first, for example with [`preload`](../database/model/relationship/belongs-to.md#load-it).
 
-```dart title="lib/app/http/serializers/comment.serializer.dart"
+```dart title="lib/app/serializers/comment.serializer.dart"
 class CommentSerializer extends Serializer<Comment> {
   CommentSerializer(super.data);
 
@@ -157,7 +157,7 @@ See [Pagination](../guides/pagination.md) for the full example.
 
 ### A plain Dart class
 
-```dart title="lib/app/http/serializers/weather.serializer.dart"
+```dart title="lib/app/serializers/weather.serializer.dart"
 import 'package:dox_core/dox_core.dart';
 
 class Weather {
@@ -192,7 +192,7 @@ WeatherSerializer today(DoxRequest req) {
 `QueryBuilder.table(...)` gives rows as maps, not models.
 Use `Serializer<Map<String, dynamic>>` to pick and rename the keys.
 
-```dart title="lib/app/http/serializers/sales_report.serializer.dart"
+```dart title="lib/app/serializers/sales_report.serializer.dart"
 class SalesReportSerializer extends Serializer<Map<String, dynamic>> {
   SalesReportSerializer(super.data);
 

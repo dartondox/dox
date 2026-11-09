@@ -23,7 +23,7 @@ Each section links to its full page.
 | `lib/app/http/controllers/` | `<name>.controller.dart` |
 | `lib/app/dtos/<name>/` | `<name>.dto.dart` |
 | `lib/app/http/middleware/` | `<name>.middleware.dart` |
-| `lib/app/http/serializers/` | `<name>.serializer.dart` |
+| `lib/app/serializers/` | `<name>.serializer.dart` |
 | `lib/app/models/<name>/` | `<name>.model.dart` |
 | `lib/app/jobs/` | `<name>.job.dart` |
 | `lib/providers/` | `DoxProvider` classes: ORM, storage, queue, schedule. You add others, like auth. |
