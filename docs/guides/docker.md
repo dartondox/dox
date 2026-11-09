@@ -197,6 +197,10 @@ DB_PASSWORD=<a real password>
 
 `.env` is in `.dockerignore` and `.gitignore`. It never goes into the image or into git.
 
+The app now uses Postgres, so the build needs the Postgres driver.
+A new app skips it in `pubspec.yaml`. Remove the `dox_postgres_native` skip lines.
+See [Skip unused drivers](../database/index.md#skip-unused-drivers).
+
 ## 6. Build and run
 
 ```bash
