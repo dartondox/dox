@@ -1,4 +1,4 @@
-## Unreleased
+## 3.1.1
 
 - New: `flexible` takes a null `stale`. Then the value is kept until a refresh replaces it, so callers still get the last good value when `compute` fails.
 

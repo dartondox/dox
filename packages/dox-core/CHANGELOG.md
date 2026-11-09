@@ -1,4 +1,4 @@
-## Unreleased
+## 3.1.1
 
 - `Cache().flexible` takes a null `stale`: keep the last good value until a refresh replaces it.
 - New: `Hash.sha256(value)` gives the SHA-256 hex of a value, to store API keys and access tokens as a hash (not for passwords).
