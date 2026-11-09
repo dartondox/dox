@@ -1,3 +1,8 @@
+## Unreleased
+
+- New: `ServerTiming` middleware. It adds a `Server-Timing` header with the `handler` and `total` time of the request. It is off unless you add it, because it shows timing to clients. Use it in development or for trusted clients.
+- New: `ServerTiming.add(name, duration)` and `ServerTiming.measure(name, fn)` add your own timing to the current request, with no request passed. The same name is summed and counted. Without the middleware they do nothing.
+
 ## 3.1.3
 
 - New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(channel, message)` sends, `on(channel)` gets the messages of one channel, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.

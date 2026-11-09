@@ -124,7 +124,15 @@ Future<DoxResponse> _chain(DoxRequest req, int start) async {
         return asResponse(result);
       }
       if (fn is Function || fn is ControllerAction) {
-        if (i == last) return asResponse(await route.handler!.call(req));
+        if (i == last) {
+          /// only times the controller when `ServerTiming` is on
+          return asResponse(
+            await ServerTiming.measure(
+              'handler',
+              () => route.handler!.call(req),
+            ),
+          );
+        }
         result = fn(req);
       } else if (fn is IDoxMiddleware) {
         result = fn.handle(req);

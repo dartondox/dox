@@ -154,6 +154,7 @@ class ApiKeyMiddleware implements IDoxMiddleware {
 | `const RequestId()` | `X-Request-Id` header, `req.requestId` |
 | `const ETag()` | `ETag` header, `304` when `If-None-Match` matches |
 | `RequestTimeout(Duration(seconds: 30))` or `Route.get(...).timeout(...)` | `503` when the route is too slow |
+| `const ServerTiming()` | `Server-Timing` header; `ServerTiming.add('db', d)` adds a time. Development or trusted clients only |
 | `const ValidateSignature()` | `403` unless the url is from `Route.signedUrl(...)` |
 | `implements IDoxTerminableMiddleware` | `terminate(req, res)` runs after the answer is sent |
 

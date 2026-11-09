@@ -75,6 +75,7 @@ export 'middleware/rate_limit.dart';
 export 'middleware/request_id.dart';
 export 'middleware/request_timeout.dart';
 export 'middleware/security_headers.dart';
+export 'middleware/server_timing.dart';
 export 'middleware/validate_signature.dart';
 
 /// Router
