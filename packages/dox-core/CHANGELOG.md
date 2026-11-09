@@ -1,3 +1,7 @@
+## 3.1.2
+
+- Uses dox_validation 3.1.2, so `@Describe('...')` can be used on DTO fields.
+
 ## 3.1.1
 
 - `Cache().flexible` takes a null `stale`: keep the last good value until a refresh replaces it.

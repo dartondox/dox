@@ -1,3 +1,7 @@
+## 3.1.2
+
+- Version bump only, to match the other packages.
+
 ## 3.1.1
 
 - Version bump only, to match the other packages.
