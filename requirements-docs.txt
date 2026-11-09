@@ -5,3 +5,4 @@ mkdocs==1.6.1
 mkdocs-material==9.7.7
 mike==2.2.0
 mkdocs-redirects==1.2.3
+mkdocs-rss-plugin==1.19.0 # the blog feed (blog/mkdocs.yml)

@@ -1,13 +1,15 @@
 name: Docs check
 
-# Every pull request that touches the docs: the strict build must pass
-# (broken links and anchors fail it) and the text has no known typos.
-# Deploys happen in docs.yaml, on push to main.
+# Every pull request that touches the docs or the blog: the strict builds
+# must pass (broken links and anchors fail them) and the text has no known
+# typos. Deploys happen in docs.yaml (on a tag) and blog.yaml (on main).
 
 on:
   pull_request:
     paths:
       - 'docs/**'
+      - 'blog/**'
+      - 'ci/check-no-tabs.sh'
       - 'hooks/**'
       - 'overrides/**'
       - 'packages/*/CHANGELOG.md'
@@ -30,7 +32,9 @@ jobs:
         run: pip install -r requirements-docs.txt codespell==2.4.3
       - name: Strict build
         run: mkdocs build --strict
+      - name: Strict build of the blog
+        run: mkdocs build --strict -f blog/mkdocs.yml
       - name: Spelling
-        run: codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore
+        run: codespell docs blog/docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore
       - name: No content tabs
         run: ci/check-no-tabs.sh

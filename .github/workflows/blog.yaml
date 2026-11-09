@@ -1,0 +1,60 @@
+name: Blog
+
+# The blog (blog/mkdocs.yml) lives at https://dartondox.dev/blog/.
+# It is not versioned: a push to main that changes blog/ builds it and puts
+# it in the blog/ folder of the gh-pages branch. Only that folder changes.
+# The docs versions (3.x, latest, ...), versions.json and the root files of
+# docs.yaml are never touched. ci/docs_redirects.py keeps blog/ too.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'blog/**'
+      - 'hooks/**'
+      - 'overrides/**'
+      - 'docs/assets/**'
+      - 'mkdocs.yml'
+      - 'requirements-docs.txt'
+      - '.github/workflows/blog.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# the same group as docs.yaml: two deploys must not push to gh-pages at
+# the same time
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # pushes the built blog to gh-pages
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The built-in GITHUB_TOKEN can push to gh-pages, because
+          # gh-pages is not protected. Keep persist-credentials on.
+          token: ${{ github.token }}
+
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+
+      - name: Install mkdocs, material and the rss plugin
+        run: pip install -r requirements-docs.txt
+
+      - name: Build
+        run: mkdocs build --strict -f blog/mkdocs.yml -d "$RUNNER_TEMP/blog"
+
+      - name: Git config
+        run: ci/docs-git-config.sh
+
+      - name: Put the blog on gh-pages
+        run: ci/blog-deploy.sh "$RUNNER_TEMP/blog"
