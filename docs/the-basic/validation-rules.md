@@ -248,7 +248,7 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
 | `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
 | `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
-| `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. |
+| `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. Errors from `@Unique`, `@Exists` and `validate()` are not dropped. |
 | `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.

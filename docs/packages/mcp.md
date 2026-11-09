@@ -112,7 +112,7 @@ Protocol versions: `2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05`. A 
 
 - Every isolate, and every server with the same `APP_KEY`, can check an id. Nothing is stored.
 - A new `APP_KEY` ends every session. Clients start a new one by themselves.
-- A signed id can not be ended by itself. To refuse ended ids, give a cache store: `SignedMcpSessions(ended: Cache().store('redis'))`. Use a store that all isolates share (file or Redis, not memory).
+- A signed id cannot be ended by itself. To refuse ended ids, give a cache store: `SignedMcpSessions(ended: Cache().store('redis'))`. Use a store that all isolates share (file or Redis, not memory).
 
 For another kind of session, implement `McpSessions`.
 
@@ -124,7 +124,7 @@ For another kind of session, implement `McpSessions`.
 
 1. **Tokens.** Implement `McpOAuthTokens`. `issue` makes a token for a grant. `verify` gives what a token stands for (like a user), or `null`. You choose the table and how a token is revoked. Keep only a hash of the token.
 2. **The consent page.** Serve it at `<issuer>/oauth/authorize`, or set `authorizePage`. It reads `client_id`, `redirect_uri`, `state`, `code_challenge`, `code_challenge_method` and `resource` from the query. The person signs in there the way your app always does.
-3. **The answer.** Your page calls a route of your own, behind your own login. On yes, the route calls `oauth.approve(subject: ...)` and gives the page the address to send the browser to. On no, it calls `oauth.deny(...)`. `oauth.checkClient(...)` gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere.
+3. **The answer.** Your page calls a route of your own, behind your own login. On yes, the route calls `oauth.approve(subject: ...)` and gives the page the address to send the browser to. On no, it calls `oauth.deny(...)`. `oauth.checkClient(...)` gives the client for the page and throws when the client or the redirect address is wrong. Then never send the browser anywhere. Put this route behind [CSRF protection](../security/csrf.md). Without it, another site can make a signed-in person say yes to a client without knowing it.
 
 ```dart
 final McpOAuth oauth = McpOAuth(
@@ -148,7 +148,9 @@ Future<DoxResponse> handleMcp(DoxRequest req) async {
 }
 ```
 
-On the consent page, show the redirect host, so the person sees where the browser goes. Escape the client name before you print it. The client chose the name, so do not trust it.
+On the consent page, show the redirect host, so the person sees where the browser goes. HTML-escape the client name before you print it. The client chose the name, so do not trust it.
+
+Call `oauth.routes()` in a router with no prefix. The routes must sit at the root of the host. Clients look for `/.well-known/...` at the root, as the OAuth specs say. The discovery file also gives `<issuer>/oauth/register` and `<issuer>/oauth/token` as full addresses. Under a prefix, the routes move, but these addresses do not, so clients cannot find them.
 
 `oauth.routes()` adds these routes:
 
@@ -162,7 +164,7 @@ On the consent page, show the redirect host, so the person sees where the browse
 Rules:
 
 - A redirect address must be `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`. It has no `#fragment`.
-- The codes live in `codes`, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates can not both swap it.
+- The codes live in `codes`, a Dox cache. Use a store that all isolates share (file on one host, Redis on many). Each code is taken under a lock, so two isolates cannot both swap it.
 - These routes answer any origin (CORS `*`) and read no cookie. They skip the CORS list of the app.
 - `issue` may throw `McpOAuthException`, like `access_denied` when a person has too many clients. The client gets it from the token endpoint.
 - There is no refresh token. To revoke a client, delete its token.

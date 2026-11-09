@@ -108,7 +108,7 @@ The Dart type decides. You do not write `required` or `nullable`.
 - A default value is used only when the key is missing. The rules do not check it.
 - **An empty string counts as missing.** So a required `String` rejects `""`. Add `@AllowEmpty()` to keep `""`.
 - To read `""` as `null` instead (like Laravel's `ConvertEmptyStringsToNull`), use `@Dto(emptyStringsToNull: true)`. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`.
-- On a query field, `@OrDefault()` turns a bad value into the default, with no error: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` in the constructor reads `page=abc` and `page=0` as `1`. The field needs a default in the constructor or a nullable type.
+- On a query field, `@OrDefault()` turns a bad value into the default, with no error: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` in the constructor reads `page=abc` and `page=0` as `1`. The field needs a default in the constructor or a nullable type. `@OrDefault()` only covers type errors and the normal rules of the field. Errors from `@Unique`, `@Exists` and `validate()` are not dropped: they still fail the request.
 
 ### Missing or `null`? (for PATCH)
 
