@@ -8,3 +8,4 @@ Disallow: /2.x/
 # https://dartondox.dev/llms-full.txt
 
 Sitemap: https://dartondox.dev/sitemap.xml
+Sitemap: https://dartondox.dev/blog/sitemap.xml
