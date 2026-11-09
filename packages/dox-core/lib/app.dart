@@ -183,6 +183,9 @@ class Dox {
       DoxIsolate().stopAll(config.shutdownTimeout),
       stopIsolate(),
     ]);
+    // close the bus again: `killAll` closes it while the providers of the
+    // main isolate still shut down, and one of them may join it again.
+    IsolateBus.instance.close();
   }
 
   /// [stop] for this isolate only. Internal: each isolate runs it.

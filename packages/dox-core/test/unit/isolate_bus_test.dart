@@ -90,6 +90,15 @@ void main() {
       ]),
     );
 
+    // a value that can not be sent throws, and no isolate gets it
+    ReceivePort notSendable = ReceivePort();
+    expect(() => main.publish('a', notSendable), throwsArgumentError);
+    notSendable.close();
+    main.publish('a', 'after error');
+    await _until(() => got[0].length == 2 && got[1].length == 3);
+    expect(got[0].last, 'after error');
+    expect(got[1].last, 'after error');
+
     // an isolate that leaves is not counted and gets nothing
     commands[0].send('stop');
     await _until(() => main.size == 2);
@@ -97,8 +106,8 @@ void main() {
     await _until(() => main.size == 1);
     main.publish('a', 'late');
     await Future<void>.delayed(Duration(milliseconds: 20));
-    expect(got[0], <Object?>['from main']);
-    expect(got[1].length, 2);
+    expect(got[0], <Object?>['from main', 'after error']);
+    expect(got[1].length, 3);
     commands[1].send('stop');
     for (ReceivePort out in outs) {
       out.close();

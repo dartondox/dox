@@ -3,6 +3,11 @@
 - New: `ServerTiming` middleware. It adds a `Server-Timing` header with the `handler` and `total` time of the request. It is off unless you add it, because it shows timing to clients. Use it in development or for trusted clients.
 - New: `ServerTiming.add(name, duration)` and `ServerTiming.measure(name, fn)` add your own timing to the current request, with no request passed. The same name is summed and counted. Without the middleware they do nothing.
 
+- New: `AfterResponse.run(work)` runs work after the answer of the current request is sent. Any code can call it, with no request passed. It is off until `AfterResponse.enable()` (for example in the `setup()` of a provider). Errors in the work are reported and never stop the server.
+- Fix: `Dox().stop()` closes the `IsolateBus` again after the providers shut down. Before, a provider that used the bus during its shutdown joined it again, and the open port could keep the process alive.
+- Docs: `IsolateBus.publish` throws for a value that can not be sent, before any isolate gets it.
+- Test: the `IsolateBus` through the real isolates: a crashed isolate is dropped, and the new one joins again.
+
 ## 3.1.3
 
 - New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(channel, message)` sends, `on(channel)` gets the messages of one channel, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.
@@ -77,7 +82,7 @@
 - New: `MigrationFile` in `package:dox_core/command.dart`. A command writes a migration into `db/migration` with it, with the same file name as `dox make:migration`. It does not write a second migration with the same name.
 - Fix: `Route.mount` matches whole path parts only. A mount at `/admin` now gets `/admin`, `/admin/` and `/admin/...`, but no longer `/administrator` or `/admin-login`. Only requests that went to the wrong handler change. A prefix that ends in `/` (like Socket.IO's `/socket.io/`) works as before.
 - Fix: `//` counts as one `/` when a path is matched to a mount prefix. So `/admin//secure/x` goes to a mount at `/admin/secure`. The handler still gets the path as it came.
-- Change: when two mount prefixes match, the longest one wins. Before, the first one added won. Apps with one mount, or with mounts that do not overlap, do not change.
+- Behavior change: when two mount prefixes match, the longest one wins. Before, the first one added won. Apps with one mount, or with mounts that do not overlap, do not change.
 - New: `Route.mount(prefix, handler, middleware: true)` runs `AppConfig.globalMiddleware` (security headers, CSRF, rate limit) before the raw handler. A middleware that gives a response stops the request. `RequestTimeout` does not run for a mount. When two mount prefixes match, the longest one wins. `terminate` steps run once the answer is sent. The global CORS config does not apply to a mount. The default is still no middleware, so Socket.IO does not change.
 - `RequestFile.head` now keeps the first 128 KB of a big upload (on disk), and all bytes of a small upload (in memory, no copy). Before, it kept 32 bytes. A JPEG keeps its image size after the photo metadata, so `@Dimensions` and `v.file().dimensions()` need these bytes.
 - New: `Route.staticFiles(prefix, folder, maxAge:)` serves a folder (CSS, JS, images) for GET and HEAD requests that match no route. Routes always win. `..`, dot files and folders get 404. Files get `Last-Modified`, `304`, Range support, the global CORS headers and an optional `Cache-Control`. The prefix follows `Route.group`, the router prefix and `Route.domain`.

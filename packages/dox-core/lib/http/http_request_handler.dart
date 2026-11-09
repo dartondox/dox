@@ -14,6 +14,14 @@ import 'package:dox_core/router/route_data.dart';
 /// pass http request to route middleware and controllers
 /// and response from controllers is passed to `httpResponseHandler`
 void httpRequestHandler(HttpRequest req) {
+  if (AfterResponse.enabled) {
+    AfterResponse.wrap(req.response, () => _handle(req));
+  } else {
+    _handle(req);
+  }
+}
+
+void _handle(HttpRequest req) {
   try {
     /// raw handlers like Socket.IO. empty map when nothing is mounted.
     Map<String, RawRequestHandler> mounts = Route().mounts;
