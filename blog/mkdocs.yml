@@ -1,0 +1,52 @@
+# The Dox blog, served at https://dartondox.dev/blog/.
+# It takes the theme, CSS, overrides and hooks of the docs (../mkdocs.yml)
+# and changes only what must differ. .github/workflows/blog.yaml deploys it.
+# Local: mkdocs serve -f blog/mkdocs.yml
+#
+# Paths in a config file are read from the folder of the file that is run
+# (blog/), not the parent. So hooks and custom_dir are set again here.
+# docs/assets is a link to ../../docs/assets, so the CSS, JS, logo and
+# favicon are the same files as in the docs.
+INHERIT: ../mkdocs.yml
+site_name: "DOX"
+site_description: "News and releases of Dox, the web backend framework for Dart."
+site_url: https://dartondox.dev/blog/
+docs_dir: docs
+edit_uri: edit/main/blog/docs/
+hooks:
+  - ../hooks/docs_hooks.py
+theme:
+  custom_dir: ../overrides
+extra:
+  # the docs version selector (mike) is not used on the blog
+  version: null
+  # the SEO block in overrides/main.html reads this
+  blog: true
+# The list replaces the one of the docs, so mike and redirects are off.
+plugins:
+  - search
+  - blog:
+      blog_dir: .
+      blog_toc: true
+      post_url_format: "{slug}"
+      post_date_format: long
+      post_readtime: true
+      archive_name: Archive
+      categories_name: Categories
+  - tags
+  - rss:
+      match_path: "posts/.*"
+      date_from_meta:
+        as_creation: date.created
+        as_update: date.updated
+      categories:
+        - categories
+        - tags
+      use_git: false
+      comments_path: null
+      image: https://dartondox.dev/blog/assets/social-card.png
+nav:
+  - Docs: /latest/
+  - Blog:
+    - index.md
+    - tags.md

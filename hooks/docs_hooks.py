@@ -4,6 +4,10 @@
   (3.x sections only). So the page is never out of date.
 - `llms.txt` and `llms-full.txt` are written next to the site: the docs as
   plain Markdown, for AI tools. See https://llmstxt.org.
+- Every page gets a meta description from its first paragraph.
+
+The blog (blog/mkdocs.yml) uses this file too. It gets only the meta
+description, not the changelog page or the llms files.
 """
 
 import re
@@ -13,6 +17,11 @@ from mkdocs.structure.files import File
 
 ROOT = Path(__file__).resolve().parent.parent
 PACKAGES = ROOT / "packages"
+
+
+def _is_docs(config) -> bool:
+    """False for the blog build, which has its own docs_dir."""
+    return Path(config["docs_dir"]).resolve() == ROOT / "docs"
 
 # ---- changelog ---------------------------------------------------------
 
@@ -66,6 +75,8 @@ def _changelog() -> str:
 
 
 def on_files(files, config):
+    if not _is_docs(config):
+        return files
     files.append(File.generated(config, "reference/changelog.md", content=_changelog()))
     return files
 
@@ -127,6 +138,8 @@ def on_page_markdown(markdown, page, config, files):
 
 
 def on_post_build(config):
+    if not _is_docs(config):
+        return
     site = Path(config["site_dir"])
     # mike sets site_url to https://dartondox.dev/latest (no last slash)
     base = config["site_url"].rstrip("/") + "/"

@@ -10,7 +10,8 @@
 import json, os, re, shutil
 
 versions = json.load(open('versions.json'))
-names = {'.git', '.nojekyll', 'CNAME', 'versions.json', 'robots.txt'}
+# blog/ is deployed by .github/workflows/blog.yaml. It is kept as it is.
+names = {'.git', '.nojekyll', 'CNAME', 'versions.json', 'robots.txt', 'blog'}
 for v in versions:
     names.add(v['version'])
     names.update(v['aliases'])
@@ -97,5 +98,6 @@ with open('robots.txt', 'w') as f:
             '# https://dartondox.dev/llms.txt\n'
             '# https://dartondox.dev/llms-full.txt\n'
             '\n'
-            'Sitemap: https://dartondox.dev/sitemap.xml\n')
+            'Sitemap: https://dartondox.dev/sitemap.xml\n'
+            'Sitemap: https://dartondox.dev/blog/sitemap.xml\n')
 print('redirect pages:', len(pages))

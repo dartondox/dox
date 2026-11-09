@@ -4,14 +4,19 @@
   - Open Graph and Twitter cards, so shared links show a preview.
   - JSON-LD: the framework on the home page, a breadcrumb on every page.
   The meta description comes from the page summary (hooks/docs_hooks.py).
+  The blog (blog/mkdocs.yml, extra.blog) uses this file too: its pages say
+  "Dox blog" in the title, and its index.md is not the docs home page.
 -#}
 {% extends "base.html" %}
 
 {% block htmltitle %}
+  {% set is_home = page and page.file.src_uri == "index.md" and not config.extra.blog %}
   {% if not page %}
     <title>Page not found | Dox</title>
-  {% elif (page.file.src_uri == "index.md") %}
+  {% elif is_home %}
     <title>Dox: fast web backend framework for Dart, like Laravel</title>
+  {% elif config.extra.blog %}
+    <title>{{ page.meta.title or page.title | striptags }} | Dox blog</title>
   {% else %}
     <title>{{ page.meta.title or page.title | striptags }} | Dox, the Dart backend framework</title>
   {% endif %}
@@ -19,11 +24,12 @@
 
 {% block extrahead %}
   {% if page %}
-  {% set title = "Dox: fast web backend framework for Dart" if (page.file.src_uri == "index.md") else (page.meta.title or page.title | striptags) ~ " | Dox" %}
+  {% set is_home = page.file.src_uri == "index.md" and not config.extra.blog %}
+  {% set title = "Dox: fast web backend framework for Dart" if is_home else (page.meta.title or page.title | striptags) ~ " | Dox" %}
   {% set description = (page.meta.description if page.meta and page.meta.description else config.site_description) %}
   {# mike sets site_url without the last slash (https://dartondox.dev/latest) #}
   {% set image = config.site_url.rstrip("/") ~ "/assets/social-card.png" %}
-  <meta property="og:type" content="{{ 'website' if (page.file.src_uri == "index.md") else 'article' }}">
+  <meta property="og:type" content="{{ 'website' if is_home else 'article' }}">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="{{ title }}">
   <meta property="og:description" content="{{ description }}">
@@ -37,7 +43,7 @@
   <meta name="twitter:title" content="{{ title }}">
   <meta name="twitter:description" content="{{ description }}">
   <meta name="twitter:image" content="{{ image }}">
-  {% if (page.file.src_uri == "index.md") %}
+  {% if is_home %}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
