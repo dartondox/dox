@@ -1,3 +1,7 @@
+## 3.1.1
+
+- Version bump only, to match the other packages.
+
 ## 3.1.0
 
 - New: `id()` on `IAuth`, so `req.auth?.id()` works. It gives the primary key of the logged-in user from the `id()` of the auth class (like `Auth().id()` of `dox_auth`), or null. It is an extension (`IAuthHelpers`), so a class that implements `IAuth` does not need to change. For a guest, `req.auth` is null.
