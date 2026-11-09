@@ -9127,10 +9127,7 @@ Dox().totalIsolate(2);
 await Dox().startServer();
 ```
 
-Use fewer isolates when:
-
-- the machine also runs the database or other heavy work, or
-- you use Socket.IO rooms without the Redis adapter. A room only reaches clients on the same isolate. Use `1`, or see [Socket.IO](../packages/socketio.md).
+Use fewer isolates when the machine also runs the database or other heavy work.
 
 ## Each isolate has its own memory
 
@@ -9141,6 +9138,22 @@ Isolates do not share memory:
 - To share data between isolates or servers, use a database, Redis or files.
 
 `Dox().isolateId` tells you which isolate runs the code. The first isolate is `1`.
+
+## Send a message to the other isolates
+
+`IsolateBus` sends a message from one isolate to all the others in the same process. Use it to tell them that something changed, for example "forget this cache key". Socket.IO uses it to share broadcasts (see [Socket.IO](../packages/socketio.md#many-isolates)).
+
+```dart
+IsolateBus.instance.on('users').listen(onMessage); // in a provider's setup()
+IsolateBus.instance.publish('users', <Object>['changed', 42]);
+```
+
+- A message goes to one channel. A listener on `'users'` never gets the messages of another channel.
+- An isolate never gets its own message.
+- `Dox().isolateCount` is the number of isolates that run, in every isolate.
+- `IsolateBus.instance.size` is the number of isolates that listen, this one included.
+- A message must be something a `SendPort` can send: null, bool, num, String, typed data, and lists and maps of those.
+- It works inside one process only. For many servers, use Redis.
 
 ## What each isolate does at start
 
@@ -9714,6 +9727,8 @@ docker compose up -d --build
 ```
 
 A new `.env` uses SQLite. The compose services set `DB_CONNECTION=postgres` and `DB_NAME=dox` themselves. To use the compose Postgres with `dox s`, set the same two values in `.env`. The database port listens on `127.0.0.1` only.
+
+A new app skips the Postgres driver in `pubspec.yaml`, because it uses SQLite. Remove the `dox_postgres_native` skip lines before you run the compose app. See [Skip unused drivers](../database/index.md#skip-unused-drivers).
 
 The queue worker and the scheduler run as their own processes. The compose file has a `worker` service for the queue. In the image, start them with `/app/bin/queue work` and `/app/bin/schedule work`.
 See [Docker](../guides/docker.md) for a health check in the image.
@@ -10884,6 +10899,71 @@ import 'package:dox_orm/dox_orm.dart';
     When the native library can not load, the app stops with an error.
     See the [Postgres](postgres-native.md#when-the-library-does-not-load) and
     [MySQL](mysql-native.md#when-the-library-does-not-load) pages.
+
+## Skip unused drivers
+
+`dox_orm` brings all three drivers. The build downloads a native library for each one.
+An app needs only the driver of its database.
+To skip the others, add a `hooks: user_defines:` block to `pubspec.yaml`.
+
+- Put it in the `pubspec.yaml` of your app.
+- In a pub workspace, put it in the root `pubspec.yaml` of the workspace.
+  Dart reads `user_defines` only from the root package.
+
+`skip: true` turns off the download of a driver.
+Only the bool `true` skips. Any other value does nothing.
+
+### SQLite app
+
+A new app uses SQLite. Its `pubspec.yaml` already has this block.
+
+```yaml title="pubspec.yaml"
+hooks:
+  user_defines:
+    dox_postgres_native:
+      skip: true
+    dox_mysql_native:
+      skip: true
+```
+
+### Postgres app
+
+```yaml title="pubspec.yaml"
+hooks:
+  user_defines:
+    dox_mysql_native:
+      skip: true
+    sqlite3:
+      source: system
+```
+
+### MySQL app
+
+```yaml title="pubspec.yaml"
+hooks:
+  user_defines:
+    dox_postgres_native:
+      skip: true
+    sqlite3:
+      source: system
+```
+
+`sqlite3: source: system` comes from the `sqlite3` package.
+The build does not download SQLite.
+The app loads the `libsqlite3` library of the system when it opens SQLite.
+
+!!! warning "SQLite on a system without `libsqlite3`"
+    With `source: system`, the app fails when it opens SQLite on a system
+    without `libsqlite3`. The `FROM scratch` Docker image has no `libsqlite3`.
+    When your app opens SQLite, remove the `sqlite3` lines.
+
+### Switch the database
+
+When you switch the database, remove the `skip` line of the driver you now use.
+Then run `dart pub get`.
+
+A driver that is still skipped stops the app when it opens a pool.
+The error says that the native library is not in the build, and to remove `skip`.
 
 ## Config
 
@@ -19428,7 +19508,7 @@ SocketIoConfig socketIoConfig = SocketIoConfig(
 | `enabled` | `true` | serve Socket.IO at `options.path` |
 | `options` | `ServerOptions()` | see [Options](#options) |
 | `namespaces` | `[]` | `NamespaceHandler` classes to register |
-| `adapter` | `null` (in memory) | makes one adapter in each isolate, see [Many isolates](#many-isolates-redis-adapter) |
+| `adapter` | `null` (in memory with one isolate, `IsolateAdapter` with many) | makes one adapter in each isolate, see [Many isolates](#many-isolates) |
 
 ### 4. A namespace
 
@@ -19482,7 +19562,7 @@ socket.on('welcome', (data) => console.log(data.id));
 socket.emit('message', 'hi', (answer) => console.log(answer)); // 'sent'
 ```
 
-Use `transports: ['websocket']`. See [Many isolates](#many-isolates-redis-adapter) for why.
+Use `transports: ['websocket']`. See [Many isolates](#many-isolates) for why.
 
 ### Send from a controller or a service
 
@@ -19498,45 +19578,26 @@ From a queue job or another program, use the [emitter](#emit-from-other-programs
 - With no provider, or with `enabled: false`, there is no extra work per request.
 - Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
 
-### Many isolates: Redis adapter
+### Many isolates
 
 Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
-With the default in-memory adapter, a broadcast only reaches the clients of the same isolate.
-Use the Redis adapter, so a broadcast reaches clients on every isolate (and on every server).
+A client is connected to one of them.
 
-```bash
-dart pub add ioredis
-```
+With many isolates and no `adapter`, the provider uses the `IsolateAdapter`. It sends each broadcast to the other isolates of the process (through `IsolateBus` of `dox_core`), so it reaches the clients of every isolate. `socketsJoin`, `fetchSockets`, `serverSideEmit` and broadcast acks work across isolates too. You need no Redis.
 
-```dart title="lib/config/socketio.dart"
-import 'package:dox_socketio/dox_socketio.dart';
-import 'package:ioredis/ioredis.dart';
-import 'package:my_app/app/socket/chat.namespace.dart';
-import 'package:my_app/config/env.dart';
+| Adapter | Reaches |
+|---|---|
+| `InMemoryAdapter` (one isolate) | the clients of this isolate |
+| `IsolateAdapter` (many isolates, the default) | the clients of every isolate of this process |
+| `RedisAdapter` | the clients of every isolate of every server |
 
-SocketIoConfig socketIoConfig = SocketIoConfig(
-  enabled: env.socketioEnabled,
-  namespaces: <NamespaceHandler>[ChatNamespace()],
-  adapter: const RedisSocketAdapterFactory(),
-);
-
-/// makes the Redis adapter inside each isolate.
-/// A Redis connection can not be sent to another isolate.
-class RedisSocketAdapterFactory extends SocketAdapterFactory {
-  const RedisSocketAdapterFactory();
-
-  @override
-  Adapter create() {
-    Redis redis = Redis(); // 127.0.0.1:6379. Or Redis(RedisOptions(host: ..., port: ...))
-    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
-  }
-}
-```
 
 !!! warning "Clients should connect with websocket only"
     One websocket stays on one isolate. HTTP long-polling sends many requests, and they can reach different isolates.
     Long-polling only works with `totalIsolate: 1`, or with sticky sessions in front of many single-isolate servers.
     Dox logs this hint at startup when it runs many isolates and polling is allowed.
+
+With more than one server process, or next to Node.js servers, use the [Redis adapter](#many-servers-redis-adapter).
 
 ## Without Dox
 
@@ -19743,8 +19804,43 @@ ServerOptions(allowedOrigins: <String>['https://app.example.com']);
 
 ## Many servers: Redis adapter
 
-With more than one server process, use the Redis adapter.
-Then a broadcast on one server reaches the clients of all servers.
+With more than one server process, or next to Node.js servers, use the Redis adapter.
+Then a broadcast on one server reaches the clients of all servers, and of all their isolates.
+
+Add the `ioredis` package:
+
+```bash
+dart pub add ioredis
+```
+
+In a Dox app, make the adapter in each isolate with a factory:
+
+```dart title="lib/config/socketio.dart"
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:ioredis/ioredis.dart';
+import 'package:my_app/app/socket/chat.namespace.dart';
+import 'package:my_app/config/env.dart';
+
+SocketIoConfig socketIoConfig = SocketIoConfig(
+  enabled: env.socketioEnabled,
+  namespaces: <NamespaceHandler>[ChatNamespace()],
+  adapter: const RedisSocketAdapterFactory(),
+);
+
+/// makes the Redis adapter inside each isolate.
+/// A Redis connection can not be sent to another isolate.
+class RedisSocketAdapterFactory extends SocketAdapterFactory {
+  const RedisSocketAdapterFactory();
+
+  @override
+  Adapter create() {
+    Redis redis = Redis(); // 127.0.0.1:6379. Or Redis(RedisOptions(host: ..., port: ...))
+    return RedisAdapter(subscriber: redis.duplicate(), publisher: redis);
+  }
+}
+```
+
+Without Dox, pass the adapter to the server:
 
 ```dart
 Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
@@ -19753,7 +19849,6 @@ SocketIoServer io = SocketIoServer(
 );
 ```
 
-- `Redis` comes from the `ioredis` package.
 - The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
 - It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
 - It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
@@ -19762,7 +19857,7 @@ SocketIoServer io = SocketIoServer(
 - Broadcasts with an ack get the acks of clients on all servers.
 - Servers can send events to each other with `serverSideEmit`. Clients do not get them.
 - A request waits at most `requestsTimeout` for the other servers (5 seconds by default, like Node.js).
-- Long-polling needs sticky sessions, the same as with [many isolates](#many-isolates-redis-adapter). Or use `transports: ['websocket']` on the client.
+- Long-polling needs sticky sessions, the same as with [many isolates](#many-isolates). Or use `transports: ['websocket']` on the client.
 
 ### Act on all servers
 
@@ -22855,6 +22950,10 @@ DB_PASSWORD=<a real password>
 
 `.env` is in `.dockerignore` and `.gitignore`. It never goes into the image or into git.
 
+The app now uses Postgres, so the build needs the Postgres driver.
+A new app skips it in `pubspec.yaml`. Remove the `dox_postgres_native` skip lines.
+See [Skip unused drivers](../database/index.md#skip-unused-drivers).
+
 ## 6. Build and run
 
 ```bash
@@ -24103,7 +24202,7 @@ class ChatNamespace extends NamespaceHandler {
 
 Log users in at connect time with `SocketAuth(findUser).handle` in `middleware`. The user is in `socket.user`.
 
-Turn it on with a `SocketIoProvider` (extend it in `lib/`). Many isolates need the Redis adapter and `transports: ['websocket']` on the client.
+Turn it on with a `SocketIoProvider` (extend it in `lib/`). With many isolates, clients use `transports: ['websocket']`. Broadcasts reach every isolate with no Redis; many servers need the Redis adapter.
 
 See [Socket.IO](../packages/socketio.md).
 
@@ -24329,7 +24428,7 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 | `enabled` | `bool` | `true` | Mount Socket.IO on the HTTP port at `/socket.io/`. |
 | `options` | `ServerOptions` | `ServerOptions()` | Engine options. See below. |
 | `namespaces` | `List<NamespaceHandler>` | `[]` | Namespaces to register, like `ChatNamespace()`. |
-| `adapter` | `SocketAdapterFactory?` | `null` (in memory) | Makes the adapter in each isolate. Use a Redis adapter with many isolates. |
+| `adapter` | `SocketAdapterFactory?` | `null` (in memory with one isolate, `IsolateAdapter` with many) | Makes the adapter in each isolate. Use a Redis adapter with many servers. |
 
 `ServerOptions` (`lib/src/engine/server_options.dart` in dox-socketio). The defaults match the Node.js server.
 
@@ -25528,7 +25627,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | Native server loads | The app starts and the start line says `(native)`. When the library does not load, the app stops with `dox_http_native did not load` and the fix. | [Native server](../digging-deeper/native-server.md) |
 | Native database driver loads | The app starts and the database works. When the library does not load, the app stops with `dox_postgres_native did not load` (or `mysql`) and the fix. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate` (`Platform.numberOfProcessors`), or set `APP_TOTAL_ISOLATE` to the cores the container really gets. Use fewer when the database runs on the same machine. | [Isolate](../digging-deeper/isolate.md) |
-| Shared state across isolates | Cache: `redis`, not `memory`. Socket.IO: a Redis adapter and `transports: ['websocket']`. | [Isolate](../digging-deeper/isolate.md) |
+| Shared state across isolates | Cache: `redis`, not `memory`. Socket.IO: `transports: ['websocket']` on the client, and a Redis adapter with many servers. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
 | Writable temp folder | Uploads over 1 MB go to a temp file. A `FROM scratch` image needs `/tmp` with mode `1777`. | [Docker](../guides/docker.md) |
 | Uploads live on a volume or S3 | The `local` disk writes to `storage/`. Mount it as a volume, or use the `s3` disk. | [File storage](../digging-deeper/file-storage.md) |
@@ -25830,7 +25929,7 @@ This page lists the messages Dox prints or throws, so you can search for the tex
 | `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
 | `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
-| `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use a Redis adapter, and `transports: ['websocket']` in the client. |
+| `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use `transports: ['websocket']` in the client. |
 | `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
 | `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
 | `SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
@@ -26042,6 +26141,7 @@ There is no fallback. When a library is missing, the app stops with the reason a
 | `<pkg>: sha256 of <file> does not match` | The downloaded file is not the expected one. | Delete `.dart_tool` and try again. |
 | `<pkg>: cargo build failed` | The build from source failed. | Read the cargo output below it. |
 | `Bad state: <pkg>: <path> does not exist` | The `lib_path` user define points to a missing file. | Fix the path in `pubspec.yaml`. |
+| `<pkg> did not load: the native library is not in the build (...).` | The app opens Postgres or MySQL, but `pubspec.yaml` skips that driver. | Remove its `skip` line. See [Skip unused drivers](../database/index.md#skip-unused-drivers). |
 | `Unsupported operation: dox_http_native can not detach the socket. Use NativeWebSocket.upgrade for a WebSocket.` | Code called `detachSocket()` on a response. Rust owns the socket. | For a WebSocket use `NativeWebSocket.upgrade(request)`. |
 
 See [Native server](../digging-deeper/native-server.md).
@@ -26054,8 +26154,8 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | --- | --- | --- |
 | `dox_socketio: handler error: <error>` | Your namespace handler threw. The stack follows. | Fix the handler. |
 | `dox_socketio: request error: <error>` | A Socket.IO HTTP request failed. The client gets `500`. | Check the client version and transport. |
-| `dox_socketio: redis publish failed: <error>` | The Redis adapter could not publish. | Check Redis. |
-| `dox_socketio: bad redis message: <error>` | The Redis adapter got a message it can not read. | Check that every app on the channel runs the same version. |
+| `dox_socketio: publish failed: <error>` | The Redis or isolate adapter could not publish. | Redis adapter: check Redis. Isolate adapter: it should not happen, so report it as a bug. |
+| `dox_socketio: bad adapter message: <error>` | The Redis or isolate adapter got a message it can not read. | Check that every app on the channel runs the same version. |
 
 ## CLI
 
@@ -26099,6 +26199,10 @@ What changed in each package, newest first. This page is made from the
 `CHANGELOG.md` files in the repo when the docs are built.
 
 ## dox_annotation
+
+### 3.1.3
+
+- Version bump only, to match the other packages.
 
 ### 3.1.2
 
@@ -26208,6 +26312,10 @@ What changed in each package, newest first. This page is made from the
 - See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
 
 ## dox_builder
+
+### 3.1.3
+
+- Version bump only, to match the other packages.
 
 ### 3.1.2
 
@@ -26368,6 +26476,10 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.1.3
+
+- Version bump only, to match the other packages.
+
 ### 3.1.2
 
 - Version bump only, to match the other packages.
@@ -26496,6 +26608,11 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox_core
+
+### 3.1.3
+
+- New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(channel, message)` sends, `on(channel)` gets the messages of one channel, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.
+- New: `Dox().isolateCount` is the number of isolates that really run, in every isolate. It also counts `Dox().totalIsolate(n)` and the one isolate on Windows.
 
 ### 3.1.2
 

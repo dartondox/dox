@@ -6488,6 +6488,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#skip-unused-drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skip unused drivers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Skip unused drivers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sqlite-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQLite app
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#postgres-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Postgres app
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL app
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switch-the-database" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switch the database
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#config" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6692,42 +6753,92 @@ When the native library can not load, the app stops with an error.
 See the <a href="postgres-native/#when-the-library-does-not-load">Postgres</a> and
 <a href="mysql-native/#when-the-library-does-not-load">MySQL</a> pages.</p>
 </div>
+<h2 id="skip-unused-drivers">Skip unused drivers</h2>
+<p><code>dox_orm</code> brings all three drivers. The build downloads a native library for each one.
+An app needs only the driver of its database.
+To skip the others, add a <code>hooks: user_defines:</code> block to <code>pubspec.yaml</code>.</p>
+<ul>
+<li>Put it in the <code>pubspec.yaml</code> of your app.</li>
+<li>In a pub workspace, put it in the root <code>pubspec.yaml</code> of the workspace.
+  Dart reads <code>user_defines</code> only from the root package.</li>
+</ul>
+<p><code>skip: true</code> turns off the download of a driver.
+Only the bool <code>true</code> skips. Any other value does nothing.</p>
+<h3 id="sqlite-app">SQLite app</h3>
+<p>A new app uses SQLite. Its <code>pubspec.yaml</code> already has this block.</p>
+<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span><span class="nt">dox_postgres_native</span><span class="p">:</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="nt">dox_mysql_native</span><span class="p">:</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span></code></pre></div>
+<h3 id="postgres-app">Postgres app</h3>
+<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="nt">dox_mysql_native</span><span class="p">:</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span><span class="nt">sqlite3</span><span class="p">:</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+</span></code></pre></div>
+<h3 id="mysql-app">MySQL app</h3>
+<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="nt">dox_postgres_native</span><span class="p">:</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nt">sqlite3</span><span class="p">:</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+</span></code></pre></div>
+<p><code>sqlite3: source: system</code> comes from the <code>sqlite3</code> package.
+The build does not download SQLite.
+The app loads the <code>libsqlite3</code> library of the system when it opens SQLite.</p>
+<div class="admonition warning">
+<p class="admonition-title">SQLite on a system without <code>libsqlite3</code></p>
+<p>With <code>source: system</code>, the app fails when it opens SQLite on a system
+without <code>libsqlite3</code>. The <code>FROM scratch</code> Docker image has no <code>libsqlite3</code>.
+When your app opens SQLite, remove the <code>sqlite3</code> lines.</p>
+</div>
+<h3 id="switch-the-database">Switch the database</h3>
+<p>When you switch the database, remove the <code>skip</code> line of the driver you now use.
+Then run <code>dart pub get</code>.</p>
+<p>A driver that is still skipped stops the app when it opens a pool.
+The error says that the native library is not in the build, and to remove <code>skip</code>.</p>
 <h2 id="config">Config</h2>
 <p>Put the connections in <code>lib/config/database.dart</code>.
 <code>connection</code> is the name of the default connection.</p>
-<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">5432</span><span class="p">,</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span><span class="w"> </span><span class="c1">// also for MariaDB</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
-</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
-</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span><span class="w"> </span><span class="c1">// file path, like db/dox.sqlite, or ':memory:'</span>
-</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
-</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">5432</span><span class="p">,</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
+</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
+</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-5-17"><a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-5-18"><a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span><span class="w"> </span><span class="c1">// also for MariaDB</span>
+</span><span id="__span-5-19"><a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
+</span><span id="__span-5-20"><a id="__codelineno-5-20" name="__codelineno-5-20" href="#__codelineno-5-20"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
+</span><span id="__span-5-21"><a id="__codelineno-5-21" name="__codelineno-5-21" href="#__codelineno-5-21"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
+</span><span id="__span-5-22"><a id="__codelineno-5-22" name="__codelineno-5-22" href="#__codelineno-5-22"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
+</span><span id="__span-5-23"><a id="__codelineno-5-23" name="__codelineno-5-23" href="#__codelineno-5-23"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
+</span><span id="__span-5-24"><a id="__codelineno-5-24" name="__codelineno-5-24" href="#__codelineno-5-24"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
+</span><span id="__span-5-25"><a id="__codelineno-5-25" name="__codelineno-5-25" href="#__codelineno-5-25"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
+</span><span id="__span-5-26"><a id="__codelineno-5-26" name="__codelineno-5-26" href="#__codelineno-5-26"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-5-27"><a id="__codelineno-5-27" name="__codelineno-5-27" href="#__codelineno-5-27"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-5-28"><a id="__codelineno-5-28" name="__codelineno-5-28" href="#__codelineno-5-28"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
+</span><span id="__span-5-29"><a id="__codelineno-5-29" name="__codelineno-5-29" href="#__codelineno-5-29"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span><span class="w"> </span><span class="c1">// file path, like db/dox.sqlite, or ':memory:'</span>
+</span><span id="__span-5-30"><a id="__codelineno-5-30" name="__codelineno-5-30" href="#__codelineno-5-30"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
+</span><span id="__span-5-31"><a id="__codelineno-5-31" name="__codelineno-5-31" href="#__codelineno-5-31"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-5-32"><a id="__codelineno-5-32" name="__codelineno-5-32" href="#__codelineno-5-32"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-5-33"><a id="__codelineno-5-33" name="__codelineno-5-33" href="#__codelineno-5-33"></a><span class="p">);</span>
 </span></code></pre></div>
 <p><code>env</code> is the typed env of the app, in <code>lib/config/env.dart</code>.
 Change <code>my_app</code> to the name of your app in <code>pubspec.yaml</code>.</p>
@@ -6738,33 +6849,33 @@ Change <code>my_app</code> to the name of your app in <code>pubspec.yaml</code>.
 <p>Start the ORM in a provider. The app template already has this file.
 Each isolate runs the provider.
 Isolates with the same settings share one pool, so <code>maxConnectionCount</code> is for the whole process.</p>
-<div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="c1">/// Close the database connections when the server stops.</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shutdown</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">}</span>
+<div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="c1">/// Close the database connections when the server stops.</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shutdown</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Dox finds every <code>DoxProvider</code> class on its own.
 After you add a provider, run <code>dart run build_runner build</code>.</p>
 <h3 id="env"><code>.env</code></h3>
 <p>The app config and the <a href="migration/">migration</a> commands read these values.</p>
-<div class="language-py highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">DB_CONNECTION</span><span class="o">=</span><span class="n">postgres</span> <span class="c1"># postgres, mysql or sqlite</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">DB_HOST</span><span class="o">=</span><span class="n">localhost</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">DB_PORT</span><span class="o">=</span><span class="mi">5432</span>           <span class="c1"># 3306 for mysql</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">DB_NAME</span><span class="o">=</span><span class="n">dox</span>            <span class="c1"># for sqlite: the file path, like db/dox.sqlite</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">DB_USERNAME</span><span class="o">=</span><span class="n">postgres</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">DB_PASSWORD</span><span class="o">=</span><span class="n">postgres</span>
+<div class="language-py highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">DB_CONNECTION</span><span class="o">=</span><span class="n">postgres</span> <span class="c1"># postgres, mysql or sqlite</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">DB_HOST</span><span class="o">=</span><span class="n">localhost</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">DB_PORT</span><span class="o">=</span><span class="mi">5432</span>           <span class="c1"># 3306 for mysql</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">DB_NAME</span><span class="o">=</span><span class="n">dox</span>            <span class="c1"># for sqlite: the file path, like db/dox.sqlite</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">DB_USERNAME</span><span class="o">=</span><span class="n">postgres</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="n">DB_PASSWORD</span><span class="o">=</span><span class="n">postgres</span>
 </span></code></pre></div>
 <h3 id="database_url"><code>DATABASE_URL</code></h3>
 <p>Many hosts (Fly, Render, Heroku and others) give you one database url.
@@ -6773,7 +6884,7 @@ Dox reads it from the <code>DATABASE_URL</code> environment variable.</p>
 It replaces the config of the default connection (<code>DatabaseConfig.connection</code>).
 That config still gives <code>debug</code>, <code>printer</code> and <code>extra</code>.
 Other named connections do not change.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://app:s%40cret@db.example.com:5432/blog?sslmode<span class="o">=</span>require
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://app:s%40cret@db.example.com:5432/blog?sslmode<span class="o">=</span>require
 </span></code></pre></div>
 <table>
 <thead>
@@ -6807,11 +6918,11 @@ Other named connections do not change.</p>
 </ul>
 <p>The ORM reads <code>DATABASE_URL</code> from the real environment, not from <code>.env</code>.
 To use a url from <code>.env</code>, or any other url, give it yourself:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">DatabaseConfig</span><span class="p">(</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="p">{...},</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">url:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="p">(</span><span class="s1">'DATABASE_URL'</span><span class="p">),</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="p">{...},</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nl">url:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="p">(</span><span class="s1">'DATABASE_URL'</span><span class="p">),</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>An empty <code>url</code> (<code>url: ''</code>) turns <code>DATABASE_URL</code> off.
 To make one <code>ConnectionConfig</code> from a url, use <code>ConnectionConfig.fromUrl(url)</code>.
@@ -6819,9 +6930,9 @@ To make one <code>ConnectionConfig</code> from a url, use <code>ConnectionConfig
 <h3 id="unix-socket">Unix socket</h3>
 <p>A host that starts with <code>/</code> is a Unix socket.
 Google Cloud SQL on Cloud Run uses <code>/cloudsql/PROJECT:REGION:INSTANCE</code>.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">DB_HOST</span><span class="o">=</span>/cloudsql/my-project:europe-west1:blog
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># or</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://blog:secret@/blog?host<span class="o">=</span>/cloudsql/my-project:europe-west1:blog
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">DB_HOST</span><span class="o">=</span>/cloudsql/my-project:europe-west1:blog
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1"># or</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://blog:secret@/blog?host<span class="o">=</span>/cloudsql/my-project:europe-west1:blog
 </span></code></pre></div>
 <p><strong>Postgres</strong>: the host is the socket folder, like in libpq.
 The driver uses the socket file <code>&lt;folder&gt;/.s.PGSQL.&lt;port&gt;</code>.
@@ -6829,10 +6940,10 @@ A host that already ends with <code>/.s.PGSQL.5432</code> works too.</p>
 <p><strong>MySQL and MariaDB</strong>: the host is the socket file itself. The port is not used.
 On Cloud SQL, the socket file is <code>/cloudsql/PROJECT:REGION:INSTANCE</code>.
 A local server often uses <code>/var/run/mysqld/mysqld.sock</code> or <code>/tmp/mysql.sock</code>.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">DB_CONNECTION</span><span class="o">=</span>mysql
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nv">DB_HOST</span><span class="o">=</span>/var/run/mysqld/mysqld.sock
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="c1"># or</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>mysql://app:secret@/app?socket<span class="o">=</span>/var/run/mysqld/mysqld.sock
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">DB_CONNECTION</span><span class="o">=</span>mysql
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nv">DB_HOST</span><span class="o">=</span>/var/run/mysqld/mysqld.sock
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="c1"># or</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>mysql://app:secret@/app?socket<span class="o">=</span>/var/run/mysqld/mysqld.sock
 </span></code></pre></div>
 <p><code>?socket=</code> and <code>?host=</code> do the same thing.</p>
 <h3 id="extra-options"><code>extra</code> options</h3>
@@ -6924,25 +7035,25 @@ So names like <code>order</code> or <code>key</code> work.</p>
 <h3 id="raw-queries">Raw queries</h3>
 <p><code>QueryBuilder.query()</code> runs SQL on the default connection.
 Use <code>@name</code> for values. The values are sent as bound parameters.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="s1">'select * from blog where id = @id'</span><span class="p">,</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">substitutionValues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="s1">'select * from blog where id = @id'</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">substitutionValues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Pass <code>connection</code> to run it on another connection.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'select 1'</span><span class="p">,</span><span class="w"> </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'mysql'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'select 1'</span><span class="p">,</span><span class="w"> </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'mysql'</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="other-connections">Other connections</h3>
 <p>Use <code>withConnection()</code> with a connection name from the config.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'blog'</span><span class="p">)</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">)</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'blog'</span><span class="p">)</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">)</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
 </span></code></pre></div>
 <p>A model keeps its connection. <code>save()</code> and <code>delete()</code> use it.
 Models that a query returns use the connection of the query.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">()..</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">);</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">;</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// saved on 'mysql'</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">()..</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">);</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">;</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// saved on 'mysql'</span>
 </span></code></pre></div>
 <h2 id="mysql-and-mariadb">MySQL and MariaDB</h2>
 <ul>

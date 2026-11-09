@@ -6954,7 +6954,7 @@
 <tr>
 <td><code>Socket.IO runs on &lt;n&gt; isolates: clients should use transports: ['websocket'] ...</code></td>
 <td>Socket.IO with more than one isolate and long-polling on.</td>
-<td>Use a Redis adapter, and <code>transports: ['websocket']</code> in the client.</td>
+<td>Use <code>transports: ['websocket']</code> in the client.</td>
 </tr>
 <tr>
 <td><code>[dox] isolate &lt;n&gt; error: &lt;error&gt;</code></td>
@@ -7740,6 +7740,11 @@ The table shows the <code>message</code> text.</p>
 <td>Fix the path in <code>pubspec.yaml</code>.</td>
 </tr>
 <tr>
+<td><code>&lt;pkg&gt; did not load: the native library is not in the build (...).</code></td>
+<td>The app opens Postgres or MySQL, but <code>pubspec.yaml</code> skips that driver.</td>
+<td>Remove its <code>skip</code> line. See <a href="../../database/#skip-unused-drivers">Skip unused drivers</a>.</td>
+</tr>
+<tr>
 <td><code>Unsupported operation: dox_http_native can not detach the socket. Use NativeWebSocket.upgrade for a WebSocket.</code></td>
 <td>Code called <code>detachSocket()</code> on a response. Rust owns the socket.</td>
 <td>For a WebSocket use <code>NativeWebSocket.upgrade(request)</code>.</td>
@@ -7769,13 +7774,13 @@ The table shows the <code>message</code> text.</p>
 <td>Check the client version and transport.</td>
 </tr>
 <tr>
-<td><code>dox_socketio: redis publish failed: &lt;error&gt;</code></td>
-<td>The Redis adapter could not publish.</td>
-<td>Check Redis.</td>
+<td><code>dox_socketio: publish failed: &lt;error&gt;</code></td>
+<td>The Redis or isolate adapter could not publish.</td>
+<td>Redis adapter: check Redis. Isolate adapter: it should not happen, so report it as a bug.</td>
 </tr>
 <tr>
-<td><code>dox_socketio: bad redis message: &lt;error&gt;</code></td>
-<td>The Redis adapter got a message it can not read.</td>
+<td><code>dox_socketio: bad adapter message: &lt;error&gt;</code></td>
+<td>The Redis or isolate adapter got a message it can not read.</td>
 <td>Check that every app on the channel runs the same version.</td>
 </tr>
 </tbody>

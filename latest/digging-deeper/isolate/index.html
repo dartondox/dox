@@ -2799,6 +2799,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#send-a-message-to-the-other-isolates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send a message to the other isolates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-each-isolate-does-at-start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6627,6 +6638,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#send-a-message-to-the-other-isolates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send a message to the other isolates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#what-each-isolate-does-at-start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6706,11 +6728,7 @@
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">Dox</span><span class="p">().</span><span class="n">totalIsolate</span><span class="p">(</span><span class="m">2</span><span class="p">);</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">startServer</span><span class="p">();</span>
 </span></code></pre></div>
-<p>Use fewer isolates when:</p>
-<ul>
-<li>the machine also runs the database or other heavy work, or</li>
-<li>you use Socket.IO rooms without the Redis adapter. A room only reaches clients on the same isolate. Use <code>1</code>, or see <a href="../../packages/socketio/">Socket.IO</a>.</li>
-</ul>
+<p>Use fewer isolates when the machine also runs the database or other heavy work.</p>
 <h2 id="each-isolate-has-its-own-memory">Each isolate has its own memory</h2>
 <p>Isolates do not share memory:</p>
 <ul>
@@ -6719,6 +6737,19 @@
 <li>To share data between isolates or servers, use a database, Redis or files.</li>
 </ul>
 <p><code>Dox().isolateId</code> tells you which isolate runs the code. The first isolate is <code>1</code>.</p>
+<h2 id="send-a-message-to-the-other-isolates">Send a message to the other isolates</h2>
+<p><code>IsolateBus</code> sends a message from one isolate to all the others in the same process. Use it to tell them that something changed, for example "forget this cache key". Socket.IO uses it to share broadcasts (see <a href="../../packages/socketio/#many-isolates">Socket.IO</a>).</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">IsolateBus</span><span class="p">.</span><span class="n">instance</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">listen</span><span class="p">(</span><span class="n">onMessage</span><span class="p">);</span><span class="w"> </span><span class="c1">// in a provider's setup()</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">IsolateBus</span><span class="p">.</span><span class="n">instance</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'changed'</span><span class="p">,</span><span class="w"> </span><span class="m">42</span><span class="p">]);</span>
+</span></code></pre></div>
+<ul>
+<li>A message goes to one channel. A listener on <code>'users'</code> never gets the messages of another channel.</li>
+<li>An isolate never gets its own message.</li>
+<li><code>Dox().isolateCount</code> is the number of isolates that run, in every isolate.</li>
+<li><code>IsolateBus.instance.size</code> is the number of isolates that listen, this one included.</li>
+<li>A message must be something a <code>SendPort</code> can send: null, bool, num, String, typed data, and lists and maps of those.</li>
+<li>It works inside one process only. For many servers, use Redis.</li>
+</ul>
 <h2 id="what-each-isolate-does-at-start">What each isolate does at start</h2>
 <p>Dox copies the <code>AppConfig</code>, the providers and the routes you added before <code>startServer()</code> to each new isolate. Then every isolate:</p>
 <ol>

@@ -6891,6 +6891,7 @@ environment variables:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
 </span></code></pre></div>
 <p>A new <code>.env</code> uses SQLite. The compose services set <code>DB_CONNECTION=postgres</code> and <code>DB_NAME=dox</code> themselves. To use the compose Postgres with <code>dox s</code>, set the same two values in <code>.env</code>. The database port listens on <code>127.0.0.1</code> only.</p>
+<p>A new app skips the Postgres driver in <code>pubspec.yaml</code>, because it uses SQLite. Remove the <code>dox_postgres_native</code> skip lines before you run the compose app. See <a href="../../database/#skip-unused-drivers">Skip unused drivers</a>.</p>
 <p>The queue worker and the scheduler run as their own processes. The compose file has a <code>worker</code> service for the queue. In the image, start them with <code>/app/bin/queue work</code> and <code>/app/bin/schedule work</code>.
 See <a href="../../guides/docker/">Docker</a> for a health check in the image.</p>
 <h2 id="https-put-a-proxy-in-front">HTTPS: put a proxy in front</h2>

@@ -7534,8 +7534,8 @@ Source: <code>lib/src/dox/socket_io_config.dart</code> in <a href="https://githu
 <tr>
 <td><code>adapter</code></td>
 <td><code>SocketAdapterFactory?</code></td>
-<td><code>null</code> (in memory)</td>
-<td>Makes the adapter in each isolate. Use a Redis adapter with many isolates.</td>
+<td><code>null</code> (in memory with one isolate, <code>IsolateAdapter</code> with many)</td>
+<td>Makes the adapter in each isolate. Use a Redis adapter with many servers.</td>
 </tr>
 </tbody>
 </table>

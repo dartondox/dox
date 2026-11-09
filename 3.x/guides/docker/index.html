@@ -6943,6 +6943,9 @@ Put it in <code>register()</code> of <code>WebRouter</code>. <code>QueryBuilder<
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">&lt;a real password&gt;</span>
 </span></code></pre></div>
 <p><code>.env</code> is in <code>.dockerignore</code> and <code>.gitignore</code>. It never goes into the image or into git.</p>
+<p>The app now uses Postgres, so the build needs the Postgres driver.
+A new app skips it in <code>pubspec.yaml</code>. Remove the <code>dox_postgres_native</code> skip lines.
+See <a href="../../database/#skip-unused-drivers">Skip unused drivers</a>.</p>
 <h2 id="6-build-and-run">6. Build and run</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>ps

@@ -6469,6 +6469,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#313" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#312" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6748,6 +6759,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#313_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#312_1" class="md-nav__link">
@@ -7031,6 +7053,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#313_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#312_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7310,6 +7343,17 @@
   
     <nav class="md-nav" aria-label="dox_core">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#313_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#312_3" class="md-nav__link">
@@ -7662,6 +7706,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#313" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#312" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7941,6 +7996,17 @@
   
     <nav class="md-nav" aria-label="dox_builder">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#313_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#312_1" class="md-nav__link">
@@ -8224,6 +8290,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#313_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#312_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8503,6 +8580,17 @@
   
     <nav class="md-nav" aria-label="dox_core">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#313_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1.3
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#312_3" class="md-nav__link">
@@ -8794,6 +8882,10 @@
 <p>What changed in each package, newest first. This page is made from the
 <code>CHANGELOG.md</code> files in the repo when the docs are built.</p>
 <h2 id="dox_annotation">dox_annotation</h2>
+<h3 id="313">3.1.3</h3>
+<ul>
+<li>Version bump only, to match the other packages.</li>
+</ul>
 <h3 id="312">3.1.2</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -8902,6 +8994,10 @@
 <li>See the <a href="https://github.com/dartondox/dox/pull/112">release notes</a> for all main changes.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
+<h3 id="313_1">3.1.3</h3>
+<ul>
+<li>Version bump only, to match the other packages.</li>
+</ul>
 <h3 id="312_1">3.1.2</h3>
 <ul>
 <li>DTOs: <code>@Describe('...')</code> on a field sets <code>description</code> in its JSON Schema (the generated <code>toJsonSchema()</code> and the OpenAPI docs). It wins over the <code>///</code> doc comment. Needs dox_validation 3.1.2.</li>
@@ -9060,6 +9156,10 @@
 <li>Works with analyzer 5 and 6.</li>
 </ul>
 <h2 id="dox_cache">dox_cache</h2>
+<h3 id="313_2">3.1.3</h3>
+<ul>
+<li>Version bump only, to match the other packages.</li>
+</ul>
 <h3 id="312_2">3.1.2</h3>
 <ul>
 <li>Version bump only, to match the other packages.</li>
@@ -9188,6 +9288,11 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
+<h3 id="313_3">3.1.3</h3>
+<ul>
+<li>New: <code>IsolateBus</code> sends a message from one isolate to all the other isolates of the app, with no Redis. <code>publish(channel, message)</code> sends, <code>on(channel)</code> gets the messages of one channel, <code>size</code> counts the isolates that listen. The main isolate keeps the hub, like the <code>RateLimit</code> counts.</li>
+<li>New: <code>Dox().isolateCount</code> is the number of isolates that really run, in every isolate. It also counts <code>Dox().totalIsolate(n)</code> and the one isolate on Windows.</li>
+</ul>
 <h3 id="312_3">3.1.2</h3>
 <ul>
 <li>Uses dox_validation 3.1.2, so <code>@Describe('...')</code> can be used on DTO fields.</li>

@@ -6895,7 +6895,7 @@
 </tr>
 <tr>
 <td>Shared state across isolates</td>
-<td>Cache: <code>redis</code>, not <code>memory</code>. Socket.IO: a Redis adapter and <code>transports: ['websocket']</code>.</td>
+<td>Cache: <code>redis</code>, not <code>memory</code>. Socket.IO: <code>transports: ['websocket']</code> on the client, and a Redis adapter with many servers.</td>
 <td><a href="../../digging-deeper/isolate/">Isolate</a></td>
 </tr>
 <tr>
