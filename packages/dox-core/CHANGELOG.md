@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `Hash.sha256Bytes(bytes)` gives the raw 32 bytes of the SHA-256, and `Hash.pkceChallenge(verifier)` gives the PKCE S256 code challenge. No need to import `crypto` for PKCE or WebAuthn.
+
 ## 3.1.3
 
 - New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(channel, message)` sends, `on(channel)` gets the messages of one channel, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.

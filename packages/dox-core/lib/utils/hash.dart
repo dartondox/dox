@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:bcrypt/bcrypt.dart';
 import 'package:crypto/crypto.dart' as crypto;
@@ -104,6 +105,27 @@ class Hash {
   /// ```
   static String sha256(String value) {
     return crypto.sha256.convert(utf8.encode(value)).toString();
+  }
+
+  /// SHA-256 of [bytes], as the raw 32 bytes.
+  /// Use it when a spec needs the bytes, not hex
+  /// (PKCE S256, WebAuthn).
+  /// ```
+  /// Uint8List digest = Hash.sha256Bytes(utf8.encode('abc'));
+  /// ```
+  static Uint8List sha256Bytes(List<int> bytes) {
+    return Uint8List.fromList(crypto.sha256.convert(bytes).bytes);
+  }
+
+  /// PKCE S256 code challenge for [verifier]:
+  /// base64url of the SHA-256, with no `=` padding (RFC 7636).
+  /// ```
+  /// String challenge = Hash.pkceChallenge(verifier);
+  /// ```
+  static String pkceChallenge(String verifier) {
+    return base64Url
+        .encode(sha256Bytes(ascii.encode(verifier)))
+        .replaceAll('=', '');
   }
 
   /// bcrypt throws its own error with the password in the text. Throw

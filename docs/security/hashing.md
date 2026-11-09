@@ -90,6 +90,18 @@ Token? row = await Token().where('hash', Hash.sha256(given)).getFirst();
 
 Never use `Hash.sha256` for passwords. A password is short and can be guessed, so use `Hash.make` (bcrypt).
 
+## Raw bytes and PKCE
+
+`Hash.sha256` gives hex text. Some specs need the raw 32 bytes instead, like PKCE and WebAuthn.
+Use `Hash.sha256Bytes` for that. You do not need to import `crypto`.
+
+```dart
+Uint8List digest = Hash.sha256Bytes(utf8.encode('abc'));
+String challenge = Hash.pkceChallenge(verifier);  // PKCE S256 code challenge
+```
+
+`Hash.pkceChallenge` returns the base64url of the SHA-256, with no `=` padding (RFC 7636).
+
 ## With login
 
 You do not need `Hash.verify` for normal login.

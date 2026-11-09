@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
@@ -24,6 +26,22 @@ void main() {
       );
       expect(Hash.sha256('mex_token'), Hash.sha256('mex_token'));
       expect(Hash.sha256('a'), isNot(Hash.sha256('b')));
+    });
+
+    test('sha256Bytes gives the raw 32 bytes', () {
+      List<int> bytes = Hash.sha256Bytes(utf8.encode('abc'));
+      expect(bytes.length, 32);
+      String hex = bytes
+          .map((int b) => b.toRadixString(16).padLeft(2, '0'))
+          .join();
+      expect(hex, Hash.sha256('abc'));
+    });
+
+    test('pkceChallenge matches the RFC 7636 example', () {
+      expect(
+        Hash.pkceChallenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk'),
+        'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWPkGjZCZFtMs',
+      );
     });
 
     test('check is the same as verify', () {
