@@ -23,7 +23,7 @@ final Converter<List<int>, Object?> _jsonUtf8Decoder = utf8.decoder.fuse(
 /// Map<String, dynamic> data = JSON.parse(text);
 /// ```
 class JSON {
-  /// Turns [object] into a JSON `String`.
+  /// Turns [value] into a JSON `String`.
   ///
   /// A `DateTime` becomes an ISO 8601 string.
   /// Any other object must have a `toJson()` method.
@@ -34,8 +34,8 @@ class JSON {
   /// JSON.stringify({'at': DateTime.utc(2024)}); // {"at":"2024-01-01T00:00:00.000Z"}
   /// JSON.stringify(user); // calls user.toJson()
   /// ```
-  static String stringify(dynamic object) {
-    return const JsonEncoder(advanceEncode).convert(object);
+  static String stringify(Object? value) {
+    return const JsonEncoder(advanceEncode).convert(value);
   }
 
   /// Turns [value] into UTF-8 bytes, in one pass.

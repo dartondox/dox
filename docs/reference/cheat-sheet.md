@@ -486,15 +486,9 @@ dynamic a = JSON.parse(text);          // from a String
 dynamic b = JSON.parse(res.bodyBytes); // from bytes, from an HTTP client
 ```
 
-`stringify` and `bytes` write a `DateTime` as an ISO 8601 string. They call `toJson()` on other objects. A value with no `toJson()` throws.
+`stringify` gives a String and `bytes` gives UTF-8 bytes. Use bytes for sockets, files, queues and HTTP client bodies, and never return `JSON.bytes` from a controller.
 
-`parse` takes a String or UTF-8 bytes. Bytes skip the full String, so prefer `res.bodyBytes` over `res.body`. Bad JSON or bad UTF-8 throws a `FormatException`.
-
-Use `bytes` for sockets, files, queues or an HTTP client body. Use `stringify` when you need a String.
-
-JSON has no date type. A date comes back as a String.
-
-A controller should return a Map, List or model. Dox already turns it into JSON bytes for you. Do not return `JSON.bytes` from a controller.
+`parse` takes a String or bytes. Prefer `res.bodyBytes` over `res.body`.
 
 ## Env
 
