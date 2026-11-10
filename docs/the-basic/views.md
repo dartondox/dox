@@ -242,10 +242,10 @@ Put `@auth`, `@guest`, `@production`, `@once` and `@verbatim` alone on their lin
 
 With a space before the `(`, a tag can also be plain text. These rules decide:
 
-- In the middle of a line, it is a tag only when its args are one valid expression (two for `@section` and `@yield`). So text like `see @class (see docs)` stays text.
-- Alone on its line, a tag with no body is a tag, even when its args are not valid. Then the args give an error, like `@class (see docs)`.
+- In the middle of a line, it is a tag only when its args are one valid expression (one or two for `@section` and `@yield`). So text like `see @class (see docs)` stays text.
+- Alone on its line, it is a tag even when its args are not valid, unless a rule below says it stays text. Then the args give an error, like `@class (see docs)`.
 - A tag with a body, like `@isset`, `@empty`, `@env`, `@section` and `@push`, also needs its own `@end` after it, on any line. The `@end` of a block around it does not count. So `@empty (none)` stays text, also alone on its line.
-- `@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend`, `@method` and `@error` also need text in quotes as the first argument, on any line. So `git @push (force)` and `an @error (see log)` stay text, but `@yield ('title')` is a tag.
+- `@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend`, `@method` and `@error` also need text in quotes as the first argument, on any line. So `git @push (force)` and `an @error (see log)` stay text, but `@yield ('title')` is a tag. If such a tag stays text, its `@end` gives the error "@end has no matching tag before it".
 - `@json` and `@includeWhen` are never tags with a space, on any line. So `the @json (format)` stays text.
 
 With no space, like `@empty(items)` or `@json(user)`, a tag is always a tag.
