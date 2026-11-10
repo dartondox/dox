@@ -43,14 +43,16 @@ Do not put it in a URL. URLs are kept in logs and in the browser history.
 ### HTML forms
 
 Put the token in a hidden field.
-With [views](../the-basic/views.md#forms), `csrfField()` writes this field for you:
+With [views](../the-basic/views.md#forms), `@csrf` writes this field for you:
 
 ```html
 <form method="POST" action="/posts">
-  {{ csrfField() }}
+  @csrf
   ...
 </form>
 ```
+
+`@csrf` must be alone on its line. In the middle of a line, use `{{ csrfField() }}`. It prints the same field.
 
 `csrfToken()` gives only the token, for example for a `<meta>` tag.
 

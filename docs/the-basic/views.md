@@ -200,6 +200,8 @@ Close a block tag with `@end`. `@else` works in all of them, but not in `@once` 
 
 Put `@auth`, `@guest`, `@production`, `@once` and `@verbatim` alone on their line. In the middle of text, like `@once upon a time`, they stay text.
 
+With a space before the `(`, in the middle of a line, a tag is used only when its args are a valid expression. A tag with a body, like `@isset`, `@empty`, `@env`, `@section` and `@push`, also needs an `@end` after it. So text like `@empty (none)` or `@class (see docs)` stays text. With no space, like `@empty(items)`, a tag is always a tag. Alone on its line, a tag is also always a tag, with one exception: `@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend` and `@method`. With a space before the `(`, these seven are tags only when the first argument is text in quotes, like `@yield ('title')`. This holds on any line. So text like `git @push (force)` or `the @yield (curve)` stays text.
+
 | Tag | What it does |
 | --- | --- |
 | `@isset(user.phone) ... @end` | shows when the value is not `null`. A field of `null` is not an error here. |
@@ -210,6 +212,15 @@ Put `@auth`, `@guest`, `@production`, `@once` and `@verbatim` alone on their lin
 | `@production ... @end` | shows when `APP_ENV` is `production` |
 | `@once ... @end` | shows only the first time in one render, for example a `<script>` in a component |
 | `@verbatim ... @end` | prints the text as it is: no `{{ }}` and no tags run inside it |
+| `@extends('layouts/app')` | the layout of the page. See [Layouts with sections](#layouts-with-sections). |
+| `@section('name') ... @end` | fills a section. Short form: `@section('title', 'Home')`. |
+| `@yield('name')` | prints a section. `@yield('title', 'My app')` has a default. |
+| `@stack('scripts')` | prints every push of the stack. See [Stacks](#stacks). |
+| `@push('scripts') ... @end` | adds to the end of a stack |
+| `@prepend('scripts') ... @end` | adds to the start of a stack |
+| `@csrf` | the hidden `_token` field. See [Forms](#forms). |
+| `@method('PUT')` | the hidden `_method` field |
+| `@datetime(...)` | a tag of your app. See [Your own tags](#your-own-tags). |
 
 ```html
 @auth
@@ -318,13 +329,81 @@ Only text, numbers and `true` are attributes. `true` prints the name alone, like
 
 `$attributes` keeps any attribute name, like `onclick`. So do not pass a map from the user as the props of a component.
 
+## Layouts with sections
+
+A page can also name its layout with `@extends`. The page fills sections. The layout prints them with `@yield`.
+
+```html title="resources/views/layouts/app.dox.html"
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>@yield('title', 'My app')</title>
+  </head>
+  <body>
+    <main>@yield('content')</main>
+  </body>
+</html>
+```
+
+```html title="resources/views/home.dox.html"
+@extends('layouts/app')
+
+@section('title', 'Home')
+
+@section('content')
+  <p>Hello {{ user.name }}</p>
+@end
+```
+
+- `@extends` must be the first thing in the template. A template can have only one.
+- `@section('name') ... @end` fills a section. The short form `@section('title', 'Home')` takes a value. The value is escaped, like `{{ }}`.
+- `@yield('name')` prints a section. With a second argument, like `@yield('title', 'My app')`, it prints that value when the page has no such section. The value is escaped too.
+- In a page with `@extends`, only the sections reach the layout. Text outside a section is not printed. `@let` and `@push` outside a section still work.
+- A section sees the variables of the page. The layout sees them too.
+- A layout can extend another layout. When a page and its layout fill the same section, the page wins.
+- The names of sections and stacks must be plain text in quotes, like `'title'`.
+- The first `@section` with a name wins. So a `@section` inside `@each` keeps only the first round.
+- A `@yield('s')` that comes before the `@section('s')` in the same file prints nothing.
+- An `@include` or a component with its own `@extends` prints its layout in place. It shares the section names with the page.
+- A tag right after a letter or a digit, like `L@yield('s')`, stays text.
+
+Use `@extends` for the page layout. Use a component when you need props or more than one copy on a page.
+
+## Stacks
+
+A stack collects HTML from many templates and prints it in one place. Use it for scripts and styles.
+
+```html
+<head>
+  @stack('styles')
+</head>
+<body>
+  @yield('content')
+  @stack('scripts')
+</body>
+```
+
+```html
+@push('scripts')
+  <script src="/js/chart.js"></script>
+@end
+```
+
+- `@push('name') ... @end` adds to the end of the stack. `@prepend('name') ... @end` adds to the start.
+- A push works from the page, its layout, an `@include` and a component.
+- `@stack` can come before the `@push` in the page. It still prints every push.
+- The pushes are printed in the order they run. A page with `@extends` runs before its layout.
+- Put `@once` inside `@push` in a component, so the script is added one time only.
+
+`@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend` and `@method` need `( )`. With no `( )`, like `@section` in a sentence, they stay text. For a space before the `(`, see the rule in [More tags](#more-tags).
+
 ## Forms
 
 With `SessionMiddleware`, `view()` adds these to every template:
 
 | Name | What it is |
 | --- | --- |
-| `csrfField()` | the hidden `_token` field for `CsrfMiddleware` |
+| `csrfField()` | the hidden `_token` field for `CsrfMiddleware`. `@csrf` prints the same. |
 | `csrfToken()` | the CSRF token |
 | `errors` | the flashed validation errors, like `errors.email` |
 | `old('email')` | the input of the request before |
@@ -342,6 +421,21 @@ If your app has a global named `errors`, the global shows when the request has n
   <button>Register</button>
 </form>
 ```
+
+`@csrf` prints the same hidden field as `csrfField()`. Put it alone on its line. With no session, `@csrf` throws a `ViewException`.
+
+A browser form can only send GET and POST. For a PUT, PATCH or DELETE route, send a POST and add `@method`. It prints the hidden `_method` field that the `MethodOverride` middleware reads:
+
+```html
+<form method="POST" action="/posts/{{ post.id }}">
+  @csrf
+  @method('PUT')
+  <input name="title" value="{{ post.title }}">
+  <button>Save</button>
+</form>
+```
+
+This prints `<input type="hidden" name="_token" value="...">` and `<input type="hidden" name="_method" value="PUT">`.
 
 Every template from `view()` also has `request.path`, `request.method` and `request.query`.
 
@@ -386,6 +480,37 @@ A value of type `SafeString` is printed with no escape:
 View.global('logo', const SafeString('<img src="/logo.svg" alt="Logo">'));
 ```
 
+## Your own tags
+
+A directive is a tag that your app adds. Write a class with a `render` method. It gets the values between `(` and `)`, and gives the text to print.
+
+```dart
+class DateTimeDirective implements ViewDirective {
+  @override
+  Object? render(List<Object?> args, Scope scope) {
+    Object? value = args[0];
+    DateTime time = value is DateTime ? value : DateTime.parse('$value');
+    return '${time.day}/${time.month}/${time.year}';
+  }
+}
+
+View.directive('datetime', DateTimeDirective());
+```
+
+```html
+<time>@datetime(post.createdAt)</time>
+```
+
+- The text is escaped, like `{{ }}`. Give a `SafeString` to print HTML as it is. `null` prints nothing.
+- `scope.lookup('name')` reads a variable of the template.
+- A directive has no body and no `@end`.
+- The tag needs `( )`. With no `( )`, like `@datetime` in a sentence, it stays text.
+- The name can have letters, digits and `_`. The name of a built-in tag, like `if` or `section`, throws a `ViewException`.
+- When `resources/views/components/` has a template with the same name, the component wins.
+- You can also give them in the config: `ViewConfig(directives: <String, ViewDirective>{'datetime': DateTimeDirective()})`.
+
+Each isolate has its own engine. So add directives in your provider, after `super.setup()`, like globals.
+
 ## Config
 
 | Option | Default | What it does |
@@ -394,6 +519,7 @@ View.global('logo', const SafeString('<img src="/logo.svg" alt="Logo">'));
 | `extension` | `.dox.html` | the file extension |
 | `cache` | on, but off when `APP_ENV` is `development` or `local` | keep parsed templates in memory |
 | `globals` | `{}` | variables for every template |
+| `directives` | `{}` | your own tags, by name |
 
 With the cache off, a changed template shows on the next request, with no restart.
 

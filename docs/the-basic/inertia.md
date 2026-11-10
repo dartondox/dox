@@ -72,6 +72,8 @@ InertiaConfig inertiaConfig = InertiaConfig(
 | `devServerUrl` | `null` | the url of the Vite dev server, see [Vite](#vite) |
 | `reactRefresh` | `false` | add the React Fast Refresh code in dev mode |
 | `version` | hash of the manifest | the asset version, see [Asset version](#asset-version) |
+| `encryptHistory` | `false` | encrypt the browser history of every page, see [History encryption](#history-encryption) |
+| `ssr` | `null` | server side rendering, see [SSR](#server-side-rendering-ssr) |
 
 Paths are from the project root, where the app runs.
 
@@ -186,6 +188,7 @@ class UserController {
 
 A prop can be a function, like `users` above. It runs only when the prop is sent. It can give a `Future`.
 Props become JSON. A model or any object with `toJson()` works. A `DateTime` becomes ISO text.
+A Dart `int` above 2^53 in a prop loses precision. JavaScript reads the page JSON, in the browser and on the SSR server. Send such a number as a string.
 
 `Inertia.render(req, 'Users/Index', {...})` does the same as `inertia(...)`.
 
@@ -375,12 +378,168 @@ Each page has a version. When you deploy new assets, the version changes. A brow
 
 The default version is a hash of the Vite manifest. Dox reads it once per isolate, so restart the server after `vite build` (a deploy does this). To set your own, use `version` in the config, eg. the git commit.
 
+## History encryption
+
+The browser keeps the props of each page in its history, so the back button is fast. After a logout, the back button can still show a page with private data. History encryption stops this.
+
+With it, the browser encrypts the page data before it goes into the history. The key stays in the browser, in session storage. When you clear the history, the browser makes a new key, and the old pages can not be read any more. The back button then asks the server for the page again.
+
+The browser can only encrypt on HTTPS, and on `localhost`.
+
+Turn it on for all pages in the config:
+
+```dart title="lib/config/inertia.dart"
+InertiaConfig inertiaConfig = InertiaConfig(
+  encryptHistory: true,
+);
+```
+
+Or for one page, in the controller. `false` turns it off for one page when the config turns it on.
+
+```dart
+Future<DoxResponse> show(DoxRequest req) {
+  Inertia.encryptHistory(req);
+  // Inertia.encryptHistory(req, false);
+  return inertia(req, 'Account/Show', props);
+}
+```
+
+Or for all pages of a router, with `EncryptHistoryMiddleware`:
+
+```dart
+class AccountRouter extends Router {
+  @override
+  List<dynamic> get middleware => <dynamic>[const EncryptHistoryMiddleware()];
+
+  // ...
+}
+```
+
+Call `Inertia.clearHistory(req)` to clear the history, for example on logout:
+
+```dart
+Future<DoxResponse> logout(DoxRequest req) async {
+  // ... sign the user out
+  Inertia.clearHistory(req);
+  return redirect('/login');
+}
+```
+
+The next Inertia page tells the browser to clear its history, once. The mark is kept in the session, so it works with a redirect. It needs `SessionMiddleware`. With no session, it only works when the same request renders a page with `inertia(...)`.
+
+## Server side rendering (SSR)
+
+By default, the first visit gets an empty page, and the browser renders it. With SSR, the first visit gets the full HTML of the page. Search engines can read it, and the visitor sees the page sooner.
+
+The page is rendered by the Inertia SSR server. It is a Node process that you build with Vite and run next to your Dox app. On a first visit, Dox sends the page to it and puts the answer in the root view. Inertia requests (links and forms) never use it.
+
+### 1. The SSR entry file
+
+```jsx title="resources/js/ssr.jsx"
+import { createInertiaApp } from '@inertiajs/react'
+import createServer from '@inertiajs/react/server'
+import ReactDOMServer from 'react-dom/server'
+
+createServer(
+  (page) =>
+    createInertiaApp({
+      page,
+      render: ReactDOMServer.renderToString,
+      resolve: (name) => {
+        const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
+        return pages[`./Pages/${name}.jsx`]
+      },
+      setup: ({ App, props }) => <App {...props} />,
+    }),
+  { host: '127.0.0.1' },
+)
+```
+
+Vue and Svelte have the same `createServer`, in `@inertiajs/vue3/server` and `@inertiajs/svelte/server`.
+
+The SSR server listens on port `13714`. Set `host` to `127.0.0.1`, so only your own machine can reach it.
+
+### 2. Hydrate in the browser
+
+The browser must reuse the HTML from the server, and not render the page again. Change `setup` in your app file:
+
+```jsx title="resources/js/app.jsx"
+import { createInertiaApp } from '@inertiajs/react'
+import { createRoot, hydrateRoot } from 'react-dom/client'
+
+createInertiaApp({
+  resolve: (name) => {
+    const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
+    return pages[`./Pages/${name}.jsx`]
+  },
+  setup({ el, App, props }) {
+    if (el.hasAttribute('data-server-rendered')) {
+      hydrateRoot(el, <App {...props} />)
+    } else {
+      createRoot(el).render(<App {...props} />)
+    }
+  },
+})
+```
+
+The `else` part is for a page that was sent without SSR.
+
+### 3. Build and run
+
+Build the browser files, then the SSR file. Then start the SSR server with Node.
+
+```bash
+vite build
+vite build --ssr resources/js/ssr.jsx --outDir bootstrap/ssr
+node bootstrap/ssr/ssr.js
+```
+
+The file is `ssr.js` when your `package.json` has `"type": "module"`. Else it is `ssr.mjs`.
+The SSR file loads your packages from `node_modules`, so keep that folder on the server.
+Keep the Node process running with your process manager, like the Dox app. Build and start it again on each deploy.
+
+### 4. Turn it on
+
+```dart title="lib/config/inertia.dart"
+InertiaConfig inertiaConfig = InertiaConfig(
+  entryPoints: <String>['resources/js/app.jsx'],
+  ssr: InertiaSsr(),
+);
+```
+
+With no `ssr`, SSR is off. `InertiaSsr` has two options:
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `url` | `http://127.0.0.1:13714/render` | the render url of the SSR server |
+| `timeout` | 2 seconds | how long Dox waits for the answer. Then it stops the request. |
+
+The `url` must be a full `http` or `https` url. A wrong url gives an error when the app starts.
+
+To use SSR only in production, set it from the env:
+
+```dart
+ssr: Env.get<String>('APP_ENV') == 'production' ? InertiaSsr() : null,
+```
+
+### The root view with SSR
+
+The root view needs no change. It must have `@inertia`. Head tags also need a `</head>` tag.
+
+- The HTML from the SSR server goes in place of `@inertia`. It holds the page data and the rendered `<div id="app">`.
+- The head tags of the page (from the `<Head>` component, like `<title>`) go right before the first `</head>`. `</HEAD>` works too. A root view with no `</head>` gets no head tags.
+
+When your pages set a title with `<Head>`, remove the `<title>` from the root view, so the page does not have two.
+
+### When the SSR server fails
+
+When the SSR server is down, is too slow, or gives a bad answer, the visitor gets the normal page and the browser renders it. No error is shown. Dox prints one warning to stderr for the first failure, and no more until the SSR server works again.
+
 ## Not included
 
 - The Inertia 1 and 2 clients. They read the page from `<div id="app" data-page="...">`. Use the Inertia 3 client.
 - Once props, scroll props (infinite scroll), `prependProps`, `deepMergeProps` and `matchPropsOn`.
 - Partial reloads of nested props with dots, like `only: ['auth.user']`. Ask for the top level prop (`auth`).
-- Server side rendering (SSR).
-- History encryption. `encryptHistory` and `clearHistory` are always `false`.
+- Starting the SSR server from Dox. You run the Node process yourself.
 
 Inertia needs [sessions](session.md) for the errors, flash data and redirects. The client sends the CSRF token by itself, see [CSRF](../security/csrf.md#axios-and-inertia).
