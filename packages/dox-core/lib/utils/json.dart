@@ -13,7 +13,7 @@ final Converter<List<int>, Object?> _jsonUtf8Decoder = utf8.decoder.fuse(
   json.decoder,
 );
 
-/// Small helper to turn values into JSON text and back.
+/// Small helper to turn values into JSON (a String or UTF-8 bytes) and back.
 class JSON {
   /// Same as `jsonEncode`. It also turns a `DateTime` into an ISO 8601
   /// string. It calls `toJson()` on any other object that has it.

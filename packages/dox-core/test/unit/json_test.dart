@@ -69,5 +69,16 @@ void main() {
       );
       expect((r as Map<String, dynamic>)['at'], '2023-01-01T00:00:00.000Z');
     });
+
+    test('a value with no toJson fails the same way in both paths', () {
+      expect(
+        () => JSON.bytes(Object()),
+        throwsA(isA<JsonUnsupportedObjectError>()),
+      );
+      expect(
+        () => JSON.stringify(Object()),
+        throwsA(isA<JsonUnsupportedObjectError>()),
+      );
+    });
   });
 }

@@ -473,6 +473,22 @@ return Storage().download(path); // from a controller
 
 See [File storage](../digging-deeper/file-storage.md).
 
+## JSON
+
+```dart
+String text = JSON.stringify({'at': DateTime.now(), 'user': user}); // a String
+dynamic data = JSON.parse(text);
+
+List<int> bytes = JSON.bytes({'ok': true}); // UTF-8 bytes
+Object? back = JSON.parseBytes(bytes);
+```
+
+`stringify` and `bytes` write a `DateTime` as an ISO 8601 string. They call `toJson()` on other objects. A value with no `toJson()` throws.
+
+Use `bytes` and `parseBytes` for HTTP, sockets, files and cache. They build no String. Use `stringify` and `parse` when you need a String.
+
+JSON has no date type. A date comes back as a String.
+
 ## Env
 
 ```dart
