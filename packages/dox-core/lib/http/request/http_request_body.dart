@@ -115,7 +115,7 @@ class HttpBody {
   static RequestBody _json(Uint8List bytes) {
     if (bytes.isEmpty) return RequestBody.empty();
     try {
-      Object? data = JSON.parseBytes(bytes);
+      Object? data = JSON.parse(bytes);
       return RequestBody(
         data is Map<String, dynamic> ? data : <String, dynamic>{},
         kind: BodyKind.json,

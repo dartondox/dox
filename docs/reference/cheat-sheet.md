@@ -476,18 +476,25 @@ See [File storage](../digging-deeper/file-storage.md).
 ## JSON
 
 ```dart
-String text = JSON.stringify({'at': DateTime.now(), 'user': user}); // a String; user is a model, has toJson()
-dynamic data = JSON.parse(text);
+String text = JSON.stringify(<String, dynamic>{
+  'at': DateTime.now(),
+  'user': user, // a model, has toJson()
+});
+List<int> bytes = JSON.bytes(<String, dynamic>{'ok': true}); // UTF-8 bytes
 
-List<int> bytes = JSON.bytes({'ok': true}); // UTF-8 bytes
-Object? back = JSON.parseBytes(bytes);
+dynamic a = JSON.parse(text);          // from a String
+dynamic b = JSON.parse(res.bodyBytes); // from bytes, from an HTTP client
 ```
 
 `stringify` and `bytes` write a `DateTime` as an ISO 8601 string. They call `toJson()` on other objects. A value with no `toJson()` throws.
 
-Use `bytes` and `parseBytes` for sockets, files, queues or an HTTP client body. They build no String. A controller should return a Map, List or model. Dox already turns it into JSON bytes for you. Do not return `JSON.bytes` from a controller. Use `stringify` and `parse` when you need a String.
+`parse` takes a String or UTF-8 bytes. Bytes skip the full String, so prefer `res.bodyBytes` over `res.body`. Bad JSON or bad UTF-8 throws a `FormatException`.
+
+Use `bytes` for sockets, files, queues or an HTTP client body. Use `stringify` when you need a String.
 
 JSON has no date type. A date comes back as a String.
+
+A controller should return a Map, List or model. Dox already turns it into JSON bytes for you. Do not return `JSON.bytes` from a controller.
 
 ## Env
 

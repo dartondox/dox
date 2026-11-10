@@ -51,23 +51,33 @@ void main() {
       );
     });
 
-    test('bytes and parseBytes round trip, non-ASCII', () {
+    test('bytes and parse with bytes round trip, non-ASCII', () {
       Map<String, dynamic> x = <String, dynamic>{'a': 'é 日本 😀'};
       List<int> b = JSON.bytes(x);
       expect(b, utf8.encode(JSON.stringify(x)));
-      expect(JSON.parseBytes(b), x);
+      expect(JSON.parse(b), x);
     });
 
-    test('parseBytes throws FormatException for bad input', () {
-      expect(() => JSON.parseBytes(<int>[0xff]), throwsFormatException);
-      expect(() => JSON.parseBytes(utf8.encode('{')), throwsFormatException);
+    test('parse throws FormatException for bad bytes', () {
+      expect(() => JSON.parse(<int>[0xff]), throwsFormatException);
+      expect(() => JSON.parse(utf8.encode('{')), throwsFormatException);
     });
 
-    test('parseBytes returns a date as a String', () {
-      Object? r = JSON.parseBytes(
+    test('parse of bytes returns a date as a String', () {
+      Object? r = JSON.parse(
         JSON.bytes(<String, dynamic>{'at': DateTime.utc(2023)}),
       );
       expect((r as Map<String, dynamic>)['at'], '2023-01-01T00:00:00.000Z');
+    });
+
+    test('parse of a String and of bytes give equal results', () {
+      String text = '{"a":[1,2,{"b":null}],"c":"é"}';
+      expect(JSON.parse(utf8.encode(text)), JSON.parse(text));
+    });
+
+    test('parse of another type throws ArgumentError', () {
+      expect(() => JSON.parse(42), throwsArgumentError);
+      expect(() => JSON.parse(<String, dynamic>{}), throwsArgumentError);
     });
 
     test('a value with no toJson fails the same way in both paths', () {
