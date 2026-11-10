@@ -28,15 +28,17 @@ class JSON {
   }
 
   /// Like [stringify], but gives UTF-8 bytes. No String is built in between.
-  /// Use it for HTTP, sockets, files and cache. Use [stringify] when you
-  /// need a String.
+  /// Use it for sockets, files, queues or an HTTP client body.
+  /// Use [stringify] when you need a String.
+  /// A controller should return a Map, List or model. Dox already turns it
+  /// into JSON bytes. Do not return `JSON.bytes` from a controller.
   static List<int> bytes(Object? value) {
     return _jsonUtf8Encoder.convert(value);
   }
 
   /// Like [parse], but reads UTF-8 bytes. No String is built in between.
-  /// Use it for HTTP, sockets, files and cache. Use [parse] when you have
-  /// a String.
+  /// Use it for sockets, files, queues or an HTTP client body.
+  /// Use [parse] when you have a String.
   /// Throws a `FormatException` for bad UTF-8 or bad JSON.
   /// A date comes back as a String, because JSON has no date type.
   static Object? parseBytes(List<int> bytes) {
