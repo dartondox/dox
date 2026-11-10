@@ -282,10 +282,12 @@ AppConfig(compress: true);
 
 ## Logging
 
-`LogMiddleware` prints one JSON line per request. Writing to stdout blocks
-the isolate. So Dox collects log lines and writes them every 20 ms (or every
-64 KB) in one write. If the process is killed hard, the last 20 ms of request logs can
-be lost. Errors from `Logger` are still written right away.
+`LogMiddleware` logs one line per request through `Logger`. Writing to stdout
+blocks the isolate. So `Logger` collects log lines and writes them every 20 ms
+(or every 64 KB) in one write. A `warn` or `danger` line is written right away,
+with the waiting lines before it, so the order stays. The buffer is also
+written when the app stops. If the process is killed hard, the last 20 ms of
+logs can be lost.
 
 Turn `LogMiddleware` off when a proxy already writes access logs. The new
 project does this for you: `enabled` is `false` when `APP_ENV` is

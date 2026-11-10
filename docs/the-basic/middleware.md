@@ -191,7 +191,7 @@ AppConfig appConfig = AppConfig(
 
 - When the client (or a proxy) sends a safe `X-Request-Id` (1 to 128 characters of `A-Z a-z 0-9 . _ -`), Dox keeps it. Else it makes a new one of 32 hex characters.
 - `RequestId(trustClient: false)` always makes a new one.
-- `LogMiddleware` adds `request_id` to each log line. Put `RequestId` before it.
+- `LogMiddleware` adds `http.request_id` to each log line. Put `RequestId` before it.
 - The default `ExceptionHandler.report` prints the id with the error. In your own `report`, read `ExceptionHandler.requestId`.
 
 ## ETag and 304 Not Modified
@@ -365,7 +365,7 @@ flowchart LR
 ```
 
 !!! tip "Built-in middleware"
-    - `LogMiddleware` from `dox_core` writes one JSON log line per request. Headers are logged only with `withHeader: true`. Body fields and headers whose name has a word like `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`. The new project turns it off when `APP_ENV` is `production`.
+    - `LogMiddleware` from `dox_core` logs one line per request through `Logger`. It follows `LoggerConfig`: `enabled`, `level` and `prettyPrint`. With `prettyPrint` it prints colored text. Without it, it prints one JSON line with `status`, `message`, `network.client.ip`, `http.method`, `http.url`, `http.request_id` and `payload`. `enabled: false` turns only these request logs off. Leave `enabled` unset to follow the logger. Headers are logged only with `withHeader: true`. Body fields and headers whose name has a word like `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`. The new project turns it off when `APP_ENV` is `production`.
     - `AuthMiddleware` from `dox_auth` checks the JWT token. `AuthMiddleware(optional: true)` lets guests through too. `GuestMiddleware` lets only guests through, for login pages. See [Authentication](../security/authentication.md).
     - `RateLimit` from `dox_core` answers `429` when a client sends too many requests. See [Rate limiting](../security/rate-limiting.md).
     - `SecurityHeaders` from `dox_core` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).

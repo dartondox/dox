@@ -233,7 +233,7 @@ void main() {
         '/id-log',
         headers: <String, String>{'X-Request-Id': 'log-1'},
       );
-      expect(logLine!['request_id'], 'log-1');
+      expect(logLine!['http']['request_id'], 'log-1');
     });
 
     test('a route without it has no id', () async {

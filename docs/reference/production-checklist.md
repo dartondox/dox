@@ -75,7 +75,7 @@ If `APP_ENV` is empty or not set, Dox treats the app as production: `/docs` is o
 | --- | --- | --- |
 | JSON logs | `LoggerConfig(enabled: true, prettyPrint: false)`. The new project sets `prettyPrint` only when `APP_ENV=development`. | [App config](app-config.md) |
 | Log level | Set `LOG_LEVEL=warn` to print only warnings and errors. | [App config](app-config.md) |
-| Access logs in one place | `LogMiddleware` writes one line per request. It writes them in batches, every 20 ms, so a hard kill can lose the last lines. The new project turns it off when `APP_ENV=production`, because the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
+| Access logs in one place | `LogMiddleware` logs one line per request through `Logger`. Lines are written in batches, every 20 ms, so a hard kill can lose the last lines. A `warn` or `danger` line is written at once. The new project turns it off when `APP_ENV=production`, because the proxy already logs requests. | [Performance](../digging-deeper/performance.md) |
 | Errors go to your tracker | Extend `ExceptionHandler` and set `AppConfig.exceptionHandler`. Any non-HTTP error is passed to its `report` method. The client gets `500` with `server_error`. The error text is sent only when `APP_ENV` is `development` or `local`. | [Error handling](../the-basic/errors.md) |
 
 ## Health and shutdown

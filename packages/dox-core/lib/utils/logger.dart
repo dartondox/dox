@@ -4,6 +4,7 @@ library;
 import 'package:dox_core/app.dart';
 import 'package:dox_core/interfaces/app_config.dart';
 import 'package:dox_core/utils/json.dart';
+import 'package:dox_core/utils/log_buffer.dart';
 
 class Logger {
   /// rank of each level. a line prints when its rank is at least
@@ -28,9 +29,11 @@ class Logger {
   static void log(String level, dynamic message, [dynamic data]) {
     LoggerConfig config = Dox().config.logger;
     if (!config.enabled || !shouldLog(level, config.level)) return;
-    Dox().config.logger.prettyPrint
+    String line = config.prettyPrint
         ? _prettyLog(level, message, data)
-        : _log(level, message, data);
+        : _log(config, level, message, data);
+    // a warning or an error is written at once, it must not be lost
+    LogBuffer.write(line, now: (_ranks[level] ?? 3) >= 2);
   }
 
   /// log the text using info color (lightblue)
@@ -65,10 +68,8 @@ class Logger {
     log('danger', message, data);
   }
 
-  /// log as json string
-  /// this function is use for logging services
-  /// eg. datadog, sentry etc..
-  static void _prettyLog(String level, dynamic message, dynamic data) {
+  /// the colored text line
+  static String _prettyLog(String level, dynamic message, dynamic data) {
     String? payload = '';
     if (data == null || data is String) {
       payload = data;
@@ -85,23 +86,34 @@ class Logger {
     };
     String? color = colors[level];
     if (payload == null || payload.isEmpty) {
-      print('\x1B[${color}m$message\x1B[0m');
-      return;
+      return '\x1B[${color}m$message\x1B[0m';
     }
-    print('\x1B[${color}m$message => $payload\x1B[0m');
+    return '\x1B[${color}m$message => $payload\x1B[0m';
   }
 
-  /// log as json string
-  /// this function is use for logging services
-  /// eg. datadog, sentry etc..
-  static void _log(String level, dynamic message, dynamic data) {
+  /// one JSON line, with the standard attributes of log services
+  /// (eg. datadog). A Map in [data] is merged into the top level.
+  /// Any other value goes under `payload`.
+  static String _log(
+    LoggerConfig config,
+    String level,
+    dynamic message,
+    dynamic data,
+  ) {
     Map<String, dynamic> text = <String, dynamic>{
-      'level': level.toUpperCase(),
-      'name': Dox().config.logger.name,
-      'message': message.toString(),
       'timestamp': DateTime.now().toIso8601String(),
-      'payload': data,
+      'status': level,
+      'message': message.toString(),
+      if (config.name.isNotEmpty)
+        'logger': <String, dynamic>{'name': config.name},
     };
-    print(JSON.stringify(text));
+    if (data is Map) {
+      for (MapEntry<dynamic, dynamic> e in data.entries) {
+        text['${e.key}'] = e.value;
+      }
+    } else if (data != null) {
+      text['payload'] = data;
+    }
+    return JSON.stringify(text);
   }
 }

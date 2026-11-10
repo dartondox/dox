@@ -6,6 +6,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
+import 'package:dox_core/utils/log_buffer.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 IocContainer _ioc = IocContainer();
@@ -206,6 +207,8 @@ class Dox {
     }
     // after the providers too: they may still publish
     if (isolateId != 1) IsolateBus.instance.close();
+    // write the log lines that wait in the buffer
+    LogBuffer.flush();
   }
 
   /// the real address of [server], like `http://127.0.0.1:3000` or
