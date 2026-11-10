@@ -244,6 +244,7 @@ Keys of `extra`:
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |
 | mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
 | sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
+| sqlite | `background` | `bool` | `false` | `true` runs the queries in a helper isolate, so a slow query does not block the request isolate. Each query costs one message hop. See [SQLite](../database/index.md#run-queries-in-a-helper-isolate). |
 
 The `database.dart` of a new project also sets `maxConnectionAge` for Postgres and `collation` for MySQL. The Postgres driver does not read `maxConnectionAge`, and no driver reads `collation`. So these two keys change nothing.
 
