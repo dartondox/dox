@@ -108,7 +108,11 @@ The Dart type decides. You do not write `required` or `nullable`.
 - A default value is used only when the key is missing. The rules do not check it.
 - **An empty string counts as missing.** So a required `String` rejects `""`. Add `@AllowEmpty()` to keep `""`.
 - To read `""` as `null` instead (like Laravel's `ConvertEmptyStringsToNull`), use `@Dto(emptyStringsToNull: true)`. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`. A field that is not nullable but has a default gets `required` too, because `null` is not a missing key.
-- `@OrDefault()` turns a bad value into the default, with no error. It works on any field, in a body or a query. A query field is a common use: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` in the constructor reads `page=abc` and `page=0` as `1`. The field needs a default in the constructor, a nullable type, or a `Maybe` type (a bad value then gives `Maybe.missing()`). `@OrDefault()` only covers type errors and the normal rules of the field. Errors from async rules (`@Unique`, `@Exists` and your own `AsyncRule`) and from `validate()` are not dropped: they still give `422`. These checks run later, on the built object.
+- `@OrDefault()` turns a bad value into the default, with no error.
+  - It works on any field, in a body or a query.
+  - Example: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` reads `page=abc` and `page=0` as `1`.
+  - The field needs a default, a nullable type or a `Maybe` type. A `Maybe` field gets `Maybe.missing()`.
+  - Errors from async rules (`@Unique`, `@Exists`, your `AsyncRule`) and from `validate()` are not dropped. They run later, on the built object, and still give `422`.
 
 ### Missing or `null`? (for PATCH)
 

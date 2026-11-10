@@ -4,6 +4,7 @@
 - OpenAPI: a controller method that calls `req.validateSchema(...)`, or `req.validate<T>()` with no request class found, gets a `422` answer. A `@Response(422, ...)` wins. Needs the next dox_core.
 - OpenAPI: a controller method that calls `Gate.authorize(...)` gets a `403` answer in the docs. A `@Response(403, ...)` wins.
 - DTOs: a DTO with no `@RequiredIf` or `@RequiredWith` field (and no nested DTO with one) now writes `usesRequiredWhen => false`. Then the check does not keep each converted value, which saves work. Needs the next dox_validation.
+- Fix: `@OrDefault()` on a `Maybe<T>` field no longer stops the build. A bad value gives `Maybe.missing()`.
 - Fix: a nested DTO deeper in lists and maps, like `List<List<A>>` or `Map<String, List<A>>`, now runs its `validate()` and its async rules. Before, only one level (`List<A>`, `Map<String, A>`) was found. So after `build_runner`, an app may now get errors from these deeper DTOs that were skipped before.
 
 ## 3.1.3

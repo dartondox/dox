@@ -166,7 +166,7 @@ for (Song song in artist!.songs) {
   `updateExistingPivot()` sets `updated_at`.
   The pivot table needs both columns (`table.timestamps()`).
 - A model that was not loaded by a ManyToMany relation has an empty `pivot`.
-- `toJson()` of a model loaded by a ManyToMany relation has a `pivot` key with these values, like Laravel. Dates are ISO text. Put `'pivot'` in `hidden` to leave it out. A model with its own `pivot` column keeps its column value in that key. The pivot values are then only in `pivot` in Dart.
+- `toJson()` of a model loaded by a ManyToMany relation has a `pivot` key with these values, like Laravel. Dates are ISO text. Put `'pivot'` in `hidden` to leave it out. A model with its own `pivot` column keeps its column value in that key. Then the pivot values are only in the `pivot` getter in Dart, not in `toJson()`.
 
 ## Change the links
 

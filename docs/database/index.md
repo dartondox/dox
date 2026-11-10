@@ -356,7 +356,7 @@ A `QueryEvent` has:
 - `connection`: the name of the connection.
 
 The function runs only after a query that worked. A failed query is not sent: its error goes to your code.
-It also gets the queries of `Schema`, `truncate()` and the migrator, when they run on a connection of the ORM. A migrator that opens its own database from `.env` has no connection name, so its queries are not sent.
+It also gets the queries of `Schema`, `truncate()` and the migrator, when they run on a connection of the ORM. A migrator that opens its own database from `.env` does not use a connection of the ORM, so its queries are not sent.
 If the function throws, Dox logs the error and the query still returns its rows.
 `SqlQueryBuilder().removeListener(onQuery)` stops it.
 

@@ -269,12 +269,12 @@ Server-Timing: db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02
 - Without the middleware, or outside a request, `add` and `measure` do nothing. The cost is one small lookup.
 - A name may only have letters, digits and ``!#$%&'*+-.^_`|~``. Other characters become `_`. An empty name is ignored.
 - One answer keeps at most 32 names, plus `handler` and `total`.
-- `handler` and `total` are kept for the built-in times. If your code adds a time named `total` or `handler`, it is sent as `app_total` or `app_handler`. It does not change the built-in times.
+- `handler` and `total` are kept for the built-in times. If your code adds a time named `total` or `handler`, it is sent as `app_total` or `app_handler`. It does not change the built-in times. A time you name `app_total` yourself is added to it.
 - If the answer already has a `Server-Timing` header (set with `res.header`), the times are added after it, like `cdn;dur=1, handler;dur=12.34, total;dur=13.02`.
 
 To add the time of every database query, listen to the queries once, for example in `setup()` of a provider. The listener runs inside the request that made the query, so `add` finds that request:
 
-```dart
+```dart title="lib/app/providers/query_timing.provider.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart'; // SqlQueryBuilder and QueryEvent
 
@@ -282,10 +282,15 @@ void onQuery(QueryEvent event) {
   ServerTiming.add('db', event.time);
 }
 
-SqlQueryBuilder().listen(onQuery);
+class QueryTimingProvider extends DoxProvider {
+  @override
+  void setup() {
+    SqlQueryBuilder().listen(onQuery);
+  }
+}
 ```
 
-Each `listen` call adds the listener again. If `setup()` runs a second time (for example in tests), each query is added twice. Call `SqlQueryBuilder().removeListener(onQuery)` first, or when you are done.
+Each `listen` call adds the listener again. If `setup()` runs a second time (for example in tests), the time of each query is counted twice. Call `SqlQueryBuilder().removeListener(onQuery)` first, or when you are done.
 
 The header then shows the total query time and the count, like `db;dur=4.10;desc="3 calls"`. See [Listen to queries](../database/index.md#listen-to-queries).
 
