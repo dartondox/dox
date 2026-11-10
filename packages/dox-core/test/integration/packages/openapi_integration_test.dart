@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/router/route_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
@@ -25,6 +26,25 @@ class ApiKeyAuthMiddleware implements IDoxMiddleware {
 class LoginGuard implements IDoxMiddleware {
   @override
   dynamic handle(IDoxRequest req) => req;
+}
+
+/// dox_auth is not a dependency here. The docs find these by class name.
+class Can implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) => req;
+}
+
+class GuestMiddleware implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) => req;
+}
+
+class GateController {
+  dynamic update(DoxRequest req) => 'ok';
+
+  dynamic destroy(DoxRequest req) => 'ok';
+
+  dynamic filter(DoxRequest req) => 'ok';
 }
 
 /// like the your-qr app: two controllers with the same method names and
@@ -138,6 +158,31 @@ const OpenApiRegistry registry = OpenApiRegistry(
       argumentTypes: <String>['DoxRequest'],
       summary: 'API links',
     ),
+    // `@Response(403, ...)` on a route with `Can`
+    OpenApiOperation(
+      controller: 'GateController',
+      method: 'destroy',
+      argumentTypes: <String>['DoxRequest'],
+      responses: <int, ResponseDoc>{
+        200: ResponseDoc(description: 'Successful response'),
+        403: ResponseDoc(description: 'Not your post'),
+      },
+    ),
+    // a method that calls `req.validateSchema(...)`
+    OpenApiOperation(
+      controller: 'GateController',
+      method: 'filter',
+      argumentTypes: <String>['DoxRequest'],
+      responses: <int, ResponseDoc>{
+        200: ResponseDoc(description: 'Successful response'),
+        422: ResponseDoc(
+          description: 'Validation failed',
+          schema: <String, dynamic>{
+            r'$ref': '#/components/schemas/ValidationError',
+          },
+        ),
+      },
+    ),
     OpenApiOperation(
       controller: 'LinkApiController',
       method: 'show',
@@ -228,6 +273,23 @@ class WebRouter extends Router {
   }
 }
 
+class GateRouter extends Router {
+  @override
+  String get prefix => 'gate';
+
+  @override
+  void register() {
+    Route.get('/can', <dynamic>[Can(), GateController().update]);
+    Route.get('/guest', <dynamic>[GuestMiddleware(), GateController().update]);
+    Route.get('/signed', <dynamic>[
+      const ValidateSignature(),
+      GateController().update,
+    ]);
+    Route.get('/custom', <dynamic>[Can(), GateController().destroy]);
+    Route.get('/filter', GateController().filter);
+  }
+}
+
 class DocsRouter extends Router {
   @override
   List<dynamic> get middleware => <dynamic>[AuthMiddleware()];
@@ -271,7 +333,7 @@ AppConfig config = AppConfig(
   // the OS picks a free port, so test files can run in parallel
   serverPort: 0,
   totalIsolate: 1,
-  routers: <Router>[DocsRouter(), ApiRouter(), WebRouter()],
+  routers: <Router>[DocsRouter(), ApiRouter(), WebRouter(), GateRouter()],
   container: (IocContainer c) {
     c.singleton<LinkApiController>((IocContainer c) => LinkApiController());
     c.singleton<LinkPageController>((IocContainer c) => LinkPageController());
@@ -429,6 +491,60 @@ void main() {
     expect(doc['paths']['/search']['get']['security'], <dynamic>[
       <String, dynamic>{'bearerAuth': <dynamic>[]},
     ]);
+  });
+
+  test('Can, GuestMiddleware and ValidateSignature give 401 and 403', () {
+    Map<String, dynamic> doc = OpenApiDocument(config.openApi)
+        .build(Route().routes)
+        .toJson();
+    Map<String, dynamic> error = <String, dynamic>{
+      'type': 'object',
+      'properties': <String, dynamic>{
+        'code': <String, dynamic>{'type': 'string'},
+        'message': <String, dynamic>{'type': 'string'},
+      },
+    };
+
+    Map<String, dynamic> can = doc['paths']['/gate/can']['get']['responses'];
+    expect(can['401']['description'], 'Not logged in');
+    expect(can['403']['description'], 'Not allowed');
+    expect(can['401']['content']['application/json']['schema'], error);
+    expect(can['403']['content']['application/json']['schema'], error);
+
+    for (String path in <String>['/gate/guest', '/gate/signed']) {
+      Map<String, dynamic> responses = doc['paths'][path]['get']['responses'];
+      expect(responses['403']['description'], 'Not allowed', reason: path);
+      expect(responses.containsKey('401'), isFalse, reason: path);
+    }
+
+    /// the 403 of the code wins, the 401 is still added
+    Map<String, dynamic> custom =
+        doc['paths']['/gate/custom']['get']['responses'];
+    expect(custom['403'], <String, dynamic>{'description': 'Not your post'});
+    expect(custom['401']['description'], 'Not logged in');
+
+    /// a route with none of them gets no 403
+    expect(
+      doc['paths']['/gate/filter']['get']['responses'].containsKey('403'),
+      isFalse,
+    );
+  });
+
+  test('a 422 from the registry adds the ValidationError schema', () {
+    List<RouteData> routes = <RouteData>[
+      for (RouteData route in Route().routes)
+        if (route.path.endsWith('/gate/filter')) route,
+    ];
+    expect(routes, hasLength(1));
+    Map<String, dynamic> doc = OpenApiDocument(
+      const OpenApiConfig(registry: registry),
+    ).build(routes).toJson();
+    expect(OpenApiChecker().check(doc), isEmpty);
+    expect(
+      doc['paths']['/gate/filter']['get']['responses']['422']['content']['application/json']['schema'],
+      <String, dynamic>{r'$ref': '#/components/schemas/ValidationError'},
+    );
+    expect(doc['components']['schemas'], contains('ValidationError'));
   });
 
   test('an optional param gives the path with and without it', () {
