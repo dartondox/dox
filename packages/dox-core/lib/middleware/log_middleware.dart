@@ -65,7 +65,8 @@ class LogMiddleware implements IDoxMiddleware {
       'payload': payload,
     };
     if (filter != null) {
-      text = filter!(text);
+      // a copy: the filter may return a map that can not change
+      text = Map<String, dynamic>.of(filter!(text));
     }
     // the logger config decides if the line is written, and how
     String status = '${text.remove('status') ?? 'info'}';

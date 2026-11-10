@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_request_handler.dart';
+import 'package:dox_core/utils/log_buffer.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 class DoxServer {
@@ -72,6 +73,7 @@ class DoxServer {
       },
       (Object error, StackTrace stackTrace) {
         Dox().config.exceptionHandler.report(error, stackTrace);
+        LogBuffer.flush();
       },
     );
     httpServer = server;

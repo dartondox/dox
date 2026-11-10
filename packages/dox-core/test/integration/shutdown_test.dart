@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dox_cache/dox_cache.dart' show MemoryDriver;
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/log_buffer.dart';
 import 'package:test/test.dart';
 
 import '../utils/free_port.dart';
@@ -98,6 +99,16 @@ void main() {
       Dox().cache.addStore('spy', spy);
       await Dox().stop();
       expect(spy.closed, 1);
+    });
+
+    test('stop writes the waiting log lines', () async {
+      List<String> written = <String>[];
+      LogBuffer.writer = written.add;
+      addTearDown(() => LogBuffer.writer = stdout.write);
+      LogBuffer.write('waiting line');
+      expect(written, isEmpty);
+      await Dox().stop();
+      expect(written.join(), contains('waiting line'));
     });
 
     test('a request longer than shutdownTimeout is cut', () async {

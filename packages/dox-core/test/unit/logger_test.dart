@@ -122,6 +122,55 @@ void main() {
       expect(writes.length, 1);
     });
 
+    test('warning and error are written right away too', () {
+      config();
+      Logger.log('warning', 'w');
+      expect(writes.length, 1);
+      Logger.log('error', 'e');
+      expect(writes.length, 2);
+    });
+
+    test('debug shows with level debug, and is hidden with info', () {
+      config(level: 'debug');
+      Logger.log('debug', 'd');
+      LogBuffer.flush();
+      expect(jsonDecode(lines.single)['status'], 'debug');
+      writes.clear();
+      config();
+      Logger.log('debug', 'd');
+      LogBuffer.flush();
+      expect(writes, isEmpty);
+    });
+
+    test('pretty colors: no null color for any level', () {
+      config(pretty: true, level: 'debug');
+      for (String level in <String>['debug', 'warning', 'error', 'other']) {
+        Logger.log(level, level);
+      }
+      LogBuffer.flush();
+      expect(lines.join(), isNot(contains('nullm')));
+      expect(lines[1], startsWith('\x1B[33m'));
+      expect(lines[2], startsWith('\x1B[31m'));
+    });
+
+    test('data keys do not replace the standard fields', () {
+      config();
+      Logger.info('real', <String, dynamic>{
+        'message': 'fake',
+        'status': 'fake',
+        'timestamp': 'fake',
+        'logger': 'fake',
+        'extra': 1,
+      });
+      LogBuffer.flush();
+      Map<String, dynamic> line = jsonDecode(lines.single);
+      expect(line['message'], 'real');
+      expect(line['status'], 'info');
+      expect(line['timestamp'], isNot('fake'));
+      expect(line['logger'], <String, dynamic>{'name': 'api'});
+      expect(line['extra'], 1);
+    });
+
     test('danger and warn are written right away, in order', () {
       config();
       Logger.info('one');

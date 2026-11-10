@@ -112,6 +112,21 @@ void main() {
       expect(line.containsKey('payload'), isFalse);
     });
 
+    test('filter can return a map that can not change', () {
+      config();
+      Map<String, dynamic> out = Map<String, dynamic>.unmodifiable(
+        <String, dynamic>{'status': 'error', 'message': 'fixed', 'a': 1},
+      );
+      LogMiddleware(filter: (Map<String, dynamic> l) => out)
+          .handle(FakeRequest());
+      LogBuffer.flush();
+      Map<String, dynamic> line = jsonDecode(lines.single);
+      expect(line['status'], 'error');
+      expect(line['message'], 'fixed');
+      expect(line['a'], 1);
+      expect(out.containsKey('status'), isTrue);
+    });
+
     test('enabled not set follows the logger config', () {
       config(enabled: false);
       LogMiddleware().handle(FakeRequest());

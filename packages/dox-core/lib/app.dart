@@ -158,6 +158,8 @@ class Dox {
     _cancelSignals();
     Logger.info('$signal: stopping, open requests can finish');
     await stop();
+    // lines logged after the flush of `stop` must not be lost
+    LogBuffer.flush();
     exit(0);
   }
 
@@ -180,17 +182,30 @@ class Dox {
   /// ```
   Future<void> stop() async {
     _cancelSignals();
-    await Future.wait(<Future<void>>[
-      DoxIsolate().stopAll(config.shutdownTimeout),
-      stopIsolate(),
-    ]);
-    // close the bus again: `killAll` closes it while the providers of the
-    // main isolate still shut down, and one of them may join it again.
-    IsolateBus.instance.close();
+    try {
+      await Future.wait(<Future<void>>[
+        DoxIsolate().stopAll(config.shutdownTimeout),
+        stopIsolate(),
+      ]);
+      // close the bus again: `killAll` closes it while the providers of the
+      // main isolate still shut down, and one of them may join it again.
+      IsolateBus.instance.close();
+    } finally {
+      LogBuffer.flush();
+    }
   }
 
   /// [stop] for this isolate only. Internal: each isolate runs it.
   Future<void> stopIsolate() async {
+    try {
+      await _stopIsolate();
+    } finally {
+      // write the log lines that wait in the buffer, also after an error
+      LogBuffer.flush();
+    }
+  }
+
+  Future<void> _stopIsolate() async {
     await DoxServer().shutdown(config.shutdownTimeout);
     for (DoxProvider provider in doxProviders) {
       try {
@@ -207,8 +222,6 @@ class Dox {
     }
     // after the providers too: they may still publish
     if (isolateId != 1) IsolateBus.instance.close();
-    // write the log lines that wait in the buffer
-    LogBuffer.flush();
   }
 
   /// the real address of [server], like `http://127.0.0.1:3000` or

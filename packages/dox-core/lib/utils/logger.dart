@@ -79,12 +79,16 @@ class Logger {
       payload = JSON.stringify(data);
     }
     Map<String, String> colors = <String, String>{
+      'debug': '90',
       'info': '36',
       'warn': '33',
+      'warning': '33',
       'success': '32',
       'danger': '31',
+      'error': '31',
     };
-    String? color = colors[level];
+    // an unknown level gets the default color
+    String color = colors[level] ?? '0';
     if (payload == null || payload.isEmpty) {
       return '\x1B[${color}m$message\x1B[0m';
     }
@@ -109,7 +113,8 @@ class Logger {
     };
     if (data is Map) {
       for (MapEntry<dynamic, dynamic> e in data.entries) {
-        text['${e.key}'] = e.value;
+        // the standard fields stay: a key with the same name is dropped
+        text.putIfAbsent('${e.key}', () => e.value);
       }
     } else if (data != null) {
       text['payload'] = data;
