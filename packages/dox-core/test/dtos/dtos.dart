@@ -26,5 +26,6 @@ const List<DtoSchema<Object>> testDtos = <DtoSchema<Object>>[
   $SignUpDto,
   $AsyncCheckDto,
   $CreatePostDto,
+  $ListPostsDto,
   $UploadAvatarDto,
 ];

@@ -207,7 +207,7 @@ Call `oauth.routes()` in a router with no prefix. The routes must sit at the roo
 | `GET /.well-known/oauth-protected-resource` (also with `/mcp` after it) | Names the MCP address and the issuer. |
 | `GET /.well-known/oauth-authorization-server` | Lists the endpoints. PKCE `S256` only, `authorization_code` only, no client secret. |
 | `POST /oauth/register` | Dynamic client registration. Nothing is stored. The `client_id` is the name and the redirect addresses, signed with `APP_KEY`. |
-| `POST /oauth/token` | Swaps a code for a token. The body is a form or JSON. The code works once, for `codeTtl` (1 minute). The client, the redirect address and the PKCE verifier must all match. |
+| `POST /oauth/token` | Swaps a code for a token. The body is a form or JSON. The code works once, for `codeTtl` (1 minute). The client, the redirect address and the PKCE verifier must all match. An unknown `client_id` gets `401` with `invalid_client`. |
 
 Rules:
 

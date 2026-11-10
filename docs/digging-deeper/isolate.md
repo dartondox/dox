@@ -77,7 +77,7 @@ IsolateBus.instance.publish('users', <Object>['changed', 42]);
 - `Dox().isolateCount` is the number of isolates that run, in every isolate.
 - `IsolateBus.instance.size` is the number of isolates that listen, this one included.
 - A message must be something a `SendPort` can send: null, bool, num, String, typed data, and lists and maps of those.
-- A value that a `SendPort` can not send throws in `publish`. Then no isolate gets the message.
+- A value that a `SendPort` can not send throws an `ArgumentError` in `publish`. Then no isolate gets the message. In the main isolate it throws only when another isolate listens on the bus. With no other isolate there, nobody gets it and nothing throws.
 - It works inside one process only. For many servers, use Redis.
 - There is no backpressure. `publish` never waits. A slow listener gets the messages in a queue in its memory.
 - A message reaches only the isolates that listen at that moment. An isolate that calls `on()` later does not get the messages sent before.

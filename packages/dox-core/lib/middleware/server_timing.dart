@@ -15,15 +15,22 @@ import 'package:dox_core/dox_core.dart';
 ///
 /// It always sends `total` (the middleware after it and the controller)
 /// and `handler` (only the controller). Other code adds its own timing
-/// to the current request with [add] or [measure]:
+/// to the current request with [add] or [measure]. The names `total`
+/// and `handler` are kept for these two: your own `total` is sent as
+/// `app_total`, and your own `handler` as `app_handler`. If you also
+/// add a time named `app_total`, the two are added together.
 ///
 /// ```
 /// ServerTiming.add('db', query.duration);
 /// String html = await ServerTiming.measure('render', () => view.render());
 /// ```
 ///
-/// The header is sent like this:
-/// `handler;dur=12.34, db;dur=4.10;desc="3 calls", total;dur=13.02`.
+/// The names come in the order they were first added. So the times of
+/// the controller (like `db`) come first, then `handler`, then `total`:
+/// `db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02`.
+///
+/// When the answer already has a `Server-Timing` header (set with
+/// `res.header`), these times are added after it.
 ///
 /// Security: this header tells every client how long your code takes.
 /// That can help an attacker (for example to guess if a user exists).
@@ -51,8 +58,19 @@ class ServerTiming implements IDoxNextMiddleware {
       next,
       zoneValues: <Object, Object>{_key: timings},
     );
-    timings.add('total', watch.elapsed, null);
-    return res.header(header, timings.toHeader());
+    timings.add('total', watch.elapsed, null, own: true);
+    String value = timings.toHeader();
+    // keep a Server-Timing header that the app set itself
+    String key = header;
+    for (MapEntry<String, dynamic> entry in res.headers.entries) {
+      if (entry.key.toLowerCase() == 'server-timing') {
+        key = entry.key;
+        Object? old = entry.value;
+        String text = old is Iterable ? old.join(', ') : '$old';
+        if (text.isNotEmpty) value = '$text, $value';
+      }
+    }
+    return res.header(key, value);
   }
 
   /// Adds [duration] to the timing [name] of the current request. When
@@ -82,6 +100,25 @@ class ServerTiming implements IDoxNextMiddleware {
   }
 }
 
+/// Not exported. true when the [ServerTiming] middleware is on for the
+/// current request. The router checks it before it times the controller,
+/// so a route without the middleware pays nothing more.
+bool serverTimingOn() {
+  return Zone.current[ServerTiming._key] is _Timings;
+}
+
+/// Not exported. Runs the controller [fn] and adds its time as
+/// `handler`, also when it throws. Call it only when [serverTimingOn].
+Future<dynamic> timeHandler(FutureOr<dynamic> Function() fn) async {
+  _Timings timings = Zone.current[ServerTiming._key] as _Timings;
+  Stopwatch watch = Stopwatch()..start();
+  try {
+    return await fn();
+  } finally {
+    timings.add('handler', watch.elapsed, null, own: true);
+  }
+}
+
 /// one name in the header
 class _Timing {
   int micros = 0;
@@ -99,13 +136,21 @@ class _Timings {
   /// control and non-ASCII characters, not safe in a header value
   static final RegExp _notPrintable = RegExp(r'[^\x20-\x7e]');
 
-  void add(String name, Duration duration, String? description) {
+  /// [own] is true only for the built-in `total` and `handler`. A name
+  /// from app code that is `total` or `handler` gets `app_` in front,
+  /// so it does not add to the built-in times.
+  void add(
+    String name,
+    Duration duration,
+    String? description, {
+    bool own = false,
+  }) {
     String clean = name.replaceAll(_notToken, '_');
     if (clean.isEmpty) return;
     if (clean.length > 64) clean = clean.substring(0, 64);
+    if (!own && (clean == 'total' || clean == 'handler')) clean = 'app_$clean';
     _Timing? item = _items[clean];
     if (item == null) {
-      bool own = clean == 'total' || clean == 'handler';
       if (!own && _items.length >= ServerTiming.maxNames) return;
       item = _items[clean] = _Timing();
     }

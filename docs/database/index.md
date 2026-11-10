@@ -221,7 +221,7 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 - For Postgres, `sslmode` works like libpq (`disable`, `prefer`, `require`, `verify-ca`, `verify-full`). `require` does not check the certificate. Use `verify-full` when your host supports it. See [Postgres TLS](postgres-native.md#tls).
 - For MySQL, `ssl=true` (or `sslmode=require`) turns TLS on, and it checks the certificate. Add `verifyCertificate=false` to skip the check, only for a self-signed certificate in development.
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
-- Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`.
+- Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`. This works for SQLite too, like `sqlite://db/dox.sqlite?background=true`.
 
 The ORM reads `DATABASE_URL` from the real environment, not from `.env`.
 To use a url from `.env`, or any other url, give it yourself:
@@ -282,7 +282,7 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | `timeZone` | Postgres | `UTC` | Time zone of the session. |
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
 | `busyTimeout` | SQLite | `5000` | Milliseconds a query waits for a lock. |
-| `background` | SQLite | `false` | `true` runs the queries in a helper isolate. See [Run queries in a helper isolate](#run-queries-in-a-helper-isolate). |
+| `background` | SQLite | `false` | `true` (or `1`, `'true'`, `'1'`) runs the queries in a helper isolate. See [Run queries in a helper isolate](#run-queries-in-a-helper-isolate). |
 
 ### Table and column names are quoted
 
@@ -355,7 +355,8 @@ A `QueryEvent` has:
 - `time`: how long the query took, a `Duration`.
 - `connection`: the name of the connection.
 
-The function runs only after a query that worked.
+The function runs only after a query that worked. A failed query is not sent: its error goes to your code.
+It also gets the queries of `Schema`, `truncate()` and the migrator, when they run on a connection of the ORM. A migrator that opens its own database from `.env` does not use a connection of the ORM, so its queries are not sent.
 If the function throws, Dox logs the error and the query still returns its rows.
 `SqlQueryBuilder().removeListener(onQuery)` stops it.
 
@@ -376,6 +377,9 @@ It is off by default. It works with `debug` off, so you can use it in production
 The log line goes to the query `printer`.
 It has the time, the connection name and the SQL, like `Slow query (812 ms, postgres): select ...`.
 A value named in `logRedact` shows as `***`.
+Set `slowQueryMs` to `0` to log every query.
+A failed query is not logged here.
+With `debug` on, a slow query of the query builder shows twice: the debug line before it runs, and the slow line with its time after it.
 
 ## MySQL and MariaDB
 
@@ -444,6 +448,8 @@ Your isolate only waits for the answer, so it keeps serving other requests.
 It is off by default.
 Queries, transactions, `:memory:` databases, the query listener and the slow query log work the same.
 A SQL error is the same `SqliteException`.
+A database that does not open (for example a wrong folder) does not throw at startup. The error comes on the first query, and on every query after it.
+To turn it on with `DATABASE_URL`, add `?background=true`, like `sqlite://db/dox.sqlite?background=true`.
 
 Each query costs one message to the helper isolate and one back.
 

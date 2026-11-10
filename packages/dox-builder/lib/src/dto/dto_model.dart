@@ -656,7 +656,8 @@ class DtoReader {
           field.allowEmpty = true;
         case 'OrDefault':
           field.orDefault = true;
-          if (field.required) {
+          // a Maybe field falls back to Maybe.missing()
+          if (!field.maybe && field.required) {
             errors.add(
               '@OrDefault on $where needs a default value or a nullable type.',
             );

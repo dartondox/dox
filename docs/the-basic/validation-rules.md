@@ -79,9 +79,10 @@ For `String` fields. Like the Laravel rules with the same names.
 | `@Digits(6)` | `digits` | `The {field} must be {digits} digits` | `pattern` |
 | `@DigitsBetween(4, 6)` | `digits_between` | `The {field} must be between {min} and {max} digits` | `pattern` |
 | `@DateFormatted('Y-m-d')` | `date_format` | `The {field} must match the format {format}` | |
-| `@HexColor()` | `hex_color` | `The {field} must be a hex color like #1a2b3c` | `pattern` |
+| `@HexColor()`, `@HexColor(short: true)` | `hex_color` | `The {field} must be a hex color like #1a2b3c` | `pattern` |
 | `@Password(min: 8, ...)` | `password` | `The {field} must have {rules}` | `minLength` |
 
+- `@HexColor()` takes `#` and 6 hex digits, in any case. `@HexColor(short: true)` also takes 3 digits, like `#abc`.
 - `@Digits` and `@DigitsBetween` take only `0-9`. No sign, no dot. Use a `String` field, so leading zeros stay.
 - `@DateFormatted` uses the PHP `date()` letters:
   day `d`, `j`, `D` (`Mon`), `l` (`Monday`), `N`, `w`, `S` (`st`), `z`;
@@ -131,6 +132,16 @@ These change the value before the rules run. They always run in this order, wher
 | `@AllowEmpty()` | keeps `""` as a value. Without it, `""` counts as missing. |
 
 They have no error and no JSON Schema output. `@Lowercase()` and `@Uppercase()` together stop the build.
+
+## Bad value to default
+
+| Annotation | Does |
+| --- | --- |
+| `@OrDefault()` | a bad value gives the default of the field (or `null`, or `Maybe.missing()`), not an error. |
+
+- It drops type errors and the errors of the normal rules of the field.
+- Errors from async rules (`@Unique`, `@Exists`, your `AsyncRule`) and from `validate()` are not dropped. They still give `422`.
+- The field needs a default, a nullable type or a `Maybe` type. Else the build stops.
 
 ## Numbers
 
@@ -248,7 +259,6 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
 | `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
 | `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
-| `@OrDefault()` | on a field: a bad value gives the default (or `null`), not an error. Errors from `@Unique`, `@Exists` and `validate()` are not dropped. |
 | `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
 | `@Describe('...')` | on a field: a short text for the `description` of the field in the JSON Schema. It does not change the checks. |
 
@@ -309,6 +319,7 @@ The build stops with a clear error when:
 - a rule does not fit the field type (like `@Email()` on an `int`),
 - a `Maybe<T>` field has no `const Maybe.missing()` default,
 - `@RequiredIf` or `@RequiredWith` is on a field that is always required,
+- `@OrDefault()` is on a field that is always required (no default, not nullable and not a `Maybe`),
 - `@RequiredIf`, `@RequiredWith`, `@Same` or `@Confirmed(other:)` names a Dart field (like `accountType`) instead of its input key (`account_type`),
 - `@DateFormatted` has a letter it does not know,
 - two `@Dto` classes in the app have the same name,

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_error_handler.dart';
+import 'package:dox_core/middleware/server_timing.dart';
 import 'package:dox_core/router/route_data.dart';
 
 /// Run middleware and controllers. It stays sync while every step gives
@@ -126,12 +127,10 @@ Future<DoxResponse> _chain(DoxRequest req, int start) async {
       if (fn is Function || fn is ControllerAction) {
         if (i == last) {
           /// only times the controller when `ServerTiming` is on
-          return asResponse(
-            await ServerTiming.measure(
-              'handler',
-              () => route.handler!.call(req),
-            ),
-          );
+          if (!serverTimingOn()) {
+            return asResponse(await route.handler!.call(req));
+          }
+          return asResponse(await timeHandler(() => route.handler!.call(req)));
         }
         result = fn(req);
       } else if (fn is IDoxMiddleware) {

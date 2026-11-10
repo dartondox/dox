@@ -289,6 +289,14 @@ Run a job now, in this process, with no queue:
 await SendWelcomeEmail(userId: 1).dispatchSync();
 ```
 
+Run a job in this process after the answer is sent. The client does not wait for it:
+
+```dart
+SendWelcomeEmail(userId: 1).dispatchAfterResponse();
+```
+
+It does not go on the queue. So it has no job id and no retry. Outside a request, the job runs soon. When the job throws, its `failed()` runs and the error goes to the exception handler, never to the client. `QueueProvider` turns on `AfterResponse` for it. When the server stops, a job that did not run yet is lost.
+
 ### Queue an email
 
 You do not need a job class to send an email later. With [dox_mailer](mail.md#queue-an-email), call `Mail.queue()`:
@@ -545,7 +553,7 @@ test('signing up queues the welcome email', () async {
 
 To read the jobs, use `queue.pushed`. Each item has the `job`, the `queue` name and the `delay`. `queue.jobsOf<T>()` gives the `T` jobs. `queue.clear()` forgets them. `Queue.restore()` stops the fake.
 
-- `dispatchSync()` is not faked. It still runs the job.
+- `dispatchSync()` runs the job now. `dispatchAfterResponse()` runs it after the answer, or soon outside a request. The fake does not stop them. It keeps their jobs in `queue.dispatchedSync` and `queue.dispatchedAfterResponse` (not in `queue.pushed`). `queue.clear()` empties these lists too.
 - The fake does not encode the job. A job that is missing from `QueueConfig.jobs`, or has data that is not JSON, passes a faked test but fails for real.
 - The fake also catches `Mail.queue()`, but only when `Mail.fake()` is off. When both are on, `Mail.fake()` catches the email first. See [Mail](mail.md#testing).
 

@@ -37,6 +37,36 @@ class TimingRouter extends Router {
       const ServerTiming(),
       (DoxRequest req) => throw NotFoundHttpException(),
     ]);
+    Route.get('/reserved', <dynamic>[
+      const ServerTiming(),
+      (DoxRequest req) {
+        ServerTiming.add('total', const Duration(seconds: 5));
+        ServerTiming.add('handler', const Duration(seconds: 5));
+        return 'ok';
+      },
+    ]);
+    Route.get('/own-header', <dynamic>[
+      const ServerTiming(),
+      (DoxRequest req) => response('ok').header('server-timing', 'cdn;dur=1'),
+    ]);
+    Route.get('/measure-throws', <dynamic>[
+      const ServerTiming(),
+      (DoxRequest req) async {
+        try {
+          await ServerTiming.measure<void>('fail', () async {
+            await Future<void>.delayed(Duration.zero);
+            throw StateError('fail');
+          });
+        } on StateError {
+          return 'caught';
+        }
+        return 'not caught';
+      },
+    ]);
+    Route.get('/next-only', <dynamic>[
+      (DoxRequest req, Next next) => next(),
+      (DoxRequest req) => 'next',
+    ]);
     Route.get('/plain', (DoxRequest req) {
       ServerTiming.add('db', const Duration(milliseconds: 1));
       return 'plain';
@@ -87,6 +117,36 @@ void main() {
 
     test('no header and no error without the middleware', () async {
       TestResponse res = (await client.get('/plain')).expectStatus(200);
+      expect(res.header('server-timing'), isNull);
+    });
+
+    test('a user total or handler gets app_ in front', () async {
+      TestResponse res = (await client.get('/reserved')).expectStatus(200);
+      List<String> parts = res.header('server-timing')!.split(', ');
+      expect(parts[0], 'app_total;dur=5000.00');
+      expect(parts[1], 'app_handler;dur=5000.00');
+      // the built-in times do not get the 5 seconds
+      expect(parts[2], matches(RegExp(r'^handler;dur=\d{1,3}\.\d\d$')));
+      expect(parts[3], matches(RegExp(r'^total;dur=\d{1,3}\.\d\d$')));
+    });
+
+    test('keeps a Server-Timing header the app set', () async {
+      TestResponse res = (await client.get('/own-header')).expectStatus(200);
+      String header = res.header('server-timing')!;
+      expect(header, startsWith('cdn;dur=1, handler;dur='));
+      expect(header, contains('total;dur='));
+    });
+
+    test('measure adds the time when an async function throws', () async {
+      TestResponse res = (await client.get('/measure-throws'))
+          .expectStatus(200);
+      expect(res.body, 'caught');
+      expect(res.header('server-timing'), matches(RegExp(r'fail;dur=\d')));
+    });
+
+    test('a next middleware without ServerTiming sends no header', () async {
+      TestResponse res = (await client.get('/next-only')).expectStatus(200);
+      expect(res.body, 'next');
       expect(res.header('server-timing'), isNull);
     });
 
