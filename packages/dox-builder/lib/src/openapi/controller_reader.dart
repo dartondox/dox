@@ -225,9 +225,11 @@ class ControllerReader {
   /// Error answers of calls on the request in the method body:
   /// `req.authorize(...)` gives 401 and 403. `req.validateSchema(...)`,
   /// or `req.validate()` with no request class found, gives 422.
+  /// The static `Gate.authorize(user, ...)` gives 403 only.
   /// A `@Response` for the same status wins.
   void _errors(OperationData op, FunctionBody? body) {
     for (MethodInvocation call in CallCollector.of(body, _errorCalls)) {
+      if (_onGate(call)) op.responses.putIfAbsent(403, _notAllowed);
       if (!_onRequest(call)) continue;
       if (call.methodName.name == 'authorize') {
         op.responses.putIfAbsent(401, _notLoggedIn);
@@ -243,6 +245,16 @@ class ControllerReader {
   bool _onRequest(MethodInvocation call) {
     String? type = call.realTarget?.staticType?.element?.displayName;
     return type == 'DoxRequest' || type == 'IDoxRequest';
+  }
+
+  /// true for the static `Gate.authorize(...)` of dox_auth
+  bool _onGate(MethodInvocation call) {
+    Expression? target = call.realTarget;
+    if (call.methodName.name != 'authorize' || target is! Identifier) {
+      return false;
+    }
+    Element? element = target.element;
+    return element is ClassElement && element.displayName == 'Gate';
   }
 
   ResponseData _notLoggedIn() {
