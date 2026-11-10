@@ -1,4 +1,6 @@
-import 'package:dox_core/utils/json.dart';
+import 'dart:convert';
+
+import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 class JsonSerializableObject {
@@ -25,6 +27,68 @@ void main() {
     test('json serializable object', () {
       String jsonString = JSON.stringify(JsonSerializableObject());
       expect(jsonString.contains('success'), true);
+    });
+
+    test('map with a DateTime and an object with toJson, round trip', () {
+      String text = JSON.stringify(<String, dynamic>{
+        'at': DateTime.utc(2023),
+        'obj': JsonSerializableObject(),
+      });
+      expect(JSON.parse(text), <String, dynamic>{
+        'at': '2023-01-01T00:00:00.000Z',
+        'obj': <String, dynamic>{'success': 'true'},
+      });
+    });
+
+    test('bytes with a DateTime and a toJson object', () {
+      List<int> b = JSON.bytes(<String, dynamic>{
+        'at': DateTime.utc(2023),
+        'obj': JsonSerializableObject(),
+      });
+      expect(
+        utf8.decode(b),
+        '{"at":"2023-01-01T00:00:00.000Z","obj":{"success":"true"}}',
+      );
+    });
+
+    test('bytes and parse with bytes round trip, non-ASCII', () {
+      Map<String, dynamic> x = <String, dynamic>{'a': 'é 日本 😀'};
+      List<int> b = JSON.bytes(x);
+      expect(b, utf8.encode(JSON.stringify(x)));
+      expect(JSON.parse(b), x);
+    });
+
+    test('parse throws FormatException for bad bytes', () {
+      expect(() => JSON.parse(<int>[0xff]), throwsFormatException);
+      expect(() => JSON.parse(utf8.encode('{')), throwsFormatException);
+    });
+
+    test('parse of bytes returns a date as a String', () {
+      Object? r = JSON.parse(
+        JSON.bytes(<String, dynamic>{'at': DateTime.utc(2023)}),
+      );
+      expect((r as Map<String, dynamic>)['at'], '2023-01-01T00:00:00.000Z');
+    });
+
+    test('parse of a String and of bytes give equal results', () {
+      String text = '{"a":[1,2,{"b":null}],"c":"é"}';
+      expect(JSON.parse(utf8.encode(text)), JSON.parse(text));
+    });
+
+    test('parse of another type throws ArgumentError', () {
+      expect(() => JSON.parse(42), throwsArgumentError);
+      expect(() => JSON.parse(<String, dynamic>{}), throwsArgumentError);
+    });
+
+    test('a value with no toJson fails the same way in both paths', () {
+      expect(
+        () => JSON.bytes(Object()),
+        throwsA(isA<JsonUnsupportedObjectError>()),
+      );
+      expect(
+        () => JSON.stringify(Object()),
+        throwsA(isA<JsonUnsupportedObjectError>()),
+      );
     });
   });
 }

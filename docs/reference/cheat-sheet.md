@@ -473,6 +473,23 @@ return Storage().download(path); // from a controller
 
 See [File storage](../digging-deeper/file-storage.md).
 
+## JSON
+
+```dart
+String text = JSON.stringify(<String, dynamic>{
+  'at': DateTime.now(),
+  'user': user, // a model, has toJson()
+});
+List<int> bytes = JSON.bytes(<String, dynamic>{'ok': true}); // UTF-8 bytes
+
+dynamic a = JSON.parse(text);          // from a String
+dynamic b = JSON.parse(res.bodyBytes); // from bytes, from an HTTP client
+```
+
+`stringify` gives a String and `bytes` gives UTF-8 bytes. Use bytes for sockets, files, queues and HTTP client bodies, and never return `JSON.bytes` from a controller.
+
+`parse` takes a String or bytes. Prefer `res.bodyBytes` over `res.body`.
+
 ## Env
 
 ```dart

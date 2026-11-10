@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
-import 'package:dox_core/utils/json.dart';
 
 class LogMiddleware implements IDoxMiddleware {
   Map<String, dynamic> Function(Map<String, dynamic>)? filter;
