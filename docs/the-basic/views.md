@@ -240,7 +240,7 @@ Close a block tag with `@end`. `@else` works in all of them, but not in `@once` 
 
 Put `@auth`, `@guest`, `@production`, `@once` and `@verbatim` alone on their line. In the middle of text, like `@once upon a time`, they stay text.
 
-With a space before the `(`, in the middle of a line, a tag is used only when its args are a valid expression. A tag with a body, like `@isset`, `@empty`, `@env`, `@section` and `@push`, also needs an `@end` after it. So text like `@empty (none)` or `@class (see docs)` stays text. With no space, like `@empty(items)`, a tag is always a tag. Alone on its line, a tag is also always a tag, with two exceptions:
+With a space before the `(`, in the middle of a line, a tag is used only when its args are a valid expression. So text like `@class (see docs)` stays text. With a space, on any line, a tag with a body, like `@isset`, `@empty`, `@env`, `@section` and `@push`, also needs its own `@end` after it. The `@end` of a block around it does not count. So `@empty (none)` stays text, also alone on its line. With no space, like `@empty(items)`, a tag is always a tag. These rules also hold:
 
 - `@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend`, `@method` and `@error`. With a space before the `(`, these eight are tags only when the first argument is text in quotes, like `@yield ('title')`. This holds on any line. So text like `git @push (force)` or `an @error (see log)` stays text.
 - `@json` and `@includeWhen`. They are tags only with the `(` right after the name, like `@json(user)`. With a space, like `the @json (format)`, they stay text.

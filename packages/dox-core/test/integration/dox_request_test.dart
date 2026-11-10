@@ -98,6 +98,11 @@ void main() {
       expect((await kindOf(json, '{nope'))['kind'], 'invalidJson');
       // package:http sends a String body as text/plain
       expect((await kindOf(<String, String>{}, 'hi'))['kind'], 'other');
+      // a JSON content type with an empty body is no body
+      expect((await kindOf(json, ''))['kind'], 'none');
+      // no body and no content type
+      http.Response res = await http.post(url);
+      expect(jsonDecode(res.body)['kind'], 'none');
     });
 
     test('get cookies', () async {

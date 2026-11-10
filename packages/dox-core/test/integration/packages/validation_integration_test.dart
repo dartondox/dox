@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:http/http.dart' as http;
@@ -82,6 +83,17 @@ void main() {
     expect(res.statusCode, 422);
     expect(json(res).keys, <String>['title']);
   });
+
+  test('schema.parse in a controller keeps the issues', () async {
+    http.Request request = http.Request('POST', Uri.parse('$baseUrl/parse'))
+      ..headers['Content-Type'] = 'application/json'
+      ..headers['x-issues'] = '1'
+      ..body = '{}';
+    http.Response res = await http.Response.fromStream(await request.send());
+    expect(json(res), <String, dynamic>{
+      'issues': <String>['title:required'],
+    });
+  });
 }
 
 /// does not log the errors the tests cause on purpose
@@ -90,4 +102,18 @@ class _QuietExceptionHandler extends ExceptionHandler {
 
   @override
   void report(Object error, StackTrace stackTrace) {}
+
+  /// with `x-issues: 1`: the issues that reach the handler
+  @override
+  dynamic render(Object error, HttpRequest req) {
+    if (error is ValidationException && req.headers.value('x-issues') == '1') {
+      return <String, dynamic>{
+        'issues': <String>[
+          for (ValidationIssue issue in error.issues)
+            '${issue.dottedPath}:${issue.code}',
+        ],
+      };
+    }
+    return super.render(error, req);
+  }
 }

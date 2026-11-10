@@ -480,6 +480,21 @@ class A {
       expect(code, contains('c0isUndefined?30:c0asint'));
     });
 
+    test('@OrDefault on a Maybe field builds', () async {
+      String output = await _generate('''
+@Dto()
+class A {
+  @OrDefault()
+  final Maybe<int> days;
+
+  const A({this.days = const Maybe.missing()});
+}''');
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      String code = output.replaceAll(RegExp(r'\s+'), '');
+      expect(code, contains('if(s.dropIssuesAfter(f0))c0=undefined;'));
+      expect(code, contains('c0isUndefined?constMaybe<int>.missing()'));
+    });
+
     test('@OrDefault on a required field stops the build', () async {
       String output = await _generate('''
 @Dto()

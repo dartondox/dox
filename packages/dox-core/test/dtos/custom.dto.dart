@@ -98,3 +98,32 @@ class CreatePost {
 
   static const DtoSchema<CreatePost> schema = $CreatePostDto;
 }
+
+/// `@OrDefault`, `emptyStringsToNull` and `@HexColor(short: true)`
+@Dto(emptyStringsToNull: true)
+class ListPosts {
+  @OrDefault()
+  @MinValue(1)
+  final int page;
+
+  @OrDefault()
+  final Maybe<int> days;
+
+  /// an async rule still fails with @OrDefault
+  @OrDefault()
+  @NotTaken()
+  final String? handle;
+
+  @HexColor(short: true)
+  final String? color;
+
+  final String? note;
+
+  const ListPosts({
+    this.page = 1,
+    this.days = const Maybe<int>.missing(),
+    this.handle,
+    this.color,
+    this.note,
+  });
+}

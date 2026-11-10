@@ -81,7 +81,10 @@ class IsolateBus {
   /// Sends [message] to every other isolate that listens [on] [channel].
   ///
   /// A [message] that a [SendPort] can not send throws an
-  /// [ArgumentError] here. It is all or nothing: then no isolate gets it.
+  /// [ArgumentError] here, in an isolate other than the main one. In the
+  /// main isolate it throws only when another isolate listens on the bus.
+  /// With no other isolate there, nobody gets it and nothing throws.
+  /// It is all or nothing: when it throws, no isolate gets it.
   void publish(String channel, Object? message) {
     _send(<Object?>['send', _id, channel, message]);
   }

@@ -134,6 +134,7 @@ They read the file and write it back, so two writers at the same time can lose a
 `makeDirectory()` makes a folder only on a local disk. On any other disk it does nothing.
 
 `exists()` finds files only. `directoryExists()` finds folders. On a local disk it checks the real folder. On S3 and memory disks, a folder exists when a file is under it.
+
 `directoryExists('')` is always true on every disk: the empty path is the root.
 
 `putRequestFile` on the local disk moves the upload temp file. It does not read it into memory.

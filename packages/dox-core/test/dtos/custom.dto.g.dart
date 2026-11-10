@@ -193,3 +193,153 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
     return j;
   }
 }
+
+/// The checks, the converter and the JSON Schema of [ListPosts].
+const DtoSchema<ListPosts> $ListPostsDto = _$ListPostsDto();
+
+class _$ListPostsDto extends DtoSchema<ListPosts> {
+  const _$ListPostsDto();
+
+  static const Map<String, String> _m = <String, String>{};
+
+  @override
+  Type get type => ListPosts;
+
+  @override
+  String get name => 'ListPosts';
+
+  @override
+  bool get usesRequiredWhen => false;
+
+  @override
+  bool get isAsync => true;
+
+  @override
+  ListPosts? convert(Object? input, DtoState s, List<Object> p) {
+    if (input is! Map) {
+      s.notObject(input, p, _m);
+      return null;
+    }
+    int e = s.issues.length;
+    // page: int
+    Object? c0;
+    int f0 = s.issues.length;
+    c0 = s.integer(s.read(input, 'page', emptyToNull: true), p, 'page', _m);
+    if (c0 == null) s.required(p, 'page', _m);
+    if (s.dropIssuesAfter(f0)) c0 = undefined;
+    // days: Maybe<int>
+    Object? c1;
+    int f1 = s.issues.length;
+    c1 = s.integer(s.read(input, 'days', emptyToNull: true), p, 'days', _m);
+    if (c1 == null) s.required(p, 'days', _m);
+    if (s.dropIssuesAfter(f1)) c1 = undefined;
+    // handle: String?
+    Object? c2;
+    int f2 = s.issues.length;
+    c2 = s.string(s.read(input, 'handle', emptyToNull: true), p, 'handle', _m);
+    if (s.dropIssuesAfter(f2)) c2 = undefined;
+    // color: String?
+    Object? c3;
+    c3 = s.string(s.read(input, 'color', emptyToNull: true), p, 'color', _m);
+    // note: String?
+    Object? c4;
+    c4 = s.string(s.read(input, 'note', emptyToNull: true), p, 'note', _m);
+    if (s.issues.length != e) return null;
+    int r0 = s.issues.length;
+    if (c0 is int) {
+      if (!(const MinValue(1).check(c0, s.context(p, 'page', c0)))) {
+        s.failRule(const MinValue(1), p, 'page', c0, _m);
+      }
+    }
+    if (s.dropIssuesAfter(r0)) c0 = undefined;
+    if (c3 is String) {
+      if (!(const HexColor(short: true).check(c3, s.context(p, 'color', c3)))) {
+        s.failRule(const HexColor(short: true), p, 'color', c3, _m);
+      }
+    }
+    if (s.issues.length != e) return null;
+    return ListPosts(
+      page: c0 is Undefined ? 1 : c0 as int,
+      days: c1 is Undefined
+          ? const Maybe<int>.missing()
+          : Maybe<int>(c1 as int),
+      handle: c2 is Undefined ? null : c2 as String?,
+      color: c3 is Undefined ? null : c3 as String?,
+      note: c4 is Undefined ? null : c4 as String?,
+    );
+  }
+
+  @override
+  Future<void> checkAsync(ListPosts o, DtoState s, List<Object> p) async {
+    {
+      String? f = o.handle;
+      if (f != null) {
+        await s.asyncRule(const NotTaken(), f, p, 'handle', _m);
+      }
+    }
+  }
+
+  @override
+  ListPosts fromMap(Map<String, dynamic> m) {
+    return ListPosts(
+      page: m.containsKey('page') ? (m['page'] as num).toInt() : 1,
+      days: m.containsKey('days')
+          ? Maybe<int>((m['days'] as num).toInt())
+          : const Maybe<int>.missing(),
+      handle: m['handle'] == null ? null : (m['handle'] as String),
+      color: m['color'] == null ? null : (m['color'] as String),
+      note: m['note'] == null ? null : (m['note'] as String),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toMap(ListPosts o) {
+    int f0 = o.page;
+    Maybe<int> f1 = o.days;
+    String? f2 = o.handle;
+    String? f3 = o.color;
+    String? f4 = o.note;
+    return <String, dynamic>{
+      'page': f0,
+      if (f1 case Maybe<int>(isPresent: true, value: int g1)) 'days': g1,
+      'handle': f2,
+      'color': f3,
+      'note': f4,
+    };
+  }
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    Map<String, dynamic> j = <String, dynamic>{
+      'type': 'object',
+      'title': 'ListPosts',
+      'properties': <String, dynamic>{
+        'page': <String, dynamic>{'type': 'integer', 'default': 1},
+        'days': <String, dynamic>{'type': 'integer'},
+        'handle': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+          'description': 'an async rule still fails with @OrDefault',
+        },
+        'color': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+        'note': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+        },
+      },
+    };
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'page',
+    ], const MinValue(1).toJsonSchema());
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'handle',
+    ], const NotTaken().toJsonSchema());
+    JsonSchemaTools.merge(j, <String>[
+      'properties',
+      'color',
+    ], const HexColor(short: true).toJsonSchema());
+    return j;
+  }
+}

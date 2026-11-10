@@ -864,6 +864,58 @@ void main() {
     });
   });
 
+  group('OrDefault and emptyStringsToNull |', () {
+    test('a bad value gives the default', () async {
+      ListPosts value = await $ListPostsDto.validateMap(<String, dynamic>{
+        'page': 'abc',
+        'days': 'x',
+      });
+      expect(value.page, 1);
+      expect(value.days.isPresent, isFalse);
+
+      value = await $ListPostsDto.validateMap(<String, dynamic>{
+        'page': 0,
+        'days': 7,
+      });
+      expect(value.page, 1);
+      expect(value.days.value, 7);
+    });
+
+    test(
+      '"" is null: a default field with @OrDefault keeps its default',
+      () async {
+        ListPosts value = await $ListPostsDto.validateMap(<String, dynamic>{
+          'page': '',
+          'note': '',
+        });
+        expect(value.page, 1);
+        expect(value.note, isNull);
+      },
+    );
+
+    test('an async rule still fails with @OrDefault', () async {
+      expect(
+        await errorsOf($ListPostsDto, <String, dynamic>{'handle': 'taken'}),
+        <String, String>{'handle': 'The handle is taken'},
+      );
+    });
+
+    test('@HexColor(short: true) takes 3 or 6 digits', () async {
+      for (String color in <String>['#abc', '#A1B2C3']) {
+        expect(
+          await errorsOf($ListPostsDto, <String, dynamic>{'color': color}),
+          isEmpty,
+        );
+      }
+      expect(
+        (await errorsOf($ListPostsDto, <String, dynamic>{
+          'color': '#abcd',
+        })).keys,
+        <String>['color'],
+      );
+    });
+  });
+
   group('files |', () {
     test('a good image and pdf', () async {
       UploadAvatar value = await $UploadAvatarDto.validateMap(<String, dynamic>{
