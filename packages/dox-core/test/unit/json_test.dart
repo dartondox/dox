@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
@@ -36,6 +38,36 @@ void main() {
         'at': '2023-01-01T00:00:00.000Z',
         'obj': <String, dynamic>{'success': 'true'},
       });
+    });
+
+    test('bytes with a DateTime and a toJson object', () {
+      List<int> b = JSON.bytes(<String, dynamic>{
+        'at': DateTime.utc(2023),
+        'obj': JsonSerializableObject(),
+      });
+      expect(
+        utf8.decode(b),
+        '{"at":"2023-01-01T00:00:00.000Z","obj":{"success":"true"}}',
+      );
+    });
+
+    test('bytes and parseBytes round trip, non-ASCII', () {
+      Map<String, dynamic> x = <String, dynamic>{'a': 'é 日本 😀'};
+      List<int> b = JSON.bytes(x);
+      expect(b, utf8.encode(JSON.stringify(x)));
+      expect(JSON.parseBytes(b), x);
+    });
+
+    test('parseBytes throws FormatException for bad input', () {
+      expect(() => JSON.parseBytes(<int>[0xff]), throwsFormatException);
+      expect(() => JSON.parseBytes(utf8.encode('{')), throwsFormatException);
+    });
+
+    test('parseBytes returns a date as a String', () {
+      Object? r = JSON.parseBytes(
+        JSON.bytes(<String, dynamic>{'at': DateTime.utc(2023)}),
+      );
+      expect((r as Map<String, dynamic>)['at'], '2023-01-01T00:00:00.000Z');
     });
   });
 }

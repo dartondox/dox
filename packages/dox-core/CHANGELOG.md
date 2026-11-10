@@ -1,6 +1,6 @@
 ## Unreleased
 
-- New: the `JSON` helper (`JSON.stringify` and `JSON.parse`) is exported from `dox_core`. `JSON.stringify` is `jsonEncode` that also writes a `DateTime` as an ISO 8601 string and calls `toJson()` on objects.
+- New: the `JSON` helper (`JSON.stringify`, `JSON.parse`, `JSON.bytes` and `JSON.parseBytes`) is exported from `dox_core`. `bytes` and `parseBytes` work with UTF-8 bytes and build no String, so use them for HTTP, sockets, files and cache. `JSON.stringify` is `jsonEncode` that also writes a `DateTime` as an ISO 8601 string and calls `toJson()` on objects.
 - OpenAPI: a route with the `Can` middleware gets a `401` and a `403` answer in the docs. A route with `GuestMiddleware` or `ValidateSignature` gets a `403`. They are found by class name. A `@Response` with the same status wins.
 - OpenAPI: the `ValidationError` schema is in the docs whenever a route has the automatic `422` answer, also when it comes from a `req.validateSchema(...)` call.
 - New: `ServerTiming` middleware. It adds a `Server-Timing` header with the `handler` and `total` time of the request. It is off unless you add it, because it shows timing to clients. Use it in development or for trusted clients.
