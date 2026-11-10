@@ -619,7 +619,7 @@ const ViewConfig(
 );
 ```
 
-**`strictVariables`**: a variable that does not exist throws a `ViewException`. The message has the name of the variable, the template and the line. So a typo like `{{ usre.name }}` shows as an error, not as an empty page.
+**`strictVariables`**: a variable that does not exist throws a `ViewException`. The message has the name of the variable, the template and the line. So a typo like `{{ usr.name }}` shows as an error, not as an empty page.
 
 A variable that is there with the value `null` is fine. These ways to read a variable that may not exist never throw:
 
@@ -657,7 +657,7 @@ dox_view: warning: posts/index:12 "@foreach" is not a Dox tag. Use "@each(item i
 - The output of the template does not change. The warning is only a hint.
 - Each warning is written one time.
 - `@end...` names warn anywhere in a line. The other names warn only with the `(` right after the name, like `@foreach(...)`, or alone on their line. So a sentence like `the @foreach loop` does not warn.
-- Text in a comment, in `@verbatim`, and a name with `@@` before it, do not warn.
+- Text in a `{{-- --}}` comment, in `@verbatim`, and a name with `@@` before it, do not warn. A name in an HTML comment, like `<!-- @endif -->`, does warn.
 - `ViewConfig(bladeWarnings: false)` turns the warnings off.
 
 ## Errors
