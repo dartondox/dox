@@ -15,10 +15,28 @@ slug: dox-vs-go-speed-and-memory
 
 # Dox vs Go: speed and memory
 
-In our published benchmark on 2 CPU cores, a Dox app served more requests per second than a Go app.
+In our published benchmark on 2 CPU cores, a Dox app handled 2× to 4.8× the requests per second of a Go app.
 Go used less memory once a database was added.
 
 <!-- more -->
+
+## The short answer
+
+How many times more requests per second Dox handled, at 256 connections:
+
+| Test | Dox | Go | Dox handles |
+| --- | ---: | ---: | ---: |
+| Plain HTTP, `GET /` | 638,067 | 242,043 | **2.6×** |
+| Plain HTTP, `GET /user/:id` | 572,658 | 230,845 | **2.5×** |
+| Plain HTTP, `POST /user` | 545,986 | 231,050 | **2.4×** |
+| JSON, `GET /json` | 555,216 | 206,398 | **2.7×** |
+| One row from Postgres, `GET /db` | 266,432 | 55,903 | **4.8×** |
+| 20 rows from Postgres, `GET /queries?n=20` | 17,772 | 6,635 | **2.7×** |
+| One row from MySQL, `GET /db` | 247,242 | 55,322 | **4.5×** |
+| 20 rows from MySQL, `GET /queries?n=20` | 12,347 | 5,520 | **2.2×** |
+
+The smallest gap is 2×, on `GET /` at 64 connections.
+The JSON row is from the Postgres run.
 
 This post compares Dox with Go only.
 The full tables also have other servers. You can find them, and the full method, on the [Performance](/latest/digging-deeper/performance/) page.
@@ -104,7 +122,8 @@ The other two routes, at 256 connections:
 | Dox | 572,658 | 545,986 |
 | Go | 230,845 | 231,050 |
 
-At 256 connections, Dox served about 2.6 times more requests than Go on `GET /`.
+Dox handled 2× the requests of Go at 64 connections, and 2.6× at 256 and 512 connections.
+On the other two routes it handled 2.5× and 2.4×.
 Its peak memory was 19 MB. Go's peak was 36 MB.
 Both are small.
 
@@ -190,7 +209,8 @@ On `/db` with Postgres, the p99 was 1.8 ms for Dox and 6.3 ms for Go.
 
 Two things to see here:
 
-- Dox served more requests on every route. The gap is largest on `/db`: about 4.8 times with Postgres and 4.5 times with MySQL.
+- Dox handled more requests on every route. The gap is largest on `/db`: 4.8× with Postgres and 4.5× with MySQL.
+- On `/json` it handled 2.7×. On 20 queries per request it handled 2.7× with Postgres and 2.2× with MySQL.
 - Go used less memory. Its peak was 31 MB with Postgres and 27 MB with MySQL. The peak of Dox was 106 MB and 70 MB.
 
 ## Why the numbers differ
