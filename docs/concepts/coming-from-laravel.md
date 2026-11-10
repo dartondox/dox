@@ -154,7 +154,10 @@ With [dox_view](../the-basic/views.md), templates end in `.dox.html`. Most Blade
 | `@class`, `@checked`, `@selected`, `@disabled` | the same |
 | `@include('nav')` | `@include('nav')` |
 | `<x-button>`, `$attributes->merge([...])`, `$slot` | `@button(...) ... @end`, `$attributes.merge({...})`, `$slot` |
-| `@csrf`, `old('email')` | `{{ csrfField() }}`, `old('email')` |
+| `@extends('layouts.app')`, `@section ... @endsection`, `@yield('content')` | `@extends('layouts/app')`, `@section ... @end`, `@yield('content')` |
+| `@stack('scripts')`, `@push ... @endpush`, `@prepend ... @endprepend` | `@stack('scripts')`, `@push ... @end`, `@prepend ... @end` |
+| `@csrf`, `@method('PUT')`, `old('email')` | `@csrf`, `@method('PUT')`, `old('email')` |
+| `Blade::directive('datetime', ...)` | `View.directive('datetime', DateTimeDirective())` |
 
 ## Eloquent vs Dox Model
 
