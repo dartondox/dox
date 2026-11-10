@@ -5,6 +5,7 @@
 - Change: `LogMiddleware` now writes through `Logger`. It follows `LoggerConfig` (`enabled`, `level`, `prettyPrint`). With `prettyPrint` it prints the colored text line. `enabled` is now optional: not set follows the logger, `false` turns only the request logs off.
 - Change: `Logger` collects lines and writes them in one write every 20 ms (or 64 KB), not one `print()` per line. A `warn`, `warning`, `danger` or `error` line is written at once, after the lines before it. The buffer is written when the app stops.
 - Fix: pretty `Logger` lines for `debug`, `warning` and `error` have a color. Before, they printed `null` in the color code.
+- New: `dox_core` exports the `JSON` helper. `JSON.stringify` gives a String. `JSON.bytes` gives UTF-8 bytes in one pass. `JSON.parse` reads a String or UTF-8 bytes. Use bytes for sockets, files, queues and HTTP client bodies. Do not return `JSON.bytes` from a controller.
 - OpenAPI: a route with the `Can` middleware gets a `401` and a `403` answer in the docs. A route with `GuestMiddleware` or `ValidateSignature` gets a `403`. They are found by class name. A `@Response` with the same status wins.
 - OpenAPI: the `ValidationError` schema is in the docs whenever a route has the automatic `422` answer, also when it comes from a `req.validateSchema(...)` call.
 - New: `ServerTiming` middleware. It adds a `Server-Timing` header with the `handler` and `total` time of the request. It is off unless you add it, because it shows timing to clients. Use it in development or for trusted clients.

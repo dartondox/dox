@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
-import 'package:dox_core/utils/json.dart';
 
 dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   /// Websocket handler will return websocket payload
@@ -65,12 +63,8 @@ void _guardActiveFile(HttpResponse res, ContentType type) {
   }
 }
 
-/// encodes json straight to utf8 bytes, without building a String first.
-/// 8 KB chunks: most bodies fit in one, so there is no join.
-final JsonUtf8Encoder _jsonUtf8 = JsonUtf8Encoder(null, advanceEncode, 8192);
-
 /// [payload] as JSON bytes, like the response sends it
-List<int> encodeJson(dynamic payload) => _jsonUtf8.convert(payload);
+List<int> encodeJson(dynamic payload) => JSON.bytes(payload);
 
 /// A JSON body that is already encoded, so it is not encoded twice
 /// (`ETag` hashes the bytes first). For internal use.
@@ -157,7 +151,7 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     bytes = payload.bytes;
     res.headers.contentType = ContentType.json;
   } else {
-    bytes = _jsonUtf8.convert(payload);
+    bytes = JSON.bytes(payload);
     res.headers.contentType = ContentType.json;
   }
 

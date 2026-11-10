@@ -115,7 +115,7 @@ class HttpBody {
   static RequestBody _json(Uint8List bytes) {
     if (bytes.isEmpty) return RequestBody.empty();
     try {
-      Object? data = _jsonUtf8.convert(bytes);
+      Object? data = JSON.parse(bytes);
       return RequestBody(
         data is Map<String, dynamic> ? data : <String, dynamic>{},
         kind: BodyKind.json,
@@ -186,6 +186,3 @@ class HttpBody {
         'application/x-www-form-urlencoded';
   }
 }
-
-/// decodes utf8 bytes straight into json, without a middle String.
-final Converter<List<int>, Object?> _jsonUtf8 = utf8.decoder.fuse(json.decoder);
