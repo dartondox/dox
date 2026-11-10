@@ -159,6 +159,8 @@ class Dox {
     Logger.info('$signal: stopping, open requests can finish');
     // `stop` writes the log buffer, also when it throws
     await stop();
+    // a line logged after the flush of `stop` must not be lost
+    LogBuffer.flush();
     exit(0);
   }
 

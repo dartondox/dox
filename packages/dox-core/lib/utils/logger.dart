@@ -31,9 +31,18 @@ class Logger {
     level = level.toLowerCase();
     LoggerConfig config = Dox().config.logger;
     if (!config.enabled || !shouldLog(level, config.level)) return;
-    String line = config.prettyPrint
-        ? _prettyLog(level, message, data)
-        : _log(config, level, message, data);
+    String line;
+    try {
+      line = _build(config, level, message, data);
+    } catch (_) {
+      // data that can not become JSON must not break the caller (eg. a
+      // request). Log its text instead.
+      try {
+        line = _build(config, level, message, data?.toString());
+      } catch (_) {
+        return;
+      }
+    }
     // a warning or an error is written at once, it must not be lost
     LogBuffer.write(line, now: (_ranks[level] ?? 3) >= 2);
   }
@@ -68,6 +77,17 @@ class Logger {
   ///
   static void danger(dynamic message, [dynamic data]) {
     log('danger', message, data);
+  }
+
+  static String _build(
+    LoggerConfig config,
+    String level,
+    dynamic message,
+    dynamic data,
+  ) {
+    return config.prettyPrint
+        ? _prettyLog(level, message, data)
+        : _log(config, level, message, data);
   }
 
   /// the colored text line

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/log_buffer.dart';
 import 'package:test/test.dart';
@@ -27,9 +25,11 @@ class ThrowingHandler extends ExceptionHandler {
 
 void main() {
   late List<String> written;
+  late void Function(String) oldWriter;
 
   setUp(() async {
     written = <String>[];
+    oldWriter = LogBuffer.writer;
     LogBuffer.writer = written.add;
     await startHttpServer(
       AppConfig(
@@ -43,7 +43,7 @@ void main() {
   });
 
   tearDown(() {
-    LogBuffer.writer = stdout.write;
+    LogBuffer.writer = oldWriter;
   });
 
   group('shutdown that throws |', () {

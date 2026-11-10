@@ -1,6 +1,10 @@
 import 'package:dox_core/dox_core.dart';
 
 class LogMiddleware implements IDoxMiddleware {
+  /// changes the line before it is logged. It can change `status` too, so
+  /// with a `filter` the line is built for every request when the logger is
+  /// on, also when `level` would hide `info`. The cost is one request copy.
+  /// Without a `filter` that work is skipped.
   Map<String, dynamic> Function(Map<String, dynamic>)? filter;
 
   final bool withHeader;

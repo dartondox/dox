@@ -72,8 +72,11 @@ class DoxServer {
         );
       },
       (Object error, StackTrace stackTrace) {
-        Dox().config.exceptionHandler.report(error, stackTrace);
-        LogBuffer.flush();
+        try {
+          Dox().config.exceptionHandler.report(error, stackTrace);
+        } finally {
+          LogBuffer.flush();
+        }
       },
     );
     httpServer = server;

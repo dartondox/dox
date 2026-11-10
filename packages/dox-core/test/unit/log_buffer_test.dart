@@ -47,7 +47,18 @@ void main() {
     test('a writer that throws does not throw out', () {
       LogBuffer.writer = (String text) => throw StateError('closed');
       LogBuffer.write('a', now: true);
+      // the lines are gone, so a second flush has nothing to write
+      int calls = 0;
+      LogBuffer.writer = (String text) {
+        calls++;
+        throw StateError('closed');
+      };
       LogBuffer.flush();
+      expect(calls, 0);
+      // a good writer gets the new lines
+      LogBuffer.writer = writes.add;
+      LogBuffer.write('b', now: true);
+      expect(writes, <String>['b\n']);
     });
 
     test('flush with nothing waiting writes nothing', () {

@@ -171,6 +171,20 @@ void main() {
       expect(line['extra'], 1);
     });
 
+    test('data that can not become JSON does not throw', () {
+      config();
+      Logger.info('hi', _NoJson());
+      LogBuffer.flush();
+      Map<String, dynamic> line = jsonDecode(lines.single);
+      expect(line['message'], 'hi');
+      expect(line['payload'], 'no json');
+      writes.clear();
+      config(pretty: true);
+      Logger.info('hi', _NoJson());
+      LogBuffer.flush();
+      expect(lines.single, contains('no json'));
+    });
+
     test('an upper case level ranks like the lower case one', () {
       config(level: 'warn');
       Logger.log('INFO', 'hidden');
@@ -208,4 +222,9 @@ void main() {
       expect(jsonDecode(writes[1])['message'], 'four');
     });
   });
+}
+
+class _NoJson {
+  @override
+  String toString() => 'no json';
 }

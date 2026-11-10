@@ -36,7 +36,10 @@ class StrayRouter extends Router {
 }
 
 void main() {
+  late void Function(String) oldWriter;
+
   setUpAll(() async {
+    oldWriter = LogBuffer.writer;
     LogBuffer.writer = written.add;
     await startHttpServer(
       AppConfig(
@@ -50,7 +53,7 @@ void main() {
   });
 
   tearDownAll(() async {
-    LogBuffer.writer = stdout.write;
+    LogBuffer.writer = oldWriter;
     await Dox().server.close();
   });
 
