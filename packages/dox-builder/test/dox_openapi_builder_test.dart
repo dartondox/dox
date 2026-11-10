@@ -15,6 +15,9 @@ class DoxRequest {
   T validate<T>() => throw UnimplementedError();
   dynamic validateSchema(dynamic schema) => null;
 }
+abstract class IDoxRequest {
+  dynamic validateSchema(dynamic schema);
+}
 abstract class IHttpException {}
 class UnAuthorizedException extends IHttpException {}
 class DoxResponse {}
@@ -670,11 +673,43 @@ security: <String, OpenApiSecurity>{
 
     test('req.authorize and req.validateSchema give error answers', () async {
       String out = await _generate(<String, String>{
+        'dox_auth|lib/dox_auth.dart': '''
+class Gate {
+  static Future<void> authorize(Object? user, String ability) async {}
+}
+''',
+        // an app class with the same name is not the dox_auth one
+        'a|lib/own_gate.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+class Gate {
+  static Future<void> authorize(Object? user, String ability) async {}
+}
+
+@DoxController()
+class OwnGateController {
+  Future<String> ownGate(DoxRequest req) async {
+    await Gate.authorize(null, 'update');
+    return 'ok';
+  }
+}
+''',
         'a|lib/a.dart': """
+import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
 extension GateRequest on DoxRequest {
   Future<void> authorize(String ability, [Object? subject]) async {}
+}
+
+extension GateIRequest on IDoxRequest {
+  Future<void> authorize(String ability, [Object? subject]) async {}
+}
+
+@Dto()
+class SavePost {
+  SavePost(this.title);
+  final String title;
 }
 
 class Payment {
@@ -708,6 +743,28 @@ class PostController {
   @Response(422, null, description: 'Bad filter')
   String custom(DoxRequest req) {
     req.validateSchema(<String, dynamic>{});
+    return 'ok';
+  }
+
+  Future<String> plain(IDoxRequest req) async {
+    await req.authorize('update');
+    req.validateSchema(<String, dynamic>{});
+    return 'ok';
+  }
+
+  String save(DoxRequest req) {
+    req.validate<SavePost>();
+    return 'ok';
+  }
+
+  Future<String> gate(DoxRequest req) async {
+    await Gate.authorize(null, 'update');
+    return 'ok';
+  }
+
+  @Response(403, null, description: 'Not your post')
+  Future<String> gateCustom(DoxRequest req) async {
+    await Gate.authorize(null, 'update');
     return 'ok';
   }
 
@@ -765,6 +822,34 @@ class PostController {
         contains(_flat("422: ResponseDoc(description: 'Bad filter')")),
       );
       expect(custom, isNot(contains('ValidationError')));
+
+      /// an `IDoxRequest` argument works like a `DoxRequest`
+      String plain = operation('plain');
+      expect(plain, contains('401:ResponseDoc('));
+      expect(plain, contains('403:ResponseDoc('));
+      expect(plain, contains(_flat(invalid)));
+
+      /// with a request class, dox_core adds the 422, not the builder
+      String save = operation('save');
+      expect(save, contains('#/components/schemas/SavePost'));
+      expect(save, isNot(contains('422:')));
+
+      /// the static `Gate.authorize` of dox_auth gives 403 only
+      String gate = operation('gate');
+      expect(
+        gate,
+        contains(_flat("403: ResponseDoc(description: 'Not allowed', $error")),
+      );
+      expect(gate, isNot(contains('401:')));
+      String gateCustom = operation('gateCustom');
+      expect(
+        gateCustom,
+        contains(_flat("403: ResponseDoc(description: 'Not your post')")),
+      );
+      expect(gateCustom, isNot(contains('Notallowed')));
+
+      /// an app class named `Gate` adds nothing
+      expect(operation('ownGate'), isNot(contains('403:')));
 
       /// `authorize` and `validate` of another class add nothing
       String pay = operation('pay');
