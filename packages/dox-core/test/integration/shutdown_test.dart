@@ -165,6 +165,9 @@ void main() {
         for (int id = 1; id <= 3; id++) {
           expect(out.toString(), contains('cleanup $id'));
         }
+        // the buffered logger lines reach stdout before the exit
+        expect(out.toString(), contains('stopping, open requests can finish'));
+        expect(out.toString(), contains('"message":"bye 1"'));
       } finally {
         app.kill(ProcessSignal.sigkill);
       }

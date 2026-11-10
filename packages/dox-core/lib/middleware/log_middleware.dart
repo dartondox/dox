@@ -42,6 +42,11 @@ class LogMiddleware implements IDoxMiddleware {
     if (enabled == false) {
       return req;
     }
+    // skip the work when the logger would drop the line. With a filter the
+    // status can change, so only the `enabled` check is safe there.
+    LoggerConfig logger = Dox().config.logger;
+    if (!logger.enabled) return req;
+    if (filter == null && !Logger.shouldLog('info', logger.level)) return req;
     Map<String, dynamic> payload = <String, dynamic>{
       'request': _redact(req.toJson()),
     };

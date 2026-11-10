@@ -32,6 +32,14 @@ class LogBuffer {
     if (_buffer.isEmpty) return;
     String text = _buffer.toString();
     _buffer.clear();
-    writer(text);
+    try {
+      writer(text);
+    } catch (_) {
+      // a failed write (eg. closed stdout) must not crash the app.
+      // try stderr once, so the lines are not lost without a trace.
+      try {
+        stderr.write(text);
+      } catch (_) {}
+    }
   }
 }

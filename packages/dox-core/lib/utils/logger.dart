@@ -114,7 +114,7 @@ class Logger {
     if (data is Map) {
       for (MapEntry<dynamic, dynamic> e in data.entries) {
         // the standard fields stay: a key with the same name is dropped
-        text.putIfAbsent('${e.key}', () => e.value);
+        text.putIfAbsent(e.key is String ? e.key : '${e.key}', () => e.value);
       }
     } else if (data != null) {
       text['payload'] = data;

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dox_core/utils/log_buffer.dart';
 import 'package:test/test.dart';
 
@@ -15,10 +17,16 @@ void main() {
 
   group('LogBuffer |', () {
     test('lines are written together after about 20 ms', () async {
+      Completer<void> written = Completer<void>();
+      LogBuffer.writer = (String text) {
+        writes.add(text);
+        written.complete();
+      };
       LogBuffer.write('a');
       LogBuffer.write('b');
       expect(writes, isEmpty);
-      await Future<void>.delayed(const Duration(milliseconds: 80));
+      // the timer writes it, no fixed wait
+      await written.future.timeout(const Duration(seconds: 5));
       expect(writes, <String>['a\nb\n']);
     });
 
@@ -34,6 +42,12 @@ void main() {
       LogBuffer.write('1');
       LogBuffer.write('2', now: true);
       expect(writes, <String>['1\n2\n']);
+    });
+
+    test('a writer that throws does not throw out', () {
+      LogBuffer.writer = (String text) => throw StateError('closed');
+      LogBuffer.write('a', now: true);
+      LogBuffer.flush();
     });
 
     test('flush with nothing waiting writes nothing', () {

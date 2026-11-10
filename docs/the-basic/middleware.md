@@ -371,6 +371,7 @@ flowchart LR
         - `enabled: false` turns only the request logs off. Leave it unset to follow the logger.
         - With `prettyPrint` it prints colored text.
         - Without it, it prints one JSON line with `status`, `message`, `network.client.ip`, `http.method`, `http.url`, `http.request_id` and `payload`.
+        - The `filter` can change `status`, `message` and the other fields. It can not change `timestamp` or `logger`: `Logger` sets them.
         - Headers are logged only with `withHeader: true`.
         - Body fields and headers whose name has a word like `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`.
         - The new project turns it off when `APP_ENV` is `production`.

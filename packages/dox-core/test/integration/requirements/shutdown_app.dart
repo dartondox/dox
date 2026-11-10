@@ -12,6 +12,7 @@ void main(List<String> args) async {
       serverPort: int.parse(args[0]),
       totalIsolate: int.parse(args[1]),
       routers: <Router>[SlowRouter()],
+      logger: const LoggerConfig(enabled: true),
       providers: <DoxProvider>[CleanupProvider()],
     ),
   );
@@ -39,5 +40,6 @@ class CleanupProvider extends DoxProvider {
   @override
   void shutdown() {
     stdout.writeln('cleanup ${Dox().isolateId}');
+    Logger.info('bye ${Dox().isolateId}');
   }
 }

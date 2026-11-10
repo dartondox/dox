@@ -1,7 +1,7 @@
 ## Unreleased
 
 - BREAKING: the JSON line of `Logger` uses the standard names of log services (Datadog). `level` is now `status` (lower case). `name` is now `logger.name` (left out when empty). A `Map` in the data goes to the top level, other data goes under `payload`. The standard fields can not be replaced by a data key. Pretty mode is the same.
-- BREAKING: the JSON line of `LogMiddleware` has new field names. `level` is now `status`. `source_ip` is now `network.client.ip`. `request_id` is now `http.request_id`. New: `http.method` and `http.url`. `payload.request` and `payload.headers` stay. The `filter` gets the new map.
+- BREAKING: the JSON line of `LogMiddleware` has new field names. `level` is now `status`. `source_ip` is now `network.client.ip`. `request_id` is now `http.request_id`. New: `http.method` and `http.url`. `payload.request` and `payload.headers` stay. The `filter` gets the new map. It can not change `timestamp` or `logger`.
 - Change: `LogMiddleware` now writes through `Logger`. It follows `LoggerConfig` (`enabled`, `level`, `prettyPrint`). With `prettyPrint` it prints the colored text line. `enabled` is now optional: not set follows the logger, `false` turns only the request logs off.
 - Change: `Logger` collects lines and writes them in one write every 20 ms (or 64 KB), not one `print()` per line. A `warn`, `warning`, `danger` or `error` line is written at once, after the lines before it. The buffer is written when the app stops.
 - Fix: pretty `Logger` lines for `debug`, `warning` and `error` have a color. Before, they printed `null` in the color code.

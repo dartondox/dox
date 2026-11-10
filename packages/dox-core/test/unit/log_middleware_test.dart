@@ -127,6 +127,69 @@ void main() {
       expect(out.containsKey('status'), isTrue);
     });
 
+    test('logger off: the filter is not even called', () {
+      config(enabled: false);
+      int calls = 0;
+      LogMiddleware(
+        filter: (Map<String, dynamic> l) {
+          calls++;
+          return l;
+        },
+      ).handle(FakeRequest());
+      LogBuffer.flush();
+      expect(calls, 0);
+      expect(writes, isEmpty);
+    });
+
+    test('level above info and no filter: nothing is built', () {
+      config(level: 'warn');
+      LogMiddleware().handle(FakeRequest());
+      LogBuffer.flush();
+      expect(writes, isEmpty);
+    });
+
+    test('a filter that sets status to warn is written at once', () {
+      config();
+      LogMiddleware(filter: (Map<String, dynamic> l) => l..['status'] = 'warn')
+          .handle(FakeRequest());
+      expect(writes.length, 1);
+      expect(jsonDecode(lines.single)['status'], 'warn');
+    });
+
+    test('a filter that sets status warn is hidden by level error', () {
+      config(level: 'error');
+      LogMiddleware(filter: (Map<String, dynamic> l) => l..['status'] = 'warn')
+          .handle(FakeRequest());
+      LogBuffer.flush();
+      expect(writes, isEmpty);
+    });
+
+    test('a filter that removes status and message', () {
+      config();
+      LogMiddleware(
+        filter: (Map<String, dynamic> l) => l
+          ..remove('status')
+          ..remove('message'),
+      ).handle(FakeRequest());
+      LogBuffer.flush();
+      Map<String, dynamic> line = jsonDecode(lines.single);
+      expect(line['status'], 'info');
+      expect(line['message'], '');
+    });
+
+    test('a filter can not change timestamp or logger', () {
+      config();
+      LogMiddleware(
+        filter: (Map<String, dynamic> l) => l
+          ..['timestamp'] = 'fake'
+          ..['logger'] = 'fake',
+      ).handle(FakeRequest());
+      LogBuffer.flush();
+      Map<String, dynamic> line = jsonDecode(lines.single);
+      expect(line['timestamp'], isNot('fake'));
+      expect(line['logger'], <String, dynamic>{'name': 'api'});
+    });
+
     test('enabled not set follows the logger config', () {
       config(enabled: false);
       LogMiddleware().handle(FakeRequest());

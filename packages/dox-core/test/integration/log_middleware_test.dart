@@ -34,6 +34,7 @@ void main() {
         // the OS picks a free port, so test files can run in parallel
         serverPort: 0,
         totalIsolate: 1,
+        logger: const LoggerConfig(enabled: true, name: 'it'),
         routers: <Router>[LogRouter()],
         globalMiddleware: <dynamic>[
           LogMiddleware(

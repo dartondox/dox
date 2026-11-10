@@ -284,7 +284,7 @@ AppConfig(compress: true);
 
 `LogMiddleware` logs one line per request through `Logger`. Writing to stdout
 blocks the isolate. So `Logger` collects log lines and writes them every 20 ms
-(or every 64 KB) in one write. A `warn` or `danger` line is written right away,
+(or every 64 KB) in one write. A `warn`, `warning`, `danger` or `error` line is written right away,
 with the waiting lines before it, so the order stays. The buffer is also
 written when the app stops. If the process is killed hard, the last 20 ms of
 logs can be lost.

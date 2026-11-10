@@ -172,6 +172,7 @@ void main() {
         previousKeys: <String>[oldKey],
         routers: <Router>[CoreRouter()],
         exceptionHandler: const RecordingHandler(),
+        logger: const LoggerConfig(enabled: true),
       ),
     );
   });
