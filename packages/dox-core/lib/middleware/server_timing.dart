@@ -17,8 +17,8 @@ import 'package:dox_core/dox_core.dart';
 /// and `handler` (only the controller). Other code adds its own timing
 /// to the current request with [add] or [measure]. The names `total`
 /// and `handler` are kept for these two: your own `total` is sent as
-/// `app_total`, and your own `handler` as `app_handler`. A time you
-/// name `app_total` yourself is added to it.
+/// `app_total`, and your own `handler` as `app_handler`. If you also
+/// add a time named `app_total`, the two are added together.
 ///
 /// ```
 /// ServerTiming.add('db', query.duration);

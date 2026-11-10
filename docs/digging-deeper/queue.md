@@ -295,7 +295,7 @@ Run a job in this process after the answer is sent. The client does not wait for
 SendWelcomeEmail(userId: 1).dispatchAfterResponse();
 ```
 
-It does not go on the queue, so there is no job id and no retry. Outside a request, the job runs soon. When the job throws, its `failed()` runs and the error goes to the exception handler, never to the client. `QueueProvider` turns on `AfterResponse` for it. When the server stops, a job that did not run yet is lost.
+It does not go on the queue. So it has no job id and no retry. Outside a request, the job runs soon. When the job throws, its `failed()` runs and the error goes to the exception handler, never to the client. `QueueProvider` turns on `AfterResponse` for it. When the server stops, a job that did not run yet is lost.
 
 ### Queue an email
 

@@ -157,7 +157,7 @@ A middleware needs to be on the route. `AfterResponse` lets any code (a controll
 
 It is off by default. Turn it on once, in the `setup()` of a provider. `setup()` runs in every isolate.
 
-```dart title="lib/app/providers/app.provider.dart"
+```dart title="lib/providers/app_provider.dart"
 @override
 void setup() {
   AfterResponse.enable();
@@ -269,12 +269,12 @@ Server-Timing: db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02
 - Without the middleware, or outside a request, `add` and `measure` do nothing. The cost is one small lookup.
 - A name may only have letters, digits and ``!#$%&'*+-.^_`|~``. Other characters become `_`. An empty name is ignored.
 - One answer keeps at most 32 names, plus `handler` and `total`.
-- `handler` and `total` are kept for the built-in times. If your code adds a time named `total` or `handler`, it is sent as `app_total` or `app_handler`. It does not change the built-in times. A time you name `app_total` yourself is added to it.
+- `handler` and `total` are kept for the built-in times. If your code adds a time named `total` or `handler`, it is sent as `app_total` or `app_handler`. It does not change the built-in times. If you also add a time named `app_total`, the two are added together.
 - If the answer already has a `Server-Timing` header (set with `res.header`), the times are added after it, like `cdn;dur=1, handler;dur=12.34, total;dur=13.02`.
 
 To add the time of every database query, listen to the queries once, for example in `setup()` of a provider. The listener runs inside the request that made the query, so `add` finds that request:
 
-```dart title="lib/app/providers/query_timing.provider.dart"
+```dart title="lib/providers/query_timing_provider.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart'; // SqlQueryBuilder and QueryEvent
 
@@ -282,6 +282,8 @@ void onQuery(QueryEvent event) {
   ServerTiming.add('db', event.time);
 }
 
+/// Dox finds every DoxProvider class,
+/// see lib/generated/container.g.dart.
 class QueryTimingProvider extends DoxProvider {
   @override
   void setup() {
