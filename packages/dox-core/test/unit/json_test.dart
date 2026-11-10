@@ -1,4 +1,4 @@
-import 'package:dox_core/utils/json.dart';
+import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 class JsonSerializableObject {
@@ -25,6 +25,17 @@ void main() {
     test('json serializable object', () {
       String jsonString = JSON.stringify(JsonSerializableObject());
       expect(jsonString.contains('success'), true);
+    });
+
+    test('map with a DateTime and an object with toJson, round trip', () {
+      String text = JSON.stringify(<String, dynamic>{
+        'at': DateTime.utc(2023),
+        'obj': JsonSerializableObject(),
+      });
+      expect(JSON.parse(text), <String, dynamic>{
+        'at': '2023-01-01T00:00:00.000Z',
+        'obj': <String, dynamic>{'success': 'true'},
+      });
     });
   });
 }

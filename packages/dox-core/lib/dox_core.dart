@@ -95,5 +95,6 @@ export 'utils/aes_encryptor.dart';
 export 'utils/crypt.dart';
 export 'utils/extensions.dart';
 export 'utils/hash.dart';
+export 'utils/json.dart' show JSON;
 export 'utils/key_derivation.dart';
 export 'utils/logger.dart';
