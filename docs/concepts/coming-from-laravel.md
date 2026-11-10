@@ -146,18 +146,30 @@ See [Validation](../the-basic/validation.md).
 
 With [dox_view](../the-basic/views.md), templates end in `.dox.html`. Most Blade tags have the same name. A block ends with `@end`.
 
+A Blade name that is not a Dox tag, like `@foreach` or `@endif`, is printed as text. Dox writes a warning to `stderr` that names the template, the line and the Dox way. See [Coming from Blade](../the-basic/views.md#coming-from-blade).
+
 | Laravel Blade | Dox |
 | --- | --- |
 | `{{ $user->name }}`, `{!! $html !!}` | `{{ user.name }}`, `{{{ html }}}` |
 | `@if ... @endif`, `@foreach ($users as $user)` | `@if ... @end`, `@each(user in users) ... @end` |
 | `@isset`, `@empty`, `@auth`, `@guest`, `@env`, `@production`, `@once`, `@verbatim` | the same names, closed with `@end` |
 | `@class`, `@checked`, `@selected`, `@disabled` | the same |
-| `@include('nav')` | `@include('nav')` |
+| `@include('nav')`, `@include('card', ['title' => 'Hi'])` | `@include('nav')`, `@include('card', { title: 'Hi' })` |
+| `@includeWhen($user, 'account')` | `@includeWhen(user, 'account')` |
+| `$loop->iteration`, `$loop->remaining`, `$loop->even`, `$loop->parent` | `$loop.iteration`, `$loop.remaining`, `$loop.even`, `$loop.parent` |
+| `@json($data)`, `Js::from($data)` | `@json(data)`, `{{ json(data) }}` |
+| `@error('email') {{ $message }} @enderror` | `@error('email') {{ message }} @end` |
 | `<x-button>`, `$attributes->merge([...])`, `$slot` | `@button(...) ... @end`, `$attributes.merge({...})`, `$slot` |
 | `@extends('layouts.app')`, `@section ... @endsection`, `@yield('content')` | `@extends('layouts/app')`, `@section ... @end`, `@yield('content')` |
 | `@stack('scripts')`, `@push ... @endpush`, `@prepend ... @endprepend` | `@stack('scripts')`, `@push ... @end`, `@prepend ... @end` |
 | `@csrf`, `@method('PUT')`, `old('email')` | `@csrf`, `@method('PUT')`, `old('email')` |
 | `Blade::directive('datetime', ...)` | `View.directive('datetime', DateTimeDirective())` |
+
+Three things are not the same as in Blade:
+
+- `@includeIf(condition, 'name')` in Dox takes a condition first. It does not check if the template exists.
+- `{{ true }}` prints `true`, a variable that does not exist prints nothing, and the text `'0'` is true. The `bladeOutput`, `strictVariables` and `stringZeroIsFalse` options change this. See [Strict options](../the-basic/views.md#strict-options).
+- `@json` is safe in a `<script>` block and in an attribute in single quotes, not in an attribute in double quotes.
 
 ## Eloquent vs Dox Model
 

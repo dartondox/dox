@@ -65,7 +65,7 @@ String html = View.render('emails/welcome', <String, dynamic>{'name': 'Ann'});
 <article>{{{ post.html }}}</article>
 ```
 
-`null`, and a variable that does not exist, print nothing.
+`null`, and a variable that does not exist, print nothing. `true` prints `true`, `false` prints `false`, and `10.0` prints `10.0`. You can change this with the `strictVariables` and `bladeOutput` options. See [Strict options](#strict-options).
 
 A comment is not in the output:
 
@@ -84,9 +84,10 @@ To print `{{` or a tag as text, put `@` before it: `@{{ name }}` prints `{{ name
 - **Check URLs from users.** `href="{{ url }}"` does not block a `javascript:` URL.
   A click on `javascript:alert(1)` runs the code.
   Allow only `http://` and `https://` URLs (or your own paths) before you print them.
-- **`<script>` and `<style>` are not safe.** Inside them, `{{ }}` only escapes HTML.
+- **`<script>` and `<style>` are not safe for `{{ }}`.** Inside them, `{{ }}` only escapes HTML.
   It does not make a value safe for JavaScript or CSS.
-  Do not print user data there. Put it in a quoted `data-` attribute, and read it in your script.
+  Do not print user data there with `{{ }}`. In a `<script>`, use `@json`. See [JSON for JavaScript](#json-for-javascript).
+  Or put the value in a quoted `data-` attribute, and read it in your script.
 
 ```html
 <a href="{{ profile.website }}">Website</a>  {{-- only after you check it is http or https --}}
@@ -119,7 +120,7 @@ Lists, maps and text have `length`, `isEmpty` and `isNotEmpty`. Lists also have 
 Text has `toUpperCase()`, `toLowerCase()`, `trim()`, `contains()`, `startsWith()`, `endsWith()`, `split()`, `replaceAll()`, `substring()` and `indexOf()`.
 Numbers have `toStringAsFixed()`, `round()`, `floor()`, `ceil()` and `abs()`.
 
-In `@if` and `?:`, these values are false: `null`, `false`, `0`, `''`, an empty list and an empty map.
+In `@if` and `?:`, these values are false: `null`, `false`, `0`, `''`, an empty list and an empty map. The text `'0'` is true. The `stringZeroIsFalse` option makes it false. See [Strict options](#strict-options).
 
 ## Conditions
 
@@ -165,13 +166,36 @@ Get the index too, or the key of a map:
 @end
 ```
 
-`$loop` has `index`, `first`, `last` and `length`:
+`$loop` tells you where the loop is:
 
 ```html
 @each(tag in tags)
   {{ tag }}{{ $loop.last ? '' : ', ' }}
 @end
 ```
+
+| Field | What it is |
+| --- | --- |
+| `$loop.index` | the round, from 0 |
+| `$loop.iteration` | the round, from 1 |
+| `$loop.first` | true in the first round |
+| `$loop.last` | true in the last round |
+| `$loop.count` | the number of items. `$loop.length` is the same. |
+| `$loop.remaining` | the rounds left after this one |
+| `$loop.even` | true when `iteration` is even: the 2nd, 4th, ... round |
+| `$loop.odd` | true when `iteration` is odd: the 1st, 3rd, ... round |
+| `$loop.depth` | 1 for a loop, 2 for a loop inside a loop |
+| `$loop.parent` | the `$loop` of the loop around this one. `null` when there is none. |
+
+```html
+@each(row in rows)
+  @each(cell in row)
+    <td class="{{ $loop.parent.odd ? 'light' : 'dark' }}">{{ cell }}</td>
+  @end
+@end
+```
+
+A loop in an `@include` counts the loop around the `@include` as its parent. A loop in a component starts at depth 1.
 
 ## Variables
 
@@ -191,7 +215,23 @@ Total: {{ total }}
 
 ```html
 @include('partials/nav')
+```
+
+A map as the second argument gives more variables to the template:
+
+```html
+@include('partials/card', { title: 'Profile', user: post.author })
+```
+
+- The template sees the variables of the page and the map. On the same name, the map wins.
+- The map is only for this include. The page does not see it after the include.
+- A second argument that is not a map throws a `ViewException`.
+
+`@includeIf` and `@includeWhen` include the template only when the condition is true. The two tags do the same. The condition is the first argument, the template name is the second, and the map is the third:
+
+```html
 @includeIf(user, 'partials/account')
+@includeWhen(user.isAdmin, 'partials/admin', { level: 2 })
 ```
 
 ## More tags
@@ -200,7 +240,10 @@ Close a block tag with `@end`. `@else` works in all of them, but not in `@once` 
 
 Put `@auth`, `@guest`, `@production`, `@once` and `@verbatim` alone on their line. In the middle of text, like `@once upon a time`, they stay text.
 
-With a space before the `(`, in the middle of a line, a tag is used only when its args are a valid expression. A tag with a body, like `@isset`, `@empty`, `@env`, `@section` and `@push`, also needs an `@end` after it. So text like `@empty (none)` or `@class (see docs)` stays text. With no space, like `@empty(items)`, a tag is always a tag. Alone on its line, a tag is also always a tag, with one exception: `@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend` and `@method`. With a space before the `(`, these seven are tags only when the first argument is text in quotes, like `@yield ('title')`. This holds on any line. So text like `git @push (force)` or `the @yield (curve)` stays text.
+With a space before the `(`, in the middle of a line, a tag is used only when its args are a valid expression. A tag with a body, like `@isset`, `@empty`, `@env`, `@section` and `@push`, also needs an `@end` after it. So text like `@empty (none)` or `@class (see docs)` stays text. With no space, like `@empty(items)`, a tag is always a tag. Alone on its line, a tag is also always a tag, with two exceptions:
+
+- `@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend`, `@method` and `@error`. With a space before the `(`, these eight are tags only when the first argument is text in quotes, like `@yield ('title')`. This holds on any line. So text like `git @push (force)` or `an @error (see log)` stays text.
+- `@json` and `@includeWhen`. They are tags only with the `(` right after the name, like `@json(user)`. With a space, like `the @json (format)`, they stay text.
 
 | Tag | What it does |
 | --- | --- |
@@ -220,6 +263,9 @@ With a space before the `(`, in the middle of a line, a tag is used only when it
 | `@prepend('scripts') ... @end` | adds to the start of a stack |
 | `@csrf` | the hidden `_token` field. See [Forms](#forms). |
 | `@method('PUT')` | the hidden `_method` field |
+| `@error('email') ... @end` | shows when the field has a validation error. See [Forms](#forms). |
+| `@json(value)` | the value as JSON. See [JSON for JavaScript](#json-for-javascript). |
+| `@includeWhen(condition, 'name')` | includes a template when the condition is true. See [Partials](#partials). |
 | `@datetime(...)` | a tag of your app. See [Your own tags](#your-own-tags). |
 
 ```html
@@ -395,7 +441,7 @@ A stack collects HTML from many templates and prints it in one place. Use it for
 - The pushes are printed in the order they run. A page with `@extends` runs before its layout.
 - Put `@once` inside `@push` in a component, so the script is added one time only.
 
-`@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend` and `@method` need `( )`. With no `( )`, like `@section` in a sentence, they stay text. For a space before the `(`, see the rule in [More tags](#more-tags).
+`@extends`, `@section`, `@yield`, `@stack`, `@push`, `@prepend`, `@method`, `@error`, `@json` and `@includeWhen` need `( )`. With no `( )`, like `@section` in a sentence, they stay text. For a space before the `(`, see the rule in [More tags](#more-tags).
 
 ## Forms
 
@@ -415,12 +461,21 @@ If your app has a global named `errors`, the global shows when the request has n
 <form method="POST" action="/register">
   {{ csrfField() }}
   <input name="email" value="{{ old('email') }}">
-  @if(errors.email)
-    <p class="error">{{ errors.email }}</p>
+  @error('email')
+    <p class="error">{{ message }}</p>
   @end
   <button>Register</button>
 </form>
 ```
+
+`@error('field') ... @end` shows its body when `errors` has a message for the field. Inside the body, `message` is that message.
+
+- When the value in `errors` is a list, `message` is its first item.
+- With no error for the field, the body is not printed. An `@else` part is printed instead, when there is one.
+- With no session, and in `View.render`, there are no errors, so the body is not printed. It does not throw.
+- A name with dots, like `@error('user.email')`, reads the key `'user.email'` of `errors` first. That is how the validator names a nested field. When there is no such key, it reads `email` inside `user`.
+- The name can be a variable, like `@error(name)` in an input component.
+- `message` is only there inside the body. After `@end`, a `message` variable of your page has its own value again.
 
 `@csrf` prints the same hidden field as `csrfField()`. Put it alone on its line. With no session, `@csrf` throws a `ViewException`.
 
@@ -480,6 +535,31 @@ A value of type `SafeString` is printed with no escape:
 View.global('logo', const SafeString('<img src="/logo.svg" alt="Logo">'));
 ```
 
+## JSON for JavaScript
+
+`@json(value)` prints a value as JSON. Use it to give data to JavaScript:
+
+```html
+<script>
+  const user = @json(user);
+</script>
+
+<div data-tags='@json(tags)'></div>
+```
+
+- Maps, lists, text, numbers, `true`, `false` and `null` work. An object with a `toJson()` method works too, like a Dox model.
+- `<`, `>`, `&`, `'` and the line separators U+2028 and U+2029 are written as `\uXXXX`. So a value can not close the `<script>` block or the attribute.
+- The output is safe in two places: inside a `<script>` block, and inside an attribute in single quotes. Do not put it in an attribute in double quotes: JSON has `"` in it, and that ends the attribute.
+- A value that can not be JSON, like a `DateTime` or an object with no `toJson()`, throws a `ViewException`.
+
+`json(value)` is the same as a function. `{{ json(value) }}` prints the same text, and does not escape it again. Use it where you need an expression:
+
+```html
+@!chart({ points: json(points) })
+```
+
+In Dart, `SafeString.json(value)` gives the same text.
+
 ## Your own tags
 
 A directive is a tag that your app adds. Write a class with a `render` method. It gets the values between `(` and `)`, and gives the text to print.
@@ -505,7 +585,7 @@ View.directive('datetime', DateTimeDirective());
 - `scope.lookup('name')` reads a variable of the template.
 - A directive has no body and no `@end`.
 - The tag needs `( )`. With no `( )`, like `@datetime` in a sentence, it stays text.
-- The name can have letters, digits and `_`. The name of a built-in tag, like `if` or `section`, throws a `ViewException`.
+- The name can have letters, digits and `_`. The name of a built-in tag, like `if`, `section` or `json`, throws a `ViewException`.
 - When `resources/views/components/` has a template with the same name, the component wins.
 - You can also give them in the config: `ViewConfig(directives: <String, ViewDirective>{'datetime': DateTimeDirective()})`.
 
@@ -520,8 +600,65 @@ Each isolate has its own engine. So add directives in your provider, after `supe
 | `cache` | on, but off when `APP_ENV` is `development` or `local` | keep parsed templates in memory |
 | `globals` | `{}` | variables for every template |
 | `directives` | `{}` | your own tags, by name |
+| `strictVariables` | `false` | a variable that does not exist throws a `ViewException`. See [Strict options](#strict-options). |
+| `stringZeroIsFalse` | `false` | the text `'0'` is false in a condition |
+| `bladeOutput` | `false` | print `true` as `1`, `false` as nothing and `10.0` as `10` |
+| `bladeWarnings` | `true` | warn about Blade names that are not Dox tags. See [Coming from Blade](#coming-from-blade). |
 
 With the cache off, a changed template shows on the next request, with no restart.
+
+## Strict options
+
+These three options are off by default. Turn them on in `ViewConfig`:
+
+```dart
+const ViewConfig(
+  strictVariables: true,
+  stringZeroIsFalse: true,
+  bladeOutput: true,
+);
+```
+
+**`strictVariables`**: a variable that does not exist throws a `ViewException`. The message has the name of the variable, the template and the line. So a typo like `{{ usre.name }}` shows as an error, not as an empty page.
+
+A variable that is there with the value `null` is fine. These ways to read a variable that may not exist never throw:
+
+| Code | What it gives when `user` does not exist |
+| --- | --- |
+| `@isset(user) ... @end` | the body is not printed |
+| `@empty(user) ... @end` | the body is printed |
+| `{{ user ?? 'Guest' }}` | `Guest` |
+| `{{ user?.name }}` | nothing |
+
+The rule covers the variable on the left of `??` and `?.`. In `{{ a ?? b ?? 'x' }}`, both `a` and `b` can be missing. `{{ user.name ?? 'Guest' }}` still throws when `user` does not exist: write `{{ user?.name ?? 'Guest' }}`.
+
+**`stringZeroIsFalse`**: the text `'0'` is false in `@if`, `@unless`, `@empty`, `?:`, `&&`, `||`, `!`, `@class`, `@checked`, `@selected`, `@disabled`, `@includeIf` and `@includeWhen`. Other text, like `'0.0'` or `'00'`, is still true.
+
+**`bladeOutput`**: `{{ }}` and `{{{ }}}` print `true` as `1`, `false` as nothing, and a number with no fraction, like `10.0`, as `10`. The values of `@yield`, `@section` and `@method` are printed the same way. Joining text with `+` does not change: `{{ 'a' + true }}` is still `atrue`.
+
+## Coming from Blade
+
+Some Blade names are not Dox tags. Dox prints them as plain text. To help you find them, Dox writes a warning to `stderr` when it reads a template that has one:
+
+```
+dox_view: warning: posts/index:12 "@foreach" is not a Dox tag. Use "@each(item in items) ... @end".
+```
+
+| Blade | Dox |
+| --- | --- |
+| `{!! html !!}` | `{{{ html }}}` |
+| `@foreach`, `@forelse`, `@for` | `@each(item in items) ... @else ... @end` |
+| `@endif`, `@endforeach`, `@endsection` and the other `@end...` names, `@stop` | `@end` |
+| `@switch` | `@if ... @elseif ... @else ... @end` |
+| `@php`, `@endphp` | `@let(name = value)` |
+| `@show` | `@end`, then `@yield('name')` |
+| `@parent` | not there. Use `@stack` and `@push` to add content. |
+
+- The output of the template does not change. The warning is only a hint.
+- Each warning is written one time.
+- `@end...` names warn anywhere in a line. The other names warn only with the `(` right after the name, like `@foreach(...)`, or alone on their line. So a sentence like `the @foreach loop` does not warn.
+- Text in a comment, in `@verbatim`, and a name with `@@` before it, do not warn.
+- `ViewConfig(bladeWarnings: false)` turns the warnings off.
 
 ## Errors
 
