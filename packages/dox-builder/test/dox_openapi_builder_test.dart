@@ -673,7 +673,29 @@ security: <String, OpenApiSecurity>{
 
     test('req.authorize and req.validateSchema give error answers', () async {
       String out = await _generate(<String, String>{
+        'dox_auth|lib/dox_auth.dart': '''
+class Gate {
+  static Future<void> authorize(Object? user, String ability) async {}
+}
+''',
+        // an app class with the same name is not the dox_auth one
+        'a|lib/own_gate.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+class Gate {
+  static Future<void> authorize(Object? user, String ability) async {}
+}
+
+@DoxController()
+class OwnGateController {
+  Future<String> ownGate(DoxRequest req) async {
+    await Gate.authorize(null, 'update');
+    return 'ok';
+  }
+}
+''',
         'a|lib/a.dart': """
+import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_core/dox_core.dart';
 
 extension GateRequest on DoxRequest {
@@ -682,10 +704,6 @@ extension GateRequest on DoxRequest {
 
 extension GateIRequest on IDoxRequest {
   Future<void> authorize(String ability, [Object? subject]) async {}
-}
-
-class Gate {
-  static Future<void> authorize(Object? user, String ability) async {}
 }
 
 @Dto()
@@ -816,7 +834,7 @@ class PostController {
       expect(save, contains('#/components/schemas/SavePost'));
       expect(save, isNot(contains('422:')));
 
-      /// the static `Gate.authorize` gives 403 only
+      /// the static `Gate.authorize` of dox_auth gives 403 only
       String gate = operation('gate');
       expect(
         gate,
@@ -829,6 +847,9 @@ class PostController {
         contains(_flat("403: ResponseDoc(description: 'Not your post')")),
       );
       expect(gateCustom, isNot(contains('Notallowed')));
+
+      /// an app class named `Gate` adds nothing
+      expect(operation('ownGate'), isNot(contains('403:')));
 
       /// `authorize` and `validate` of another class add nothing
       String pay = operation('pay');

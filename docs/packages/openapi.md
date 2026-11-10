@@ -170,7 +170,7 @@ Blog:
 | `422` | the route has a request class, or the controller method calls `req.validate<T>()` or `req.validateSchema(...)`. The body is `{field: message}` |
 | `500` | every route |
 
-`Can`, `GuestMiddleware` and `ValidateSignature` are found by their class name. A `@Response` with the same status wins over an automatic answer.
+`Can`, `GuestMiddleware` and `ValidateSignature` are found by their class name. `req.authorize(...)` is found when it is called on the request (`DoxRequest` or `IDoxRequest`) in the controller method. `Gate.authorize(...)` is found when `Gate` is the class of `dox_auth`. A `@Response` with the same status wins over an automatic answer.
 
 `GuestMiddleware(redirectTo: ...)` also shows a `403`, but the app sends a redirect. Put `@Response(403, ...)` on the method to replace it.
 

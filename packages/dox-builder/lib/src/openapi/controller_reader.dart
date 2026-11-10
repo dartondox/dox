@@ -254,7 +254,9 @@ class ControllerReader {
       return false;
     }
     Element? element = target.element;
-    return element is ClassElement && element.displayName == 'Gate';
+    return element is ClassElement &&
+        element.displayName == 'Gate' &&
+        '${element.library.uri}'.startsWith('package:dox_auth/');
   }
 
   ResponseData _notLoggedIn() {
