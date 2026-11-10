@@ -1,5 +1,7 @@
 ## Unreleased
 
+- OpenAPI: a route with the `Can` middleware gets a `401` and a `403` answer in the docs. A route with `GuestMiddleware` or `ValidateSignature` gets a `403`. They are found by class name. A `@Response` with the same status wins.
+- OpenAPI: the `ValidationError` schema is in the docs whenever a route has the automatic `422` answer, also when it comes from a `req.validateSchema(...)` call.
 - New: `ServerTiming` middleware. It adds a `Server-Timing` header with the `handler` and `total` time of the request. It is off unless you add it, because it shows timing to clients. Use it in development or for trusted clients.
 - New: `ServerTiming.add(name, duration)` and `ServerTiming.measure(name, fn)` add your own timing to the current request, with no request passed. The same name is summed and counted. Without the middleware they do nothing.
 

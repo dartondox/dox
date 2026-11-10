@@ -53,6 +53,28 @@ class ControllerReader {
 
   static const String _ok = 'Successful response';
 
+  static const Set<String> _errorCalls = <String>{
+    'authorize',
+    'validate',
+    'validateSchema',
+  };
+
+  /// The `{code, message}` body of a 401 and 403 answer. dox_core
+  /// writes the same for an auth middleware.
+  static const Map<String, dynamic> _errorSchema = <String, dynamic>{
+    'type': 'object',
+    'properties': <String, dynamic>{
+      'code': <String, dynamic>{'type': 'string'},
+      'message': <String, dynamic>{'type': 'string'},
+    },
+  };
+
+  /// The 422 body. dox_core adds this schema to the docs
+  /// (`OpenApiRouteReader.validationError`). The builder can not
+  /// import dox_core, so the name is repeated here.
+  static const String _validationErrorRef =
+      '#/components/schemas/ValidationError';
+
   /// The docs of all public methods of [controller]. With
   /// `@ApiIgnore()` on the class or method, the method is marked
   /// `ignore`, so its routes are left out.
@@ -98,6 +120,7 @@ class ControllerReader {
     op.params = await _params(method);
     op.request = await requests.read(method, body);
     op.responses = await _responses(method, body);
+    _errors(op, body);
     return op;
   }
 
@@ -197,6 +220,43 @@ class ControllerReader {
       responses[200] = ResponseData(_ok, await _returnSchema(method, body));
     }
     return responses;
+  }
+
+  /// Error answers of calls on the request in the method body:
+  /// `req.authorize(...)` gives 401 and 403. `req.validateSchema(...)`,
+  /// or `req.validate()` with no request class found, gives 422.
+  /// A `@Response` for the same status wins.
+  void _errors(OperationData op, FunctionBody? body) {
+    for (MethodInvocation call in CallCollector.of(body, _errorCalls)) {
+      if (!_onRequest(call)) continue;
+      if (call.methodName.name == 'authorize') {
+        op.responses.putIfAbsent(401, _notLoggedIn);
+        op.responses.putIfAbsent(403, _notAllowed);
+      } else if (op.request == null) {
+        op.responses.putIfAbsent(422, _validationFailed);
+      }
+    }
+  }
+
+  /// true for `req.name(...)`. Other classes also have methods named
+  /// `authorize` or `validate`, like a payment client.
+  bool _onRequest(MethodInvocation call) {
+    String? type = call.realTarget?.staticType?.element?.displayName;
+    return type == 'DoxRequest' || type == 'IDoxRequest';
+  }
+
+  ResponseData _notLoggedIn() {
+    return const ResponseData('Not logged in', _errorSchema);
+  }
+
+  ResponseData _notAllowed() {
+    return const ResponseData('Not allowed', _errorSchema);
+  }
+
+  ResponseData _validationFailed() {
+    return const ResponseData('Validation failed', <String, dynamic>{
+      r'$ref': _validationErrorRef,
+    });
   }
 
   Future<Map<String, dynamic>?> _returnSchema(

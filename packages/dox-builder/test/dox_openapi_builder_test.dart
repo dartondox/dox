@@ -13,6 +13,7 @@ export 'package:dox_validation/src/dto/dto_annotations.dart';
 
 class DoxRequest {
   T validate<T>() => throw UnimplementedError();
+  dynamic validateSchema(dynamic schema) => null;
 }
 abstract class IHttpException {}
 class UnAuthorizedException extends IHttpException {}
@@ -665,6 +666,111 @@ security: <String, OpenApiSecurity>{
         rootPackage: 'a',
         outputs: <String, Object>{},
       );
+    });
+
+    test('req.authorize and req.validateSchema give error answers', () async {
+      String out = await _generate(<String, String>{
+        'a|lib/a.dart': """
+import 'package:dox_core/dox_core.dart';
+
+extension GateRequest on DoxRequest {
+  Future<void> authorize(String ability, [Object? subject]) async {}
+}
+
+class Payment {
+  void authorize(int amount) {}
+  void validate() {}
+}
+
+@DoxController()
+class PostController {
+  Future<String> update(DoxRequest req, String id) async {
+    await req.authorize('update');
+    return id;
+  }
+
+  @Response(403, null, description: 'Not your post')
+  Future<String> destroy(DoxRequest req, String id) async {
+    await req.authorize('delete');
+    return id;
+  }
+
+  String search(DoxRequest req) {
+    req.validateSchema(<String, dynamic>{});
+    return 'ok';
+  }
+
+  String filter(DoxRequest req) {
+    req.validate<Object>();
+    return 'ok';
+  }
+
+  @Response(422, null, description: 'Bad filter')
+  String custom(DoxRequest req) {
+    req.validateSchema(<String, dynamic>{});
+    return 'ok';
+  }
+
+  String pay(DoxRequest req) {
+    Payment()
+      ..authorize(5)
+      ..validate();
+    Payment().authorize(5);
+    Payment().validate();
+    return 'ok';
+  }
+}
+""",
+      });
+      String error =
+          "schema: <String, dynamic>{'type': 'object', 'properties': "
+          "<String, dynamic>{'code': <String, dynamic>{'type': 'string'}, "
+          "'message': <String, dynamic>{'type': 'string'}}})";
+      String invalid =
+          "422: ResponseDoc(description: 'Validation failed', schema: "
+          "<String, dynamic>{'\\\$ref': '#/components/schemas/ValidationError'})";
+      String operation(String method) {
+        int start = out.indexOf("method:'$method'");
+        int end = out.indexOf('OpenApiOperation(', start);
+        return out.substring(start, end < 0 ? out.length : end);
+      }
+
+      String update = operation('update');
+      expect(
+        update,
+        contains(
+          _flat("401: ResponseDoc(description: 'Not logged in', $error"),
+        ),
+      );
+      expect(
+        update,
+        contains(_flat("403: ResponseDoc(description: 'Not allowed', $error")),
+      );
+
+      /// `@Response(403, ...)` wins, the 401 is still added
+      String destroy = operation('destroy');
+      expect(
+        destroy,
+        contains(_flat("403: ResponseDoc(description: 'Not your post')")),
+      );
+      expect(destroy, isNot(contains('Notallowed')));
+      expect(destroy, contains('401:ResponseDoc('));
+
+      expect(operation('search'), contains(_flat(invalid)));
+      expect(operation('filter'), contains(_flat(invalid)));
+
+      String custom = operation('custom');
+      expect(
+        custom,
+        contains(_flat("422: ResponseDoc(description: 'Bad filter')")),
+      );
+      expect(custom, isNot(contains('ValidationError')));
+
+      /// `authorize` and `validate` of another class add nothing
+      String pay = operation('pay');
+      expect(pay, isNot(contains('401:')));
+      expect(pay, isNot(contains('403:')));
+      expect(pay, isNot(contains('422:')));
     });
 
     test('routes with a prefixed dox_core import are found', () async {

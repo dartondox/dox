@@ -39,6 +39,36 @@ class OpenApiRouteReader {
     <String, dynamic>{'type': 'http', 'scheme': 'bearer'},
   );
 
+  /// Error answers of known middleware, by class name. `Can` and
+  /// `GuestMiddleware` are in dox_auth, so only the name can be checked.
+  static const Map<String, List<int>> _statusByMiddleware = <String, List<int>>{
+    'Can': <int>[401, 403],
+    'GuestMiddleware': <int>[403],
+    'ValidateSignature': <int>[403],
+  };
+
+  /// the `{code, message}` body of an error answer
+  static const Map<String, dynamic> _errorSchema = <String, dynamic>{
+    'type': 'object',
+    'properties': <String, dynamic>{
+      'code': <String, dynamic>{'type': 'string'},
+      'message': <String, dynamic>{'type': 'string'},
+    },
+  };
+
+  static const Map<int, ResponseDoc> _errorDocs = <int, ResponseDoc>{
+    401: ResponseDoc(description: 'Not logged in', schema: _errorSchema),
+    403: ResponseDoc(description: 'Not allowed', schema: _errorSchema),
+  };
+
+  static const String _validationErrorRef =
+      '${OpenApiConstants.schemaRefPrefix}$validationError';
+
+  static const ResponseDoc _validationFailed = ResponseDoc(
+    description: 'Validation failed',
+    schema: <String, dynamic>{r'$ref': _validationErrorRef},
+  );
+
   final Set<String> _operationIds = <String>{};
 
   /// docs for [route], or null when it has `@ApiIgnore()`
@@ -75,7 +105,7 @@ class OpenApiRouteReader {
       bodyMediaType: !inQuery && schema is Map<String, dynamic>
           ? RouteDoc.mediaTypeFor(schema)
           : null,
-      responses: _responses(op, request != null, security != null),
+      responses: _responses(op, request != null, security != null, middleware),
       // only paths that still have a param can miss a record, so the short
       // path of `/greet/{name?}` gets no 404
       paramResponses: path.contains('{')
@@ -210,6 +240,7 @@ class OpenApiRouteReader {
     OpenApiOperation? op,
     bool validates,
     bool secured,
+    List<String> middleware,
   ) {
     Map<int, ResponseDoc> responses = <int, ResponseDoc>{...?op?.responses};
     if (responses.isEmpty) {
@@ -217,34 +248,20 @@ class OpenApiRouteReader {
         description: OpenApiConstants.defaultResponseDescription,
       );
     }
-    if (secured) {
-      _add(
-        responses,
-        401,
-        const ResponseDoc(
-          description: 'Not logged in',
-          schema: <String, dynamic>{
-            'type': 'object',
-            'properties': <String, dynamic>{
-              'code': <String, dynamic>{'type': 'string'},
-              'message': <String, dynamic>{'type': 'string'},
-            },
-          },
-        ),
-      );
+    if (secured) _add(responses, 401, _errorDocs[401]!);
+    for (String name in middleware) {
+      for (int status in _statusByMiddleware[name] ?? const <int>[]) {
+        _add(responses, status, _errorDocs[status]!);
+      }
     }
     if (validates) {
       usesValidationError = true;
-      _add(
-        responses,
-        422,
-        const ResponseDoc(
-          description: 'Validation failed',
-          schema: <String, dynamic>{
-            r'$ref': '${OpenApiConstants.schemaRefPrefix}$validationError',
-          },
-        ),
-      );
+      _add(responses, 422, _validationFailed);
+    }
+    // the 422 can also come from the registry (`req.validateSchema`)
+    Object? invalid = responses[422]?.schema;
+    if (invalid is Map && invalid[r'$ref'] == _validationErrorRef) {
+      usesValidationError = true;
     }
     _add(responses, 500, const ResponseDoc(description: 'Server error'));
     return responses;

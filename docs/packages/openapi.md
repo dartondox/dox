@@ -164,9 +164,13 @@ Blog:
 | request | see [Request](#request) below |
 | 200 answer | the return type, see [Response](#response) below |
 | `401` and a login scheme | `@Security` on a middleware class, or a middleware whose class name ends with `AuthMiddleware`. See [Login schemes](#login-schemes) |
+| `401` and `403` | the `Can` middleware on the route, or a `req.authorize(...)` call in the controller method |
+| `403` | the `GuestMiddleware` or `ValidateSignature` middleware on the route |
 | `404` | the path has a `{param}`. The short path of an optional param, like `/blog`, has no `404` |
-| `422` | the route has a request class. The body is `{field: message}` |
+| `422` | the route has a request class, or the controller method calls `req.validate<T>()` or `req.validateSchema(...)`. The body is `{field: message}` |
 | `500` | every route |
+
+`Can`, `GuestMiddleware` and `ValidateSignature` are found by their class name. A `@Response` with the same status wins over an automatic answer.
 
 Routes that the builder does not know (for example inline closures) still get a basic entry.
 
