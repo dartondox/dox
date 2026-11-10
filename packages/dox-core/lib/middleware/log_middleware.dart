@@ -1,13 +1,17 @@
-import 'dart:async';
-import 'dart:io';
-
 import 'package:dox_core/dox_core.dart';
 
 class LogMiddleware implements IDoxMiddleware {
+  /// changes the line before it is logged. It can change `status` too, so
+  /// with a `filter` the line is built for every request when the logger is
+  /// on, also when `level` would hide `info`. The cost is one request copy.
+  /// Without a `filter` that work is skipped.
   Map<String, dynamic> Function(Map<String, dynamic>)? filter;
 
   final bool withHeader;
-  final bool enabled;
+
+  /// `false` turns the request logs off. Not set: follow the logger config
+  /// (`LoggerConfig.enabled` and `level`). The logger config always wins.
+  final bool? enabled;
 
   /// a body field or header whose name contains one of these (any case)
   /// is logged as `[REDACTED]`, so passwords and tokens stay out of logs.
@@ -31,7 +35,7 @@ class LogMiddleware implements IDoxMiddleware {
   ];
 
   LogMiddleware({
-    required this.enabled,
+    this.enabled,
     this.filter,
     this.withHeader = false,
     this.redact = defaultRedact,
@@ -39,9 +43,14 @@ class LogMiddleware implements IDoxMiddleware {
 
   @override
   IDoxRequest handle(IDoxRequest req) {
-    if (!enabled) {
+    if (enabled == false) {
       return req;
     }
+    // skip the work when the logger would drop the line. With a filter the
+    // status can change, so only the `enabled` check is safe there.
+    LoggerConfig logger = Dox().config.logger;
+    if (!logger.enabled) return req;
+    if (filter == null && !Logger.shouldLog('info', logger.level)) return req;
     Map<String, dynamic> payload = <String, dynamic>{
       'request': _redact(req.toJson()),
     };
@@ -50,19 +59,28 @@ class LogMiddleware implements IDoxMiddleware {
       payload['headers'] = _redact(req.headers);
     }
 
+    String? requestId = req is DoxRequest ? req.requestId : null;
     Map<String, dynamic> text = <String, dynamic>{
-      'level': 'INFO',
+      'status': 'info',
       'message': '${req.method} ${req.uri.path}',
-      'source_ip': req.ip(),
-      'timestamp': DateTime.now().toIso8601String(),
+      'network': <String, dynamic>{
+        'client': <String, dynamic>{'ip': req.ip()},
+      },
+      'http': <String, dynamic>{
+        'method': req.method,
+        'url': req.uri.path,
+        'request_id': ?requestId,
+      },
       'payload': payload,
     };
-    String? requestId = req is DoxRequest ? req.requestId : null;
-    if (requestId != null) text['request_id'] = requestId;
     if (filter != null) {
-      text = filter!(text);
+      // a copy: the filter may return a map that can not change
+      text = Map<String, dynamic>.of(filter!(text));
     }
-    _LogBuffer.write(JSON.stringify(text));
+    // the logger config decides if the line is written, and how
+    String status = '${text.remove('status') ?? 'info'}';
+    String message = '${text.remove('message') ?? ''}';
+    Logger.log(status, message, text);
     return req;
   }
 
@@ -84,29 +102,5 @@ class LogMiddleware implements IDoxMiddleware {
       if (name.contains(word)) return true;
     }
     return false;
-  }
-}
-
-/// collects log lines and writes them in one go every few ms.
-/// one big write is much cheaper than one blocking write per request.
-class _LogBuffer {
-  static final StringBuffer _buffer = StringBuffer();
-  static Timer? _timer;
-
-  static void write(String line) {
-    _buffer.writeln(line);
-    if (_buffer.length > 64 * 1024) {
-      flush();
-    } else {
-      _timer ??= Timer(const Duration(milliseconds: 20), flush);
-    }
-  }
-
-  static void flush() {
-    _timer?.cancel();
-    _timer = null;
-    if (_buffer.isEmpty) return;
-    stdout.write(_buffer.toString());
-    _buffer.clear();
   }
 }

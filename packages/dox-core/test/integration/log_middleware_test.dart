@@ -34,6 +34,7 @@ void main() {
         // the OS picks a free port, so test files can run in parallel
         serverPort: 0,
         totalIsolate: 1,
+        logger: const LoggerConfig(enabled: true, name: 'it'),
         routers: <Router>[LogRouter()],
         globalMiddleware: <dynamic>[
           LogMiddleware(
@@ -73,6 +74,12 @@ void main() {
     client.close();
 
     Map<String, dynamic> logged = jsonDecode(File(logFile).readAsStringSync());
+    expect(logged['status'], 'info');
+    expect(logged['message'], 'POST /log/login');
+    expect(logged['http']['method'], 'POST');
+    expect(logged['http']['url'], '/log/login');
+    expect(logged['http'].containsKey('request_id'), isFalse);
+    expect(logged['network']['client']['ip'], isNotNull);
     Map<String, dynamic> payload = logged['payload'];
     Map<String, dynamic> body = payload['request'];
     expect(body['email'], 'a@dox.dev');

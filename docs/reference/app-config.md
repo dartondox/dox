@@ -74,9 +74,9 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `name` | `String` | `''` | The `name` field in each JSON log line. |
-| `enabled` | `bool` | `false` | Turn the `Logger` on. |
-| `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line (for log services). |
+| `name` | `String` | `''` | Written as `logger.name` in each JSON log line. Left out when empty. |
+| `enabled` | `bool` | `false` | Turn the `Logger` on. When it is `false`, `LogMiddleware(enabled: true)` does not turn request logs on. |
+| `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line (for log services). The line has `timestamp`, `status`, `message` and `logger.name`. Keys of a `Map` you log are added at the top level. Other data goes under `payload`. `LogMiddleware` follows this setting too. |
 | `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. `Logger.success` counts as `info`. `Logger.danger` counts as `error`. An unknown value prints every line. |
 
 ## CacheConfig

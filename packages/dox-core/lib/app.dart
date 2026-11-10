@@ -6,6 +6,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
+import 'package:dox_core/utils/log_buffer.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 IocContainer _ioc = IocContainer();
@@ -156,7 +157,10 @@ class Dox {
     // stop watching: the next signal does the default, it ends the process
     _cancelSignals();
     Logger.info('$signal: stopping, open requests can finish');
+    // `stop` writes the log buffer, also when it throws
     await stop();
+    // a line logged after the flush of `stop` must not be lost
+    LogBuffer.flush();
     exit(0);
   }
 
@@ -179,17 +183,30 @@ class Dox {
   /// ```
   Future<void> stop() async {
     _cancelSignals();
-    await Future.wait(<Future<void>>[
-      DoxIsolate().stopAll(config.shutdownTimeout),
-      stopIsolate(),
-    ]);
-    // close the bus again: `killAll` closes it while the providers of the
-    // main isolate still shut down, and one of them may join it again.
-    IsolateBus.instance.close();
+    try {
+      await Future.wait(<Future<void>>[
+        DoxIsolate().stopAll(config.shutdownTimeout),
+        stopIsolate(),
+      ]);
+      // close the bus again: `killAll` closes it while the providers of the
+      // main isolate still shut down, and one of them may join it again.
+      IsolateBus.instance.close();
+    } finally {
+      LogBuffer.flush();
+    }
   }
 
   /// [stop] for this isolate only. Internal: each isolate runs it.
   Future<void> stopIsolate() async {
+    try {
+      await _stopIsolate();
+    } finally {
+      // write the log lines that wait in the buffer, also after an error
+      LogBuffer.flush();
+    }
+  }
+
+  Future<void> _stopIsolate() async {
     await DoxServer().shutdown(config.shutdownTimeout);
     for (DoxProvider provider in doxProviders) {
       try {

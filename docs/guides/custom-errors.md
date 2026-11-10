@@ -155,10 +155,10 @@ class AppExceptionHandler extends ExceptionHandler {
   void report(Object error, StackTrace stackTrace) {
     print(
       jsonEncode(<String, String>{
-        'level': 'ERROR',
-        'message': error.toString(),
-        'stack': stackTrace.toString(),
         'timestamp': DateTime.now().toIso8601String(),
+        'status': 'error',
+        'message': error.toString(),
+        'error': <String, String>{'stack': stackTrace.toString()},
       }),
     );
   }
@@ -197,7 +197,7 @@ Route.get('/boom', (DoxRequest req) => throw StateError('boom'));
 After `GET /api/boom`, the server prints one line:
 
 ```json
-{"level":"ERROR","message":"Bad state: boom","stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ...","timestamp":"2026-10-22T14:01:12.000Z"}
+{"timestamp":"2026-10-22T14:01:12.000Z","status":"error","message":"Bad state: boom","error":{"stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ..."}}
 ```
 
 Remove the `/boom` route when you are done.

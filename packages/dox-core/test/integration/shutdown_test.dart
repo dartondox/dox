@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:dox_cache/dox_cache.dart' show MemoryDriver;
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/log_buffer.dart';
 import 'package:test/test.dart';
 
 import '../utils/free_port.dart';
@@ -100,6 +101,16 @@ void main() {
       expect(spy.closed, 1);
     });
 
+    test('stop writes the waiting log lines', () async {
+      List<String> written = <String>[];
+      LogBuffer.writer = written.add;
+      addTearDown(() => LogBuffer.writer = stdout.write);
+      LogBuffer.write('waiting line');
+      expect(written, isEmpty);
+      await Dox().stop();
+      expect(written.join(), contains('waiting line'));
+    });
+
     test('a request longer than shutdownTimeout is cut', () async {
       Future<Object> open = fetch(port, '/slow?ms=5000');
       await slowStarted.future.timeout(const Duration(seconds: 10));
@@ -154,6 +165,9 @@ void main() {
         for (int id = 1; id <= 3; id++) {
           expect(out.toString(), contains('cleanup $id'));
         }
+        // the buffered logger lines reach stdout before the exit
+        expect(out.toString(), contains('stopping, open requests can finish'));
+        expect(out.toString(), contains('"message":"bye 1"'));
       } finally {
         app.kill(ProcessSignal.sigkill);
       }

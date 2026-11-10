@@ -4,6 +4,7 @@ library;
 import 'package:dox_core/app.dart';
 import 'package:dox_core/interfaces/app_config.dart';
 import 'package:dox_core/utils/json.dart';
+import 'package:dox_core/utils/log_buffer.dart';
 
 class Logger {
   /// rank of each level. a line prints when its rank is at least
@@ -22,15 +23,28 @@ class Logger {
   /// an unknown [minLevel] prints every line, so no log is lost.
   static bool shouldLog(String level, String minLevel) {
     int min = _ranks[minLevel.toLowerCase()] ?? 0;
-    return (_ranks[level] ?? 3) >= min;
+    return (_ranks[level.toLowerCase()] ?? 3) >= min;
   }
 
   static void log(String level, dynamic message, [dynamic data]) {
+    // `INFO` from a filter ranks as `info`
+    level = level.toLowerCase();
     LoggerConfig config = Dox().config.logger;
     if (!config.enabled || !shouldLog(level, config.level)) return;
-    Dox().config.logger.prettyPrint
-        ? _prettyLog(level, message, data)
-        : _log(level, message, data);
+    String line;
+    try {
+      line = _build(config, level, message, data);
+    } catch (_) {
+      // data that can not become JSON must not break the caller (eg. a
+      // request). Log its text instead.
+      try {
+        line = _build(config, level, message, data?.toString());
+      } catch (_) {
+        return;
+      }
+    }
+    // a warning or an error is written at once, it must not be lost
+    LogBuffer.write(line, now: (_ranks[level] ?? 3) >= 2);
   }
 
   /// log the text using info color (lightblue)
@@ -65,10 +79,19 @@ class Logger {
     log('danger', message, data);
   }
 
-  /// log as json string
-  /// this function is use for logging services
-  /// eg. datadog, sentry etc..
-  static void _prettyLog(String level, dynamic message, dynamic data) {
+  static String _build(
+    LoggerConfig config,
+    String level,
+    dynamic message,
+    dynamic data,
+  ) {
+    return config.prettyPrint
+        ? _prettyLog(level, message, data)
+        : _log(config, level, message, data);
+  }
+
+  /// the colored text line
+  static String _prettyLog(String level, dynamic message, dynamic data) {
     String? payload = '';
     if (data == null || data is String) {
       payload = data;
@@ -78,30 +101,49 @@ class Logger {
       payload = JSON.stringify(data);
     }
     Map<String, String> colors = <String, String>{
+      'debug': '90',
       'info': '36',
       'warn': '33',
+      'warning': '33',
       'success': '32',
       'danger': '31',
+      'error': '31',
     };
-    String? color = colors[level];
+    // an unknown level gets the default color
+    String color = colors[level] ?? '0';
     if (payload == null || payload.isEmpty) {
-      print('\x1B[${color}m$message\x1B[0m');
-      return;
+      return '\x1B[${color}m$message\x1B[0m';
     }
-    print('\x1B[${color}m$message => $payload\x1B[0m');
+    return '\x1B[${color}m$message => $payload\x1B[0m';
   }
 
-  /// log as json string
-  /// this function is use for logging services
-  /// eg. datadog, sentry etc..
-  static void _log(String level, dynamic message, dynamic data) {
+  /// one JSON line, with the standard attributes of log services
+  /// (eg. datadog). A Map in [data] is merged into the top level.
+  /// Any other value goes under `payload`.
+  static String _log(
+    LoggerConfig config,
+    String level,
+    dynamic message,
+    dynamic data,
+  ) {
     Map<String, dynamic> text = <String, dynamic>{
-      'level': level.toUpperCase(),
-      'name': Dox().config.logger.name,
-      'message': message.toString(),
       'timestamp': DateTime.now().toIso8601String(),
-      'payload': data,
+      'status': level,
+      'message': message.toString(),
+      if (config.name.isNotEmpty)
+        'logger': <String, dynamic>{'name': config.name},
     };
-    print(JSON.stringify(text));
+    if (data is Map) {
+      for (MapEntry<dynamic, dynamic> e in data.entries) {
+        // the standard fields stay: a key with the same name is dropped
+        String key = e.key is String ? e.key : '${e.key}';
+        // `logger` is always ours: it is left out when the name is empty
+        if (key == 'logger') continue;
+        text.putIfAbsent(key, () => e.value);
+      }
+    } else if (data != null) {
+      text['payload'] = data;
+    }
+    return JSON.stringify(text);
   }
 }
