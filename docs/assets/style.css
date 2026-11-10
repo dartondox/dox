@@ -458,3 +458,21 @@ svg.lucide {
   .dox-bench__p99, .dox-bench__ram, .dox-bench__head:nth-child(4), .dox-bench__head--ram { display: none; }
   .md-typeset .dox-bench__foot { flex-direction: column; }
 }
+
+/* ---------- Page background: faint grid that fades at the edges ---------- */
+[data-md-color-scheme="default"] { --dox-grid-line: rgba(11, 27, 54, 0.07); }
+[data-md-color-scheme="slate"] { --dox-grid-line: rgba(148, 163, 200, 0.09); }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--dox-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--dox-grid-line) 1px, transparent 1px);
+  background-size: 35px 35px;
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(ellipse 50% 65% at 50% 35%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 65% at 50% 35%, #000 30%, transparent 100%);
+}
