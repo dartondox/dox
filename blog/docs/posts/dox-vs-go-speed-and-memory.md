@@ -22,7 +22,7 @@ Go used less memory once a database was added.
 
 ## The short answer
 
-How many times more requests per second Dox handled, at 256 connections:
+Requests per second at 256 connections. The last column shows how many times the requests of Go that Dox handled:
 
 | Test | Dox | Go | Dox handles |
 | --- | ---: | ---: | ---: |
@@ -207,7 +207,7 @@ MySQL 8.4, requests per second at 256 connections:
 
 On `/db` with Postgres, the p99 was 1.8 ms for Dox and 6.3 ms for Go.
 
-Two things to see here:
+Three things to see here:
 
 - Dox handled more requests on every route. The gap is largest on `/db`: 4.8× with Postgres and 4.5× with MySQL.
 - On `/json` it handled 2.7×. On 20 queries per request it handled 2.7× with Postgres and 2.2× with MySQL.
