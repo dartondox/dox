@@ -21,7 +21,7 @@ dart pub add dox_inertia
 
 ### 1. Root view
 
-The root view is the HTML page of the first visit. Dox puts the script and style tags in place of `@vite`, and the page in place of `@inertia`. It is plain HTML, with no template engine.
+The root view is the HTML page of the first visit. Dox puts the script and style tags in place of `@vite`, and the page in place of `@inertia`. It is plain HTML, with no template engine. It can hold `{{ key }}` marks for values like the title, see [Root view data](#root-view-data).
 
 ```html title="resources/views/app.html"
 <!DOCTYPE html>
@@ -65,7 +65,7 @@ InertiaConfig inertiaConfig = InertiaConfig(
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `rootView` | `resources/views/app.html` | the HTML page of the first visit |
+| `rootView` | `resources/views/app.html` | the HTML page of the first visit. One request can use another file with `Inertia.setRootView` |
 | `entryPoints` | `['resources/js/app.js']` | the Vite entry files |
 | `publicPath` | `public` | the folder of public files |
 | `buildDirectory` | `build` | the folder in `publicPath` where `vite build` writes its files |
@@ -377,6 +377,75 @@ InertiaConfig inertiaConfig = InertiaConfig(
 Each page has a version. When you deploy new assets, the version changes. A browser with the old version that makes an Inertia `GET` request gets `409` with `X-Inertia-Location`. The client then loads the whole page again, with the new assets.
 
 The default version is a hash of the Vite manifest. Dox reads it once per isolate, so restart the server after `vite build` (a deploy does this). To set your own, use `version` in the config, eg. the git commit.
+
+## Root view data
+
+Page props go to the JavaScript page. Sometimes the root view itself needs a value, like the `<title>` or a CSRF meta tag. Use `Inertia.withViewData` for that.
+
+Write `{{ key }}` in the root view:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrfToken }}">
+    <title>{{ title }}</title>
+    @vite
+  </head>
+  <body>
+    @inertia
+  </body>
+</html>
+```
+
+Set the values in the controller:
+
+```dart
+Future<DoxResponse> index(DoxRequest req) {
+  Inertia.withViewData(req, <String, Object?>{'title': 'Users'});
+  return inertia(req, 'Users/Index', <String, dynamic>{
+    'users': () => User().query().all(),
+  });
+}
+```
+
+- The values are for the root view only. They are not page props. They are never sent as JSON, so an Inertia request (a link or a form) does not get them.
+- Each value is HTML escaped (`&`, `<`, `>`, `"` and `'`). A `null` value gives empty text.
+- Put a value in text or in a quoted attribute only. It is not safe inside a `<script>` block, an unquoted attribute or a link address.
+- You can call `withViewData` many times, also in a middleware. The data is merged. For the same key, the last call wins.
+- A key has letters, digits and `_`. The spaces are optional: `{{title}}` works too.
+- `{{ key }}` with a key that you did not set stays as it is. So set every key that the root view uses.
+- `{{ csrfToken }}` is filled for you with the CSRF token of the session. It needs `SessionMiddleware`. With no session it stays as it is. Your own `csrfToken` value wins.
+- Only `{{ key }}` in the root view file is replaced. The same text in a prop, or in the HTML from the SSR server, is not touched.
+
+A title set this way is for the first page load only. On later visits the browser does not load the root view again. There, the `<Head>` component of the Inertia client changes the title. So set the title in `<Head>` too. With SSR, the `<Head>` title is also added to the first page, so use only one of the two for the title.
+
+### Another root view for some pages
+
+`Inertia.setRootView` uses another HTML file for one request, eg. for an admin area:
+
+```dart
+Future<DoxResponse> dashboard(DoxRequest req) {
+  Inertia.setRootView(req, 'resources/views/admin.html');
+  return inertia(req, 'Admin/Dashboard');
+}
+```
+
+`RootViewMiddleware` does the same for every page of a router:
+
+```dart
+class AdminRouter extends Router {
+  @override
+  List<dynamic> get middleware => <dynamic>[
+    const RootViewMiddleware('resources/views/admin.html'),
+  ];
+
+  // ...
+}
+```
+
+The path is from the project root, like `rootView` in the config. Use a fixed path. Never pass a value from the request: it could show any file of the server as the page. The file works like the default root view, with `@vite`, `@inertia` and `{{ key }}`.
 
 ## History encryption
 
