@@ -282,6 +282,7 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | `timeZone` | Postgres | `UTC` | Time zone of the session. |
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
 | `busyTimeout` | SQLite | `5000` | Milliseconds a query waits for a lock. |
+| `background` | SQLite | `false` | `true` runs the queries in a helper isolate. See [Run queries in a helper isolate](#run-queries-in-a-helper-isolate). |
 
 ### Table and column names are quoted
 
@@ -421,3 +422,30 @@ For a busy production app, use Postgres or MySQL.
     next to `build/bundle/bin/server`. Keep the two folders together.
     `dart compile exe` does not work with build hooks.
     See [Deployment](../digging-deeper/deployment.md).
+
+### Run queries in a helper isolate
+
+A SQLite query blocks the isolate while it runs.
+So one slow query stops every other request on that isolate.
+
+Set `background` to `true` to run the queries in a helper isolate.
+The helper isolate opens the database and runs every query.
+Your isolate only waits for the answer, so it keeps serving other requests.
+
+```dart
+'sqlite': ConnectionConfig(
+  driver: Driver.sqlite,
+  database: 'db/dox.sqlite',
+  debug: false,
+  extra: {'background': true},
+),
+```
+
+It is off by default.
+Queries, transactions, `:memory:` databases, the query listener and the slow query log work the same.
+A SQL error is the same `SqliteException`.
+
+Each query costs one message to the helper isolate and one back.
+
+- Turn it on when some queries are slow, like a big report or a search with no index.
+- Leave it off when the app runs many tiny queries. They get a little slower.
