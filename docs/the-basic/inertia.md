@@ -412,6 +412,7 @@ Future<DoxResponse> index(DoxRequest req) {
 
 - The values are for the root view only. They are not page props. They are never sent as JSON, so an Inertia request (a link or a form) does not get them.
 - Each value is HTML escaped (`&`, `<`, `>`, `"` and `'`). A `null` value gives empty text.
+- Put a value in text or in a quoted attribute only. It is not safe inside a `<script>` block, an unquoted attribute or a link address.
 - You can call `withViewData` many times, also in a middleware. The data is merged. For the same key, the last call wins.
 - A key has letters, digits and `_`. The spaces are optional: `{{title}}` works too.
 - `{{ key }}` with a key that you did not set stays as it is. So set every key that the root view uses.
@@ -444,7 +445,7 @@ class AdminRouter extends Router {
 }
 ```
 
-The path is from the project root, like `rootView` in the config. The file works like the default root view, with `@vite`, `@inertia` and `{{ key }}`.
+The path is from the project root, like `rootView` in the config. Use a fixed path. Never pass a value from the request: it could show any file of the server as the page. The file works like the default root view, with `@vite`, `@inertia` and `{{ key }}`.
 
 ## History encryption
 
