@@ -171,6 +171,26 @@ void main() {
       expect(line['extra'], 1);
     });
 
+    test('an upper case level ranks like the lower case one', () {
+      config(level: 'warn');
+      Logger.log('INFO', 'hidden');
+      LogBuffer.flush();
+      expect(writes, isEmpty);
+      config();
+      Logger.log('INFO', 'shown');
+      expect(writes, isEmpty, reason: 'info waits in the buffer');
+      LogBuffer.flush();
+      expect(jsonDecode(lines.single)['status'], 'info');
+      expect(Logger.shouldLog('INFO', 'WARN'), isFalse);
+    });
+
+    test('a logger key in data is ignored, also with an empty name', () {
+      config(name: '');
+      Logger.info('hi', <String, dynamic>{'logger': 'fake'});
+      LogBuffer.flush();
+      expect(jsonDecode(lines.single).containsKey('logger'), isFalse);
+    });
+
     test('danger and warn are written right away, in order', () {
       config();
       Logger.info('one');

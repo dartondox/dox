@@ -11,7 +11,15 @@ class LogBuffer {
   /// where the text goes. Tests change it.
   static void Function(String) writer = _stdoutWrite;
 
+  static bool _guarded = false;
+
   static void _stdoutWrite(String text) {
+    if (!_guarded) {
+      _guarded = true;
+      // a broken pipe (EPIPE) is reported later through this future.
+      // Without a handler it would crash the isolate.
+      stdout.done.catchError((Object _) {});
+    }
     stdout.write(text);
   }
 
@@ -37,6 +45,9 @@ class LogBuffer {
     } catch (_) {
       // a failed write (eg. closed stdout) must not crash the app.
       // try stderr once, so the lines are not lost without a trace.
+      // We can not know how much of the text the writer wrote before it
+      // threw, so a few lines can appear twice. This is on purpose: a
+      // double line is better than a lost line.
       try {
         stderr.write(text);
       } catch (_) {}

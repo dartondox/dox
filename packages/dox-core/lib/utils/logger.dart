@@ -23,10 +23,12 @@ class Logger {
   /// an unknown [minLevel] prints every line, so no log is lost.
   static bool shouldLog(String level, String minLevel) {
     int min = _ranks[minLevel.toLowerCase()] ?? 0;
-    return (_ranks[level] ?? 3) >= min;
+    return (_ranks[level.toLowerCase()] ?? 3) >= min;
   }
 
   static void log(String level, dynamic message, [dynamic data]) {
+    // `INFO` from a filter ranks as `info`
+    level = level.toLowerCase();
     LoggerConfig config = Dox().config.logger;
     if (!config.enabled || !shouldLog(level, config.level)) return;
     String line = config.prettyPrint
@@ -114,7 +116,10 @@ class Logger {
     if (data is Map) {
       for (MapEntry<dynamic, dynamic> e in data.entries) {
         // the standard fields stay: a key with the same name is dropped
-        text.putIfAbsent(e.key is String ? e.key : '${e.key}', () => e.value);
+        String key = e.key is String ? e.key : '${e.key}';
+        // `logger` is always ours: it is left out when the name is empty
+        if (key == 'logger') continue;
+        text.putIfAbsent(key, () => e.value);
       }
     } else if (data != null) {
       text['payload'] = data;
