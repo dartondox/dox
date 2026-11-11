@@ -664,7 +664,17 @@ List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
 !!! note
     In `where`, a number or a bool value works the same on every database.
     On Postgres, the other methods compare the value as text.
-    For example, `whereBetween('options->rating', [1, 5])` compares text there.
+    For example, `whereBetween('options->rating', [1, 5])` and `whereIn('options->rating', [4, 5])` compare text there.
+    `sum('options->rating')` and `avg(...)` fail on Postgres, because the value is text.
+    Use `selectRaw` with a cast for them.
+
+!!! note
+    `where('options->lang', null)` and `whereNull('options->lang')` match a missing key.
+    On SQLite and Postgres they also match a JSON `null`. On MySQL and MariaDB they do not.
+
+!!! note
+    On SQLite, and in `where` on Postgres, the number `5` does not match the string `"5"`.
+    MySQL and MariaDB compare text with a number as numbers, so `5` matches `"5"` there.
 
 ### `whereRaw` and `orWhereRaw`
 
@@ -768,6 +778,7 @@ Anything else, like `count(*)`, throws an `ArgumentError`. Use `selectRaw` for i
 
 `selectRaw()` takes values, like `whereRaw`.
 Write `@name` in the SQL and put the value in the map.
+Use unique names. A name that the query uses in another place, like in `whereRaw`, throws an `ArgumentError`.
 
 ```dart
 await QueryBuilder.table('actor')
@@ -1247,10 +1258,20 @@ await QueryBuilder.table('setting').updateOrInsert(
 );
 ```
 
+- It updates every row that matches the first map, not only one.
 - It does not read the row back. Use `updateOrCreate` when you need the row.
 - It returns `true` when it inserted a row, or when the update changed a row.
   MySQL and MariaDB count only the rows that really changed.
 - An empty first map throws an `ArgumentError`, so it can never update every row by mistake.
+- On a model, it uses the model's `insert()` and `update()`:
+    - `fillable` and `guarded` apply.
+    - The insert is a `create()`, so the create [model events](model/events.md) run and the timestamps are set.
+    - The update fires no model events and does not set `updated_at`.
+    - Soft deleted rows do not match. So a match that is soft deleted gives a new row.
+
+!!! warning
+    Two calls at the same time can both insert a row.
+    Add a unique index, and use `upsert` when this matters.
 
 ## Update
 
