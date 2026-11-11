@@ -542,7 +542,7 @@ class SendReport extends DoxJob with HasMiddleware {
     WithoutOverlapping(
       'report-$reportId',
       releaseAfter: Duration(seconds: 30),
-      expireAfter: Duration(minutes: 10),
+      expireAfter: Duration(minutes: 10), // longer than the longest report run
     ),
   ];
 
@@ -577,7 +577,7 @@ Outside a worker there is no queue. A release then logs a warning, and `handle()
 | Middleware | What it does |
 | --- | --- |
 | `RateLimited(key, max, per)` | runs at most `max` jobs of `key` in each `per` window. The others go back on the queue until the window ends |
-| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter` (default: zero, so at once). With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after a crash. Default: no expiry. Set `expireAfter`, so a crash can not hold the lock forever |
+| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter` (default: zero, so at once). With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after this time, also while a job still runs. Default: no expiry. Set `expireAfter` longer than the longest run of the job, so a crash can not hold the lock forever and two runs do not overlap |
 | `ThrottlesExceptions(key, maxAttempts:, decay:, retryAfter:)` | after `maxAttempts` errors, jobs of `key` wait until `decay` is over. A job that threw goes back after `retryAfter`. Defaults: `maxAttempts` 10, `decay` 10 minutes, `retryAfter` zero |
 
 Things to know:
