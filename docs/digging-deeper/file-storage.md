@@ -132,13 +132,14 @@ The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the app s
 ## Functions
 
 ```dart
-// save to this exact path. String, List<int> or Stream<List<int>>
-await Storage().put('notes/a.txt', 'hello');
-
 // save with a new uuid file name, returns '/images/<uuid>.png'
 String path = await Storage().putFile('images', file);  // a RequestFile
 Uint8List bytes = Uint8List.fromList(<int>[1, 2, 3]);
 String path2 = await Storage().putFile('images', bytes, extension: 'png');
+String same = await Storage().put('images', bytes, extension: 'png'); // like putFile
+
+// save to this exact path. String, List<int> or Stream<List<int>>
+await Storage().put('notes/a.txt', 'hello', exact: true);
 String path3 = await Storage().putFileAs('avatars', file, 'user-1.png'); // your own name
 
 Uint8List? found = await Storage().get(path);  // null when missing
@@ -170,11 +171,11 @@ String signed = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10)
 String same = await Storage().temporaryUrl(path); // the same as signedUrl()
 
 // another disk
-await Storage().disk('s3').put('reports/2026.pdf', bytes);
+await Storage().disk('s3').put('reports/2026.pdf', bytes, exact: true);
 ```
 
-`put()` writes to the exact path, and replaces an old file there.
-`putFile()` makes a new uuid name in the folder. For bytes, it finds the extension from the bytes, or you pass `extension:`.
+`put()` and `putFile()` make a new uuid name in the folder and return the path. For bytes, they find the extension from the bytes, or you pass `extension:`.
+`put()` with `exact: true` writes to the exact path, and replaces an old file there. It takes a `String`, a `List<int>` or a `Stream<List<int>>`, and returns the path.
 `putFileAs()` uses your name, and replaces an old file with the same name.
 
 `files()`, `allFiles()` and `directories()` give paths that start with `/`, like `putFile()`.
@@ -291,5 +292,5 @@ Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register
 
 ```dart
 Storage.manager.register('dropbox', DropboxDriver());
-await Storage().disk('dropbox').put('notes/a.txt', 'hello');
+await Storage().disk('dropbox').put('notes/a.txt', 'hello', exact: true);
 ```
