@@ -593,7 +593,7 @@ The rules:
 Safety notes:
 
 - A longer `grace` gives a stolen old token more time. In that time it works on every route, also the token routes, so it can make new tokens. Only rotate refuses it. Keep `grace` short, or zero.
-- Each rotate gives a full new life. So a client that rotates again and again stays logged in forever. To set a limit, check `createdAt` of the first token yourself, or ask for the password again after some time.
+- Each rotate gives a full new life. So a client that rotates again and again stays logged in forever. A rotated token has a new `createdAt` and no link to the first token. To set a limit, keep the first login time yourself. For example, save it in a column, or in the token name with `rotateAccessToken(token, name: ...)`. Or ask for the password again after some time.
 
 Rotate needs the `rotated_at` column. A table made by `dox auth:tokens-table` has it.
 
@@ -1148,7 +1148,7 @@ This flow replaces the normal `attempt()` login of the [access token way](#acces
 How it works:
 
 1. Step one checks the password with `once()`. It gives a token with only `2fa:pending`. The token works 10 minutes.
-2. Step two checks the code. Then it gives the token the abilities of a full login (`*`, like `attempt()` gives), and rotates it. The client gets a new token with a full life. The step-one token ends at once.
+2. Step two checks the code. Then it rotates the token, and gives the new token the abilities of a full login (`*`, like `attempt()` gives). The client gets the new token with a full life. The step-one token ends at once.
 3. Each route that needs the second step uses the `requireTwoFactor` middleware. A `*` token passes it, a `2fa:pending` token does not.
 
 Add the DTO for the code:
@@ -1212,10 +1212,10 @@ class TwoFactorController {
     if (!_codeIsGood(auth.user<User>()!, body.code)) {
       throw UnAuthorizedException(message: 'Wrong code');
     }
-    // all abilities, like a normal login. Rotate copies them.
-    await auth.setAccessTokenAbilities(token, <String>['*']);
-    // a new token with the expiresIn of the driver, like attempt() gives
+    // a new token with the expiresIn of the driver. It still has 2fa:pending.
     AccessToken full = await auth.rotateAccessToken(token);
+    // all abilities, like a normal login
+    await auth.setAccessTokenAbilities(full, <String>['*']);
     return <String, dynamic>{'token': full.value};
   }
 
@@ -1228,9 +1228,9 @@ class TwoFactorController {
 ```
 
 - `verify` checks `abilities.contains('2fa:pending')`, not `tokenCan`, because `tokenCan` is also `true` for `*`. So only a step-one token can do step two.
-- The order matters: `setAccessTokenAbilities` first, then `rotateAccessToken`. Rotate copies the abilities of the row, so the new token gets `*`.
+- The order matters: `rotateAccessToken` first, then `setAccessTokenAbilities` on the new token. Rotate copies `2fa:pending` to the new token. When a step fails, no token has `*`: the user logs in again.
 - After step two, the step-one token stops working. A copy of it, taken before step two, is of no use.
-- Rotate needs the `rotated_at` column. A table made by `dox auth:tokens-table` has it. See [A token table without `rotated_at`](#a-token-table-without-rotated_at).
+- Rotate needs the `rotated_at` column. A table made by `dox auth:tokens-table` has it. Without it, step two fails and the step-one token stays `2fa:pending`. See [A token table without `rotated_at`](#a-token-table-without-rotated_at).
 
 Add a middleware that needs the second step:
 
