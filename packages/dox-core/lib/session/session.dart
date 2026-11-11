@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:dox_core/app.dart';
+
 /// The session of one request: `req.session`. `SessionMiddleware` makes
 /// it.
 ///
@@ -142,18 +144,22 @@ class Session {
 
   /// Give the session a new id and a new CSRF token, and keep the data.
   /// Call it after login, so an old id from before the login is no use.
-  void regenerate() {
+  ///
+  /// [keepToken] true keeps the CSRF token, so forms open in other tabs
+  /// still work. When it is null, `CoreFlags.keepCsrfToken` decides.
+  void regenerate({bool? keepToken}) {
     _load();
     if (id != null) previousId = id;
     id = null;
-    _token = _randomToken();
+    if (!(keepToken ?? Dox().flags.keepCsrfToken)) _token = _randomToken();
     _changed = true;
   }
 
-  /// Remove all data and give the session a new id. Use it on logout.
+  /// Remove all data and give the session a new id and a new CSRF token.
+  /// Use it on logout.
   void invalidate() {
     flush();
-    regenerate();
+    regenerate(keepToken: false);
   }
 
   /// The CSRF token of the session. Made on first use.

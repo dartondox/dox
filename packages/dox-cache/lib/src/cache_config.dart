@@ -1,3 +1,5 @@
+import 'cache_lock.dart';
+
 /// Cache settings.
 ///
 /// ```
@@ -11,11 +13,36 @@
 /// );
 /// ```
 class CacheConfig {
-  const CacheConfig({required this.defaultStore, required this.stores});
+  const CacheConfig({
+    required this.defaultStore,
+    required this.stores,
+    this.flags = const CacheFlags(),
+  });
 
   /// Name of the store used by `CacheManager.store()`.
   final String defaultStore;
 
   /// Store name to options. Each needs a 'driver' option.
   final Map<String, Map<String, dynamic>> stores;
+
+  /// Opt-in behaviors that work like Laravel. All off by default.
+  final CacheFlags flags;
+}
+
+/// Opt-in behaviors of the cache that work like Laravel. Every flag is
+/// off by default.
+/// ```
+/// CacheConfig(defaultStore: 'file', stores: stores,
+///     flags: const CacheFlags(lockThrows: true));
+/// ```
+class CacheFlags {
+  const CacheFlags({this.lockThrows = false});
+
+  /// Every flag on.
+  const CacheFlags.all() : lockThrows = true;
+
+  /// `lock.block(timeout)` with no callback throws [LockTimeoutException]
+  /// when the lock was not taken in time. Off: it gives false.
+  /// `CacheLock.throwOnTimeout` wins over this flag.
+  final bool lockThrows;
 }

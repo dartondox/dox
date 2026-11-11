@@ -10,6 +10,8 @@ class DoxCookie {
   final String value;
   final bool encrypt;
 
+  /// null sends no `Path`. With `CoreFlags.cookieDefaults` null sends
+  /// `Path=/`.
   String? path;
   String? domain;
 
@@ -23,6 +25,7 @@ class DoxCookie {
   Duration maxAge;
 
   /// `SameSite` of the cookie, like `SameSite.lax`. null sends none.
+  /// With `CoreFlags.cookieDefaults` null sends `SameSite=Lax`.
   SameSite? sameSite;
 
   DoxCookie(
@@ -68,12 +71,7 @@ class DoxCookie {
   String expire({bool https = false}) {
     Cookie cookie = Cookie(key, value);
     cookie.maxAge = -1;
-    cookie.path = path;
-    cookie.domain = domain;
-    cookie.httpOnly = httpOnly;
-    cookie.secure = secure ?? https;
-    cookie.expires = expires;
-    cookie.sameSite = sameSite;
+    _apply(cookie, https);
     return cookie.toString();
   }
 
@@ -96,12 +94,17 @@ class DoxCookie {
 
     Cookie cookie = Cookie(key, val);
     cookie.maxAge = maxAge.inSeconds;
-    cookie.path = path;
+    _apply(cookie, https);
+    return cookie.toString();
+  }
+
+  void _apply(Cookie cookie, bool https) {
+    bool defaults = Dox().flags.cookieDefaults;
+    cookie.path = path ?? (defaults ? '/' : null);
     cookie.domain = domain;
     cookie.httpOnly = httpOnly;
     cookie.secure = secure ?? https;
     cookie.expires = expires;
-    cookie.sameSite = sameSite;
-    return cookie.toString();
+    cookie.sameSite = sameSite ?? (defaults ? SameSite.lax : null);
   }
 }

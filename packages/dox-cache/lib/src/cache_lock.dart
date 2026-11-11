@@ -25,6 +25,14 @@ abstract class CacheLock {
   /// to release the same lock there.
   final String owner;
 
+  /// true: [block] with no callback throws [LockTimeoutException] when
+  /// the lock was not taken in time. A store sets it from
+  /// `CacheFlags.lockThrows`. Set it on one lock to choose yourself:
+  /// ```
+  /// CacheLock lock = cache.lock('report')..throwOnTimeout = true;
+  /// ```
+  bool throwOnTimeout = false;
+
   /// Try to take the lock once. True when taken.
   Future<bool> get();
 
@@ -40,7 +48,8 @@ abstract class CacheLock {
   /// Try to take the lock until [timeout] passes.
   ///
   /// Without [callback]: true when taken, false when the time is over.
-  /// You must call [release] yourself.
+  /// With [throwOnTimeout] it throws [LockTimeoutException] instead of
+  /// false. You must call [release] yourself.
   ///
   /// With [callback]: runs it while holding the lock, frees the lock
   /// and returns the callback result. Throws [LockTimeoutException]
@@ -54,6 +63,7 @@ abstract class CacheLock {
   ]) async {
     bool taken = await _waitFor(timeout);
     if (callback == null) {
+      if (!taken && throwOnTimeout) throw LockTimeoutException(name, timeout);
       return taken as T;
     }
     if (!taken) {
@@ -93,8 +103,8 @@ abstract class CacheLock {
   }
 }
 
-/// Thrown by [CacheLock.block] with a callback when the lock was not
-/// taken in time.
+/// Thrown by [CacheLock.block] when the lock was not taken in time: with a
+/// callback, or with [CacheLock.throwOnTimeout].
 class LockTimeoutException implements Exception {
   LockTimeoutException(this.name, this.timeout);
 

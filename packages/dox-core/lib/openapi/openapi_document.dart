@@ -28,6 +28,29 @@ class OpenApiDocument {
     'example': <String, dynamic>{'title': 'The title field is required'},
   };
 
+  /// the 422 answer with `CoreFlags.laravelErrors`:
+  /// `{message, errors: {field: [messages]}}`
+  static const Map<String, dynamic> _laravelErrorSchema = <String, dynamic>{
+    'type': 'object',
+    'required': <String>['message', 'errors'],
+    'properties': <String, dynamic>{
+      'message': <String, dynamic>{'type': 'string'},
+      'errors': <String, dynamic>{
+        'type': 'object',
+        'additionalProperties': <String, dynamic>{
+          'type': 'array',
+          'items': <String, dynamic>{'type': 'string'},
+        },
+      },
+    },
+    'example': <String, dynamic>{
+      'message': 'The title field is required',
+      'errors': <String, dynamic>{
+        'title': <String>['The title field is required'],
+      },
+    },
+  };
+
   OpenApiServer? _server;
   int _builtFor = -1;
 
@@ -49,7 +72,12 @@ class OpenApiDocument {
       docs.schema(schema.key, schema.value);
     }
     if (reader.usesValidationError) {
-      docs.schema(OpenApiRouteReader.validationError, _validationErrorSchema);
+      docs.schema(
+        OpenApiRouteReader.validationError,
+        Dox().flags.laravelErrors
+            ? _laravelErrorSchema
+            : _validationErrorSchema,
+      );
     }
 
     /// a scheme in the config wins over one found in the code

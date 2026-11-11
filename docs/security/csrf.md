@@ -93,3 +93,4 @@ Only skip paths that do not use the session login. A webhook should check its ow
 ## After login
 
 `req.session.regenerate()` also makes a new token. Dox sends the new `XSRF-TOKEN` cookie with the same response.
+`regenerate(keepToken: true)` and the flag `keepCsrfToken` keep the token. See [Core flags](../reference/app-config.md#core-flags).

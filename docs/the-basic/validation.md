@@ -294,6 +294,8 @@ When a check fails, Dox answers `422` with one message per field:
 
 The key is the path to the value, with the input keys. List items use the index.
 
+The flag `laravelErrors` sends `{"message": "...", "errors": {"field": ["..."]}}` instead, like Laravel. See [Core flags](../reference/app-config.md#core-flags).
+
 For another error shape, read `error.issues` of the `ValidationException` in your `ExceptionHandler`. Each issue has its `dottedPath`, its rule `code` (like `min_length`), its `message` and its `params`.
 
 ## Messages

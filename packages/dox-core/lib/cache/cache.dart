@@ -23,9 +23,13 @@ class Cache {
   /// ```
   /// Cache().store('file').put('key', 'value');
   /// ```
+  /// It changes this `Cache` and gives it back. With
+  /// `CoreFlags.cacheCopies` it gives a new `Cache`, and this one does
+  /// not change.
   Cache store(String store) {
-    _store = store;
-    return this;
+    Cache target = _target();
+    target._store = store;
+    return target;
   }
 
   /// Put the items under a tag, so you can flush only this tag.
@@ -39,8 +43,17 @@ class Cache {
 
   /// Same as [tag], with many tags.
   Cache tags(List<String> names) {
-    _tags = names;
-    return this;
+    Cache target = _target();
+    target._tags = names;
+    return target;
+  }
+
+  /// this, or a copy with `CoreFlags.cacheCopies`
+  Cache _target() {
+    if (!Dox().flags.cacheCopies) return this;
+    return Cache(manager: _manager)
+      .._store = _store
+      .._tags = _tags;
   }
 
   /// [config] where each Redis store with no `prefix` gets
@@ -62,7 +75,11 @@ class Cache {
             ? <String, dynamic>{...store.value, 'prefix': '${name}_cache:'}
             : store.value,
     };
-    return CacheConfig(defaultStore: config.defaultStore, stores: stores);
+    return CacheConfig(
+      defaultStore: config.defaultStore,
+      stores: stores,
+      flags: config.flags,
+    );
   }
 
   /// The `dox_cache` store, for the methods that are not here.

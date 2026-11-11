@@ -22,6 +22,9 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
       payload is! File &&
       payload is! StreamFile &&
       payload is! DownloadableFile) {
+    if (payload is String && Dox().flags.htmlStrings) {
+      request.response.headers.contentType = ContentType.html;
+    }
     responseDataHandler(payload, request);
     return;
   }

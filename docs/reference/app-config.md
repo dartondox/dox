@@ -50,6 +50,42 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
 | `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
+| `flags` | `CoreFlags` | `CoreFlags()` (all off) | Opt-in behaviors that work like Laravel. See [Core flags](#core-flags). |
+
+## Core flags
+
+`CoreFlags` turns on behaviors that work like Laravel. Every flag is off by default.
+Turn on the ones you want:
+
+```dart
+AppConfig(
+  appKey: env.appKey,
+  flags: const CoreFlags(onlyPresent: true, cookieDefaults: true),
+);
+```
+
+`CoreFlags.all()` turns on every flag:
+
+```dart
+AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
+```
+
+| Flag | When it is on |
+| --- | --- |
+| `laravelErrors` | A `422` body is `{"message": "...", "errors": {"field": ["..."]}}`, with all messages of each field. The `message` is the first error, plus `(and N more errors)`. The OpenAPI `ValidationError` schema has this shape too. Off: `{"field": "first message"}`. |
+| `onlyPresent` | `req.only([...])` leaves out keys that are not in the input. So `model.update(req.only([...]))` does not write `null` for a field the client did not send. Off: a missing key is in the map with `null`. |
+| `cookieDefaults` | A `DoxCookie` with no `path` gets `Path=/`, and one with no `sameSite` gets `SameSite=Lax`. A value you set wins. Off: no `Path` and no `SameSite`. |
+| `hasKeyOnly` | `req.has('x')` is `true` when the key is there, with any value (also `''` or null), like `req.exists('x')`. Dot keys work. Off: `''` and null give `false`. |
+| `htmlStrings` | A string from a controller is sent as `text/html`. A content type you set wins. Escape user input in the string. Off: `text/plain`. |
+| `replaceHeaders` | `res.header(k, v)` replaces a value of the header that a middleware put on the response before. `Vary` and `Set-Cookie` are lists, so they still get one more value. Off: it adds a second value. `res.header(k, v, replace: true)` or `replace: false` picks for one call. |
+| `keepCsrfToken` | `req.session.regenerate()` keeps the CSRF token, so forms open in other tabs still work after login. `invalidate()` still makes a new token. Off: a new token. `regenerate(keepToken: true)` or `keepToken: false` picks for one call. |
+| `decryptServerError` | A `DecryptException` gives `500` with `{"code": "server_error", "message": "Server Error"}`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. `req.cookie()` still gives `null` for a bad cookie. |
+| `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
+
+Each isolate builds its own `AppConfig`, so every isolate has the same flags.
+Dox reads a flag when the code runs, with `Dox().flags`.
+
+The lock flag of the cache is in [`CacheConfig`](#cacheconfig): `CacheFlags`.
 
 ## CORSConfig
 
@@ -87,6 +123,21 @@ Source: `packages/dox-cache/lib/src/cache_config.dart`. Option keys: `packages/d
 | --- | --- | --- | --- |
 | `defaultStore` | `String` | required | The store `Cache()` uses when no store is named. |
 | `stores` | `Map<String, Map<String, dynamic>>` | required | Store name to options. Each store needs a `driver` option. |
+| `flags` | `CacheFlags` | `CacheFlags()` (all off) | Opt-in behaviors that work like Laravel. See below. |
+
+`CacheFlags` has one flag. `CacheFlags.all()` turns it on.
+
+| Flag | When it is on |
+| --- | --- |
+| `lockThrows` | `lock.block(timeout)` with no callback throws `LockTimeoutException` when the lock was not taken in time. Off: it gives `false`. Set `lock.throwOnTimeout` to pick for one lock. |
+
+```dart
+CacheConfig(
+  defaultStore: 'redis',
+  stores: stores,
+  flags: const CacheFlags(lockThrows: true),
+);
+```
 
 Options of each driver:
 

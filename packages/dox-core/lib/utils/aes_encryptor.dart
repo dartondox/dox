@@ -1,19 +1,32 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:dox_core/app.dart';
 import 'package:dox_core/exception/bad_request_exception.dart';
 import 'package:dox_core/utils/key_derivation.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 /// Thrown when encrypted text can not be decrypted.
 /// The text was changed, cut, or made with another key.
-/// Dox answers with 400 Bad Request.
+/// Dox answers with 400 Bad Request. With `CoreFlags.decryptServerError`
+/// it answers 500 Server Error, and the `ExceptionHandler` reports it.
 class DecryptException extends BadRequestException {
   DecryptException()
     : super(
-        message: 'The encrypted value is not valid',
-        errorCode: 'decrypt_failed',
+        message: _serverError ? 'Server Error' : _text,
+        errorCode: _serverError ? 'server_error' : 'decrypt_failed',
+        code: _serverError
+            ? HttpStatus.internalServerError
+            : HttpStatus.badRequest,
       );
+
+  static const String _text = 'The encrypted value is not valid';
+
+  static bool get _serverError => Dox().flags.decryptServerError;
+
+  @override
+  String toString() => 'DecryptException: $_text';
 }
 
 /// Encrypt and decrypt text with AES-GCM.

@@ -64,6 +64,10 @@ class Dox {
 
   bool _initialized = false;
 
+  /// The [CoreFlags] of this isolate, from `config.flags`. All off before
+  /// [initialize].
+  CoreFlags get flags => _initialized ? config.flags : const CoreFlags();
+
   /// cache stores from `config.cache`, made on first use in each isolate.
   /// `Cache()` uses it. replace it in tests.
   late CacheManager cache = CacheManager(
