@@ -39,6 +39,8 @@ class BroadcastProvider extends DoxProvider {
 }
 ```
 
+Run `dart run build_runner build`, so the generated container finds the provider. Without it, no rule is added, and every private subscribe gets `Forbidden`.
+
 A client that is not logged in as a socket gets a token from the auth route. Add the route with your own auth middleware:
 
 ```dart title="lib/routes/api.dart"
@@ -126,7 +128,6 @@ Without a Socket.IO server in the process, and with no [emitter](#send-from-a-pr
 Use `socket.io-client`. A public channel needs no token.
 A subscription belongs to one socket. After a reconnect, the client has a new socket and is in no channel.
 So subscribe inside the `connect` handler. It runs again after each reconnect.
-
 
 ```js
 import { io } from 'socket.io-client';

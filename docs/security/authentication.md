@@ -1018,7 +1018,7 @@ So a stolen session still works.
 Turn on the `endSessionsOnPasswordChange` [flag](authorization.md#auth-flags) to fix this.
 The session then keeps a fingerprint of the password hash.
 When the hash changes, the session ends on its next request that checks the login.
-That is a request through `AuthMiddleware`, or a call of an `Auth` check.
+That is a request through `AuthMiddleware`. For a socket, it is a call of `Auth().userFromSession(session)`.
 A route with no login check does not end it.
 The flag is off by default.
 
@@ -1064,9 +1064,10 @@ Future<Map<String, bool>> logoutOthers(DoxRequest req, ConfirmPassword body) asy
 }
 ```
 
-`ConfirmPassword` is a [DTO](#3-add-the-input-checks) like `LoginUser`. A missing field gets `422` before the controller runs:
+`ConfirmPassword` is a [DTO](#3-add-the-input-checks) like `LoginUser`. A missing field gets `422` before the controller runs.
+Add it to the same file as `LoginUser`, then run `dart run build_runner build`:
 
-```dart
+```dart title="lib/app/dtos/auth/auth.dto.dart"
 @Dto()
 class ConfirmPassword {
   final String password;
@@ -1087,7 +1088,7 @@ class ConfirmPassword {
 
 A session made while the flag was off has no fingerprint.
 It is not logged out.
-Its first request with the flag on stores the fingerprint.
+Its first request that checks the login, with the flag on, stores the fingerprint.
 Until then, a password change does not end it.
 So a session stolen before you turned the flag on can stay.
 

@@ -102,7 +102,7 @@ The worker starts the providers of your app (database, cache, queue). It does no
 ### 4. Tables
 
 The `jobs` and `failed_jobs` tables are only for the database driver.
-The `job_batches` table is for [job batches](#job-batches). It is needed with every driver.
+The `job_batches` table is for [job batches](#job-batches). If you use batches, you need it with every driver.
 
 Run `dox queue:table`. It writes a migration in `db/migration` that makes all three tables. Then run `dox migrate`.
 
@@ -113,22 +113,24 @@ dox migrate
 
 `queue:table` is a [package command](package-commands.md) of `dox_queue`. It does not overwrite: when a `create_queue_tables` migration is already there, it prints so and stops.
 
-The migration it writes looks like this. You can also write it by hand. `QueueTables` makes the two tables.
+The migration it writes looks like this. You can also write it by hand. `QueueTables.up` makes the `jobs` and `failed_jobs` tables. `QueueTables.upBatches` makes the `job_batches` table.
 
 ```dart title="db/migration/2026_10_25_000000_create_queue_tables.dart"
 // ignore_for_file: file_names
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_queue/dox_queue.dart';
 
-/// The jobs and failed_jobs tables of dox_queue.
+/// The jobs, failed_jobs and job_batches tables of dox_queue.
 class CreateQueueTables extends Migration {
   @override
   Future<void> up(Schema schema) async {
     await QueueTables.up(schema);
+    await QueueTables.upBatches(schema);
   }
 
   @override
   Future<void> down(Schema schema) async {
+    await QueueTables.downBatches(schema);
     await QueueTables.down(schema);
   }
 }
@@ -527,13 +529,21 @@ Add the opt-in `HasMiddleware` mixin and list the middleware. The first one runs
 ```dart
 @Job()
 class SendReport extends DoxJob with HasMiddleware {
+  SendReport({required this.reportId});
+
+  final int reportId;
+
   @override
   int get tries => 5;
 
   @override
   List<JobMiddleware> get middleware => <JobMiddleware>[
     RateLimited('report-api', 10, Duration(minutes: 1)),
-    WithoutOverlapping('report-$reportId'),
+    WithoutOverlapping(
+      'report-$reportId',
+      releaseAfter: Duration(seconds: 30),
+      expireAfter: Duration(minutes: 10),
+    ),
   ];
 
   // ...
@@ -567,7 +577,7 @@ Outside a worker there is no queue. A release then logs a warning, and `handle()
 | Middleware | What it does |
 | --- | --- |
 | `RateLimited(key, max, per)` | runs at most `max` jobs of `key` in each `per` window. The others go back on the queue until the window ends |
-| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter` (default: zero, so at once). With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after a crash |
+| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter` (default: zero, so at once). With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after a crash. Default: no expiry. Set `expireAfter`, so a crash can not hold the lock forever |
 | `ThrottlesExceptions(key, maxAttempts:, decay:, retryAfter:)` | after `maxAttempts` errors, jobs of `key` wait until `decay` is over. A job that threw goes back after `retryAfter`. Defaults: `maxAttempts` 10, `decay` 10 minutes, `retryAfter` zero |
 
 Things to know:
@@ -633,7 +643,7 @@ await Queue.chain(<DoxJob>[
 
 ### The catch job
 
-A function can not be saved in the queue. So the catch handler is a job too, of a class in `jobRegistry`.
+A function can not be saved in the queue. So the catch handler is a job too, of a class in `jobRegistry`. Run `dart run build_runner build` after you add it.
 It runs once, in the worker where the job failed. It has no queue and no retry, like `dispatchSync()`.
 Add the `CatchesError` mixin to read the error:
 
@@ -702,7 +712,7 @@ class CreateJobBatchesTable extends Migration {
 }
 ```
 
-An app that does not use batches does not need the table.
+An app that does not use batches does not need the table. If you use batches, you need it with every driver.
 Without it, `dispatch()` throws a `StateError` that names `QueueTables.upBatches()`.
 
 ### Callbacks
@@ -715,7 +725,7 @@ Without it, `dispatch()` throws a `StateError` that names `QueueTables.upBatches
 | `catchError(job)` | once, when the first job fails for good |
 | `whenComplete(job)` | once, when every job ran, done or failed |
 
-A function can not be saved in the queue. So each callback is a job of a class in `jobRegistry`.
+A function can not be saved in the queue. So each callback is a job of a class in `jobRegistry`. Run `dart run build_runner build` after you add one.
 It runs once, in the process where the step happened. It has no queue and no retry, like `dispatchSync()`.
 An error in a callback is logged. For slow work, dispatch a new job from it.
 Add `Batchable` to read the batch, and `CatchesError` to read the error:

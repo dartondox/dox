@@ -174,7 +174,8 @@ Call the seconds method first, then the other frequency.
 A run that takes longer than its step skips the steps it missed.
 With such a task, `run` from cron stays until the end of the minute.
 
-You can limit the days. The order of the calls does not matter for the days.
+You can limit the days. The order does not matter between a day method and a time method like `dailyAt()`.
+The day methods, `weekly()`, `weeklyOn()` and `cron()` all write the day of the week. The last call wins: `.mondays().weekly()` runs on Sundays.
 
 | Method | Runs |
 | --- | --- |
