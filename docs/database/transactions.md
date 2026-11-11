@@ -81,6 +81,92 @@ This works on Postgres, MySQL, MariaDB and SQLite. You can nest many levels.
 - On MySQL and MariaDB, a `CREATE`, `ALTER` or `DROP TABLE` inside a nested transaction
   saves the outer work and ends the savepoint. Do not change the schema there.
 
+## Run again after a deadlock
+
+Two transactions can wait for each other's rows.
+The database then stops one of them with a deadlock error.
+Often one more run works.
+`attempts` runs the whole function again, up to that many runs in all:
+
+```dart
+await QueryBuilder.transaction(() async {
+  // ...
+}, attempts: 3);
+```
+
+- It runs again only on a deadlock or a lock / serialization failure.
+  Other errors are thrown at once.
+- When the last run fails too, its error is thrown.
+- There is no wait between the runs.
+- The default is `1`: one run, no retry. `0` and below also run once.
+- Only the outermost transaction runs again.
+  A nested transaction gives the error to the outer one.
+- `afterCommit()` functions of a failed run are dropped.
+  Only the functions of the run that commits run.
+- An error after the commit (for example in an `afterCommit()` function) never runs it again.
+- The function runs again from the start. So keep work that is not in the database
+  (a mail, a call to another service) out of it, or put it in [`afterCommit()`](#run-code-after-the-commit).
+
+The errors that count:
+
+| Database | Errors |
+| --- | --- |
+| Postgres | SQLSTATE `40001` (serialization failure), `40P01` (deadlock) |
+| MySQL, MariaDB | error `1213` (deadlock), `1205` (lock wait timeout), `1020` (record changed), SQLSTATE `40001` |
+| SQLite | `SQLITE_BUSY` and `SQLITE_LOCKED` ("database is locked") |
+
+`DatabaseTransaction.isConcurrencyError(error)` gives the same answer for your own error checks.
+
+## Begin and commit by hand
+
+`QueryBuilder.transaction()` is the simple way. Use it when you can.
+When the work can not fit in one function, begin the transaction by hand:
+
+```dart
+DatabaseTransaction tx = await QueryBuilder.beginTransaction();
+try {
+  await tx.run(() async {
+    User user = await User().create(<String, dynamic>{'email': email});
+    await QueryBuilder.afterCommit(() => sendWelcomeMail(user));
+  });
+  await tx.run(() => QueryBuilder.table('audit').insert(<String, dynamic>{'event': 'signup'}));
+  await tx.commit();
+} finally {
+  await tx.rollBack(); // does nothing after commit
+}
+```
+
+- Only code inside `tx.run()` uses the transaction.
+  Queries outside it, and queries of other requests, never join it.
+- Nested `QueryBuilder.transaction()` calls (savepoints) and `afterCommit()` work inside `run()`.
+- Await each `run()` before `commit()`.
+- `commit()` saves the work, then runs the `afterCommit()` functions.
+  It throws a `StateError` when the transaction is closed already.
+- `rollBack()` undoes the work and drops the `afterCommit()` functions.
+  It does nothing when the transaction is closed already, so it is safe in a `finally`.
+- `tx.isOpen` is `true` until `commit()`, `rollBack()` or the timeout.
+- `connection:` picks a named connection, like `transaction()`.
+
+Limits:
+
+- The transaction holds one connection until you close it.
+  When it is still open after `timeout` (default 1 minute), it is rolled back, so its connection is free again.
+  Set your own: `QueryBuilder.beginTransaction(timeout: const Duration(seconds: 10))`.
+- After the timeout, `run()` and `commit()` throw a `StateError`. The work is lost.
+- On SQLite, other queries of the isolate wait until the transaction is closed.
+  This is true for a plain query and for `QueryBuilder.transaction()` outside `run()`.
+  They wait until the transaction ends or times out.
+  So do not await them while it is open.
+- `beginTransaction()` throws a `StateError` inside a transaction of the same connection.
+  Use `QueryBuilder.transaction()` for nested work.
+- Use the transaction only in the code that began it: the same request, job or test.
+
+!!! warning "Postgres: roll back after a database error"
+    On Postgres, a database error inside `run()` breaks the whole transaction.
+    Call `rollBack()` then.
+    A `commit()` saves nothing and gives no error, because the server answers COMMIT with ROLLBACK.
+    A plain `QueryBuilder.transaction()` works the same way when you catch a database error inside it.
+
 ## Run code after the commit
 
 Some work must only happen when the data is saved.
@@ -197,4 +283,5 @@ It changes the value in one query, so it needs no lock.
 - When a model has more than one relation to load (`preload` or `eager`),
   the relation queries run at the same time outside a transaction.
   Inside a transaction, they run one after another on its connection.
-- A query runs in a transaction only when you use `QueryBuilder.transaction()`.
+- A query runs in a transaction only when you use `QueryBuilder.transaction()`,
+  or `tx.run()` of a [transaction you began by hand](#begin-and-commit-by-hand).
