@@ -298,6 +298,7 @@ Run a job in this process after the answer is sent. The client does not wait for
 SendWelcomeEmail(userId: 1).dispatchAfterResponse();
 ```
 
+Do not `await` it. It returns nothing.
 It does not go on the queue. So it has no job id and no retry. Outside a request, the job runs soon. When the job throws, its `failed()` runs and the error goes to the exception handler, never to the client. `QueueProvider` turns on `AfterResponse` for it. When the server stops, a job that did not run yet is lost.
 
 ### Dispatch after the commit
@@ -362,7 +363,7 @@ Commands:
 | `retry all` | put all failed jobs back |
 | `forget <id>` | delete one failed job |
 | `flush` | delete all failed jobs |
-| `clear [queue]` | delete the jobs of a queue. Default: `default` |
+| `clear [queue]` | delete the jobs of a queue, also the running ones. It frees the locks of [unique jobs](#unique-jobs). Default: `default` |
 | `restart` | stop the running workers after their current jobs |
 | `prune-failed` | delete failed jobs older than `--hours=N` (default 24) |
 
@@ -513,6 +514,138 @@ With `dispatchSync()`, `dispatchAfterResponse()` and the `sync` driver there is 
 There `attempts()` is 1, `release()` and `delete()` do nothing, and `fail()` only runs `failed()`.
 
 In a test file, `package:test` has its own `fail()`. Inside a job class with the mixin, a bare `fail(...)` calls the job method. Write `this.fail(...)` to make it clear.
+
+## Job middleware
+
+Middleware wraps `handle()` of a job. Use it for rules that many jobs share, like a rate limit.
+Add the opt-in `HasMiddleware` mixin and list the middleware. The first one runs first.
+
+```dart
+@Job()
+class SendReport extends DoxJob with HasMiddleware {
+  @override
+  int get tries => 5;
+
+  @override
+  List<JobMiddleware> get middleware => <JobMiddleware>[
+    RateLimited('report-api', 10, Duration(minutes: 1)),
+    WithoutOverlapping('report-$reportId'),
+  ];
+
+  // ...
+}
+```
+
+Write your own with `JobMiddleware`.
+Call `next()` to go on.
+Do not call it to skip the job. The job is then done.
+Call `release(job, delay)` to put the job back on the queue.
+
+```dart
+class SkipAtNight extends JobMiddleware {
+  @override
+  Future<void> handle(DoxJob job, JobNext next) async {
+    if (DateTime.now().hour < 6) {
+      release(job, Duration(hours: 1));
+      return;
+    }
+    await next();
+  }
+}
+```
+
+The middleware runs in the worker, with the `sync` driver, with `dispatchSync()` and with `dispatchAfterResponse()`.
+A release counts as a try, like `release()` in [Control the job in handle()](#control-the-job-in-handle).
+Outside a worker there is no queue. A release then logs a warning, and `handle()` does not run.
+
+### Rate limits and locks
+
+| Middleware | What it does |
+| --- | --- |
+| `RateLimited(key, max, per)` | runs at most `max` jobs of `key` in each `per` window. The others go back on the queue until the window ends |
+| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter`. With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after a crash |
+| `ThrottlesExceptions(key, maxAttempts:, decay:, retryAfter:)` | after `maxAttempts` errors, jobs of `key` wait until `decay` is over. A job that threw goes back after `retryAfter` |
+
+Things to know:
+
+- They keep their counts and locks in the default cache store. All workers must use the same store: `file` on one machine, or `redis` for several servers. A `memory` store is per process, so the limit would not work.
+- A release counts as a try. A job that is released and has `tries` of 1 fails on its next pickup. Set `tries` above 1, or a `retryUntil`.
+- The lock of `WithoutOverlapping` has no class name in it. Job classes with the same key share one lock. Put the class name in the key if they should not.
+
+## Unique jobs
+
+Some jobs should wait in the queue only once, like "rebuild the search index of product 5".
+Add the opt-in `ShouldBeUnique` mixin.
+While a job with the same class and `uniqueId` waits or runs, `dispatch()` pushes nothing and returns `''`.
+
+```dart
+@Job()
+class UpdateSearchIndex extends DoxJob with ShouldBeUnique {
+  UpdateSearchIndex({required this.productId});
+
+  final int productId;
+
+  @override
+  String get uniqueId => '$productId';
+
+  @override
+  Duration? get uniqueFor => Duration(hours: 1);
+
+  // ...
+}
+```
+
+- `uniqueId` is the key next to the class. The default is empty: only one job of the class at a time.
+- `uniqueFor` ends the lock after a time, also when the job never ran. `null` means no end.
+- The worker frees the lock when the job is done, deleted or failed for good. A release or a retry keeps it.
+- `ShouldBeUniqueUntilProcessing` frees the lock when a worker starts the job. A new job can then be queued while this one runs.
+- The lock is in the default cache store. The web app and the workers must use the same store, like `redis`.
+- `queue:clear` frees the locks of the jobs it deletes.
+- `queue:retry` of a failed job does not take the lock.
+- `dispatchSync()` ignores uniqueness.
+- With `afterCommit` inside a transaction, the lock is taken at the commit. `dispatch()` returns the id at once, also when the job is then skipped.
+- When a worker crashes, its lock stays. With no `uniqueFor`, the lock never ends, and `dispatch()` keeps returning `''`. So set `uniqueFor` on unique jobs.
+- `Queue.fake()` keeps its own locks and needs no cache.
+
+## Queue events
+
+Listen to the steps of a job:
+
+```dart
+Queue.before((QueueEvent event) => print('start ${event.name} ${event.id}'));
+Queue.after((QueueEvent event) => print('done ${event.name}'));
+Queue.failing((QueueEvent event) => alert(event.name, event.error));
+```
+
+| Hook | When |
+| --- | --- |
+| `Queue.queued` | `dispatch()` pushed a job |
+| `Queue.before` | a worker starts a job |
+| `Queue.after` | a worker finished a job and deleted it |
+| `Queue.released` | a worker put a job back (`release()` or a retry) |
+| `Queue.exceptionOccurred` | `handle()` threw and the job will be tried again |
+| `Queue.failing` | a job failed for good |
+| `Queue.looping` | a worker is about to take the next job |
+| `Queue.stopping` | a worker stops |
+
+A listener gets a `QueueEvent`:
+
+| Field | What it holds |
+| --- | --- |
+| `type` | the kind of event |
+| `job` | the job. `null` for `looping` and `stopping`, and when the worker can not read the job |
+| `name` | the job name of the registry |
+| `id` | the job id |
+| `queue` | the queue name |
+| `attempts` | the try number. `0` for `queued`, `looping` and `stopping` |
+| `error`, `stack` | the error and its stack trace, for `exceptionOccurred` and `failing` |
+| `delay` | the wait, for `queued` and `released` |
+
+- Listeners are per isolate. Register them where the app starts, like in a provider. Then the web app and each worker have them.
+- A listener can be async. The queue waits for it.
+- A listener that throws is logged. It never stops the worker or the dispatch.
+- The `sync` driver, `dispatchSync()`, `dispatchAfterResponse()` and `Queue.fake()` fire no events.
+- `Queue.forgetListeners()` removes all listeners, for example between tests.
 
 ## Drivers
 

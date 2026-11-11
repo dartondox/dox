@@ -173,7 +173,7 @@ AfterResponse.run(() => mailer.sendWelcome(user));
 - The work runs after the answer is sent, one after the other, in the order it was added. The next one starts only when the one before it ends. So work that never ends blocks the rest of the work of that request.
 - Outside a request, or when it is off, the work runs soon, after the code that runs now.
 - An error in the work goes to `ExceptionHandler.report`. It never reaches the client and never stops the server.
-- The work is not saved anywhere. When the server stops, work that did not run yet is lost. Use a [queue](../digging-deeper/queue.md) for work that must run.
+- The work is not saved anywhere. When the server stops, work that did not run yet is lost. Use a [queue](../digging-deeper/queue.md) for work that must run. To run a queue job this way, see `dispatchAfterResponse()` in [Queue](../digging-deeper/queue.md#dispatch-a-job).
 
 ## Request id
 

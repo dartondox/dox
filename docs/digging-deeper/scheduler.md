@@ -91,6 +91,21 @@ s.call('report', () => SendReport().dispatch()).hourly();
 
 The task only puts the job on the queue. A queue worker runs it.
 
+With `dox_queue`, `schedule.job()` does the same in one line:
+
+```dart
+import 'package:dox_queue/dox_queue.dart';
+
+void schedule(Schedule s) {
+  s.job(SendReport()).dailyAt('08:00');
+  s.job(PruneFiles(), name: 'prune', connection: 'database').hourly();
+}
+```
+
+The task name is the class name of the job, unless you pass `name:`.
+The name must be unique in the schedule.
+`connection:` is a [queue connection](queue.md#queue-connections). Without it, the main connection is used.
+
 ### Processes and dox commands
 
 ```dart
