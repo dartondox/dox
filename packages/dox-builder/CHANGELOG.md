@@ -1,9 +1,16 @@
 ## Unreleased
 
+- New: DTOs read `@Dto(trim: true)`, `@Dto(coerce: true)` and `@Dto(attributes: {...})`. Needs the next dox_validation.
+- New: `@After` and `@Before` take `'today'`, `'tomorrow'`, `'yesterday'` and the input key of another `DateTime` field. New `@AfterOrEqual` and `@BeforeOrEqual`. A text that is not a date, a word or a `DateTime` field stops the build. The words and fields work with any dox_validation. `@AfterOrEqual` and `@BeforeOrEqual` need the next dox_validation.
+- New: DTOs read `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` and `@ExcludeUnless`. Each one on an always-required field stops the build, like `@RequiredIf`. Needs the next dox_validation.
+- New: the rules `@Different` and the field compare rules check the whole field on a `List` field, not each item. Rules that name another key stop the build when they name a Dart field name in place of the input key.
+- A DTO that uses none of these gets the same code as before.
 - OpenAPI: a controller method that calls `req.authorize(...)` gets a `401` and a `403` answer in the docs. A `@Response` with the same status wins.
 - OpenAPI: a controller method that calls `req.validateSchema(...)`, or `req.validate<T>()` with no request class found, gets a `422` answer. A `@Response(422, ...)` wins. Needs the next dox_core.
 - OpenAPI: a controller method that calls `Gate.authorize(...)` gets a `403` answer in the docs. A `@Response(403, ...)` wins.
 - DTOs: a DTO with no `@RequiredIf` or `@RequiredWith` field (and no nested DTO with one) now writes `usesRequiredWhen => false`. Then the check does not keep each converted value, which saves work. Needs the next dox_validation.
+- New: DTO code reads the DTO flags of `ValidationFlags` at run time: `dtoAllErrors`, `dtoRejectEmptyList` and `dtoMaybeRejectsEmpty`. All are off by default, so the checks work as before. The builder writes this code only when the app's dox_validation has `DtoState.allErrors`. With an older dox_validation it writes the old code, so it still compiles.
+- New: a model `@BelongsTo` field passes its name as `relation:` to `belongsTo()`, for the dox_orm flag `belongsToKeyFromRelation`. The builder writes it only when the app's dox_orm has the `relation:` parameter. With an older dox_orm the code does not change.
 - Fix: `@OrDefault()` on a `Maybe<T>` field no longer stops the build. A bad value gives `Maybe.missing()`.
 - Fix: a nested DTO deeper in lists and maps, like `List<List<A>>` or `Map<String, List<A>>`, now runs its `validate()` and its async rules. Before, only one level (`List<A>`, `Map<String, A>`) was found. So after `build_runner`, an app may now get errors from these deeper DTOs that were skipped before.
 

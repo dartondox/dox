@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 
 import 'cache_clock.dart';
+import 'cache_config.dart';
 import 'cache_driver.dart';
 import 'cache_lock.dart';
 import 'constants/cache_constants.dart';
@@ -16,13 +17,20 @@ import 'constants/cache_constants.dart';
 ///
 /// A null ttl means forever. A zero or negative ttl removes the key.
 class CacheStore {
-  CacheStore(this.driver, {this.clock = const CacheClock()});
+  CacheStore(
+    this.driver, {
+    this.clock = const CacheClock(),
+    this.flags = const CacheFlags(),
+  });
 
   /// The backend of this store.
   final CacheDriver driver;
 
   /// Time source of [flexible].
   final CacheClock clock;
+
+  /// The flags of the config. [lock] gives them to each lock.
+  final CacheFlags flags;
 
   /// Running computes of `remember`, per driver and key. Tagged views of
   /// one store share it, because they share the driver.
@@ -241,13 +249,13 @@ class CacheStore {
   /// An atomic lock. Supported by memory, file and redis drivers.
   /// Null [ttl] means the lock never expires by itself.
   CacheLock lock(String name, [Duration? ttl, String? owner]) {
-    return driver.lock(name, ttl, owner);
+    return driver.lock(name, ttl, owner)..throwOnTimeout = flags.lockThrows;
   }
 
   /// A view of this store where keys belong to [names].
   /// `tags(['a']).flush()` removes only items stored with tag 'a'.
   TaggedCache tags(List<String> names) {
-    return TaggedCache(driver, names, clock: clock);
+    return TaggedCache(driver, names, clock: clock, flags: flags);
   }
 
   /// Key sent to the driver. Tagged caches change it.
@@ -402,7 +410,7 @@ class CacheStore {
 /// Old items are not deleted right away. They stay until their ttl ends
 /// (or LRU removes them). Items stored forever stay until a full flush.
 class TaggedCache extends CacheStore {
-  TaggedCache(super.driver, this.names, {super.clock});
+  TaggedCache(super.driver, this.names, {super.clock, super.flags});
 
   /// Tag names of this view.
   final List<String> names;

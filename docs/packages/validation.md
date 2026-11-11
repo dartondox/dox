@@ -256,6 +256,37 @@ They use the same codes and messages as the DTO annotations. See the [rules refe
 
 - `requiredIf` and `requiredWith` come after `optional()` or `nullish()`.
   Then a missing, `null` or blank value is an error when the condition is true.
+
+More Laravel rules:
+
+```dart
+final ObjectSchema order = v.object(<String, Schema<Object?>>{
+  'type': v.string(),
+  'email': v.string().optional().requiredWithout(<String>['phone']),
+  'phone': v.string().optional(),
+  'fax': v.string().optional().requiredWithoutAll(<String>['email', 'phone']),
+  'company': v.string().optional().requiredUnless('type', 'person'),
+  'nick': v.string().optional().filled(),
+  'note': v.string().optional().present().nullable(),
+  'coupon': v.string().optional().prohibitedIf('type', 'guest'),
+  'debug': v.any().optional().prohibited(),
+  'terms': v.coerce.bool().accepted(),
+  'new_password': v.string().different('old_password'),
+  'id': v.string().ulid(),
+  'min_price': v.int(),
+  'max_price': v.int().gtField('min_price'),
+});
+```
+
+- `requiredUnless`, `requiredWithout`, `requiredWithoutAll`, `filled` and `present` come after `optional()`, like `requiredIf`.
+- `present()` needs the key. Add `.nullable()` to allow `null`.
+- `prohibited()` and `prohibitedIf()` come after `optional()`. Like Laravel, they treat empty values in different ways:
+    - `prohibited()`: a missing key or blank text passes. Any other sent value fails, also `null`, `[]`, `0` and `false`.
+    - `prohibitedIf()`: when the condition matches, a missing key, `null`, blank text and an empty list or map pass. `0`, `false` and any other value fail.
+- `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact Laravel words.
+- `gtField`, `gteField`, `ltField` and `lteField` compare with another key, like Laravel `gt:field`. A missing other key fails.
+- There is no fluent `exclude_if` and no `bail`. A fluent schema runs all rules of a value.
+- The rules are explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing).
 - `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
 - For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
 - `exists(table, column: 'id')`: the column default is `id`. For a number id column, use `v.int().exists('teams')`, not `v.string()`. Then text like `abc` is a type error, before any query.
@@ -328,8 +359,68 @@ createUser.safeParse(input, messages: MessageResolver(messages: <String, String>
 A resolver for one call is used in place of the global one.
 Codes that it does not have get the built-in text, not the global text.
 
+With the flag `laravelMessageKeys`, a key can use the Laravel rule name too, like `name.min` for the `min_length` error. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys).
+
+To show a name for `{field}` in place of the key, give `attributes`:
+
+```dart
+MessageResolver.global = MessageResolver(
+  attributes: <String, String>{'first_name': 'first name'},
+);
+// The first name is required
+```
+
+A DTO can give its own names with `@Dto(attributes:)`. See [Names for `{field}`](../the-basic/validation.md#names-for-field).
+
 For other languages, extend `MessageResolver` and override `resolve()`.
 See [Messages](../the-basic/validation.md#messages).
+
+## Opt-in flags
+
+`ValidationFlags` turns on behaviors that are off by default.
+Set it in `Validator.flags`.
+
+```dart
+// turn on one flag
+Validator.flags = const ValidationFlags(unicodeAlpha: true);
+
+// turn on every flag
+Validator.flags = const ValidationFlags.all();
+```
+
+| Flag | What it does when on |
+| --- | --- |
+| `emptyStringsToNull` | Fluent schemas turn each `""` in the input into `null` before they check it. This also happens in nested maps and lists. So `""` fails a required field, and `.nullable()` gives `null`. |
+| `unicodeAlpha` | `alpha`, `alphaNumeric` and `alphaDash` accept Unicode letters and marks, like `José`. `alphaNumeric` and `alphaDash` also accept Unicode digits. This works for fluent schemas and DTOs. |
+| `shortInMessage` | The default `in` message is `The selected {field} is invalid`. It does not list the allowed values. |
+| `dtoAllErrors` | A DTO runs the rules of each field that has the right type, also when another field is missing or has the wrong type. So one request gets all its errors at once. The type and `required` errors come first (a nested DTO's errors at its field), then the rule errors. A list or map with a bad item skips its rules. |
+| `dtoRejectEmptyList` | A required `List` field of a DTO fails `required` on `[]`, and its other rules do not run. It does not apply to a nullable list, a list with a default, or a `Maybe<List>`. |
+| `dtoMaybeRejectsEmpty` | A `Maybe<T>` field of a DTO (with `T` not nullable) fails `required` when the key is sent with an empty value, like `""`. A missing key still gives `Maybe.missing()`. It does not apply to `Maybe<T?>`. A text of only spaces is a value and passes. With `@Trim` it becomes `""` and fails. |
+| `laravelMessageKeys` | A custom message key can use the Laravel rule name of a code, like `name.min` for the `min_length` error. It works in `@Dto(messages:)` and in a `MessageResolver`. At each step of the lookup the Dox code wins. The error code does not change. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys). |
+
+With a flag off, the check works as described in the rest of this page:
+`""` is text, the alpha rules take only `a-z`, `A-Z` and `0-9`, the `in` message lists the allowed values, and a message key matches only the Dox code.
+For DTOs: a missing field or a type error stops the rules of the other fields, `[]` passes a required list, and `""` in a `Maybe` field counts as not sent.
+
+The three DTO flags are read when the check runs.
+They need the DTO code from a `dox_builder` that knows them.
+Run `dart run build_runner build` once to make it.
+
+`emptyStringsToNull` is for fluent schemas.
+A DTO checked on its own keeps `""`; use `@Dto(emptyStringsToNull: true)` there.
+A DTO inside a fluent schema gets the changed input.
+
+Each isolate has its own `Validator.flags`.
+In a Dox app, set it in a provider's `setup()`, so every isolate runs it:
+
+```dart
+class ValidationProvider extends DoxProvider {
+  @override
+  void setup() {
+    Validator.flags = const ValidationFlags.all();
+  }
+}
+```
 
 ## Standard Schema
 

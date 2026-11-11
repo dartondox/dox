@@ -133,6 +133,10 @@ class AppConfig {
   /// `allowedOrigins` of a route wins over this.
   final List<String>? webSocketAllowedOrigins;
 
+  /// Opt-in behaviors that work like Laravel. All off by default.
+  /// See [CoreFlags].
+  final CoreFlags flags;
+
   AppConfig({
     required this.appKey,
     this.previousKeys = const <String>[],
@@ -169,6 +173,7 @@ class AppConfig {
     this.compress = false,
     this.shutdownTimeout = const Duration(seconds: 8),
     this.webSocketAllowedOrigins,
+    this.flags = const CoreFlags(),
   }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
 }
 

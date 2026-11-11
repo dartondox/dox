@@ -40,7 +40,11 @@ class CacheManager {
     if (existing != null) {
       return existing;
     }
-    CacheStore created = CacheStore(_createDriver(storeName), clock: clock);
+    CacheStore created = CacheStore(
+      _createDriver(storeName),
+      clock: clock,
+      flags: config.flags,
+    );
     _stores[storeName] = created;
     return created;
   }
@@ -52,7 +56,7 @@ class CacheManager {
 
   /// Add a ready driver as a store.
   void addStore(String name, CacheDriver driver) {
-    _stores[name] = CacheStore(driver, clock: clock);
+    _stores[name] = CacheStore(driver, clock: clock, flags: config.flags);
   }
 
   /// Close the connections of every store that was built (eg. Redis).

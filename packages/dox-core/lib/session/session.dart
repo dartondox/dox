@@ -142,15 +142,20 @@ class Session {
 
   /// Give the session a new id and a new CSRF token, and keep the data.
   /// Call it after login, so an old id from before the login is no use.
-  void regenerate() {
+  ///
+  /// [keepToken] true keeps the CSRF token, so forms open in other tabs
+  /// still work. Do not use it at login: a token from before the login
+  /// would stay valid after it.
+  void regenerate({bool keepToken = false}) {
     _load();
     if (id != null) previousId = id;
     id = null;
-    _token = _randomToken();
+    if (!keepToken) _token = _randomToken();
     _changed = true;
   }
 
-  /// Remove all data and give the session a new id. Use it on logout.
+  /// Remove all data and give the session a new id and a new CSRF token.
+  /// Use it on logout.
   void invalidate() {
     flush();
     regenerate();

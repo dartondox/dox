@@ -70,6 +70,8 @@ A key that is in the input as it is wins. So a body key `'a.b'` is read before t
 Dot keys also work in `filled`, `exists`, `missing`, `boolean`, `integer`, `file` and `hasFile`.
 `has` does not read dot keys: `req.has('user.name')` is `false` for `{"user": {"name": "Ann"}}`. Use `filled` for that.
 
+The flags `onlyPresent` and `hasKeyOnly` make `only` leave out missing keys and `has` only check the key. See [Core flags](../reference/app-config.md#core-flags).
+
 Form and query keys with brackets give lists and maps, like in Laravel:
 
 | Input | `req.input(...)` gives |

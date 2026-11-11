@@ -38,7 +38,7 @@ String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
 
 - `encode` returns base64 text.
 - The same text gives a different output each time.
-- `decode` throws `DecryptException` when the text was changed, or the key is wrong. It is a `400 Bad Request` error.
+- `decode` throws `DecryptException` when the text was changed, or the key is wrong. It is a `400 Bad Request` error. The flag `decryptServerError` makes it a reported `500`. See [Core flags](../reference/app-config.md#core-flags).
 - The AES key is not the secret itself. Dox makes a 32-byte key (AES-256) from the secret with HKDF-SHA256 (RFC 5869) and a label. The default label is `dox:encrypt`. Pick another one with `purpose:`, like `AESEncryptor.encode(text, secret, purpose: 'app:invoice')`. `decode` needs the same `purpose`.
 
 Make a new 32-character `APP_KEY` with the CLI:

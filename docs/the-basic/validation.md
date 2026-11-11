@@ -107,12 +107,14 @@ The Dart type decides. You do not write `required` or `nullable`.
 - Rules on an optional field run only when it has a value.
 - A default value is used only when the key is missing. The rules do not check it.
 - **An empty string counts as missing.** So a required `String` rejects `""`. Add `@AllowEmpty()` to keep `""`.
-- To read `""` as `null` instead (like Laravel's `ConvertEmptyStringsToNull`), use `@Dto(emptyStringsToNull: true)`. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`. A field that is not nullable but has a default gets `required` too, because `null` is not a missing key.
+- **Spaces are kept.** So `"   "` passes `required`, unless the field has `@Trim()`. To trim every text field of a DTO (like Laravel's `TrimStrings`), use `@Dto(trim: true)`. Then `"   "` counts as missing. It works like `@Trim()` on each `String` field and on the text items of its lists and maps. A nested DTO uses its own `@Dto(trim:)`.
+- To read `""` as `null` instead (like Laravel's `ConvertEmptyStringsToNull`), use `@Dto(emptyStringsToNull: true)`. With `@Dto(trim: true)` too, blank text like `"  "` is `null` as well. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`. A field that is not nullable but has a default gets `required` too, because `null` is not a missing key.
 - `@OrDefault()` turns a bad value into the default, with no error.
     - It works on any field, in a body or a query.
     - Example: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` reads `page=abc` and `page=0` as `1`.
     - The field needs a default, a nullable type or a `Maybe` type. A `Maybe` field gets `Maybe.missing()`.
     - Errors from async rules (`@Unique`, `@Exists`, your `AsyncRule`) and from `validate()` are not dropped. They run later, on the built object, and still give `422`.
+- Three [opt-in flags](../packages/validation.md#opt-in-flags) make DTOs work more like Laravel: get all errors at once, reject `[]` in a required list, and reject `""` in a `Maybe` field.
 
 ### Missing or `null`? (for PATCH)
 
@@ -141,6 +143,17 @@ if (body.bio.isPresent) {
 | `Map<String, T>` | an object | bracket keys: `meta[color]` |
 
 JSON is strict: `"18"` is not an `int`. Query and form data are text, so Dox converts them.
+To accept text in a JSON body too, use `@Dto(coerce: true)`. Then `"18"` is read as `18`, `"4.5"` as `4.5`, and `"true"`, `"1"`, `"yes"`, `"on"` (and the opposites) as a bool. A `bool` also takes the numbers `1` and `0`. A nested DTO uses its own `@Dto(coerce:)`.
+
+```dart
+@Dto(coerce: true)
+class UpdateStock {
+  final int count; // {"count": "18"} gives 18
+  final bool active; // {"active": 1} gives true
+
+  const UpdateStock({required this.count, required this.active});
+}
+```
 Every detail is in [Types in detail](validation-rules.md#types-in-detail).
 
 ## Where the data comes from
@@ -190,11 +203,14 @@ final String email;
 
 | Kind | Annotations |
 | --- | --- |
-| Text | `@Length`, `@MinLength`, `@MaxLength`, `@Email`, `@Url`, `@Uuid`, `@Ip`, `@Regex`, `@In`, `@NotIn`, `@StartsWith`, `@EndsWith`, `@Alpha`, `@AlphaNumeric`, `@AlphaDash` |
+| Text | `@Length`, `@MinLength`, `@MaxLength`, `@Email`, `@Url`, `@Uuid`, `@Ulid`, `@Ip`, `@Regex`, `@In`, `@NotIn`, `@StartsWith`, `@EndsWith`, `@Alpha`, `@AlphaNumeric`, `@AlphaDash` |
 | Change text | `@Trim`, `@Lowercase`, `@Uppercase`, `@AllowEmpty` |
 | Numbers | `@Min`, `@Max`, `@Range`, `@Positive`, `@GreaterThan`, `@LessThan`, `@In`, `@NotIn` |
 | Lists | `@MinItems`, `@MaxItems`, `@UniqueItems` |
-| Dates | `@After`, `@Before` |
+| Dates | `@After`, `@Before`, `@AfterOrEqual`, `@BeforeOrEqual` |
+| Other fields | `@Same`, `@Confirmed`, `@Different`, `@GreaterThanField`, `@GreaterThanOrEqualField`, `@LessThanField`, `@LessThanOrEqualField`, `@ProhibitedIf` |
+| Present or missing | `@RequiredIf`, `@RequiredUnless`, `@RequiredWith`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@Accepted`, `@Declined` |
+| Skip a field | `@ExcludeIf`, `@ExcludeUnless` |
 | Files | `@MaxSize`, `@MinSize`, `@Mimes`, `@MimeTypes`, `@Image`, `@Dimensions` |
 | Database | `@Unique`, `@Exists` |
 
@@ -294,6 +310,8 @@ When a check fails, Dox answers `422` with one message per field:
 
 The key is the path to the value, with the input keys. List items use the index.
 
+The flag `laravelErrors` sends `{"message": "...", "errors": {"field": ["..."]}}` instead, like Laravel. See [Core flags](../reference/app-config.md#core-flags).
+
 For another error shape, read `error.issues` of the `ValidationException` in your `ExceptionHandler`. Each issue has its `dottedPath`, its rule `code` (like `min_length`), its `message` and its `params`.
 
 ## Messages
@@ -335,6 +353,73 @@ AppConfig appConfig = AppConfig(
 ```
 
 Placeholders: `{field}` (the last key), `{value}`, and rule values like `{min}` and `{max}`.
+
+### Names for `{field}`
+
+By default `{field}` is the key, like `The first_name is required`.
+To show another name, give attribute names, like Laravel's custom attributes.
+A key with no name still shows the key.
+
+On the DTO:
+
+```dart
+@Dto(attributes: <String, String>{'first_name': 'first name'})
+class CreateUser { ... }
+// The first name is required
+```
+
+For the whole app (and for fluent schemas), in the `MessageResolver`:
+
+```dart
+AppConfig appConfig = AppConfig(
+  validationMessages: MessageResolver(
+    attributes: <String, String>{'first_name': 'first name'},
+  ),
+  // ...
+);
+```
+
+- A name is looked up by the dotted path (`address.city`), then with `*` for list items (`items.*.qty`), then by the field name (`city`).
+- The names of the DTO win over the names of the `MessageResolver`. A nested DTO uses its own names first, then the names of the outer DTO.
+- `MessageResolver.setAttributes(...)` adds names to a resolver. A custom resolver can override `attributeName(path)`.
+- `{other}` and `{others}` (the other keys of rules like `@RequiredIf` and `@Same`) show their names too.
+- The error path and the key in the error response do not change. Only the text does.
+- `@Dto(attributes:)` needs one `build_runner` run.
+
+### Laravel rule names in message keys
+
+Some Dox codes have another name in Laravel. With the opt-in flag `laravelMessageKeys`, a message key can use the Laravel name too. So `'name.min'` gives the message for the `min_length` error of `name`. Without the flag, only the Dox codes match.
+
+```dart
+Validator.flags = const ValidationFlags(laravelMessageKeys: true);
+```
+
+Set it in a provider's `setup()`, like the [other flags](../packages/validation.md#opt-in-flags).
+The error code in the response does not change: it is still `min_length`.
+
+At each step of the lookup, the Dox code is tried first, then the Laravel name. So `'name.min_length'` wins over `'name.min'`. A key with a path still wins over a key with only a code: `'name.min'` wins over `'min_length'`.
+
+| Dox code | Laravel name |
+| --- | --- |
+| `min_length` | `min` |
+| `max_length` | `max` |
+| `length` | `size` |
+| `length_between` | `between` |
+| `start_with` | `starts_with` |
+| `end_with` | `ends_with` |
+| `alpha_numeric` | `alpha_num` |
+| `greater_than` | `gt` |
+| `less_than` | `lt` |
+| `min_items` | `min` |
+| `max_items` | `max` |
+| `unique_items` | `distinct` |
+| `min_size` | `min` |
+| `max_size` | `max` |
+| `mime_types` | `mimetypes` |
+| `datetime` | `date` |
+
+This works in `@Dto(messages:)` and in a `MessageResolver`. A code with the same name in both (like `email` or `required`) needs nothing.
+With the flag on, a message key `min` or `max` with no path fits text, list and file errors too, not only numbers.
 
 ## Custom rules
 

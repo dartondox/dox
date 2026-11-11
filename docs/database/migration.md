@@ -188,6 +188,7 @@ You can also give the database yourself:
 
 - `Migrator(migrations: migrations, config: databaseConfig.getConnectionConfig())` opens this config, and closes it at the end.
 - `Migrator(migrations: migrations, connection: SqlQueryBuilder().dbDriver)` runs on a driver that is already open. The migrator does not close it.
+- `Migrator(migrations: migrations, flags: databaseConfig.flags)` gives the [ORM flags](index.md#orm-flags) to the `Schema` of each migration. Without it, the migrator uses `SqlQueryBuilder().flags`.
 
 ## Transactions
 

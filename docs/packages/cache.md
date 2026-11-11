@@ -220,6 +220,7 @@ bool got = await lock.block(Duration(seconds: 5)); // wait up to 5 seconds
 - The `ttl` frees the lock by itself if the worker crashes. Without a ttl, the lock stays until `release()`.
 - `release()` frees the lock only for the owner that took it.
 - `block(timeout, callback)` runs the callback while it holds the lock, frees the lock and returns the result. It throws `LockTimeoutException` when the time is over.
+- `block(timeout)` with no callback gives `false` when the time is over. With `lock.throwOnTimeout = true` or the flag `CacheFlags(lockThrows: true)` it throws `LockTimeoutException`. See [CacheConfig](../reference/app-config.md#cacheconfig).
 - `forceRelease()` frees the lock, whoever holds it.
 - `memory`, `file` and `redis` support locks. The `memory` lock works inside one isolate only. The `file` lock is a file made with `create(exclusive: true)`. It works for all isolates on one machine. `null` throws `UnsupportedError`.
 

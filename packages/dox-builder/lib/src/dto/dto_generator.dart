@@ -18,6 +18,12 @@ class DoxDtoGenerator extends Generator {
   Future<String?> generate(LibraryReader library, BuildStep buildStep) async {
     List<String> parts = <String>[];
     DtoFlagsReader flags = DtoFlagsReader(reader);
+    // the DTO flags need a dox_validation with DtoState.allErrors
+    Element? state = library.element.firstFragment.scope
+        .lookup('DtoState')
+        .getter;
+    bool runtimeFlags =
+        state is ClassElement && state.getGetter('allErrors') != null;
     for (ClassElement element in library.classes) {
       if (!reader.isDto(element)) continue;
       DtoClass dto = reader.read(element);
@@ -36,7 +42,14 @@ class DoxDtoGenerator extends Generator {
           if (entry.key != dto.name) entry.key: entry.value,
       };
       if (defs.isNotEmpty) schema[r'$defs'] = defs;
-      parts.add(DtoWriter(dto, flags, schema).write(flags.of(element)));
+      parts.add(
+        DtoWriter(
+          dto,
+          flags,
+          schema,
+          runtimeFlags: runtimeFlags,
+        ).write(flags.of(element)),
+      );
     }
     if (parts.isEmpty) return null;
     return '// ignore_for_file: type=lint\n\n${parts.join('\n')}';

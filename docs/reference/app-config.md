@@ -50,6 +50,41 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
 | `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
+| `flags` | `CoreFlags` | `CoreFlags()` (all off) | Opt-in behaviors that work like Laravel. See [Core flags](#core-flags). |
+
+## Core flags
+
+`CoreFlags` turns on behaviors that work like Laravel. Every flag is off by default.
+Turn on the ones you want:
+
+```dart
+AppConfig(
+  appKey: env.appKey,
+  flags: const CoreFlags(onlyPresent: true, cookieDefaults: true),
+);
+```
+
+`CoreFlags.all()` turns on every flag:
+
+```dart
+AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
+```
+
+| Flag | When it is on |
+| --- | --- |
+| `laravelErrors` | A `422` body is `{"message": "...", "errors": {"field": ["..."]}}`, with all messages of each field. The `message` is the first error, plus `(and N more errors)`. The OpenAPI `ValidationError` schema has this shape too. Off: `{"field": "first message"}`. |
+| `onlyPresent` | `req.only([...])` leaves out keys that are not in the input. So `model.update(req.only([...]))` does not write `null` for a field the client did not send. Off: a missing key is in the map with `null`. |
+| `cookieDefaults` | A `DoxCookie` with no `path` gets `Path=/`, and one with no `sameSite` gets `SameSite=Lax`. A value you set wins. `SameSite.none` needs `secure: true`, or browsers drop the cookie. A cookie set before with no `Path` on a sub-path (like `/auth`) is not removed by an `expire()` that sends `Path=/`. Expire it with its old `path`. Off: no `Path` and no `SameSite`. |
+| `hasKeyOnly` | `req.has('x')` is `true` when the key is there, with any value (also `''` or null), like `req.exists('x')`. Dot keys work. Off: `''` and null give `false`. |
+| `htmlStrings` | A string from a controller is sent as `text/html`. A content type you set wins, also one a middleware set on the response. Only the preset `text/plain; charset=utf-8` is changed, so a string with that type set by hand is sent as HTML too. To keep plain text, return `response(text).contentType(ContentType.text)`. Escape user input in the string. Off: `text/plain`. |
+| `replaceHeaders` | `res.header(k, v)` replaces a value of the header that a middleware put on the response before. `Vary` and `Set-Cookie` are lists, so they still get one more value. Off: it adds a second value. `res.header(k, v, replace: true)` or `replace: false` picks for one call. |
+| `decryptServerError` | A `DecryptException` gives `500` with `{"code": "server_error", "message": "Server Error"}`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. `req.cookie()` still gives `null` for a bad cookie. |
+| `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
+
+Each isolate builds its own `AppConfig`, so every isolate has the same flags.
+Dox reads a flag when the code runs, with `Dox().flags`.
+
+The lock flag of the cache is in [`CacheConfig`](#cacheconfig): `CacheFlags`.
 
 ## CORSConfig
 
@@ -87,6 +122,21 @@ Source: `packages/dox-cache/lib/src/cache_config.dart`. Option keys: `packages/d
 | --- | --- | --- | --- |
 | `defaultStore` | `String` | required | The store `Cache()` uses when no store is named. |
 | `stores` | `Map<String, Map<String, dynamic>>` | required | Store name to options. Each store needs a `driver` option. |
+| `flags` | `CacheFlags` | `CacheFlags()` (all off) | Opt-in behaviors that work like Laravel. See below. |
+
+`CacheFlags` has one flag. `CacheFlags.all()` turns it on.
+
+| Flag | When it is on |
+| --- | --- |
+| `lockThrows` | `lock.block(timeout)` with no callback throws `LockTimeoutException` when the lock was not taken in time. Off: it gives `false`. Set `lock.throwOnTimeout` to pick for one lock. |
+
+```dart
+CacheConfig(
+  defaultStore: 'redis',
+  stores: stores,
+  flags: const CacheFlags(lockThrows: true),
+);
+```
 
 Options of each driver:
 
@@ -123,6 +173,8 @@ Options of each driver:
 | `local` | `url` | `String` | none | Base of the public URLs, like `http://localhost:3000/files`. |
 | `local` | `app_key` | `String` | `AppConfig.appKey` | Key that signs the URLs. |
 | `local` | `visibility` | `String` | `public` | `public` or `private`. |
+| `local` | `atomic_writes` | `bool` | `false` | Write to a temp file, then rename it. |
+| `local` | `permissions` | `bool` or `Map` | off | Visibility is the file mode. See [File storage](../digging-deeper/file-storage.md#config). |
 | `s3` | `bucket` | `String` | required | Bucket name. |
 | `s3` | `region` | `String` | `us-east-1` | Region. |
 | `s3` | `key` | `String` | required | Access key id. |

@@ -167,12 +167,11 @@ A Blade name that is not a Dox tag, like `@foreach` or `@endif`, is printed as t
 | `@csrf`, `@method('PUT')`, `old('email')` | `@csrf`, `@method('PUT')`, `old('email')` |
 | `Blade::directive('datetime', ...)` | `View.directive('datetime', DateTimeDirective())` |
 
-Two things are not the same as in Blade:
+Three things are not the same as in Blade:
 
 - `@includeIf(condition, 'name')` in Dox takes a condition first. It does not check if the template exists.
+- `{{ true }}` prints `true`, a variable that does not exist prints nothing, and the text `'0'` is true. Turn on the `bladeOutput`, `strictVariables` and `stringZeroIsFalse` options to work like Blade. See [Strict options](../the-basic/views.md#strict-options).
 - `@json` is safe in a `<script>` block and in an attribute in single quotes, not in an attribute in double quotes.
-
-Values work like in Blade. `{{ true }}` prints `1`, a variable that does not exist throws an error, and the text `'0'` is false. The `bladeOutput`, `strictVariables` and `stringZeroIsFalse` options turn each of these off. See [Strict options](../the-basic/views.md#strict-options).
 
 ## Eloquent vs Dox Model
 
@@ -415,16 +414,29 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 | Laravel | Dox |
 | --- | --- |
 | `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageProvider` (`dox_storage`) |
-| `Storage::put('a.txt', $bytes)` | `await Storage().put('files', bytes, extension: 'txt')` (a uuid file name) |
-| `$request->file('f')->store('avatars')` | `await file.store('avatars')` or `Storage().putRequestFile('avatars', file)` |
+| `Storage::put('a.txt', $bytes)` | `await Storage().put('a.txt', bytes, exact: true)` |
+| `Storage::putFile('avatars', $file)` | `await Storage().putFile('avatars', file)` |
+| `Storage::putFileAs('avatars', $file, 'u1.png')` | `await Storage().putFileAs('avatars', file, 'u1.png')` |
+| `$request->file('f')->store('avatars')` | `await file.store('avatars')` |
+| `$request->file('f')->storeAs('avatars', 'u1.png')` | `await file.storeAs('avatars', 'u1.png')` |
 | `Storage::get($path)` | `await Storage().get(path)` |
-| `Storage::exists($path)` | `await Storage().exists(path)` |
+| `Storage::exists($path)` / `missing($path)` | `await Storage().exists(path)` / `missing(path)` |
 | `Storage::delete($path)` | `await Storage().delete(path)` |
+| `Storage::copy($from, $to)` / `move($from, $to)` | `await Storage().copy(from, to)` / `move(from, to)` |
+| `Storage::files($dir)` / `allFiles($dir)` | `await Storage().files(dir)` / `allFiles(dir)` |
+| `Storage::directories($dir)` / `deleteDirectory($dir)` | `await Storage().directories(dir)` / `deleteDirectory(dir)` |
+| `Storage::setVisibility($path, 'private')` | `await Storage().setVisibility(path, Visibility.private)` |
 | `Storage::url($path)` | `await Storage().url(path)` |
 | `Storage::temporaryUrl($path, now()->addMinutes(10))` | `await Storage().signedUrl(path, expiresIn: Duration(minutes: 10))` |
 | `Storage::disk('s3')` | `Storage().disk('s3')` |
-| `Storage::download($path)` | `return Storage().download(path);` |
+| `Storage::download($path, $name)` | `return Storage().download(path, name: name);` |
 | drivers: local, s3, ftp, sftp | drivers: `local`, `s3` (also R2, MinIO, Spaces), `memory` |
+
+Three things are different from Laravel:
+
+- `setVisibility()` and `getVisibility()` on a local disk change and read the file mode only when the disk has `'permissions': true`. Without it, `setVisibility()` does nothing on a local disk, and `getVisibility()` gives the disk `visibility` (`public` by default). Laravel always runs `chmod`. So a file you made private is not private on disk until you turn this on.
+- Paths that Dox gives you start with `/`. This is true for `putFile`, `store`, `files`, `allFiles` and `directories`.
+- `put()` returns nothing. `download()` takes `name:` but no headers. For headers, use `response(await Storage().download(path)).header('Cache-Control', 'no-store')`.
 
 See [File Storage](../digging-deeper/file-storage.md).
 
