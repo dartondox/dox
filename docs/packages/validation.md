@@ -331,6 +331,44 @@ Codes that it does not have get the built-in text, not the global text.
 For other languages, extend `MessageResolver` and override `resolve()`.
 See [Messages](../the-basic/validation.md#messages).
 
+## Opt-in flags
+
+`ValidationFlags` turns on behaviors that are off by default.
+Set it in `Validator.flags`.
+
+```dart
+// turn on one flag
+Validator.flags = const ValidationFlags(unicodeAlpha: true);
+
+// turn on every flag
+Validator.flags = const ValidationFlags.all();
+```
+
+| Flag | What it does when on |
+| --- | --- |
+| `emptyStringsToNull` | Fluent schemas turn each `""` in the input into `null` before they check it. This also happens in nested maps and lists. So `""` fails a required field, and `.nullable()` gives `null`. |
+| `unicodeAlpha` | `alpha`, `alphaNumeric` and `alphaDash` accept Unicode letters and marks, like `José`. `alphaNumeric` and `alphaDash` also accept Unicode digits. This works for fluent schemas and DTOs. |
+| `shortInMessage` | The default `in` message is `The selected {field} is invalid`. It does not list the allowed values. |
+
+With a flag off, the check works as described in the rest of this page:
+`""` is text, the alpha rules take only `a-z`, `A-Z` and `0-9`, and the `in` message lists the allowed values.
+
+`emptyStringsToNull` is for fluent schemas.
+A DTO checked on its own keeps `""`; use `@Dto(emptyStringsToNull: true)` there.
+A DTO inside a fluent schema gets the changed input.
+
+Each isolate has its own `Validator.flags`.
+In a Dox app, set it in a provider's `setup()`, so every isolate runs it:
+
+```dart
+class ValidationProvider extends DoxProvider {
+  @override
+  void setup() {
+    Validator.flags = const ValidationFlags.all();
+  }
+}
+```
+
 ## Standard Schema
 
 Every schema, and every `DtoSchema`, implements the [Standard Schema](https://standardschema.dev) interface (`StandardSchema`).
