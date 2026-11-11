@@ -16,7 +16,7 @@ Follow it from the top. At the end of each way, your app has working auth.
 - a login throttle, and tools to revoke and renew tokens
 
 `dox_auth` has no password reset, no email check, no "remember me" and no two-step login (2FA).
-Your app builds these. The tools on this page help, for example [the two-step login recipe](#change-the-abilities-of-a-token).
+Your app builds these. The tools on this page help, for example the [two-step login recipe](#change-the-abilities-of-a-token).
 Who may do what (roles, "may this user edit this post") is on the [Authorization](authorization.md) page.
 
 ## Which one do I need?
@@ -203,7 +203,6 @@ dox migrate
 ```
 
 `dox auth:tokens-table` writes a migration in `db/migration`. `dox migrate` adds it to `db/migration/migrations.dart`, runs it, and makes the `auth_access_tokens` table.
-If `dox s` runs at this time, it runs the new migration itself when it restarts. That is fine: `dox migrate` then says it is up to date.
 
 The migration it writes looks like this:
 
@@ -278,34 +277,128 @@ class AuthController {
     await (req.auth as Auth).revokeToken(req);
     return <String, bool>{'logged_out': true};
   }
-
-  /// POST /api/auth/refresh: a new token in place of the token of this
-  /// request. The old token works one more minute.
-  Future<Map<String, dynamic>> refresh(DoxRequest req) async {
-    Auth auth = req.auth as Auth;
-    if (!auth.tokenCan('tokens:manage')) {
-      throw ForbiddenHttpException();
-    }
-    AccessToken next = await auth.rotateAccessToken(
-      auth.currentAccessToken!,
-      grace: const Duration(minutes: 1),
-    );
-    return <String, dynamic>{
-      'token': next.value,
-      'expires_at': next.expiresAt?.toIso8601String(),
-    };
-  }
 }
 ```
 
 - `Hash.makeAsync` runs bcrypt in another isolate, so it does not block the server. See [Hashing](hashing.md).
 - `attempt` finds the user by email and checks the password. It gives a new token with all abilities (`*`), or `null`. It runs bcrypt in another isolate too.
 - `Auth(ip: req.ip())` gives the client ip to the [login throttle](#login-throttle).
-- `refresh` is explained in [Rotate a token](#rotate-a-token). It needs the `tokens:manage` ability, see below.
 
-### 3. Write the token and post controllers
+### 3. Add the routes
 
-Users can make extra tokens, for example for a script.
+`AuthMiddleware()` protects a route. A request with no good token stops with `401`.
+A [rate limit](rate-limiting.md) on register and login slows down password guessing.
+
+```dart title="lib/routes/api.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/http/controllers/api.controller.dart';
+import 'package:my_app/app/http/controllers/auth.controller.dart';
+
+class ApiRouter extends Router {
+  @override
+  String get prefix => 'api';
+
+  @override
+  List<dynamic> get middleware => <dynamic>[];
+
+  @override
+  void register() {
+    Route.get('/ping', (ApiController c) => c.pong);
+
+    // for guests
+    Route.post('/auth/register', <dynamic>[
+      RateLimit(max: 5, name: 'register'),
+      (AuthController c) => c.register,
+    ]);
+    Route.post('/auth/login', <dynamic>[
+      RateLimit(max: 5, name: 'login'),
+      (AuthController c) => c.login,
+    ]);
+
+    // for logged-in users
+    Route.get('/auth/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
+    Route.post('/auth/logout', <dynamic>[
+      AuthMiddleware(),
+      (AuthController c) => c.logout,
+    ]);
+  }
+}
+```
+
+Run the generator again, then start the app:
+
+```bash
+dart run build_runner build
+dox s
+```
+
+### 4. Try it
+
+The client sends the token in the `Authorization` header: `Authorization: Bearer oat_12.<secret>`.
+The word `Bearer` can be in any case.
+Run these in a second terminal. Where a step says "keep it in", copy the token from the answer into a shell variable.
+
+```bash
+# make an account
+curl -X POST localhost:3000/api/auth/register -H 'Content-Type: application/json' \
+  -d '{"name":"Ada","email":"ada@example.com","password":"secret-pass"}'
+# 201 {"token":"oat_1.c79C...","user":{"id":1,"name":"Ada","email":"ada@example.com",...}}
+
+# a wrong password
+curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"ada@example.com","password":"wrong-pass"}'
+# 401 {"code":"unauthorized","message":"Wrong email or password"}
+
+# log in, and keep the token in TOKEN
+curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"ada@example.com","password":"secret-pass"}'
+# 200 {"token":"oat_2.OTAG...","user":{"id":1,...}}
+TOKEN='oat_2.OTAG...'
+
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
+# 200 {"id":1,"name":"Ada","email":"ada@example.com",...}
+
+curl localhost:3000/api/auth/me
+# 401 {"code":"unauthorized","message":"Authentication failed"}
+
+# log out
+curl -X POST localhost:3000/api/auth/logout -H "Authorization: Bearer $TOKEN"
+# 200 {"logged_out":true}
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
+# 401 {"code":"unauthorized","message":"Authentication failed"}
+```
+
+The password is never in an answer, because it is in `hidden`.
+The ids (`oat_1`, `oat_2`, ...) count up in your table, so yours may differ.
+
+Your app has a working login. The next part adds script tokens, abilities and token renewal. You can skip it until you need it.
+
+## More with access tokens
+
+### Abilities
+
+`createAccessToken(user, abilities: <String>['posts:read'])` gives a token that can do only these things.
+The default is `<String>['*']`: all abilities. `attempt` always gives `*`.
+
+Check an ability in the controller, after `AuthMiddleware`:
+
+```dart
+Auth auth = req.auth as Auth;
+if (!auth.tokenCan('posts:write')) {
+  throw ForbiddenHttpException();
+}
+auth.currentAccessToken; // the AccessToken of this request
+```
+
+- `tokenCan` is `true` when the token has the ability, or `*`.
+- `tokenCan` is `false` when there is no access token. So a session or JWT login never passes it.
+- A route with no `tokenCan` check takes every good token, whatever its abilities. Check an ability on each route that needs one.
+- A token without the ability gets `403`. A request with no good token gets `401` from `AuthMiddleware`.
+
+### Script tokens
+
+Users can make extra tokens, for example for a script that only reads posts.
 This controller lists, makes and revokes them. Each action needs the `tokens:manage` ability.
 A login token has `*`, so it passes. A script token does not, so a leaked script token can not make new tokens.
 
@@ -354,7 +447,7 @@ class TokenController {
 }
 ```
 
-A route that needs an ability:
+A route that needs the `posts:read` ability:
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -372,101 +465,36 @@ class PostController {
 }
 ```
 
-### 4. Add the routes
+In `lib/routes/api.dart`, add the imports at the top:
 
-`AuthMiddleware()` protects a route. A request with no good token stops with `401`.
-A [rate limit](rate-limiting.md) on register and login slows down password guessing.
-
-```dart title="lib/routes/api.dart"
-import 'package:dox_auth/dox_auth.dart';
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/app/http/controllers/api.controller.dart';
-import 'package:my_app/app/http/controllers/auth.controller.dart';
+```dart
 import 'package:my_app/app/http/controllers/post.controller.dart';
 import 'package:my_app/app/http/controllers/token.controller.dart';
-
-class ApiRouter extends Router {
-  @override
-  String get prefix => 'api';
-
-  @override
-  List<dynamic> get middleware => <dynamic>[];
-
-  @override
-  void register() {
-    Route.get('/ping', (ApiController c) => c.pong);
-
-    // for guests
-    Route.post('/auth/register', <dynamic>[
-      RateLimit(max: 5, name: 'register'),
-      (AuthController c) => c.register,
-    ]);
-    Route.post('/auth/login', <dynamic>[
-      RateLimit(max: 5, name: 'login'),
-      (AuthController c) => c.login,
-    ]);
-
-    // for logged-in users
-    Route.get('/auth/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
-    Route.post('/auth/logout', <dynamic>[
-      AuthMiddleware(),
-      (AuthController c) => c.logout,
-    ]);
-    Route.post('/auth/refresh', <dynamic>[
-      AuthMiddleware(),
-      (AuthController c) => c.refresh,
-    ]);
-    Route.get('/tokens', <dynamic>[AuthMiddleware(), (TokenController c) => c.index]);
-    Route.post('/tokens', <dynamic>[AuthMiddleware(), (TokenController c) => c.store]);
-    Route.delete('/tokens/{id}', <dynamic>[
-      AuthMiddleware(),
-      (TokenController c) => c.destroy,
-    ]);
-    Route.get('/posts', <dynamic>[AuthMiddleware(), (PostController c) => c.index]);
-  }
-}
 ```
 
-Run the generator again, then start the app:
+And add the routes at the end of `register()`:
 
-```bash
-dart run build_runner build
-dox s
+```dart
+Route.get('/tokens', <dynamic>[AuthMiddleware(), (TokenController c) => c.index]);
+Route.post('/tokens', <dynamic>[AuthMiddleware(), (TokenController c) => c.store]);
+Route.delete('/tokens/{id}', <dynamic>[
+  AuthMiddleware(),
+  (TokenController c) => c.destroy,
+]);
+Route.get('/posts', <dynamic>[AuthMiddleware(), (PostController c) => c.index]);
 ```
 
-### 5. Try it
+Run `dart run build_runner build`. `dox s` restarts by itself.
 
-The client sends the token in the `Authorization` header: `Authorization: Bearer oat_12.<secret>`.
-The word `Bearer` can be in any case.
-Run these in a second terminal. Where a step says "keep it in", copy the token from the answer into a shell variable.
+`/auth/me` and `/auth/logout` have no ability check, so a script token can call them too. That is fine: it sees its own user, and its logout revokes only itself.
+
+Try it. Log in first and keep the token in `TOKEN`, like above.
 
 ```bash
-# make an account
-curl -X POST localhost:3000/api/auth/register -H 'Content-Type: application/json' \
-  -d '{"name":"Ada","email":"ada@example.com","password":"secret-pass"}'
-# 201 {"token":"oat_1.c79C...","user":{"id":1,"name":"Ada","email":"ada@example.com",...}}
-
-# a wrong password
-curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
-  -d '{"email":"ada@example.com","password":"wrong-pass"}'
-# 401 {"code":"unauthorized","message":"Wrong email or password"}
-
-# log in, and keep the token in TOKEN
-curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
-  -d '{"email":"ada@example.com","password":"secret-pass"}'
-# 200 {"token":"oat_2.OTAG...","user":{"id":1,...}}
-TOKEN='oat_2.OTAG...'
-
-curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
-# 200 {"id":1,"name":"Ada","email":"ada@example.com",...}
-
-curl localhost:3000/api/auth/me
-# 401 {"code":"unauthorized","message":"Authentication failed"}
-
 # make a script token, and keep it in SCRIPT_TOKEN
 curl -X POST localhost:3000/api/tokens -H "Authorization: Bearer $TOKEN"
-# 200 {"token":"oat_3.pwwK..."}
-SCRIPT_TOKEN='oat_3.pwwK...'
+# 200 {"token":"oat_4.pwwK..."}
+SCRIPT_TOKEN='oat_4.pwwK...'
 
 curl localhost:3000/api/posts -H "Authorization: Bearer $SCRIPT_TOKEN"
 # 200 ["Hello"]
@@ -474,53 +502,15 @@ curl localhost:3000/api/posts -H "Authorization: Bearer $SCRIPT_TOKEN"
 # the script token may not manage tokens
 curl -X POST localhost:3000/api/tokens -H "Authorization: Bearer $SCRIPT_TOKEN"
 # 403 {"code":"forbidden","message":"Forbidden"}
-curl -X POST localhost:3000/api/auth/refresh -H "Authorization: Bearer $SCRIPT_TOKEN"
-# 403 {"code":"forbidden","message":"Forbidden"}
 
-# list the tokens, then revoke the script token (id 3)
+# list the tokens, then revoke the script token (id 4)
 curl localhost:3000/api/tokens -H "Authorization: Bearer $TOKEN"
-# 200 [{"id":3,"name":"script","type":"api","abilities":["posts:read"],...},...]
-curl -X DELETE localhost:3000/api/tokens/3 -H "Authorization: Bearer $TOKEN"
+# 200 [{"id":4,"name":"script","type":"api","abilities":["posts:read"],...},...]
+curl -X DELETE localhost:3000/api/tokens/4 -H "Authorization: Bearer $TOKEN"
 # 200 {"revoked":true}
 curl localhost:3000/api/posts -H "Authorization: Bearer $SCRIPT_TOKEN"
 # 401 {"code":"unauthorized","message":"Authentication failed"}
-
-# renew the login token, and keep the new one in NEW_TOKEN
-curl -X POST localhost:3000/api/auth/refresh -H "Authorization: Bearer $TOKEN"
-# 200 {"token":"oat_4.-qAk...","expires_at":"2026-12-11T04:43:15.701944Z"}
-NEW_TOKEN='oat_4.-qAk...'
-curl -X POST localhost:3000/api/auth/refresh -H "Authorization: Bearer $TOKEN"
-# 401 {"code":"unauthorized","message":"The access token was already rotated."}
-
-# log out
-curl -X POST localhost:3000/api/auth/logout -H "Authorization: Bearer $NEW_TOKEN"
-# 200 {"logged_out":true}
-curl localhost:3000/api/auth/me -H "Authorization: Bearer $NEW_TOKEN"
-# 401 {"code":"unauthorized","message":"Authentication failed"}
 ```
-
-The password is never in an answer, because it is in `hidden`.
-The ids (`oat_1`, `oat_2`, ...) count up in your table, so yours may differ.
-
-### Abilities
-
-`createAccessToken(user, abilities: <String>['posts:read'])` gives a token that can do only these things.
-The default is `<String>['*']`: all abilities. `attempt` always gives `*`.
-
-Check an ability in the controller, after `AuthMiddleware`:
-
-```dart
-Auth auth = req.auth as Auth;
-if (!auth.tokenCan('posts:write')) {
-  throw ForbiddenHttpException();
-}
-auth.currentAccessToken; // the AccessToken of this request
-```
-
-- `tokenCan` is `true` when the token has the ability, or `*`.
-- `tokenCan` is `false` when there is no access token. So a session or JWT login never passes it.
-- A route with no `tokenCan` check takes every good token, whatever its abilities. Check an ability on each route that needs one.
-- A token without the ability gets `403`. A request with no good token gets `401` from `AuthMiddleware`.
 
 ### List and revoke tokens
 
@@ -542,11 +532,52 @@ await Auth().pruneExpiredAccessTokens();   // delete expired tokens, eg. from a 
 Rotate a token to renew it before it expires.
 `rotateAccessToken` makes a new token in place of an old one.
 The new token has the same user, name and abilities as the old one.
-The `refresh` method of the [auth controller](#2-write-the-auth-controller) does this.
 
-`grace` is how long the old token still works.
-A client may have other requests on the way with the old token. With a short `grace`, they do not fail.
-The default `grace` is zero: the old token ends at once.
+Add this method to `AuthController`:
+
+```dart
+/// POST /api/auth/refresh: a new token in place of the token of this
+/// request. The old token stops working at once.
+Future<Map<String, dynamic>> refresh(DoxRequest req) async {
+  Auth auth = req.auth as Auth;
+  if (!auth.tokenCan('tokens:manage')) {
+    throw ForbiddenHttpException();
+  }
+  AccessToken next = await auth.rotateAccessToken(auth.currentAccessToken!);
+  return <String, dynamic>{
+    'token': next.value,
+    'expires_at': next.expiresAt?.toIso8601String(),
+  };
+}
+```
+
+And this route at the end of `register()` in `lib/routes/api.dart`:
+
+```dart
+Route.post('/auth/refresh', <dynamic>[
+  AuthMiddleware(),
+  (AuthController c) => c.refresh,
+]);
+```
+
+Run `dart run build_runner build`. The `tokens:manage` check keeps a script token from renewing itself.
+
+Try it. Log in first and keep the token in `TOKEN`.
+
+```bash
+curl -X POST localhost:3000/api/auth/refresh -H "Authorization: Bearer $TOKEN"
+# 200 {"token":"oat_6.-qAk...","expires_at":"2026-12-11T04:43:15.701944Z"}
+NEW_TOKEN='oat_6.-qAk...'
+
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
+# 401 {"code":"unauthorized","message":"Authentication failed"}
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $NEW_TOKEN"
+# 200 {"id":1,"name":"Ada",...}
+```
+
+`grace` is how long the old token still works. The default is zero: the old token ends at once, like above.
+You need a grace only when one client sends requests in parallel. Then a request that is on the way with the old token does not fail.
+Keep it short, a few seconds: `rotateAccessToken(token, grace: const Duration(seconds: 10))`.
 If the old token ends sooner than `grace`, it keeps its own end.
 
 The rules:
@@ -561,7 +592,7 @@ The rules:
 
 Safety notes:
 
-- A longer `grace` gives a stolen old token more time to be used. It can not make new tokens: a rotated token can not be rotated again.
+- A longer `grace` gives a stolen old token more time. In that time it works on every route, also the token routes, so it can make new tokens. Only rotate refuses it. Keep `grace` short, or zero.
 - Each rotate gives a full new life. So a client that rotates again and again stays logged in forever. To set a limit, check `createdAt` of the first token yourself, or ask for the password again after some time.
 
 Rotate needs the `rotated_at` column. A table made by `dox auth:tokens-table` has it.
@@ -1106,16 +1137,19 @@ Route.get('/login', <dynamic>[GuestMiddleware(redirectTo: '/dashboard'), (PageCo
 - Both take `guard:`, like `AuthMiddleware(guard: 'admin')`.
 - `req.can()` of [Authorization](authorization.md) also works on a page with `optional: true`.
 
-### Change the abilities of a token
+### Two-step login (2FA) {#change-the-abilities-of-a-token}
 
-`setAccessTokenAbilities` changes what an access token can do. The plain token stays the same.
-A two-step login (2FA) uses it. `dox_auth` does not make or check the code: your app does that.
+A two-step login asks for a password, then for a code (from a mail or an app).
+`dox_auth` does not make or check the code: your app does that.
+`setAccessTokenAbilities` helps: it replaces the abilities of a token. The plain token stays the same.
 
-The idea:
+This flow replaces the normal `attempt()` login of the [access token way](#access-tokens). An app has one login flow.
 
-1. Step one checks the password with `once()`. The token it gives has only `2fa:pending`. No `*`, no `2fa`.
-2. Step two checks the code, then gives the token the abilities of a full login: `2fa` and `tokens:manage`.
-3. Each route that needs the second step checks `tokenCan('2fa')`.
+How it works:
+
+1. Step one checks the password with `once()`. It gives a token with only `2fa:pending`. The token works 10 minutes.
+2. Step two checks the code. Then it gives the token the abilities of a full login (`*`, like `attempt()` gives), and rotates it. The client gets a new token with a full life. The step-one token ends at once.
+3. Each route that needs the second step uses the `requireTwoFactor` middleware. A `*` token passes it, a `2fa:pending` token does not.
 
 Add the DTO for the code:
 
@@ -1146,8 +1180,8 @@ import 'package:my_app/app/models/user/user.model.dart';
 
 @Inject()
 class TwoFactorController {
-  /// POST /api/auth/login, step one: check the password. The token can
-  /// only do step two.
+  /// POST /api/auth/login, step one: check the password. The token
+  /// works 10 minutes, and only for step two.
   Future<Map<String, dynamic>> login(DoxRequest req, LoginUser body) async {
     Auth auth = Auth(ip: req.ip());
     bool ok = await auth.once(<String, dynamic>{
@@ -1161,14 +1195,15 @@ class TwoFactorController {
       auth.user<User>()!,
       name: 'login',
       abilities: <String>['2fa:pending'],
+      expiresIn: const Duration(minutes: 10),
     );
     // send the code to the user here, for example by mail
     return <String, dynamic>{'token': token.value, 'two_factor': true};
   }
 
-  /// POST /api/auth/two-factor, step two: check the code, then give the
-  /// token the abilities of a full login.
-  Future<Map<String, bool>> verify(DoxRequest req, TwoFactorCode body) async {
+  /// POST /api/auth/two-factor, step two: check the code. Give a new
+  /// token for a full login. The step-one token ends.
+  Future<Map<String, dynamic>> verify(DoxRequest req, TwoFactorCode body) async {
     Auth auth = req.auth as Auth;
     AccessToken token = auth.currentAccessToken!;
     if (!token.abilities.contains('2fa:pending')) {
@@ -1177,18 +1212,25 @@ class TwoFactorController {
     if (!_codeIsGood(auth.user<User>()!, body.code)) {
       throw UnAuthorizedException(message: 'Wrong code');
     }
-    await auth.setAccessTokenAbilities(token, <String>['2fa', 'tokens:manage']);
-    return <String, bool>{'verified': true};
+    // all abilities, like a normal login. Rotate copies them.
+    await auth.setAccessTokenAbilities(token, <String>['*']);
+    // a new token with the expiresIn of the driver, like attempt() gives
+    AccessToken full = await auth.rotateAccessToken(token);
+    return <String, dynamic>{'token': full.value};
   }
 
-  /// Check the code with your own two-step code.
+  /// Check the code with your own two-step code. Make each code expire,
+  /// and limit the wrong tries per user.
   bool _codeIsGood(User user, String code) {
     throw UnimplementedError('check the two-step code');
   }
 }
 ```
 
-`verify` checks `abilities.contains('2fa:pending')`, not `tokenCan`, because `tokenCan` is also `true` for `*`. So only a step-one token can do step two.
+- `verify` checks `abilities.contains('2fa:pending')`, not `tokenCan`, because `tokenCan` is also `true` for `*`. So only a step-one token can do step two.
+- The order matters: `setAccessTokenAbilities` first, then `rotateAccessToken`. Rotate copies the abilities of the row, so the new token gets `*`.
+- After step two, the step-one token stops working. A copy of it, taken before step two, is of no use.
+- Rotate needs the `rotated_at` column. A table made by `dox auth:tokens-table` has it. See [A token table without `rotated_at`](#a-token-table-without-rotated_at).
 
 Add a middleware that needs the second step:
 
@@ -1200,23 +1242,40 @@ import 'package:dox_core/dox_core.dart';
 /// Put it after AuthMiddleware.
 dynamic requireTwoFactor(DoxRequest req) {
   Auth? auth = req.auth as Auth?;
-  if (auth == null || !auth.tokenCan('2fa')) {
+  if (auth == null || auth.currentAccessToken == null) {
+    throw UnAuthorizedException();
+  }
+  if (auth.currentAccessToken!.abilities.contains('2fa:pending')) {
     throw ForbiddenHttpException();
   }
   return req;
 }
 ```
 
-In `lib/routes/api.dart`:
+Then change the app in these steps:
 
-1. Add the imports at the top:
+1. In `AuthController.register`, give no token: the user logs in with the two steps after register. Replace the method with:
+
+    ```dart
+    /// POST /api/auth/register: make an account. Log in after it.
+    Future<DoxResponse> register(RegisterUser body) async {
+      User user = User()
+        ..name = body.name
+        ..email = body.email
+        ..password = await Hash.makeAsync(body.password);
+      await user.save();
+      return response(<String, dynamic>{'user': user}).statusCode(201);
+    }
+    ```
+
+2. In `lib/routes/api.dart`, add the imports at the top:
 
     ```dart
     import 'package:my_app/app/http/controllers/two_factor.controller.dart';
     import 'package:my_app/app/http/middleware/two_factor.middleware.dart';
     ```
 
-2. In `register()`, change the login route to the new controller, and add the step-two route under it. The rate limit stops a fast guess of the 6-digit code:
+3. In `register()` of `lib/routes/api.dart`, change the login route to the new controller, and add the step-two route under it. This removes the normal login. You can delete `AuthController.login`.
 
     ```dart
     Route.post('/auth/login', <dynamic>[
@@ -1230,7 +1289,9 @@ In `lib/routes/api.dart`:
     ]);
     ```
 
-3. Add `requireTwoFactor` after `AuthMiddleware()` on each route that needs the second step:
+    The rate limit slows down guessing of the code from one ip. It is not enough alone: your code check must also make each code expire, and limit the wrong tries per user.
+
+4. Add `requireTwoFactor` after `AuthMiddleware()` on each route of a logged-in user:
 
     ```dart
     Route.get('/auth/me', <dynamic>[
@@ -1242,33 +1303,38 @@ In `lib/routes/api.dart`:
 
     For many routes, use a group: `Route.middleware(<dynamic>[AuthMiddleware(), requireTwoFactor], () { ... });`.
 
-Then run `dart run build_runner build`.
+5. Run `dart run build_runner build`.
 
 Things to know:
 
-- A route without `requireTwoFactor` (or a `tokenCan('2fa')` check) still takes a step-one token. `AuthMiddleware` only checks that the token is good.
-- Everything else that gives a token must follow the same rule. `register` in the [auth controller](#2-write-the-auth-controller) gives `*`, so in an app with a two-step login, give `<String>['2fa:pending']` there too. The same is true for script tokens: add `2fa` to their abilities if their routes need the second step.
-- [Rotate](#rotate-a-token) keeps the abilities it finds. A step-one token also can not use the `refresh` route, because it has no `tokens:manage`.
-- `tokenCan` on the same `Auth` sees the new abilities at once. The next requests read them from the table.
+- A route without `requireTwoFactor` still takes a step-one token. `AuthMiddleware` only checks that the token is good. The routes with a `tokenCan` check (like `/tokens` and `/auth/refresh`) refuse it too, because it has no `*`.
+- A [script token](#script-tokens) has no `2fa:pending`, so it passes `requireTwoFactor`. Its own abilities still limit it. Only a full login token can make one, because `/tokens` needs `tokens:manage`.
+- Any other place in your app that gives a token must also give a step-one token, or check the code first.
+- `tokenCan` on the same `Auth` sees new abilities at once. The next requests read them from the table.
 - `setAccessTokenAbilities` throws an `UnAuthorizedException` (`401`) when the token is gone (revoked). It does not check the expiry. A token of another guard throws an `ArgumentError`. It works on a token table without the `rotated_at` column too.
 
 Try it, with the code check of your app in place:
 
 ```bash
+# step one, and keep the token in PENDING
 curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
   -d '{"email":"ada@example.com","password":"secret-pass"}'
 # 200 {"token":"oat_7.Ab1x...","two_factor":true}
-TOKEN='oat_7.Ab1x...'
+PENDING='oat_7.Ab1x...'
 
-curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $PENDING"
 # 403 {"code":"forbidden","message":"Forbidden"}
 
-curl -X POST localhost:3000/api/auth/two-factor -H "Authorization: Bearer $TOKEN" \
+# step two, and keep the new token in TOKEN
+curl -X POST localhost:3000/api/auth/two-factor -H "Authorization: Bearer $PENDING" \
   -H 'Content-Type: application/json' -d '{"code":"123456"}'
-# 200 {"verified":true}
+# 200 {"token":"oat_8.Zq9p..."}
+TOKEN='oat_8.Zq9p...'
 
 curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
 # 200 {"id":1,"name":"Ada",...}
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $PENDING"
+# 401 {"code":"unauthorized","message":"Authentication failed"}
 ```
 
 ### When the database fails
@@ -1496,7 +1562,7 @@ Old hashes keep their own cost, so they still work. Hash them again on the next 
 
 ```dart
 if (Auth.needsRehash(user.password!)) {
-  user.password = Hash.make(password);
+  user.password = await Hash.makeAsync(password);
   await user.save();
 }
 ```
@@ -1609,7 +1675,7 @@ Sessions:
 | `await forgetUser(id)` | drops this user from the `userCacheTtl` cache. Needs [revocation](#revoke-tokens) |
 | `await createAccessToken(user, name:, abilities:, expiresIn:)` | a new access token. `token.value` is the plain token. `abilities` default to `['*']`, `expiresIn` to the driver `expiresIn` |
 | `await rotateAccessToken(token, grace:, name:, expiresIn:)` | a new access token in place of `token`. See [Rotate a token](#rotate-a-token) |
-| `await setAccessTokenAbilities(token, abilities)` | changes the abilities of a token. See [Change the abilities of a token](#change-the-abilities-of-a-token) |
+| `await setAccessTokenAbilities(token, abilities)` | replaces the whole abilities list of a token. See [Two-step login](#change-the-abilities-of-a-token) |
 | `await accessTokens(user)` | all access tokens of the user, newest first |
 | `await revokeAccessToken(user, id)` | deletes one access token of the user. `false` when the user has no such token |
 | `await revokeAllAccessTokens(user)` | deletes all access tokens of the user. Gives how many |
