@@ -84,7 +84,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String createdColumn = createdAt != null ? _str(createdAt) : 'null';
     String updatedColumn = updatedAt != null ? _str(updatedAt) : 'null';
 
-    var r = _getRelationsCode(visitor);
+    var r = _getRelationsCode(visitor, _belongsToHasRelation(element));
     var map = _getCodeForToMap(visitor);
 
     String computedCode = _getCodeForComputedAndHooks(visitor);
@@ -298,7 +298,24 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     'MorphTo',
   ];
 
-  Map<String, String> _getRelationsCode(ModelVisitor visitor) {
+  /// `true` when the `belongsTo` the model sees has a `relation:`
+  /// parameter (a newer dox_orm). An older dox_orm does not get it, so the
+  /// code still compiles.
+  bool _belongsToHasRelation(ClassElement element) {
+    Element? function = element.firstFragment.libraryFragment.scope
+        .lookup('belongsTo')
+        .getter;
+    if (function is! ExecutableElement) return false;
+    for (FormalParameterElement p in function.formalParameters) {
+      if (p.name == 'relation') return true;
+    }
+    return false;
+  }
+
+  Map<String, String> _getRelationsCode(
+    ModelVisitor visitor,
+    bool belongsToRelation,
+  ) {
     String content = '';
     String mapResultContent = '';
     String mapQueryContent = '';
@@ -309,6 +326,12 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
       String onQuery = value['onQuery'] != null
           ? ", onQuery: ${visitor.className}.${value['onQuery']}"
+          : '';
+
+      /// the relation name, for OrmFlags.belongsToKeyFromRelation
+      String relation =
+          belongsToRelation && value['relationType'] == 'BelongsTo'
+          ? ', relation: ${_str(key.toString())}'
           : '';
 
       mapResultContent += "'$key': $getFunctionName,";
@@ -353,6 +376,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
           ${_getParamKeyValue(value, 'pivotRelatedForeignKey')}
           ${_getParamKeyValue(value, 'pivotTable')}
           ${_getPivotParams(value)}
+          $relation
           $onQuery,
         );
       }

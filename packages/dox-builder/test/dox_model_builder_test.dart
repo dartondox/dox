@@ -622,5 +622,56 @@ class Post {
       String yaml = File('build.yaml').readAsStringSync();
       expect(yaml, contains('defaults:\n      generate_for: ["lib/**"]'));
     });
+
+    group('belongsTo relation name |', () {
+      const String model = '''
+@DoxModel()
+class Post {
+  @BelongsTo(User)
+  User? author;
+
+  @HasMany(Comment)
+  List<Comment> comments = <Comment>[];
+}
+''';
+
+      test('a dox_orm without relation: gets no relation name', () async {
+        String out = await _generate(
+          model,
+          imports: "import 'orm.dart';",
+          files: <String, String>{
+            'a|lib/orm.dart': 'dynamic belongsTo(Object a, Object b) {}',
+          },
+        );
+        expect(out, isNot(contains('relation:')));
+      });
+
+      test('a dox_orm with relation: gets the field name', () async {
+        String out = await _generate(
+          model,
+          imports: "import 'orm.dart';",
+          files: <String, String>{
+            'a|lib/orm.dart':
+                'dynamic belongsTo(Object a, Object b, {String? relation}) {}',
+          },
+        );
+        String flat = out.replaceAll(RegExp(r'\s'), '');
+        expect(flat, contains("relation:'author'"));
+        // only belongsTo gets it
+        expect(RegExp('relation:').allMatches(flat), hasLength(1));
+      });
+
+      test('a hidden belongsTo gets no relation name', () async {
+        String out = await _generate(
+          model,
+          imports: "import 'orm.dart' hide belongsTo;",
+          files: <String, String>{
+            'a|lib/orm.dart':
+                'dynamic belongsTo(Object a, Object b, {String? relation}) {}',
+          },
+        );
+        expect(out, isNot(contains('relation:')));
+      });
+    });
   });
 }

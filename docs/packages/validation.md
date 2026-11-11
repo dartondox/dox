@@ -349,9 +349,17 @@ Validator.flags = const ValidationFlags.all();
 | `emptyStringsToNull` | Fluent schemas turn each `""` in the input into `null` before they check it. This also happens in nested maps and lists. So `""` fails a required field, and `.nullable()` gives `null`. |
 | `unicodeAlpha` | `alpha`, `alphaNumeric` and `alphaDash` accept Unicode letters and marks, like `José`. `alphaNumeric` and `alphaDash` also accept Unicode digits. This works for fluent schemas and DTOs. |
 | `shortInMessage` | The default `in` message is `The selected {field} is invalid`. It does not list the allowed values. |
+| `dtoAllErrors` | A DTO runs the rules of each field that has the right type, also when another field is missing or has the wrong type. So one request gets all its errors at once. The type and `required` errors come first (a nested DTO's errors at its field), then the rule errors. A list or map with a bad item skips its rules. |
+| `dtoRejectEmptyList` | A required `List` field of a DTO fails `required` on `[]`, and its other rules do not run. It does not apply to a nullable list, a list with a default, or a `Maybe<List>`. |
+| `dtoMaybeRejectsEmpty` | A `Maybe<T>` field of a DTO (with `T` not nullable) fails `required` when the key is sent with an empty value, like `""`. A missing key still gives `Maybe.missing()`. It does not apply to `Maybe<T?>`. A text of only spaces is a value and passes. With `@Trim` it becomes `""` and fails. |
 
 With a flag off, the check works as described in the rest of this page:
 `""` is text, the alpha rules take only `a-z`, `A-Z` and `0-9`, and the `in` message lists the allowed values.
+For DTOs: a missing field or a type error stops the rules of the other fields, `[]` passes a required list, and `""` in a `Maybe` field counts as not sent.
+
+The three DTO flags are read when the check runs.
+They need the DTO code from a `dox_builder` that knows them.
+Run `dart run build_runner build` once to make it.
 
 `emptyStringsToNull` is for fluent schemas.
 A DTO checked on its own keeps `""`; use `@Dto(emptyStringsToNull: true)` there.

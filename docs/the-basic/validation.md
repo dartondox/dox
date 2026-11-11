@@ -113,6 +113,7 @@ The Dart type decides. You do not write `required` or `nullable`.
     - Example: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` reads `page=abc` and `page=0` as `1`.
     - The field needs a default, a nullable type or a `Maybe` type. A `Maybe` field gets `Maybe.missing()`.
     - Errors from async rules (`@Unique`, `@Exists`, your `AsyncRule`) and from `validate()` are not dropped. They run later, on the built object, and still give `422`.
+- Three [opt-in flags](../packages/validation.md#opt-in-flags) make DTOs work more like Laravel: get all errors at once, reject `[]` in a required list, and reject `""` in a `Maybe` field.
 
 ### Missing or `null`? (for PATCH)
 
