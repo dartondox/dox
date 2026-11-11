@@ -178,6 +178,7 @@ Future<Map<String, dynamic>> show(DoxRequest req, Post post) async {
 ```
 
 `req.authorize` answers `401` for a guest and `403` for a user who may not do it.
+With the [`forbidGuest` flag](#auth-flags), a guest gets `403` too.
 
 ## On a route
 
@@ -201,7 +202,7 @@ When `Route.bind` finds nothing, the answer is `404`.
 
 The answers:
 
-- A guest who may not do it gets `401`.
+- A guest who may not do it gets `401`. With the [`forbidGuest` flag](#auth-flags), it is `403`.
 - A logged-in user who may not do it gets `403`.
 
 ## Guests
@@ -264,7 +265,34 @@ class PostPolicy extends Policy<User, Post> {
 }
 ```
 
-## In tests
+## Auth flags
+
+Some answers are opt-in.
+Turn them on with `flags:` in `AuthConfig`.
+All flags are off by default.
+
+```dart
+AuthConfig authConfig = AuthConfig(
+  defaultGuard: 'web',
+  guards: guards,
+  flags: const AuthFlags(forbidGuest: true, jsonNoRedirect: true),
+);
+```
+
+The flags:
+
+- `forbidGuest`: `req.authorize` and `Can` give a guest `403`, not `401`. The `403` has the message of the gate. `AuthMiddleware` runs first on most routes, and it still gives a guest `401`.
+- `jsonNoRedirect`: `AuthMiddleware(redirectTo: '/login')` gives a JSON or XHR client a `401`, not a redirect. A JSON client sends an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request still gets the redirect.
+
+`AuthFlags.all()` turns on every flag:
+
+```dart
+AuthConfig(defaultGuard: 'web', guards: guards, flags: const AuthFlags.all());
+```
+
+The flags are part of `AuthConfig`.
+`Auth.initialize(authConfig)` runs in the `setup()` of your auth provider, so every isolate gets the same flags.
+
 
 `Gate.flush()` removes all gates, policies and hooks.
 Call it in `setUp` when each test adds its own rules.
