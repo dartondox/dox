@@ -434,7 +434,7 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 
 Three things are different from Laravel:
 
-- `setVisibility()` and `getVisibility()` on a local disk change and read the file mode only when the disk has `'permissions': true`. Without it, `setVisibility()` does nothing on a local disk. Laravel always runs `chmod`. So a file you made private is not private on disk until you turn this on.
+- `setVisibility()` and `getVisibility()` on a local disk change and read the file mode only when the disk has `'permissions': true`. Without it, `setVisibility()` does nothing on a local disk, and `getVisibility()` gives the disk `visibility` (`public` by default). Laravel always runs `chmod`. So a file you made private is not private on disk until you turn this on.
 - Paths that Dox gives you start with `/`. This is true for `putFile`, `store`, `files`, `allFiles` and `directories`.
 - `put()` returns nothing. `download()` takes `name:` but no headers. For headers, use `response(await Storage().download(path)).header('Cache-Control', 'no-store')`.
 

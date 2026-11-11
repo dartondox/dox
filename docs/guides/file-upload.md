@@ -81,7 +81,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 
 ## 3. Write the controller
 
-`putFile` moves the upload to the disk with a new UUID name. It does not read the file into memory.
+`putFile` with a `RequestFile`, on the local disk, moves the upload temp file to a new UUID name (with `permissions` on, it streams it). It does not read it into memory.
 
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';

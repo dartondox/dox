@@ -120,8 +120,9 @@ It is off by default.
 In a Dox app, use `'permissions': true` in the disk map.
 `setVisibility` then runs `chmod` and `getVisibility` reads the mode of the file.
 The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`.
-`LocalPermissions` takes other modes. In a Dox app, the map has a `file` and a `dir` key, each with `public` and `private`. A key that is not one of these is ignored.
-Each mode must be an int from 0 to 0o777. A string like `'0644'`, a negative number or a bigger number throws `ArgumentError` when the disk is made.
+Without `permissions`, `setVisibility` does nothing, and `getVisibility` gives the disk `visibility`.
+`LocalPermissions` takes other modes. In a Dox app, the map has a `file` and a `dir` key, each with `public` and `private`. A mode that is not in the map keeps its default. A key that is not one of these is ignored.
+Each mode must be an int from 0 to 0x1ff (0777). A string like `'0644'`, a negative number or a bigger number throws `ArgumentError` when the disk is made.
 It is off by default. On Windows it does nothing.
 
 - The mode is set before the content is written. A private file is never readable by others, not even for a moment.

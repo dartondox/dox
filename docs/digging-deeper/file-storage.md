@@ -64,14 +64,14 @@ To make visibility the file mode, like Laravel, add `'permissions': true`. It is
 Then `setVisibility()` runs `chmod` and `getVisibility()` reads the mode of the file.
 The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`.
 To change them, give a map with a `file` and a `dir` key. Each has a `public` and a `private` mode. A mode that is not there keeps its default. A key that is not one of these is ignored.
-Each mode must be an int from 0 to 0o777. A string like `'0644'`, a negative number or a bigger number throws `ArgumentError` when the disk is made.
+Each mode must be an int from 0 to 0x1ff (0777). A string like `'0644'`, a negative number or a bigger number throws `ArgumentError` when the disk is made.
 Dart has no octal numbers, so write the modes in hex. `0x1a0` is `0640`, `0x1e8` is `0750`:
 
 ```dart
 'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'permissions': true},
 'private': <String, dynamic>{
   'driver': 'local',
-  'root': 'storage/private',
+  'root': 'storage-private',
   'visibility': 'private',
   'permissions': <String, dynamic>{
     'file': <String, int>{'public': 0x1a4, 'private': 0x1a0},
@@ -204,7 +204,7 @@ They read the file and write it back, so two writers at the same time can lose a
 
 `directoryExists('')` is always true on every disk: the empty path is the root.
 
-`putFile` with a `RequestFile`, on the local disk, moves the upload temp file. It does not read it into memory.
+`putFile` with a `RequestFile`, on the local disk, moves the upload temp file (with `permissions` on, it streams it). It does not read it into memory.
 
 An uploaded file can store itself. `store` gives it a new uuid name, like `putFile`. `storeAs` uses your name, like `putFileAs`, and replaces an old file with the same name. Both take `disk:`:
 
