@@ -127,7 +127,7 @@ dox make:migration create_blogs_table --sql    # .sql file
 ```
 
 - `-r` (or `--resource`) adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`. `--api` adds the same methods without `create` and `edit`.
-- `make:model` options: `-m` migration, `-c` controller, `-r` resource controller, `--api` resource controller without `create` and `edit`, `-f` factory, `-s` seeder, `-a` all of them. Join them, like `-mfs`. See [CLI reference](../reference/cli.md#dox-makemodel).
+- `make:model` options: `-m` migration, `-c` controller, `-r` resource controller, `--api` resource controller without `create` and `edit`, `-f` factory, `-s` seeder, `-a` migration, factory, seeder and resource controller. Join them, like `-mfs`. See [CLI reference](../reference/cli.md#dox-makemodel).
 - Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
 - After `make:controller` or `make:dto`, run `dox build_runner:build` (or keep `dox serve` running). See [Validation](../the-basic/validation.md).
 - The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.

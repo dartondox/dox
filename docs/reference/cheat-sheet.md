@@ -48,7 +48,7 @@ dox make:middleware Auth
 dox make:dto CreateBlog
 dox make:serializer Blog
 dox make:model Blog -m             # model + migration
-dox make:model Blog -a             # + factory, seeder, resource controller
+dox make:model Blog -a             # + migration, factory, seeder, resource controller
 dox make:migration create_blogs_table [--sql]
 dox make:job SendWelcomeEmail
 dox migrate                        # migration:run
