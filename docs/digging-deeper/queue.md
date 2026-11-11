@@ -58,6 +58,8 @@ QueueConfig queueConfig = QueueConfig(
 | `workerQueues` | `['default']` | the queues of the in-process worker |
 | `workerConcurrency` | `1` | jobs at once in the in-process worker |
 | `workerTimeoutGrace` | none | the `--timeout-grace` wait of the in-process worker, see [Retries and failed jobs](#retries-and-failed-jobs) |
+| `serializeSync` | `false` | opt-in: the `sync` driver saves the job and reads it back before it runs, see [Sync](#sync) |
+| `connections` | none | opt-in: more queue connections by name, see [Queue connections](#queue-connections) |
 
 !!! warning "Keep `retryAfter` bigger than your longest job"
     `retryAfter` is how Dox finds the job of a crashed worker.
@@ -429,6 +431,44 @@ dart run bin/queue.dart forget 6f1c0e...
 dart run bin/queue.dart flush
 ```
 
+### Control the job in handle()
+
+Inside `handle()`, a job can decide what happens next:
+
+| Call | What it does |
+| --- | --- |
+| `attempts()` | how many times a worker took the job. The first run gives 1 |
+| `release(delay)` | put the job back on its queue. It runs again after `delay` |
+| `fail(error)` | fail the job now, with no retry. `failed()` runs |
+| `delete()` | delete the job, with no retry and no `failed()` |
+
+```dart
+@override
+int get tries => 5;
+
+@override
+Future<void> handle() async {
+  ReportApi api = Dox().ioc.get<ReportApi>();
+  if (await api.isBusy()) {
+    release(Duration(seconds: 30));
+    return;
+  }
+  if (!await api.hasReport(reportId)) {
+    delete();
+    return;
+  }
+  await api.send(reportId);
+}
+```
+
+The worker does the call when `handle()` ends. When you call more than one, the last one wins.
+A call also wins over an error that `handle()` throws after it.
+
+`release()` counts as a try. Set `tries` (or `retryUntil`) high enough, or the next run fails.
+
+With `dispatchSync()`, `dispatchAfterResponse()` and the `sync` driver there is no queue.
+There `attempts()` is 1, `release()` and `delete()` do nothing, and `fail()` only runs `failed()`.
+
 ## Drivers
 
 | Driver | Where jobs are | Needs |
@@ -440,6 +480,16 @@ dart run bin/queue.dart flush
 ### Database
 
 Jobs are rows in the `jobs` table. Failed jobs are rows in `failed_jobs`.
+
+`failed_jobs.connection` has the name of the queue connection (see [Queue connections](#queue-connections)). It is NULL for the main connection.
+A `failed_jobs` table without this column works too. Then the name is not saved.
+To add the column, write a migration:
+
+```dart
+await schema.table('failed_jobs', (Table table) {
+  table.string('connection').nullable();
+});
+```
 
 - On Postgres, MySQL and MariaDB a worker takes a job with `SELECT ... FOR UPDATE SKIP LOCKED`. Many workers do not wait on each other.
 - On SQLite a worker takes a job with one `UPDATE ... RETURNING`. SQLite runs one write at a time, so this is safe. It is good for small apps.
@@ -477,6 +527,55 @@ A Lua script takes a job, so two workers never get the same one. Failed jobs are
 `dispatch()` runs the job at once and waits for it. There is no worker, no retry and no delay.
 When the job throws, `failed()` runs and `dispatch()` throws the error.
 Use it for tests and for local work.
+
+By default the sync driver runs the job object as it is.
+So a job that is not in `jobRegistry`, or a field that is not JSON, works here and fails later in the worker.
+Set `serializeSync: true` to save the job and read it back before it runs, the way a worker gets it:
+
+```dart
+Queue.configure(
+  QueueConfig(driver: 'sync', jobs: jobRegistry, serializeSync: true),
+);
+```
+
+Then `dispatch()` throws for such a job.
+
+## Queue connections
+
+One app can use more than one queue store.
+The config is the main connection. Add more in `connections`, by name:
+
+```dart
+QueueConfig queueConfig = QueueConfig(
+  driver: 'redis',
+  jobs: jobRegistry,
+  connections: <String, QueueConfig>{
+    'database': QueueConfig(driver: 'database'),
+  },
+);
+```
+
+Pick a connection when you dispatch:
+
+```dart
+await SendReport(reportId: 1).dispatch(connection: 'database');
+```
+
+With no `connection`, the job goes to the main connection.
+An unknown name throws an `ArgumentError`.
+
+Run a worker for each connection. Every command of `bin/queue.dart` takes `--connection`:
+
+```bash
+dart run bin/queue.dart work
+dart run bin/queue.dart work --connection=database
+dart run bin/queue.dart failed --connection=database
+```
+
+- An entry uses only `driver`, `redis`, `prefix`, `connection` (the dox_orm one), `retryAfter` and `serializeSync`. The `jobs` of the main config count for all connections.
+- The in-process worker (`workInProcess`) runs the jobs of the main connection only.
+- Two `database` connections on the same dox_orm connection share the `jobs` table. Give each one its own dox_orm connection.
+- `Queue.fake()` keeps the name in `PushedJob.connection`.
 
 ## Small apps: a worker in the web server
 
