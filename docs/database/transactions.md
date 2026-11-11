@@ -97,7 +97,8 @@ await QueryBuilder.transaction(() async {
 - It runs again only on a deadlock or a lock / serialization failure.
   Other errors are thrown at once.
 - When the last run fails too, its error is thrown.
-- The default is `1`: one run, no retry.
+- There is no wait between the runs.
+- The default is `1`: one run, no retry. `0` and below also run once.
 - Only the outermost transaction runs again.
   A nested transaction gives the error to the outer one.
 - `afterCommit()` functions of a failed run are dropped.
@@ -151,11 +152,20 @@ Limits:
 - The transaction holds one connection until you close it.
   When it is still open after `timeout` (default 1 minute), it is rolled back, so its connection is free again.
   Set your own: `QueryBuilder.beginTransaction(timeout: const Duration(seconds: 10))`.
+- After the timeout, `run()` and `commit()` throw a `StateError`. The work is lost.
 - On SQLite, other queries of the isolate wait until the transaction is closed.
-  So do not await a query outside `run()` while it is open: it waits until the timeout.
+  This is true for a plain query and for `QueryBuilder.transaction()` outside `run()`.
+  They wait until the transaction ends or times out.
+  So do not await them while it is open.
 - `beginTransaction()` throws a `StateError` inside a transaction of the same connection.
   Use `QueryBuilder.transaction()` for nested work.
 - Use the transaction only in the code that began it: the same request, job or test.
+
+!!! warning "Postgres: roll back after a database error"
+    On Postgres, a database error inside `run()` breaks the whole transaction.
+    Call `rollBack()` then.
+    A `commit()` saves nothing and gives no error, because the server answers COMMIT with ROLLBACK.
+    A plain `QueryBuilder.transaction()` works the same way when you catch a database error inside it.
 
 ## Run code after the commit
 

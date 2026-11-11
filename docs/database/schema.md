@@ -205,6 +205,8 @@ await schema.hasIndex('posts', <String>['state', 'created_at']);       // by col
 - The list must have all the columns of the index, in the same order.
 - The primary key is named `primary` on MySQL, MariaDB and SQLite.
   On Postgres it has its real name, like `posts_pkey`.
+- The name is compared like the database does.
+  MySQL, MariaDB and SQLite ignore the case. Postgres needs the exact case.
 
 ### Foreign keys
 
