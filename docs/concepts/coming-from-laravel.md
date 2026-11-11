@@ -364,6 +364,7 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | `php artisan optimize` | `dox build` (one native binary in `build/bundle`) |
 | `php artisan queue:work` | `dox queue:work` |
 | `php artisan schedule:work` | `dox schedule:work` |
+| `php artisan schedule:clear-cache` | `dox schedule:clear-cache` |
 
 The `make:*` and `migrate` commands are in the tables above. Two commands have no Laravel twin: `dox build_runner:build` makes the generated code, and `dox env:generate` makes the typed env class.
 See [Dox CLI](../digging-deeper/dox-cli.md).
