@@ -387,7 +387,13 @@ AppConfig appConfig = AppConfig(
 
 ### Laravel rule names in message keys
 
-Some Dox codes have another name in Laravel. A message key can use the Laravel name too. So `'name.min'` gives the message for the `min_length` error of `name`.
+Some Dox codes have another name in Laravel. With the opt-in flag `laravelMessageKeys`, a message key can use the Laravel name too. So `'name.min'` gives the message for the `min_length` error of `name`. Without the flag, only the Dox codes match.
+
+```dart
+Validator.flags = const ValidationFlags(laravelMessageKeys: true);
+```
+
+Set it in a provider's `setup()`, like the [other flags](../packages/validation.md#opt-in-flags).
 The error code in the response does not change: it is still `min_length`.
 
 At each step of the lookup, the Dox code is tried first, then the Laravel name. So `'name.min_length'` wins over `'name.min'`. A key with a path still wins over a key with only a code: `'name.min'` wins over `'min_length'`.
@@ -412,7 +418,7 @@ At each step of the lookup, the Dox code is tried first, then the Laravel name. 
 | `datetime` | `date` |
 
 This works in `@Dto(messages:)` and in a `MessageResolver`. A code with the same name in both (like `email` or `required`) needs nothing.
-Note: a message key `min` or `max` with no path fits text, list and file errors too, not only numbers.
+With the flag on, a message key `min` or `max` with no path fits text, list and file errors too, not only numbers.
 
 ## Custom rules
 

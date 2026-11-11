@@ -356,7 +356,7 @@ createUser.safeParse(input, messages: MessageResolver(messages: <String, String>
 A resolver for one call is used in place of the global one.
 Codes that it does not have get the built-in text, not the global text.
 
-A key can use the Laravel rule name too, like `name.min` for the `min_length` error. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys).
+With the flag `laravelMessageKeys`, a key can use the Laravel rule name too, like `name.min` for the `min_length` error. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys).
 
 To show a name for `{field}` in place of the key, give `attributes`:
 
@@ -393,9 +393,10 @@ Validator.flags = const ValidationFlags.all();
 | `dtoAllErrors` | A DTO runs the rules of each field that has the right type, also when another field is missing or has the wrong type. So one request gets all its errors at once. The type and `required` errors come first (a nested DTO's errors at its field), then the rule errors. A list or map with a bad item skips its rules. |
 | `dtoRejectEmptyList` | A required `List` field of a DTO fails `required` on `[]`, and its other rules do not run. It does not apply to a nullable list, a list with a default, or a `Maybe<List>`. |
 | `dtoMaybeRejectsEmpty` | A `Maybe<T>` field of a DTO (with `T` not nullable) fails `required` when the key is sent with an empty value, like `""`. A missing key still gives `Maybe.missing()`. It does not apply to `Maybe<T?>`. A text of only spaces is a value and passes. With `@Trim` it becomes `""` and fails. |
+| `laravelMessageKeys` | A custom message key can use the Laravel rule name of a code, like `name.min` for the `min_length` error. It works in `@Dto(messages:)` and in a `MessageResolver`. At each step of the lookup the Dox code wins. The error code does not change. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys). |
 
 With a flag off, the check works as described in the rest of this page:
-`""` is text, the alpha rules take only `a-z`, `A-Z` and `0-9`, and the `in` message lists the allowed values.
+`""` is text, the alpha rules take only `a-z`, `A-Z` and `0-9`, the `in` message lists the allowed values, and a message key matches only the Dox code.
 For DTOs: a missing field or a type error stops the rules of the other fields, `[]` passes a required list, and `""` in a `Maybe` field counts as not sent.
 
 The three DTO flags are read when the check runs.

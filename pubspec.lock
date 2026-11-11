@@ -234,12 +234,11 @@ packages:
     source: hosted
     version: "3.1.0"
   dox_validation:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: dox_validation
-      sha256: "2bc67273cce46cd33d4f01e71e7f6c687f6917479cc92570b8e8f5ebcdc23aab"
-      url: "https://pub.dev"
-    source: hosted
+      path: "/private/tmp/claude-501/-Users-zinkyawkyaw-projects-dox/ac814386-14dc-4d24-9281-8467d173aea8/scratchpad/dox-validation-rules"
+      relative: false
+    source: path
     version: "3.1.2"
   ffi:
     dependency: transitive
