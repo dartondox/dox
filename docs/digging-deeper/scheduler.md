@@ -91,10 +91,36 @@ s.call('report', () => SendReport().dispatch()).hourly();
 
 The task only puts the job on the queue. A queue worker runs it.
 
+### Processes and dox commands
+
+```dart
+s.exec('pg_dump', args: <String>['-f', 'backup.sql', 'mydb']).daily();
+s.command('queue:prune', args: <String>['--hours=48']).hourly();
+```
+
+`exec(executable, args: [...])` runs a process. No shell is used, so `|`, `>` and `*` are plain text.
+Use `s.exec('sh', args: <String>['-c', '...'])` when you need a shell.
+A non-zero exit code fails the task.
+Its stdin is closed, so a program that waits for input ends at once.
+With `timeout()`, the process gets SIGTERM when the time is up, and SIGKILL 5 seconds later (`Schedule.processGrace`).
+Only the process itself is killed. The children of a shell (`sh -c 'a | b'`) may live on.
+A stop of `work` waits for the process to end.
+
+`command(command, args: [...])` runs a `dox` command of your app, as the process `dox <command> <args>`.
+When `dox` is not on PATH, set its full path: `Schedule.doxExecutable = '/usr/local/bin/dox';`.
+
+The task name is the command line, like `dox queue:prune --hours=48`.
+It shows in the logs, the lock keys and `list`.
+So do not put a secret (like `--token=...`) in `args` without your own name: `s.command('sync', args: <String>['--token=$token'], name: 'sync')`.
+A name also lets you add the same command line twice.
+
+The output is dropped. Use the [output hooks](#output-hooks) to keep it.
+
 ## Frequencies
 
 | Method | Runs |
 | --- | --- |
+| `everySecond()` | every second. Also `everyTwoSeconds`, `everyFiveSeconds`, `everyTenSeconds`, `everyFifteenSeconds`, `everyTwentySeconds`, `everyThirtySeconds` |
 | `everyMinute()` | every minute (the default) |
 | `everyTwoMinutes()` | every 2 minutes |
 | `everyThreeMinutes()` | every 3 minutes |
@@ -123,6 +149,12 @@ The task only puts the job on the queue. A queue worker runs it.
 | `yearly()` | January 1st at 00:00 |
 | `yearlyOn(6, 1, '17:00')` | June 1st at 17:00. A day the month never has, like `yearlyOn(2, 30)`, throws |
 | `cron('*/5 9-17 * * 1-5')` | any 5 field cron expression |
+
+A task that runs every few seconds repeats inside each due minute.
+A frequency, the days, the filters and `timezone()` still decide if the minute is due: `s.call('poll', poll).everyFiveSeconds().between('09:00', '17:00')`.
+`when()` and `skip()` are checked before each repeat.
+A run that takes longer than its step skips the steps it missed.
+With such a task, `run` from cron stays until the end of the minute.
 
 You can limit the days. The order of the calls does not matter.
 
@@ -216,7 +248,7 @@ s.call('backup', backup).daily().skip(isHoliday);
 | `onOneServer()` | runs once per tick across isolates and servers. **On by default** |
 | `onEveryServer()` | runs on every process that runs the schedule |
 | `runInBackground()` | the next task of the same minute does not wait for this one |
-| `timeout(Duration(minutes: 5))` | counts the run as failed when it takes longer |
+| `timeout(Duration(minutes: 5))` | counts the run as failed when it takes longer. It kills the process of an `exec()` or `command()` task |
 
 ### withoutOverlapping
 
@@ -258,6 +290,7 @@ With one server you can ignore it.
 
 Dart can not stop a running function.
 After the timeout, the run counts as failed and the hooks run, but the work may go on.
+The process of an `exec()` or `command()` task is killed at the timeout.
 
 ## Hooks
 
@@ -283,6 +316,48 @@ Future<void> alertTeam(Object error, StackTrace stack) async {
 | `after` | after the task, always |
 
 An error in a task is logged and the next task still runs.
+
+### Output hooks
+
+These work on `exec()` and `command()` tasks. On a function task they do nothing.
+
+| Hook | What it does |
+| --- | --- |
+| `sendOutputTo('storage/logs/backup.log')` | writes the output (stdout and stderr) to the file. It replaces the file each run |
+| `appendOutputTo('storage/logs/backup.log')` | adds the output to the end of the file |
+| `onOutput((String output) {...})` | gets the output after the process ends |
+
+- The file gets the output as it comes. `onOutput` holds the whole output in memory, so do not use it for a very large output.
+- Two runs at the same time write to the same file. Use `withoutOverlapping()` or `appendOutputTo()`.
+- A file that can not be written fails the task. `onOutput` still gets the output first.
+- A throwing `onOutput` hook fails the task.
+- When more than one thing fails, the task fails with the first of: a non-zero exit code, an `onOutput` error, a file error.
+- After a timeout, the file and `onOutput` finish a bit later, after the failure hooks ran. An error there is lost.
+
+### Ping hooks
+
+```dart
+s
+    .call('backup', backup)
+    .daily()
+    .pingBefore('https://health.example.com/backup/start')
+    .pingOnSuccess('https://health.example.com/backup')
+    .pingOnFailure('https://health.example.com/backup/fail');
+```
+
+| Hook | Sends a GET request |
+| --- | --- |
+| `pingBefore(url)` | before the task |
+| `thenPing(url)` | after the task, always |
+| `pingOnSuccess(url)` | after the task worked |
+| `pingOnFailure(url)` | after the task failed |
+
+Each one also has an `If` form that takes a bool first, like `pingOnFailureIf(isProduction, url)`.
+
+- A ping fails after 10 seconds (`ScheduledTask.pingTimeout`), or on a status of 400 or more.
+- A failed ping is logged. It never fails the task.
+- A url that is not `http` or `https` throws an `ArgumentError` when the schedule is made.
+- In tests, replace the request: `ScheduledTask.sendPing = (Uri url) async {...};`.
 
 ## Run the schedule
 
@@ -322,6 +397,7 @@ The `dox` CLI runs the same file: `dox schedule:work`, `dox schedule:run`, `dox 
 `work` is a long running process. Run it next to your server, with the same deploy tool (systemd, Docker, Kubernetes).
 
 It wakes at each full minute and runs the due tasks.
+With a task that runs every few seconds, it also wakes inside the minute.
 On Ctrl+C or SIGTERM it starts no new task and waits for the running ones.
 A second signal stops it at once.
 

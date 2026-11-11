@@ -336,6 +336,8 @@ SocketIoServer(
 | `allowUpgrades` | `true` | let polling clients move to websocket |
 | `cors` | `null` | CORS headers for polling requests. It also checks the origin of websockets |
 | `allowedOrigins` | `null` | the sites that may connect, see [Allowed origins](#allowed-origins) |
+| `allowRequest` | `null` | a function that accepts or refuses each request, see [Allow requests and limit sessions](#allow-requests-and-limit-sessions) |
+| `maxSessions` | `null` | the most open sessions, see [Allow requests and limit sessions](#allow-requests-and-limit-sessions) |
 
 - `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
 - `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
@@ -356,6 +358,31 @@ ServerOptions(allowedOrigins: <String>['https://app.example.com']);
 - A list of sites: the same host and those sites can connect.
 - `['*']`: every site can connect.
 - Other sites get 403. A client with no `Origin` header (not a browser) is always allowed.
+
+### Allow requests and limit sessions
+
+`allowRequest` is a function that runs for every handshake and every websocket upgrade.
+It gets an `EngineRequest` (headers, query and address).
+It gives `true` or `false`, sync or async.
+`maxSessions` is the most open sessions.
+Set both in the `options` of `SocketIoConfig`:
+
+```dart title="lib/config/socketio.dart"
+SocketIoConfig socketIoConfig = SocketIoConfig(
+  options: ServerOptions(
+    allowRequest: (EngineRequest req) => req.query['key'] == 'secret',
+    maxSessions: 10000,
+  ),
+);
+```
+
+- When the function gives `false` or throws, the client gets `403` with `{"code":4,"message":"Forbidden"}`.
+- At the limit, a new handshake gets `503` with `{"code":3,"message":"Too many sessions"}`. Open sessions keep working.
+- The count is per isolate. With 4 isolates, the app allows 4 times `maxSessions`.
+- Keep the function fast. A slow function keeps a slot busy longer.
+- A browser client only sees a connect error. It does not see the `403` or `503` body.
+
+Both are `null` by default: all requests are allowed and there is no limit.
 
 ## Many servers: Redis adapter
 

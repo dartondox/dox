@@ -1011,6 +1011,78 @@ curl -b jar.txt localhost:3000/me
 
 A `POST` with no CSRF token gets `419` (`csrf_token_mismatch`).
 
+### End other sessions when the password changes
+
+By default, a session stays logged in after the user changes the password.
+So a stolen session still works.
+Turn on the `endSessionsOnPasswordChange` [flag](authorization.md#auth-flags) to fix this.
+The session then keeps a fingerprint of the password hash.
+When the hash changes, the session ends on its next request.
+The flag is off by default.
+
+```dart title="lib/config/auth.dart"
+AuthConfig authConfig = AuthConfig(
+  defaultGuard: 'web',
+  guards: guards,
+  flags: const AuthFlags(endSessionsOnPasswordChange: true),
+);
+```
+
+A password change now ends all sessions of the user, also the current one.
+When your app changes the password itself, keep the current session with `updateSessionPasswordHash`.
+Call it after `save()`:
+
+```dart
+user.password = await Hash.makeAsync(newPassword);
+await user.save();
+Auth().updateSessionPasswordHash(req, user);
+```
+
+A [rehash on login](#password-hash-cost) changes the hash too.
+Call `updateSessionPasswordHash` after that `save()` as well.
+
+Pass a fully loaded user to `updateSessionPasswordHash` and `loginSession`.
+A model from a `select()` with no password column looks like a user with no password.
+The session then ends on the next request.
+The user must be the user of the session. Another user throws an `ArgumentError`.
+The password column must give the same value on every read.
+A hook or cast that makes a new value each time ends every session.
+
+#### Log out other devices
+
+`logoutOtherDevices` ends all other sessions of the user and keeps this one.
+It checks the password, hashes it again and saves the user.
+It needs a session guard and the flag.
+
+```dart
+/// POST /logout-others: end the sessions on other devices.
+Future<Map<String, bool>> logoutOthers(DoxRequest req) async {
+  await (req.auth as Auth).logoutOtherDevices(req, req.input('password'));
+  return <String, bool>{'done': true};
+}
+```
+
+- A wrong password throws an `UnAuthorizedException` with status `401` and code `wrong_password`. Catch it to show an error on your form.
+- Without the flag, it throws a `StateError` and changes nothing.
+- When a model hook stops `save()`, it throws a `StateError`. The sessions do not change.
+- When `save()` throws, the old hash is put back on the model and the error is thrown again.
+- It checks a password, so put a limit on the route, like on a login. See [Login throttle](#login-throttle) and [Rate limiting](rate-limiting.md).
+
+#### Sessions made before the flag
+
+A session made while the flag was off has no fingerprint.
+It is not logged out.
+Its first request with the flag on stores the fingerprint.
+Until then, a password change does not end it.
+So a session stolen before you turned the flag on can stay.
+
+To end all old sessions once, change `APP_KEY` and do not put the old key in `previousKeys`.
+This also breaks other data made with the old key, like encrypted values and JWTs.
+With the `cache` session driver, you can clear the session store instead.
+
+A fingerprint made with a key in `previousKeys` still works.
+When you remove that key from `previousKeys`, sessions that still hold such a fingerprint are logged out.
+
 ## Test it
 
 `DoxTestClient` runs your app in the test. `withToken` sends `Authorization: Bearer <token>`.
@@ -1565,8 +1637,13 @@ Old hashes keep their own cost, so they still work. Hash them again on the next 
 if (Auth.needsRehash(user.password!)) {
   user.password = await Hash.makeAsync(password);
   await user.save();
+  // with a session login and the endSessionsOnPasswordChange flag:
+  // Auth().updateSessionPasswordHash(req, user);
 }
 ```
+
+With the [`endSessionsOnPasswordChange` flag](#end-other-sessions-when-the-password-changes), a new hash ends the other sessions of the user.
+Call `updateSessionPasswordHash` to keep the current one.
 
 `Auth.needsRehash(hash, rounds: 12)` checks against another cost. `Auth.hashCost(hash)` gives the cost of a hash.
 bcrypt reads at most 72 bytes. A longer password throws an `ArgumentError`, so limit the length in the DTO.
@@ -1603,6 +1680,8 @@ bcrypt reads at most 72 bytes. A longer password throws an `ArgumentError`, so l
 | `429` `Too many login attempts. Try again in <n> seconds.` | The [login throttle](#login-throttle). | Wait `retryAfter`. |
 | `419` `CSRF token mismatch` | A session `POST` without the CSRF token. | Send the `X-XSRF-TOKEN` header or the `_token` field. See [CSRF protection](csrf.md). |
 | `403` `Already logged in` | `GuestMiddleware` with no `redirectTo`, for a logged-in user. | Set `redirectTo`, or log out first. |
+| `401` `The password does not match the current password.` (`wrong_password`) | `logoutOtherDevices` with a wrong password. | Show an error on the form. |
+| `Bad state: logoutOtherDevices() needs the endSessionsOnPasswordChange flag` | `logoutOtherDevices` with the flag off. | Turn the flag on. See [End other sessions](#end-other-sessions-when-the-password-changes). |
 
 ## Good to know
 
@@ -1672,6 +1751,8 @@ Sessions:
 | `await attemptSession(req, credentials)` | checks the password like `attempt`, and keeps the user id in the session. Gives `true` or `false`. Session guard only |
 | `loginSession(req, user)` | keeps this user in the session, with no password check. Session guard only |
 | `logout(req)` | removes the session login and all session data. Session guard only |
+| `await logoutOtherDevices(req, password)` | checks the password, hashes it again, and ends all other sessions of the user. Session guard and the `endSessionsOnPasswordChange` flag only. See [End other sessions](#end-other-sessions-when-the-password-changes) |
+| `updateSessionPasswordHash(req, user)` | keeps the current session logged in after your app changed the password. Needs the `endSessionsOnPasswordChange` flag |
 | `await revokeToken(req)` | revokes the bearer token of this request. JWT (needs [revocation](#revoke-tokens)) or access token |
 | `await revokeAllTokens(id)` | revokes all JWTs of this user made before the current second. Needs [revocation](#revoke-tokens) |
 | `await forgetUser(id)` | drops this user from the `userCacheTtl` cache. Needs [revocation](#revoke-tokens) |
