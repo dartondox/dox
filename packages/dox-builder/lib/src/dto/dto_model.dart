@@ -188,8 +188,13 @@ class DtoField {
 
   final List<DtoRule> rules = <DtoRule>[];
 
-  /// `@RequiredIf` and `@RequiredWith`: checked when the value is missing.
+  /// `@RequiredIf`, `@RequiredWith` and the other `Required*` rules,
+  /// `@Filled` and `@Present`: checked when the value is missing.
   final List<DtoRule> requiredWhen = <DtoRule>[];
+
+  /// `@ExcludeIf` and `@ExcludeUnless`: when one applies, the field is
+  /// not read and gets its missing value.
+  final List<DtoRule> exclude = <DtoRule>[];
   bool trim = false;
 
   /// 0 as is, 1 lower case, 2 upper case
@@ -233,7 +238,16 @@ class DtoClass {
 
   /// `@Dto(emptyStringsToNull: true)`: `""` is read as `null`.
   bool emptyStringsToNull = false;
+
+  /// `@Dto(trim: true)`: every text field is trimmed.
+  bool trim = false;
+
+  /// `@Dto(coerce: true)`: JSON text is read as a number or a bool.
+  bool coerce = false;
   Map<String, String> messages = <String, String>{};
+
+  /// `@Dto(attributes:)`: the names shown for `{field}`.
+  Map<String, String> attributes = <String, String>{};
 
   /// The `validate(DtoErrors errors)` method, or null.
   MethodElement? validate;
@@ -288,7 +302,20 @@ class DtoReader {
     'UniqueItems',
   };
 
-  static const Set<String> dateRules = <String>{'After', 'Before'};
+  static const Set<String> dateRules = <String>{
+    'After',
+    'Before',
+    'AfterOrEqual',
+    'BeforeOrEqual',
+  };
+
+  /// The words a date rule takes, besides an ISO date and a key.
+  static const Set<String> dateWords = <String>{
+    'now',
+    'today',
+    'tomorrow',
+    'yesterday',
+  };
 
   static const Set<String> fileRules = <String>{
     'MaxSize',
@@ -305,6 +332,29 @@ class DtoReader {
   static const Set<String> requiredWhenRules = <String>{
     'RequiredIf',
     'RequiredWith',
+    'RequiredUnless',
+    'RequiredWithout',
+    'RequiredWithoutAll',
+    'Filled',
+    'Present',
+  };
+
+  /// Rules that skip a field, like `@ExcludeIf`.
+  static const Set<String> excludeRules = <String>{
+    'ExcludeIf',
+    'ExcludeUnless',
+  };
+
+  /// `Rule<T>` classes that check the whole field, also on a list: they
+  /// read the key next to the field, or check that it is empty.
+  static const Set<String> wholeFieldRules = <String>{
+    'Prohibited',
+    'ProhibitedIf',
+    'Different',
+    'GreaterThanField',
+    'GreaterThanOrEqualField',
+    'LessThanField',
+    'LessThanOrEqualField',
   };
 
   static const Set<String> textChanges = <String>{
@@ -347,6 +397,8 @@ class DtoReader {
     dto.strict = options?.getField('strict')?.toBoolValue() ?? false;
     dto.emptyStringsToNull =
         options?.getField('emptyStringsToNull')?.toBoolValue() ?? false;
+    dto.trim = options?.getField('trim')?.toBoolValue() ?? false;
+    dto.coerce = options?.getField('coerce')?.toBoolValue() ?? false;
     bool snake =
         (options?.getField('keyCase')?.variable?.displayName ?? 'snake') ==
         'snake';
@@ -358,6 +410,16 @@ class DtoReader {
       String? key = entry.key?.toStringValue();
       String? value = entry.value?.toStringValue();
       if (key != null && value != null) dto.messages[key] = value;
+    }
+    Map<DartObject?, DartObject?>? attributes = options
+        ?.getField('attributes')
+        ?.toMapValue();
+    for (MapEntry<DartObject?, DartObject?> entry
+        in attributes?.entries ??
+            const <MapEntry<DartObject?, DartObject?>>[]) {
+      String? key = entry.key?.toStringValue();
+      String? value = entry.value?.toStringValue();
+      if (key != null && value != null) dto.attributes[key] = value;
     }
 
     if (element.typeParameters.isNotEmpty) {
@@ -405,6 +467,8 @@ class DtoReader {
           '"${read.key}".',
         );
       }
+      // @Dto(trim: true) is @Trim() on each text field
+      if (dto.trim) read.trim = true;
       dto.fields.add(read);
     }
     for (FormalParameterElement param in constructor.formalParameters) {
@@ -420,6 +484,7 @@ class DtoReader {
     }
     _validateMethod(dto);
     _otherKeys(dto);
+    _dateKeys(dto);
     return dto;
   }
 
@@ -438,12 +503,27 @@ class DtoReader {
       for (DtoField field in dto.fields) field.name: field.key,
     };
     for (DtoField field in dto.fields) {
-      for (DtoRule rule in <DtoRule>[...field.requiredWhen, ...field.rules]) {
+      for (DtoRule rule in <DtoRule>[
+        ...field.requiredWhen,
+        ...field.rules,
+        ...field.exclude,
+      ]) {
         List<String> names = switch (rule.name) {
           'RequiredIf' ||
           'Same' ||
-          'Confirmed' => <String>[?rule.stringField('other')],
-          'RequiredWith' => <String>[
+          'Confirmed' ||
+          'RequiredUnless' ||
+          'ExcludeIf' ||
+          'ExcludeUnless' ||
+          'ProhibitedIf' ||
+          'Different' ||
+          'GreaterThanField' ||
+          'GreaterThanOrEqualField' ||
+          'LessThanField' ||
+          'LessThanOrEqualField' => <String>[?rule.stringField('other')],
+          'RequiredWith' ||
+          'RequiredWithout' ||
+          'RequiredWithoutAll' => <String>[
             for (DartObject item
                 in rule.value.getField('others')?.toListValue() ??
                     const <DartObject>[])
@@ -462,6 +542,35 @@ class DtoReader {
         }
       }
     }
+  }
+
+  /// A date rule with a key (not an ISO date or a word) compares with
+  /// another `DateTime` field of the DTO. Stop the build when there is
+  /// no such field.
+  void _dateKeys(DtoClass dto) {
+    for (DtoField field in dto.fields) {
+      for (DtoRule rule in field.rules) {
+        if (!dateRules.contains(rule.name)) continue;
+        String date = rule.stringField('date') ?? '';
+        if (dateWords.contains(date) || parseDate(date) != null) continue;
+        DtoField? other = dateField(dto, date);
+        if (other == null || other == field) {
+          dto.errors.add(
+            '@${rule.name} on ${dto.name}.${field.name} needs an ISO 8601 '
+            'date, \'now\', \'today\', \'tomorrow\', \'yesterday\' or the '
+            'input key of another DateTime field, not "$date".',
+          );
+        }
+      }
+    }
+  }
+
+  /// The `DateTime` field of [dto] with the input [key], or null.
+  static DtoField? dateField(DtoClass dto, String key) {
+    for (DtoField field in dto.fields) {
+      if (field.key == key && field.type.kind == DtoKind.date) return field;
+    }
+    return null;
   }
 
   void _validateMethod(DtoClass dto) {
@@ -668,14 +777,16 @@ class DtoReader {
         _fits(field, name, where, errors, <DtoKind>{DtoKind.string});
         continue;
       }
-      if (requiredWhenRules.contains(name)) {
+      if (requiredWhenRules.contains(name) || excludeRules.contains(name)) {
         if (!field.maybe && field.required) {
           errors.add(
             '@$name on $where does nothing: the field is always required. '
             'Make it nullable, a Maybe, or give it a default.',
           );
         }
-        field.requiredWhen.add(DtoRule(name, value, source));
+        (excludeRules.contains(name) ? field.exclude : field.requiredWhen).add(
+          DtoRule(name, value, source),
+        );
         continue;
       }
       if (!builtIn.contains(name)) continue;
@@ -812,10 +923,14 @@ class DtoReader {
     if (dateRules.contains(name)) {
       if (!_fits(field, name, where, errors, <DtoKind>{DtoKind.date})) return;
       String date = rule.stringField('date') ?? '';
-      if (date != 'now' && parseDate(date) == null) {
+      // a key of another field is checked when all fields are read
+      if (!dateWords.contains(date) &&
+          parseDate(date) == null &&
+          !RegExp(r'^[A-Za-z_][A-Za-z0-9_.-]*$').hasMatch(date)) {
         errors.add(
-          '@$name on $where needs an ISO 8601 date or \'now\', '
-          'not "$date".',
+          '@$name on $where needs an ISO 8601 date, \'now\', \'today\', '
+          '\'tomorrow\', \'yesterday\' or the input key of another '
+          'DateTime field, not "$date".',
         );
       }
       return;
@@ -852,7 +967,9 @@ class DtoReader {
     DartType checks = ruleSuper.typeArguments.first;
     TypeSystemLike system = TypeSystemLike(field.element.library);
     DtoType value = field.type;
-    if (value.kind == DtoKind.list && system.fits(value.item!.type, checks)) {
+    if (value.kind == DtoKind.list &&
+        !wholeFieldRules.contains(rule.name) &&
+        system.fits(value.item!.type, checks)) {
       rule.onItems = true;
     } else if (!system.fits(value.type, checks)) {
       errors.add(

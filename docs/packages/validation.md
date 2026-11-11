@@ -256,6 +256,34 @@ They use the same codes and messages as the DTO annotations. See the [rules refe
 
 - `requiredIf` and `requiredWith` come after `optional()` or `nullish()`.
   Then a missing, `null` or blank value is an error when the condition is true.
+
+More Laravel rules:
+
+```dart
+final ObjectSchema order = v.object(<String, Schema<Object?>>{
+  'type': v.string(),
+  'email': v.string().optional().requiredWithout(<String>['phone']),
+  'phone': v.string().optional(),
+  'fax': v.string().optional().requiredWithoutAll(<String>['email', 'phone']),
+  'company': v.string().optional().requiredUnless('type', 'person'),
+  'nick': v.string().optional().filled(),
+  'note': v.string().optional().present().nullable(),
+  'coupon': v.string().optional().prohibitedIf('type', 'guest'),
+  'debug': v.any().optional().prohibited(),
+  'terms': v.bool().accepted(),
+  'new_password': v.string().different('old_password'),
+  'id': v.string().ulid(),
+  'min_price': v.int(),
+  'max_price': v.int().gtField('min_price'),
+});
+```
+
+- `requiredUnless`, `requiredWithout`, `requiredWithoutAll`, `filled` and `present` come after `optional()`, like `requiredIf`.
+- `present()` needs the key. Add `.nullable()` to allow `null`.
+- `prohibited()` and `prohibitedIf()` pass a missing or empty value. Use them after `optional()`.
+- `gtField`, `gteField`, `ltField` and `lteField` compare with another key, like Laravel `gt:field`. A missing other key fails.
+- There is no fluent `exclude_if` and no `bail`. A fluent schema runs all rules of a value.
+- The rules are explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing).
 - `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
 - For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
 - `exists(table, column: 'id')`: the column default is `id`. For a number id column, use `v.int().exists('teams')`, not `v.string()`. Then text like `abc` is a type error, before any query.
@@ -327,6 +355,19 @@ createUser.safeParse(input, messages: MessageResolver(messages: <String, String>
 
 A resolver for one call is used in place of the global one.
 Codes that it does not have get the built-in text, not the global text.
+
+A key can use the Laravel rule name too, like `name.min` for the `min_length` error. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys).
+
+To show a name for `{field}` in place of the key, give `attributes`:
+
+```dart
+MessageResolver.global = MessageResolver(
+  attributes: <String, String>{'first_name': 'first name'},
+);
+// The first name is required
+```
+
+A DTO can give its own names with `@Dto(attributes:)`. See [Names for `{field}`](../the-basic/validation.md#names-for-field).
 
 For other languages, extend `MessageResolver` and override `resolve()`.
 See [Messages](../the-basic/validation.md#messages).

@@ -84,6 +84,13 @@ class DtoWriter {
         'static const Map<String, String> _m = ${literal.stringMap(dto.messages)};',
       )
       ..writeln();
+    if (dto.attributes.isNotEmpty) {
+      out
+        ..writeln(
+          'static const Map<String, String> _a = ${literal.stringMap(dto.attributes)};',
+        )
+        ..writeln();
+    }
     if (dto.strict) {
       // the key `@Confirmed` reads is not a field, but it is not unknown
       Set<String> keys = <String>{
@@ -158,7 +165,10 @@ class DtoWriter {
       ..writeln('@override')
       ..writeln(
         '${dto.name}? convert(Object? input, DtoState s, List<Object> p) {',
-      )
+      );
+    // @Dto(attributes:): the names for {field} in this DTO
+    if (dto.attributes.isNotEmpty) out.writeln('s.attributes(p, _a);');
+    out
       ..writeln('if (input is! Map) {')
       ..writeln('s.notObject(input, p, _m);')
       ..writeln('return null;')
@@ -182,9 +192,23 @@ class DtoWriter {
       out
         ..writeln('// ${field.name}: ${field.fieldCode}')
         ..writeln('Object? $c;');
+      // @ExcludeIf / @ExcludeUnless: the field is not read, as if it was
+      // not sent
+      String excluded = <String>[
+        for (DtoRule rule in field.exclude) '${rule.source}.appliesTo(input)',
+      ].join(' || ');
+      if (excluded.isNotEmpty) {
+        out
+          ..writeln('bool x$i = $excluded;')
+          ..writeln('if (x$i) {')
+          ..writeln('$c = undefined;')
+          ..writeln('} else {');
+      }
       if (field.orDefault) out.writeln('int f$i = s.issues.length;');
       String read = dto.emptyStringsToNull
-          ? 's.read(input, $key, emptyToNull: true)'
+          ? dto.trim
+                ? 's.read(input, $key, emptyToNull: true, trim: true)'
+                : 's.read(input, $key, emptyToNull: true)'
           : 's.read(input, $key)';
       _conv(out, field, field.type, read, 'p', key, c, 0);
       if (field.maybe) {
@@ -214,12 +238,13 @@ class DtoWriter {
       if (field.orDefault) {
         out.writeln('if (s.dropIssuesAfter(f$i)) $c = undefined;');
       }
+      if (excluded.isNotEmpty) out.writeln('}');
       // requiredWhen checks if the value is missing (blank text and an
       // empty list count as missing too). It runs after all fields are
       // converted, so it reads the converted value of a later field too.
       for (DtoRule rule in field.requiredWhen) {
         requiredWhen.writeln(
-          's.requiredWhen(${rule.source}, $c, input, p, $key, _m);',
+          '${excluded.isEmpty ? '' : 'if (!x$i) '}s.requiredWhen(${rule.source}, $c, input, p, $key, _m);',
         );
       }
     }
@@ -297,6 +322,8 @@ class DtoWriter {
     int depth,
   ) {
     String args = '$raw, $path, $key, _m';
+    // @Dto(coerce: true): JSON text becomes a number or a bool
+    String coerce = dto.coerce ? ', coerce: true' : '';
     switch (type.kind) {
       case DtoKind.string:
         List<String> options = <String>[
@@ -307,13 +334,13 @@ class DtoWriter {
         String extra = options.isEmpty ? '' : ', ${options.join(', ')}';
         out.writeln('$target = s.string($args$extra);');
       case DtoKind.integer:
-        out.writeln('$target = s.integer($args);');
+        out.writeln('$target = s.integer($args$coerce);');
       case DtoKind.decimal:
-        out.writeln('$target = s.decimal($args);');
+        out.writeln('$target = s.decimal($args$coerce);');
       case DtoKind.number:
-        out.writeln('$target = s.number($args);');
+        out.writeln('$target = s.number($args$coerce);');
       case DtoKind.boolean:
-        out.writeln('$target = s.boolean($args);');
+        out.writeln('$target = s.boolean($args$coerce);');
       case DtoKind.date:
         out.writeln('$target = s.date($args);');
       case DtoKind.file:
@@ -740,21 +767,43 @@ class DtoWriter {
         );
       case 'After':
       case 'Before':
+      case 'AfterOrEqual':
+      case 'BeforeOrEqual':
         String date = rule.stringField('date')!;
-        String other = 's.now';
-        if (date != 'now') {
-          other = '_d${_dates++}';
+        bool after = rule.name.startsWith('After');
+        bool orEqual = rule.name.endsWith('OrEqual');
+        String code = switch (rule.name) {
+          'After' => 'after',
+          'Before' => 'before',
+          'AfterOrEqual' => 'afterOrEqual',
+          _ => 'beforeOrEqual',
+        };
+        // `!isBefore` is on or after, `!isAfter` is on or before
+        String method = after == !orEqual ? 'isAfter' : 'isBefore';
+        String not = orEqual ? '!' : '';
+        String fail = f(code, code, <String, Object?>{'date': date});
+        DtoField? field = DtoReader.dateWords.contains(date)
+            ? null
+            : DtoReader.dateField(dto, date);
+        if (field != null) {
+          // another field: no value (or a bad one) passes
+          String c = 'c${dto.fields.indexOf(field)}';
+          return _Check('$c is! DateTime || $not$v.$method($c)', fail);
+        }
+        String other = switch (date) {
+          'now' => 's.now',
+          'today' => 'DateTime.utc(s.now.year, s.now.month, s.now.day)',
+          'tomorrow' => 'DateTime.utc(s.now.year, s.now.month, s.now.day + 1)',
+          'yesterday' => 'DateTime.utc(s.now.year, s.now.month, s.now.day - 1)',
+          _ => '_d${_dates++}',
+        };
+        if (other.startsWith('_d')) {
           int micros = DtoReader.parseDate(date)!.microsecondsSinceEpoch;
           _statics.add(
             'static final DateTime $other = DateTime.fromMicrosecondsSinceEpoch($micros, isUtc: true);',
           );
         }
-        String code = rule.name == 'After' ? 'after' : 'before';
-        String method = rule.name == 'After' ? 'isAfter' : 'isBefore';
-        return _Check(
-          '$v.$method($other)',
-          f(code, code, <String, Object?>{'date': date}),
-        );
+        return _Check('$not$v.$method($other)', fail);
       case 'MaxSize':
         String size = rule.stringField('size')!;
         int bytes = DtoReader.sizeOf(size)!;
