@@ -53,7 +53,9 @@ class ApiRouter extends Router {
 | Laravel | Dox |
 | --- | --- |
 | `php artisan make:controller BlogController` | `dox make:controller Blog` |
-| `php artisan make:controller BlogController --resource` | `dox make:controller Blog -r` |
+| `php artisan make:controller BlogController --resource` | `dox make:controller Blog -r` (or `--resource`) |
+| `php artisan make:controller BlogController --api` | `dox make:controller Blog --api` |
+| `php artisan make:controller BlogController --model=Blog` | `dox make:controller Blog --model=Blog` |
 | `public function show(Request $request, int $id)` | `Future<Blog?> show(DoxRequest req, int id)` |
 | `public function store(StoreBlogRequest $request)` | `Future<Blog> store(CreateBlog body)` |
 | constructor injection by the service container | constructor injection by the container: `@Inject()` above the class |
@@ -177,6 +179,8 @@ Values work like in Blade. `{{ true }}` prints `1`, a variable that does not exi
 | Laravel | Dox |
 | --- | --- |
 | `php artisan make:model Blog -m` | `dox make:model Blog -m` |
+| `php artisan make:model Blog -mcr` | `dox make:model Blog -mcr` |
+| `php artisan make:model Blog -a` | `dox make:model Blog -a` (migration, factory, seeder, resource controller) |
 | `class Blog extends Model` | `@DoxModel() class Blog extends BlogGenerator` |
 | `protected $table = 'blogs';` | `@DoxModel(table: 'blogs')` |
 | `protected $primaryKey = 'uid';` | `@DoxModel(primaryKey: 'uid')` |

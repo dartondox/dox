@@ -265,7 +265,9 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | `Command "<name>" not found.` | `dox help <name>` with an unknown command. | Run `dox help`. |
 | `<name> already exists` | A `make:*` file is already there. | Pick another name, or delete the file. |
 | `Folder name "<name>" already exist` | `dox create` into a folder that exists. | Pick another name. |
-| `Invalid option <x>, use -m or --migration` | `dox make:model` with another option. | Use `-m`. |
+| `Unknown option <x> for <command>.` | `dox make:model` or `dox make:controller` with an option it does not know. | Run `dox help <command>` to see the options. |
+| `<command> takes 1 name, got 2: <words>.` or `<command> takes 1 name, got 0.` | `dox make:model` or `dox make:controller` with no name (like `dox make:model -m`), or with an extra word after the name (like `dox make:model Pen extra`). | Give one name. |
+| `--model needs a value, like --model=Post.` | `dox make:controller` with `--model` and no model name. | Use `--model=Post`. |
 | `Invalid option <x>, use --step=<count>` | `dox migration:rollback` with another option. | Use `--step=2`. |
 | `Skip <file>: no class that extends Migration.` | A Dart file in `db/migration` has no migration class. | Add `class X extends Migration`, or move the file. |
 | `.env.example is missing.` | `dox env:generate` with no example file. | Make `.env.example`. |
