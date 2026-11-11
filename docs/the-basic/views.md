@@ -376,7 +376,7 @@ A template in `resources/views/components/` is also a tag with its name. A `.` i
 
 This prints `<button class="btn btn-big" type="submit">`.
 
-Only text, numbers and `true` are attributes. `true` prints the name alone, like `hidden`. `null`, `false`, lists, maps and objects are left out. You can still read any prop, like `$attributes.type`.
+Only text, numbers and `true` are attributes. `true` prints the name alone, like `hidden`. A number prints like `{{ }}`: `1.0` is `title="1"`, or `title="1.0"` with `bladeOutput: false`. `null`, `false`, lists, maps and objects are left out. You can still read any prop, like `$attributes.type`.
 
 `$attributes` keeps any attribute name, like `onclick`. So do not pass a map from the user as the props of a component.
 
@@ -639,7 +639,7 @@ The rule covers the variable on the left of `??` and `?.`. In `{{ a ?? b ?? 'x' 
 
 **`stringZeroIsFalse`**: the text `'0'` is false in `@if`, `@unless`, `@empty`, `?:`, `&&`, `||`, `!`, `@class`, `@checked`, `@selected`, `@disabled`, `@includeIf` and `@includeWhen`. Other text, like `'0.0'` or `'00'`, is still true. With `stringZeroIsFalse: false`, `'0'` is true, like any text that is not empty.
 
-**`bladeOutput`**: `{{ }}` and `{{{ }}}` print `true` as `1`, `false` as nothing, and a number with no fraction, like `10.0`, as `10`. The values of `@yield`, `@section` and `@method` are printed the same way. Joining text with `+` does not change: `{{ 'a' + true }}` is still `atrue`. With `bladeOutput: false`, `true` prints `true`, `false` prints `false`, and `10.0` prints `10.0`.
+**`bladeOutput`**: `{{ }}` and `{{{ }}}` print `true` as `1`, `false` as nothing, and a number with no fraction, like `10.0`, as `10`. The values of `@yield`, `@section` and `@method`, and the numbers in `$attributes`, are printed the same way. Joining text with `+` does not change: `{{ 'a' + true }}` is still `atrue`. With `bladeOutput: false`, `true` prints `true`, `false` prints `false`, and `10.0` prints `10.0`.
 
 ## Coming from Blade
 
