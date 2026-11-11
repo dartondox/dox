@@ -136,11 +136,11 @@ The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the app s
 String path = await Storage().putFile('images', file);  // a RequestFile
 Uint8List bytes = Uint8List.fromList(<int>[1, 2, 3]);
 String path2 = await Storage().putFile('images', bytes, extension: 'png');
-String same = await Storage().put('images', bytes, extension: 'png'); // like putFile
+String path3 = await Storage().put('images', bytes, extension: 'png'); // like putFile
+String path4 = await Storage().putFileAs('avatars', file, 'user-1.png'); // your own name
 
 // save to this exact path. String, List<int> or Stream<List<int>>
 await Storage().put('notes/a.txt', 'hello', exact: true);
-String path3 = await Storage().putFileAs('avatars', file, 'user-1.png'); // your own name
 
 Uint8List? found = await Storage().get(path);  // null when missing
 bool exists = await Storage().exists(path);           // files only
