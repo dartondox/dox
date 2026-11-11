@@ -482,6 +482,10 @@ List<Object?> answers = await io.serverSideEmitWithAck('reload-config', <Object?
 When a server does not answer in time, `serverSideEmitWithAck` throws an `AckTimeoutException`. Its `responses` holds the answers that came back.
 `onServerSideEmit` is also on namespaces: `io.of('/chat').onServerSideEmit(...)`.
 
+## Broadcasting
+
+To send events to public, private and presence channels, see [Broadcasting](../digging-deeper/broadcasting.md).
+
 ## Emit from other programs
 
 An emitter sends events to your clients without a Socket.IO server.

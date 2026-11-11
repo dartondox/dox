@@ -156,6 +156,7 @@ nav:
     - digging-deeper/queue.md
     - digging-deeper/mail.md
     - digging-deeper/notifications.md
+    - digging-deeper/broadcasting.md
     - digging-deeper/scheduler.md
     - digging-deeper/file-storage.md
     - digging-deeper/env.md
