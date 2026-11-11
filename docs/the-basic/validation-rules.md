@@ -47,6 +47,7 @@ For `String` fields (and `List<String>` items).
 | `@Email()` | `email` | `The {field} is not a valid email` | `format: email` |
 | `@Url()` | `url` | `The {field} must be a url` | `format: uri` |
 | `@Uuid()` | `uuid` | `The {field} is invalid uuid` | `format: uuid` |
+| `@Ulid()` | `ulid` | `The {field} must be a valid ULID` | `pattern` |
 | `@Ip()` | `ip` | `The {field} must be an ip address` | `anyOf` `ipv4` / `ipv6` |
 | `@Regex(r'[a-z]+')` | `regex` | `The {field} format is invalid` | `pattern` |
 | `@In(['a', 'b'])` | `in` | `The selected {field} is invalid. Valid options are {values}` | `enum` |
@@ -64,6 +65,7 @@ Details:
 - Length counts characters (Unicode code points). `é` counts as 1.
 - `@Url()` needs `http` or `https` and a host.
 - `@Uuid()` takes any version. Upper or lower case.
+- `@Ulid()` takes 26 Crockford base32 characters, upper or lower case, like Laravel `ulid`. The first one is `0` to `7`.
 - `@Regex(pattern, {message})` must match the **whole** value. You do not need `^` and `$`.
   The regex is checked when the generator runs. A bad regex stops the build.
 - `@Alpha()`, `@AlphaNumeric()` and `@AlphaDash()` use ASCII letters `a-z`, `A-Z`. `@AlphaDash()` also allows digits `0-9`, `-` and `_`.
@@ -109,6 +111,15 @@ These read another key of the same object. The other key is the input key, like 
 | `@Same('email')` | `same` | `The {field} must match {other}` |
 | `@RequiredIf('type', 'company')` | `required_if` | `The {field} is required when {other} is {values}` |
 | `@RequiredWith(['phone'])` | `required_with` | `The {field} is required when {others} is present` |
+| `@RequiredUnless('type', 'guest')` | `required_unless` | `The {field} is required unless {other} is {values}` |
+| `@RequiredWithout(['email'])` | `required_without` | `The {field} is required when {others} is not present` |
+| `@RequiredWithoutAll(['email', 'phone'])` | `required_without_all` | `The {field} is required when none of {others} are present` |
+| `@Different('old_password')` | `different` | `The {field} and {other} must be different` |
+| `@ProhibitedIf('type', 'guest')` | `prohibited_if` | `The {field} is prohibited when {other} is {values}` |
+| `@GreaterThanField('min_price')` | `greater_than` | `The {field} must be greater than {min}` |
+| `@GreaterThanOrEqualField('min_price')` | `min` | `The {field} must be greater than or equal {min}` |
+| `@LessThanField('max_price')` | `less_than` | `The {field} must be less than {max}` |
+| `@LessThanOrEqualField('max_price')` | `max` | `The {field} must be less than or equal {max}` |
 
 - `@Confirmed()` on `password` needs the key `password_confirmation` with the same value. The error is on `password`. Use `@Confirmed(other: 'password_again')` for another key.
   The DTO does not need a field for the confirmation key.
@@ -116,8 +127,64 @@ These read another key of the same object. The other key is the input key, like 
 - `@RequiredIf` and `@RequiredWith` work on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops.
 - `@RequiredIf('type', ['company', 'shop'])` takes a list: any of the values makes the field required. `"true"` matches `true`, `"1"` matches `1`. An enum value matches its name: `@RequiredIf('role', Role.admin)` matches `"admin"`.
 - `@RequiredWith(['phone', 'email'])`: the field is required when any of the keys is there and not empty.
+- `@RequiredUnless('type', 'guest')` is Laravel `required_unless`: the field is required unless `type` is `guest`. A missing `type` counts as `null`, so the field is required then. It takes a list of values like `@RequiredIf`.
+- `@RequiredWithout(['email'])`: the field is required when any of the keys is missing or empty. `@RequiredWithoutAll(['email', 'phone'])`: when all of them are missing or empty.
+- `@RequiredUnless`, `@RequiredWithout` and `@RequiredWithoutAll` follow the same rules as `@RequiredIf`: a nullable, `Maybe` or default field, and input keys.
+- `@Different('old_password')` is Laravel `different`. It compares the raw input like `@Same`. A missing other key passes.
+- `@ProhibitedIf('type', 'guest')` is Laravel `prohibited_if`: when `type` is `guest`, the field must be missing or empty. Empty is `null`, blank text, an empty list or an empty map. `0` and `false` fail. This is not the same as `@Prohibited()`, which fails on `null` and `[]`: Laravel does it this way too. It reads `type` and matches like `@RequiredIf`.
+- `@GreaterThanField`, `@GreaterThanOrEqualField`, `@LessThanField` and `@LessThanOrEqualField` are Laravel `gt`, `gte`, `lt` and `lte` with a field. They are for `int`, `double` and `num` fields. They read the raw input of the other key: a number, or number text from a form. Like Laravel, a missing other key (or one that is not a number) fails.
+  `{min}` and `{max}` in the message are the other key. They use the codes of `@GreaterThan`, `@Min`, `@LessThan` and `@Max`.
+- On a `List<T>` field, `@Different` checks the whole list, not each item. The field compare rules do not fit a list.
 - Missing means: not there, `null`, blank text, an empty list or an empty map.
 - They run in step 1, with the other "required" checks. `@Confirmed` and `@Same` run in step 2.
+
+## Present or missing
+
+These check if a key is sent and has a value. Like Laravel.
+
+| Annotation | Code | Message |
+| --- | --- | --- |
+| `@Filled()` | `filled` | `The {field} must have a value` |
+| `@Present()` | `present` | `The {field} must be present` |
+| `@Prohibited()` | `prohibited` | `The {field} is prohibited` |
+| `@Accepted()` | `accepted` | `The {field} must be accepted` |
+| `@Declined()` | `declined` | `The {field} must be declined` |
+
+- `@Filled()`: a missing key passes. A key that is sent must have a value: not `null`, not blank text, not an empty list.
+- `@Present()`: the key must be sent. Its value may be `null` or empty.
+- `@Filled()` and `@Present()` are for a nullable, `Maybe` or default field, like `@RequiredIf`. They run in step 1.
+- `@Prohibited()`: the key must be missing, or blank text like `""` or `"  "`. Any other sent value fails, also `null`, `[]`, `{}`, `0` and `false`. This is what Laravel's `prohibited` rule does by itself. It reads the raw input, so it runs before the type check, in step 1. It is for a nullable, `Maybe` or default field.
+- `@Accepted()` takes `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"`. `@Declined()` takes `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"`. The text is case sensitive, like Laravel.
+  Use them on a `bool` field with no default. Then a missing value fails with `required`. In a form, `yes` and `on` turn into `true` first. In a JSON body a `bool` field takes only `true` and `false`, unless the DTO has `@Dto(coerce: true)`.
+
+```dart
+@Accepted()
+final bool terms;
+
+@Present()
+final String? note; // the key must be there, null is fine
+```
+
+## Skip a field
+
+| Annotation | Does |
+| --- | --- |
+| `@ExcludeIf('type', 'person')` | when `type` is `person`, the field is skipped |
+| `@ExcludeUnless('type', 'company')` | unless `type` is `company`, the field is skipped |
+
+- A skipped field is not read and not checked. It gets its default, `null` or `Maybe.missing()`, as if it was not sent. Like Laravel `exclude_if` and `exclude_unless`, where the field is left out of the validated data.
+- They read the raw input of the other key, and match like `@RequiredIf` (also with a list of values).
+- `@ExcludeIf`: a missing other key does not skip. `@ExcludeUnless`: a missing other key counts as `null`, so the field is skipped.
+- They are for a nullable, `Maybe` or default field. On an always-required field the build stops.
+- There is no fluent version.
+
+```dart
+final String type;
+
+@ExcludeIf('type', 'person')
+@MinLength(5)
+final String? vatNumber; // not checked for a person
+```
 
 ## Change text
 
@@ -180,10 +247,25 @@ For `DateTime` fields.
 | --- | --- | --- | --- |
 | `@After('2000-01-01')` | `after` | `The {field} must be a date after {date}` | `format: date-time` |
 | `@Before('now')` | `before` | `The {field} must be a date before {date}` | `format: date-time` |
+| `@AfterOrEqual('today')` | `after_or_equal` | `The {field} must be a date after or equal to {date}` | `format: date-time` |
+| `@BeforeOrEqual('end_date')` | `before_or_equal` | `The {field} must be a date before or equal to {date}` | `format: date-time` |
 
-- The value is an ISO 8601 date, or `'now'` (the time of the request). A bad date text stops the build.
-- Both are exclusive: `@After('2000-01-01')` does not accept `2000-01-01T00:00:00Z`.
-- To compare two fields (end after start), use [`validate()`](validation.md#checks-across-fields-validate).
+- The value is one of:
+    - an ISO 8601 date, like `'2000-01-01'`,
+    - a word: `'now'` (the time of the request), `'today'`, `'tomorrow'` or `'yesterday'`. These are in UTC, and `'today'` is the start of the day,
+    - the input key of another `DateTime` field of the same DTO, like `'start_date'`.
+- With another field, the check uses its converted value. When that field has no value, the check passes.
+- A text that is not a date, a word or a `DateTime` field stops the build.
+- `@After` and `@Before` are exclusive: `@After('2000-01-01')` does not accept `2000-01-01T00:00:00Z`. `@AfterOrEqual` and `@BeforeOrEqual` accept the same time.
+- Words and other fields need one `build_runner` run.
+
+```dart
+final DateTime startDate;
+
+@After('start_date')
+@BeforeOrEqual('tomorrow')
+final DateTime endDate;
+```
 
 ## Files
 
@@ -259,7 +341,10 @@ In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int
 | `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
 | `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
 | `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
-| `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. |
+| `@Dto(trim: true)` | trims every `String` field and text item, like `@Trim()` on each. Default `false`. |
+| `@Dto(coerce: true)` | a JSON body may send text for numbers and bools, like a form. Default `false`. |
+| `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. A Laravel rule name works too, like `name.min`. See [Messages](validation.md#laravel-rule-names-in-message-keys). |
+| `@Dto(attributes: {...})` | the names shown for `{field}`, by key, like `{'first_name': 'first name'}`. See [Names for `{field}`](validation.md#names-for-field). |
 | `@Describe('...')` | on a field: a short text for the `description` of the field in the JSON Schema. It does not change the checks. |
 
 A `///` doc comment on a field becomes its `description` in the JSON Schema.
@@ -274,7 +359,7 @@ The OpenAPI docs and MCP tools (`McpDtoTool`) show it.
 
 How each field type reads input. The short table is in [Types](validation.md#types).
 
-- **JSON is strict.** In a JSON body, `"18"` is not an `int`. You get the error `integer`.
+- **JSON is strict.** In a JSON body, `"18"` is not an `int`. You get the error `integer`. With `@Dto(coerce: true)`, JSON is read like form text for `int`, `double`, `num` and `bool`, and a `bool` also takes `1` and `0`.
 - **Query and form data are text.** Dox turns the text into the field type first. If it can not, you get the type error.
 - `int` takes `18` or `18.0`, never a fraction. `"4.5"` or `4.5` gives `integer`.
 - `bool` in text takes `true`, `1`, `yes`, `on` and `false`, `0`, `no`, `off` (any case).
@@ -300,7 +385,7 @@ How each field type reads input. The short table is in [Types](validation.md#typ
 ## The order of checks
 
 1. Read the input and convert types. Change text (`@Trim`, `@Lowercase`, `@Uppercase`). Find missing required fields.
-2. The field rules, top to bottom.
+2. The field rules, top to bottom. The first rule that fails stops the other rules of that field, like Laravel `bail`. So there is no `@Bail`.
 3. The `validate()` method (nested DTOs first, then the parent).
 4. Async rules (`@Unique`, `@Exists`, your `AsyncRule`), one at a time, in field order.
 
@@ -318,9 +403,10 @@ The build stops with a clear error when:
 - a field type is not supported (see [Types](validation.md#types)),
 - a rule does not fit the field type (like `@Email()` on an `int`),
 - a `Maybe<T>` field has no `const Maybe.missing()` default,
-- `@RequiredIf` or `@RequiredWith` is on a field that is always required,
+- `@RequiredIf`, `@RequiredWith`, `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` or `@ExcludeUnless` is on a field that is always required,
 - `@OrDefault()` is on a field that is always required (no default, not nullable and not a `Maybe`),
-- `@RequiredIf`, `@RequiredWith`, `@Same` or `@Confirmed(other:)` names a Dart field (like `accountType`) instead of its input key (`account_type`),
+- a rule that reads another key (like `@RequiredIf`, `@Same`, `@Different`, `@ExcludeIf` or `@GreaterThanField`) names a Dart field (like `accountType`) instead of its input key (`account_type`),
+- `@After`, `@Before`, `@AfterOrEqual` or `@BeforeOrEqual` has a text that is not a date, a word or another `DateTime` field,
 - `@DateFormatted` has a letter it does not know,
 - two `@Dto` classes in the app have the same name,
 - the class is generic, or extends another class (other than `Object`).

@@ -740,6 +740,377 @@ class A {
     });
   });
 
+  group('DTO options and Laravel rules |', () {
+    /// The generated code of [source] with no spaces.
+    Future<String> code(String source) async {
+      String output = await _generate(source);
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      return output.replaceAll(RegExp(r'\s+'), '');
+    }
+
+    Future<void> expectError(String source, String message) async {
+      String output = await _generate(source);
+      expect(output, startsWith('ERROR'));
+      expect(output, contains(message));
+    }
+
+    const String plain = '''
+@Dto()
+class A {
+  final String name;
+  final List<String> tags;
+  final int age;
+  final bool on;
+  const A({required this.name, required this.tags, required this.age, required this.on});
+}''';
+
+    test('no option: no trim, coerce or names', () async {
+      String c = await code(plain);
+      expect(c, isNot(contains('trim:true')));
+      expect(c, isNot(contains('coerce')));
+      expect(c, isNot(contains('_a')));
+      expect(c, isNot(contains('s.attributes')));
+    });
+
+    test('@Dto(trim: true) trims each text field and item', () async {
+      String c = await code(plain.replaceFirst('@Dto()', '@Dto(trim: true)'));
+      expect(
+        c,
+        contains("s.string(s.read(input,'name'),p,'name',_m,trim:true)"),
+      );
+      expect(c, contains('s.string(c1[i0],q0,i0,_m,trim:true)'));
+      expect(c, contains("s.integer(s.read(input,'age'),p,'age',_m)"));
+      // with emptyStringsToNull, blank text is null too
+      c = await code(
+        plain.replaceFirst(
+          '@Dto()',
+          '@Dto(trim: true, emptyStringsToNull: true)',
+        ),
+      );
+      expect(c, contains("s.read(input,'name',emptyToNull:true,trim:true)"));
+    });
+
+    test('@Dto(coerce: true) reads JSON text as numbers and bools', () async {
+      String c = await code('''
+@Dto(coerce: true)
+class A {
+  final int age;
+  final double price;
+  final num size;
+  final List<bool> flags;
+  final String name;
+  const A({required this.age, required this.price, required this.size, required this.flags, required this.name});
+}''');
+      expect(
+        c,
+        contains("s.integer(s.read(input,'age'),p,'age',_m,coerce:true)"),
+      );
+      expect(
+        c,
+        contains("s.decimal(s.read(input,'price'),p,'price',_m,coerce:true)"),
+      );
+      expect(
+        c,
+        contains("s.number(s.read(input,'size'),p,'size',_m,coerce:true)"),
+      );
+      expect(c, contains('s.boolean(c3[i0],q0,i0,_m,coerce:true)'));
+      expect(c, contains("s.string(s.read(input,'name'),p,'name',_m)"));
+    });
+
+    test('@Dto(attributes:) names the fields in messages', () async {
+      String c = await code('''
+@Dto(attributes: <String, String>{'first_name': 'first name'})
+class A {
+  final String firstName;
+  const A({required this.firstName});
+}''');
+      expect(
+        c,
+        contains(
+          "staticconstMap<String,String>_a=<String,String>{'first_name':'firstname',};",
+        ),
+      );
+      expect(
+        c,
+        contains(
+          'convert(Object?input,DtoStates,List<Object>p){s.attributes(p,_a);if(inputis!Map)',
+        ),
+      );
+    });
+
+    test('@After and @Before take words and another field', () async {
+      String c = await code('''
+@Dto()
+class A {
+  final DateTime start;
+
+  @After('start')
+  @Before('tomorrow')
+  final DateTime end;
+
+  @AfterOrEqual('today')
+  @BeforeOrEqual('end')
+  final List<DateTime>? days;
+
+  @AfterOrEqual('2024-01-01')
+  @After('yesterday')
+  final Maybe<DateTime> at;
+
+  const A({required this.start, required this.end, this.days, this.at = const Maybe.missing()});
+}''');
+      expect(c, contains('if(!(c0is!DateTime||c1.isAfter(c0))){'));
+      expect(c, contains("params:const<String,Object?>{'date':'start'}"));
+      expect(
+        c,
+        contains(
+          'c1.isBefore(DateTime.utc(s.now.year,s.now.month,s.now.day+1)',
+        ),
+      );
+      expect(
+        c,
+        contains('!v.isBefore(DateTime.utc(s.now.year,s.now.month,s.now.day))'),
+      );
+      expect(
+        c,
+        contains('IssueCodes.afterOrEqual,DefaultMessages.afterOrEqual'),
+      );
+      expect(c, contains('if(!(c1is!DateTime||!v.isAfter(c1))){'));
+      expect(
+        c,
+        contains('IssueCodes.beforeOrEqual,DefaultMessages.beforeOrEqual'),
+      );
+      expect(
+        c,
+        contains('staticfinalDateTime_d0=DateTime.fromMicrosecondsSinceEpoch('),
+      );
+      expect(c, contains('!c3.isBefore(_d0)'));
+      expect(
+        c,
+        contains('c3.isAfter(DateTime.utc(s.now.year,s.now.month,s.now.day-1)'),
+      );
+    });
+
+    test('@After needs a date, a word or a DateTime field', () async {
+      await expectError('''
+@Dto()
+class A {
+  final String start;
+
+  @After('start')
+  final DateTime end;
+
+  const A({required this.start, required this.end});
+}''', '@After on A.end needs an ISO 8601 date');
+      await expectError('''
+@Dto()
+class A {
+  @Before('2024-13-01')
+  final DateTime end;
+  const A({required this.end});
+}''', 'not "2024-13-01"');
+      await expectError('''
+@Dto()
+class A {
+  @After('end')
+  final DateTime end;
+  const A({required this.end});
+}''', '@After on A.end needs an ISO 8601 date');
+    });
+
+    test('the new Required* rules, @Filled and @Present', () async {
+      String c = await code('''
+@Dto()
+class A {
+  final String? type;
+  final String? email;
+
+  @RequiredUnless('type', 'guest')
+  @RequiredWithout(<String>['email'])
+  final String? phone;
+
+  @RequiredWithoutAll(<String>['email', 'phone'])
+  @Filled()
+  final Maybe<String> fax;
+
+  @Present()
+  final String? note;
+
+  const A({this.type, this.email, this.phone, this.fax = const Maybe.missing(), this.note});
+}''');
+      expect(
+        c,
+        contains(
+          "s.requiredWhen(constRequiredUnless('type','guest'),c2,input,p,'phone',_m,);",
+        ),
+      );
+      expect(
+        c,
+        contains("s.requiredWhen(constRequiredWithout(<String>['email']),c2"),
+      );
+      expect(
+        c,
+        contains(
+          "s.requiredWhen(constRequiredWithoutAll(<String>['email','phone']),c3",
+        ),
+      );
+      expect(c, contains("s.requiredWhen(constFilled(),c3,input,p,'fax',_m)"));
+      expect(
+        c,
+        contains("s.requiredWhen(constPresent(),c4,input,p,'note',_m)"),
+      );
+      expect(c, isNot(contains('boolgetusesRequiredWhen=>false;')));
+    });
+
+    test('the new Required* rules need a field that can be missing', () async {
+      await expectError('''
+@Dto()
+class A {
+  @RequiredUnless('type', 'guest')
+  final String phone;
+  const A({required this.phone});
+}''', '@RequiredUnless on A.phone does nothing');
+      await expectError('''
+@Dto()
+class A {
+  final String? emailAddress;
+  @RequiredWithout(<String>['emailAddress'])
+  final String? phone;
+  const A({this.emailAddress, this.phone});
+}''', "'emailAddress' is a Dart field name. Use the input key 'email_address'.");
+    });
+
+    test('@ExcludeIf and @ExcludeUnless skip the field', () async {
+      String c = await code('''
+@Dto()
+class A {
+  final String? type;
+
+  @ExcludeIf('type', 'person')
+  @ExcludeUnless('type', <String>['company', 'shop'])
+  @RequiredIf('type', 'shop')
+  @MinLength(3)
+  final String? vat;
+
+  const A({this.type, this.vat});
+}''');
+      expect(
+        c,
+        contains(
+          "Object?c1;boolx1=constExcludeIf('type','person').appliesTo(input)||constExcludeUnless('type',<String>['company','shop',]).appliesTo(input);if(x1){c1=undefined;}else{c1=s.string(s.read(input,'vat'),p,'vat',_m);}",
+        ),
+      );
+      expect(
+        c,
+        contains("if(!x1)s.requiredWhen(constRequiredIf('type','shop'),c1"),
+      );
+      // the rules see `undefined`, so they do not run
+      expect(c, contains('if(c1isString){'));
+      await expectError('''
+@Dto()
+class A {
+  @ExcludeIf('type', 'person')
+  final String vat;
+  const A({required this.vat});
+}''', '@ExcludeIf on A.vat does nothing');
+      await expectError('''
+@Dto()
+class A {
+  @Prohibited()
+  final String debug;
+  const A({required this.debug});
+}''', '@Prohibited on A.debug can never pass: the field is always required');
+      await expectError(
+        '''
+@Dto()
+class A {
+  final String? type;
+  @ProhibitedIf('type', 'guest')
+  final String debug;
+  const A({this.type, required this.debug});
+}''',
+        '@ProhibitedIf on A.debug can not pass when its condition matches: the field is always required',
+      );
+    });
+
+    const String rules = '''
+class Different<T> extends Rule<T> {
+  const Different(this.other);
+  final String other;
+}
+class Accepted<T> extends Rule<T> {
+  const Accepted();
+}
+class GreaterThanField<T extends num> extends Rule<T> {
+  const GreaterThanField(this.other);
+  final String other;
+}
+''';
+
+    test('rules that read the next key check the whole list', () async {
+      String c = await code('''
+$rules
+@Dto()
+class A {
+  final List<String> old;
+
+  @Different('old')
+  @Accepted()
+  final List<String>? tags;
+
+  @Prohibited()
+  @ProhibitedIf('old', 'x')
+  final List<String>? gone;
+
+  @GreaterThanField('min')
+  final int max;
+  final int min;
+
+  const A({required this.old, this.tags, this.gone, required this.max, required this.min});
+}''');
+      expect(
+        c,
+        contains("constDifferent('old').check(c1,s.context(p,'tags',c1))"),
+      );
+      // @Prohibited reads the raw key, for every value
+      expect(
+        c,
+        contains("s.requiredWhen(constProhibited(),c2,input,p,'gone',_m)"),
+      );
+      expect(
+        c,
+        contains(
+          "s.requiredWhen(constProhibitedIf('old','x'),c2,input,p,'gone',_m",
+        ),
+      );
+      // a rule that does not read a key still checks each item
+      expect(c, contains("constAccepted().check(v,s.context(q,i,v))"));
+      expect(
+        c,
+        contains(
+          "constGreaterThanField('min').check(c3,s.context(p,'max',c3))",
+        ),
+      );
+      await expectError('''
+$rules
+@Dto()
+class A {
+  @GreaterThanField('min')
+  final List<int> max;
+  final int min;
+  const A({required this.max, required this.min});
+}''', '@GreaterThanField checks num');
+      await expectError('''
+$rules
+@Dto()
+class A {
+  @Different('oldName')
+  final String? name;
+  final String? oldName;
+  const A({this.name, this.oldName});
+}''', "@Different on A.name: 'oldName' is a Dart field name");
+    });
+  });
+
   group('DTO file rules |', () {
     // copies of the new annotations, so the test also runs against a
     // dox_validation release that does not have them yet

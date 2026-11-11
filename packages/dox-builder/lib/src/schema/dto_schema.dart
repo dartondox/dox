@@ -152,6 +152,8 @@ class DtoJsonSchema {
         return <String, dynamic>{'uniqueItems': true};
       case 'After':
       case 'Before':
+      case 'AfterOrEqual':
+      case 'BeforeOrEqual':
         return <String, dynamic>{'format': 'date-time'};
       case 'MaxSize':
         return <String, dynamic>{
