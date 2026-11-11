@@ -9,8 +9,13 @@
 # Env: PACKAGES (from ci/publish-order.sh). Needs python3 and network.
 set -euo pipefail
 
+if [ -z "${SELF_TEST:-}" ] && [ -z "${PACKAGES:-}" ]; then
+  echo "::error::PACKAGES is empty, nothing to check"
+  exit 1
+fi
+
 # shellcheck disable=SC2086 # one argument per package on purpose
-python3 - ${SELF_TEST:+--self-test} $PACKAGES <<'PY'
+python3 - ${SELF_TEST:+--self-test} ${PACKAGES:-} <<'PY'
 import json, re, sys, urllib.request
 
 def ver(s):
