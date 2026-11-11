@@ -66,7 +66,7 @@ The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELE
    If the package needs a newer sibling, raise that constraint by hand.
    Close the `## Unreleased` section of its `CHANGELOG.md`.
 2. Merge the release PR, then push the tag `<package>-v<version>`. This publishes that package to pub.dev.
-   Release in dependency order: `dox_annotation`, then `dox_builder`, `dox_cache`, `dox_core`.
+   Release in dependency order: `dox_annotation`, `dox_cache`, `dox_builder`, `dox_core`.
 3. Release the matching `dox-sample` template.
 
 A builder-only fix needs a `dox_builder` release only. It does not need a `dox_core` release.
@@ -86,6 +86,7 @@ A new package must first exist on pub.dev, so publish its first version by hand 
 2. It checks that the version in `packages/<folder>/pubspec.yaml` is the tag version.
    If not, it stops. Run `bin/bump.sh <package> <version>` and try again.
 3. It runs the tests. They must pass.
+   Then it checks that the sibling packages it needs are on pub.dev. If not, it stops: "release <dep> first".
 4. It checks that one package with a dry run, then publishes it.
 
 A tag for a version that is already on pub.dev is skipped.
@@ -113,13 +114,13 @@ On pub.dev:
 1. Open `https://pub.dev/packages/<name>/admin`.
 2. Under "Automated publishing", click "Enable publishing from GitHub Actions".
 3. Repository: `dartondox/dox`.
-4. Tag pattern: `v{{version}}`.
+4. Tag pattern: `<package>-v{{version}}`, like `dox_core-v{{version}}`. Each package has its own pattern.
 5. Tick "Require GitHub Actions environment" and set the environment to `pub.dev`.
 6. Save.
 
 On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`.
 The publish job runs in it.
-Optional: add yourself as a required reviewer, and allow only tags `v*`.
+Optional: add yourself as a required reviewer, and allow only the tags `dox_annotation-v*`, `dox_builder-v*`, `dox_cache-v*` and `dox_core-v*`.
 
 ## Packages in other repos
 

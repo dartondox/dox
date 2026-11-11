@@ -31,7 +31,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: publish-${{ github.ref_name }}
+  group: publish-${{ github.event_name }}-${{ github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -66,6 +66,9 @@ jobs:
       # so unpublished sibling versions resolve.
       - name: Resolve the workspace
         run: dart pub get
+      # A warning only here: in a dry run the siblings may be unreleased.
+      - name: Check the sibling packages are on pub.dev
+        run: ci/check-siblings.sh || echo "::warning::a sibling is not on pub.dev yet"
       - name: Dry run publish
         run: ci/publish-dry-run.sh
 
@@ -101,5 +104,8 @@ jobs:
         run: dart pub get
       - name: Check the package (dry run)
         run: ci/publish-dry-run.sh
+      # Stops when a sibling this package needs is not on pub.dev yet.
+      - name: Check the sibling packages are on pub.dev
+        run: ci/check-siblings.sh
       - name: Publish the package
         run: ci/publish.sh

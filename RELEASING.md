@@ -51,7 +51,8 @@ No package in this repo may depend on `dox_orm` or `dox_auth`. That would make a
 - Each package with changes has a `## Unreleased` section at the top of its `CHANGELOG.md`.
 - A package that was never published by the Release workflow needs automated publishing on pub.dev.
   Go to pub.dev → the package → Admin → Automated publishing → GitHub Actions.
-  Use repo `dartondox/dox`, tag pattern `v{{version}}` and environment `pub.dev`.
+  Use repo `dartondox/dox`, tag pattern `<package>-v{{version}}` (like `dox_core-v{{version}}`) and environment `pub.dev`.
+  A new package in `packages/` needs this pattern before its first tag.
   Without it, the Release workflow fails on that package.
   A package in another repo uses that repo name, like `dartondox/dox-orm`.
 
@@ -74,14 +75,14 @@ Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cac
 
 ## 2. Merge the release PR
 
-Open a PR from `release-x.y.z` into `main`.
+Open a PR from `release-<package>-x.y.z` into `main`.
 Wait for CI, then squash merge it.
 
 ## 3. Publish to pub.dev
 
 Tag the merge commit on `main`. The tag is `<package>-vx.y.z`. One tag publishes one package.
 If several packages changed, tag them one by one in dependency order:
-`dox_annotation`, then `dox_builder`, `dox_cache`, `dox_core`.
+`dox_annotation`, `dox_cache`, `dox_builder`, `dox_core` (the order of `bin/publish_order.py`).
 Wait until the run of one tag is done (and the package is on pub.dev) before you push the next tag.
 
 ```sh
@@ -92,7 +93,7 @@ git push origin dox_builder-vx.y.z
 
 The tag starts `.github/workflows/publish.yaml` (the "Release" workflow).
 It checks that the tag matches the version in `packages/<folder>/pubspec.yaml`.
-Then it runs the tests. Then it checks the package with `dart pub publish --dry-run`
+Then it runs the tests. Then it checks that every sibling it needs is on pub.dev (`ci/check-siblings.sh`; if not: "release <dep> first"). Then it checks the package with `dart pub publish --dry-run`
 (in the workspace, so it needs no wait for pub.dev).
 Then it uploads that one package, with `--skip-validation`.
 If pub.dev refuses an upload, it tries again every 15 seconds, for up to 10 minutes.
