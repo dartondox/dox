@@ -463,13 +463,17 @@ Values must be JSON types. `memory` is per isolate. See [Cache](../digging-deepe
 ## Storage
 
 ```dart
-String path = await Storage().putRequestFile('avatars', file); // '/avatars/<uuid>.png'
+String path = await Storage().putFile('avatars', file); // '/avatars/<uuid>.png'
+await Storage().put('notes/a.txt', 'hello');           // this exact path
 Uint8List? bytes = await Storage().get(path);
 await Storage().exists(path);
 await Storage().delete(path);
 String url = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
-await Storage().disk('s3').put('reports', bytes, extension: 'pdf');
-return Storage().download(path); // from a controller
+await Storage().copy(path, 'backup/a.png');
+List<String> files = await Storage().files('avatars');
+Uint8List report = Uint8List.fromList(<int>[1, 2, 3]);
+await Storage().disk('s3').put('reports/2026.pdf', report);
+return Storage().download(path, name: 'avatar.png'); // from a controller
 ```
 
 See [File storage](../digging-deeper/file-storage.md).

@@ -123,6 +123,8 @@ Options of each driver:
 | `local` | `url` | `String` | none | Base of the public URLs, like `http://localhost:3000/files`. |
 | `local` | `app_key` | `String` | `AppConfig.appKey` | Key that signs the URLs. |
 | `local` | `visibility` | `String` | `public` | `public` or `private`. |
+| `local` | `atomic_writes` | `bool` | `false` | Write to a temp file, then rename it. |
+| `local` | `permissions` | `bool` or `Map` | off | Visibility is the file mode. See [File storage](../digging-deeper/file-storage.md#config). |
 | `s3` | `bucket` | `String` | required | Bucket name. |
 | `s3` | `region` | `String` | `us-east-1` | Region. |
 | `s3` | `key` | `String` | required | Access key id. |
