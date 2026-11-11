@@ -86,7 +86,7 @@ The table shows the `message` text.
 | `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
 | `Invalid argument(s): invalid file` | `Storage().putFile()` with bytes and no `extension:`, and Dox can not find the type from the bytes. | Pass `extension: 'pdf'`. |
 | `403` `invalid or expired signature` | A `Storage.route()` URL without a valid `signature`, or after `expires`. | Make a new link with `Storage().signedUrl()`. |
-| `404` `file not found` | `Storage().stream()` or `download()` of a missing file. | Check the path. |
+| `404` `file not found` | `Storage().stream()`, `download()`, `copy()`, `move()`, `getVisibility()`, `setVisibility()`, `size()` or `lastModified()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
 | `400` `decrypt_failed`, `The encrypted value is not valid` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
@@ -173,7 +173,7 @@ The text has the form `<Exception>: <message> (key: "<key>")`.
 | `PermissionDeniedException: Permission denied` | The OS (local) or S3 (`403`) refused it. | Check file rights, or the S3 key and bucket policy. |
 | `InvalidKeyException: Invalid key: path traversal is not allowed` | A key with `..`. | Do not build keys from user input. |
 | `InvalidKeyException: Invalid key: absolute paths are not allowed` | A `Disk` key that starts with `/` or a drive letter. | Remove the first `/`. |
-| `InvalidKeyException: Invalid key: key is empty` | An empty key. | Pass a file name. |
+| `InvalidKeyException: Invalid key: key is empty` | An empty key. `Storage().deleteDirectory()` with `''`, `'/'` or `'.'` also gives it, because the root is refused. | Pass a file or folder name. |
 | `UnsupportedOperationException: urlBase and appKey are needed for signed URLs` | `signedUrl()` on a local disk with no `url`, or no `APP_KEY`. | Set both. |
 | `UnsupportedOperationException: S3 signed URLs must expire within 1 second and 7 days` | `signedUrl()` on S3 with a bad `expiresIn`. | Use a time up to 7 days. |
 | `UnsupportedOperationException: Disk "<name>" is not registered` | `Storage().disk('<name>')` with a missing disk. | Add the disk to `StorageConfig.disks`. |

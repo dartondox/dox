@@ -118,9 +118,16 @@ It is off by default.
 
 `LocalDriverConfig(permissions: LocalPermissions())` makes visibility the file mode, like Laravel.
 In a Dox app, use `'permissions': true` in the disk map.
-`setVisibility` then runs `chmod`, `getVisibility` reads the mode, and `put` and `putStream` set the mode.
-The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`. `LocalPermissions` takes other modes.
+`setVisibility` then runs `chmod` and `getVisibility` reads the mode.
+The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`. `LocalPermissions` takes other modes. In a Dox app, the map has a `file` and a `dir` key, each with `public` and `private`.
 It is off by default. On Windows it does nothing.
+
+- The mode is set before the content is written. A private file is never readable by others, not even for a moment.
+- A new file gets the visibility of the write, or the disk `visibility`. An overwrite keeps the mode of the file, unless the call gives a visibility. `copy` and `move` also keep the mode, unless a visibility is given.
+- Folders that a write creates get the folder mode. Folders that were there before, and the disk root, keep their mode.
+- `getVisibility` and `setVisibility` of a symlink throw `UnsupportedOperationException`.
+- When the `chmod` fails, a file that the write created is removed.
+- On every local disk, `copy` or `move` of a missing file throws `FileNotFoundException` and makes no folders.
 
 ## Use a disk
 

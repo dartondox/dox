@@ -471,7 +471,8 @@ await Storage().delete(path);
 String url = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
 await Storage().copy(path, 'backup/a.png');
 List<String> files = await Storage().files('avatars');
-await Storage().disk('s3').put('reports/2026.pdf', bytes);
+Uint8List report = Uint8List.fromList(<int>[1, 2, 3]);
+await Storage().disk('s3').put('reports/2026.pdf', report);
 return Storage().download(path, name: 'avatar.png'); // from a controller
 ```
 

@@ -61,9 +61,10 @@ The rename makes a new file. So the folder must be writable, the file gets the d
 
 A local disk has no per-file access rules by default. `setVisibility()` does nothing there, and `getVisibility()` gives the disk `visibility`.
 To make visibility the file mode, like Laravel, add `'permissions': true`. It is off by default.
-Then `setVisibility()` runs `chmod`, `getVisibility()` reads the mode, and every write sets the mode from its visibility.
+Then `setVisibility()` runs `chmod` and `getVisibility()` reads the mode.
 The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`.
-To change them, give a map. Dart has no octal numbers, so write them in hex. `0x1a0` is `0640`:
+To change them, give a map with a `file` and a `dir` key. Each has a `public` and a `private` mode. A key that is not there keeps its default. A wrong key is ignored with no error.
+Dart has no octal numbers, so write the modes in hex. `0x1a0` is `0640`, `0x1e8` is `0750`:
 
 ```dart
 'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'permissions': true},
@@ -72,10 +73,19 @@ To change them, give a map. Dart has no octal numbers, so write them in hex. `0x
   'root': 'storage/private',
   'visibility': 'private',
   'permissions': <String, dynamic>{
-    'file': <String, int>{'private': 0x1a0},
+    'file': <String, int>{'public': 0x1a4, 'private': 0x1a0},
+    'dir': <String, int>{'public': 0x1ed, 'private': 0x1e8},
   },
 },
 ```
+
+How it works:
+
+- The mode is set before the content is written. A private file is never readable by others, not even for a moment.
+- A new file gets the visibility of the write, or the disk `visibility`. An overwrite keeps the mode of the file, unless the call gives a visibility. `copy()` and `move()` also keep the mode, unless a visibility is given.
+- Folders that a write creates get the folder mode. Folders that were there before, and the disk root, keep their mode.
+- `getVisibility()` and `setVisibility()` of a symlink throw `UnsupportedOperationException`.
+- When the `chmod` fails, a file that the write created is removed.
 
 Windows has no `chmod`. There `permissions` does nothing.
 
@@ -123,11 +133,12 @@ await Storage().put('notes/a.txt', 'hello');
 
 // save with a new uuid file name, returns '/images/<uuid>.png'
 String path = await Storage().putFile('images', file);  // a RequestFile
+Uint8List bytes = Uint8List.fromList(<int>[1, 2, 3]);
 String path2 = await Storage().putFile('images', bytes, extension: 'png');
 String path3 = await Storage().putFileAs('avatars', file, 'user-1.png'); // your own name
 
-Uint8List? bytes = await Storage().get(path);  // null when missing
-bool found = await Storage().exists(path);            // files only
+Uint8List? found = await Storage().get(path);  // null when missing
+bool exists = await Storage().exists(path);           // files only
 bool gone = await Storage().missing(path);            // not exists()
 bool folder = await Storage().directoryExists('images');
 await Storage().delete(path);
@@ -170,9 +181,10 @@ It refuses the root (`''` or `/`) with `InvalidKeyException`, so a wrong path ca
 To empty a whole disk on purpose, use `Storage().use().deleteAll()`.
 
 `copy()` and `move()` replace an old file at the new path. On S3 the copy runs inside S3, so the bytes do not pass through your app.
-`copy()`, `move()`, `getVisibility()` and `setVisibility()` of a missing file answer `404`.
+`copy()`, `move()`, `getVisibility()` and `setVisibility()` of a missing file answer `404`. On a local disk, a `copy()` or `move()` of a missing file makes no folders.
 
-`setVisibility()` sets the ACL on S3. On a local disk it needs the `permissions` option, see [Config](#config).
+On S3, `setVisibility()` sets the ACL when `acl` is on (the default). With `'acl': false` (R2 and similar), `setVisibility()` does nothing, and `getVisibility()` gives the disk `visibility`, also for a missing file.
+On a local disk, `setVisibility()` needs the `permissions` option, see [Config](#config).
 
 On a local disk with no `url` option, `url()` gives `/storage/<path>` (no host). Dox serves it only when you add `Storage.route('storage', signed: false)`. `signedUrl()` still needs `url`.
 

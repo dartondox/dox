@@ -81,7 +81,7 @@ For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image(
 
 ## 3. Write the controller
 
-`putRequestFile` moves the upload to the disk with a new UUID name. It does not read the file into memory.
+`putFile` moves the upload to the disk with a new UUID name. It does not read the file into memory.
 
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';
@@ -93,7 +93,7 @@ class UploadController {
   /// POST /api/upload (multipart/form-data, field `image`)
   Future<Map<String, String>> store(UploadImage body) async {
     // saves the file as /images/<uuid>.<ext> on the default disk
-    String path = await Storage().putRequestFile('images', body.image);
+    String path = await Storage().putFile('images', body.image);
     String url = await Storage().url(path);
     return <String, String>{'path': path, 'url': url};
   }
@@ -103,7 +103,7 @@ class UploadController {
 !!! warning "Save the file before you return"
     A file bigger than 1 MB is written to a temp file while it arrives.
     Dox deletes that temp file when the response is sent.
-    So call `putRequestFile`, `store` or `moveTo` inside the controller, not later.
+    So call `putFile`, `store` or `moveTo` inside the controller, not later.
 
 ## 4. Add the routes
 
