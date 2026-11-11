@@ -44,5 +44,6 @@ class CacheFlags {
   /// `lock.block(timeout)` with no callback throws [LockTimeoutException]
   /// when the lock was not taken in time. Off: it gives false.
   /// `CacheLock.throwOnTimeout` wins over this flag.
+  // NEXT MAJOR: make this the default, then remove the flag.
   final bool lockThrows;
 }
