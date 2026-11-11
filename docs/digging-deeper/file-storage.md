@@ -13,7 +13,7 @@ import 'package:dox_storage/dox_storage.dart';
 
 Route.post('/avatar', (DoxRequest req) async {
   RequestFile file = req.input('avatar');
-  String path = await Storage().putRequestFile('avatars', file);
+  String path = await Storage().putFile('avatars', file);
   return <String, String>{'path': path}; // /avatars/<uuid>.png
 });
 ```
@@ -59,6 +59,26 @@ The rename makes a new file. So the folder must be writable, the file gets the d
 'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'atomic_writes': true},
 ```
 
+A local disk has no per-file access rules by default. `setVisibility()` does nothing there, and `getVisibility()` gives the disk `visibility`.
+To make visibility the file mode, like Laravel, add `'permissions': true`. It is off by default.
+Then `setVisibility()` runs `chmod`, `getVisibility()` reads the mode, and every write sets the mode from its visibility.
+The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`.
+To change them, give a map. Dart has no octal numbers, so write them in hex. `0x1a0` is `0640`:
+
+```dart
+'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'permissions': true},
+'private': <String, dynamic>{
+  'driver': 'local',
+  'root': 'storage/private',
+  'visibility': 'private',
+  'permissions': <String, dynamic>{
+    'file': <String, int>{'private': 0x1a0},
+  },
+},
+```
+
+Windows has no `chmod`. There `permissions` does nothing.
+
 The `s3` disk reads five keys that a new project does not have yet. Add them to
 `lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
 and the `s3` disk is only added when `AWS_BUCKET` is set. So the app starts without them:
@@ -89,7 +109,7 @@ class AppStorageProvider extends StorageProvider {
 
 | Driver | Options |
 | --- | --- |
-| `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility` |
+| `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility`, `atomic_writes`, `permissions` |
 | `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
 | `memory` | none. For tests |
 
@@ -98,15 +118,30 @@ The `s3` disk needs `bucket`, `key` and `secret`. When one is missing, the app s
 ## Functions
 
 ```dart
+// save to this exact path. String, List<int> or Stream<List<int>>
+await Storage().put('notes/a.txt', 'hello');
+
 // save with a new uuid file name, returns '/images/<uuid>.png'
-String path = await Storage().put('images', bytes, extension: 'png');
-String path2 = await Storage().putRequestFile('images', file);
-String path3 = await Storage().putRequestFileAs('avatars', 'user-1.png', file); // your own name
+String path = await Storage().putFile('images', file);  // a RequestFile
+String path2 = await Storage().putFile('images', bytes, extension: 'png');
+String path3 = await Storage().putFileAs('avatars', file, 'user-1.png'); // your own name
 
 Uint8List? bytes = await Storage().get(path);  // null when missing
 bool found = await Storage().exists(path);            // files only
+bool gone = await Storage().missing(path);            // not exists()
 bool folder = await Storage().directoryExists('images');
 await Storage().delete(path);
+
+await Storage().copy('notes/a.txt', 'backup/a.txt');
+await Storage().move('backup/a.txt', 'old/a.txt');
+
+List<String> files = await Storage().files('images');         // direct files only
+List<String> all = await Storage().allFiles('images');        // in sub-folders too
+List<String> folders = await Storage().directories('images'); // direct sub-folders
+await Storage().deleteDirectory('old');                       // the folder and its files
+
+await Storage().setVisibility(path, Visibility.private);
+Visibility visibility = await Storage().getVisibility(path);
 
 int size = await Storage().size(path);                 // throws when missing
 DateTime changed = await Storage().lastModified(path); // throws when missing
@@ -120,8 +155,24 @@ String signed = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10)
 String same = await Storage().temporaryUrl(path); // the same as signedUrl()
 
 // another disk
-await Storage().disk('s3').put('reports', bytes, extension: 'pdf');
+await Storage().disk('s3').put('reports/2026.pdf', bytes);
 ```
+
+`put()` writes to the exact path, and replaces an old file there.
+`putFile()` makes a new uuid name in the folder. For bytes, it finds the extension from the bytes, or you pass `extension:`.
+`putFileAs()` uses your name, and replaces an old file with the same name.
+
+`files()`, `allFiles()` and `directories()` give paths that start with `/`, like `putFile()`.
+On S3 and memory disks, a folder is there when a file is under it.
+
+`deleteDirectory()` deletes a folder and every file in it. A missing folder is not an error.
+It refuses the root (`''` or `/`) with `InvalidKeyException`, so a wrong path can not empty the disk.
+To empty a whole disk on purpose, use `Storage().use().deleteAll()`.
+
+`copy()` and `move()` replace an old file at the new path. On S3 the copy runs inside S3, so the bytes do not pass through your app.
+`copy()`, `move()`, `getVisibility()` and `setVisibility()` of a missing file answer `404`.
+
+`setVisibility()` sets the ACL on S3. On a local disk it needs the `permissions` option, see [Config](#config).
 
 On a local disk with no `url` option, `url()` gives `/storage/<path>` (no host). Dox serves it only when you add `Storage.route('storage', signed: false)`. `signedUrl()` still needs `url`.
 
@@ -137,9 +188,9 @@ They read the file and write it back, so two writers at the same time can lose a
 
 `directoryExists('')` is always true on every disk: the empty path is the root.
 
-`putRequestFile` on the local disk moves the upload temp file. It does not read it into memory.
+`putFile` with a `RequestFile`, on the local disk, moves the upload temp file. It does not read it into memory.
 
-An uploaded file can store itself. `store` gives it a new uuid name. `storeAs` uses your name, and replaces an old file with the same name. Both take `disk:`:
+An uploaded file can store itself. `store` gives it a new uuid name, like `putFile`. `storeAs` uses your name, like `putFileAs`, and replaces an old file with the same name. Both take `disk:`:
 
 ```dart
 RequestFile file = req.input('image');
@@ -148,9 +199,9 @@ String onS3 = await file.store('images', disk: 's3');
 String avatar = await file.storeAs('avatars', 'user-1.png');
 ```
 
-`storeAs` and `putRequestFileAs` use the name as it is. Do not use the file name from the client. Make your own name, like `user-1.png`.
+`storeAs` and `putFileAs` use the name as it is. Do not use the file name from the client. Make your own name, like `user-1.png`.
 
-`putRequestFile` and `file.store()` take the extension from the file name. When the bytes are a known format (png, jpg, pdf, zip, ...) that does not match the name, the extension of the bytes is used. So a png sent as `a.html` is saved as `.png` and is never served as a web page.
+`putFile` and `file.store()` take the extension of an upload from the file name. When the bytes are a known format (png, jpg, pdf, zip, ...) that does not match the name, the extension of the bytes is used. So a png sent as `a.html` is saved as `.png` and is never served as a web page.
 
 ### `stream` and `download`
 
@@ -167,10 +218,29 @@ Route.get('/report', (DoxRequest req) {
 Both read the file as a stream, from any disk, with `Content-Length`.
 A big file is never loaded into memory. A missing file answers `404`.
 
+`download()` saves the file with the last part of the path as its name. Pass `name:` to pick the name:
+
+```dart
+Route.get('/invoice', (DoxRequest req) {
+  return Storage().download('invoices/42.pdf', name: 'Invoice 42.pdf');
+});
+```
+
+Any name is safe in the header. Quotes are escaped, a new line becomes `_`, and a name like `résumé.pdf` is also sent as `filename*=UTF-8''r%C3%A9sum%C3%A9.pdf`.
+
+To add headers, put the download in a `response()`:
+
+```dart
+Route.get('/invoice', (DoxRequest req) async {
+  DownloadableFile file = await Storage().download('invoices/42.pdf');
+  return response(file).header('Cache-Control', 'no-store');
+});
+```
+
 ### Full disk API
 
-`Storage().use('s3')` returns the `dox_storage` `Disk`: `copy`, `move`, `listAll`, `getMetaData`,
-`putStream`, `setVisibility` and more. See [dox_storage](../packages/storage.md).
+`Storage().use('s3')` returns the `dox_storage` `Disk`: `listAll` with pages, `getMetaData`,
+`putStream`, `deleteAll`, write options and more. See [dox_storage](../packages/storage.md).
 
 ## Serve local signed URLs
 
@@ -205,5 +275,5 @@ Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register
 
 ```dart
 Storage.manager.register('dropbox', DropboxDriver());
-await Storage().disk('dropbox').put('notes', bytes, extension: 'txt');
+await Storage().disk('dropbox').put('notes/a.txt', 'hello');
 ```

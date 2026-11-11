@@ -181,7 +181,7 @@ test('saves the report', () async {
 
   String path = await Storage()
       .disk('s3')
-      .put('reports', <int>[1, 2, 3], extension: 'pdf'); // '/reports/<uuid>.pdf'
+      .putFile('reports', <int>[1, 2, 3], extension: 'pdf'); // '/reports/<uuid>.pdf'
 
   expect(await fake.exists(path.substring(1)), isTrue);
   Storage.manager.restore('s3');

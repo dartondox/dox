@@ -414,15 +414,22 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 | Laravel | Dox |
 | --- | --- |
 | `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageProvider` (`dox_storage`) |
-| `Storage::put('a.txt', $bytes)` | `await Storage().put('files', bytes, extension: 'txt')` (a uuid file name) |
-| `$request->file('f')->store('avatars')` | `await file.store('avatars')` or `Storage().putRequestFile('avatars', file)` |
+| `Storage::put('a.txt', $bytes)` | `await Storage().put('a.txt', bytes)` |
+| `Storage::putFile('avatars', $file)` | `await Storage().putFile('avatars', file)` |
+| `Storage::putFileAs('avatars', $file, 'u1.png')` | `await Storage().putFileAs('avatars', file, 'u1.png')` |
+| `$request->file('f')->store('avatars')` | `await file.store('avatars')` |
+| `$request->file('f')->storeAs('avatars', 'u1.png')` | `await file.storeAs('avatars', 'u1.png')` |
 | `Storage::get($path)` | `await Storage().get(path)` |
-| `Storage::exists($path)` | `await Storage().exists(path)` |
+| `Storage::exists($path)` / `missing($path)` | `await Storage().exists(path)` / `missing(path)` |
 | `Storage::delete($path)` | `await Storage().delete(path)` |
+| `Storage::copy($from, $to)` / `move($from, $to)` | `await Storage().copy(from, to)` / `move(from, to)` |
+| `Storage::files($dir)` / `allFiles($dir)` | `await Storage().files(dir)` / `allFiles(dir)` |
+| `Storage::directories($dir)` / `deleteDirectory($dir)` | `await Storage().directories(dir)` / `deleteDirectory(dir)` |
+| `Storage::setVisibility($path, 'private')` | `await Storage().setVisibility(path, Visibility.private)` |
 | `Storage::url($path)` | `await Storage().url(path)` |
 | `Storage::temporaryUrl($path, now()->addMinutes(10))` | `await Storage().signedUrl(path, expiresIn: Duration(minutes: 10))` |
 | `Storage::disk('s3')` | `Storage().disk('s3')` |
-| `Storage::download($path)` | `return Storage().download(path);` |
+| `Storage::download($path, $name)` | `return Storage().download(path, name: name);` |
 | drivers: local, s3, ftp, sftp | drivers: `local`, `s3` (also R2, MinIO, Spaces), `memory` |
 
 See [File Storage](../digging-deeper/file-storage.md).

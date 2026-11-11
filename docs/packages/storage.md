@@ -54,7 +54,7 @@ import 'package:dox_storage/dox_storage.dart';
 
 Route.post('/avatar', (DoxRequest req) async {
   RequestFile file = req.input('avatar');
-  String path = await Storage().putRequestFile('avatars', file);
+  String path = await Storage().putFile('avatars', file);
   return <String, String>{'path': path}; // /avatars/<uuid>.png
 });
 ```
@@ -116,6 +116,12 @@ In a Dox app, use `'atomic_writes': true` in the disk map.
 A failed or stopped upload then never leaves a partial file, and the old file stays. Temp file names end with `.dox-upload.tmp`, and `listAll()` hides them.
 It is off by default.
 
+`LocalDriverConfig(permissions: LocalPermissions())` makes visibility the file mode, like Laravel.
+In a Dox app, use `'permissions': true` in the disk map.
+`setVisibility` then runs `chmod`, `getVisibility` reads the mode, and `put` and `putStream` set the mode.
+The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`. `LocalPermissions` takes other modes.
+It is off by default. On Windows it does nothing.
+
 ## Use a disk
 
 In a Dox app, get a disk with `Storage().use('s3')`. Without Dox, use `drive.use('s3')`.
@@ -141,7 +147,13 @@ bool folder = await disk.directoryExists('reports');
 await disk.copy('a.png', 'b.png');
 await disk.move('b.png', 'c.png');
 await disk.delete('c.png');
-await disk.deleteAll('avatars'); // every file under this prefix
+bool gone = await disk.missing('c.png');
+await disk.deleteAll('avatars'); // every file under this prefix, '' for all
+await disk.deleteDirectory('reports'); // never the root
+
+List<String> files = await disk.files('avatars');         // direct files
+List<String> all = await disk.allFiles('avatars');        // in sub-folders too
+List<String> folders = await disk.directories('avatars'); // direct sub-folders
 
 ListResult page = await disk.listAll('avatars', ListOptions(recursive: true, limit: 100));
 // next page: ListOptions(paginationToken: page.paginationToken)
@@ -155,6 +167,8 @@ Visibility v = await disk.getVisibility('avatars/1.png');
 - `append` and `prepend` keep the visibility and content type of the file.
 - `append` and `prepend` read the file and write it back. They are not atomic, so two writers at the same time can lose a write.
 - `makeDirectory` makes the folder and its parent folders on a local disk. On any other disk it does nothing, because those disks have no real folders.
+- `files`, `allFiles` and `directories` give keys, like `avatars/1.png`. They read every page of `listAll`.
+- `deleteDirectory` deletes a folder and its files. The root (`''` or `/`) throws `InvalidKeyException`. `deleteAll()` empties the whole disk.
 - `directoryExists` is true when a folder exists. On a local disk it checks the real folder. On S3 and memory disks, a folder exists when a file is under it. `exists` is true for files only.
 
 ### Save an upload
