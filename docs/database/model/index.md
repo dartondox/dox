@@ -258,10 +258,10 @@ Blog created = await Blog().create(<String, dynamic>{
 - `save()` returns `true` when it saved, and `false` when a [model event](events.md) cancels it.
 - `blog.update(<String, dynamic>{...})` on a loaded model changes only that row and sets `updated_at` too. It fires no model events.
 
-!!! note "`create()` and `save()` are not the same"
-    On a model without [events](events.md), `create()` inserts the map as it is.
-    It does not run `beforeSave`, and it does not set `created_at` and `updated_at`.
-    Use `save()` when you need them, or put the values in the map.
+!!! note "`create()` works like `save()` on a new model"
+    `create()` fills a new model from the map, so only the `@Column` fields are saved.
+    It runs `beforeSave` and sets `created_at` and `updated_at` when the map has no value for them.
+    On a model with [events](events.md), it calls `save()`, so the hooks run too.
 
 ### Mass assignment
 
