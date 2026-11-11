@@ -117,7 +117,7 @@ The client sends its socket id in the `X-Socket-ID` header. `Broadcast.socketId(
 await Broadcast.event(OrderShipped(order), toOthers: Broadcast.socketId(req));
 ```
 
-Without a Socket.IO server in the process, and with no [emitter](#send-from-a-process-with-no-socket-io-server), `Broadcast.event` throws a `StateError`.
+Without a Socket.IO server in the process, and with no [emitter](#send-from-a-process-with-no-socketio-server), `Broadcast.event` throws a `StateError`.
 
 ## The client
 
