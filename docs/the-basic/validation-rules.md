@@ -131,7 +131,7 @@ These read another key of the same object. The other key is the input key, like 
 - `@RequiredWithout(['email'])`: the field is required when any of the keys is missing or empty. `@RequiredWithoutAll(['email', 'phone'])`: when all of them are missing or empty.
 - `@RequiredUnless`, `@RequiredWithout` and `@RequiredWithoutAll` follow the same rules as `@RequiredIf`: a nullable, `Maybe` or default field, and input keys.
 - `@Different('old_password')` is Laravel `different`. It compares the raw input like `@Same`. A missing other key passes.
-- `@ProhibitedIf('type', 'guest')` is Laravel `prohibited_if`: when `type` is `guest`, the field works like `@Prohibited()` (see below). It reads `type` and matches like `@RequiredIf`.
+- `@ProhibitedIf('type', 'guest')` is Laravel `prohibited_if`: when `type` is `guest`, the field must be missing or empty. Empty is `null`, blank text, an empty list or an empty map. `0` and `false` fail. This is not the same as `@Prohibited()`, which fails on `null` and `[]`: Laravel does it this way too. It reads `type` and matches like `@RequiredIf`.
 - `@GreaterThanField`, `@GreaterThanOrEqualField`, `@LessThanField` and `@LessThanOrEqualField` are Laravel `gt`, `gte`, `lt` and `lte` with a field. They are for `int`, `double` and `num` fields. They read the raw input of the other key: a number, or number text from a form. Like Laravel, a missing other key (or one that is not a number) fails.
   `{min}` and `{max}` in the message are the other key. They use the codes of `@GreaterThan`, `@Min`, `@LessThan` and `@Max`.
 - On a `List<T>` field, `@Different` checks the whole list, not each item. The field compare rules do not fit a list.

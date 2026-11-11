@@ -280,7 +280,9 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
 
 - `requiredUnless`, `requiredWithout`, `requiredWithoutAll`, `filled` and `present` come after `optional()`, like `requiredIf`.
 - `present()` needs the key. Add `.nullable()` to allow `null`.
-- `prohibited()` and `prohibitedIf()` come after `optional()`. A missing key or blank text passes. Any other sent value fails, also `null`, `[]`, `0` and `false`, like Laravel.
+- `prohibited()` and `prohibitedIf()` come after `optional()`. Like Laravel, they treat empty values in different ways:
+    - `prohibited()`: a missing key or blank text passes. Any other sent value fails, also `null`, `[]`, `0` and `false`.
+    - `prohibitedIf()`: when the condition matches, a missing key, `null`, blank text and an empty list or map pass. `0`, `false` and any other value fail.
 - `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact Laravel words.
 - `gtField`, `gteField`, `ltField` and `lteField` compare with another key, like Laravel `gt:field`. A missing other key fails.
 - There is no fluent `exclude_if` and no `bail`. A fluent schema runs all rules of a value.

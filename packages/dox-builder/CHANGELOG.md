@@ -1,7 +1,7 @@
 ## Unreleased
 
 - New: DTOs read `@Dto(trim: true)`, `@Dto(coerce: true)` and `@Dto(attributes: {...})`. Needs the next dox_validation.
-- New: `@After` and `@Before` take `'today'`, `'tomorrow'`, `'yesterday'` and the input key of another `DateTime` field. New `@AfterOrEqual` and `@BeforeOrEqual`. A text that is not a date, a word or a `DateTime` field stops the build. The words and fields work with any dox_validation.
+- New: `@After` and `@Before` take `'today'`, `'tomorrow'`, `'yesterday'` and the input key of another `DateTime` field. New `@AfterOrEqual` and `@BeforeOrEqual`. A text that is not a date, a word or a `DateTime` field stops the build. The words and fields work with any dox_validation. `@AfterOrEqual` and `@BeforeOrEqual` need the next dox_validation.
 - New: DTOs read `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` and `@ExcludeUnless`. Each one on an always-required field stops the build, like `@RequiredIf`. Needs the next dox_validation.
 - New: the rules `@Different` and the field compare rules check the whole field on a `List` field, not each item. Rules that name another key stop the build when they name a Dart field name in place of the input key.
 - A DTO that uses none of these gets the same code as before.

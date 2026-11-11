@@ -1012,6 +1012,13 @@ class A {
   final String vat;
   const A({required this.vat});
 }''', '@ExcludeIf on A.vat does nothing');
+      await expectError('''
+@Dto()
+class A {
+  @Prohibited()
+  final String debug;
+  const A({required this.debug});
+}''', '@Prohibited on A.debug can never pass: the field is always required');
     });
 
     const String rules = '''
