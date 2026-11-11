@@ -99,9 +99,12 @@ Future<void> main(List<String> args) async {
 
 The worker starts the providers of your app (database, cache, queue). It does not start the HTTP server.
 
-### 4. Tables (database driver only)
+### 4. Tables
 
-Run `dox queue:table`. It writes a migration in `db/migration` that makes the `jobs` and `failed_jobs` tables, and the `job_batches` table of [job batches](#job-batches). Then run `dox migrate`.
+The `jobs` and `failed_jobs` tables are only for the database driver.
+The `job_batches` table is for [job batches](#job-batches). It is needed with every driver.
+
+Run `dox queue:table`. It writes a migration in `db/migration` that makes all three tables. Then run `dox migrate`.
 
 ```bash
 dox queue:table
@@ -564,8 +567,8 @@ Outside a worker there is no queue. A release then logs a warning, and `handle()
 | Middleware | What it does |
 | --- | --- |
 | `RateLimited(key, max, per)` | runs at most `max` jobs of `key` in each `per` window. The others go back on the queue until the window ends |
-| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter`. With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after a crash |
-| `ThrottlesExceptions(key, maxAttempts:, decay:, retryAfter:)` | after `maxAttempts` errors, jobs of `key` wait until `decay` is over. A job that threw goes back after `retryAfter` |
+| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter` (default: zero, so at once). With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after a crash |
+| `ThrottlesExceptions(key, maxAttempts:, decay:, retryAfter:)` | after `maxAttempts` errors, jobs of `key` wait until `decay` is over. A job that threw goes back after `retryAfter`. Defaults: `maxAttempts` 10, `decay` 10 minutes, `retryAfter` zero |
 
 Things to know:
 
@@ -758,8 +761,8 @@ A `Batch` has these fields:
 | `totalJobs` | how many jobs the batch has |
 | `pendingJobs` | how many jobs are not done. It also counts failed jobs, because they can be retried |
 | `failedJobs` | how many jobs failed |
-| `processedJobs` | how many jobs ran |
-| `progress` | from 0 to 100 |
+| `processedJobs` | how many jobs are done. Failed jobs are not counted |
+| `progress` | the percent of done jobs, from 0 to 100 |
 | `finished` | `true` when every job ran, or the batch was cancelled |
 | `cancelled` | `true` after `cancel()`, or after a first failure |
 
@@ -1096,7 +1099,7 @@ test('signing up queues the welcome email', () async {
 | `assertNotPushed<T>()` | no `T` job was pushed |
 | `assertNothingPushed()` | no job was pushed at all |
 | `assertChained(<Type>[A, B])` | a chain of exactly these job classes, in this order, was dispatched |
-| `assertBatched([test])` | a batch was dispatched. With `test`, one of them passes it |
+| `assertBatched([test])` | a batch was dispatched. With `test`, one of them passes it. `test` gets a `PendingBatch` |
 | `assertBatchCount(n)` | exactly `n` batches were dispatched |
 
 To read the jobs, use `queue.pushed`. Each item has the `job`, the `queue` name and the `delay`. `queue.jobsOf<T>()` gives the `T` jobs. `queue.clear()` forgets them. `Queue.restore()` stops the fake.

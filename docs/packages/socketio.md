@@ -362,6 +362,7 @@ ServerOptions(allowedOrigins: <String>['https://app.example.com']);
 ### Allow requests and limit sessions
 
 `allowRequest` is a function that runs for every handshake and every websocket upgrade.
+It does not run again for the polling requests of an open session.
 It gets an `EngineRequest` (headers, query and address).
 It gives `true` or `false`, sync or async.
 `maxSessions` is the most open sessions.
@@ -379,7 +380,7 @@ SocketIoConfig socketIoConfig = SocketIoConfig(
 - When the function gives `false` or throws, the client gets `403` with `{"code":4,"message":"Forbidden"}`.
 - At the limit, a new handshake gets `503` with `{"code":3,"message":"Too many sessions"}`. Open sessions keep working.
 - The count is per isolate. With 4 isolates, the app allows 4 times `maxSessions`.
-- Keep the function fast. A slow function keeps a slot busy longer.
+- Keep the function fast. When the client leaves while the function runs, the session is still made. It holds a `maxSessions` slot until the ping timeout.
 - A browser client only sees a connect error. It does not see the `403` or `503` body.
 
 Both are `null` by default: all requests are allowed and there is no limit.

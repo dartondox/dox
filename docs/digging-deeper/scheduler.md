@@ -167,11 +167,14 @@ The output is dropped. Use the [output hooks](#output-hooks) to keep it.
 
 A task that runs every few seconds repeats inside each due minute.
 A frequency, the days, the filters and `timezone()` still decide if the minute is due: `s.call('poll', poll).everyFiveSeconds().between('09:00', '17:00')`.
+Call the seconds method first, then the other frequency.
+`everyFiveSeconds()` also sets the task to every minute. If you call it last, it undoes the frequency before it.
+`.everyFiveSeconds().hourly()` repeats in minute 0 of each hour. `.hourly().everyFiveSeconds()` repeats in every minute.
 `when()` and `skip()` are checked before each repeat.
 A run that takes longer than its step skips the steps it missed.
 With such a task, `run` from cron stays until the end of the minute.
 
-You can limit the days. The order of the calls does not matter.
+You can limit the days. The order of the calls does not matter for the days.
 
 | Method | Runs |
 | --- | --- |

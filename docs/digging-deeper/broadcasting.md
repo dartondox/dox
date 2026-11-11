@@ -44,9 +44,11 @@ A client that is not logged in as a socket gets a token from the auth route. Add
 ```dart title="lib/routes/api.dart"
 @override
 void register() {
-  Broadcast.routes(middleware: <dynamic>[AuthMiddleware()]); // POST /broadcasting/auth
+  Broadcast.routes(middleware: <dynamic>[AuthMiddleware()]); // POST /api/broadcasting/auth
 }
 ```
+
+The prefix of the router is added to the path. This router has the prefix `api`, so the path is `/api/broadcasting/auth`.
 
 The route runs the channel rule with `req.auth` and answers `{"auth": "<token>"}`, or `403`.
 Pass `path:` to use another path.
@@ -121,7 +123,10 @@ Without a Socket.IO server in the process, and with no [emitter](#send-from-a-pr
 
 ## The client
 
-Use `socket.io-client`. A public channel needs no token:
+Use `socket.io-client`. A public channel needs no token.
+A subscription belongs to one socket. After a reconnect, the client has a new socket and is in no channel.
+So subscribe inside the `connect` handler. It runs again after each reconnect.
+
 
 ```js
 import { io } from 'socket.io-client';
@@ -129,14 +134,17 @@ import { io } from 'socket.io-client';
 const socket = io('https://app.example.com', { transports: ['websocket'] });
 
 socket.on('order.shipped', (channel, payload) => console.log(channel, payload));
-socket.emit('subscribe', { channel: 'news' }, (ack) => console.log(ack));
+socket.on('connect', () => {
+  socket.emit('subscribe', { channel: 'news' }, (ack) => console.log(ack));
+});
 ```
 
-For a private or presence channel, get a token first, then send it in `subscribe`:
+For a private or presence channel, get a token first, then send it in `subscribe`.
+A token works for one socket id only. So ask for a new token in the `connect` handler, after each reconnect too:
 
 ```js
 socket.on('connect', async () => {
-  const res = await fetch('/broadcasting/auth', {
+  const res = await fetch('/api/broadcasting/auth', {
     method: 'POST',
     headers: { 'content-type': 'application/json', authorization: `Bearer ${apiToken}` },
     body: JSON.stringify({ socket_id: socket.id, channel_name: 'private-orders.5' }),
@@ -162,7 +170,7 @@ A socket that is already logged in with [`SocketAuth`](../packages/socketio.md#l
 | `unsubscribed` | an `unsubscribe` came while it was subscribing |
 | `presence is not available` | another server did not answer in time |
 
-The event names are the same as in the Echo Socket.IO connector. The auth is not. Echo sends `auth` as an object with headers. This server wants a token string, so get it yourself and send a small `subscribe` like above.
+Send the token as a string in `auth`, like above. An object of headers is refused with `Forbidden`.
 
 ## Presence
 

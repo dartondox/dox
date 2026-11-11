@@ -1017,7 +1017,9 @@ By default, a session stays logged in after the user changes the password.
 So a stolen session still works.
 Turn on the `endSessionsOnPasswordChange` [flag](authorization.md#auth-flags) to fix this.
 The session then keeps a fingerprint of the password hash.
-When the hash changes, the session ends on its next request.
+When the hash changes, the session ends on its next request that checks the login.
+That is a request through `AuthMiddleware`, or a call of an `Auth` check.
+A route with no login check does not end it.
 The flag is off by default.
 
 ```dart title="lib/config/auth.dart"
@@ -1043,7 +1045,7 @@ Call `updateSessionPasswordHash` after that `save()` as well.
 
 Pass a fully loaded user to `updateSessionPasswordHash` and `loginSession`.
 A model from a `select()` with no password column looks like a user with no password.
-The session then ends on the next request.
+The session then ends on its next request that checks the login.
 The user must be the user of the session. Another user throws an `ArgumentError`.
 The password column must give the same value on every read.
 A hook or cast that makes a new value each time ends every session.
@@ -1056,9 +1058,22 @@ It needs a session guard and the flag.
 
 ```dart
 /// POST /logout-others: end the sessions on other devices.
-Future<Map<String, bool>> logoutOthers(DoxRequest req) async {
-  await (req.auth as Auth).logoutOtherDevices(req, req.input('password'));
+Future<Map<String, bool>> logoutOthers(DoxRequest req, ConfirmPassword body) async {
+  await (req.auth as Auth).logoutOtherDevices(req, body.password);
   return <String, bool>{'done': true};
+}
+```
+
+`ConfirmPassword` is a [DTO](#3-add-the-input-checks) like `LoginUser`. A missing field gets `422` before the controller runs:
+
+```dart
+@Dto()
+class ConfirmPassword {
+  final String password;
+
+  const ConfirmPassword({required this.password});
+
+  static const DtoSchema<ConfirmPassword> schema = $ConfirmPasswordDto;
 }
 ```
 
