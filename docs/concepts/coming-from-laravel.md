@@ -389,7 +389,7 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Crypt::encryptString($v)`, `Crypt::decryptString($v)` | `Crypt.encryptString(v)`, `Crypt.decryptString(v)` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.check(p, hash)` (or `Hash.verify`) |
 
-For an API, Dox auth is a JWT in the `Authorization` header. For tokens you can revoke, like Sanctum, use `AccessTokenAuthDriver`. `dox auth:tokens-table` makes its `auth_access_tokens` table.
+For an API, Dox auth is a JWT in the `Authorization` header. For tokens you can revoke, like Sanctum, use `AccessTokenAuthDriver`. `dox auth:tokens-table` makes its `auth_access_tokens` table. `$user->createToken('cli', ['posts:read'])` is `Auth().createAccessToken(user, name: 'cli', abilities: <String>['posts:read'])`, and `$request->user()->tokenCan('posts:read')` is `(req.auth as Auth).tokenCan('posts:read')`. To renew a token, use `rotateAccessToken`.
 For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie.
 See [Authentication](../security/authentication.md).
 

@@ -99,9 +99,11 @@ The table shows the `message` text.
 | `Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.` | `Hash.make()` or `Hash.makeAsync()` with a password over 72 bytes. | Limit the length in the DTO. See [Troubleshooting](troubleshooting.md#hashmake-throws-on-a-long-password). |
 | `Invalid argument(s) (secret): The JWT secret is empty. Set APP_KEY (run `dox key:generate`).` | `JwtAuthDriver` with an empty secret. | Set `APP_KEY`. |
 | `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local`, `test` and `testing` it is only a warning. | Run `dox key:generate`. |
+| `401` `The access token was already rotated.` | `rotateAccessToken` on a token that was rotated before. A token can be rotated only once. | Use the new token. |
+| `Bad state: The table 'auth_access_tokens' has no rotated_at column. ...` | `rotateAccessToken` on a token table made before the `rotated_at` column existed. | Add the column in a migration. See [Authentication](../security/authentication.md#a-token-table-without-rotated_at). |
 
 `Hash.verify()` gives `false` for a value that is not a bcrypt hash. It does not throw.
-`Auth().attempt()` returns `null` for a wrong password. It does not throw. See [Authentication](../security/authentication.md).
+`Auth().attempt()` returns `null` for a wrong password. It does not throw. More auth errors are in [Authentication: Problems](../security/authentication.md#problems).
 
 ## dox_orm
 

@@ -119,7 +119,7 @@ dox build_runner:build   # runs once
 | `dox_core` | HTTP server, routing, requests, responses, validation |
 | `dox_orm` | query builder and models |
 | `dox_migration` | database migrations |
-| `dox_auth` | JWT authentication |
+| `dox_auth` | Login with access tokens, JWT or sessions |
 | `dox_builder`, `dox_annotation` | code generation for models, DTOs and the container |
 | `dox_validation` | [typed validation schemas](../packages/validation.md) |
 | `dox_openapi` | [OpenAPI docs](../packages/openapi.md) |
