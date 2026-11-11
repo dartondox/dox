@@ -66,6 +66,10 @@ class FlagsRouter extends Router {
       body: v.object(<String, Schema<Object?>>{'email': v.string()}),
     );
     Route.get('decrypt', (DoxRequest req) => Crypt.decryptString('bad'));
+    Route.get(
+      'format-error',
+      (DoxRequest req) => throw const FormatException('<b>x</b>'),
+    );
     Route.get('session-all', (DoxRequest req) => req.session.all());
     Route.get('regenerate', (DoxRequest req) {
       String before = req.session.token;
@@ -270,13 +274,13 @@ void coreFlagTests(CoreFlags flags) {
     }
   });
 
-  test('htmlStrings: an error text stays plain', () async {
+  test('htmlStrings: the development error text stays plain', () async {
     Env().env['APP_ENV'] = 'development';
     addTearDown(() => Env().env.remove('APP_ENV'));
-    TestResponse res = await client.get('/decrypt');
-    if (!flags.decryptServerError) return;
-    // the dev error text of a 500 is never html
-    expect(res.header('content-type'), isNot(contains('html')));
+    TestResponse res = await client.get('/format-error');
+    res.expectStatus(500);
+    expect(res.body, contains('<b>x</b>'));
+    expect(res.header('content-type'), startsWith('text/plain'));
   });
 
   test('replaceHeaders: res.header and a value set before', () async {
