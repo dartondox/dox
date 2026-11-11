@@ -374,22 +374,22 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | Laravel | Dox |
 | --- | --- |
 | `config/auth.php` guards and providers | `Auth.initialize(AuthConfig(guards: ...))` in a provider |
-| `Auth::attempt(['email' => $e, 'password' => $p])` | `await Auth().attempt(<String, dynamic>{'email': e, 'password': p})` gives a JWT, or `null` |
-| `Auth::login($user)` | `Auth().login(user)` gives a JWT |
+| `Auth::attempt(['email' => $e, 'password' => $p])` | `await Auth().attempt(<String, dynamic>{'email': e, 'password': p})` gives a token (an access token or a JWT, by the guard), or `null` |
+| `Auth::login($user)` | `Auth().login(user)` gives a JWT. With access tokens, use `Auth().createAccessToken(user)` |
 | `Auth::user()` | `req.auth?.user<User>()` |
 | `Auth::id()` | `req.auth?.id()` |
 | `Auth::guest()` | `req.auth == null` |
 | `Auth::check()` | `Auth().check()` (the same as `isLoggedIn()`) |
 | `Auth::once($credentials)` | `await Auth().once(credentials)` gives `true` or `false`, with no token and no session |
 | `Auth::attempt(...)` for a web page (session) | `await Auth().attemptSession(req, <String, dynamic>{...})` gives `true` or `false` |
-| `Auth::logout()` | `Auth().logout(req)` |
+| `Auth::logout()` | `Auth().logout(req)` for a session. For a token: `await Auth().revokeToken(req)` |
 | `->middleware('auth:sanctum')` | `AuthMiddleware()` from `dox_auth` |
 | `->middleware('auth:web,api')` | `AuthMiddleware(guards: <String>['web', 'api'])` |
 | `->middleware('guest')` | `GuestMiddleware(redirectTo: '/dashboard')` |
 | `Crypt::encryptString($v)`, `Crypt::decryptString($v)` | `Crypt.encryptString(v)`, `Crypt.decryptString(v)` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.check(p, hash)` (or `Hash.verify`) |
 
-For an API, Dox auth is a JWT in the `Authorization` header. For tokens you can revoke, like Sanctum, use `AccessTokenAuthDriver`. `dox auth:tokens-table` makes its `auth_access_tokens` table. `$user->createToken('cli', ['posts:read'])` is `Auth().createAccessToken(user, name: 'cli', abilities: <String>['posts:read'])`, and `$request->user()->tokenCan('posts:read')` is `(req.auth as Auth).tokenCan('posts:read')`. To renew a token, use `rotateAccessToken`.
+For an API, use access tokens (`AccessTokenAuthDriver`), like Sanctum. JWT is also available. `dox auth:tokens-table` makes the `auth_access_tokens` table. `$user->createToken('cli', ['posts:read'])` is `Auth().createAccessToken(user, name: 'cli', abilities: <String>['posts:read'])`, and `$request->user()->tokenCan('posts:read')` is `(req.auth as Auth).tokenCan('posts:read')`. To renew a token, use `rotateAccessToken`.
 For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie.
 See [Authentication](../security/authentication.md).
 
@@ -452,7 +452,7 @@ A missing key stops the app at start, with a list of every missing key. See [Env
 | `Mail::fake()` | `Mail.fake()`, then `mail.assertSent()` and `mail.assertQueued()` |
 | `Queue::fake()` | `Queue.fake()`, then `queue.assertPushed<T>()` |
 | `Cache::fake()` | `Dox().cache = CacheManager(CacheConfig(...))` with a `memory` store |
-| `$this->actingAs($user)` | `client.withToken(token)` with the JWT from `Auth().login(user)` |
+| `$this->actingAs($user)` | `client.withToken(token)` with a token from `Auth().createAccessToken(user)` (access tokens) or `Auth().login(user)` (JWT) |
 
 Dox has no fake HTTP kernel. `DoxTestClient.start(appConfig)` starts the real server inside the test, on a free port, and sends real requests.
 See [Testing](../digging-deeper/testing.md).

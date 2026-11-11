@@ -16,7 +16,7 @@ Follow it from the top. At the end of each way, your app has working auth.
 - a login throttle, and tools to revoke and renew tokens
 
 `dox_auth` has no password reset, no email check, no "remember me" and no two-step login (2FA).
-Your app builds these. The tools on this page help, for example [change abilities](#change-the-abilities-of-a-token) for a two-step login.
+Your app builds these. The tools on this page help, for example [the two-step login recipe](#change-the-abilities-of-a-token).
 Who may do what (roles, "may this user edit this post") is on the [Authorization](authorization.md) page.
 
 ## Which one do I need?
@@ -29,6 +29,11 @@ Who may do what (roles, "may this user edit this post") is on the [Authorization
 | Web pages and an API in one app | [More than one guard](#more-than-one-guard) | A session guard for the pages, a token guard for the API. |
 
 Not sure? For an API, use access tokens.
+
+Two words used on this page:
+
+- A **guard** is a named way to log in, like `api` or `web`. It says how the login is kept (access token, JWT or session) and which model holds the users.
+- An **ability** is a name like `posts:read` on an access token. It says what the token may do.
 
 ## Set it up
 
@@ -127,7 +132,7 @@ class LoginUser {
 
 ### 4. Add the auth config
 
-A guard is a named way to log in. It has a driver (how the login is kept) and a provider (which model holds the users).
+The config lists the guards. Each guard has a driver (how the login is kept) and an `AuthProvider` (which model holds the users).
 This config has one guard, `api`, with access tokens. The [JWT](#jwt-tokens) and [session](#session-login-for-web-pages) ways give their own version of this file.
 
 ```dart title="lib/config/auth.dart"
@@ -147,9 +152,10 @@ AuthConfig authConfig = AuthConfig(
 
 `Auth()` and `AuthMiddleware()` use `defaultGuard`. All options are in the [reference](#reference).
 
-### 5. Add the provider
+### 5. Load the config when the app starts
 
-The provider gives the config to `dox_auth` when the app starts.
+This class gives the config to `dox_auth` when the app starts.
+It is a `DoxProvider` (a class that Dox runs at startup). It is not the `AuthProvider` of step 4.
 
 ```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -168,14 +174,14 @@ You do not register it by hand. Dox finds every `DoxProvider`.
 
 ### 6. Run the code generator
 
-It writes the DTO code and adds the provider to `lib/generated/container.g.dart`.
+It writes the DTO code and adds `AppAuthProvider` to `lib/generated/container.g.dart`.
 
 ```bash
 dart run build_runner build
 dart analyze
 ```
 
-`dox s` runs the generator for you while it runs.
+Do not start `dox s` yet. The first way below makes a migration first.
 
 ## Access tokens
 
@@ -185,7 +191,7 @@ It is like an AdonisJS access token or a Laravel Sanctum token.
 - A token looks like `oat_12.<secret>`. `12` is the row id in the token table.
 - The table keeps only a SHA-256 hash of the secret. You see the plain token once, when you make it.
 - A token works until it expires or you revoke it.
-- Each token has abilities, like `posts:read`. The default is `*` (all).
+- Each token has abilities. The default is `*` (all abilities).
 
 The [setup](#set-it-up) above already added the `api` guard with `AccessTokenAuthDriver`.
 
@@ -196,12 +202,12 @@ dox auth:tokens-table --users-table=users
 dox migrate
 ```
 
-`dox auth:tokens-table` writes a migration in `db/migration`. `dox migrate` runs it and makes the `auth_access_tokens` table.
-`bin/server.dart` also runs new migrations when the server starts.
+`dox auth:tokens-table` writes a migration in `db/migration`. `dox migrate` adds it to `db/migration/migrations.dart`, runs it, and makes the `auth_access_tokens` table.
+If `dox s` runs at this time, it runs the new migration itself when it restarts. That is fine: `dox migrate` then says it is up to date.
 
-The migration looks like this. You can also write it by hand:
+The migration it writes looks like this:
 
-```dart title="db/migration/2026_11_11_000000_create_access_tokens_table.dart"
+```dart
 // ignore_for_file: file_names
 import 'package:dox_auth/dox_auth.dart';
 import 'package:dox_migration/dox_migration.dart';
@@ -277,6 +283,9 @@ class AuthController {
   /// request. The old token works one more minute.
   Future<Map<String, dynamic>> refresh(DoxRequest req) async {
     Auth auth = req.auth as Auth;
+    if (!auth.tokenCan('tokens:manage')) {
+      throw ForbiddenHttpException();
+    }
     AccessToken next = await auth.rotateAccessToken(
       auth.currentAccessToken!,
       grace: const Duration(minutes: 1),
@@ -290,13 +299,15 @@ class AuthController {
 ```
 
 - `Hash.makeAsync` runs bcrypt in another isolate, so it does not block the server. See [Hashing](hashing.md).
-- `attempt` finds the user by email and checks the password. It gives a new token with all abilities, or `null`. It runs bcrypt in another isolate too.
+- `attempt` finds the user by email and checks the password. It gives a new token with all abilities (`*`), or `null`. It runs bcrypt in another isolate too.
 - `Auth(ip: req.ip())` gives the client ip to the [login throttle](#login-throttle).
-- `refresh` is explained in [Rotate a token](#rotate-a-token).
+- `refresh` is explained in [Rotate a token](#rotate-a-token). It needs the `tokens:manage` ability, see below.
 
-### 3. Write the token controller
+### 3. Write the token and post controllers
 
-Users can make extra tokens, for example for a script. This controller lists, makes and revokes them.
+Users can make extra tokens, for example for a script.
+This controller lists, makes and revokes them. Each action needs the `tokens:manage` ability.
+A login token has `*`, so it passes. A script token does not, so a leaked script token can not make new tokens.
 
 ```dart title="lib/app/http/controllers/token.controller.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -307,13 +318,13 @@ import 'package:my_app/app/models/user/user.model.dart';
 class TokenController {
   /// GET /api/tokens: all tokens of the user, newest first.
   Future<List<AccessToken>> index(DoxRequest req) async {
-    Auth auth = req.auth as Auth;
+    Auth auth = _manager(req);
     return auth.accessTokens(auth.user<User>()!);
   }
 
   /// POST /api/tokens: a token for a script. It can only read posts.
   Future<Map<String, dynamic>> store(DoxRequest req) async {
-    Auth auth = req.auth as Auth;
+    Auth auth = _manager(req);
     AccessToken token = await auth.createAccessToken(
       auth.user<User>()!,
       name: 'script',
@@ -325,16 +336,25 @@ class TokenController {
 
   /// DELETE /api/tokens/{id}: revoke one token of the user.
   Future<Map<String, bool>> destroy(DoxRequest req, int id) async {
-    Auth auth = req.auth as Auth;
+    Auth auth = _manager(req);
     if (!await auth.revokeAccessToken(auth.user<User>()!, id)) {
       throw NotFoundHttpException();
     }
     return <String, bool>{'revoked': true};
   }
+
+  /// The Auth of the request, when its token may manage tokens.
+  Auth _manager(DoxRequest req) {
+    Auth auth = req.auth as Auth;
+    if (!auth.tokenCan('tokens:manage')) {
+      throw ForbiddenHttpException();
+    }
+    return auth;
+  }
 }
 ```
 
-And a route that needs an ability:
+A route that needs an ability:
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -418,30 +438,69 @@ dox s
 
 The client sends the token in the `Authorization` header: `Authorization: Bearer oat_12.<secret>`.
 The word `Bearer` can be in any case.
+Run these in a second terminal. Where a step says "keep it in", copy the token from the answer into a shell variable.
 
 ```bash
+# make an account
 curl -X POST localhost:3000/api/auth/register -H 'Content-Type: application/json' \
   -d '{"name":"Ada","email":"ada@example.com","password":"secret-pass"}'
-# 201 {"token":"oat_1.TjFv...","user":{"id":1,"name":"Ada","email":"ada@example.com",...}}
+# 201 {"token":"oat_1.c79C...","user":{"id":1,"name":"Ada","email":"ada@example.com",...}}
 
+# a wrong password
 curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
   -d '{"email":"ada@example.com","password":"wrong-pass"}'
 # 401 {"code":"unauthorized","message":"Wrong email or password"}
 
-curl localhost:3000/api/auth/me -H 'Authorization: Bearer oat_1.TjFv...'
+# log in, and keep the token in TOKEN
+curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"ada@example.com","password":"secret-pass"}'
+# 200 {"token":"oat_2.OTAG...","user":{"id":1,...}}
+TOKEN='oat_2.OTAG...'
+
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
 # 200 {"id":1,"name":"Ada","email":"ada@example.com",...}
 
 curl localhost:3000/api/auth/me
 # 401 {"code":"unauthorized","message":"Authentication failed"}
 
-curl -X POST localhost:3000/api/auth/logout -H 'Authorization: Bearer oat_1.TjFv...'
-# 200 {"logged_out":true}
+# make a script token, and keep it in SCRIPT_TOKEN
+curl -X POST localhost:3000/api/tokens -H "Authorization: Bearer $TOKEN"
+# 200 {"token":"oat_3.pwwK..."}
+SCRIPT_TOKEN='oat_3.pwwK...'
 
-curl localhost:3000/api/auth/me -H 'Authorization: Bearer oat_1.TjFv...'
+curl localhost:3000/api/posts -H "Authorization: Bearer $SCRIPT_TOKEN"
+# 200 ["Hello"]
+
+# the script token may not manage tokens
+curl -X POST localhost:3000/api/tokens -H "Authorization: Bearer $SCRIPT_TOKEN"
+# 403 {"code":"forbidden","message":"Forbidden"}
+curl -X POST localhost:3000/api/auth/refresh -H "Authorization: Bearer $SCRIPT_TOKEN"
+# 403 {"code":"forbidden","message":"Forbidden"}
+
+# list the tokens, then revoke the script token (id 3)
+curl localhost:3000/api/tokens -H "Authorization: Bearer $TOKEN"
+# 200 [{"id":3,"name":"script","type":"api","abilities":["posts:read"],...},...]
+curl -X DELETE localhost:3000/api/tokens/3 -H "Authorization: Bearer $TOKEN"
+# 200 {"revoked":true}
+curl localhost:3000/api/posts -H "Authorization: Bearer $SCRIPT_TOKEN"
+# 401 {"code":"unauthorized","message":"Authentication failed"}
+
+# renew the login token, and keep the new one in NEW_TOKEN
+curl -X POST localhost:3000/api/auth/refresh -H "Authorization: Bearer $TOKEN"
+# 200 {"token":"oat_4.-qAk...","expires_at":"2026-12-11T04:43:15.701944Z"}
+NEW_TOKEN='oat_4.-qAk...'
+curl -X POST localhost:3000/api/auth/refresh -H "Authorization: Bearer $TOKEN"
+# 401 {"code":"unauthorized","message":"The access token was already rotated."}
+
+# log out
+curl -X POST localhost:3000/api/auth/logout -H "Authorization: Bearer $NEW_TOKEN"
+# 200 {"logged_out":true}
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $NEW_TOKEN"
 # 401 {"code":"unauthorized","message":"Authentication failed"}
 ```
 
-The password is never in the answer, because it is in `hidden`.
+The password is never in an answer, because it is in `hidden`.
+The ids (`oat_1`, `oat_2`, ...) count up in your table, so yours may differ.
 
 ### Abilities
 
@@ -460,17 +519,8 @@ auth.currentAccessToken; // the AccessToken of this request
 
 - `tokenCan` is `true` when the token has the ability, or `*`.
 - `tokenCan` is `false` when there is no access token. So a session or JWT login never passes it.
-- A token without the ability gets `403` from the code above. A request with no good token gets `401` from `AuthMiddleware`.
-
-Try it with the script token from `POST /api/tokens`:
-
-```bash
-curl -X POST localhost:3000/api/tokens -H 'Authorization: Bearer oat_2.<secret>'
-# 200 {"token":"oat_5.CSrR..."}
-
-curl localhost:3000/api/posts -H 'Authorization: Bearer oat_5.CSrR...'
-# 200 ["Hello"]
-```
+- A route with no `tokenCan` check takes every good token, whatever its abilities. Check an ability on each route that needs one.
+- A token without the ability gets `403`. A request with no good token gets `401` from `AuthMiddleware`.
 
 ### List and revoke tokens
 
@@ -483,33 +533,16 @@ await Auth().pruneExpiredAccessTokens();   // delete expired tokens, eg. from a 
 ```
 
 - A revoked token is deleted from the table, so it stops working at once.
-- `accessTokens` gives `AccessToken` objects. `token.toJson()` has no hash and no plain token, so you can send it to the client. `GET /api/tokens` above does this.
+- `token.toJson()` has no hash and no plain token, so you can send it to the client. `GET /api/tokens` above does this.
 - On the `Auth` of `AuthMiddleware`, `(req.auth as Auth).revokeToken(req)` uses the token that was already checked. It does not check it again.
 - Expired tokens stay in the table until you call `pruneExpiredAccessTokens()`. Run it from a [scheduled task](../digging-deeper/scheduler.md).
-
-```bash
-curl localhost:3000/api/tokens -H 'Authorization: Bearer oat_4.<secret>'
-# 200 [{"id":5,"name":"script","type":"api","abilities":["posts:read"],"last_used_at":...,"expires_at":...},...]
-
-curl -X DELETE localhost:3000/api/tokens/5 -H 'Authorization: Bearer oat_4.<secret>'
-# 200 {"revoked":true}   (again: 404 {"code":"not_found","message":"Not Found"})
-```
 
 ### Rotate a token
 
 Rotate a token to renew it before it expires.
 `rotateAccessToken` makes a new token in place of an old one.
 The new token has the same user, name and abilities as the old one.
-The `refresh` method of the [auth controller](#2-write-the-auth-controller) does this:
-
-```dart
-Auth auth = req.auth as Auth;
-AccessToken next = await auth.rotateAccessToken(
-  auth.currentAccessToken!,
-  grace: const Duration(minutes: 1),
-);
-return <String, dynamic>{'token': next.value};
-```
+The `refresh` method of the [auth controller](#2-write-the-auth-controller) does this.
 
 `grace` is how long the old token still works.
 A client may have other requests on the way with the old token. With a short `grace`, they do not fail.
@@ -531,192 +564,50 @@ Safety notes:
 - A longer `grace` gives a stolen old token more time to be used. It can not make new tokens: a rotated token can not be rotated again.
 - Each rotate gives a full new life. So a client that rotates again and again stays logged in forever. To set a limit, check `createdAt` of the first token yourself, or ask for the password again after some time.
 
-Try it:
-
-```bash
-curl -X POST localhost:3000/api/auth/refresh -H 'Authorization: Bearer oat_3.<secret>'
-# 200 {"token":"oat_4.3_B6...","expires_at":"2026-12-11T04:35:18.512696Z"}
-
-curl -X POST localhost:3000/api/auth/refresh -H 'Authorization: Bearer oat_3.<secret>'
-# 401 {"code":"unauthorized","message":"The access token was already rotated."}
-```
-
 Rotate needs the `rotated_at` column. A table made by `dox auth:tokens-table` has it.
 
 #### A token table without `rotated_at`
 
-A token table made before the `rotated_at` column existed works for everything except rotate.
+A token table without the `rotated_at` column works for everything except rotate.
 `rotateAccessToken` then throws a `StateError` that names the column:
 
 ```text
 Bad state: The table 'auth_access_tokens' has no rotated_at column. rotate() needs it. Add it in a new migration: ...
 ```
 
-Add the column in a new migration:
+To add the column:
 
-```bash
-dox make:migration add_rotated_at_to_auth_access_tokens
-```
+1. Stop `dox s` if it runs. It runs new migrations when it restarts. It would run the new, still empty file, and then the column is never added.
+2. Make a migration:
 
-```dart title="db/migration/2026_11_11_000001_add_rotated_at_to_auth_access_tokens.dart"
-// ignore_for_file: file_names
-import 'package:dox_migration/dox_migration.dart';
+    ```bash
+    dox make:migration add_rotated_at_to_auth_access_tokens
+    ```
 
-class AddRotatedAtToAuthAccessTokens extends Migration {
-  @override
-  Future<void> up(Schema schema) async {
-    await schema.table('auth_access_tokens', (Table t) {
-      t.dateTimeTz('rotated_at').nullable();
-    });
-  }
+3. Paste this into the new file in `db/migration` (its name starts with the date and time):
 
-  @override
-  Future<void> down(Schema schema) async {
-    await schema.table('auth_access_tokens', (Table t) {
-      t.dropColumn('rotated_at');
-    });
-  }
-}
-```
+    ```dart
+    // ignore_for_file: file_names
+    import 'package:dox_migration/dox_migration.dart';
 
-Then run `dox migrate`.
+    class AddRotatedAtToAuthAccessTokens extends Migration {
+      @override
+      Future<void> up(Schema schema) async {
+        await schema.table('auth_access_tokens', (Table t) {
+          t.dateTimeTz('rotated_at').nullable();
+        });
+      }
 
-### Change the abilities of a token
-
-`setAccessTokenAbilities` changes what a token can do. The plain token stays the same.
-For example, add `2fa` after the user gave a two-step code. `dox_auth` does not check the code: your app does that.
-
-The body has the code:
-
-```dart title="lib/app/dtos/two_factor_code/two_factor_code.dto.dart"
-import 'package:dox_core/dox_core.dart';
-
-part 'two_factor_code.dto.g.dart';
-
-@Dto()
-class TwoFactorCode {
-  @Length(min: 6, max: 6)
-  final String code;
-
-  const TwoFactorCode({required this.code});
-
-  static const DtoSchema<TwoFactorCode> schema = $TwoFactorCodeDto;
-}
-```
-
-Add a method to the auth controller (and import the DTO):
-
-```dart
-/// POST /api/auth/two-factor
-Future<Map<String, bool>> twoFactor(DoxRequest req, TwoFactorCode body) async {
-  Auth auth = req.auth as Auth;
-  if (!_codeIsGood(auth.user<User>()!, body.code)) {
-    throw UnAuthorizedException(message: 'Wrong code');
-  }
-  AccessToken token = auth.currentAccessToken!;
-  await auth.setAccessTokenAbilities(token, <String>[...token.abilities, '2fa']);
-  return <String, bool>{'verified': true};
-}
-
-/// Check the code with your own two-step code.
-bool _codeIsGood(User user, String code) {
-  throw UnimplementedError('check the two-step code');
-}
-```
-
-Add the route in `lib/routes/api.dart`:
-
-```dart
-Route.post('/auth/two-factor', <dynamic>[
-  AuthMiddleware(),
-  (AuthController c) => c.twoFactor,
-]);
-```
-
-Then protect the routes that need the second step with `tokenCan('2fa')`. See [Abilities](#abilities).
-
-- `tokenCan` on the same `Auth` sees the new abilities at once. The next requests read them from the table.
-- A token with `*` passes every check, also `tokenCan('2fa')`. So for a two-step login, do not give `*` at login. Use `Auth().once(credentials)` to check the password, then `createAccessToken(user, abilities: <String>['user'])`.
-- A revoked token throws an `UnAuthorizedException` (`401`). A token of another guard throws an `ArgumentError`.
-- A token table made before the `rotated_at` column existed works with it too.
-
-### When the database fails
-
-The token check reads the database. When the database fails, the default is to fail closed:
-the check gives no user, the request gets `401`, and the error goes to the `report` of your [exception handler](../the-basic/errors.md).
-
-But a `401` tells many clients "you are logged out". A short database problem then logs users out.
-Turn on `throwOnError` to stop this:
-
-```dart title="lib/config/auth.dart"
-import 'package:dox_auth/dox_auth.dart';
-import 'package:my_app/app/models/user/user.model.dart';
-
-AuthConfig authConfig = AuthConfig(
-  defaultGuard: 'api',
-  guards: <String, AuthGuard>{
-    'api': AuthGuard(
-      driver: AccessTokenAuthDriver(
-        expiresIn: const Duration(days: 30),
-        throwOnError: true,
-      ),
-      provider: AuthProvider(model: () => User()),
-    ),
-  },
-);
-```
-
-With `throwOnError: true`, an error in a token check is thrown. This is a database error, a token row that can not be read, or a guard that is not set up.
-It goes to your exception handler. The default answer is `500`.
-To answer `503`, so the client tries again, catch the database error in `render`:
-
-```dart title="lib/app/exception_handler.dart"
-import 'dart:io';
-
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_orm/dox_orm.dart';
-
-class AppExceptionHandler extends ExceptionHandler {
-  const AppExceptionHandler();
-
-  @override
-  dynamic render(Object error, HttpRequest req) {
-    // PgException: Postgres. MysqlException: MySQL.
-    if (error is PgException || error is MysqlException) {
-      return HttpStatusException(503, headers: <String, String>{'retry-after': '5'});
+      @override
+      Future<void> down(Schema schema) async {
+        await schema.table('auth_access_tokens', (Table t) {
+          t.dropColumn('rotated_at');
+        });
+      }
     }
-    return super.render(error, req);
-  }
-}
-```
+    ```
 
-```dart title="lib/config/app.dart"
-AppConfig appConfig = AppConfig(
-  exceptionHandler: const AppExceptionHandler(),
-  // ...
-);
-```
-
-The answer is then `503` with a `Retry-After: 5` header and `{"code":"service_unavailable","message":"Service Unavailable"}`.
-On SQLite the error is a `SqliteException` of the `sqlite3` package.
-
-`throwOnError` also counts for `AuthMiddleware(optional: true)`: a database error is thrown, not turned into a guest.
-A failed `last_used_at` write is never thrown. It is reported, and the request goes on.
-
-### Things to know about access tokens
-
-- A token fails (`401`) when its format is bad, the secret is wrong, it is expired, it was revoked, its user is gone, it has another type, or it was made for a guard with another user table.
-- `tokenable_type` is the table name of the user model. If you rename the users table, the old tokens stop working.
-- Each token has a `type`. By default it is the guard name. So two access token guards do not take each other's tokens. If you rename a guard, set `AccessTokenAuthDriver(type: 'old-name')` to keep its tokens working.
-- Pass a user of the guard's model. For admins, use `Auth(guard: 'admin').createAccessToken(admin)`. A user of another model throws an `ArgumentError`.
-- A token `name` over 255 characters throws an `ArgumentError`. Nothing is written.
-- When you delete a user, call `revokeAllAccessTokens(user)` too, or use `--users-table` (`usersTable:`) in the migration. Then old tokens can never match a new user with the same id.
-- With `usersTable`, use one token table per user model. If you have more than one user model (like users and admins), give each model its own token table, with `table:` on the driver and in the migration. With one shared table, the foreign key fails for admin tokens, and deleting a user also deletes the tokens of the admin with the same id.
-- The migration makes the table on the default connection. If the driver uses another connection, like `AccessTokenAuthDriver(connection: 'other')`, make the table on that connection.
-- `last_used_at` is written at most once a minute per token. So a busy token does not write on every request. If this write fails, the error is reported and the request goes on.
-- `Auth().login(user)` throws a `StateError` with this driver. Use `createAccessToken`.
-- On MySQL, `expires_at` is kept to the second: MySQL rounds the time. So a token can stop working up to half a second before or after its exact time.
-- To check a token without a request, like in Socket.IO, see [Check a login with no request](#check-a-login-with-no-request).
+4. Run `dox migrate`, then start `dox s` again.
 
 ## JWT tokens
 
@@ -849,23 +740,27 @@ Run `dart run build_runner build`, then `dox s`.
 ### 4. Try it
 
 ```bash
+curl -X POST localhost:3000/api/auth/register -H 'Content-Type: application/json' \
+  -d '{"name":"Ada","email":"ada@example.com","password":"secret-pass"}'
+# 201 {"token":"eyJhbGciOiJIUzI1NiIs...","user":{"id":1,"name":"Ada",...}}
+
+# log in, and keep the token in TOKEN
 curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
   -d '{"email":"ada@example.com","password":"secret-pass"}'
 # 200 {"token":"eyJhbGciOiJIUzI1NiIs...","user":{"id":1,"name":"Ada",...}}
+TOKEN='eyJhbGciOiJIUzI1NiIs...'
 
-curl localhost:3000/api/auth/me -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIs...'
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
 # 200 {"id":1,"name":"Ada","email":"ada@example.com",...}
 
-curl -X POST localhost:3000/api/auth/logout -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIs...'
+curl -X POST localhost:3000/api/auth/logout -H "Authorization: Bearer $TOKEN"
 # 200 {"logged_out":true}
 
-curl localhost:3000/api/auth/me -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIs...'
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
 # 401 {"code":"unauthorized","message":"Authentication failed"}
 ```
 
-Use `POST /api/auth/register` first if Ada has no account yet. It answers `201` with a token.
-`JwtAuthDriver.bearerToken(req)` gives the token of a request.
-
+If Ada already has an account from another way, `register` answers `422`. Then just log in.
 For a longer JWT walkthrough, see the [JWT auth guide](../guides/jwt-auth.md).
 
 ### Small tokens
@@ -928,17 +823,6 @@ Only a wrong signature moves on to the next secret. An expired token fails at on
 Remove the old secret once `expiresIn` has passed. Then every old token has expired anyway.
 Do not keep a leaked secret: anyone who has it can make tokens.
 To log out everyone at once, change the secret and keep no old secrets.
-
-### Things to know about JWT
-
-- **The token is not secret.** By default, anyone with the token can read `user.toJson()`. Keep private columns in `hidden`, or use [small tokens](#small-tokens).
-- **By default, you can not cancel one token.** Turn on [revocation](#revoke-tokens), or use [access tokens](#access-tokens).
-- **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
-- **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds, unless `forgetUser` runs. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
-- The token keeps the guard name in its `aud` claim. So a token of one guard does not work on another guard, even with the same secret.
-- Dox does not sign with the `secret` text as it is. The HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Another service that checks the tokens needs that key: `driver.signingKey`.
-- A token with another algorithm in its header is rejected.
-- `Auth().logout(req)` is the session logout. It throws on a JWT guard. Use `revokeToken`.
 
 ## Session login for web pages
 
@@ -1070,7 +954,8 @@ Run `dart run build_runner build`, then `dox s`.
 
 ### 4. Try it
 
-A browser keeps the cookies by itself. With curl, keep them in a file, and send the `XSRF-TOKEN` cookie back in the `X-XSRF-TOKEN` header:
+A browser keeps the cookies by itself. With curl, keep them in a file, and send the `XSRF-TOKEN` cookie back in the `X-XSRF-TOKEN` header.
+Ada must have an account. Make one with `POST /register` (same body as below, plus `name`), or use the one from another way.
 
 ```bash
 # the first request gives the session and XSRF-TOKEN cookies
@@ -1093,14 +978,6 @@ curl -b jar.txt localhost:3000/me
 ```
 
 A `POST` with no CSRF token gets `419` (`csrf_token_mismatch`).
-
-### Things to know about sessions
-
-- Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
-- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout, until the session `lifetime` ends. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
-- The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
-- `attemptSession`, `loginSession` and `logout` throw a `StateError` on a guard that does not use `SessionAuthDriver`.
-- `attemptSession` sends a `Retry-After` header with the `429` of the [login throttle](#login-throttle).
 
 ## Test it
 
@@ -1207,8 +1084,9 @@ Route.get('/me', <dynamic>[AuthMiddleware(guards: <String>['web', 'api']), (User
 
 - With `guards:`, the first guard with a good login sets `req.auth`.
 - Set `guard:` or `guards:`, not both. Both, or an empty list, throws an `ArgumentError`.
-- An unknown guard name throws an `ArgumentError`.
 - A JWT keeps the guard name in its `aud` claim, and an access token keeps its `type`. So a token of one guard does not work on another guard.
+- Give each user model its own token table, with `table:` on the driver and in the migration (`AccessTokenTables.up(schema, table: 'admin_access_tokens')`). With one shared table and `usersTable`, the foreign key fails for admin tokens, and deleting a user also deletes the tokens of the admin with the same id.
+- Pass a user of the guard's model: `Auth(guard: 'admin').createAccessToken(admin)`. A user of another model throws an `ArgumentError`.
 
 ### Pages for everyone and pages for guests
 
@@ -1228,6 +1106,250 @@ Route.get('/login', <dynamic>[GuestMiddleware(redirectTo: '/dashboard'), (PageCo
 - Both take `guard:`, like `AuthMiddleware(guard: 'admin')`.
 - `req.can()` of [Authorization](authorization.md) also works on a page with `optional: true`.
 
+### Change the abilities of a token
+
+`setAccessTokenAbilities` changes what an access token can do. The plain token stays the same.
+A two-step login (2FA) uses it. `dox_auth` does not make or check the code: your app does that.
+
+The idea:
+
+1. Step one checks the password with `once()`. The token it gives has only `2fa:pending`. No `*`, no `2fa`.
+2. Step two checks the code, then gives the token the abilities of a full login: `2fa` and `tokens:manage`.
+3. Each route that needs the second step checks `tokenCan('2fa')`.
+
+Add the DTO for the code:
+
+```dart title="lib/app/dtos/two_factor_code/two_factor_code.dto.dart"
+import 'package:dox_core/dox_core.dart';
+
+part 'two_factor_code.dto.g.dart';
+
+@Dto()
+class TwoFactorCode {
+  @Length(min: 6, max: 6)
+  final String code;
+
+  const TwoFactorCode({required this.code});
+
+  static const DtoSchema<TwoFactorCode> schema = $TwoFactorCodeDto;
+}
+```
+
+Add the controller with both steps:
+
+```dart title="lib/app/http/controllers/two_factor.controller.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/dtos/auth/auth.dto.dart';
+import 'package:my_app/app/dtos/two_factor_code/two_factor_code.dto.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+@Inject()
+class TwoFactorController {
+  /// POST /api/auth/login, step one: check the password. The token can
+  /// only do step two.
+  Future<Map<String, dynamic>> login(DoxRequest req, LoginUser body) async {
+    Auth auth = Auth(ip: req.ip());
+    bool ok = await auth.once(<String, dynamic>{
+      'email': body.email,
+      'password': body.password,
+    });
+    if (!ok) {
+      throw UnAuthorizedException(message: 'Wrong email or password');
+    }
+    AccessToken token = await auth.createAccessToken(
+      auth.user<User>()!,
+      name: 'login',
+      abilities: <String>['2fa:pending'],
+    );
+    // send the code to the user here, for example by mail
+    return <String, dynamic>{'token': token.value, 'two_factor': true};
+  }
+
+  /// POST /api/auth/two-factor, step two: check the code, then give the
+  /// token the abilities of a full login.
+  Future<Map<String, bool>> verify(DoxRequest req, TwoFactorCode body) async {
+    Auth auth = req.auth as Auth;
+    AccessToken token = auth.currentAccessToken!;
+    if (!token.abilities.contains('2fa:pending')) {
+      throw ForbiddenHttpException();
+    }
+    if (!_codeIsGood(auth.user<User>()!, body.code)) {
+      throw UnAuthorizedException(message: 'Wrong code');
+    }
+    await auth.setAccessTokenAbilities(token, <String>['2fa', 'tokens:manage']);
+    return <String, bool>{'verified': true};
+  }
+
+  /// Check the code with your own two-step code.
+  bool _codeIsGood(User user, String code) {
+    throw UnimplementedError('check the two-step code');
+  }
+}
+```
+
+`verify` checks `abilities.contains('2fa:pending')`, not `tokenCan`, because `tokenCan` is also `true` for `*`. So only a step-one token can do step two.
+
+Add a middleware that needs the second step:
+
+```dart title="lib/app/http/middleware/two_factor.middleware.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_core/dox_core.dart';
+
+/// Lets a request through only when its token did the second step.
+/// Put it after AuthMiddleware.
+dynamic requireTwoFactor(DoxRequest req) {
+  Auth? auth = req.auth as Auth?;
+  if (auth == null || !auth.tokenCan('2fa')) {
+    throw ForbiddenHttpException();
+  }
+  return req;
+}
+```
+
+In `lib/routes/api.dart`:
+
+1. Add the imports at the top:
+
+    ```dart
+    import 'package:my_app/app/http/controllers/two_factor.controller.dart';
+    import 'package:my_app/app/http/middleware/two_factor.middleware.dart';
+    ```
+
+2. In `register()`, change the login route to the new controller, and add the step-two route under it. The rate limit stops a fast guess of the 6-digit code:
+
+    ```dart
+    Route.post('/auth/login', <dynamic>[
+      RateLimit(max: 5, name: 'login'),
+      (TwoFactorController c) => c.login,
+    ]);
+    Route.post('/auth/two-factor', <dynamic>[
+      RateLimit(max: 5, name: 'two-factor'),
+      AuthMiddleware(),
+      (TwoFactorController c) => c.verify,
+    ]);
+    ```
+
+3. Add `requireTwoFactor` after `AuthMiddleware()` on each route that needs the second step:
+
+    ```dart
+    Route.get('/auth/me', <dynamic>[
+      AuthMiddleware(),
+      requireTwoFactor,
+      (AuthController c) => c.me,
+    ]);
+    ```
+
+    For many routes, use a group: `Route.middleware(<dynamic>[AuthMiddleware(), requireTwoFactor], () { ... });`.
+
+Then run `dart run build_runner build`.
+
+Things to know:
+
+- A route without `requireTwoFactor` (or a `tokenCan('2fa')` check) still takes a step-one token. `AuthMiddleware` only checks that the token is good.
+- Everything else that gives a token must follow the same rule. `register` in the [auth controller](#2-write-the-auth-controller) gives `*`, so in an app with a two-step login, give `<String>['2fa:pending']` there too. The same is true for script tokens: add `2fa` to their abilities if their routes need the second step.
+- [Rotate](#rotate-a-token) keeps the abilities it finds. A step-one token also can not use the `refresh` route, because it has no `tokens:manage`.
+- `tokenCan` on the same `Auth` sees the new abilities at once. The next requests read them from the table.
+- `setAccessTokenAbilities` throws an `UnAuthorizedException` (`401`) when the token is gone (revoked). It does not check the expiry. A token of another guard throws an `ArgumentError`. It works on a token table without the `rotated_at` column too.
+
+Try it, with the code check of your app in place:
+
+```bash
+curl -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"ada@example.com","password":"secret-pass"}'
+# 200 {"token":"oat_7.Ab1x...","two_factor":true}
+TOKEN='oat_7.Ab1x...'
+
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
+# 403 {"code":"forbidden","message":"Forbidden"}
+
+curl -X POST localhost:3000/api/auth/two-factor -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{"code":"123456"}'
+# 200 {"verified":true}
+
+curl localhost:3000/api/auth/me -H "Authorization: Bearer $TOKEN"
+# 200 {"id":1,"name":"Ada",...}
+```
+
+### When the database fails
+
+The access token check reads the database. When the database fails, the default is to fail closed:
+the check gives no user, the request gets `401`, and the error goes to the `report` of your [exception handler](../the-basic/errors.md).
+
+But a `401` tells many clients "you are logged out". A short database problem then logs users out.
+Turn on `throwOnError` to stop this:
+
+```dart title="lib/config/auth.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+AuthConfig authConfig = AuthConfig(
+  defaultGuard: 'api',
+  guards: <String, AuthGuard>{
+    'api': AuthGuard(
+      driver: AccessTokenAuthDriver(
+        expiresIn: const Duration(days: 30),
+        throwOnError: true,
+      ),
+      provider: AuthProvider(model: () => User()),
+    ),
+  },
+);
+```
+
+With `throwOnError: true`, an error in a token check is thrown. This is a database error, a token row that can not be read, or a guard that is not set up.
+It goes to your exception handler. The default answer is `500`.
+In production the `500` body is only `{"code":"server_error","message":"Server Error"}`. When `APP_ENV` is `development` or `local`, the error text is sent instead.
+
+To answer `503`, so the client tries again, catch the database error in `render`.
+Each database has its own error class. On SQLite (the default database of a new app), the class is in the `sqlite3` package. Add it:
+
+```bash
+dart pub add sqlite3
+```
+
+Make a new file for the handler:
+
+```dart title="lib/app/exception_handler.dart"
+import 'dart:io';
+
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_orm/dox_orm.dart';
+import 'package:sqlite3/sqlite3.dart' show SqliteException;
+
+class AppExceptionHandler extends ExceptionHandler {
+  const AppExceptionHandler();
+
+  @override
+  dynamic render(Object error, HttpRequest req) {
+    // a database error: ask the client to try again
+    if (error is SqliteException ||
+        error is PgException ||
+        error is MysqlException) {
+      return HttpStatusException(503, headers: <String, String>{'retry-after': '5'});
+    }
+    return super.render(error, req);
+  }
+}
+```
+
+On Postgres or MySQL only, drop the `sqlite3` package, its import and `error is SqliteException`.
+Then set the handler in `lib/config/app.dart`. Add the import at the top, and `exceptionHandler` in `AppConfig`:
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/app/exception_handler.dart';
+
+AppConfig appConfig = AppConfig(
+  exceptionHandler: const AppExceptionHandler(),
+  // ... the other settings stay
+);
+```
+
+The answer is then `503` with a `Retry-After: 5` header and `{"code":"service_unavailable","message":"Service Unavailable"}`.
+
+- `throwOnError` also counts for `AuthMiddleware(optional: true)`: a database error is thrown, not turned into a guest.
+- A failed `last_used_at` write is never thrown. It is reported, and the request goes on.
+
 ### Check a login with no request
 
 Code that has no request, like a [Socket.IO](../packages/socketio.md#log-in-a-socket) login, can check a token or a session itself:
@@ -1241,7 +1363,6 @@ User? user = await Auth(guard: 'web').userFromSession(session);
 - With an access token, `currentAccessToken` and `tokenCan` work on the same `Auth` after `userFromToken`. The driver method behind it is `check(token, guard)`, an instance method of `AccessTokenAuthDriver`.
 - `userCacheTtl` is a cache, not a check. With it on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
 - `userFromSession` gives the user of a session, or `null`. Load the session with `SessionMiddleware().fromCookie(value)`. See [Session](../the-basic/session.md#load-a-session-with-no-request). It needs a guard with `SessionAuthDriver`.
-- Both throw a `StateError` on a guard with the wrong driver.
 
 ### Your own guard (API key)
 
@@ -1307,7 +1428,7 @@ return req;
 
 ### Log in with another field
 
-`attempt` searches by the fields in `identifierFields` of the provider, and checks the column in `passwordField`:
+`attempt` searches by the fields in `identifierFields` of the `AuthProvider`, and checks the column in `passwordField`:
 
 ```dart
 AuthProvider(
@@ -1332,7 +1453,7 @@ Use the same choice in the migration and on the driver. Session and JWT guards n
 ### Login throttle
 
 The login throttle limits failed logins per account and ip. It is off by default.
-Turn it on in the auth provider:
+Turn it on where the config is loaded:
 
 ```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -1356,7 +1477,7 @@ class AppAuthProvider extends DoxProvider {
 - Without an ip, `attempt` counts per account only. Then anyone can lock an account for `decay`. So pass the ip: `Auth(ip: req.ip())`. `attemptSession` takes the ip from the request.
 - `attemptSession` sends a `Retry-After` header with the `429`. `attempt` has no request, so catch `LoginThrottledException` and set the header from `retryAfter` if you need it.
 - `once` counts like `attempt`.
-- A burst of parallel tries can get a few more than `maxAttempts`, because the check and the count are separate cache steps.
+- Parallel tries are not stopped. The limit is checked before a failed try is counted, so tries that run at the same time all pass the check. A burst of parallel wrong logins can all run, far past `maxAttempts`. In a test, 50 parallel wrong logins with `maxAttempts: 5` all ran. The throttle works for tries that come one after another. To stop fast parallel guessing, also put `RateLimit` on the login route, like the routes on this page do.
 
 ### Password hash cost
 
@@ -1394,17 +1515,20 @@ bcrypt reads at most 72 bytes. A longer password throws an `ArgumentError`, so l
 
 | Error | Cause | Fix |
 | --- | --- | --- |
-| `LateInitializationError: Field 'config' has not been initialized.` | `Auth.initialize` did not run. The provider is missing, or the generator did not run. | Add the [provider](#5-add-the-provider), then run `dart run build_runner build`. |
+| `LateInitializationError: Field 'config' has not been initialized.` | `Auth.initialize` did not run. `AppAuthProvider` is missing, or the generator did not run. | Add [`AppAuthProvider`](#5-load-the-config-when-the-app-starts), then run `dart run build_runner build`. |
 | `401` `Authentication failed` | No `Authorization` header, a bad, expired or revoked token, a deleted user, or a token of another guard. | Send `Authorization: Bearer <token>`. Log in again. |
 | `401` `Wrong email or password` | Your login controller: `attempt` gave `null`. | Check the email and password. |
+| `403` `Forbidden` | Your controller: the token does not have the ability. | Use a token with the ability. See [Abilities](#abilities). |
 | `Invalid argument (guard): no auth guard with this name: "admin"` | `Auth(guard: ...)` or `AuthMiddleware(guard: ...)` with a name that is not in `guards`. | Fix the name, or add the guard. |
 | `Bad state: The auth guard 'api' does not use SessionAuthDriver. Use attempt() and login() for a token, and revokeToken() to log out.` | `logout`, `attemptSession` or `loginSession` on a token guard. | Use `revokeToken(req)` to log out a token. |
 | `Bad state: The auth guard 'api' does not use AccessTokenAuthDriver.` | An access token method on a JWT or session guard. | Use `Auth(guard: ...)` of a guard with `AccessTokenAuthDriver`. |
+| `Bad state: The auth guard 'web' does not use JwtAuthDriver.` | `revokeAllTokens`, `forgetUser` or `userFromToken` on a session guard, or `revokeToken` on a session guard. | Use them on a JWT guard. A session logs out with `logout(req)`. |
 | `Bad state: AccessTokenAuthDriver makes tokens with Auth().createAccessToken(user), not login().` | `Auth().login(user)` on an access token guard. | Use `createAccessToken(user)`. |
-| `Bad state: revokeToken needs token revocation. Turn it on with JwtAuthDriver(revocation: true).` | `revokeToken`, `revokeAllTokens` or `forgetUser` on a JWT guard without revocation. | Set `revocation: true`. See [Revoke tokens](#revoke-tokens). |
-| `Bad state: The table 'auth_access_tokens' has no rotated_at column. ...` | `rotateAccessToken` on a token table made before the `rotated_at` column existed. | Add the column. See [A token table without `rotated_at`](#a-token-table-without-rotated_at). |
+| `Bad state: revokeToken needs token revocation. Turn it on with JwtAuthDriver(revocation: true).` | `revokeToken`, `revokeAllTokens` or `forgetUser` on a JWT guard without revocation. The text names the method. | Set `revocation: true`. See [Revoke tokens](#revoke-tokens). |
+| `Bad state: The table 'auth_access_tokens' has no rotated_at column. ...` | `rotateAccessToken` on a token table without the `rotated_at` column. | Add the column. See [A token table without `rotated_at`](#a-token-table-without-rotated_at). |
 | `401` `The access token was already rotated.` | A second rotate of the same token. | Use the new token. Rotate it, not the old one. |
-| `401` `The access token is revoked or does not exist.` / `The access token is expired.` | Rotate or change abilities of a revoked or expired token. | Log in again. |
+| `401` `The access token is expired.` | Rotate of an expired token. | Log in again. |
+| `401` `The access token is revoked or does not exist.` | Rotate or change abilities of a revoked token. | Log in again. |
 | `Invalid argument(s) (secret): The JWT secret is empty. Set APP_KEY (run `dox key:generate`).` | `JwtAuthDriver` with an empty secret. | Set `APP_KEY`. |
 | `Invalid argument(s) (secret): The JWT secret is <n> bytes. It must be at least 32 bytes. ...` | A short secret. In `development`, `local`, `test` and `testing` it is only a warning. | Run `dox key:generate`. |
 | `Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.` | `Hash.make` or `Hash.makeAsync` with a longer password. | Limit the length in the DTO. |
@@ -1413,13 +1537,57 @@ bcrypt reads at most 72 bytes. A longer password throws an `ArgumentError`, so l
 | `419` `CSRF token mismatch` | A session `POST` without the CSRF token. | Send the `X-XSRF-TOKEN` header or the `_token` field. See [CSRF protection](csrf.md). |
 | `403` `Already logged in` | `GuestMiddleware` with no `redirectTo`, for a logged-in user. | Set `redirectTo`, or log out first. |
 
+## Good to know
+
+Access tokens:
+
+- A token fails (`401`) when its format is bad, the secret is wrong, it is expired, it was revoked, its user is gone, it has another type, or it was made for a guard with another user table.
+- `tokenable_type` is the table name of the user model. If you rename the users table, the old tokens stop working.
+- Each token has a `type`. By default it is the guard name. So two access token guards do not take each other's tokens. If you rename a guard, set `AccessTokenAuthDriver(type: 'old-name')` to keep its tokens working.
+- A token `name` over 255 characters throws an `ArgumentError`. Nothing is written.
+- When you delete a user, call `revokeAllAccessTokens(user)` too, or use `--users-table` (`usersTable:`) in the migration. Then old tokens can never match a new user with the same id.
+- The migration makes the table on the default connection. If the driver uses another connection, like `AccessTokenAuthDriver(connection: 'other')`, make the table on that connection.
+- `last_used_at` is written at most once a minute per token. So a busy token does not write on every request. If this write fails, the error is reported and the request goes on.
+- On MySQL, `expires_at` is kept to the second: MySQL rounds the time. So a token can stop working up to half a second before or after its exact time.
+
+JWT:
+
+- **The token is not secret.** By default, anyone with the token can read `user.toJson()`. Keep private columns in `hidden`, or use [small tokens](#small-tokens).
+- **The user is loaded on each request**, by the id in the token. A deleted user can not log in, even with a valid token.
+- **`userCacheTtl` skips that query.** With `Duration(seconds: 30)`, a deleted or changed user is seen only after 30 seconds, unless `forgetUser` runs. Each isolate has its own cache. Requests in that time share one user object, so do not change it per request.
+- Dox does not sign with the `secret` text as it is. The HMAC key is made from it with HKDF-SHA256 and the label `dox:jwt`. Another service that checks the tokens needs that key: `driver.signingKey`.
+- `JwtAuthDriver.bearerToken(req)` gives the token of a request.
+
+Sessions:
+
+- Login and logout give the session a new id and a new CSRF token. So an id that someone saw before the login is of no use.
+- With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout, until the session `lifetime` ends. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+- The session keeps only the user id. `AuthMiddleware` loads the user from the database on each request, so a deleted user is logged out.
+
 ## Reference
+
+### `AuthConfig` and `AuthGuard`
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `AuthConfig(defaultGuard:)` | required | the guard that `Auth()` and the middleware use when no guard is given |
+| `AuthConfig(guards:)` | `{}` | the guards, by name |
+| `AuthGuard(driver:)` | required | `AccessTokenAuthDriver`, `JwtAuthDriver`, `SessionAuthDriver`, or your own `AuthDriver` |
+| `AuthGuard(provider:)` | required | the `AuthProvider`: which model holds the users |
+
+### `AuthProvider`
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `model` | required | a function that makes a new model, like `() => User()` |
+| `identifierFields` | `['email']` | the fields `attempt` searches by |
+| `passwordField` | `'password'` | the column with the bcrypt hash |
 
 ### `Auth`
 
 | Method | What it does |
 | --- | --- |
-| `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a provider |
+| `Auth.initialize(AuthConfig)` | sets the config. Call it once, in a `DoxProvider` |
 | `Auth(guard: 'admin')` | uses another guard from `guards`. Without `guard`, it uses `defaultGuard` |
 | `Auth(ip: req.ip())` | gives the client ip to `attempt`, for the [login throttle](#login-throttle) |
 | `Auth.throttle` | the [login throttle](#login-throttle). `null` (off) by default |
@@ -1451,8 +1619,6 @@ bcrypt reads at most 72 bytes. A longer password throws an `ArgumentError`, so l
 | `Auth.needsRehash(hash)` | `true` when the hash was not made with the cost of `Hash.rounds`. See [Password hash cost](#password-hash-cost) |
 | `Auth.hashCost(hash)` | the bcrypt cost of a hash, or `null` when it is not a bcrypt hash |
 
-Access token methods throw a `StateError` on a guard without `AccessTokenAuthDriver`.
-
 ### `req.auth`
 
 After `AuthMiddleware`, `req.auth` holds the login.
@@ -1465,14 +1631,6 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `req.auth?.id()` | the primary key of the user, or `null` |
 | `req.auth?.user<User>()` | the user model |
 | `req.auth?.toJson()` | the user as a map, without `hidden` fields |
-
-### `AuthProvider`
-
-| Option | Default | What it does |
-| --- | --- | --- |
-| `model` | required | a function that makes a new model, like `() => User()` |
-| `identifierFields` | `['email']` | the fields `attempt` searches by |
-| `passwordField` | `'password'` | the column with the bcrypt hash |
 
 ### `AccessTokenAuthDriver`
 
@@ -1497,9 +1655,10 @@ After `AuthMiddleware`, `req.auth` holds the login.
 | `usersTable` | `--users-table=users` | none | adds a foreign key from `tokenable_id` to `usersKey` of this table, with cascade delete. The two id columns must have the same type |
 | `usersKey` | `--users-key=uid` | `'id'` | the key column of `usersTable`. Alone, the flag prints a warning and does nothing |
 
+`AccessTokenTables.down(schema, table: 'auth_access_tokens')` drops the table. Pass the same `table` as in `up`.
+
 The table has these columns: `id`, `tokenable_type`, `tokenable_id`, `type`, `name`, `hash`, `abilities`, `last_used_at`, `expires_at`, `rotated_at`, `created_at`, `updated_at`.
 There is an index on `expires_at`. The time columns are `DATETIME` on MySQL, so a token can expire after 2038.
-`AccessTokenTables.down(schema)` drops the table.
 `auth:tokens-table` is a [package command](../digging-deeper/package-commands.md) of `dox_auth`. The same flag twice is an error: it writes nothing and exits with code 1.
 
 ### `AccessToken`
@@ -1509,10 +1668,12 @@ There is an index on `expires_at`. The time columns are `DATETIME` on MySQL, so 
 | `id` | the row id |
 | `value` | the plain token. Only set by `createAccessToken` and `rotateAccessToken`. It is not kept |
 | `name`, `type` | the name and the type |
+| `tokenableType` | the table name of the user model |
+| `tokenableId` | the user id: an `int`, or a `String` with `stringIds` or `uuidIds` |
 | `abilities` | the list of abilities |
 | `lastUsedAt`, `expiresAt`, `createdAt`, `updatedAt` | times, in UTC |
 | `user` | the user. Set by `createAccessToken` and by a token check. `null` in `accessTokens(user)` |
-| `can(ability)`, `cannot(ability)` | checks one ability |
+| `can(ability)`, `cannot(ability)` | checks one ability (`*` passes every check) |
 | `toJson()` | the token without the hash and the plain value |
 
 ### `JwtAuthDriver`
@@ -1530,6 +1691,8 @@ There is an index on `expires_at`. The time columns are `DATETIME` on MySQL, so 
 | `revocation` | `false` | turn on token revocation. See [Revoke tokens](#revoke-tokens) |
 | `revocationStore` | `null` | the cache store for revoked tokens. `null` is the default app store |
 
+The token keeps the guard name in its `aud` claim.
+
 ### `SessionAuthDriver`
 
 | Option | Default | What it does |
@@ -1546,3 +1709,11 @@ There is an index on `expires_at`. The time columns are `DATETIME` on MySQL, so 
 | `AuthMiddleware(optional:)` | `false` | let guests through too. See [Pages for everyone and pages for guests](#pages-for-everyone-and-pages-for-guests) |
 | `GuestMiddleware(guard:)` | `defaultGuard` | the guard to check |
 | `GuestMiddleware(redirectTo:)` | none (`403`) | send a logged-in user to this page instead of a `403` |
+
+### `LoginThrottle`
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `maxAttempts` | `5` | failed logins allowed per login field and ip. Less than 1 throws an `ArgumentError` |
+| `decay` | `Duration(minutes: 1)` | how long the count is kept, from the first failed login |
+| `store` | `null` | the cache store for the counts. `null` is the default app store |

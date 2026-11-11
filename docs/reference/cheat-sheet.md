@@ -536,12 +536,15 @@ Protect a route with `AuthMiddleware()`. Client sends `Authorization: Bearer <to
 Access tokens (`AccessTokenAuthDriver`):
 
 ```dart
-AccessToken token = await Auth().createAccessToken(user, abilities: <String>['posts:read']);
-bool ok = (req.auth as Auth).tokenCan('posts:read');
+Auth auth = req.auth as Auth; // after AuthMiddleware()
+User user = auth.user<User>()!;
+AccessToken token = await auth.createAccessToken(user, abilities: <String>['posts:read']);
+bool ok = auth.tokenCan('posts:read');
 AccessToken next = await auth.rotateAccessToken(auth.currentAccessToken!, grace: const Duration(minutes: 1));
-await auth.setAccessTokenAbilities(auth.currentAccessToken!, <String>['user', '2fa']);
-await Auth().revokeToken(req); // logout
+await auth.setAccessTokenAbilities(auth.currentAccessToken!, <String>['2fa']);
+await auth.revokeToken(req); // logout
 ```
+
 `AuthMiddleware(optional: true)` lets guests through too. `GuestMiddleware(redirectTo: '/dashboard')` is for login pages.
 
 See [Authentication](../security/authentication.md) and [Hashing](../security/hashing.md).
