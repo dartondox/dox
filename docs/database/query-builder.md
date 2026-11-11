@@ -778,7 +778,8 @@ Anything else, like `count(*)`, throws an `ArgumentError`. Use `selectRaw` for i
 
 `selectRaw()` takes values, like `whereRaw`.
 Write `@name` in the SQL and put the value in the map.
-Use unique names. A name that the query uses in another place, like in `whereRaw`, throws an `ArgumentError`.
+Use unique names. A name that the query uses in another place, like in `whereRaw` or in another `selectRaw`, throws an `ArgumentError`.
+A name may not start with `dox_`. The ORM uses these names for its own values.
 
 ```dart
 await QueryBuilder.table('actor')
