@@ -9,7 +9,7 @@ name: Docs
 
 # The docs go live with a tag, and build the docs of that tag. So docs for
 # a feature that is not released yet stay off the site.
-# - `v<version>`: a release. The same tag publishes the packages.
+# - `dox_core-v<version>`: a release of dox_core. The same tag publishes it.
 # - `docs-v<version>`: the docs only, eg. a typo fix or the docs of a
 #   package from another repo that was just released. Nothing is published.
 # Run it by hand (workflow_dispatch) to deploy a branch, or the 2.x docs.
@@ -17,7 +17,7 @@ name: Docs
 on:
   push:
     tags:
-      - 'v*'
+      - 'dox_core-v*'
       - 'docs-v*'
   workflow_dispatch:
     inputs:
