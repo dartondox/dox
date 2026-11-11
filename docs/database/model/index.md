@@ -85,6 +85,7 @@ All options go in `@DoxModel(...)`.
 
 The default table name is the class name in snake_case, and singular.
 `Blog` uses `blog`, and `BlogPost` uses `blog_post`.
+With the [`pluralTableNames` flag](../index.md#orm-flags) it is plural: `blogs` and `blog_posts`.
 
 ```dart
 @DoxModel(table: 'blogs')
@@ -244,10 +245,12 @@ Blog created = await Blog().create(<String, dynamic>{
 ```
 
 - On insert, `null` fields are not sent, so the database default is used.
+  With the [`createWritesNull` flag](../index.md#orm-flags), `create()` writes `NULL` for a key that is `null` in the map.
 - On update, only the fields that changed are sent.
   A field is compared to its value from the last load or save.
   A `Map` or `List` field is always sent, because it can change in place.
 - When nothing changed, `save()` runs no query, and `updated_at` stays as it is.
+  It still fires `updating` and `updated`, unless the [`skipCleanUpdateEvents` flag](../index.md#orm-flags) is on.
 - When you set `updatedAt` yourself, `save()` keeps your value. Else it sets `updated_at` to now.
 - On update, a field is set to `NULL` only when it had a value before
   (loaded from the database, or saved).

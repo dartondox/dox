@@ -85,6 +85,7 @@ Helpers:
 
 - `timestamps()`: nullable `created_at` and `updated_at` (`timestampTz`).
 - `softDeletes(['deleted_at'])`: nullable `deleted_at` (`timestampTz`), for models with `softDelete: true`.
+- With the [`laravelPostgresTypes` flag](index.md#orm-flags), a new Postgres table gets `TIMESTAMP` for `timestamps()` and `softDeletes()`, and `JSON` for `json()`.
 - `rememberToken()`: nullable `remember_token` `VARCHAR(100)`.
 - `softDeletesTz(['deleted_at'])`: the same as `softDeletes`. It is already a time with a zone.
 - `morphs('owner')`: `owner_id` (unsigned big integer), `owner_type` (string) and one index on both columns.

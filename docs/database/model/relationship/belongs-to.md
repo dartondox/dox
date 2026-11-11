@@ -144,6 +144,7 @@ See [Query by relations](../relation-queries.md).
 
 The default `foreignKey` uses the class name of the related model in snake_case.
 `User` gives `user_id`, also when the table is `users`.
+The [`belongsToKeyFromRelation` flag](../../index.md#orm-flags) takes it from the relation name (`author_id`). The model generator does not pass the relation name yet, so set `foreignKey` when it is not the class name.
 
 ### `foreignKey` and `localKey`
 
