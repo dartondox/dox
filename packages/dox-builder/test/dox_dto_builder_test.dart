@@ -1019,6 +1019,17 @@ class A {
   final String debug;
   const A({required this.debug});
 }''', '@Prohibited on A.debug can never pass: the field is always required');
+      await expectError(
+        '''
+@Dto()
+class A {
+  final String? type;
+  @ProhibitedIf('type', 'guest')
+  final String debug;
+  const A({this.type, required this.debug});
+}''',
+        '@ProhibitedIf on A.debug can not pass when its condition matches: the field is always required',
+      );
     });
 
     const String rules = '''

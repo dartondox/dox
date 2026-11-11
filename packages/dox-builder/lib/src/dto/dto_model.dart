@@ -780,10 +780,15 @@ class DtoReader {
       }
       if (requiredWhenRules.contains(name) || excludeRules.contains(name)) {
         if (!field.maybe && field.required) {
-          String why = name.startsWith('Prohibited')
-              ? 'can never pass: the field is always required, so it can '
-                    'not be missing or empty'
-              : 'does nothing: the field is always required';
+          String why = switch (name) {
+            'Prohibited' =>
+              'can never pass: the field is always required, so it can '
+                  'not be missing or empty',
+            'ProhibitedIf' =>
+              'can not pass when its condition matches: the field is always '
+                  'required, so it can not be missing or empty',
+            _ => 'does nothing: the field is always required',
+          };
           errors.add(
             '@$name on $where $why. '
             'Make it nullable, a Maybe, or give it a default.',
