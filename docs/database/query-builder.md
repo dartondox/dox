@@ -101,6 +101,18 @@ try {
 }
 ```
 
+### `sole`
+
+`sole()` returns the only row of the query.
+It throws a `ModelNotFoundException` when no row matches.
+It throws a `MultipleRecordsFoundException` when more than one row matches.
+
+```dart
+Actor actor = await Actor().where('email', 'john@example.com').sole();
+```
+
+It reads 2 rows at most.
+
 ### `count`
 
 Returns the number of rows as an `int`.
@@ -413,6 +425,24 @@ Give the function its type, like `(QueryBuilder<Actor> q) {...}`. Without it, `q
     A row with `NULL` in a column of the brackets matches neither the brackets nor `NOT` of them.
     This is how SQL works with `NULL`.
 
+### `whereAny` and `whereAll`
+
+`whereAny` keeps the rows where at least one of the columns matches.
+`whereAll` keeps the rows where all of the columns match.
+They take the same values as `where`, after the list of columns.
+
+```dart
+await Actor().whereAny(<String>['name', 'email'], 'like', '%john%').get();
+// WHERE ("name" like @name_p0 OR "email" like @email_p1)
+
+await Actor().whereAll(<String>['first_name', 'last_name'], 'like', 'J%').get();
+// WHERE ("first_name" like @first_name_p0 AND "last_name" like @last_name_p1)
+```
+
+- The conditions go in one bracket.
+- Each one has an `or` form: `orWhereAny` and `orWhereAll`.
+- An empty list adds nothing.
+
 ### `whereIn` and `whereNotIn`
 
 ```dart
@@ -601,6 +631,51 @@ await Actor().whereJsonDoesntContain('tags', 'horror').get();
     `whereJsonDoesntContain` on a row that does not have the key is not the same on every database.
     SQLite and MariaDB keep the row. Postgres and MySQL drop it. Laravel works the same way.
 
+### JSON columns
+
+Use `->` in a column name to read a key inside a JSON column.
+Use `->` again for a nested key.
+
+```dart
+await Actor().where('options->lang', 'en').get();
+await Actor().where('options->address->city', 'Paris').get();
+await Actor().where('options->rating', '>', 4).get();
+await Actor().where('options->active', true).get();
+
+await Actor().whereIn('options->lang', <String>['en', 'de']).get();
+await Actor().whereNull('options->lang').get();
+
+List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
+    .select(<String>['name', 'options->lang as lang'])
+    .orderBy('options->lang')
+    .get();
+```
+
+- It works in `where`, the other `where*` methods, `select`, `orderBy`, `groupBy` and joins.
+- Keys can have letters, digits and `_`. Any other key throws an `ArgumentError`.
+- In `select`, give the value a name with `as`.
+
+| Database | `options->address->city` |
+| --- | --- |
+| SQLite | `json_extract("options", '$."address"."city"')` |
+| MySQL, MariaDB | ``json_unquote(json_extract(`options`, '$."address"."city"'))`` |
+| Postgres | `CAST("options" AS jsonb)->'address'->>'city'` |
+
+!!! note
+    In `where`, a number or a bool value works the same on every database.
+    On Postgres, the other methods compare the value as text.
+    For example, `whereBetween('options->rating', [1, 5])` and `whereIn('options->rating', [4, 5])` compare text there.
+    `sum('options->rating')` and `avg(...)` fail on Postgres, because the value is text.
+    Use `selectRaw` with a cast for them.
+
+!!! note
+    `where('options->lang', null)` and `whereNull('options->lang')` match a missing key.
+    On SQLite and Postgres they also match a JSON `null`. On MySQL and MariaDB they do not.
+
+!!! note
+    On SQLite, and in `where` on Postgres, the number `5` does not match the string `"5"`.
+    MySQL and MariaDB compare text with a number as numbers, so `5` matches `"5"` there.
+
 ### `whereRaw` and `orWhereRaw`
 
 Write the condition yourself. Put values in a map, and use `@key` in the SQL.
@@ -701,6 +776,17 @@ Anything else, like `count(*)`, throws an `ArgumentError`. Use `selectRaw` for i
 
 `selectRaw()` replaces the select list. The [`selectRawAdds` flag](index.md#orm-flags) makes it add to the list.
 
+`selectRaw()` takes values, like `whereRaw`.
+Write `@name` in the SQL and put the value in the map.
+Use unique names. A name that the query uses in another place, like in `whereRaw` or in another `selectRaw`, throws an `ArgumentError`.
+A name may not start with `dox_`. The ORM uses these names for its own values.
+
+```dart
+await QueryBuilder.table('actor')
+    .selectRaw('age * @rate as score', <String, dynamic>{'rate': 2})
+    .get();
+```
+
 !!! info
     A model loaded with `select()` only has the selected fields.
     `save()` on it only updates the fields it has.
@@ -735,6 +821,20 @@ await Actor().orderBy('name', 'asc').orderBy('id', 'desc').get();
 - For an expression, use `orderByRaw('count(*) desc')`. Nothing is quoted there,
   so never put user input in it.
 
+### `orderByDesc` and `reorder`
+
+```dart
+await Actor().orderByDesc('age').get();
+// ORDER BY "age" desc
+
+// remove the order
+await Actor().latest().reorder().get();
+
+// remove the order, then order by name
+await Actor().latest().reorder('name').get();
+await Actor().latest().reorder('name', 'desc').get();
+```
+
 ### `latest`, `oldest` and `inRandomOrder`
 
 ```dart
@@ -764,6 +864,22 @@ await Actor().limit(10).offset(20).get();
 ```
 
 The numbers are sent as bound parameters.
+
+### `skip` and `forPage`
+
+`skip` is the same as `offset`.
+`forPage` gets one page of rows. The first page is `1`.
+The page size is `15` when you give none.
+
+```dart
+await Actor().skip(20).take(10).get();
+
+// rows 31 to 45
+await Actor().forPage(3).get();
+
+// rows 51 to 100
+await Actor().forPage(2, 50).get();
+```
 
 ### `groupBy`
 
@@ -826,6 +942,38 @@ await Actor().rightJoin('actor_info', 'actor_info.actor_id', 'actor.id').get();
 
 // with an operator
 await Actor().join('actor_info', 'actor_info.actor_id', '=', 'actor.id').get();
+```
+
+For a join with more conditions, pass a function in place of the columns.
+It works with `join`, `leftJoin` and `rightJoin`.
+
+```dart
+await Actor()
+    .join('contact', (JoinClause j) {
+      j
+          .on('contact.actor_id', 'actor.id')
+          .orOn('contact.agent_id', 'actor.id')
+          .where('contact.active', true);
+    })
+    .get();
+// JOIN "contact" on "contact"."actor_id" = "actor"."id"
+//   OR "contact"."agent_id" = "actor"."id"
+//   AND "contact"."active" = @contactactive_p0
+```
+
+- `on` and `orOn` compare two columns. They take an operator too, like `on('a.x', '>=', 'b.x')`.
+- `where` and `orWhere` compare a column with a value. The value is bound.
+- Give the function its type, like `(JoinClause j) {...}`.
+- The function must add at least one condition, or it throws an `ArgumentError`.
+
+!!! note
+    SQL reads `a OR b AND c` as `a OR (b AND c)`.
+
+`crossJoin` joins each row with each row of the other table.
+
+```dart
+await QueryBuilder.table('size').crossJoin('color').get();
+// SELECT * FROM "size" CROSS JOIN "color"
 ```
 
 For other join conditions, use the raw methods.
@@ -1097,6 +1245,33 @@ User updated = await User().updateOrCreate(
 
 !!! warning
     Two requests at the same time can both create a row.
+    Add a unique index, and use `upsert` when this matters.
+
+### `updateOrInsert`
+
+`updateOrInsert` updates the rows that match the first map with the second map.
+When no row matches, it inserts one row from both maps.
+
+```dart
+await QueryBuilder.table('setting').updateOrInsert(
+  <String, dynamic>{'key': 'theme'},
+  <String, dynamic>{'value': 'dark'},
+);
+```
+
+- It updates every row that matches the first map, not only one.
+- It does not read the row back. Use `updateOrCreate` when you need the row.
+- It returns `true` when it inserted a row, or when the update changed a row.
+  MySQL and MariaDB count only the rows that really changed.
+- An empty first map throws an `ArgumentError`, so it can never update every row by mistake.
+- On a model, it uses the model's `insert()` and `update()`:
+    - `fillable` and `guarded` apply.
+    - The insert is a `create()`, so the create [model events](model/events.md) run and the timestamps are set.
+    - The update fires no model events and does not set `updated_at`.
+    - Soft deleted rows do not match. So a match that is soft deleted gives a new row.
+
+!!! warning
+    Two calls at the same time can both insert a row.
     Add a unique index, and use `upsert` when this matters.
 
 ## Update
