@@ -71,6 +71,7 @@ dox make:controller Blog -r
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 import 'package:dox_core/dox_core.dart';
 
+/// Route: Route.resource('path', BlogController);
 @Inject()
 class BlogController {
   /// GET /resource
@@ -92,6 +93,8 @@ class BlogController {
   Future<dynamic> update(DoxRequest req, int id) async {}
 
   /// DELETE /resource/{id}
+  /// delete() gives the number of rows it deleted, so 0 is a 404:
+  /// `if (await Post().where('id', id).delete() == 0) throw NotFoundHttpException();`
   Future<dynamic> destroy(DoxRequest req, int id) async {}
 }
 ```
@@ -136,6 +139,7 @@ class BlogController {
 
   /// POST /resource
   /// create() takes only the fillable columns of Blog.
+  /// Set fillable in the Blog model first. While it is empty, this throws.
   Future<dynamic> store(DoxRequest req) async {
     return Blog().create(req.body);
   }
@@ -152,6 +156,8 @@ class BlogController {
   }
 
   /// PUT|PATCH /resource/{id}
+  /// update() takes only the fillable columns of Blog.
+  /// Set fillable in the Blog model first. While it is empty, this throws.
   Future<dynamic> update(DoxRequest req, Blog blog) async {
     await blog.update(req.body);
     return blog;

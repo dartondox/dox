@@ -12,7 +12,7 @@ dox make:model Blog -m   # the model and a migration for the table `blogs`
 dox make:model Blog -a   # the model, a migration, a factory, a seeder and a resource controller
 ```
 
-Other options: `-c` controller, `-r` resource controller, `-f` factory, `-s` seeder.
+Other options: `-c` controller, `-r` resource controller, `--api` resource controller without `create` and `edit`, `-f` factory, `-s` seeder.
 You can join them, like `-mfs`. See [CLI reference](../../reference/cli.md#dox-makemodel).
 
 This makes `lib/app/models/blog/blog.model.dart`.

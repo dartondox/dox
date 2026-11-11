@@ -40,7 +40,7 @@ dart pub global deactivate dox
 | `dox make:middleware <name>` | create a middleware |
 | `dox make:dto <name>` | create a DTO (typed, checked input) |
 | `dox make:serializer <name>` | create a serializer |
-| `dox make:model <name> [-m] [-c] [-r] [-f] [-s] [-a]` | create a model, and with the options its migration, controller, factory and seeder |
+| `dox make:model <name> [-m] [-c] [-r] [--api] [-f] [-s] [-a]` | create a model, and with the options its migration, controller, factory and seeder |
 | `dox make:migration <name> [--sql]` | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
@@ -127,7 +127,7 @@ dox make:migration create_blogs_table --sql    # .sql file
 ```
 
 - `-r` (or `--resource`) adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`. `--api` adds the same methods without `create` and `edit`.
-- `make:model` options: `-m` migration, `-c` controller, `-r` resource controller, `-f` factory, `-s` seeder, `-a` all of them. Join them, like `-mfs`. See [CLI reference](../reference/cli.md#dox-makemodel).
+- `make:model` options: `-m` migration, `-c` controller, `-r` resource controller, `--api` resource controller without `create` and `edit`, `-f` factory, `-s` seeder, `-a` all of them. Join them, like `-mfs`. See [CLI reference](../reference/cli.md#dox-makemodel).
 - Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
 - After `make:controller` or `make:dto`, run `dox build_runner:build` (or keep `dox serve` running). See [Validation](../the-basic/validation.md).
 - The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.
