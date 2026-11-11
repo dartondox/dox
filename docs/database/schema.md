@@ -42,6 +42,8 @@ await schema.dropIfExists('posts');
 | `rename('from', 'to')` | Rename a table. |
 | `hasTable('t')` | `true` when the table exists. |
 | `hasColumn('t', 'c')` | `true` when the column exists. |
+| `hasColumns('t', ['a', 'b'])` | `true` when every column exists. |
+| `hasIndex('t', index)` | `true` when the index exists. See [Check an index](#check-an-index). |
 | `getColumnListing('t')` | The column names, in order. |
 
 ## Column types
@@ -191,6 +193,19 @@ table.dropPrimary();                              // posts_pkey on Postgres
 Index names are `{table}_{columns}_{index|unique|foreign}`.
 You can give your own name as the last argument: `table.unique('slug', 'my_name')`.
 
+### Check an index
+
+`hasIndex` takes an index name, or a list of its columns:
+
+```dart
+await schema.hasIndex('posts', 'posts_slug_unique');                   // by name
+await schema.hasIndex('posts', <String>['state', 'created_at']);       // by columns
+```
+
+- The list must have all the columns of the index, in the same order.
+- The primary key is named `primary` on MySQL, MariaDB and SQLite.
+  On Postgres it has its real name, like `posts_pkey`.
+
 ### Foreign keys
 
 ```dart
@@ -213,6 +228,47 @@ table.foreign('user_id').references('id').on('users').onDelete('cascade');
 !!! warning "Same type on both sides"
     `id()` is a big integer. `foreignId()` is a big integer too, so they match.
     If the parent uses `increments()` (a normal integer), use `unsignedInteger()` for the child on MySQL.
+
+### Turn the foreign key checks off
+
+Sometimes you must write rows before their parent rows, for example when you copy data.
+Turn the foreign key checks off for that work:
+
+```dart
+await schema.withoutForeignKeyConstraints(() async {
+  // the post first, its user later
+  await QueryBuilder.table('posts').insert(<String, dynamic>{'user_id': 1, 'title': 'Hi'});
+  await QueryBuilder.table('users').insert(<String, dynamic>{'id': 1, 'name': 'Ann'});
+});
+```
+
+`withoutForeignKeyConstraints` turns the checks on again after the function, also when it throws.
+Use it when you can.
+
+`disableForeignKeyConstraints()` and `enableForeignKeyConstraints()` do the same in two steps:
+
+```dart
+await QueryBuilder.transaction(() async {
+  await schema.disableForeignKeyConstraints();
+  // ...
+  await schema.enableForeignKeyConstraints();
+});
+```
+
+Each database works in its own way:
+
+| Database | SQL | Limits |
+|---|---|---|
+| SQLite | `PRAGMA foreign_keys = OFF` | It is for the one connection of the isolate. So other code of that isolate is not checked either while it is off. Inside a transaction it does nothing. |
+| MySQL, MariaDB | `SET FOREIGN_KEY_CHECKS = 0` | It is a setting of one pool connection. So `disable` and `enable` must run inside a transaction, else they throw a `StateError`. Turn the checks on again before the transaction ends. |
+| Postgres | `SET CONSTRAINTS ALL DEFERRED` | Only keys made `DEFERRABLE` wait, and only until the checks are on again. Dox keys are not `DEFERRABLE`, so they are still checked. It must run inside a transaction too. |
+
+- On MySQL, MariaDB and Postgres, `withoutForeignKeyConstraints` runs in a transaction.
+  So all its queries use the same connection.
+  Inside another transaction it uses a savepoint.
+- On SQLite, run `withoutForeignKeyConstraints` outside a transaction.
+- A migration runs in a transaction, so `disable` and `enable` work there on every database.
+  On SQLite, a migration already runs with the checks off.
 
 ## SQLite notes
 
