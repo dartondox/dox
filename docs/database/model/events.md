@@ -65,7 +65,7 @@ All hooks come in pairs: one runs before the query, one after it.
 | `touch()` | `saving` → `updating` → *UPDATE updated_at* → `updated` → `saved` (`touchQuietly()` fires none) |
 
 - The model hook runs first. Then the observers run, in the order you added them.
-- `save()` on a loaded model with no changes fires the same events, but runs no UPDATE. A model with a `Map` or `List` field is always sent, because the field can be changed in place. With the [`skipCleanUpdateEvents` flag](../index.md#orm-flags), it fires only `saving` and `saved`. A model with a `Map` or `List` field always counts as changed, because the field can be changed in place.
+- `save()` on a loaded model with no changes fires the same events, but runs no UPDATE. A model with a `Map` or `List` field is always sent, because the field can be changed in place. With the [`skipCleanUpdateEvents` flag](../index.md#orm-flags), it fires only `saving` and `saved`. With this flag on, a save with changes runs `beforeSave` two times, and a save with no changes runs it one time.
 - When a model has events, `create({...})` saves only the `@Column` fields.
 
 !!! warning "Query updates and deletes fire no events"
