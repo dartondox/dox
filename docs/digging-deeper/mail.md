@@ -567,7 +567,7 @@ Pass `output` to print somewhere else, eg. `LogTransport(output: stderr.writeln)
 
 Two options, both off by default:
 
-- `useLogger: true` writes each email to the app log with `Logger.info`, not with `print`. The logger settings apply, eg. `LoggerConfig.enabled`.
+- `useLogger: true` writes each email to the app log with `Logger.info`, not with `print`. The logger is off by default: set `LoggerConfig(enabled: true)`, or nothing is written. The logger level must allow `info`. When the logger throws (eg. Dox is not set up), the email is printed.
 - `bothBodies: true` shows the text body and the HTML body when the email has both. When it is off, only the text body is shown.
 
 ```dart
