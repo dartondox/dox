@@ -22,6 +22,7 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
       payload is! File &&
       payload is! StreamFile &&
       payload is! DownloadableFile) {
+    if (payload is String) htmlForText(request.response);
     responseDataHandler(payload, request);
     return;
   }
@@ -41,6 +42,20 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   /// which will set header and status code in the response
   /// and will pass payload/content to `responseDataHandler` function.
   doxResponse.process(request);
+}
+
+/// the content type the server sets before the app runs
+const String _presetType = 'text/plain; charset=utf-8';
+
+/// With `CoreFlags.htmlStrings`, a string is sent as `text/html`. Only
+/// when the type is still the preset one: a type set by a middleware or
+/// the controller stays. The preset can not be told from `ContentType.text`
+/// set by hand, so use `response(text).contentType(...)` to keep plain
+/// text.
+void htmlForText(HttpResponse res) {
+  if (!Dox().flags.htmlStrings) return;
+  if (res.headers.value(HttpHeaders.contentTypeHeader) != _presetType) return;
+  res.headers.contentType = ContentType.html;
 }
 
 /// sent on every file response, so the browser never guesses the type

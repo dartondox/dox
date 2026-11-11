@@ -1,5 +1,18 @@
 ## Unreleased
 
+- New: `CoreFlags`, opt-in behaviors that work like Laravel, as `AppConfig(flags: ...)`. All are off by default, so nothing changes until you turn one on. `CoreFlags.all()` turns on every flag. `Dox().flags` gives the flags of the current isolate.
+- New: `CoreFlags.laravelErrors` sends a `422` as `{"message": "...", "errors": {"field": ["..."]}}`. The OpenAPI `ValidationError` schema follows it.
+- New: `CoreFlags.onlyPresent` makes `req.only([...])` leave out keys that are not in the input.
+- New: `CoreFlags.cookieDefaults` sends `Path=/` and `SameSite=Lax` for a `DoxCookie` with no `path` or `sameSite`.
+- New: `CoreFlags.hasKeyOnly` makes `req.has('x')` only check that the key is there, like `req.exists('x')`.
+- New: `CoreFlags.htmlStrings` sends a string from a controller as `text/html`. A content type set by the app wins.
+- New: `res.header(k, v, replace: true)` replaces a value that a middleware put on the response. `CoreFlags.replaceHeaders` makes it the default. `Vary` and `Set-Cookie` still get one more value with the flag.
+- New: `session.regenerate(keepToken: true)` keeps the CSRF token, so forms open in other tabs keep working. The default is still a new token. Do not use it at login: a token from before the login would stay valid.
+- New: `CoreFlags.decryptServerError` makes a `DecryptException` a reported `500`.
+- New: `CoreFlags.cacheCopies` makes `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`.
+- New: `dox_core` exports `CacheFlags` and `LockTimeoutException` of `dox_cache`. `Cache.withAppPrefix` keeps the `flags` of the `CacheConfig`.
+- Fix: `HealthCheck.cache('name')` uses the result of `Cache().store('name')`, so it checks the named store with `CoreFlags.cacheCopies` too.
+- Change: `DecryptException.toString()` gives `DecryptException: The encrypted value is not valid`, so a log line says what failed.
 - BREAKING: the JSON line of `Logger` uses the standard names of log services (Datadog). `level` is now `status` (lower case). `name` is now `logger.name` (left out when empty). A `Map` in the data goes to the top level, other data goes under `payload`. The standard fields can not be replaced by a data key. Pretty mode is the same.
 - BREAKING: the JSON line of `LogMiddleware` has new field names. `level` is now `status`. `source_ip` is now `network.client.ip`. `request_id` is now `http.request_id`. New: `http.method` and `http.url`. `payload.request` and `payload.headers` stay. The `filter` gets the new map. It can not change `timestamp` or `logger`. A `logger` key in the data is always ignored.
 - Change: `LogMiddleware` now writes through `Logger`. It follows `LoggerConfig` (`enabled`, `level`, `prettyPrint`). With `prettyPrint` it prints the colored text line. `enabled` is now optional: not set follows the logger, `false` turns only the request logs off.

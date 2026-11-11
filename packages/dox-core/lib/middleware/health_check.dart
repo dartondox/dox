@@ -40,8 +40,8 @@ class HealthCheck {
   /// [store] is a store name of `AppConfig.cache`, default store when null.
   static HealthCheckFunction cache([String? store]) {
     Future<bool> check() async {
-      Cache cache = Cache();
-      if (store != null) cache.store(store);
+      // use the result: with `CoreFlags.cacheCopies` store() gives a copy
+      Cache cache = store == null ? Cache() : Cache().store(store);
       String key = 'dox_health_check';
       await cache.put(key, 'ok', duration: const Duration(minutes: 1));
       return await cache.get(key) == 'ok';

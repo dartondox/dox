@@ -116,6 +116,9 @@ req.session.invalidate();
 
 Always call `regenerate()` after login. Then an id that someone saw before the login is of no use.
 
+`regenerate(keepToken: true)` gives a new id but keeps the CSRF token, so forms open in other tabs keep working.
+Do not use it at login. A token from before the login would stay valid after the login.
+
 With the default `cookie` session driver, all session data sits in the cookie. So an old copy of the cookie still works after logout. If logout must really end old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
 
 `dox_auth` does this for you. See [Session login](../security/authentication.md#session-login-for-web-pages).

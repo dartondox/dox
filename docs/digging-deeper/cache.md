@@ -152,6 +152,8 @@ await Cache().store('redis').put('foo', 'bar');
 await Cache().store('memory').get('foo');
 ```
 
+`store()` changes the `Cache` it is called on. The flag `cacheCopies` makes `store()` and `tags()` give a new `Cache`. See [Core flags](../reference/app-config.md#core-flags).
+
 ### Tags
 
 Put items under a tag. Then you can remove only the items of that tag:
@@ -181,6 +183,7 @@ if (await lock.get()) {
 
 - `get()` tries once. It is `true` when you got the lock.
 - `block(Duration(seconds: 5))` tries again and again until the time is over.
+  It gives `false` when the time is over. With the flag `CacheFlags(lockThrows: true)` it throws `LockTimeoutException`. See [CacheConfig](../reference/app-config.md#cacheconfig).
 - The lock is freed after its `ttl`, even if you never call `release()`.
 - `block(timeout, callback)` runs the callback while it holds the lock, then frees it.
 - `forceRelease()` frees the lock, whoever holds it.

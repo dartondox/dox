@@ -11,6 +11,9 @@ class DoxResponse {
   dynamic _contentData;
 
   final Map<String, dynamic> _headers = <String, dynamic>{};
+
+  /// names in [_headers] that replace a value already on the response
+  final Set<String> _replaced = <String>{};
   int? _statusCode;
   ContentType? _contentType;
 
@@ -92,12 +95,21 @@ class DoxResponse {
   /// ```
   /// res.header('Authorization', 'Bearer xxx');
   /// ```
-  DoxResponse header(String key, dynamic value) {
+  /// A value that is already on the response (for example one set by a
+  /// middleware) stays, and this one is added as a second value.
+  /// [replace] true removes that value first. When [replace] is null,
+  /// `CoreFlags.replaceHeaders` decides, but `Vary` and `Set-Cookie` are
+  /// lists, so the flag does not replace them (CORS adds `Vary: Origin`).
+  DoxResponse header(String key, dynamic value, {bool? replace}) {
     if (_headers.isNotEmpty) {
       String name = key.toLowerCase();
       _headers.removeWhere((String k, dynamic _) => k.toLowerCase() == name);
+      _replaced.removeWhere((String k) => k.toLowerCase() == name);
     }
     _headers[key] = value;
+    if (replace ?? (Dox().flags.replaceHeaders && !_isList(key))) {
+      _replaced.add(key);
+    }
     return this;
   }
 
@@ -144,8 +156,9 @@ class DoxResponse {
       /// Content-Type has one value. `add` would keep the default
       /// `text/plain` too, and the response fails with
       /// "More than one value for header content-type".
-      if (key.length == 12 &&
-          key.toLowerCase() == HttpHeaders.contentTypeHeader) {
+      if (_replaced.contains(key) ||
+          (key.length == 12 &&
+              key.toLowerCase() == HttpHeaders.contentTypeHeader)) {
         headers.set(key, value);
       } else {
         headers.add(key, value);
@@ -162,6 +175,8 @@ class DoxResponse {
     }
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
+    } else if (content is String && !_headers.keys.any(_isContentType)) {
+      htmlForText(request.response);
     }
     if (_cookies.isNotEmpty) {
       bool https =
@@ -180,6 +195,16 @@ class DoxResponse {
     }
     return responseDataHandler(_contentData, request);
   }
+}
+
+/// headers that hold a list, so the flag adds to them
+bool _isList(String key) {
+  String name = key.toLowerCase();
+  return name == HttpHeaders.varyHeader || name == HttpHeaders.setCookieHeader;
+}
+
+bool _isContentType(String key) {
+  return key.toLowerCase() == HttpHeaders.contentTypeHeader;
 }
 
 /// content can be anything

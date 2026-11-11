@@ -1,3 +1,9 @@
+## Unreleased
+
+- New: `CacheFlags`, opt-in behaviors that work like Laravel, as `CacheConfig(flags: ...)`. All are off by default. `CacheFlags.all()` turns on every flag.
+- New: `CacheFlags.lockThrows` makes `lock.block(timeout)` with no callback throw `LockTimeoutException` when the time is over, not give `false`.
+- New: `CacheLock.throwOnTimeout` picks this for one lock. A store sets it from the flag. `CacheStore` takes `flags:`.
+
 ## 3.1.3
 
 - Version bump only, to match the other packages.

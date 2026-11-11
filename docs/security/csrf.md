@@ -93,3 +93,5 @@ Only skip paths that do not use the session login. A webhook should check its ow
 ## After login
 
 `req.session.regenerate()` also makes a new token. Dox sends the new `XSRF-TOKEN` cookie with the same response.
+`regenerate(keepToken: true)` keeps the token, so forms open in other tabs keep working.
+Do not use it at login. A token from before the login would stay valid after the login.

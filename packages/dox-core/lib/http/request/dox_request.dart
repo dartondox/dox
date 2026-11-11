@@ -171,10 +171,14 @@ class DoxRequest implements IDoxRequest {
   /// ```
   /// req.only(['email', 'name']);
   /// ```
+  /// A key that is not in the input is in the map with `null`. With
+  /// `CoreFlags.onlyPresent` it is left out.
   @override
   Map<String, dynamic> only(List<String> keys) {
+    bool present = Dox().flags.onlyPresent;
     Map<String, dynamic> ret = <String, dynamic>{};
     for (String key in keys) {
+      if (present && !_allRequest.containsKey(key)) continue;
       ret[key] = _allRequest[key];
     }
     return ret;
@@ -431,8 +435,11 @@ class DoxRequest implements IDoxRequest {
   /// ```
   /// req.has('email')
   /// ```
+  /// `''` and null give false, like [filled]. With `CoreFlags.hasKeyOnly`
+  /// it only checks that the key is there, like [exists].
   @override
   bool has(String key) {
+    if (Dox().flags.hasKeyOnly) return exists(key);
     dynamic val = _allRequest[key];
     if (val == null) {
       return false;

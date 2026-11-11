@@ -127,7 +127,7 @@ DoxResponse store(DoxRequest req) {
 | Method | Does |
 | --- | --- |
 | `statusCode(201)` | sets the status code. Default `200`. |
-| `header('X-Key', 'value')` | sets one header |
+| `header('X-Key', 'value')` | sets one header. A value a middleware put on the response stays, and this one is added. `header('X-Key', 'value', replace: true)` replaces it. |
 | `withHeaders({...})` | adds these headers. A key replaces the header with the same name, in any case. Other headers stay. |
 | `contentType(ContentType.html)` | sets `Content-Type` (`ContentType` is from `dart:io`) |
 | `cache(Duration(minutes: 5))` | sets `Cache-Control: max-age=300` |
@@ -149,6 +149,8 @@ return back(req);
 ```
 
 See [Session](session.md#redirect-back-with-errors) for flash messages and errors with a redirect.
+
+The flags `htmlStrings` (a string is sent as `text/html`) and `replaceHeaders` (`header()` replaces) change this page. See [Core flags](../reference/app-config.md#core-flags).
 
 ## Cookie
 
@@ -174,6 +176,8 @@ return response('ok').cookie(DoxCookie('token', ''), setExpire: true);
 ```
 
 To read a cookie, see [Request: cookies](request.md#cookies).
+
+The flag `cookieDefaults` sends `Path=/` and `SameSite=Lax` when you set no `path` or `sameSite`. See [Core flags](../reference/app-config.md#core-flags).
 
 !!! info "Encrypt and decrypt"
     By default, Dox encrypts the cookie value with `APP_KEY`, and decrypts it when you read it.
