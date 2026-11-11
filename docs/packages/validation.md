@@ -304,7 +304,7 @@ v.string().min(8).email().bail().safeParse('ab');
 
 - It counts for all rules of that schema, wherever you put `.bail()` in the chain.
 - Async rules after a failed rule do not run. So no database query is made for a value that is already wrong.
-- Put it before `.optional()`, `.nullable()` or `.transform()`. A rule after one of them belongs to the wrapper, so it does not count.
+- Put it before `.optional()`, `.nullable()` or `.transform()`. A rule after one of them belongs to the wrapper, so it does not count. `.bail()` after a wrapper, like `.optional().bail()`, does nothing for the rules inside it.
 - On `v.object()` or `v.list()`, it counts for the rules of the object or list only. Each field and each item keeps its own setting.
 - A type error already stops the rules of a value, with or without `.bail()`.
 
@@ -324,11 +324,13 @@ account.parse(<String, dynamic>{'type': 'person', 'vat_number': 'x'});
 ```
 
 - They work like the DTO `@ExcludeIf` and `@ExcludeUnless`. They read the raw input of the other key, and match like `requiredIf` (also with a list of values).
+- `other` is a key of the same object. A dotted path like `user.type` does not work.
 - `excludeIf`: a missing other key does not skip. `excludeUnless`: a missing other key counts as `null`, so the field is skipped.
 - The key is left out also with `.optional()`, `.nullable()` or `.defaultTo()`, in any order. A skipped field never gets its default.
 - In a `v.list()` of objects, each item is checked on its own.
 - A skipped key is not an unknown key for `strict()`, and `passthrough()` does not add it back.
 - In the JSON Schema, the field is not in `required`.
+- The rules of other fields that read this key (like `same`, `requiredIf` or `gtField`) still see its raw input, also when it is skipped.
 - They work only on a field of `v.object()`. On a top-level value, a list item or a value of `v.map()`, they do nothing.
 
 #### The presence verifier
