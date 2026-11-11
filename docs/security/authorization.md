@@ -293,6 +293,7 @@ AuthConfig(defaultGuard: 'web', guards: guards, flags: const AuthFlags.all());
 The flags are part of `AuthConfig`.
 `Auth.initialize(authConfig)` runs in the `setup()` of your auth provider, so every isolate gets the same flags.
 
+## In tests
 
 `Gate.flush()` removes all gates, policies and hooks.
 Call it in `setUp` when each test adds its own rules.
