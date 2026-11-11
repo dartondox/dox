@@ -66,6 +66,7 @@ dart pub global deactivate dox
 | `dox schedule:run` | run the tasks that are due now, once |
 | `dox schedule:list` | list the scheduled tasks |
 | `dox schedule:test <name>` | run one scheduled task now |
+| `dox schedule:clear-cache` | remove the `withoutOverlapping()` locks left by a crash |
 | `dox key:generate [--show] [--force]` | make a new `APP_KEY`. `--show` prints a key and writes nothing. In production it asks first, `--force` skips |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |

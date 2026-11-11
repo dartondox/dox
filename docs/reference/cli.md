@@ -453,6 +453,7 @@ When `bin/schedule.dart` is missing, the command prints how to set it up and exi
 | `dox schedule:run` | `bin/schedule.dart run` | Run the tasks that are due now, once. |
 | `dox schedule:list` | `bin/schedule.dart list` | List the scheduled tasks. |
 | `dox schedule:test <name>` | `bin/schedule.dart test <name>` | Run one task now. |
+| `dox schedule:clear-cache` | `bin/schedule.dart clear-cache` | Remove the `withoutOverlapping()` locks that a crash left behind. Do not run it while a task really runs. |
 
 You add tasks in `lib/config/schedule.dart`. These are the two files of a new project:
 
@@ -520,6 +521,7 @@ See [Scheduler](../digging-deeper/scheduler.md) for the task methods. See [Queue
 | `schedule:run` | | Schedule |
 | `schedule:list` | | Schedule |
 | `schedule:test` | | Schedule |
+| `schedule:clear-cache` | | Schedule |
 | `db:seed` | | Database |
 | `version` | `--version`, `-version`, `v`, `-v`, `--v` | System |
 | `update` | | System |
