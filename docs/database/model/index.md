@@ -9,7 +9,11 @@ A model has all the [query builder](../query-builder.md) methods too.
 ```bash
 dox make:model Blog      # only the model
 dox make:model Blog -m   # the model and a migration for the table `blogs`
+dox make:model Blog -a   # the model, a migration, a factory, a seeder and a resource controller
 ```
+
+Other options: `-c` controller, `-r` resource controller, `-f` factory, `-s` seeder.
+You can join them, like `-mfs`. See [CLI reference](../../reference/cli.md#dox-makemodel).
 
 This makes `lib/app/models/blog/blog.model.dart`.
 `create:model` is another name for the same command.

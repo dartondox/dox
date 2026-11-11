@@ -103,6 +103,72 @@ Route.resource('blogs', BlogController);
 You can delete methods you do not need. `Route.resource` skips them.
 See [Routing: resource routes](routing.md#resource-routes).
 
+### API resource controller
+
+An API has no form pages. `--api` makes the resource controller without `create` and `edit`:
+
+```bash
+dox make:controller Blog --api
+```
+
+### Resource controller for a model
+
+`--model` makes a resource controller that uses a model:
+
+```bash
+dox make:controller Blog --model=Blog
+```
+
+```dart title="lib/app/http/controllers/blog.controller.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/app/models/blog/blog.model.dart';
+
+/// Route: Route.resource('path', BlogController);
+@Inject()
+class BlogController {
+  /// GET /resource
+  Future<dynamic> index(DoxRequest req) async {
+    return Blog().all();
+  }
+
+  /// GET /resource/create
+  Future<dynamic> create(DoxRequest req) async {}
+
+  /// POST /resource
+  /// create() takes only the fillable columns of Blog.
+  Future<dynamic> store(DoxRequest req) async {
+    return Blog().create(req.body);
+  }
+
+  /// GET /resource/{id}
+  /// Dox loads blog by the {id}. No row answers 404.
+  Future<dynamic> show(DoxRequest req, Blog blog) async {
+    return blog;
+  }
+
+  /// GET /resource/{id}/edit
+  Future<dynamic> edit(DoxRequest req, Blog blog) async {
+    return blog;
+  }
+
+  /// PUT|PATCH /resource/{id}
+  Future<dynamic> update(DoxRequest req, Blog blog) async {
+    await blog.update(req.body);
+    return blog;
+  }
+
+  /// DELETE /resource/{id}
+  Future<dynamic> destroy(DoxRequest req, Blog blog) async {
+    await blog.delete();
+  }
+}
+```
+
+- `show`, `edit`, `update` and `destroy` take the model. [Route model binding](dependency-injection.md#route-model-binding) loads it by the `{id}`.
+- `create()` and `update()` take only the columns in the model's `fillable` list. Add your columns there.
+- Use `--api` and `--model` together for an API controller with a model.
+- `dox make:model Blog -r` makes the model and this controller in one step.
+
 ## Parameters
 
 A controller asks for what it needs by **type**. Dox fills each parameter.

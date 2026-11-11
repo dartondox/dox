@@ -43,11 +43,12 @@ dox build_runner:build             # make .g.dart files
 dox key:generate                   # APP_KEY in .env
 dox env:generate                   # lib/config/env.dart from .env.example
 dox env:check                      # check the env, exit 1 when bad
-dox make:controller Blog [-r]
+dox make:controller Blog [-r] [--api] [--model=Blog]
 dox make:middleware Auth
 dox make:dto CreateBlog
 dox make:serializer Blog
 dox make:model Blog -m             # model + migration
+dox make:model Blog -a             # + factory, seeder, resource controller
 dox make:migration create_blogs_table [--sql]
 dox make:job SendWelcomeEmail
 dox migrate                        # migration:run

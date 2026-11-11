@@ -36,11 +36,11 @@ dart pub global deactivate dox
 | `dox serve` (or `dox s`) | start the dev server with build_runner watch |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
-| `dox make:controller <name> [-r]` | create a controller |
+| `dox make:controller <name> [-r] [--api] [--model=<model>]` | create a controller |
 | `dox make:middleware <name>` | create a middleware |
 | `dox make:dto <name>` | create a DTO (typed, checked input) |
 | `dox make:serializer <name>` | create a serializer |
-| `dox make:model <name> [-m]` | create a model, and with `-m` its migration |
+| `dox make:model <name> [-m] [-c] [-r] [-f] [-s] [-a]` | create a model, and with the options its migration, controller, factory and seeder |
 | `dox make:migration <name> [--sql]` | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
 | `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
@@ -114,15 +114,20 @@ See [Deployment](deployment.md#build).
 ```bash
 dox make:controller Blog        # lib/app/http/controllers/blog.controller.dart
 dox make:controller Blog -r     # resource controller
+dox make:controller Blog --api  # resource controller without create and edit
+dox make:controller Blog --model=Post  # resource controller that uses the Post model
 dox make:middleware Auth        # lib/app/http/middleware/auth.middleware.dart
 dox make:dto CreateBlog         # lib/app/dtos/create_blog/create_blog.dto.dart
 dox make:serializer Blog        # lib/app/serializers/blog.serializer.dart
 dox make:model Blog -m          # lib/app/models/blog/blog.model.dart and a create_blogs_table migration
+dox make:model Blog -mcr        # model, migration and a resource controller
+dox make:model Blog -a          # model, migration, factory, seeder and a resource controller
 dox make:migration create_blogs_table          # .dart file (default)
 dox make:migration create_blogs_table --sql    # .sql file
 ```
 
-- `-r` adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`.
+- `-r` (or `--resource`) adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`. `--api` adds the same methods without `create` and `edit`.
+- `make:model` options: `-m` migration, `-c` controller, `-r` resource controller, `-f` factory, `-s` seeder, `-a` all of them. Join them, like `-mfs`. See [CLI reference](../reference/cli.md#dox-makemodel).
 - Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
 - After `make:controller` or `make:dto`, run `dox build_runner:build` (or keep `dox serve` running). See [Validation](../the-basic/validation.md).
 - The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.

@@ -220,21 +220,27 @@ Aliases: `--help`, `-h`. Without a command: lists every command by category. Wit
 ### `dox make:controller`
 
 ```
-dox make:controller <name> [-r]
+dox make:controller <name> [-r|--resource] [--api] [--model=<model>]
 ```
 
 Alias: `create:controller`. The other `make:*` commands below have the same kind of alias.
 
 | Option | Meaning |
 | --- | --- |
-| `-r` | A resource controller with `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`. |
+| `-r` or `--resource` | A resource controller with `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`. |
+| `--api` | A resource controller without `create` and `edit`, the two form pages. `Route.resource` makes no route for them. |
+| `--model=<model>` or `--model <model>` | A resource controller that uses the model. It imports `package:<app>/app/models/<model>/<model>.model.dart`. `index` returns all rows, and `store` creates a row from `req.body`. `show`, `edit`, `update` and `destroy` take the model as a parameter, so [route model binding](../the-basic/dependency-injection.md#route-model-binding) loads it by the `{id}`. |
+
+`--api` and `--model` work together. Each one makes a resource controller, also without `-r`.
+With `--model`, the CLI prints a warning when the model file does not exist yet.
+Any other option prints `Unknown option <x> for make:controller.` (exit code 1), and no file is made.
 
 A trailing `Controller` in the name is removed: `UserController` and `User` give the same file.
 
 | Form | Writes | Template |
 | --- | --- | --- |
 | plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `lib/src/tools/create_controller.dart` |
-| `-r` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
+| `-r`, `--api`, `--model` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
 
 The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get('path', (BlogController c) => c.index);`.
 After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/generated/container.g.dart`.
@@ -276,8 +282,8 @@ Template: `_getSample` in `lib/src/tools/create_serializer.dart`.
 ### `dox make:model`
 
 ```
-dox make:model <name> [-m|--migration]
-dox create:model <name> [-m|--migration]
+dox make:model <name> [-m] [-c] [-r] [-f] [-s] [-a] [--api]
+dox create:model <name> [-m] [-c] [-r] [-f] [-s] [-a] [--api]
 ```
 
 Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel(table: '<plural snake name>')` class with `part '<name>.model.g.dart';`. `BlogPost` gives `blog_posts`. The class has an empty `fillable` list. Add your columns to it.
@@ -285,8 +291,29 @@ Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel(table: '<plural s
 | Option | Meaning |
 | --- | --- |
 | `-m` or `--migration` | Also make a `create_<table>_table` migration. |
+| `-c` or `--controller` | Also make a plain controller, `<name>.controller.dart`. |
+| `-r` or `--resource` | Also make a resource controller that uses the model. |
+| `--api` | Also make a resource controller without `create` and `edit`, that uses the model. |
+| `-f` or `--factory` | Also make a factory, `db/factories/<name>.factory.dart`. |
+| `-s` or `--seed` | Also make a seeder, `db/seeders/<name>.seeder.dart`. |
+| `-a` or `--all` | Also make the migration, the factory, the seeder and a resource controller. |
 
-Any other second argument prints `Invalid option <x>, use -m or --migration` (exit code 1).
+You can join short options: `-mcr` is the same as `-m -c -r`. With `-c` and `-r` together, the controller is a resource controller.
+
+Each extra file is the same as the one from the single command:
+
+| Command | Same file as |
+| --- | --- |
+| `dox make:model Post -m` | `dox make:migration create_posts_table` |
+| `dox make:model Post -c` | `dox make:controller Post` |
+| `dox make:model Post -r` | `dox make:controller Post -r --model=Post` |
+| `dox make:model Post --api` | `dox make:controller Post --api --model=Post` |
+| `dox make:model Post -f` | `dox make:factory Post` |
+| `dox make:model Post -s` | `dox make:seeder Post` |
+
+When the model file exists, the command prints `<Name> model already exists` and makes no other file.
+When one of the other files exists, that file is skipped, the same as with its own command.
+Any other option prints `Unknown option <x> for make:model.` (exit code 1), and no file is made.
 
 Template: `_getSample` in `lib/src/tools/create_model.dart`.
 
