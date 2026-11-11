@@ -207,6 +207,8 @@ On every schema:
 - `defaultTo(x)`: the value when the key is missing. (`default` is a reserved word in Dart.)
 - `transform(fn)`, `refine(fn)`, `refineAsync(fn)`, `superRefine(fn)`, `superRefineAsync(fn)`, `use(rule)`.
 - `same(other)`, `confirmed()`: compare with another key of the same object.
+- `bail()`: stop at the first failed rule. See [Stop at the first error](#stop-at-the-first-error).
+- `excludeIf(other, value)`, `excludeUnless(other, value)`: leave a key out. See [Skip a field](#skip-a-field).
 - `describe(text)`, `example(x)`: only used in the JSON Schema.
 
 ### Coercion
@@ -285,12 +287,51 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
     - `prohibitedIf()`: when the condition matches, a missing key, `null`, blank text and an empty list or map pass. `0`, `false` and any other value fail.
 - `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact Laravel words.
 - `gtField`, `gteField`, `ltField` and `lteField` compare with another key, like Laravel `gt:field`. A missing other key fails.
-- There is no fluent `exclude_if` and no `bail`. A fluent schema runs all rules of a value.
 - The rules are explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing).
 - `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
 - For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
 - `exists(table, column: 'id')`: the column default is `id`. For a number id column, use `v.int().exists('teams')`, not `v.string()`. Then text like `abc` is a type error, before any query.
 - `unique(table, column: 'email', ignore: id)`: `column` is required. It is never taken from the input key, because a key in `v.map()` comes from the user. `ignore` skips the row where `ignoreColumn` (default `id`) has this value. Use it for updates.
+
+#### Stop at the first error
+
+A fluent schema runs all rules of a value, and gives one error for each failed rule. Add `.bail()` to stop at the first failed rule, like Laravel `bail`. A DTO always does this.
+
+```dart
+v.string().min(8).email().bail().safeParse('ab');
+// one error: min_length. Without bail(): min_length and email.
+```
+
+- It counts for all rules of that schema, wherever you put `.bail()` in the chain.
+- Async rules after a failed rule do not run. So no database query is made for a value that is already wrong.
+- Put it before `.optional()`, `.nullable()` or `.transform()`. A rule after one of them belongs to the wrapper, so it does not count. `.bail()` after a wrapper, like `.optional().bail()`, does nothing for the rules inside it.
+- On `v.object()` or `v.list()`, it counts for the rules of the object or list only. Each field and each item keeps its own setting.
+- A type error already stops the rules of a value, with or without `.bail()`.
+
+#### Skip a field
+
+`excludeIf(other, value)` and `excludeUnless(other, value)` skip a field of `v.object()`, like Laravel `exclude_if` and `exclude_unless`. When they match, the field is not checked, and its key is not in the output.
+
+```dart
+final ObjectSchema account = v.object(<String, Schema<Object?>>{
+  'type': v.string(),
+  'vat_number': v.string().min(5).excludeIf('type', 'person'),
+  'company': v.string().excludeUnless('type', 'company'),
+});
+
+account.parse(<String, dynamic>{'type': 'person', 'vat_number': 'x'});
+// {type: person}
+```
+
+- They work like the DTO `@ExcludeIf` and `@ExcludeUnless`. They read the raw input of the other key, and match like `requiredIf` (also with a list of values).
+- `other` is a key of the same object. A dotted path like `user.type` does not work.
+- `excludeIf`: a missing other key does not skip. `excludeUnless`: a missing other key counts as `null`, so the field is skipped.
+- The key is left out also with `.optional()`, `.nullable()` or `.defaultTo()`, in any order. A skipped field never gets its default.
+- In a `v.list()` of objects, each item is checked on its own.
+- A skipped key is not an unknown key for `strict()`, and `passthrough()` does not add it back.
+- In the JSON Schema, the field is not in `required`.
+- The rules of other fields that read this key (like `same`, `requiredIf` or `gtField`) still see its raw input, also when it is skipped.
+- They work only on a field of `v.object()`. On a top-level value, a list item or a value of `v.map()`, they do nothing.
 
 #### The presence verifier
 

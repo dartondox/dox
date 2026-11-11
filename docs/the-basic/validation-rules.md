@@ -176,7 +176,7 @@ final String? note; // the key must be there, null is fine
 - They read the raw input of the other key, and match like `@RequiredIf` (also with a list of values).
 - `@ExcludeIf`: a missing other key does not skip. `@ExcludeUnless`: a missing other key counts as `null`, so the field is skipped.
 - They are for a nullable, `Maybe` or default field. On an always-required field the build stops.
-- There is no fluent version.
+- The fluent schemas have `.excludeIf()` and `.excludeUnless()`. There the key is left out of the output. See [Skip a field](../packages/validation.md#skip-a-field).
 
 ```dart
 final String type;
@@ -385,7 +385,7 @@ How each field type reads input. The short table is in [Types](validation.md#typ
 ## The order of checks
 
 1. Read the input and convert types. Change text (`@Trim`, `@Lowercase`, `@Uppercase`). Find missing required fields.
-2. The field rules, top to bottom. The first rule that fails stops the other rules of that field, like Laravel `bail`. So there is no `@Bail`.
+2. The field rules, top to bottom. The first rule that fails stops the other rules of that field, like Laravel `bail`. So there is no `@Bail`. A fluent schema runs all rules, unless you add `.bail()`. See [Stop at the first error](../packages/validation.md#stop-at-the-first-error).
 3. The `validate()` method (nested DTOs first, then the parent).
 4. Async rules (`@Unique`, `@Exists`, your `AsyncRule`), one at a time, in field order.
 
