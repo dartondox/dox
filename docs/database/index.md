@@ -207,7 +207,7 @@ flags: const OrmFlags(pluralTableNames: true, sumReturnsZero: true),
 |---|---|---|
 | `skipCleanUpdateEvents` | `save()` with no changes fires `saving`, `updating`, `updated` and `saved`. | It fires only `saving` and `saved`. A model with a `Map` or `List` field always counts as changed. |
 | `belongsToKeyFromRelation` | The default `belongsTo` foreign key comes from the class name: `@BelongsTo(User) User? author` uses `user_id`. | It comes from the relation name: `author_id`. |
-| `pluralTableNames` | The default table name is singular: `User` uses `user`. | It is plural: `users`, `blog_posts`, `categories`. |
+| `pluralTableNames` | The default table name is singular: `User` uses `user`. | It is plural, with the same English rules as Laravel: `users`, `blog_posts`, `categories`. |
 | `createWritesNull` | `create()` does not send a `null` key, so the column default is used. | It writes `NULL` for a key that is `null` in the map. |
 | `sumReturnsZero` | `sum()` gives `null` when no row matches. | It gives `0`. |
 | `selectRawAdds` | `selectRaw()` replaces the select list. | It adds to it, so `select('a').selectRaw('count(*) as c')` selects both. |
