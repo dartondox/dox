@@ -81,6 +81,56 @@ This works on Postgres, MySQL, MariaDB and SQLite. You can nest many levels.
 - On MySQL and MariaDB, a `CREATE`, `ALTER` or `DROP TABLE` inside a nested transaction
   saves the outer work and ends the savepoint. Do not change the schema there.
 
+## Run code after the commit
+
+Some work must only happen when the data is saved.
+A mail or a queue job, for example.
+`QueryBuilder.afterCommit()` runs a function after the transaction commits:
+
+```dart
+await QueryBuilder.transaction(() async {
+  User user = await User().create(<String, dynamic>{'email': email});
+  await QueryBuilder.afterCommit(() => sendWelcomeMail(user));
+});
+```
+
+- Inside a transaction, the function runs after the outermost transaction commits.
+  The data is saved, and other connections can see it.
+- When the transaction rolls back, the function does not run.
+- Outside a transaction, the function runs at once.
+- A function added in a nested transaction waits for the outermost commit.
+  When that nested transaction rolls back, its functions are dropped, even when the outer one commits.
+- The functions run one by one, in the order you added them.
+- The function can be async. The `QueryBuilder.transaction()` call waits for it.
+- A function can open a new transaction, or call `afterCommit()` again.
+  Outside a transaction, that call runs at once.
+- `connection:` picks a named connection, like `transaction()`.
+  The function waits only for a transaction of that connection.
+  With no `connection`, it uses the default connection.
+
+When a function throws, the data stays saved. The commit is not undone.
+The other functions still run.
+Then the `QueryBuilder.transaction()` call throws the first error.
+
+```dart
+await QueryBuilder.afterCommit(() => notify(order), connection: 'mysql');
+```
+
+A driver has it too: `driver.afterCommit(() => ...)`.
+
+Limits:
+
+- Code can outlive its transaction, like a `Timer` or a future that you did not await.
+  When it calls `afterCommit()` after the transaction ended, the function runs at once if the transaction committed.
+  It is dropped if the transaction rolled back. It never waits for a later transaction.
+  When such a late function throws, the error goes to the `Future` that `afterCommit()` returns. Await it or catch it. Else it is an uncaught async error.
+- A transaction opened with the default connection's own name (like `connection: 'main'`) uses another driver than no name.
+  So `afterCommit()` with no name runs at once there.
+  Pass the same `connection:` to both, or no name to both.
+- A custom `DBDriver` that does not use the `afterCommitZone()` and `runAfterCommit()` helpers runs the functions at once.
+
+[Queue jobs](../digging-deeper/queue.md#dispatch-after-the-commit) use it with `dispatch(afterCommit: true)`.
+
 ## Row locks
 
 A row lock stops two requests from changing the same row at the same time.
