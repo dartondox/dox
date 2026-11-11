@@ -184,6 +184,7 @@ print(page.lastPage); // number of pages
 So you can return a `Pagination` from a controller.
 
 - `perPage` must be 1 or more. A smaller value throws an `ArgumentError`.
+- With no rows, `lastPage` is `0`. The [`lastPageAtLeastOne` flag](index.md#orm-flags) makes it `1`.
 - A `currentPage` below 1 is read as page 1.
 
 ### `simplePaginate`
@@ -288,6 +289,7 @@ dynamic newest = await Actor().max('created_at');
 ```
 
 - `sum()` returns a `num`. It is an `int` or a `double`, by driver. Use `toInt()` or `toDouble()`.
+  When no row matches, it is `null`. The [`sumReturnsZero` flag](index.md#orm-flags) makes it `0`.
 - `avg()` returns a `double`.
 - `min()` and `max()` return the value as the driver gives it.
   A date is an ISO string. A Postgres `numeric` is a `String`. A MySQL `DECIMAL` is a `double`.
@@ -697,6 +699,8 @@ await QueryBuilder.table('actor').selectRaw('count(*) as total, name').groupBy('
 Each part must be a plain name: `name`, `table.name`, `table.*`, `*` or `name as alias`.
 Anything else, like `count(*)`, throws an `ArgumentError`. Use `selectRaw` for it.
 
+`selectRaw()` replaces the select list. The [`selectRawAdds` flag](index.md#orm-flags) makes it add to the list.
+
 !!! info
     A model loaded with `select()` only has the selected fields.
     `save()` on it only updates the fields it has.
@@ -773,6 +777,8 @@ List<Map<String, dynamic>> rows = await QueryBuilder.table('actor')
 ```
 
 For an expression, use `groupByRaw('date(created_at)')`. Nothing is quoted there.
+
+A second `groupBy()` replaces the first. The [`groupByAdds` flag](index.md#orm-flags) makes it add to the first.
 
 !!! info
     Use `QueryBuilder.table()` for `groupBy`. A group row is a map, not a model.

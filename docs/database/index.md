@@ -183,6 +183,46 @@ class ORMProvider extends DoxProvider {
 Dox finds every `DoxProvider` class on its own.
 After you add a provider, run `dart run build_runner build`.
 
+### ORM flags
+
+`OrmFlags` turns on ORM behaviors that work like Laravel.
+Each flag is off by default. With all flags off, the ORM works as this page and the other database pages say.
+Pass the flags as `flags:` in `DatabaseConfig`:
+
+```dart title="lib/config/database.dart"
+DatabaseConfig databaseConfig = DatabaseConfig(
+  connection: env.dbConnection,
+  connections: <String, ConnectionConfig>{ /* ... */ },
+  flags: OrmFlags.all(), // every flag on
+);
+```
+
+Turn on only some flags by name:
+
+```dart
+flags: const OrmFlags(pluralTableNames: true, sumReturnsZero: true),
+```
+
+| Flag | Off (default) | On |
+|---|---|---|
+| `skipCleanUpdateEvents` | `save()` with no changes fires `saving`, `updating`, `updated` and `saved`. | It fires only `saving` and `saved`. A model with a `Map` or `List` field always counts as changed. A save with changes runs `beforeSave` two times, and a save with no changes runs it one time. |
+| `belongsToKeyFromRelation` | The default `belongsTo` foreign key comes from the class name: `@BelongsTo(User) User? author` uses `user_id`. | It comes from the relation name: `author_id`. |
+| `pluralTableNames` | The default table name is singular: `User` uses `user`. | It is plural, with the same English rules as Laravel: `users`, `blog_posts`, `categories`. |
+| `createWritesNull` | `create()` does not send a `null` key, so the column default is used. | It writes `NULL` for a key that is `null` in the map. |
+| `sumReturnsZero` | `sum()` gives `null` when no row matches. | It gives `0`. |
+| `selectRawAdds` | `selectRaw()` replaces the select list. | It adds to it, so `select('a').selectRaw('count(*) as c')` selects both. |
+| `groupByAdds` | A second `groupBy()` replaces the first. | It adds to the first. `groupByRaw()` too. |
+| `lastPageAtLeastOne` | `paginate()` gives `lastPage` `0` when there are no rows. | It gives `1`. |
+| `laravelPostgresTypes` | On Postgres, `timestamps()` and `softDeletes()` make `TIMESTAMPTZ`, and `json()` makes `JSONB`. | A new table gets `TIMESTAMP` and `JSON`. |
+
+- `OrmFlags.all()` turns on every flag. New apps can start with it.
+- The ORM keeps the flags in `SqlQueryBuilder().flags`. Each isolate runs the ORM provider, so each isolate gets the same flags. All connections use them.
+- `SqlQueryBuilder.initialize(..., flags: ...)` takes the flags too.
+- `pluralTableNames` does not change a name set with `@DoxModel(table: ...)`. The default foreign key stays singular (`user_id`).
+- `belongsToKeyFromRelation` needs the relation name. The model generator does not pass it yet, so a generated model still uses the class name. Set `foreignKey` on the relation to be sure.
+- `laravelPostgresTypes` changes only tables made with `Schema.create`. It never changes a table that is already there, and `Schema.table` keeps the old types. MySQL and SQLite do not change.
+- Migrations get the flags from `SqlQueryBuilder().flags`. `bin/migrate.dart` does not start the ORM, so give the flags to the migrator: `Migrator(migrations: migrations, flags: databaseConfig.flags)`. See [Migration](migration.md#database-settings).
+
 ### `.env`
 
 The app config and the [migration](migration.md) commands read these values.
