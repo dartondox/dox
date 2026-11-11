@@ -414,7 +414,7 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 | Laravel | Dox |
 | --- | --- |
 | `config/filesystems.php` disks | `lib/config/storage.dart`, `StorageConfig(defaultDisk:, disks:)`, passed to a `StorageProvider` (`dox_storage`) |
-| `Storage::put('a.txt', $bytes)` | `await Storage().put('a.txt', bytes)` |
+| `Storage::put('a.txt', $bytes)` | `await Storage().put('a.txt', bytes, exact: true)` |
 | `Storage::putFile('avatars', $file)` | `await Storage().putFile('avatars', file)` |
 | `Storage::putFileAs('avatars', $file, 'u1.png')` | `await Storage().putFileAs('avatars', file, 'u1.png')` |
 | `$request->file('f')->store('avatars')` | `await file.store('avatars')` |
