@@ -61,8 +61,10 @@ In the steps below, replace `x.y.z` with the new version.
 ## 1. Bump the versions
 
 ```sh
-git checkout -b release-<package>-x.y.z origin/main
+git checkout -b release-x.y.z origin/main
 ```
+
+Branch name: use the same name in every repo of a release, like `release-x.y.z`, so CI can clone the sibling repos on that branch (`ci/clone-siblings.sh`). A release that touches only the `dox` repo may use `release-<package>-x.y.z`.
 
 Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cache`, `dox_core`).
 
@@ -75,7 +77,7 @@ Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cac
 
 ## 2. Merge the release PR
 
-Open a PR from `release-<package>-x.y.z` into `main`.
+Open a PR from your release branch into `main`.
 Wait for CI, then squash merge it.
 
 ## 3. Publish to pub.dev
