@@ -7,7 +7,7 @@
 - New: `CoreFlags.hasKeyOnly` makes `req.has('x')` only check that the key is there, like `req.exists('x')`.
 - New: `CoreFlags.htmlStrings` sends a string from a controller as `text/html`. A content type set by the app wins.
 - New: `res.header(k, v, replace: true)` replaces a value that a middleware put on the response. `CoreFlags.replaceHeaders` makes it the default. `Vary` and `Set-Cookie` still get one more value with the flag.
-- New: `session.regenerate(keepToken: true)` keeps the CSRF token. `CoreFlags.keepCsrfToken` makes it the default. `invalidate()` always makes a new token.
+- New: `session.regenerate(keepToken: true)` keeps the CSRF token, so forms open in other tabs keep working. The default is still a new token. Do not use it at login: a token from before the login would stay valid.
 - New: `CoreFlags.decryptServerError` makes a `DecryptException` a reported `500`.
 - New: `CoreFlags.cacheCopies` makes `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`.
 - New: `dox_core` exports `CacheFlags` and `LockTimeoutException` of `dox_cache`. `Cache.withAppPrefix` keeps the `flags` of the `CacheConfig`.

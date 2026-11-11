@@ -175,10 +175,8 @@ class DoxResponse {
     }
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
-    } else if (content is String &&
-        Dox().flags.htmlStrings &&
-        !_headers.keys.any(_isContentType)) {
-      request.response.headers.contentType = ContentType.html;
+    } else if (content is String && !_headers.keys.any(_isContentType)) {
+      htmlForText(request.response);
     }
     if (_cookies.isNotEmpty) {
       bool https =

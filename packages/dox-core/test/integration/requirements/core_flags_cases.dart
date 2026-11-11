@@ -14,6 +14,15 @@ class PresetHeader implements IDoxNextMiddleware {
   }
 }
 
+/// sets the content type straight on the response, before the route
+class JsonType implements IDoxNextMiddleware {
+  @override
+  Future<DoxResponse> handle(DoxRequest req, Next next) {
+    req.httpRequest.response.headers.contentType = ContentType.json;
+    return next();
+  }
+}
+
 class Reported extends ExceptionHandler {
   final List<Object> errors = <Object>[];
 
@@ -38,6 +47,10 @@ class FlagsRouter extends Router {
       },
     );
     Route.get('text', (DoxRequest req) => '<b>hi</b>');
+    Route.middleware(<dynamic>[JsonType()], () {
+      Route.get('text-json', (DoxRequest req) => '{"a":1}');
+      Route.get('text-json-res', (DoxRequest req) => response('{"a":1}'));
+    });
     Route.get(
       'text-typed',
       (DoxRequest req) => response('hi').contentType(ContentType.text),
@@ -53,6 +66,7 @@ class FlagsRouter extends Router {
       body: v.object(<String, Schema<Object?>>{'email': v.string()}),
     );
     Route.get('decrypt', (DoxRequest req) => Crypt.decryptString('bad'));
+    Route.get('session-all', (DoxRequest req) => req.session.all());
     Route.get('regenerate', (DoxRequest req) {
       String before = req.session.token;
       req.session.regenerate();
@@ -248,6 +262,12 @@ void coreFlagTests(CoreFlags flags) {
     expect(res.body, '<b>hi</b>');
     TestResponse typed = await client.get('/text-typed');
     expect(typed.header('content-type'), startsWith('text/plain'));
+    // a type a middleware set on the response stays, in both modes
+    for (String path in <String>['/text-json', '/text-json-res']) {
+      TestResponse res = await client.get(path);
+      expect(res.header('content-type'), startsWith('application/json'));
+      expect(res.body, '{"a":1}');
+    }
   });
 
   test('htmlStrings: an error text stays plain', () async {
@@ -271,15 +291,18 @@ void coreFlagTests(CoreFlags flags) {
     expect(vary, allOf(contains('Origin'), contains('X-Inertia')));
   });
 
-  test('keepCsrfToken: session.regenerate', () async {
-    DoxTestClient browser = client.withSession();
-    (await browser.get('/regenerate'))
-        .expectJson(<String, dynamic>{'kept': flags.keepCsrfToken});
-    (await browser.get('/regenerate-keep'))
-        .expectJson(<String, dynamic>{'kept': true});
-    (await browser.get('/invalidate'))
-        .expectJson(<String, dynamic>{'kept': false});
-  });
+  test(
+    'session.regenerate: new token by default, keepToken keeps it',
+    () async {
+      DoxTestClient browser = client.withSession();
+      (await browser.get('/regenerate'))
+          .expectJson(<String, dynamic>{'kept': false});
+      (await browser.get('/regenerate-keep'))
+          .expectJson(<String, dynamic>{'kept': true});
+      (await browser.get('/invalidate'))
+          .expectJson(<String, dynamic>{'kept': false});
+    },
+  );
 
   test('decryptServerError: the status and the report', () async {
     handler.errors.clear();
@@ -297,6 +320,19 @@ void coreFlagTests(CoreFlags flags) {
       expect(handler.errors, isEmpty);
     }
   });
+
+  test(
+    'decryptServerError: a bad session cookie is an empty session',
+    () async {
+      handler.errors.clear();
+      (await client
+              .withCookies(<String, String>{'dox_session': 'garbage'})
+              .get('/session-all'))
+          .expectStatus(200)
+          .expectJson(<String, dynamic>{});
+      expect(handler.errors, isEmpty);
+    },
+  );
 
   test('cacheCopies: Cache().store() and tags()', () async {
     await Cache().store('b').put('k', 'in b');

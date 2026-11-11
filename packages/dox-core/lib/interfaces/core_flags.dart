@@ -14,7 +14,6 @@ class CoreFlags {
     this.hasKeyOnly = false,
     this.htmlStrings = false,
     this.replaceHeaders = false,
-    this.keepCsrfToken = false,
     this.decryptServerError = false,
     this.cacheCopies = false,
   });
@@ -27,7 +26,6 @@ class CoreFlags {
       hasKeyOnly = true,
       htmlStrings = true,
       replaceHeaders = true,
-      keepCsrfToken = true,
       decryptServerError = true,
       cacheCopies = true;
 
@@ -56,11 +54,6 @@ class CoreFlags {
   /// the response (for example one set by a middleware). Off: it adds a
   /// second value. `res.header(k, v, replace: ...)` wins over this flag.
   final bool replaceHeaders;
-
-  /// `session.regenerate()` keeps the CSRF token, so forms open in other
-  /// tabs still work after login. `session.invalidate()` still makes a
-  /// new token. `regenerate(keepToken: ...)` wins over this flag.
-  final bool keepCsrfToken;
 
   /// A `DecryptException` gives 500 and is reported by the
   /// `ExceptionHandler`. Off: it gives 400 and is not reported.

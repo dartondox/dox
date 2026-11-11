@@ -72,7 +72,7 @@ The table shows the `message` text.
 | `419` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one, on a `POST`, `PUT`, `PATCH` or `DELETE`. | Send the token. See [CSRF](../security/csrf.md). |
 | `429` | `Too Many Requests` | A `RateLimit` middleware sees too many requests. The `Retry-After` header says how many seconds to wait. | Wait, then try again. See [Rate limiting](../security/rate-limiting.md). |
 | `422` | `{"_root":"The input has too many items (max 1000) or levels (max 10)"}` | Form or query keys with more than 1000 list items or 10 levels. | Send less nested data. |
-| `422` | `{"<field>":"<message>"}` | A DTO check failed. | See [Validation rules](../the-basic/validation-rules.md). |
+| `422` | `{"<field>":"<message>"}` | A DTO check failed. With the flag `laravelErrors` the body is `{"message":"...","errors":{"<field>":["..."]}}`. See [Core flags](app-config.md#core-flags). | See [Validation rules](../the-basic/validation-rules.md). |
 | `431` | (no text) | Native server: request line plus headers over 16 KB. | Send smaller headers or cookies. |
 | `500` | `Server Error`, code `server_error`. When `APP_ENV` is `development` or `local`, the body is `<error>.toString()` as plain text. | Any error that is not an `IHttpException`. It also goes to the `report` method of the `ExceptionHandler`. | Look at the server log. |
 
@@ -89,7 +89,7 @@ The table shows the `message` text.
 | `404` `file not found` | `Storage().stream()`, `download()`, `copy()`, `move()`, `getVisibility()`, `setVisibility()`, `size()` or `lastModified()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
-| `400` `decrypt_failed`, `The encrypted value is not valid` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. | Check the key. For a cookie, ask the user to log in again. |
+| `400` `decrypt_failed`, `The encrypted value is not valid` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. With the flag `decryptServerError` it is a `500` `server_error` and is reported. See [Core flags](app-config.md#core-flags). | Check the key. For a cookie, ask the user to log in again. |
 
 ## dox_auth
 
