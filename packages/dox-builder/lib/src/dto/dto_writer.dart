@@ -41,6 +41,7 @@ class DtoWriter {
     this.flags,
     this.jsonSchema, {
     this.literal = const DartLiteral(),
+    this.runtimeFlags = false,
   });
 
   final DtoClass dto;
@@ -49,6 +50,11 @@ class DtoWriter {
   /// The JSON Schema of the DTO (with `$defs`), built at build time.
   final Map<String, dynamic> jsonSchema;
   final DartLiteral literal;
+
+  /// `true` when the dox_validation of the app has the DTO flags
+  /// (`DtoState.allErrors`). Then the code reads them at run time. An
+  /// older dox_validation gets the old code, so it still compiles.
+  final bool runtimeFlags;
 
   final List<String> _statics = <String>[];
   int _regexes = 0;
@@ -183,11 +189,17 @@ class DtoWriter {
       _conv(out, field, field.type, read, 'p', key, c, 0);
       if (field.maybe) {
         if (!field.type.nullable) {
-          out.writeln('if ($c == null) s.required(p, $key, _m);');
+          // ValidationFlags.dtoMaybeRejectsEmpty: a key sent with ""
+          String sent = runtimeFlags ? ' || s.sentEmpty($c, input, $key)' : '';
+          out.writeln('if ($c == null$sent) s.required(p, $key, _m);');
         }
       } else if (field.required) {
+        // ValidationFlags.dtoRejectEmptyList: `[]`
+        String empty = runtimeFlags && field.type.kind == DtoKind.list
+            ? ' || s.emptyList($c)'
+            : '';
         out.writeln(
-          'if ($c == null || $c is Undefined) s.required(p, $key, _m);',
+          'if ($c == null || $c is Undefined$empty) s.required(p, $key, _m);',
         );
       } else if (!field.type.nullable) {
         out.writeln('if ($c == null) s.required(p, $key, _m);');
@@ -205,9 +217,15 @@ class DtoWriter {
         );
       }
     }
+    // ValidationFlags.dtoAllErrors: the rules still run. Each rule checks
+    // the type of its value first, so a bad field skips its rules.
     out
       ..write(requiredWhen)
-      ..writeln('if (s.issues.length != e) return null;');
+      ..writeln(
+        runtimeFlags
+            ? 'if (s.issues.length != e && !s.allErrors) return null;'
+            : 'if (s.issues.length != e) return null;',
+      );
     StringBuffer rules = StringBuffer();
     for (int i = 0; i < dto.fields.length; i++) {
       DtoField field = dto.fields[i];
@@ -224,7 +242,7 @@ class DtoWriter {
       }
     }
     // the rules of this DTO run when all its fields have the right type
-    if (rules.isNotEmpty) {
+    if (rules.isNotEmpty || runtimeFlags) {
       out
         ..write(rules)
         ..writeln('if (s.issues.length != e) return null;');

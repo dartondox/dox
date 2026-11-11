@@ -461,6 +461,82 @@ class A {
       expect(output, contains("s.read(input, 'note', emptyToNull: true)"));
     });
 
+    group('ValidationFlags |', () {
+      const String dto = '''
+@Dto()
+class A {
+  @MinLength(2)
+  final String name;
+  final List<String> tags;
+  final Maybe<String> nick;
+  final List<String>? extra;
+
+  const A({
+    required this.name,
+    required this.tags,
+    this.nick = const Maybe.missing(),
+    this.extra,
+  });
+}''';
+
+      // a stub of the DtoState of a dox_validation with the flags
+      const String newState = 'class DtoState { bool get allErrors => false; }';
+
+      test('an older dox_validation gets the old code', () async {
+        String code = (await _generate(dto)).replaceAll(RegExp(r'\s+'), '');
+        expect(code, isNot(contains('allErrors')));
+        expect(code, isNot(contains('emptyList')));
+        expect(code, isNot(contains('sentEmpty')));
+        expect(code, contains('if(s.issues.length!=e)returnnull;'));
+      });
+
+      test('a dox_validation with the flags reads them at run time', () async {
+        String output = await _generate('$dto\n$newState');
+        expect(output, isNot(startsWith('ERROR')), reason: output);
+        String code = output.replaceAll(RegExp(r'\s+'), '');
+        // dtoAllErrors: the rules run, then the code stops
+        expect(
+          code,
+          contains('if(s.issues.length!=e&&!s.allErrors)returnnull;'),
+        );
+        expect(
+          code.indexOf('if(s.issues.length!=e)returnnull;'),
+          greaterThan(code.indexOf('MinLength')),
+        );
+        // dtoRejectEmptyList: only the required list
+        expect(
+          code,
+          contains(
+            "if(c1==null||c1isUndefined||s.emptyList(c1))s.required(p,'tags',_m);",
+          ),
+        );
+        expect(RegExp(r'emptyList\(').allMatches(code), hasLength(1));
+        // dtoMaybeRejectsEmpty
+        expect(
+          code,
+          contains(
+            "if(c2==null||s.sentEmpty(c2,input,'nick'))s.required(p,'nick',_m);",
+          ),
+        );
+      });
+
+      test('a DTO with no rules still stops before it builds', () async {
+        String code = (await _generate('''
+@Dto()
+class A {
+  final int age;
+  const A({required this.age});
+}
+$newState''')).replaceAll(RegExp(r'\s+'), '');
+        expect(
+          code,
+          contains(
+            'if(s.issues.length!=e&&!s.allErrors)returnnull;if(s.issues.length!=e)returnnull;returnA(',
+          ),
+        );
+      });
+    });
+
     test('@OrDefault drops the issues of its field', () async {
       String output = await _generate('''
 @Dto()
