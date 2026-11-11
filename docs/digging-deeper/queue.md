@@ -541,6 +541,74 @@ await schema.table('failed_jobs', (Table table) {
 
 Use another connection of `config/database.dart` with `QueueConfig(connection: 'postgres')`.
 
+#### The failed_at column
+
+`failed_jobs.failed_at` is the time the job failed. It has one of two types:
+
+- A big integer: unix time in milliseconds. This is the default.
+- A timestamp in UTC, like Laravel. Turn it on with `failedAtTimestamp: true`.
+
+`FailedJob.failedAt` is the same `DateTime` with both types.
+
+To make a new table with the timestamp column, pass the setting to `QueueTables.up` in the migration, and set it in the queue config too:
+
+```dart
+await QueueTables.up(schema, failedAtTimestamp: true);
+```
+
+```dart
+QueueConfig queueConfig = QueueConfig(
+  driver: 'database',
+  jobs: jobRegistry,
+  failedAtTimestamp: true,
+);
+```
+
+The setting counts per connection. Each entry of `connections` has its own `failedAtTimestamp`, so two `database` connections can use tables of different types.
+
+The setting and the column must match. A worker reads the column type once, when it first uses `failed_jobs`. When they do not match, `fail`, `failed`, `retry`, `forget` and `prune-failed` throw a `StateError`, and nothing is written. A job that can not be moved to `failed_jobs` stays in `jobs`.
+
+The column type on each database:
+
+| Database | Column | How the time is kept |
+| --- | --- | --- |
+| SQLite | `TIMESTAMP` | ISO text in UTC, with milliseconds |
+| Postgres | `TIMESTAMP` (without time zone) | the UTC time, with milliseconds |
+| MySQL, MariaDB | `TIMESTAMP` | whole seconds; the database turns it to UTC and back with the session time zone |
+
+#### Use the timestamp column on a table with the integer column
+
+1. Stop the workers, and the app too when it has `workInProcess: true`. A running worker read the column type when it started, so it would still write milliseconds.
+2. Run the SQL for your database below, in a new migration (`await schema.driver.execute('...');` for each line) or in a database client.
+3. Set `failedAtTimestamp: true` in the queue config.
+4. Start the workers again.
+
+SQLite (3.35 or newer):
+
+```sql
+ALTER TABLE failed_jobs ADD COLUMN failed_at_utc TIMESTAMP;
+UPDATE failed_jobs SET failed_at_utc = strftime('%Y-%m-%dT%H:%M:%fZ', failed_at / 1000.0, 'unixepoch');
+ALTER TABLE failed_jobs DROP COLUMN failed_at;
+ALTER TABLE failed_jobs RENAME COLUMN failed_at_utc TO failed_at;
+```
+
+Postgres:
+
+```sql
+ALTER TABLE failed_jobs ALTER COLUMN failed_at TYPE TIMESTAMP USING to_timestamp(failed_at / 1000.0) AT TIME ZONE 'UTC';
+```
+
+MySQL and MariaDB. Run it with the same time zone as the app (the server default is fine):
+
+```sql
+ALTER TABLE failed_jobs ADD COLUMN failed_at_utc TIMESTAMP NULL;
+UPDATE failed_jobs SET failed_at_utc = DATE_ADD('1970-01-01 00:00:00', INTERVAL failed_at DIV 1000 SECOND);
+ALTER TABLE failed_jobs DROP COLUMN failed_at;
+ALTER TABLE failed_jobs CHANGE failed_at_utc failed_at TIMESTAMP NOT NULL;
+```
+
+On SQLite the new column allows NULL, because SQLite can not add a NOT NULL column without a default. The queue never writes NULL there.
+
 ### Redis
 
 ```dart
