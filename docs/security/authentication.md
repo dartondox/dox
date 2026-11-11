@@ -980,6 +980,7 @@ class WebRouter extends Router {
 ```
 
 To send a guest to the login page instead of a `401`, use `AuthMiddleware(redirectTo: '/login')`.
+With the `jsonNoRedirect` [flag](authorization.md#auth-flags) on, a JSON or XHR client gets a `401` and no redirect.
 
 Run `dart run build_runner build`, then `dox s`.
 
@@ -1638,6 +1639,7 @@ Sessions:
 | --- | --- | --- |
 | `AuthConfig(defaultGuard:)` | required | the guard that `Auth()` and the middleware use when no guard is given |
 | `AuthConfig(guards:)` | `{}` | the guards, by name |
+| `AuthConfig(flags:)` | `AuthFlags()` (all off) | opt-in behaviors. See [Auth flags](authorization.md#auth-flags) |
 | `AuthGuard(driver:)` | required | `AccessTokenAuthDriver`, `JwtAuthDriver`, `SessionAuthDriver`, or your own `AuthDriver` |
 | `AuthGuard(provider:)` | required | the `AuthProvider`: which model holds the users |
 
