@@ -94,7 +94,7 @@ class BlogController {
 
   /// DELETE /resource/{id}
   /// delete() gives the number of rows it deleted, so 0 is a 404:
-  /// `if (await Post().where('id', id).delete() == 0) throw NotFoundHttpException();`
+  /// `if (await Blog().where('id', id).delete() == 0) throw NotFoundHttpException();`
   Future<dynamic> destroy(DoxRequest req, int id) async {}
 }
 ```
