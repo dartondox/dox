@@ -99,9 +99,12 @@ Future<void> main(List<String> args) async {
 
 The worker starts the providers of your app (database, cache, queue). It does not start the HTTP server.
 
-### 4. Tables (database driver only)
+### 4. Tables
 
-Run `dox queue:table`. It writes a migration in `db/migration` that makes the `jobs` and `failed_jobs` tables. Then run `dox migrate`.
+The `jobs` and `failed_jobs` tables are only for the database driver.
+The `job_batches` table is for [job batches](#job-batches). If you use batches, you need it with every driver.
+
+Run `dox queue:table`. It writes a migration in `db/migration` that makes all three tables. Then run `dox migrate`.
 
 ```bash
 dox queue:table
@@ -110,22 +113,24 @@ dox migrate
 
 `queue:table` is a [package command](package-commands.md) of `dox_queue`. It does not overwrite: when a `create_queue_tables` migration is already there, it prints so and stops.
 
-The migration it writes looks like this. You can also write it by hand. `QueueTables` makes the two tables.
+The migration it writes looks like this. You can also write it by hand. `QueueTables.up` makes the `jobs` and `failed_jobs` tables. `QueueTables.upBatches` makes the `job_batches` table.
 
 ```dart title="db/migration/2026_10_25_000000_create_queue_tables.dart"
 // ignore_for_file: file_names
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_queue/dox_queue.dart';
 
-/// The jobs and failed_jobs tables of dox_queue.
+/// The jobs, failed_jobs and job_batches tables of dox_queue.
 class CreateQueueTables extends Migration {
   @override
   Future<void> up(Schema schema) async {
     await QueueTables.up(schema);
+    await QueueTables.upBatches(schema);
   }
 
   @override
   Future<void> down(Schema schema) async {
+    await QueueTables.downBatches(schema);
     await QueueTables.down(schema);
   }
 }
@@ -298,6 +303,7 @@ Run a job in this process after the answer is sent. The client does not wait for
 SendWelcomeEmail(userId: 1).dispatchAfterResponse();
 ```
 
+Do not `await` it. It returns nothing.
 It does not go on the queue. So it has no job id and no retry. Outside a request, the job runs soon. When the job throws, its `failed()` runs and the error goes to the exception handler, never to the client. `QueueProvider` turns on `AfterResponse` for it. When the server stops, a job that did not run yet is lost.
 
 ### Dispatch after the commit
@@ -362,9 +368,10 @@ Commands:
 | `retry all` | put all failed jobs back |
 | `forget <id>` | delete one failed job |
 | `flush` | delete all failed jobs |
-| `clear [queue]` | delete the jobs of a queue. Default: `default` |
+| `clear [queue]` | delete the jobs of a queue, also the running ones. It frees the locks of [unique jobs](#unique-jobs). Default: `default` |
 | `restart` | stop the running workers after their current jobs |
 | `prune-failed` | delete failed jobs older than `--hours=N` (default 24) |
+| `prune-batches` | delete finished [batches](#prune-old-batches) older than `--hours=N` (default 24). `--unfinished=N` also deletes old batches that never finished |
 
 Flags of `work`:
 
@@ -513,6 +520,333 @@ With `dispatchSync()`, `dispatchAfterResponse()` and the `sync` driver there is 
 There `attempts()` is 1, `release()` and `delete()` do nothing, and `fail()` only runs `failed()`.
 
 In a test file, `package:test` has its own `fail()`. Inside a job class with the mixin, a bare `fail(...)` calls the job method. Write `this.fail(...)` to make it clear.
+
+## Job middleware
+
+Middleware wraps `handle()` of a job. Use it for rules that many jobs share, like a rate limit.
+Add the opt-in `HasMiddleware` mixin and list the middleware. The first one runs first.
+
+```dart
+@Job()
+class SendReport extends DoxJob with HasMiddleware {
+  SendReport({required this.reportId});
+
+  final int reportId;
+
+  @override
+  int get tries => 5;
+
+  @override
+  List<JobMiddleware> get middleware => <JobMiddleware>[
+    RateLimited('report-api', 10, Duration(minutes: 1)),
+    WithoutOverlapping(
+      'report-$reportId',
+      releaseAfter: Duration(seconds: 30),
+      expireAfter: Duration(minutes: 10), // longer than the longest report run
+    ),
+  ];
+
+  // ...
+}
+```
+
+Write your own with `JobMiddleware`.
+Call `next()` to go on.
+Do not call it to skip the job. The job is then done.
+Call `release(job, delay)` to put the job back on the queue.
+
+```dart
+class SkipAtNight extends JobMiddleware {
+  @override
+  Future<void> handle(DoxJob job, JobNext next) async {
+    if (DateTime.now().hour < 6) {
+      release(job, Duration(hours: 1));
+      return;
+    }
+    await next();
+  }
+}
+```
+
+The middleware runs in the worker, with the `sync` driver, with `dispatchSync()` and with `dispatchAfterResponse()`.
+A release counts as a try, like `release()` in [Control the job in handle()](#control-the-job-in-handle).
+Outside a worker there is no queue. A release then logs a warning, and `handle()` does not run.
+
+### Rate limits and locks
+
+| Middleware | What it does |
+| --- | --- |
+| `RateLimited(key, max, per)` | runs at most `max` jobs of `key` in each `per` window. The others go back on the queue until the window ends |
+| `WithoutOverlapping(key, releaseAfter:, expireAfter:)` | runs one job of `key` at a time. The others go back after `releaseAfter` (default: zero, so at once). With `releaseAfter: null`, they are dropped. `expireAfter` frees the lock after this time, also while a job still runs. Default: no expiry. Set `expireAfter` longer than the longest run of the job, so a crash can not hold the lock forever and two runs do not overlap |
+| `ThrottlesExceptions(key, maxAttempts:, decay:, retryAfter:)` | after `maxAttempts` errors, jobs of `key` wait until `decay` is over. A job that threw goes back after `retryAfter`. Defaults: `maxAttempts` 10, `decay` 10 minutes, `retryAfter` zero |
+
+Things to know:
+
+- They keep their counts and locks in the default cache store. All workers must use the same store: `file` on one machine, or `redis` for several servers. A `memory` store is per process, so the limit would not work.
+- A release counts as a try. A job that is released and has `tries` of 1 fails on its next pickup. Set `tries` above 1, or a `retryUntil`.
+- The lock of `WithoutOverlapping` has no class name in it. Job classes with the same key share one lock. Put the class name in the key if they should not.
+
+## Unique jobs
+
+Some jobs should wait in the queue only once, like "rebuild the search index of product 5".
+Add the opt-in `ShouldBeUnique` mixin.
+While a job with the same class and `uniqueId` waits or runs, `dispatch()` pushes nothing and returns `''`.
+
+```dart
+@Job()
+class UpdateSearchIndex extends DoxJob with ShouldBeUnique {
+  UpdateSearchIndex({required this.productId});
+
+  final int productId;
+
+  @override
+  String get uniqueId => '$productId';
+
+  @override
+  Duration? get uniqueFor => Duration(hours: 1);
+
+  // ...
+}
+```
+
+- `uniqueId` is the key next to the class. The default is empty: only one job of the class at a time.
+- `uniqueFor` ends the lock after a time, also when the job never ran. `null` means no end.
+- The worker frees the lock when the job is done, deleted or failed for good. A release or a retry keeps it.
+- `ShouldBeUniqueUntilProcessing` frees the lock when a worker starts the job. A new job can then be queued while this one runs.
+- The lock is in the default cache store. The web app and the workers must use the same store, like `redis`.
+- `queue:clear` frees the locks of the jobs it deletes.
+- `queue:retry` of a failed job does not take the lock.
+- `dispatchSync()` ignores uniqueness.
+- With `afterCommit` inside a transaction, the lock is taken at the commit. `dispatch()` returns the id at once, also when the job is then skipped.
+- When a worker crashes, its lock stays. With no `uniqueFor`, the lock never ends, and `dispatch()` keeps returning `''`. So set `uniqueFor` on unique jobs.
+- `Queue.fake()` keeps its own locks and needs no cache.
+
+## Job chains
+
+A chain runs jobs one after the other. The next job is pushed only when the job before it is done.
+
+```dart
+await Queue.chain(<DoxJob>[
+  ResizeImage(imageId: 1),
+  UploadImage(imageId: 1),
+  TellUser(imageId: 1),
+]).catchError(TellAdmin(imageId: 1)).dispatch(queue: 'images');
+```
+
+- The rest of the chain is saved in the job that runs now. So the chain works across worker processes and restarts.
+- A job that is released or retried keeps the chain. The chain goes on only after the job is done.
+- A job that ends with `delete()`, or that a middleware skips, counts as done. The chain goes on.
+- When a job fails for good, the rest of the chain is dropped and the catch job runs.
+- `queue:retry` of the failed job brings the chain back. When the job is then done, the chain goes on.
+- `dispatch()` returns the id of the first job. `queue` and `connection` count for every job. `delay` counts for the first job only.
+- The `sync` driver runs the jobs now, one after the other. When one throws, the catch job runs and `dispatch()` throws the error.
+
+### The catch job
+
+A function can not be saved in the queue. So the catch handler is a job too, of a class in `jobRegistry`. Run `dart run build_runner build` after you add it.
+It runs once, in the worker where the job failed. It has no queue and no retry, like `dispatchSync()`.
+Add the `CatchesError` mixin to read the error:
+
+```dart
+@Job()
+class TellAdmin extends DoxJob with CatchesError {
+  TellAdmin({required this.imageId});
+
+  final int imageId;
+
+  @override
+  Future<void> handle() async {
+    await alertAdmin('image $imageId failed: $caughtError');
+  }
+}
+```
+
+An error in the catch job is logged. For slow work, dispatch a new job from it.
+
+### Chain traps
+
+- Each job carries the data of the jobs after it. Keep chains short. Save ids in the jobs, not big data.
+- A `ShouldBeEncrypted` job stays encrypted inside the job before it.
+- A [unique job](#unique-jobs) in the chain that is skipped stops the chain. The catch job runs with a `StateError`. When the first job is skipped, `dispatch()` returns `''` and nothing runs.
+- A next job that can not be read, for example when its class was removed, stops the chain. The catch job runs with the error.
+- The worker pushes the next job before it deletes the job that is done. A crash between the two can run the next job twice. Make chain jobs safe to run twice.
+- When the push of the next job fails, the try of the current job counts as failed, even though its `handle()` worked. The job is tried again. When no try is left, it fails and the catch job runs. With the default `tries` of 1 the first failed push does this. So give chain jobs more than one try.
+- The unique lock of a job is freed before the next job is pushed. So a next job with the same unique id is not skipped.
+
+## Job batches
+
+A batch runs many jobs and acts when they are all done:
+
+```dart
+Batch batch = await Queue.batch(<DoxJob>[
+  ImportRows(from: 0),
+  ImportRows(from: 1000),
+  ImportRows(from: 2000),
+])
+    .name('import')
+    .then(ImportDone())
+    .catchError(ImportFailed())
+    .whenComplete(CleanUpImport())
+    .dispatch(queue: 'imports');
+
+print(batch.id);
+```
+
+### The table
+
+A batch is saved in the `job_batches` table. It uses the database connection of `QueueConfig.connection`, also with the Redis driver and the `sync` driver.
+`dox queue:table` makes this table for a new app.
+An app that already ran the `queue:table` migration adds it in a new migration:
+
+```dart
+class CreateJobBatchesTable extends Migration {
+  @override
+  Future<void> up(Schema schema) async {
+    await QueueTables.upBatches(schema);
+  }
+
+  @override
+  Future<void> down(Schema schema) async {
+    await QueueTables.downBatches(schema);
+  }
+}
+```
+
+An app that does not use batches does not need the table. If you use batches, you need it with every driver.
+Without it, `dispatch()` throws a `StateError` that names `QueueTables.upBatches()`.
+
+### Callbacks
+
+| Callback | Runs |
+| --- | --- |
+| `before(job)` | once, at `dispatch()`, before the jobs are pushed |
+| `progress(job)` | each time a job is done. With `allowFailures()`, also when one fails |
+| `then(job)` | once, when every job is done |
+| `catchError(job)` | once, when the first job fails for good |
+| `whenComplete(job)` | once, when every job ran, done or failed |
+
+A function can not be saved in the queue. So each callback is a job of a class in `jobRegistry`. Run `dart run build_runner build` after you add one.
+It runs once, in the process where the step happened. It has no queue and no retry, like `dispatchSync()`.
+An error in a callback is logged. For slow work, dispatch a new job from it.
+Add `Batchable` to read the batch, and `CatchesError` to read the error:
+
+```dart
+@Job()
+class ImportFailed extends DoxJob with Batchable, CatchesError {
+  @override
+  Future<void> handle() async {
+    Batch? batch = await this.batch();
+    await alertAdmin('import ${batch?.name} failed: $caughtError');
+  }
+}
+```
+
+### Jobs of a batch
+
+Add the opt-in `Batchable` mixin to a job to read its batch.
+`batchId` is the id. `batch()` reads the batch as it is now.
+A job can skip its work when the batch was cancelled:
+
+```dart
+@Job()
+class ImportRows extends DoxJob with Batchable {
+  ImportRows({required this.from});
+
+  final int from;
+
+  @override
+  Future<void> handle() async {
+    Batch? batch = await this.batch();
+    if (batch?.cancelled ?? false) return;
+    await importRows(from);
+  }
+}
+```
+
+A `Batch` has these fields:
+
+| Field | What it holds |
+| --- | --- |
+| `id`, `name` | the id and the name |
+| `totalJobs` | how many jobs the batch has |
+| `pendingJobs` | how many jobs are not done. It also counts failed jobs, because they can be retried |
+| `failedJobs` | how many jobs failed |
+| `processedJobs` | how many jobs are done. Failed jobs are not counted |
+| `progress` | the percent of done jobs, from 0 to 100 |
+| `finished` | `true` when every job ran, or the batch was cancelled |
+| `cancelled` | `true` after `cancel()`, or after a first failure |
+
+A `Batch` is the state at the time it was read. Read it again with `Queue.findBatch(id)`. It gives `null` when there is no such batch.
+
+- The first job that fails for good cancels the batch. Add `allowFailures()` to keep it going.
+- `cancel()` does not stop the jobs. They still run and count. A `Batchable` job reads `cancelled` to skip its work.
+- `add(jobs)` adds jobs to the batch, for example from a job of the batch. They go on the queue and connection of the batch. It throws a `StateError` when the batch is finished, cancelled or deleted. Then it pushes nothing.
+- A failed job that you retry with `queue:retry` is not counted again when it fails again. When it is done, `pendingJobs` and `failedJobs` both go down by one. So `catchError` can run again when a later job fails.
+- An empty batch throws an `ArgumentError`, because it would never finish.
+- `then` and `whenComplete` run once, also with many workers. Each count changes in one atomic step.
+
+### Batch traps
+
+- A skipped [unique job](#unique-jobs) is taken out of `totalJobs` and `pendingJobs`. `progress` does not run for it. When it was the last open job, `then` and `whenComplete` run.
+- When a push fails in `dispatch()` or `add()`, the jobs that were not pushed are taken out of the counts. The batch is cancelled and the error is thrown. The jobs that were pushed before still run, and the callbacks still fire for them.
+- The counts follow the at-least-once rule of the queue. A job that runs twice, for example when it runs longer than `retryAfter`, can be counted twice. `failedJobs` never goes below 0.
+- The batch is marked finished before `then` and `whenComplete` run. So `add()` from a callback throws a `StateError`.
+- When a worker crashes after a job is done and before it counted the job, the batch keeps that job as pending. Then `then` and `whenComplete` never run. Prune such batches with `--unfinished`, see below.
+- A chain inside a batch is not supported.
+- A batch does not wait for `afterCommit`. It is saved and its jobs are pushed at once.
+- The `sync` driver runs the jobs at `dispatch()` and counts them. A job that throws counts as failed, and `dispatch()` does not throw.
+- The queue events fire for the jobs of a batch like for any job. There are no batch events.
+
+### Prune old batches
+
+```bash
+dart run bin/queue.dart prune-batches --hours=48
+dart run bin/queue.dart prune-batches --hours=48 --unfinished=168
+```
+
+The first line deletes batches that finished, or were cancelled, more than 48 hours ago. The default is 24.
+`--unfinished=168` also deletes batches that never finished and were made more than 168 hours ago.
+In code, use `Queue.pruneBatches(before, unfinishedBefore:)`.
+
+## Queue events
+
+Listen to the steps of a job:
+
+```dart
+Queue.before((QueueEvent event) => print('start ${event.name} ${event.id}'));
+Queue.after((QueueEvent event) => print('done ${event.name}'));
+Queue.failing((QueueEvent event) => alert(event.name, event.error));
+```
+
+| Hook | When |
+| --- | --- |
+| `Queue.queued` | `dispatch()` pushed a job |
+| `Queue.before` | a worker starts a job |
+| `Queue.after` | a worker finished a job and deleted it |
+| `Queue.released` | a worker put a job back (`release()` or a retry) |
+| `Queue.exceptionOccurred` | `handle()` threw and the job will be tried again |
+| `Queue.failing` | a job failed for good |
+| `Queue.looping` | a worker is about to take the next job |
+| `Queue.stopping` | a worker stops |
+
+A listener gets a `QueueEvent`:
+
+| Field | What it holds |
+| --- | --- |
+| `type` | the kind of event |
+| `job` | the job. `null` for `looping` and `stopping`, and when the worker can not read the job |
+| `name` | the job name of the registry |
+| `id` | the job id |
+| `queue` | the queue name |
+| `attempts` | the try number. `0` for `queued`, `looping` and `stopping` |
+| `error`, `stack` | the error and its stack trace, for `exceptionOccurred` and `failing` |
+| `delay` | the wait, for `queued` and `released` |
+
+- Listeners are per isolate. Register them where the app starts, like in a provider. Then the web app and each worker have them.
+- A listener can be async. The queue waits for it.
+- A listener that throws is logged. It never stops the worker or the dispatch.
+- The `sync` driver, `dispatchSync()`, `dispatchAfterResponse()` and `Queue.fake()` fire no events.
+- `Queue.forgetListeners()` removes all listeners, for example between tests.
 
 ## Drivers
 
@@ -774,9 +1108,13 @@ test('signing up queues the welcome email', () async {
 | `assertPushedTimes<T>(n)` | exactly `n` `T` jobs were pushed |
 | `assertNotPushed<T>()` | no `T` job was pushed |
 | `assertNothingPushed()` | no job was pushed at all |
+| `assertChained(<Type>[A, B])` | a chain of exactly these job classes, in this order, was dispatched |
+| `assertBatched([test])` | a batch was dispatched. With `test`, one of them passes it. `test` gets a `PendingBatch` |
+| `assertBatchCount(n)` | exactly `n` batches were dispatched |
 
 To read the jobs, use `queue.pushed`. Each item has the `job`, the `queue` name and the `delay`. `queue.jobsOf<T>()` gives the `T` jobs. `queue.clear()` forgets them. `Queue.restore()` stops the fake.
 
+- `Queue.chain()` and `Queue.batch()` are kept too. Read chains in `queue.chains` and batches in `queue.batches`. Their jobs are not in `queue.pushed`. Nothing is saved or run, and the batch tables are not needed. In a faked batch, `add()` adds to the batch, `cancel()` does nothing and `Queue.findBatch()` gives `null`.
 - `dispatchSync()` runs the job now. `dispatchAfterResponse()` runs it after the answer, or soon outside a request. The fake does not stop them. It keeps their jobs in `queue.dispatchedSync` and `queue.dispatchedAfterResponse` (not in `queue.pushed`). `queue.clear()` empties these lists too.
 - The fake does not encode the job. A job that is missing from `QueueConfig.jobs`, or has data that is not JSON, passes a faked test but fails for real.
 - The fake also catches `Mail.queue()`, but only when `Mail.fake()` is off. When both are on, `Mail.fake()` catches the email first. See [Mail](mail.md#testing).

@@ -283,6 +283,7 @@ The flags:
 
 - `forbidGuest`: `req.authorize` and `Can` give a guest `403`, not `401`. The `403` has the message of the gate. `AuthMiddleware` runs first on most routes, and it still gives a guest `401`.
 - `jsonNoRedirect`: `AuthMiddleware(redirectTo: '/login')` gives a JSON or XHR client a `401`, not a redirect. A JSON client sends an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request still gets the redirect.
+- `endSessionsOnPasswordChange`: a session login ends when the password of the user changes. It also turns on `logoutOtherDevices`. See [End other sessions when the password changes](authentication.md#end-other-sessions-when-the-password-changes).
 
 `AuthFlags.all()` turns on every flag:
 
