@@ -167,12 +167,11 @@ A Blade name that is not a Dox tag, like `@foreach` or `@endif`, is printed as t
 | `@csrf`, `@method('PUT')`, `old('email')` | `@csrf`, `@method('PUT')`, `old('email')` |
 | `Blade::directive('datetime', ...)` | `View.directive('datetime', DateTimeDirective())` |
 
-Two things are not the same as in Blade:
+Three things are not the same as in Blade:
 
 - `@includeIf(condition, 'name')` in Dox takes a condition first. It does not check if the template exists.
+- `{{ true }}` prints `true`, a variable that does not exist prints nothing, and the text `'0'` is true. Turn on the `bladeOutput`, `strictVariables` and `stringZeroIsFalse` options to work like Blade. See [Strict options](../the-basic/views.md#strict-options).
 - `@json` is safe in a `<script>` block and in an attribute in single quotes, not in an attribute in double quotes.
-
-Values work like in Blade. `{{ true }}` prints `1`, a variable that does not exist throws an error, and the text `'0'` is false. The `bladeOutput`, `strictVariables` and `stringZeroIsFalse` options turn each of these off. See [Strict options](../the-basic/views.md#strict-options).
 
 ## Eloquent vs Dox Model
 
