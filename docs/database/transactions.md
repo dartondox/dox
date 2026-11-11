@@ -123,6 +123,7 @@ Limits:
 - Code can outlive its transaction, like a `Timer` or a future that you did not await.
   When it calls `afterCommit()` after the transaction ended, the function runs at once if the transaction committed.
   It is dropped if the transaction rolled back. It never waits for a later transaction.
+  When such a late function throws, the error goes to the `Future` that `afterCommit()` returns. Await it or catch it. Else it is an uncaught async error.
 - A transaction opened with the default connection's own name (like `connection: 'main'`) uses another driver than no name.
   So `afterCommit()` with no name runs at once there.
   Pass the same `connection:` to both, or no name to both.
