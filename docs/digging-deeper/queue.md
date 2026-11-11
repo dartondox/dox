@@ -433,7 +433,7 @@ dart run bin/queue.dart flush
 
 ### Control the job in handle()
 
-Inside `handle()`, a job can decide what happens next:
+Add the opt-in `InteractsWithQueue` mixin. Then, inside `handle()`, the job can decide what happens next:
 
 | Call | What it does |
 | --- | --- |
@@ -443,31 +443,42 @@ Inside `handle()`, a job can decide what happens next:
 | `delete()` | delete the job, with no retry and no `failed()` |
 
 ```dart
-@override
-int get tries => 5;
+@Job()
+class SendReport extends DoxJob with InteractsWithQueue {
+  SendReport({required this.reportId});
 
-@override
-Future<void> handle() async {
-  ReportApi api = Dox().ioc.get<ReportApi>();
-  if (await api.isBusy()) {
-    release(Duration(seconds: 30));
-    return;
+  final int reportId;
+
+  @override
+  int get tries => 5;
+
+  @override
+  Future<void> handle() async {
+    ReportApi api = Dox().ioc.get<ReportApi>();
+    if (await api.isBusy()) {
+      release(Duration(seconds: 30));
+      return;
+    }
+    if (!await api.hasReport(reportId)) {
+      delete();
+      return;
+    }
+    await api.send(reportId);
   }
-  if (!await api.hasReport(reportId)) {
-    delete();
-    return;
-  }
-  await api.send(reportId);
 }
 ```
 
 The worker does the call when `handle()` ends. When you call more than one, the last one wins.
 A call also wins over an error that `handle()` throws after it.
+When `handle()` times out, the call is dropped, and the timeout rules count.
 
-`release()` counts as a try. Set `tries` (or `retryUntil`) high enough, or the next run fails.
+`release()` counts as a try. The default `tries` is 1, so the job then fails on its next pickup.
+Set `tries` above 1 (or `retryUntil`) when a job calls `release()`.
 
 With `dispatchSync()`, `dispatchAfterResponse()` and the `sync` driver there is no queue.
 There `attempts()` is 1, `release()` and `delete()` do nothing, and `fail()` only runs `failed()`.
+
+In a test file, `package:test` has its own `fail()`. Inside a job class with the mixin, a bare `fail(...)` calls the job method. Write `this.fail(...)` to make it clear.
 
 ## Drivers
 
@@ -482,7 +493,7 @@ There `attempts()` is 1, `release()` and `delete()` do nothing, and `fail()` onl
 Jobs are rows in the `jobs` table. Failed jobs are rows in `failed_jobs`.
 
 `failed_jobs.connection` has the name of the queue connection (see [Queue connections](#queue-connections)). It is NULL for the main connection.
-A `failed_jobs` table without this column works too. Then the name is not saved.
+A `failed_jobs` table without this column works too. Then the name is not saved. A worker checks for the column once, so restart the workers after you add it.
 To add the column, write a migration:
 
 ```dart
@@ -574,7 +585,7 @@ dart run bin/queue.dart failed --connection=database
 
 - An entry uses only `driver`, `redis`, `prefix`, `connection` (the dox_orm one), `retryAfter` and `serializeSync`. The `jobs` of the main config count for all connections.
 - The in-process worker (`workInProcess`) runs the jobs of the main connection only.
-- Two `database` connections on the same dox_orm connection share the `jobs` table. Give each one its own dox_orm connection.
+- Two `database` connections on the same dox_orm connection share the `jobs` and `failed_jobs` tables. Give each one its own dox_orm connection. If they share, `failed --connection=X` lists all failed jobs of the table, not only those of X.
 - `Queue.fake()` keeps the name in `PushedJob.connection`.
 
 ## Small apps: a worker in the web server
