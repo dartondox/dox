@@ -322,7 +322,7 @@ await QueryBuilder.transaction(() async {
 - A job that is not in the registry, or data that is not JSON, throws at `dispatch()`, not at the commit.
 - When the push fails after the commit, the `QueryBuilder.transaction()` call throws that error. The data stays saved.
 - The `sync` driver runs the job after the commit.
-- It waits for a transaction of the default dox_orm connection only.
+- It waits only for a transaction on the default dox_orm connection, opened with no `connection:` name. A transaction opened by name pushes the job at once, also when the name is the one of the default connection.
 - `dispatchIf()`, `dispatchUnless()` and `Queue.dispatch()` take `afterCommit` too.
 - `dispatchSync()` and `dispatchAfterResponse()` run the job as before. They do not wait for a commit.
 
