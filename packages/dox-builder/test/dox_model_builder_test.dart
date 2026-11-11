@@ -660,6 +660,18 @@ class Post {
         // only belongsTo gets it
         expect(RegExp('relation:').allMatches(flat), hasLength(1));
       });
+
+      test('a hidden belongsTo gets no relation name', () async {
+        String out = await _generate(
+          model,
+          imports: "import 'orm.dart' hide belongsTo;",
+          files: <String, String>{
+            'a|lib/orm.dart':
+                'dynamic belongsTo(Object a, Object b, {String? relation}) {}',
+          },
+        );
+        expect(out, isNot(contains('relation:')));
+      });
     });
   });
 }

@@ -194,13 +194,19 @@ class DtoWriter {
           out.writeln('if ($c == null$sent) s.required(p, $key, _m);');
         }
       } else if (field.required) {
-        // ValidationFlags.dtoRejectEmptyList: `[]`
-        String empty = runtimeFlags && field.type.kind == DtoKind.list
-            ? ' || s.emptyList($c)'
-            : '';
-        out.writeln(
-          'if ($c == null || $c is Undefined$empty) s.required(p, $key, _m);',
-        );
+        if (runtimeFlags && field.type.kind == DtoKind.list) {
+          // ValidationFlags.dtoRejectEmptyList: `[]`. A list that fails
+          // `required` is bad, so its other rules do not run.
+          out
+            ..writeln('if ($c == null || $c is Undefined || s.emptyList($c)) {')
+            ..writeln('s.required(p, $key, _m);')
+            ..writeln('$c = invalid;')
+            ..writeln('}');
+        } else {
+          out.writeln(
+            'if ($c == null || $c is Undefined) s.required(p, $key, _m);',
+          );
+        }
       } else if (!field.type.nullable) {
         out.writeln('if ($c == null) s.required(p, $key, _m);');
       }
@@ -350,6 +356,7 @@ class DtoWriter {
         out
           ..writeln('$target = s.list($args);')
           ..writeln('if ($target is List) {')
+          ..write(_countIssues(depth))
           ..writeln('List<Object> $q = <Object>[...$path, $key];')
           ..writeln('List<${item.code}> $o = <${item.code}>[];')
           ..writeln('for (int $i = 0; $i < $target.length; $i++) {')
@@ -366,7 +373,7 @@ class DtoWriter {
         );
         out
           ..writeln('}')
-          ..writeln('$target = $o;')
+          ..writeln(_badOr(depth, target, o))
           ..writeln('}');
       case DtoKind.map:
         DtoType item = type.item!;
@@ -378,6 +385,7 @@ class DtoWriter {
         out
           ..writeln('$target = s.object($args);')
           ..writeln('if ($target is Map) {')
+          ..write(_countIssues(depth))
           ..writeln('List<Object> $q = <Object>[...$path, $key];')
           ..writeln('Map<String, ${item.code}> $o = <String, ${item.code}>{};')
           ..writeln(
@@ -397,9 +405,22 @@ class DtoWriter {
         );
         out
           ..writeln('}')
-          ..writeln('$target = $o;')
+          ..writeln(_badOr(depth, target, o))
           ..writeln('}');
     }
+  }
+
+  /// The issue count before the items of a list or map are read.
+  String _countIssues(int depth) {
+    return runtimeFlags ? 'int b$depth = s.issues.length;\n' : '';
+  }
+
+  /// Set [target] to the new list or map [o]. With the DTO flags, a list
+  /// or map with a bad item is [invalid], so `s.emptyList()` and the
+  /// rules of the field do not run on what is left of it.
+  String _badOr(int depth, String target, String o) {
+    if (!runtimeFlags) return '$target = $o;';
+    return '$target = s.issues.length != b$depth ? invalid : $o;';
   }
 
   /// Add a converted item [x] to its list or map.

@@ -66,7 +66,8 @@ Future<String> _generate(
     outputs: <String, Object>{
       // a file with its own @Dto gets its own part
       for (String file in files.keys)
-        file.replaceFirst('.dart', '.dox_model_generator.g.part'): anything,
+        if (files[file]!.contains('@Dto'))
+          file.replaceFirst('.dart', '.dox_model_generator.g.part'): anything,
       'a|lib/a.dox_model_generator.g.part': decodedMatches(
         predicate<String>((String text) {
           output = text;
@@ -507,10 +508,13 @@ class A {
         expect(
           code,
           contains(
-            "if(c1==null||c1isUndefined||s.emptyList(c1))s.required(p,'tags',_m);",
+            "if(c1==null||c1isUndefined||s.emptyList(c1)){s.required(p,'tags',_m);c1=invalid;}",
           ),
         );
         expect(RegExp(r'emptyList\(').allMatches(code), hasLength(1));
+        // a list with a bad item is bad: no empty check, no list rules
+        expect(code, contains('intb0=s.issues.length;'));
+        expect(code, contains('c1=s.issues.length!=b0?invalid:o0;'));
         // dtoMaybeRejectsEmpty
         expect(
           code,
@@ -518,6 +522,42 @@ class A {
             "if(c2==null||s.sentEmpty(c2,input,'nick'))s.required(p,'nick',_m);",
           ),
         );
+      });
+
+      test('the runtime comes through an import', () async {
+        String code = (await _generate(
+          dto,
+          imports: "import 'state.dart';",
+          files: <String, String>{'a|lib/state.dart': newState},
+        )).replaceAll(RegExp(r'\s+'), '');
+        expect(code, contains('s.allErrors'));
+        expect(code, contains('s.emptyList(c1)'));
+      });
+
+      test('a hidden or prefixed DtoState gives the old code', () async {
+        for (String import in <String>[
+          "import 'state.dart' hide DtoState;",
+          "import 'state.dart' as st;",
+        ]) {
+          String code = (await _generate(
+            dto,
+            imports: import,
+            files: <String, String>{'a|lib/state.dart': newState},
+          )).replaceAll(RegExp(r'\s+'), '');
+          expect(code, isNot(contains('allErrors')), reason: import);
+          expect(code, isNot(contains('invalid:o0')), reason: import);
+        }
+      });
+
+      test('a map with a bad item is bad too', () async {
+        String code = (await _generate('''
+@Dto()
+class A {
+  final Map<String, int> scores;
+  const A({required this.scores});
+}
+$newState''')).replaceAll(RegExp(r'\s+'), '');
+        expect(code, contains('c0=s.issues.length!=b0?invalid:o0;'));
       });
 
       test('a DTO with no rules still stops before it builds', () async {
