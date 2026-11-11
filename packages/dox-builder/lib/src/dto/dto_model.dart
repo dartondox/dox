@@ -190,6 +190,7 @@ class DtoField {
 
   /// `@RequiredIf`, `@RequiredWith` and the other `Required*` rules,
   /// `@Filled` and `@Present`: checked when the value is missing.
+  /// `@Prohibited` and `@ProhibitedIf`: checked for every value.
   final List<DtoRule> requiredWhen = <DtoRule>[];
 
   /// `@ExcludeIf` and `@ExcludeUnless`: when one applies, the field is
@@ -337,6 +338,8 @@ class DtoReader {
     'RequiredWithoutAll',
     'Filled',
     'Present',
+    'Prohibited',
+    'ProhibitedIf',
   };
 
   /// Rules that skip a field, like `@ExcludeIf`.
@@ -346,10 +349,8 @@ class DtoReader {
   };
 
   /// `Rule<T>` classes that check the whole field, also on a list: they
-  /// read the key next to the field, or check that it is empty.
+  /// read the key next to the field.
   static const Set<String> wholeFieldRules = <String>{
-    'Prohibited',
-    'ProhibitedIf',
     'Different',
     'GreaterThanField',
     'GreaterThanOrEqualField',

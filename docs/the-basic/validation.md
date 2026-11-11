@@ -382,6 +382,7 @@ AppConfig appConfig = AppConfig(
 - A name is looked up by the dotted path (`address.city`), then with `*` for list items (`items.*.qty`), then by the field name (`city`).
 - The names of the DTO win over the names of the `MessageResolver`. A nested DTO uses its own names first, then the names of the outer DTO.
 - `MessageResolver.setAttributes(...)` adds names to a resolver. A custom resolver can override `attributeName(path)`.
+- `{other}` and `{others}` (the other keys of rules like `@RequiredIf` and `@Same`) show their names too.
 - The error path and the key in the error response do not change. Only the text does.
 - `@Dto(attributes:)` needs one `build_runner` run.
 

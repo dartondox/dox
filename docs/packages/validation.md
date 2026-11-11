@@ -270,7 +270,7 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
   'note': v.string().optional().present().nullable(),
   'coupon': v.string().optional().prohibitedIf('type', 'guest'),
   'debug': v.any().optional().prohibited(),
-  'terms': v.bool().accepted(),
+  'terms': v.coerce.bool().accepted(),
   'new_password': v.string().different('old_password'),
   'id': v.string().ulid(),
   'min_price': v.int(),
@@ -280,7 +280,8 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
 
 - `requiredUnless`, `requiredWithout`, `requiredWithoutAll`, `filled` and `present` come after `optional()`, like `requiredIf`.
 - `present()` needs the key. Add `.nullable()` to allow `null`.
-- `prohibited()` and `prohibitedIf()` pass a missing or empty value. Use them after `optional()`.
+- `prohibited()` and `prohibitedIf()` come after `optional()`. A missing key or blank text passes. Any other sent value fails, also `null`, `[]`, `0` and `false`, like Laravel.
+- `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact Laravel words.
 - `gtField`, `gteField`, `ltField` and `lteField` compare with another key, like Laravel `gt:field`. A missing other key fails.
 - There is no fluent `exclude_if` and no `bail`. A fluent schema runs all rules of a value.
 - The rules are explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing).

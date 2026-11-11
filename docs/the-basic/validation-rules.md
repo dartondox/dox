@@ -131,10 +131,10 @@ These read another key of the same object. The other key is the input key, like 
 - `@RequiredWithout(['email'])`: the field is required when any of the keys is missing or empty. `@RequiredWithoutAll(['email', 'phone'])`: when all of them are missing or empty.
 - `@RequiredUnless`, `@RequiredWithout` and `@RequiredWithoutAll` follow the same rules as `@RequiredIf`: a nullable, `Maybe` or default field, and input keys.
 - `@Different('old_password')` is Laravel `different`. It compares the raw input like `@Same`. A missing other key passes.
-- `@ProhibitedIf('type', 'guest')` is Laravel `prohibited_if`: when `type` is `guest`, the field must be missing or empty. It reads the raw input of `type`, and matches like `@RequiredIf`.
+- `@ProhibitedIf('type', 'guest')` is Laravel `prohibited_if`: when `type` is `guest`, the field works like `@Prohibited()` (see below). It reads `type` and matches like `@RequiredIf`.
 - `@GreaterThanField`, `@GreaterThanOrEqualField`, `@LessThanField` and `@LessThanOrEqualField` are Laravel `gt`, `gte`, `lt` and `lte` with a field. They are for `int`, `double` and `num` fields. They read the raw input of the other key: a number, or number text from a form. Like Laravel, a missing other key (or one that is not a number) fails.
   `{min}` and `{max}` in the message are the other key. They use the codes of `@GreaterThan`, `@Min`, `@LessThan` and `@Max`.
-- On a `List<T>` field, `@Different` and `@ProhibitedIf` check the whole list, not each item. The field compare rules do not fit a list.
+- On a `List<T>` field, `@Different` checks the whole list, not each item. The field compare rules do not fit a list.
 - Missing means: not there, `null`, blank text, an empty list or an empty map.
 - They run in step 1, with the other "required" checks. `@Confirmed` and `@Same` run in step 2.
 
@@ -153,9 +153,9 @@ These check if a key is sent and has a value. Like Laravel.
 - `@Filled()`: a missing key passes. A key that is sent must have a value: not `null`, not blank text, not an empty list.
 - `@Present()`: the key must be sent. Its value may be `null` or empty.
 - `@Filled()` and `@Present()` are for a nullable, `Maybe` or default field, like `@RequiredIf`. They run in step 1.
-- `@Prohibited()`: the field must be missing or empty (`null`, blank text, an empty list or map). On a list it checks the whole list.
+- `@Prohibited()`: the key must be missing, or blank text like `""` or `"  "`. Any other sent value fails, also `null`, `[]`, `{}`, `0` and `false`. This is what Laravel's `prohibited` rule does by itself. It reads the raw input, so it runs before the type check, in step 1. It is for a nullable, `Maybe` or default field.
 - `@Accepted()` takes `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"`. `@Declined()` takes `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"`. The text is case sensitive, like Laravel.
-  Use them on a `bool` field with no default. Then a missing value fails with `required`. In a form, `yes` and `on` turn into `true` first.
+  Use them on a `bool` field with no default. Then a missing value fails with `required`. In a form, `yes` and `on` turn into `true` first. In a JSON body a `bool` field takes only `true` and `false`, unless the DTO has `@Dto(coerce: true)`.
 
 ```dart
 @Accepted()
@@ -403,7 +403,7 @@ The build stops with a clear error when:
 - a field type is not supported (see [Types](validation.md#types)),
 - a rule does not fit the field type (like `@Email()` on an `int`),
 - a `Maybe<T>` field has no `const Maybe.missing()` default,
-- `@RequiredIf`, `@RequiredWith`, `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@ExcludeIf` or `@ExcludeUnless` is on a field that is always required,
+- `@RequiredIf`, `@RequiredWith`, `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` or `@ExcludeUnless` is on a field that is always required,
 - `@OrDefault()` is on a field that is always required (no default, not nullable and not a `Maybe`),
 - a rule that reads another key (like `@RequiredIf`, `@Same`, `@Different`, `@ExcludeIf` or `@GreaterThanField`) names a Dart field (like `accountType`) instead of its input key (`account_type`),
 - `@After`, `@Before`, `@AfterOrEqual` or `@BeforeOrEqual` has a text that is not a date, a word or another `DateTime` field,

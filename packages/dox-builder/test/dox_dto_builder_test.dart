@@ -1019,9 +1019,6 @@ class Different<T> extends Rule<T> {
   const Different(this.other);
   final String other;
 }
-class Prohibited<T> extends Rule<T> {
-  const Prohibited();
-}
 class Accepted<T> extends Rule<T> {
   const Accepted();
 }
@@ -1039,27 +1036,40 @@ class A {
   final List<String> old;
 
   @Different('old')
-  @Prohibited()
   @Accepted()
   final List<String>? tags;
+
+  @Prohibited()
+  @ProhibitedIf('old', 'x')
+  final List<String>? gone;
 
   @GreaterThanField('min')
   final int max;
   final int min;
 
-  const A({required this.old, this.tags, required this.max, required this.min});
+  const A({required this.old, this.tags, this.gone, required this.max, required this.min});
 }''');
       expect(
         c,
         contains("constDifferent('old').check(c1,s.context(p,'tags',c1))"),
       );
-      expect(c, contains("constProhibited().check(c1,s.context(p,'tags',c1))"));
+      // @Prohibited reads the raw key, for every value
+      expect(
+        c,
+        contains("s.requiredWhen(constProhibited(),c2,input,p,'gone',_m)"),
+      );
+      expect(
+        c,
+        contains(
+          "s.requiredWhen(constProhibitedIf('old','x'),c2,input,p,'gone',_m",
+        ),
+      );
       // a rule that does not read a key still checks each item
       expect(c, contains("constAccepted().check(v,s.context(q,i,v))"));
       expect(
         c,
         contains(
-          "constGreaterThanField('min').check(c2,s.context(p,'max',c2))",
+          "constGreaterThanField('min').check(c3,s.context(p,'max',c3))",
         ),
       );
       await expectError('''

@@ -2,8 +2,8 @@
 
 - New: DTOs read `@Dto(trim: true)`, `@Dto(coerce: true)` and `@Dto(attributes: {...})`. Needs the next dox_validation.
 - New: `@After` and `@Before` take `'today'`, `'tomorrow'`, `'yesterday'` and the input key of another `DateTime` field. New `@AfterOrEqual` and `@BeforeOrEqual`. A text that is not a date, a word or a `DateTime` field stops the build. The words and fields work with any dox_validation.
-- New: DTOs read `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@ExcludeIf` and `@ExcludeUnless`. Each one on an always-required field stops the build, like `@RequiredIf`. Needs the next dox_validation.
-- New: the rules `@Prohibited`, `@ProhibitedIf`, `@Different` and the field compare rules check the whole field on a `List` field, not each item. Rules that name another key stop the build when they name a Dart field name in place of the input key.
+- New: DTOs read `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` and `@ExcludeUnless`. Each one on an always-required field stops the build, like `@RequiredIf`. Needs the next dox_validation.
+- New: the rules `@Different` and the field compare rules check the whole field on a `List` field, not each item. Rules that name another key stop the build when they name a Dart field name in place of the input key.
 - A DTO that uses none of these gets the same code as before.
 - OpenAPI: a controller method that calls `req.authorize(...)` gets a `401` and a `403` answer in the docs. A `@Response` with the same status wins.
 - OpenAPI: a controller method that calls `req.validateSchema(...)`, or `req.validate<T>()` with no request class found, gets a `422` answer. A `@Response(422, ...)` wins. Needs the next dox_core.
