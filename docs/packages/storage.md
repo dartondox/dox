@@ -118,16 +118,23 @@ It is off by default.
 
 `LocalDriverConfig(permissions: LocalPermissions())` makes visibility the file mode, like Laravel.
 In a Dox app, use `'permissions': true` in the disk map.
-`setVisibility` then runs `chmod` and `getVisibility` reads the mode.
-The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`. `LocalPermissions` takes other modes. In a Dox app, the map has a `file` and a `dir` key, each with `public` and `private`.
+`setVisibility` then runs `chmod` and `getVisibility` reads the mode of the file.
+The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`.
+`LocalPermissions` takes other modes. In a Dox app, the map has a `file` and a `dir` key, each with `public` and `private`. A key that is not one of these is ignored.
+Each mode must be an int from 0 to 0o777. A string like `'0644'`, a negative number or a bigger number throws `ArgumentError` when the disk is made.
 It is off by default. On Windows it does nothing.
 
 - The mode is set before the content is written. A private file is never readable by others, not even for a moment.
-- A new file gets the visibility of the write, or the disk `visibility`. An overwrite keeps the mode of the file, unless the call gives a visibility. `copy` and `move` also keep the mode, unless a visibility is given.
+- A new file gets the visibility of the write, or the disk `visibility`.
+- An overwrite, `append` and `prepend` keep the mode the file has, unless the call gives a visibility.
+- A `copy` gets the visibility of the call, or else the mode of the source. It is written to a temp file first and then renamed. Listings hide that temp file. A copy onto a symlink replaces the link.
+- A `move` keeps the mode, unless the call gives a visibility.
 - Folders that a write creates get the folder mode. Folders that were there before, and the disk root, keep their mode.
+- `getVisibility` reads the real mode. The private mode is private. Any other mode is public.
 - `getVisibility` and `setVisibility` of a symlink throw `UnsupportedOperationException`.
 - When the `chmod` fails, a file that the write created is removed.
-- On every local disk, `copy` or `move` of a missing file throws `FileNotFoundException` and makes no folders.
+
+On every local disk, with `permissions` on or off, `copy` or `move` of a missing file throws `FileNotFoundException` and makes no folders.
 
 ## Use a disk
 

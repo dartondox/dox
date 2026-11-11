@@ -61,9 +61,10 @@ The rename makes a new file. So the folder must be writable, the file gets the d
 
 A local disk has no per-file access rules by default. `setVisibility()` does nothing there, and `getVisibility()` gives the disk `visibility`.
 To make visibility the file mode, like Laravel, add `'permissions': true`. It is off by default.
-Then `setVisibility()` runs `chmod` and `getVisibility()` reads the mode.
+Then `setVisibility()` runs `chmod` and `getVisibility()` reads the mode of the file.
 The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`.
-To change them, give a map with a `file` and a `dir` key. Each has a `public` and a `private` mode. A key that is not there keeps its default. A wrong key is ignored with no error.
+To change them, give a map with a `file` and a `dir` key. Each has a `public` and a `private` mode. A mode that is not there keeps its default. A key that is not one of these is ignored.
+Each mode must be an int from 0 to 0o777. A string like `'0644'`, a negative number or a bigger number throws `ArgumentError` when the disk is made.
 Dart has no octal numbers, so write the modes in hex. `0x1a0` is `0640`, `0x1e8` is `0750`:
 
 ```dart
@@ -82,12 +83,15 @@ Dart has no octal numbers, so write the modes in hex. `0x1a0` is `0640`, `0x1e8`
 How it works:
 
 - The mode is set before the content is written. A private file is never readable by others, not even for a moment.
-- A new file gets the visibility of the write, or the disk `visibility`. An overwrite keeps the mode of the file, unless the call gives a visibility. `copy()` and `move()` also keep the mode, unless a visibility is given.
+- A new file gets the visibility of the write, or the disk `visibility`.
+- An overwrite, `append()` and `prepend()` keep the mode the file has, unless the call gives a visibility.
+- A `copy()` gets the visibility of the call, or else the mode of the source. It is written to a temp file first and then renamed. Listings hide that temp file. A copy onto a symlink replaces the link.
+- A `move()` keeps the mode, unless the call gives a visibility.
 - Folders that a write creates get the folder mode. Folders that were there before, and the disk root, keep their mode.
+- `getVisibility()` reads the real mode. The private mode is private. Any other mode is public.
 - `getVisibility()` and `setVisibility()` of a symlink throw `UnsupportedOperationException`.
 - When the `chmod` fails, a file that the write created is removed.
-
-Windows has no `chmod`. There `permissions` does nothing.
+- Windows has no `chmod`. There `permissions` does nothing.
 
 The `s3` disk reads five keys that a new project does not have yet. Add them to
 `lib/config/env.dart` and run `dart run build_runner build`. They are nullable,
