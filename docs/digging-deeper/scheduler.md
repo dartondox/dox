@@ -225,6 +225,14 @@ When the next minute comes and the lock is still held, the task is skipped.
 The lock expires after 24 hours, in case the process dies.
 Pass another expiry like this: `withoutOverlapping(Duration(hours: 1))`.
 
+When the process crashes, the lock stays in the store.
+The task is then skipped until the lock expires.
+To run it again at once, remove the lock with [`clear-cache`](#clear-cache):
+
+```bash
+dox schedule:clear-cache
+```
+
 ### Once per tick
 
 Before a task runs, the scheduler takes a lock named after the task and the minute.
@@ -305,8 +313,9 @@ It stops them at the end.
 | `dart run bin/schedule.dart run` | runs the tasks due this minute once, then exits |
 | `dart run bin/schedule.dart list` | shows each task, its schedule and its next run time |
 | `dart run bin/schedule.dart test cleanup` | runs one task now |
+| `dart run bin/schedule.dart clear-cache` | removes the `withoutOverlapping()` locks, after a crash |
 
-The `dox` CLI runs the same file: `dox schedule:work`, `dox schedule:run`, `dox schedule:list` and `dox schedule:test <name>`.
+The `dox` CLI runs the same file: `dox schedule:work`, `dox schedule:run`, `dox schedule:list`, `dox schedule:test <name>` and `dox schedule:clear-cache`.
 
 ### work
 
@@ -348,6 +357,35 @@ The next run time is right.
 
 `test <name>` runs one task now, with its hooks.
 It does not check the schedule, the filters or the locks.
+
+### clear-cache
+
+`clear-cache` removes the `withoutOverlapping()` lock of each task in the schedule.
+Use it after a crash, when a task is skipped because its lock is still there.
+
+```
+$ dox schedule:clear-cache
+Removed the overlap lock of report.
+```
+
+When there is no lock, it prints this:
+
+```
+No overlap locks found. Nothing to clear.
+```
+
+The exit code is 0 in both cases.
+
+It removes only the lock key of each task, by its exact name.
+Other keys in the cache store stay.
+It does not remove the once-per-tick locks of `onOneServer()`. Each one is for one minute only, and it expires after 10 minutes.
+
+!!! warning "Only when the task is not running"
+    Do not run it while a task really runs on another process or server.
+    That task could then start a second time.
+
+A `memory` store lives inside one process, so its locks end with the process.
+`clear-cache` is for `file` and Redis stores.
 
 ## Run inside the server
 
