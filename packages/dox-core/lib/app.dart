@@ -316,6 +316,32 @@ class Dox {
     Logger.warn(message);
   }
 
+  /// Add a global middleware from a package. Call it in the `setup()` of a
+  /// [DoxProvider]. It runs on every route, before the app's own
+  /// `globalMiddleware`. A second add of the same one is skipped. It takes
+  /// the same kinds as `globalMiddleware`.
+  void addGlobalMiddleware(Object middleware) {
+    GlobalMiddleware.add(middleware);
+  }
+
+  List<dynamic>? _allGlobalSource;
+  int _allGlobalCount = -1;
+  List<dynamic> _allGlobal = const <dynamic>[];
+
+  /// the middleware that packages added, then `config.globalMiddleware`.
+  /// the same list is given until one of them changes.
+  List<dynamic> get allGlobalMiddleware {
+    List<Object> added = GlobalMiddleware.items;
+    if (added.isEmpty) return config.globalMiddleware;
+    if (!identical(_allGlobalSource, config.globalMiddleware) ||
+        _allGlobalCount != added.length) {
+      _allGlobalSource = config.globalMiddleware;
+      _allGlobalCount = added.length;
+      _allGlobal = <dynamic>[...added, ...config.globalMiddleware];
+    }
+    return _allGlobal;
+  }
+
   /// ####### functions need to run on isolate #######
 
   /// add providers that run in every isolate when it starts
@@ -443,7 +469,7 @@ class Dox {
     for (Router router in _routers()) {
       Route.prefix(router.prefix);
       Route.resetWithNewMiddleware(<dynamic>[
-        ...config.globalMiddleware,
+        ...allGlobalMiddleware,
         ...router.middleware,
       ]);
       router.register();
