@@ -139,26 +139,33 @@ The `.env` file is read before `AppConfig` exists. So you must set the flag in t
 1. `Env.flags = flags;` at the top of `main()`, before any env value is read.
 2. The same flags in `AppConfig(flags: flags)`.
 
-```dart title="bin/server.dart"
+```dart title="lib/config/app.dart"
 import 'package:dox_core/dox_core.dart';
-
-import '../lib/config/app.dart';
 
 const CoreFlags flags = CoreFlags(envExpand: true);
 
-Future<void> main() async {
+AppConfig appConfig = AppConfig(
+  appKey: Env.get('APP_KEY', ''),
+  flags: flags,
+  // ...
+);
+```
+
+```dart title="bin/server.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/app.dart';
+
+void main() async {
   Env.flags = flags;
-  Dox().initialize(AppConfig(
-    appKey: Env.get('APP_KEY', ''),
-    flags: flags,
-    // ...
-  ));
+  Dox().initialize(appConfig);
   await Dox().startServer();
 }
 ```
 
+`my_app` is the `name` in your `pubspec.yaml`.
+
 The server isolates follow the main isolate. You set nothing for them.
-When the flag is on in `AppConfig` but `.env` was read without it, Dox prints a warning at start.
+When the flag is on in `AppConfig` but `.env` was read without it, Dox prints a warning at start, once in each isolate.
 
 ## Commands
 

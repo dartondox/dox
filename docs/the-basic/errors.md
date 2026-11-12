@@ -34,7 +34,7 @@ See [HTTP exceptions](../reference/http-exceptions.md) for the built-in exceptio
 
 ## An HTML error page
 
-By default every error is JSON. A browser that opens a bad URL sees JSON too.
+By default an error is sent as JSON. In `development` or `local`, a `500` is plain text with the error text. A browser that opens a bad URL sees JSON or text, not a page.
 To send an HTML page to browsers, turn on `htmlErrors`:
 
 ```dart title="lib/config/app.dart"

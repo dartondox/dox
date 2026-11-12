@@ -256,7 +256,7 @@ Route.resource('photos', PhotoController, parameter: 'photo');
 // GET /photos/{photo}, PUT /photos/{photo}, ...
 ```
 
-Now `Route.bind('photo', ...)` and [model binding](#route-model-binding) work on these routes.
+Then `Route.bind('photo', ...)` and [model binding](#route-model-binding) work on these routes.
 
 A method that the controller does not have is skipped. No route is made for it.
 Any other error from the controller is not hidden. It stops the app at start, so you see it.
@@ -327,13 +327,13 @@ route('users.show', params: <String, Object>{'id': 5, 'tab': 'a'}, query: <Strin
 ### Full URL
 
 Pass `absolute: true` to get the full URL, with `APP_URL` in front.
-Pass `baseUrl:` to use another base.
+Pass `baseUrl:` to use another base. `baseUrl:` works only with `absolute: true`.
 
 ```dart
 route('users.show', params: <String, Object>{'id': 5}, absolute: true);
 // https://example.com/users/5   (APP_URL=https://example.com)
 
-route('users.show', params: <String, Object>{'id': 5}, baseUrl: 'https://admin.example.com');
+route('users.show', params: <String, Object>{'id': 5}, absolute: true, baseUrl: 'https://admin.example.com');
 // https://admin.example.com/users/5
 ```
 
