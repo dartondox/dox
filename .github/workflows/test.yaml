@@ -27,8 +27,8 @@ concurrency:
 
 jobs:
   # Picks the jobs to run (ci/changes.sh and ci/affected.py).
-  # Docs-only changes (*.md, docs/, mkdocs.yml, requirements-docs.txt, overrides/, hooks/, blog/) skip lint, tests
-  # and examples. A change in packages/ or examples/ runs only the tests of
+  # Docs-only changes (*.md, docs/, mkdocs.yml, requirements-docs.txt,
+  # overrides/, hooks/, blog/) skip lint, tests and examples. A change in packages/ or examples/ runs only the tests of
   # the changed packages and of every package that depends on them. Any
   # other change (ci/, .github/, root pubspec, ...) and tags run everything.
   # Skipped jobs pass, so the required `test` check is not stuck. A branch
