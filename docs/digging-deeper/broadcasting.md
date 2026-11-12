@@ -194,6 +194,111 @@ socket.on('presence:leaving', (channel, member) => console.log(member.user_id));
 A user with two sockets is one member. `presence:joining` is sent for the first socket, and `presence:leaving` for the last one.
 The member list covers all isolates and servers that share the adapter.
 
+## Queued broadcasting
+
+A queued broadcast goes through your [queue](queue.md). The request does not wait for it.
+
+`dox_socketio` does not depend on `dox_queue`. You connect them with a hook and a small job. Follow these steps.
+
+### 1. Mark the event
+
+Use `ShouldBroadcastQueued` in place of `ShouldBroadcast`:
+
+```dart
+class OrderShipped with ShouldBroadcastQueued {
+  OrderShipped(this.order);
+  final Order order;
+
+  @override
+  List<Channel> broadcastOn() => <Channel>[PrivateChannel('orders.${order.id}')];
+
+  @override
+  Map<String, Object?> broadcastWith() => <String, Object?>{'id': order.id};
+}
+
+await broadcast(OrderShipped(order)); // goes to the queue
+```
+
+### 2. Write the job
+
+The worker runs this job. It sends the saved broadcast to the clients:
+
+```dart title="lib/app/jobs/broadcast.job.dart"
+import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_socketio/dox_socketio.dart';
+
+/// Sends one queued broadcast to the clients.
+@Job()
+class BroadcastJob extends DoxJob {
+  BroadcastJob({required this.payload});
+
+  final Map<String, dynamic> payload;
+
+  @override
+  Future<void> handle() async {
+    await Broadcast.deliver(BroadcastPayload.fromJson(payload));
+  }
+}
+```
+
+Run `dart run build_runner build`. It adds the job to `lib/generated/jobs.g.dart`. The queue needs this file to save and load the job. See [how the queue works](queue.md#how-it-works).
+Make sure `jobs: jobRegistry` is set in your [queue config](queue.md#1-config).
+
+### 3. Set the hook
+
+The hook gets the broadcast and puts it on the queue. Add it to the `setup()` of the `BroadcastProvider` from [Turn it on](#turn-it-on), next to the channel rules. Keep the rules:
+
+```dart title="lib/providers/broadcast_provider.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_socketio/dox_socketio.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+import '../app/jobs/broadcast.job.dart';
+
+class BroadcastProvider extends DoxProvider {
+  @override
+  void setup() {
+    Broadcast.channel('orders.{id}', (Object? user, String id) {
+      return (user as User).id.toString() == id;
+    });
+
+    // puts ShouldBroadcastQueued events on the queue
+    Broadcast.useQueue(queueBroadcast);
+  }
+
+  static Future<void> queueBroadcast(BroadcastPayload payload) async {
+    await Queue.dispatch(BroadcastJob(payload: payload.toJson()));
+  }
+}
+```
+
+The payload is JSON: `{channels, event, data, except}`. `except` is the `toOthers` socket id.
+
+### 4. Use the Redis adapter
+
+The worker is its own process. It starts your providers, so it gets its own Socket.IO server. That server has no clients.
+So the worker must reach the clients of the web server through Redis.
+
+Set the [Redis adapter](../packages/socketio.md#many-servers-redis-adapter) in `SocketIoConfig`. The web server and the worker use the same config, so both use the same Redis.
+A `Broadcast.emitter` does not help here. The worker has its own Socket.IO server, and `Broadcast.deliver` sends through that server first.
+
+### 5. Run the worker
+
+```bash
+dart run bin/queue.dart
+```
+
+Deploy the worker together with the web app. See [run the worker](queue.md#run-the-worker).
+
+### Rules
+
+- With no hook set (`Broadcast.useQueue` not called), a `ShouldBroadcastQueued` event is sent at once, like a normal one. So tests and small apps work without a queue.
+- Normal `ShouldBroadcast` events never use the hook.
+- `Broadcast.deliver` throws a `StateError` when the worker has no way to send. This is when broadcasting is off and there is no `Broadcast.emitter`.
+- `deliver` prints a warning once when it sends through an in-memory adapter with no clients. The clients of the web server do not get that broadcast.
+- In tests, `Broadcast.fake()` keeps queued events too. Check them with `fake.assertQueued<OrderShipped>()`. `fake.delivered` holds the payloads that `deliver` got.
+
 ## Send from a process with no Socket.IO server
 
 A queue worker or a command has no Socket.IO server. Set an emitter, so `Broadcast.event` can send through Redis:
@@ -209,7 +314,42 @@ The servers must use the [Redis adapter](../packages/socketio.md#many-servers-re
 When the emitter is for another namespace than `/`, use `SocketIoEmitter(redis).of('/chat')`.
 With no server and no emitter, `Broadcast.event` throws a `StateError`.
 
-There is no queued broadcasting. To send from a [queue](queue.md) job, call `Broadcast.event` inside the job.
+To send from a [queue](queue.md) job, use [queued broadcasting](#queued-broadcasting).
+
+## Whisper
+
+A whisper lets a client send an event to the other members of a private or presence channel. A typical use is "is typing".
+The server only passes it on.
+
+It is off by default. A whisper lets clients message each other with no code of yours in between. So you choose to allow it:
+
+```dart
+SocketIoConfig(broadcasting: true, whisper: true);
+```
+
+The client sends `client event` with `{channel, event, data}`. The event name must start with `client-`.
+The other sockets in the channel get the event with `(channel, data)`:
+
+```js
+socket.emit('client event', {
+  channel: 'presence-chat.lobby',
+  event: 'client-typing',
+  data: { name: 'Alice' },
+}, (ack) => console.log(ack)); // the ack is optional
+
+socket.on('client-typing', (channel, data) => console.log(channel, data));
+```
+
+- Only a socket that subscribed to the channel can whisper.
+- Only private and presence channels allow it. A public channel does not.
+- The sender does not get its own whisper. Its other sockets do.
+- It works across isolates and servers with the Redis adapter.
+- A whisper is dropped when its data is bigger than `Broadcast.maxWhisperSize`. The default is 10 KB of JSON.
+- When a whisper is refused, the ack is `{ok: false, error}`. The error is, for example, `not subscribed` or `data is too big`.
+- With whisper off, a `client event` is ignored, with no ack.
+- The `client-` prefix keeps a whisper apart from server events. Do not give a server event (`broadcastAs`) a name that starts with `client-`.
+- The event names and the whisper format follow Laravel Echo. So `channel.whisper('typing', data)` and `listenForWhisper('typing', ...)` use the same names.
+- Laravel Echo sends `auth` as an object of headers. This server refuses that. So Echo can not join a private or presence channel on its own. Log the socket in with [`SocketAuth`](../packages/socketio.md#log-in-a-socket), or send your own `subscribe` with the token, as shown in [The client](#the-client). Then whispers work.
 
 ## Limits and settings
 
@@ -219,13 +359,14 @@ There is no queued broadcasting. To send from a [queue](queue.md) job, call `Bro
 | `Broadcast.maxChannelsPerSocket` | `100` | the most channels for one socket |
 | `Broadcast.tokenLifetime` | 1 minute | how long a token from the auth route works |
 | `Broadcast.presenceTimeout` | 2 seconds | how long a presence join or leave waits for other servers |
+| `Broadcast.maxWhisperSize` | 10 KB | the biggest `data` of a [whisper](#whisper), in bytes of JSON |
 
 - It needs `APP_KEY`, to sign the tokens.
 - Turn broadcasting on for one namespace only. With two namespaces, both accept `subscribe`, but `Broadcast.event` sends only through the last one.
 - A presence `subscribe` is refused when a server does not answer in time. A leave still sends `presence:leaving`.
 - Presence joins and leaves of one channel run one after another in each isolate. During a Redis outage, each one waits up to `presenceTimeout`, so keep it short.
 - When two sockets of one user join or leave at the same moment on two isolates or servers, `presence:joining` or `presence:leaving` can be missed or sent twice.
-- A client cannot send events to the other clients of a channel. Only the server sends.
+- A client cannot send events to the other clients of a channel, unless you turn on [whispers](#whisper).
 
 ## Testing
 
