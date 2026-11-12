@@ -22,6 +22,8 @@ class ModelSchema {
     'HasMany',
     'BelongsTo',
     'ManyToMany',
+    'HasOneThrough',
+    'HasManyThrough',
     'MorphOne',
     'MorphMany',
     'MorphTo',

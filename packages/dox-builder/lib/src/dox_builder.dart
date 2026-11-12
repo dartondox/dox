@@ -293,6 +293,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
   /// relations that hold one model, not a list
   static const List<String> _singleRelations = <String>[
     'HasOne',
+    'HasOneThrough',
     'BelongsTo',
     'MorphOne',
     'MorphTo',
@@ -365,6 +366,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       static ${value['model']}? $queryFunctionName(List<Model<${visitor.className}>> list) {
         return ${lcFirst(value['relationType'])}<${visitor.className}, ${value['model']}>(list
           ${value['morphTo'] == true ? '' : ", () => ${value['model']}()"}
+          ${value['through'] == null ? '' : ", through: () => ${value['through']}()"}
           ${_getParamKeyValue(value, 'name')}
           ${_getParamKeyValue(value, 'typeColumn')}
           ${_getParamKeyValue(value, 'idColumn')}
@@ -375,6 +377,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
           ${_getParamKeyValue(value, 'pivotForeignKey')}
           ${_getParamKeyValue(value, 'pivotRelatedForeignKey')}
           ${_getParamKeyValue(value, 'pivotTable')}
+          ${_getParamKeyValue(value, 'throughForeignKey')}
+          ${_getParamKeyValue(value, 'throughLocalKey')}
           ${_getPivotParams(value)}
           $relation
           $onQuery,
