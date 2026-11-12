@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
@@ -356,6 +357,50 @@ class Dox {
     return OpenApiDocument(config.openApi).write(dir);
   }
 
+  /// register the routes of the app routers and give them, without a
+  /// server and without providers. `dox route:list` uses this.
+  /// When `config.openApi` is on, the docs routes are in it too.
+  /// Providers do not run, because their `setup()` may connect to a
+  /// database or start a worker. So a route that a provider adds in
+  /// `setup()` is not in the list.
+  ///
+  /// It is safe to call more than once. The route list is empty before
+  /// and after the call, so a later [startServer] starts clean.
+  /// Call it only before [startServer], never in a running app: it
+  /// empties `Route()`, so the server would lose its routes.
+  /// ```
+  /// Dox().initialize(appConfig);
+  /// AppRoutes routes = Dox().loadRoutes();
+  /// ```
+  AppRoutes loadRoutes() {
+    _clearRoutes();
+    try {
+      _registerRoute();
+      // like startProviders: the docs routes, when OpenAPI is on
+      if (config.openApi.isEnabled) OpenApiDocument(config.openApi).register();
+      Route route = Route();
+      return AppRoutes(
+        routes: List<RouteData>.of(route.routes),
+        fallbacks: List<RouteData>.of(route.fallbacks),
+        mounts: Map<String, RawRequestHandler>.of(route.mounts),
+        mountsWithMiddleware: Set<String>.of(route.mountsWithMiddleware),
+      );
+    } finally {
+      _clearRoutes();
+    }
+  }
+
+  /// empty the routes, fallbacks, mounts and static folders
+  void _clearRoutes() {
+    Route route = Route();
+    route.setRoutes(<RouteData>[]);
+    route.setFallbacks(<RouteData>[]);
+    route.setStatics(<StaticFolder>[]);
+    for (String prefix in route.mounts.keys.toList()) {
+      Route.unmount(prefix);
+    }
+  }
+
   /// ################ end ###########
 
   /// read the parameter types of every controller once, at start.
@@ -406,4 +451,26 @@ class Dox {
     Route.prefix('');
     Route.resetWithNewMiddleware(<dynamic>[]);
   }
+}
+
+/// the routes of the app, from [Dox.loadRoutes]
+class AppRoutes {
+  const AppRoutes({
+    required this.routes,
+    required this.fallbacks,
+    required this.mounts,
+    required this.mountsWithMiddleware,
+  });
+
+  /// every route, in the order they were added
+  final List<RouteData> routes;
+
+  /// the routes added with `Route.fallback`
+  final List<RouteData> fallbacks;
+
+  /// prefix => handler, added with `Route.mount`
+  final Map<String, RawRequestHandler> mounts;
+
+  /// the prefixes of the mounts that run the global middleware first
+  final Set<String> mountsWithMiddleware;
 }

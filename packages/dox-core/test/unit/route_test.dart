@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/http/http_static_handler.dart';
@@ -18,6 +20,38 @@ void main() {
       Route().setStatics(Route().statics);
       expect(Route().statics.length, 1);
       Route().setStatics(<StaticFolder>[]);
+    });
+
+    test('a throw inside a group does not leak its state', () {
+      void boom() => throw StateError('boom');
+      expect(
+        () => Route.group('admin', boom, name: 'admin.'),
+        throwsStateError,
+      );
+      expect(
+        () => Route.middleware(<dynamic>[(DoxRequest req) => req], boom),
+        throwsStateError,
+      );
+      expect(() => Route.domain('a.example.com', boom), throwsStateError);
+      expect(() => Route.enabledCors(boom), throwsStateError);
+
+      Route.get('/ping', (DoxRequest req) {}).name('ping');
+      RouteData route = Route().routes.single;
+      expect(route.path, '/ping');
+      expect(route.name, 'ping');
+      expect(route.preMiddleware, isEmpty);
+      expect(route.domain, isNull);
+      expect(route.corsEnabled, isNull);
+    });
+
+    test('isWebSocket is true only for Route.websocket', () {
+      Route.websocket('ws', (WebSocket socket, DoxRequest req) {});
+      // a user callable that also gives Future<WebSocket>
+      Route.get('fake', (DoxRequest req) async => Future<WebSocket>.error(1));
+      expect(Route().routes.map((RouteData r) => r.isWebSocket), <bool>[
+        true,
+        false,
+      ]);
     });
 
     test('get', () {

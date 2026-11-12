@@ -323,11 +323,13 @@ class Route {
     /// set new prefix
     r._prefix = '$originalPrefix/$prefix';
     r._namePrefix = '$originalName$name';
-    callback();
-
-    /// restore original prefix
-    r._prefix = originalPrefix;
-    r._namePrefix = originalName;
+    try {
+      callback();
+    } finally {
+      /// restore original prefix, also when the callback throws
+      r._prefix = originalPrefix;
+      r._namePrefix = originalName;
+    }
   }
 
   /// name the route added last. a group `name:` is put in front.
@@ -599,10 +601,12 @@ class Route {
 
     /// set new domain
     Route()._domain = domain;
-    callback();
-
-    /// restore original domain
-    Route()._domain = originalDomain;
+    try {
+      callback();
+    } finally {
+      /// restore original domain, also when the callback throws
+      Route()._domain = originalDomain;
+    }
   }
 
   /// group of route to enabled cors
@@ -630,12 +634,14 @@ class Route {
   static void _cors(bool enabled, Function() callback) {
     bool? originalCorsConfig = Route()._corsEnabled;
 
-    /// set new domain
+    /// set new cors setting
     Route()._corsEnabled = enabled;
-    callback();
-
-    /// restore original domain
-    Route()._corsEnabled = originalCorsConfig;
+    try {
+      callback();
+    } finally {
+      /// restore original cors setting, also when the callback throws
+      Route()._corsEnabled = originalCorsConfig;
+    }
   }
 
   /// middleware for group of routes
@@ -649,10 +655,12 @@ class Route {
 
     /// set new middleware
     Route()._preMiddleware = <dynamic>[...originalMiddleware, ...middleware];
-    callback();
-
-    /// restore original middleware
-    Route()._preMiddleware = originalMiddleware;
+    try {
+      callback();
+    } finally {
+      /// restore original middleware, also when the callback throws
+      Route()._preMiddleware = originalMiddleware;
+    }
   }
 
   /// set global middleware
@@ -734,6 +742,7 @@ class Route {
         _WebSocketRoute(handler, allowedOrigins, maxMessageSize).call,
       ],
     );
+    r._last!.isWebSocket = true;
     if (allowedOrigins == null) _noOriginCheck[r._last!] = true;
     return r;
   }
