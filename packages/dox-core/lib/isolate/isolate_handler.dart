@@ -7,6 +7,9 @@ import 'package:dox_core/server/dox_server.dart';
 
 /// process middleware and controller and sent data via sentPort
 void isolateHandler(IsolateSpawnParameter param) async {
+  /// first, before `Dox()` reads `.env`: read it like the main isolate
+  Env.flags = CoreFlags(envExpand: param.envExpand);
+
   /// send port of main isolate
   AppConfig appConfig = param.config;
   List<DoxProvider> providers = param.providers;

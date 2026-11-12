@@ -33,6 +33,11 @@ class IsolateSpawnParameter {
   /// see `Dox().isolateCount`
   final int isolateCount;
 
+  /// true when the main isolate read `.env` with `CoreFlags.envExpand`.
+  /// Statics are not shared between isolates, so the new isolate sets
+  /// `Env.flags` from it before it reads `.env`.
+  final bool envExpand;
+
   const IsolateSpawnParameter(
     this.isolateId,
     this.config,
@@ -45,5 +50,6 @@ class IsolateSpawnParameter {
     this.rateLimitPort,
     this.busPort,
     this.isolateCount = 1,
+    this.envExpand = false,
   });
 }

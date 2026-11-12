@@ -454,15 +454,28 @@ class Route {
 
   /// the path of the route named [name], with its `{params}` filled in.
   /// a param value is url encoded. [query] is added as the query string.
-  /// an unknown name or a missing param throws an [ArgumentError].
+  /// a param that is not in the path goes to the query string too. When
+  /// [params] and [query] have the same key, [query] wins. A `null` value
+  /// is left out. an unknown name or a missing param throws an
+  /// [ArgumentError].
+  ///
+  /// With [absolute], [baseUrl] (default: `APP_URL` of the env, like
+  /// `https://example.com`) is put in front. It throws an [ArgumentError]
+  /// when there is no base url.
   /// ```
   /// Route.url('users.show', params: <String, Object>{'id': 5});
   /// // /users/5
+  /// Route.url('users.show', params: <String, Object>{'id': 5, 'tab': 'a'});
+  /// // /users/5?tab=a
+  /// Route.url('users.show', params: <String, Object>{'id': 5}, absolute: true);
+  /// // https://example.com/users/5
   /// ```
   static String url(
     String name, {
     Map<String, Object?> params = const <String, Object?>{},
     Map<String, Object?> query = const <String, Object?>{},
+    bool absolute = false,
+    String? baseUrl,
   }) {
     RouteData? data = Route()._byName()[name];
     if (data == null) {
@@ -495,23 +508,32 @@ class Route {
             : Uri.encodeComponent('$value'),
       );
     }
-    for (String key in params.keys) {
-      if (!used.contains(key)) {
-        throw ArgumentError(
-          'Route "$name" (${data.path}) has no param "$key". '
-          'Use query: for the query string.',
-        );
-      }
-    }
     String path = parts.join('/');
     if (path.isEmpty) path = '/';
-    if (query.isEmpty) return path;
+    if (absolute) path = '${_baseUrl(baseUrl)}$path';
     Map<String, String> values = <String, String>{
-      for (MapEntry<String, Object?> entry in query.entries)
+      for (MapEntry<String, Object?> entry in <String, Object?>{
+        for (MapEntry<String, Object?> extra in params.entries)
+          if (!used.contains(extra.key)) extra.key: extra.value,
+        ...query,
+      }.entries)
         if (entry.value != null) entry.key: '${entry.value}',
     };
     if (values.isEmpty) return path;
     return '$path?${Uri(queryParameters: values).query}';
+  }
+
+  /// [baseUrl] or `APP_URL` of the env, with no `/` at the end
+  static String _baseUrl(String? baseUrl) {
+    String base = baseUrl ?? Env.get<String>('APP_URL', '');
+    if (base.isEmpty) {
+      throw ArgumentError(
+        'An absolute url needs a host. Set APP_URL in the env, give '
+        'baseUrl, or use absolute: false.',
+      );
+    }
+    if (base.endsWith('/')) base = base.substring(0, base.length - 1);
+    return base;
   }
 
   /// [url] with a `signature` query param, so the link can not be
@@ -544,17 +566,15 @@ class Route {
       if (expires != null)
         'expires': DateTime.now().add(expires).millisecondsSinceEpoch ~/ 1000,
     };
-    String path = url(name, params: params, query: all);
-    if (absolute) {
-      String base = baseUrl ?? Env.get<String>('APP_URL', '');
-      if (base.isEmpty) {
-        throw ArgumentError(
-          'Route.signedUrl needs a host for an absolute url. Set APP_URL '
-          'in the env, give baseUrl, or use absolute: false.',
-        );
-      }
-      if (base.endsWith('/')) base = base.substring(0, base.length - 1);
-      path = '$base$path';
+    String path = url(
+      name,
+      params: params,
+      query: all,
+      absolute: absolute,
+      baseUrl: baseUrl,
+    );
+    if (Uri.parse(path).queryParameters.containsKey('signature')) {
+      throw ArgumentError('"signature" is a reserved query param.');
     }
     String signature = ValidateSignature.sign(path);
     return '$path${path.contains('?') ? '&' : '?'}signature=$signature';
@@ -1041,13 +1061,25 @@ class Route {
   /// `blog.show`, `blog.edit`, `blog.update` and `blog.destroy`.
   /// the name is the path with `.` for `/`, without `{params}`.
   /// set [name] to use another one. a group `name:` is put in front.
+  ///
+  /// the param of one item is `{id}`. Set [parameter] to use another
+  /// name, so [bind] and model binding work for it.
   /// ```
   /// Route.resource('blog', BlogController());
+  /// Route.bind<Photo>('photo', Photo.find);
+  /// Route.resource('photos', PhotoController, parameter: 'photo');
+  /// // GET /photos/{photo} -> show(DoxRequest req, Photo photo)
   /// ```
-  static Route resource(String route, dynamic controller, {String? name}) {
+  static Route resource(
+    String route,
+    dynamic controller, {
+    String? name,
+    String parameter = 'id',
+  }) {
     if (controller is Type) controller = Dox().ioc.getByType(controller);
     Route r = Route();
     String path = r._join(route);
+    String item = '$path/{$parameter}';
     String base = name ?? route.split('/').where(_isNamePart).join('.');
     r._resourceRoute(
       HttpRequestMethod.GET,
@@ -1069,31 +1101,31 @@ class Route {
     );
     r._resourceRoute(
       HttpRequestMethod.GET,
-      '$path/{id}',
+      item,
       () => controller.show,
       '$base.show',
     );
     r._resourceRoute(
       HttpRequestMethod.GET,
-      '$path/{id}/edit',
+      '$item/edit',
       () => controller.edit,
       '$base.edit',
     );
     r._resourceRoute(
       HttpRequestMethod.PUT,
-      '$path/{id}',
+      item,
       () => controller.update,
       '$base.update',
     );
     r._resourceRoute(
       HttpRequestMethod.PATCH,
-      '$path/{id}',
+      item,
       () => controller.update,
       null,
     );
     r._resourceRoute(
       HttpRequestMethod.DELETE,
-      '$path/{id}',
+      item,
       () => controller.destroy,
       '$base.destroy',
     );
@@ -1178,13 +1210,23 @@ class Route {
 /// the path of the route named [name], see [Route.url].
 /// ```
 /// route('users.show', params: <String, Object>{'id': 5}); // /users/5
+/// route('users.show', params: <String, Object>{'id': 5, 'tab': 'a'});
+/// // /users/5?tab=a
 /// ```
 String route(
   String name, {
   Map<String, Object?> params = const <String, Object?>{},
   Map<String, Object?> query = const <String, Object?>{},
+  bool absolute = false,
+  String? baseUrl,
 }) {
-  return Route.url(name, params: params, query: query);
+  return Route.url(
+    name,
+    params: params,
+    query: query,
+    absolute: absolute,
+    baseUrl: baseUrl,
+  );
 }
 
 /// the top level [redirect], which [Route.redirect] hides inside [Route]

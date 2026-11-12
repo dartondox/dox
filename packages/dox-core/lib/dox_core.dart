@@ -37,6 +37,7 @@ export 'env/env_reader.dart';
 
 /// Exceptions
 export 'exception/bad_request_exception.dart';
+export 'exception/error_page.dart';
 export 'exception/exception_handler.dart';
 export 'exception/http_status_exception.dart';
 export 'exception/internal_error_exception.dart';

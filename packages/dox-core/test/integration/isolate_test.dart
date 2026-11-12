@@ -38,6 +38,12 @@ class ExampleProvider extends DoxProvider {
     IsolateBus.instance.on('ping').listen((Object? _) {
       IsolateBus.instance.publish('pong', Dox().isolateId);
     });
+    IsolateBus.instance.on('env').listen((Object? _) {
+      IsolateBus.instance.publish(
+        'env-value',
+        '${Dox().isolateId}:${Env.get<String>('DOX_EXPAND_B')}',
+      );
+    });
   }
 }
 
@@ -54,6 +60,9 @@ void main() {
 
   group('Isolate', () {
     setUpAll(() async {
+      /// before anything reads .env, like the top of main()
+      Env.flags = const CoreFlags(envExpand: true);
+
       /// added before startServer and outside a Router, so only the
       /// spawn parameter brings it to the other isolates
       publicDir = await Directory.systemTemp.createTemp('dox_isolate_static_');
@@ -128,6 +137,17 @@ void main() {
       bus.publish('ping', null);
       await _until(() => pongs.length == 4);
       expect(pongs, <Object?>{2, 3, 4, 5});
+    });
+
+    test('every isolate reads .env with envExpand', () async {
+      expect(Env.get<String>('DOX_EXPAND_B'), 'xy');
+      IsolateBus bus = IsolateBus.instance;
+      Set<Object?> values = <Object?>{};
+      bus.on('env-value').listen(values.add);
+      await _until(() => bus.size == 5);
+      bus.publish('env', null);
+      await _until(() => values.length == 4);
+      expect(values, <Object?>{'2:xy', '3:xy', '4:xy', '5:xy'});
     });
 
     test('default isolates is one per cpu core', () {

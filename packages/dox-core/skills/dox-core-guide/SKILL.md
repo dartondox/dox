@@ -103,6 +103,7 @@ More route tools:
 
 ```dart
 Route.resource('posts', PostController);          // all 7 CRUD routes, names like posts.index
+Route.resource('photos', PhotoController, parameter: 'photo'); // {photo} instead of {id}, for Route.bind
 Route.group('/admin', () {                       // prefix for every route inside
   Route.get('/stats', (AdminController c) => c.stats);
 });
@@ -111,12 +112,15 @@ Route.middleware(<dynamic>[ApiKeyMiddleware()], () {  // middleware for every ro
 });
 Route.get('/users/{id}', (UserController c) => c.show).name('users.show');
 route('users.show', params: <String, Object>{'id': 5}); // '/users/5'
+route('users.show', params: <String, Object>{'id': 5, 'tab': 'a'}); // '/users/5?tab=a'
+route('users.show', params: <String, Object>{'id': 5}, absolute: true); // APP_URL + '/users/5'
 Route.get('/users/{id}', (UserController c) => c.show).where('id', '[0-9]+');
 Route.get('/posts/{page?}', (int? page) => 'page ${page ?? 1}'); // optional param
 Route.health('/health');                          // answers 200 {"status": "ok"}
 ```
 
 - `Route.resource` skips a method that the controller does not have.
+- A `route()` param that is not in the path goes to the query string. When `params` and `query` have the same key, `query` wins.
 - Do not add the same method and path twice.
 
 ## Controllers
@@ -269,6 +273,12 @@ Throw an HTTP exception to answer with an error:
 For another status, extend `IHttpException` and set `code`, `errorCode` and `message`.
 Any other error gives `500`. The error text is only sent when `APP_ENV` is `development` or `local`.
 
+Errors are JSON by default. For a browser app, set `AppConfig(htmlErrors: true)`.
+Then a request that does not want JSON (no JSON `Accept`, not XHR) gets a small HTML page with the status.
+In `development` or `local` it also shows the error text and the stack trace.
+JSON clients, validation errors and answers from `ExceptionHandler.render` do not change.
+To make your own page, set `errorPage: (int status, Object error, StackTrace stack, bool debug) => '...'`. Escape every value.
+
 ## Recipe: a new API endpoint
 
 Goal: `POST /api/posts` checks the input, saves a post and answers with JSON.
@@ -364,6 +374,10 @@ class TimerMiddleware implements IDoxNextMiddleware {
 
 Read env values from the typed `env` of `lib/config/env.dart`, like `env.appPort`.
 Never call `Env.get()` on a hot path, and never put secrets in code.
+
+`export KEY=value` lines work in `.env`. `KEY=` (empty) gives the default.
+With `CoreFlags(envExpand: true)`, `URL=http://${HOST}:${PORT}` uses keys above it (a real env var wins), unquoted and in `"..."`, not in `'...'`. In `"..."`, `\n` and `\t` are a new line and a tab.
+The `.env` file is read before `AppConfig`, so also set `Env.flags = flags;` at the top of `main()`.
 
 To add a key:
 

@@ -1,5 +1,12 @@
 ## Unreleased
 
+- New: `CoreFlags.envExpand`. `.env` values can use `${OTHER}`, unquoted or in `"..."` (not in `'...'`). It reads a real environment variable first, then a key above it (`.env.testing` also sees the keys of `.env`). An unknown name stays as it is. In a `"..."` value, `\n`, `\t`, `\"`, `\\` and `\$` become a new line, a tab, `"`, `\` and `$`. Off by default: values are read as before. The `.env` file is read before `AppConfig` exists, so also set `Env.flags = flags` at the top of `main()`. The server isolates read `.env` the same way as the main isolate. `Dox().initialize` warns when the flag is on in `AppConfig` but `.env` was read without it.
+- New: `export KEY=value` lines in `.env` are read like `KEY=value`.
+- New: `AppConfig(htmlErrors: true)` sends a small HTML error page to a request that does not want JSON (see `DoxRequest.expectsJson`). Off by default, so errors stay JSON. In `development` or `local` the page also shows the error text and the stack trace. JSON clients, validation errors and answers from `ExceptionHandler.render` do not change. `AppConfig(errorPage: ...)` replaces the page; `defaultErrorPage` is the default.
+- New: `DoxRequest.expectsJsonFor(headers)` is `expectsJson()` for the headers of a raw `HttpRequest`.
+- New: `Route.resource(..., parameter: 'photo')` names the param of one item `{photo}` instead of `{id}`, so `Route.bind` and model binding work on resource routes. The default is still `{id}`.
+- New: `route()` and `Route.url()` put a param that is not in the path into the query string. Before, it threw an `ArgumentError`. When `params` and `query` have the same key, `query` wins.
+- New: `route(..., absolute: true)` and `Route.url(..., absolute: true)` give the full url, with `APP_URL` (or `baseUrl:`) in front, like `Route.signedUrl`.
 - New: a cache store with `'encrypt': true` encrypts its values with the `APP_KEY` (`Crypt`). Old keys in `previousKeys` can still read old entries. No setup is needed: `CryptCacheEncrypter` is the default. Set `CacheConfig(encrypter: ...)` to use your own. `CacheEncrypter` is exported from dox_core. `CryptCacheEncrypter.encrypt` throws a `StateError` when `APP_KEY` is empty.
 - New: `Dox().addGlobalMiddleware(middleware)`. A provider calls it in `setup()` to add global middleware. They run on every route (and on mounts), before the app's `globalMiddleware`. The same middleware added twice runs once. `Dox().allGlobalMiddleware` gives the full list.
 - Ships an AI agent skill (dox-core-guide). Install it in your app with `dart run skills@ get`.

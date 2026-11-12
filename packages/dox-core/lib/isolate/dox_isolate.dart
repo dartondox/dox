@@ -143,6 +143,7 @@ class DoxIsolate {
         rateLimitPort: RateLimitCounter.instance.port,
         busPort: IsolateBus.instance.port,
         isolateCount: Dox().isolateCount,
+        envExpand: Env().expanded,
       ),
       onError: errorPort.sendPort,
       onExit: exitPort.sendPort,

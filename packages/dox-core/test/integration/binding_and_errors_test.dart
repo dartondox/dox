@@ -34,6 +34,12 @@ class TestExceptionHandler extends ExceptionHandler {
   }
 }
 
+class PersonController {
+  Map<String, String> show(DoxRequest req, Person person) {
+    return <String, String>{'resource': person.id};
+  }
+}
+
 int finds = 0;
 
 Future<Person?> findPerson(String id) async {
@@ -76,6 +82,7 @@ void main() {
     Route.get('/people/{person}/posts/{page}', (Person person, int page) {
       return <String, Object>{'id': person.id, 'page': page};
     });
+    Route.resource('crew', PersonController(), parameter: 'person');
     Route.get('/fail/teapot', (DoxRequest req) => throw TeapotException());
     Route.get('/fail/boom', (DoxRequest req) => throw StateError('db host x'));
     Route.get('/fail/broken', (DoxRequest req) => throw ArgumentError('x'));
@@ -123,6 +130,11 @@ void main() {
       expect(finds, 0);
     });
 
+    test('a resource route with parameter: gets the bound value', () async {
+      expect(await get('/crew/5'), (200, '{"resource":"5"}'));
+      expect((await get('/crew/404')).$1, 404);
+    });
+
     test('req.bound reads the bound value', () async {
       expect(await get('/people/8/raw'), (200, '{"id":"8"}'));
     });
@@ -160,6 +172,22 @@ void main() {
         '{"code":"not_found","message":"GET /no/route not found"}',
       );
       expect(handler.reported, isEmpty);
+    });
+
+    test('htmlErrors is off: a browser still gets JSON', () async {
+      HttpClient client = HttpClient();
+      try {
+        HttpClientRequest req = await client.get('localhost', port, '/fail/x');
+        req.headers.set('accept', 'text/html');
+        HttpClientResponse res = await req.close();
+        expect(res.headers.contentType?.mimeType, 'application/json');
+        expect(
+          await utf8.decodeStream(res),
+          '{"code":"not_found","message":"GET /fail/x not found"}',
+        );
+      } finally {
+        client.close();
+      }
     });
 
     test('a 5xx http exception is reported', () async {

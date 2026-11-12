@@ -93,11 +93,15 @@ class DoxRequest implements IDoxRequest {
   /// True when the client wants a JSON answer, not a page: an `Accept`
   /// header with json, a JSON body, or an `X-Requested-With:
   /// XMLHttpRequest` header. An Inertia request (`X-Inertia`) is not.
-  bool expectsJson() {
-    if (header('x-inertia') != null) return false;
-    String accept = header(HttpHeaders.acceptHeader) ?? '';
+  bool expectsJson() => expectsJsonFor(httpHeaders);
+
+  /// [expectsJson] for the [headers] of a request.
+  static bool expectsJsonFor(HttpHeaders headers) {
+    if (headers.value('x-inertia') != null) return false;
+    String accept = headers.value(HttpHeaders.acceptHeader) ?? '';
     if (accept.contains('/json') || accept.contains('+json')) return true;
-    return isJson() || header('x-requested-with') == 'XMLHttpRequest';
+    return HttpBody.isJson(headers.contentType) ||
+        headers.value('x-requested-with') == 'XMLHttpRequest';
   }
 
   /// the query string, read on first use. bracket keys nest, like the

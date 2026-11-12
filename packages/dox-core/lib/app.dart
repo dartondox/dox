@@ -89,6 +89,13 @@ class Dox {
   void initialize(AppConfig appConfig) async {
     config = appConfig;
     _initialized = true;
+    if (appConfig.flags.envExpand && !Env().expanded) {
+      Logger.warn(
+        'CoreFlags.envExpand is on, but .env was read without it. Set '
+        'Env.flags = flags at the top of main(), before any env value is '
+        'read.',
+      );
+    }
     _dtos = null;
     ioc.clear();
     appConfig.container?.call(ioc);

@@ -133,6 +133,22 @@ class AppConfig {
   /// `allowedOrigins` of a route wins over this.
   final List<String>? webSocketAllowedOrigins;
 
+  /// Send an HTML error page to a browser. Off by default: every error
+  /// is JSON. When on, a request that does not want JSON (see
+  /// `DoxRequest.expectsJson`) gets a small HTML page with the status,
+  /// like `404 Not Found`. When `APP_ENV` is `development` or `local`,
+  /// the page also shows the error text and the stack trace. API clients
+  /// still get JSON. A validation error and an answer from a custom
+  /// `ExceptionHandler.render` stay as they are.
+  final bool htmlErrors;
+
+  /// Makes the HTML page of [htmlErrors]. Default: [defaultErrorPage].
+  /// ```
+  /// errorPage: (int status, Object error, StackTrace stack, bool debug) =>
+  ///     '<h1>Sorry, error $status</h1>',
+  /// ```
+  final ErrorPageRenderer errorPage;
+
   /// Opt-in behaviors that change the defaults. All off by default.
   /// See [CoreFlags].
   final CoreFlags flags;
@@ -174,6 +190,8 @@ class AppConfig {
     this.shutdownTimeout = const Duration(seconds: 8),
     this.webSocketAllowedOrigins,
     this.flags = const CoreFlags(),
+    this.htmlErrors = false,
+    this.errorPage = defaultErrorPage,
   }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
 }
 
