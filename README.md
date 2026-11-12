@@ -29,6 +29,7 @@ Dox is a powerful framework specifically developed for web application backend d
 - **Real time**: a Socket.IO server that works with the official Socket.IO clients.
 - **Socket.IO** (`dox_socketio`): A Socket.IO v4 server, with a Redis adapter.
 - **Cache** (`dox_cache`): Memory, file and Redis drivers, with locks and tags.
+- **Database cache** (`dox_cache_database`): a cache store in a database table, so servers share cache, locks and sessions with no Redis.
 - **Storage** (`dox_storage`): One API for local disk, AWS S3 and S3-compatible services.
 - **Schema validation** (`dox_validation`): Zod-like schemas with typed results.
 - **OpenAPI** (`dox_openapi`): OpenAPI 3.1 docs as JSON and YAML, with a docs page.
@@ -38,7 +39,7 @@ Dox is a powerful framework specifically developed for web application backend d
 
 ## Repos
 
-This repo holds `dox_core`, `dox_annotation`, `dox_builder` and `dox_cache`.
+This repo holds `dox_core`, `dox_annotation`, `dox_builder`, `dox_cache` and `dox_cache_database`.
 Some packages live in their own repos:
 
 | Package | Repo |

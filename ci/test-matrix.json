@@ -2,5 +2,6 @@
   {"name": "core", "packages": "dox-core", "group": "unit"},
   {"name": "builder", "packages": "dox-builder", "group": "unit"},
   {"name": "small packages", "packages": "dox-annotation", "group": "unit"},
-  {"name": "redis (cache)", "packages": "dox-cache", "services": "redis", "group": "unit"}
+  {"name": "redis (cache)", "packages": "dox-cache", "services": "redis", "group": "unit"},
+  {"name": "cache database", "packages": "dox-cache-database", "vars": "PG_PORT=5432 MARIADB_PORT=3306 MYSQL_PORT=3307", "services": "postgres mariadb mysql84", "group": "unit", "locks": "postgres mariadb mysql84"}
 ]

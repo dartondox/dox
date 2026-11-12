@@ -66,7 +66,7 @@ git checkout -b release-x.y.z origin/main
 
 Branch name: use the same name in every repo of a release, like `release-x.y.z`, so CI can clone the sibling repos on that branch (`ci/clone-siblings.sh`). A release that touches only the `dox` repo may use `release-<package>-x.y.z`.
 
-Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cache`, `dox_core`).
+Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cache`, `dox_core`, `dox_cache_database`).
 
 1. Run `bin/bump.sh <package> x.y.z`. It sets `version:` of that one package only.
 2. If a package needs the new version of a sibling, raise that constraint by hand
@@ -84,7 +84,7 @@ Wait for CI, then squash merge it.
 
 Tag the merge commit on `main`. The tag is `<package>-vx.y.z`. One tag publishes one package.
 If several packages changed, tag them one by one in dependency order:
-`dox_annotation`, `dox_cache`, `dox_builder`, `dox_core` (the order of `bin/publish_order.py`).
+`dox_annotation`, `dox_cache`, `dox_builder`, `dox_core`, `dox_cache_database` (the order of `bin/publish_order.py`).
 Wait until the run of one tag is done (and the package is on pub.dev) before you push the next tag.
 
 ```sh
