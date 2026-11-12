@@ -124,6 +124,7 @@ dart run skills@ get
 It finds the skills of your dependencies and installs them for your agent.
 It works with Claude Code, Codex, Cursor, GitHub Copilot and others.
 Run it again after you add a package or update one.
+It only reads the packages listed in your own `pubspec.yaml`. To get the skill of a package that comes in through another one (like `ioredis`), add it to `pubspec.yaml`.
 See [skills](https://pub.dev/packages/skills) for the options.
 
 The starter project also has an `AGENTS.md` file with the rules of the project.
