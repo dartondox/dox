@@ -223,7 +223,7 @@ Aliases: `--help`, `-h`. Without a command: lists every command by category. Wit
 dox make:controller <name> [-r|--resource] [--api] [--model=<model>]
 ```
 
-Alias: `create:controller`. The other `make:*` commands below have the same kind of alias.
+Alias: `create:controller`. Some other `make:*` commands have a `create:*` alias too. The Command list table at the end shows which.
 
 | Option | Meaning |
 | --- | --- |
@@ -329,6 +329,7 @@ With the view, the mail has `view` set to `emails/<name>` and a `data` map with 
 It makes both files or none.
 
 After it writes the files, it prints a hint for each package that `pubspec.yaml` does not have yet: `dox_mailer`, and `dox_view` when there is a view.
+With a view, it also prints that the default view settings work (`resources/views`), and that you only add a `ViewProvider` with a `ViewConfig` to change them.
 
 See [Mail](../digging-deeper/mail.md#mailables).
 
