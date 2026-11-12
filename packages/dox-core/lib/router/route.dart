@@ -1061,13 +1061,25 @@ class Route {
   /// `blog.show`, `blog.edit`, `blog.update` and `blog.destroy`.
   /// the name is the path with `.` for `/`, without `{params}`.
   /// set [name] to use another one. a group `name:` is put in front.
+  ///
+  /// the param of one item is `{id}`. Set [parameter] to use another
+  /// name, so [bind] and model binding work for it.
   /// ```
   /// Route.resource('blog', BlogController());
+  /// Route.bind<Photo>('photo', Photo.find);
+  /// Route.resource('photos', PhotoController, parameter: 'photo');
+  /// // GET /photos/{photo} -> show(DoxRequest req, Photo photo)
   /// ```
-  static Route resource(String route, dynamic controller, {String? name}) {
+  static Route resource(
+    String route,
+    dynamic controller, {
+    String? name,
+    String parameter = 'id',
+  }) {
     if (controller is Type) controller = Dox().ioc.getByType(controller);
     Route r = Route();
     String path = r._join(route);
+    String item = '$path/{$parameter}';
     String base = name ?? route.split('/').where(_isNamePart).join('.');
     r._resourceRoute(
       HttpRequestMethod.GET,
@@ -1089,31 +1101,31 @@ class Route {
     );
     r._resourceRoute(
       HttpRequestMethod.GET,
-      '$path/{id}',
+      item,
       () => controller.show,
       '$base.show',
     );
     r._resourceRoute(
       HttpRequestMethod.GET,
-      '$path/{id}/edit',
+      '$item/edit',
       () => controller.edit,
       '$base.edit',
     );
     r._resourceRoute(
       HttpRequestMethod.PUT,
-      '$path/{id}',
+      item,
       () => controller.update,
       '$base.update',
     );
     r._resourceRoute(
       HttpRequestMethod.PATCH,
-      '$path/{id}',
+      item,
       () => controller.update,
       null,
     );
     r._resourceRoute(
       HttpRequestMethod.DELETE,
-      '$path/{id}',
+      item,
       () => controller.destroy,
       '$base.destroy',
     );

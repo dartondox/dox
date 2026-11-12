@@ -59,6 +59,49 @@ void main() {
       );
     });
 
+    test('resource with another parameter name', () {
+      Route.resource('photos', BlogController(), parameter: 'photo');
+      expect(
+        Route().routes.map((RouteData r) => '${r.method} ${r.path}').toList(),
+        <String>[
+          'GET /photos',
+          'GET /photos/create',
+          'GET /photos/{photo}',
+          'GET /photos/{photo}/edit',
+          'PUT /photos/{photo}',
+          'PATCH /photos/{photo}',
+          'DELETE /photos/{photo}',
+        ],
+      );
+      expect(
+        route('photos.edit', params: <String, Object>{'photo': 3}),
+        '/photos/3/edit',
+      );
+      expect(() => route('photos.show'), throwsArgumentError);
+    });
+
+    test('nested resource keeps the parent param', () {
+      Route.group('admin', () {
+        Route.resource(
+          'users/{user}/photos',
+          BlogController(),
+          parameter: 'photo',
+        );
+      }, name: 'admin.');
+      expect(
+        route(
+          'admin.users.photos.show',
+          params: <String, Object>{'user': 1, 'photo': 2},
+        ),
+        '/admin/users/1/photos/2',
+      );
+      Route.resource('posts', BlogController());
+      expect(
+        route('posts.show', params: <String, Object>{'id': 4}),
+        '/posts/4',
+      );
+    });
+
     test('unknown name and missing param throw', () {
       Route.get('users/{id}', (DoxRequest req) {}).name('users.show');
       expect(() => route('nope'), throwsArgumentError);

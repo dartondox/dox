@@ -103,6 +103,7 @@ More route tools:
 
 ```dart
 Route.resource('posts', PostController);          // all 7 CRUD routes, names like posts.index
+Route.resource('photos', PhotoController, parameter: 'photo'); // {photo} instead of {id}, for Route.bind
 Route.group('/admin', () {                       // prefix for every route inside
   Route.get('/stats', (AdminController c) => c.stats);
 });
