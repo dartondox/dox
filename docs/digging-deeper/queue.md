@@ -330,9 +330,12 @@ await QueryBuilder.transaction(() async {
 - The `sync` driver runs the job after the commit.
 - It waits only for a transaction on the default dox_orm connection, opened with no `connection:` name. A transaction opened by name pushes the job at once, also when the name is the one of the default connection.
 - `dispatchIf()`, `dispatchUnless()` and `Queue.dispatch()` take `afterCommit` too.
+- Chains and batches take it too: `Queue.chain(jobs).dispatch(afterCommit: true)` and `Queue.batch(jobs).dispatch(afterCommit: true)`. A batch saves its `job_batches` row and pushes its jobs after the commit. A rollback drops it all.
+- Before the commit, the returned `Batch` is not saved yet. It has the id and the counts of a new batch.
+- A `sync` chain runs as a whole after the commit. It gives a new id before the commit, because its ids are made when it runs.
 - `dispatchSync()` and `dispatchAfterResponse()` run the job as before. They do not wait for a commit.
 
-Turn it on for every dispatch with `QueueConfig(afterCommit: true)`.
+Turn it on for every dispatch with `QueueConfig(afterCommit: true)`. Batches and chains follow it too.
 Then `afterCommit: false` on one dispatch pushes that job at once.
 
 `Queue.fake()` keeps the job when you call `dispatch()`, also when the transaction later rolls back.
@@ -785,6 +788,22 @@ A `Batch` is the state at the time it was read. Read it again with `Queue.findBa
 - An empty batch throws an `ArgumentError`, because it would never finish.
 - `then` and `whenComplete` run once, also with many workers. Each count changes in one atomic step.
 
+### A chain inside a batch
+
+Add `chain(jobs)` to put a chain in the batch. Its jobs run one after the other:
+
+```dart
+await Queue.batch(<DoxJob>[ImportUsers()])
+    .chain(<DoxJob>[ImportOrders(), SumOrders()])
+    .dispatch();
+```
+
+- The batch counts the chain as one job. It is done when its last job is done.
+- When a job of the chain fails for good, the rest of the chain is dropped. The batch counts one failed job.
+- The usual failure rules apply. The first failure cancels the batch, unless you call `allowFailures()`.
+- When the first job of the chain is a skipped [unique job](#unique-jobs), the chain is taken out of the counts. A skipped later job fails the chain.
+- `add(jobs)` takes jobs only, not chains.
+
 ### Batch traps
 
 - A skipped [unique job](#unique-jobs) is taken out of `totalJobs` and `pendingJobs`. `progress` does not run for it. When it was the last open job, `then` and `whenComplete` run.
@@ -792,10 +811,9 @@ A `Batch` is the state at the time it was read. Read it again with `Queue.findBa
 - The counts follow the at-least-once rule of the queue. A job that runs twice, for example when it runs longer than `retryAfter`, can be counted twice. `failedJobs` never goes below 0.
 - The batch is marked finished before `then` and `whenComplete` run. So `add()` from a callback throws a `StateError`.
 - When a worker crashes after a job is done and before it counted the job, the batch keeps that job as pending. Then `then` and `whenComplete` never run. Prune such batches with `--unfinished`, see below.
-- A chain inside a batch is not supported.
-- A batch does not wait for `afterCommit`. It is saved and its jobs are pushed at once.
+- Inside a transaction, use `dispatch(afterCommit: true)`. Then the batch is saved and pushed only after the commit. See [Dispatch after the commit](#dispatch-after-the-commit).
 - The `sync` driver runs the jobs at `dispatch()` and counts them. A job that throws counts as failed, and `dispatch()` does not throw.
-- The queue events fire for the jobs of a batch like for any job. There are no batch events.
+- The queue events fire for the jobs of a batch like for any job. The batch has its own events too, see [Batch events](#batch-events).
 
 ### Prune old batches
 
@@ -841,12 +859,38 @@ A listener gets a `QueueEvent`:
 | `attempts` | the try number. `0` for `queued`, `looping` and `stopping` |
 | `error`, `stack` | the error and its stack trace, for `exceptionOccurred` and `failing` |
 | `delay` | the wait, for `queued` and `released` |
+| `batch` | the `Batch`, for the [batch events](#batch-events). `null` for other events |
 
 - Listeners are per isolate. Register them where the app starts, like in a provider. Then the web app and each worker have them.
 - A listener can be async. The queue waits for it.
 - A listener that throws is logged. It never stops the worker or the dispatch.
 - The `sync` driver, `dispatchSync()`, `dispatchAfterResponse()` and `Queue.fake()` fire no events.
 - `Queue.forgetListeners()` removes all listeners, for example between tests.
+
+### Batch events
+
+A batch has its own events. In these events, `event.batch` is the batch after the step. It holds the `id`, the `name` and the counts:
+
+```dart
+Queue.batchProgress((QueueEvent event) {
+  Batch batch = event.batch!;
+  print('${batch.name}: ${batch.progress}%');
+});
+Queue.batchFailed((QueueEvent event) => alert(event.batch!.id, event.error));
+```
+
+| Hook | When | Where it fires |
+| --- | --- | --- |
+| `Queue.batchDispatched` | the batch was saved, before its jobs are pushed | the process that called `dispatch()` |
+| `Queue.batchProgress` | a job (or a chain) of the batch is done. With `allowFailures()`, also when one failed | the worker that counted it |
+| `Queue.batchFailed` | the first job failed for good. `event.error` is its error | the worker that counted it |
+| `Queue.batchCancelled` | the batch was cancelled: `cancel()`, the first failure without `allowFailures()`, or a push that threw | the process that cancelled it |
+| `Queue.batchFinished` | every job ran, done or failed | the worker that counted the last job |
+
+- Each event fires once per step, also with many workers.
+- When one failure cancels the batch, `batchFailed` fires first. Then `batchCancelled` fires.
+- With the `sync` driver, every event fires in the process that called `dispatch()`.
+- `Queue.fake()` fires no batch events.
 
 ## Drivers
 
@@ -1110,11 +1154,12 @@ test('signing up queues the welcome email', () async {
 | `assertNothingPushed()` | no job was pushed at all |
 | `assertChained(<Type>[A, B])` | a chain of exactly these job classes, in this order, was dispatched |
 | `assertBatched([test])` | a batch was dispatched. With `test`, one of them passes it. `test` gets a `PendingBatch` |
+| `assertBatchedChain(<Type>[A, B])` | a batch has a chain of exactly these job classes, in this order |
 | `assertBatchCount(n)` | exactly `n` batches were dispatched |
 
 To read the jobs, use `queue.pushed`. Each item has the `job`, the `queue` name and the `delay`. `queue.jobsOf<T>()` gives the `T` jobs. `queue.clear()` forgets them. `Queue.restore()` stops the fake.
 
-- `Queue.chain()` and `Queue.batch()` are kept too. Read chains in `queue.chains` and batches in `queue.batches`. Their jobs are not in `queue.pushed`. Nothing is saved or run, and the batch tables are not needed. In a faked batch, `add()` adds to the batch, `cancel()` does nothing and `Queue.findBatch()` gives `null`.
+- `Queue.chain()` and `Queue.batch()` are kept too. Read chains in `queue.chains` and batches in `queue.batches`. The chains of a batch are in `PendingBatch.chains`. Their jobs are not in `queue.pushed`. Nothing is saved or run, and the batch tables are not needed. In a faked batch, `add()` adds to the batch, `cancel()` does nothing and `Queue.findBatch()` gives `null`.
 - `dispatchSync()` runs the job now. `dispatchAfterResponse()` runs it after the answer, or soon outside a request. The fake does not stop them. It keeps their jobs in `queue.dispatchedSync` and `queue.dispatchedAfterResponse` (not in `queue.pushed`). `queue.clear()` empties these lists too.
 - The fake does not encode the job. A job that is missing from `QueueConfig.jobs`, or has data that is not JSON, passes a faked test but fails for real.
 - The fake also catches `Mail.queue()`, but only when `Mail.fake()` is off. When both are on, `Mail.fake()` catches the email first. See [Mail](mail.md#testing).
