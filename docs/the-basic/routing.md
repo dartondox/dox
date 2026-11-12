@@ -249,6 +249,15 @@ The name comes from the path: `/` becomes `.`, and `{params}` are left out.
 So `Route.resource('users/{user}/posts', ...)` gives `users.posts.index`.
 Pass `name:` to pick another one: `Route.resource('blogs', BlogController, name: 'posts')`.
 
+The param of one item is `{id}`. Pass `parameter:` to name it:
+
+```dart
+Route.resource('photos', PhotoController, parameter: 'photo');
+// GET /photos/{photo}, PUT /photos/{photo}, ...
+```
+
+Now `Route.bind('photo', ...)` and [model binding](#route-model-binding) work on these routes.
+
 A method that the controller does not have is skipped. No route is made for it.
 Any other error from the controller is not hidden. It stops the app at start, so you see it.
 See [Resource controller](controller.md#resource-controller) to make one with the CLI.
@@ -303,6 +312,33 @@ route('users.show', params: <String, Object>{'id': 5}, query: <String, Object>{'
 `route()` gives the path. `Route.url()` does the same.
 Param values are URL encoded. A missing `{name?}` param is left out.
 
+A param that is not in the path goes to the query string.
+A value that is `null` is left out.
+When `params` and `query` have the same key, `query` wins.
+
+```dart
+route('users.show', params: <String, Object>{'id': 5, 'tab': 'posts'});
+// /users/5?tab=posts
+
+route('users.show', params: <String, Object>{'id': 5, 'tab': 'a'}, query: <String, Object>{'tab': 'b'});
+// /users/5?tab=b
+```
+
+### Full URL
+
+Pass `absolute: true` to get the full URL, with `APP_URL` in front.
+Pass `baseUrl:` to use another base.
+
+```dart
+route('users.show', params: <String, Object>{'id': 5}, absolute: true);
+// https://example.com/users/5   (APP_URL=https://example.com)
+
+route('users.show', params: <String, Object>{'id': 5}, baseUrl: 'https://admin.example.com');
+// https://admin.example.com/users/5
+```
+
+With `absolute: true` and no `APP_URL` and no `baseUrl:`, `route()` throws an `ArgumentError`.
+
 A group can put a prefix in front of the names inside it:
 
 ```dart
@@ -315,7 +351,7 @@ Dox stops with a clear error when:
 
 - two routes have the same name (at start),
 - `route()` gets a name that no route has,
-- a `{param}` of the path has no value, or `params` has a key the path does not have.
+- a `{param}` of the path has no value.
 
 ### Signed routes
 

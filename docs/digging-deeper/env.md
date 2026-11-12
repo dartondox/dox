@@ -115,6 +115,50 @@ DB_PORT=5432
 - A `#` after a space starts a comment: `APP_PORT=3000 # dev` gives `3000`.
 - A `#` with no space before it is kept: `DB_PASSWORD=abc#123` gives `abc#123`.
 - A `#` inside quotes is kept: `DB_PASSWORD="abc # 123"` gives `abc # 123`.
+- `export KEY=value` is read like `KEY=value`.
+- `KEY=` (empty) gives the default value, like a key that is not there.
+
+### Use one value in another
+
+`CoreFlags.envExpand` is off by default. Turn it on to use `${OTHER}` in a value:
+
+```ini title=".env"
+HOST=localhost
+PORT=3000
+APP_URL=http://${HOST}:${PORT}
+GREETING="Hello\nWorld"
+```
+
+- `${OTHER}` works in an unquoted value and in a `"..."` value. It does not work in `'...'`.
+- Dox looks for a real environment variable first, then for a key above this line. In tests, `.env.testing` also sees the keys of `.env`.
+- A name that Dox does not find stays as it is: `${OTHER}`.
+- In a `"..."` value, `\n`, `\t`, `\"`, `\\` and `\$` become a new line, a tab, `"`, `\` and `$`. Use `\$` to write a `$` that is not a variable.
+
+The `.env` file is read before `AppConfig` exists. So you must set the flag in two places:
+
+1. `Env.flags = flags;` at the top of `main()`, before any env value is read.
+2. The same flags in `AppConfig(flags: flags)`.
+
+```dart title="bin/server.dart"
+import 'package:dox_core/dox_core.dart';
+
+import '../lib/config/app.dart';
+
+const CoreFlags flags = CoreFlags(envExpand: true);
+
+Future<void> main() async {
+  Env.flags = flags;
+  Dox().initialize(AppConfig(
+    appKey: Env.get('APP_KEY', ''),
+    flags: flags,
+    // ...
+  ));
+  await Dox().startServer();
+}
+```
+
+The server isolates follow the main isolate. You set nothing for them.
+When the flag is on in `AppConfig` but `.env` was read without it, Dox prints a warning at start.
 
 ## Commands
 
