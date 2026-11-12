@@ -366,6 +366,8 @@ class Dox {
   ///
   /// It is safe to call more than once. The route list is empty before
   /// and after the call, so a later [startServer] starts clean.
+  /// Call it only before [startServer], never in a running app: it
+  /// empties `Route()`, so the server would lose its routes.
   /// ```
   /// Dox().initialize(appConfig);
   /// AppRoutes routes = Dox().loadRoutes();

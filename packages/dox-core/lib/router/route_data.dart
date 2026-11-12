@@ -19,6 +19,9 @@ class RouteData {
 
   final String? domain;
 
+  /// true for a route added with `Route.websocket`
+  bool isWebSocket = false;
+
   /// [domain] in lower case, made once.
   late final String? domainLower = domain?.toLowerCase();
   final bool? corsEnabled;
