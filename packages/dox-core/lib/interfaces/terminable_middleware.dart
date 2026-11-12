@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:dox_core/dox_core.dart';
 
-/// A middleware that runs code after the answer is sent to the client,
-/// like the `terminate` of Laravel. Good for work the client should not
-/// wait for: logs, metrics, cleanup.
+/// A middleware that runs code after the answer is sent to the client.
+/// Good for work the client should not wait for: logs, metrics, cleanup.
 ///
 /// [terminate] gets the request and the answer that was sent.
 /// `res.status` is the status that was sent. An error in [terminate] is

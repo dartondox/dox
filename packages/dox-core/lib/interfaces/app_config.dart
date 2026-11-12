@@ -133,7 +133,7 @@ class AppConfig {
   /// `allowedOrigins` of a route wins over this.
   final List<String>? webSocketAllowedOrigins;
 
-  /// Opt-in behaviors that work like Laravel. All off by default.
+  /// Opt-in behaviors that change the defaults. All off by default.
   /// See [CoreFlags].
   final CoreFlags flags;
 

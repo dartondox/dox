@@ -43,7 +43,7 @@ class Hash {
     }
   }
 
-  /// same as [verify], with the Laravel name
+  /// same as [verify]
   /// ```
   /// Hash.check('secret', '<hashedString>');
   /// ```

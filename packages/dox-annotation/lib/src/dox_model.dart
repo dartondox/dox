@@ -12,8 +12,7 @@ class DoxModel {
   /// column of the last update time. null turns it off.
   final String? updatedAt;
 
-  /// false turns off both createdAt and updatedAt,
-  /// like `$timestamps = false` in Laravel
+  /// false turns off both createdAt and updatedAt
   final bool timestamps;
   final bool softDelete;
 

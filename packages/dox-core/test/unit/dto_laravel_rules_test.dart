@@ -3,7 +3,7 @@ import 'package:test/test.dart';
 
 import '../dtos/laravel.dto.dart';
 
-// Generated code for the DTO options and Laravel rules, run on the real
+// Generated code for the DTO options and extra rules, run on the real
 // dox_validation.
 
 Map<String, dynamic> _good() {

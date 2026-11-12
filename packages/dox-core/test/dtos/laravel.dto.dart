@@ -2,7 +2,7 @@ import 'package:dox_core/dox_core.dart';
 
 part 'laravel.dto.g.dart';
 
-/// Options and Laravel rules of dox_validation, built by dox_builder.
+/// Options and extra rules of dox_validation, built by dox_builder.
 @Dto(
   trim: true,
   coerce: true,

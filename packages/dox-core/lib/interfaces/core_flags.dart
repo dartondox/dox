@@ -1,4 +1,4 @@
-/// Opt-in behaviors that work like Laravel. Every flag is off by default.
+/// Opt-in behaviors that change the defaults. Every flag is off by default.
 /// Pass it as `AppConfig(flags: ...)`.
 /// ```
 /// AppConfig(appKey: key, flags: const CoreFlags(onlyPresent: true));
