@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dox_cache/dox_cache.dart' show MemoryDriver;
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
@@ -24,6 +25,24 @@ class SecurityRouter extends Router {
         max: 1,
         name: 'by-header',
         key: (DoxRequest req) => req.header('x-user') ?? '',
+        now: now,
+      ),
+      (DoxRequest req) => 'ok',
+    ]);
+    Route.get('/fixed-edge', <dynamic>[
+      RateLimit(max: 4, name: 'fixed-edge', now: now),
+      (DoxRequest req) => 'ok',
+    ]);
+    Route.get('/sliding', <dynamic>[
+      RateLimit(max: 4, name: 'sliding', sliding: true, now: now),
+      (DoxRequest req) => 'ok',
+    ]);
+    Route.get('/sliding-store', <dynamic>[
+      RateLimit(
+        max: 2,
+        name: 'sliding-store',
+        sliding: true,
+        cacheStore: CacheStore(MemoryDriver()),
         now: now,
       ),
       (DoxRequest req) => 'ok',
@@ -166,6 +185,69 @@ void main() {
       await one.close();
       await two.close();
     }, skip: redisPort == null ? 'set REDIS_PORT to run it' : false);
+  });
+
+  group('RateLimit sliding |', () {
+    test('fixed lets the edge burst through, sliding blocks it', () async {
+      clock = DateTime.utc(2026, 1, 1, 13, 0, 59);
+      for (int i = 0; i < 4; i++) {
+        (await client.get('/fixed-edge')).expectStatus(200);
+        (await client.get('/sliding')).expectStatus(200);
+      }
+      clock = DateTime.utc(2026, 1, 1, 13, 1, 1);
+      for (int i = 0; i < 4; i++) {
+        (await client.get('/fixed-edge')).expectStatus(200);
+      }
+      // 4 x 59/60 + 1 = 4.93, over 4. It fits again at 13:01:30, when
+      // 4 x 30/60 + 2 (this one and the next) = 4.
+      (await client.get('/sliding'))
+          .expectStatus(429)
+          .expectHeader('x-ratelimit-remaining', '0')
+          .expectHeader('retry-after', '29');
+    });
+
+    test('the window before fades out', () async {
+      // 4 x 30/60 + 2 = 4: just fits
+      clock = DateTime.utc(2026, 1, 1, 13, 1, 30);
+      (await client.get('/sliding'))
+          .expectStatus(200)
+          .expectHeader('x-ratelimit-remaining', '0');
+      // 4 x 29/60 + 3 = 4.93: over. No room in this window for one more
+      // (4 x 0 + 4 needs the window before to be gone), so wait for the
+      // next window.
+      clock = DateTime.utc(2026, 1, 1, 13, 1, 31);
+      (await client.get('/sliding'))
+          .expectStatus(429)
+          .expectHeader('retry-after', '29');
+      // 3 hits (the blocked one counts) x 60/60 + 1 = 4
+      clock = DateTime.utc(2026, 1, 1, 13, 2);
+      (await client.get('/sliding'))
+          .expectStatus(200)
+          .expectHeader('x-ratelimit-remaining', '0');
+      // 3 x 15/60 + 2 = 2.75: 1 left
+      clock = DateTime.utc(2026, 1, 1, 13, 2, 45);
+      (await client.get('/sliding'))
+          .expectStatus(200)
+          .expectHeader('x-ratelimit-remaining', '1');
+    });
+
+    test('a cache store keeps the counts too', () async {
+      clock = DateTime.utc(2026, 1, 1, 13, 0, 10);
+      (await client.get('/sliding-store')).expectStatus(200);
+      (await client.get('/sliding-store'))
+          .expectStatus(200)
+          .expectHeader('x-ratelimit-remaining', '0');
+      // 3 hits is over 2 for the rest of this window. In the next one,
+      // 3 x (60 - e)/60 + 1 <= 2 at e = 40 s: 50 s + 40 s from now.
+      (await client.get('/sliding-store'))
+          .expectStatus(429)
+          .expectHeader('retry-after', '90');
+      // at 13:01:40, as Retry-After said: 3 x 20/60 + 1 = 2
+      clock = DateTime.utc(2026, 1, 1, 13, 1, 40);
+      (await client.get('/sliding-store'))
+          .expectStatus(200)
+          .expectHeader('x-ratelimit-remaining', '0');
+    });
   });
 
   group('SecurityHeaders |', () {

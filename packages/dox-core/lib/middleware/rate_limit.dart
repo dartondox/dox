@@ -32,10 +32,13 @@ typedef RateLimitKey = String Function(DoxRequest req);
 /// - [cacheStore] is given: in that store, as it is. A `MemoryDriver`
 ///   store given here counts in each isolate on its own.
 ///
-/// It is a fixed window: the counter starts again at each new window
-/// (eg. each new minute). So a client can send up to 2 x [max] requests
-/// around the end of one window and the start of the next.
-// ponytail: fixed window, a sliding window if the burst at the edge matters
+/// By default it is a fixed window: the counter starts again at each
+/// new window (eg. each new minute). So a client can send up to
+/// 2 x [max] requests around the end of one window and the start of
+/// the next. Set [sliding] to stop that burst.
+///
+/// A blocked request still counts. So a client that keeps sending while
+/// it is blocked stays blocked.
 class RateLimit implements IDoxMiddleware {
   RateLimit({
     this.max = 60,
@@ -44,6 +47,7 @@ class RateLimit implements IDoxMiddleware {
     String? name,
     this.store,
     this.cacheStore,
+    this.sliding = false,
     DateTime Function()? now,
   }) : key = key ?? _byIp,
        name = name ?? '${max}_${per.inMilliseconds}',
@@ -74,6 +78,17 @@ class RateLimit implements IDoxMiddleware {
   /// a ready cache store to keep the counts, eg. in tests
   final CacheStore? cacheStore;
 
+  /// Use a sliding window. The count is then a guess of the requests in
+  /// the last [per]: the count of this window plus a part of the count
+  /// of the window before. That part gets smaller as this window goes
+  /// on. Eg. 30% into this window, 70% of the last count is added.
+  /// It stops the burst of 2 x [max] at the edge of a window. It costs
+  /// one more read per request, and each count is kept for 2 windows.
+  ///
+  /// `Retry-After` is the time until one more request fits, if the
+  /// client sends nothing in between.
+  final bool sliding;
+
   final DateTime Function() _now;
 
   static String _byIp(DoxRequest req) => req.ip();
@@ -84,7 +99,10 @@ class RateLimit implements IDoxMiddleware {
     int window = per.inMilliseconds;
     int now = _now().millisecondsSinceEpoch;
     int index = now ~/ window;
-    String cacheKey = 'rate_limit:$name:${key(request)}:$index';
+    String client = key(request);
+    String cacheKey = 'rate_limit:$name:$client:$index';
+
+    if (sliding) return _sliding(request, window, now, index, client);
 
     // the ttl is one full window, so the key is gone after its window
     CacheStore? counts = _cacheStore();
@@ -103,6 +121,62 @@ class RateLimit implements IDoxMiddleware {
 
     int waitMs = (index + 1) * window - now;
     headers.set(HttpHeaders.retryAfterHeader, (waitMs / 1000).ceil());
+    throw TooManyRequestsException();
+  }
+
+  /// The sliding window. All math is in ms x hits, so it stays in ints:
+  /// `estimate x window = before x (window - elapsed) + hits x window`.
+  Future<dynamic> _sliding(
+    DoxRequest req,
+    int window,
+    int now,
+    int index,
+    String client,
+  ) async {
+    String cacheKey = 'rate_limit:$name:$client:$index';
+    String beforeKey = 'rate_limit:$name:$client:${index - 1}';
+    // the ttl is two windows, so the key can still be read in the next
+    // window as the window before
+    Duration ttl = per * 2;
+    CacheStore? counts = _cacheStore();
+    int hits;
+    int before;
+    if (counts == null) {
+      (hits, before) = await RateLimitCounter.instance.incrementAndRead(
+        cacheKey,
+        beforeKey,
+        ttl,
+      );
+    } else {
+      await counts.add(cacheKey, 0, ttl);
+      hits = await counts.increment(cacheKey);
+      before = ((await counts.get(beforeKey)) as num?)?.toInt() ?? 0;
+    }
+
+    int elapsed = now - index * window;
+    int estimate = before * (window - elapsed) + hits * window;
+    HttpHeaders headers = req.httpRequest.response.headers;
+    headers.set('X-RateLimit-Limit', max);
+    int used = (estimate + window - 1) ~/ window;
+    headers.set('X-RateLimit-Remaining', math.max(0, max - used));
+    if (estimate <= max * window) return req;
+
+    // The next request fits when its own hit fits too. While this window
+    // has room (hits < max), wait until the part of the window before
+    // is small enough. Else wait for the next window, where these hits
+    // become the window before.
+    int waitMs;
+    if (hits < max) {
+      int fitsAt = window - (max - 1 - hits) * window ~/ before;
+      waitMs = fitsAt - elapsed;
+    } else {
+      int fitsAt = window - (max - 1) * window ~/ hits;
+      waitMs = window - elapsed + fitsAt;
+    }
+    headers.set(
+      HttpHeaders.retryAfterHeader,
+      math.max(1, (waitMs / 1000).ceil()),
+    );
     throw TooManyRequestsException();
   }
 

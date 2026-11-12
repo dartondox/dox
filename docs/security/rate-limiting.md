@@ -108,9 +108,30 @@ A `memory` store named in `store` counts in the main isolate too. A store passed
 
 ## How it counts
 
-It is a fixed window. With `per: Duration(minutes: 1)` the count starts at 0 at the start of each minute.
+By default it is a fixed window. With `per: Duration(minutes: 1)` the count starts at 0 at the start of each minute.
 So a client can send `max` requests at the end of one minute and `max` more at the start of the next.
-That is fine for most apps. For a hard limit, use a smaller window.
+That is fine for most apps.
+
+A blocked request still counts. A client that keeps sending while it is blocked stays blocked.
+
+## Sliding window
+
+Set `sliding: true` to stop the burst at the edge of a window:
+
+```dart
+RateLimit(max: 5, per: Duration(minutes: 1), sliding: true)
+```
+
+The count is then a guess of the requests in the last minute.
+It is the count of this minute, plus a part of the count of the minute before.
+That part gets smaller as the minute goes on.
+
+For example, the client sent 4 requests last minute and 1 this minute. We are 15 seconds into this minute.
+The count is `4 x 45/60 + 1 = 4`.
+
+- `X-RateLimit-Remaining` is `max` minus this count, rounded up.
+- `Retry-After` is the time until one more request fits, if the client sends nothing in between.
+- It costs one more read per request. Each count is kept for 2 windows.
 
 ## See also
 
