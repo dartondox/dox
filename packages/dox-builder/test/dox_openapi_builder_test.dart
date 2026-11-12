@@ -607,6 +607,49 @@ tags: <String>['User'],'''),
       },
     );
 
+    test('model schema: visibleFields keeps only its keys', () async {
+      String short = await _generate(<String, String>{
+        'a|lib/short.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+@DoxModel(table: 'notes')
+class Note {
+  List<String> get visibleFields => const <String>['id', 'title', 'body'];
+  List<String> get hidden => const <String>['body'];
+
+  @Column()
+  String? title;
+
+  @Column()
+  String? body;
+
+  @Column()
+  String? secret;
+}
+
+class NoteController {
+  Future<Note> show(DoxRequest req) async => Note();
+}
+
+class Routes {
+  void register() {
+    Route.get('/notes', (NoteController c) => c.show);
+  }
+}
+''',
+      });
+      expect(
+        short,
+        contains(
+          _flat('''
+'Note': <String, dynamic>{'type': 'object',
+'properties': <String, dynamic>{
+'id': <String, dynamic>{'type': 'integer'},
+'title': <String, dynamic>{'type': <dynamic>['string', 'null']}}}'''),
+        ),
+      );
+    });
+
     test('dto schema: constraints, defaults, enums, nested lists', () {
       expect(
         out,

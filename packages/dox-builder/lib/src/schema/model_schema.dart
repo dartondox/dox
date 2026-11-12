@@ -11,7 +11,8 @@ import 'json_schema_reader.dart';
 ///
 /// It has the primary key, the `@Column` fields, the timestamps, the
 /// relations (only there when loaded) and the `@Computed` getters.
-/// Keys in the `hidden` list are left out.
+/// Keys in the `hidden` list are left out. With a `visibleFields`
+/// list, only its keys are kept.
 class ModelSchema {
   const ModelSchema({this.annotations = const AnnotationReader()});
 
@@ -84,7 +85,15 @@ class ModelSchema {
       properties[key] =
           await types.of(getter.returnType) ?? <String, dynamic>{};
     }
-    for (String hidden in await _hidden(model, types)) {
+
+    /// `visibleFields` of dox_orm keeps only its keys in toJson()
+    List<String> only = await _strings(model, types, 'visibleFields');
+    if (only.isNotEmpty) {
+      for (String key in properties.keys.toList()) {
+        if (!only.contains(key)) properties.remove(key);
+      }
+    }
+    for (String hidden in await _strings(model, types, 'hidden')) {
       properties.remove(hidden);
     }
     String? doc = types.docText(model.documentationComment);
@@ -102,13 +111,15 @@ class ModelSchema {
     return false;
   }
 
-  /// the strings of the `hidden` getter or field of the model
-  Future<List<String>> _hidden(
+  /// the strings of the [name] getter or field of the model, like
+  /// `hidden`
+  Future<List<String>> _strings(
     ClassElement model,
     JsonSchemaReader types,
+    String name,
   ) async {
     for (GetterElement getter in model.getters) {
-      if (getter.displayName != 'hidden' || getter.isStatic) continue;
+      if (getter.displayName != name || getter.isStatic) continue;
       Element source = getter.isOriginDeclaration ? getter : getter.variable;
       return StringListCollector.of(await types.ast.of(source));
     }

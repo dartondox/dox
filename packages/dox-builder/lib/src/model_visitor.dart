@@ -18,6 +18,7 @@ const List<String> _hookNames = <String>[
   'onRestored',
   'onForceDeleting',
   'onForceDeleted',
+  'onTrashed',
 ];
 
 const List<String> _relationTypes = <String>[
