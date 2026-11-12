@@ -1,8 +1,10 @@
 ## Unreleased
 
-- New: `'encrypt': true` on a `file` or `redis` store encrypts the values. It is off by default, so nothing changes for stores without it. Set `CacheConfig(encrypter: ...)` with a `CacheEncrypter`. A store with `'encrypt': true` and no encrypter throws a `StateError`. Memory stores ignore the option.
-- On Redis, a plain `int` stays plain text when encryption is on, so `increment` and `decrement` still work. Every other value is encrypted.
-- A value that cannot be decrypted (wrong key, changed text) reads as a miss.
+- New: `'encrypt': true` on a `file` or `redis` store encrypts the values. It is off by default, so nothing changes for stores without it. Set `CacheConfig(encrypter: ...)` with a `CacheEncrypter`. A store with `'encrypt': true` and no encrypter throws a `StateError`, for every store type. Memory and null stores do not encrypt. An `encrypt` value that is not `true` or `false` throws an `ArgumentError`.
+- On Redis, a plain `int` stays plain text when encryption is on, so `increment` and `decrement` still work. Every other value is encrypted. To keep a secret number encrypted, store it as a `String`.
+- A value that cannot be decrypted (wrong key, changed text) reads as a miss. An old plain value reads as a miss too, except an `int` on Redis.
+- `FileDriver.prune()` deletes files that cannot be decrypted when encryption is on.
+- Cache keys and tag names are not encrypted, and a value is not tied to its key. Encryption protects against reading only. `maxValueBytes` is checked on the plain JSON size.
 - Ships an AI agent skill (dox-cache-guide). Install it in your app with `dart run skills@ get`.
 - Requires Dart 3.14 or newer.
 - New: `CacheFlags`, opt-in behaviors that work like Laravel, as `CacheConfig(flags: ...)`. All are off by default. `CacheFlags.all()` turns on every flag.

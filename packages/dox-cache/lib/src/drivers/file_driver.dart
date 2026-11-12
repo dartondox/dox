@@ -24,6 +24,10 @@ import '../constants/cache_constants.dart';
 /// key, changed text, or a plain file from before) reads as a miss. Lock
 /// files are not encrypted. They hold no values.
 ///
+/// [prune] deletes a file that cannot be decrypted, as it is a miss. So
+/// after a key change with no previous keys, or in a folder that apps with
+/// different keys share, [prune] removes the files of the other key.
+///
 /// A read never deletes a file. An expired file stays until it is
 /// written again, removed, or [prune] runs. Set [pruneEvery] to run
 /// [prune] by itself in the background once every that many writes.
@@ -165,7 +169,8 @@ class FileDriver extends CacheDriver {
     }
   }
 
-  /// Delete the expired and broken files of this store.
+  /// Delete the expired and broken files of this store. With an encrypter,
+  /// a file that cannot be decrypted counts as broken and is deleted.
   /// Returns how many were deleted. Run it from time to time, eg. in a
   /// schedule, to free disk space.
   ///
@@ -246,13 +251,20 @@ class FileDriver extends CacheDriver {
       return null;
     }
     Map<String, dynamic> entry;
-    try {
-      CacheEncrypter? secret = encrypter;
-      entry = jsonDecode(
-        secret == null ? text : secret.decrypt(text),
-      ) as Map<String, dynamic>;
-    } on Object {
-      return null;
+    CacheEncrypter? secret = encrypter;
+    if (secret == null) {
+      try {
+        entry = jsonDecode(text) as Map<String, dynamic>;
+      } on FormatException {
+        return null;
+      }
+    } else {
+      // A decrypt error can be any type, so catch them all here.
+      try {
+        entry = jsonDecode(secret.decrypt(text)) as Map<String, dynamic>;
+      } on Object {
+        return null;
+      }
     }
     int? expiresAt = entry[CacheConstants.fileExpiresAtField] as int?;
     if (expiresAt != null && _clock.nowMs() >= expiresAt) {

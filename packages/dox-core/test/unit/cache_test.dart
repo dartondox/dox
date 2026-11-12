@@ -141,6 +141,15 @@ void main() {
       expect(result.defaultStore, config.defaultStore);
     });
 
+    test('no app name and an encrypter gives the same config', () {
+      CacheConfig own = CacheConfig(
+        defaultStore: 'redis',
+        stores: config.stores,
+        encrypter: const CryptCacheEncrypter(),
+      );
+      expect(identical(Cache.withAppPrefix(own, '  '), own), isTrue);
+    });
+
     test('the config gets the APP_KEY encrypter when it has none', () {
       expect(
         Cache.withAppPrefix(config, 'x').encrypter,

@@ -91,6 +91,36 @@ void main() {
       }
     });
 
+    test(
+      'encrypt: true works on Redis with the APP_KEY',
+      () async {
+        CacheManager manager = CacheManager(
+          CacheConfig(
+            defaultStore: 'redis',
+            stores: <String, Map<String, dynamic>>{
+              'redis': <String, dynamic>{
+                'driver': 'redis',
+                'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
+                'port': int.parse(Platform.environment['REDIS_PORT'] ?? '6379'),
+                'prefix': 'dox_core_enc_test:',
+                'encrypt': true,
+              },
+            },
+            encrypter: const CryptCacheEncrypter(),
+          ),
+        );
+        Cache cache = Cache(manager: manager);
+        await cache.put('card', 'card-1234-secret');
+        expect(await cache.get('card'), 'card-1234-secret');
+        expect(await cache.increment('n'), 1);
+        await manager.store().flush();
+        await manager.close();
+      },
+      skip: Platform.environment['REDIS_PORT'] == null
+          ? 'set REDIS_PORT to run it'
+          : false,
+    );
+
     test('default store comes from the config', () async {
       await Cache().put('default', 'memory');
       expect(await Cache().store('memory').get('default'), 'memory');

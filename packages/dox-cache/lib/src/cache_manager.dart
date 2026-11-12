@@ -82,11 +82,18 @@ class CacheManager {
     if (options == null) {
       throw ArgumentError('Cache store "$storeName" is not configured');
     }
-    if (options[CacheConstants.encryptOption] == true &&
-        config.encrypter == null) {
+    Object? encrypt = options[CacheConstants.encryptOption];
+    if (encrypt != null && encrypt is! bool) {
+      throw ArgumentError(
+        'Cache store "$storeName": encrypt must be true or false, '
+        'not ${encrypt.runtimeType}',
+      );
+    }
+    if (encrypt == true && config.encrypter == null) {
       throw StateError(
         'Cache store "$storeName" has encrypt: true, '
-        'but CacheConfig has no encrypter',
+        'but CacheConfig has no encrypter. '
+        'This is also so for memory and null stores, which do not encrypt.',
       );
     }
     String? driverName = options[CacheConstants.driverOption] as String?;

@@ -69,6 +69,7 @@ class Cache {
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
         .replaceAll(RegExp(r'^_+|_+$'), '');
+    if (name.isEmpty && config.encrypter != null) return config;
     Map<String, Map<String, dynamic>> stores = name.isEmpty
         ? config.stores
         : <String, Map<String, dynamic>>{
