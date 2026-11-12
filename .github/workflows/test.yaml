@@ -5,11 +5,15 @@ on:
     branches:
       - '**'
     # A docs-only tag changes no code, so it needs no test run.
-    # A release tag (v*) runs this workflow from the Release workflow,
-    # before it publishes.
+    # A release tag (<package>-v*) runs this workflow from the Release
+    # workflow, before it publishes.
     tags-ignore:
       - 'docs-v*'
       - 'v*'
+      - 'dox_annotation-v*'
+      - 'dox_builder-v*'
+      - 'dox_cache-v*'
+      - 'dox_core-v*'
   workflow_call:
 
 permissions:

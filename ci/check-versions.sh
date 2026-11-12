@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
-# Checks that every package has the same version as the root pubspec.yaml.
-# On a tag push it also checks that the tag (v<version>) matches it.
+# Prints the version of each package. On a tag push (<package>-v<version>)
+# it also checks that the package has the version of the tag.
+# Packages have their own versions. They do not need to be equal.
 #
 # Env: PACKAGES (from ci/publish-order.sh), GITHUB_REF_TYPE and
 # GITHUB_REF_NAME (set by GitHub Actions).
 set -euo pipefail
 
-VERSION=$(sed -nE 's/^version:[[:space:]]*([^[:space:]]+).*/\1/p' pubspec.yaml)
-echo "Root version: $VERSION"
-if [ "${GITHUB_REF_TYPE:-}" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
-  echo "::error::Tag $GITHUB_REF_NAME does not match root pubspec version $VERSION"
-  exit 1
-fi
 FAIL=0
 for entry in $PACKAGES; do
   dir=${entry%%:*}
   v=$(sed -nE 's/^version:[[:space:]]*([^[:space:]]+).*/\1/p' "packages/$dir/pubspec.yaml")
-  if [ "$v" != "$VERSION" ]; then
-    echo "::error::packages/$dir has version $v, expected $VERSION. Run bin/update_versions.sh"
+  echo "${entry##*:} $v"
+  if [ "${GITHUB_REF_TYPE:-}" = "tag" ] && [ "${GITHUB_REF_NAME#*-v}" != "$v" ]; then
+    echo "::error::Tag $GITHUB_REF_NAME does not match the version $v in packages/$dir/pubspec.yaml. Run bin/bump.sh ${entry##*:} ${GITHUB_REF_NAME#*-v}"
     FAIL=1
   fi
 done

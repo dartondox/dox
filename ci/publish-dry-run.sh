@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs `dart pub publish --dry-run` for every package. Nothing is published.
+# Runs `dart pub publish --dry-run` for each package in $PACKAGES. Nothing is published.
 # Warnings only (exit 65) are shown as a warning. Any other error fails.
 #
 # Env: PACKAGES (from ci/publish-order.sh).

@@ -1,7 +1,7 @@
 # Releasing Dox
 
 This guide shows how to release a new Dox version to pub.dev.
-All packages in `packages/` share one version, for example `x.y.z`.
+Each package in `packages/` has its own version and its own tag. Release only the packages that changed.
 
 ## Native packages
 
@@ -51,7 +51,8 @@ No package in this repo may depend on `dox_orm` or `dox_auth`. That would make a
 - Each package with changes has a `## Unreleased` section at the top of its `CHANGELOG.md`.
 - A package that was never published by the Release workflow needs automated publishing on pub.dev.
   Go to pub.dev → the package → Admin → Automated publishing → GitHub Actions.
-  Use repo `dartondox/dox`, tag pattern `v{{version}}` and environment `pub.dev`.
+  Use repo `dartondox/dox`, tag pattern `<package>-v{{version}}` (like `dox_core-v{{version}}`) and environment `pub.dev`.
+  A new package in `packages/` needs this pattern before its first tag.
   Without it, the Release workflow fails on that package.
   A package in another repo uses that repo name, like `dartondox/dox-orm`.
 
@@ -63,45 +64,53 @@ In the steps below, replace `x.y.z` with the new version.
 git checkout -b release-x.y.z origin/main
 ```
 
-1. Set `version: x.y.z` in the root `pubspec.yaml`.
-2. Run `bash bin/update_versions.sh`.
-   It sets the version of every package and every sibling constraint.
-3. In every `packages/*/CHANGELOG.md`:
-   - rename `## Unreleased` to `## x.y.z`, or
-   - if there is no `## Unreleased`, add `## x.y.z` with "- Version bump only, to match the other packages."
+Branch name: use the same name in every repo of a release, like `release-x.y.z`, so CI can clone the sibling repos on that branch (`ci/clone-siblings.sh`). A release that touches only the `dox` repo may use `release-<package>-x.y.z`.
+
+Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cache`, `dox_core`).
+
+1. Run `bin/bump.sh <package> x.y.z`. It sets `version:` of that one package only.
+2. If a package needs the new version of a sibling, raise that constraint by hand
+   (for example `dox_annotation: ^x.y.z` in `dox_builder`).
+3. In `packages/<package>/CHANGELOG.md`, rename `## Unreleased` to `## x.y.z`.
 4. Run `dart pub get` and `dart analyze --fatal-infos packages`.
 5. Commit and push the branch.
 
 ## 2. Merge the release PR
 
-Open a PR from `release-x.y.z` into `main`.
+Open a PR from your release branch into `main`.
 Wait for CI, then squash merge it.
 
 ## 3. Publish to pub.dev
 
-Tag the merge commit on `main`:
+Tag the merge commit on `main`. The tag is `<package>-vx.y.z`. One tag publishes one package.
+If several packages changed, tag them one by one in dependency order:
+`dox_annotation`, `dox_cache`, `dox_builder`, `dox_core` (the order of `bin/publish_order.py`).
+Wait until the run of one tag is done (and the package is on pub.dev) before you push the next tag.
 
 ```sh
 git checkout main && git pull
-git tag vx.y.z
-git push origin vx.y.z
+git tag dox_builder-vx.y.z
+git push origin dox_builder-vx.y.z
 ```
 
 The tag starts `.github/workflows/publish.yaml` (the "Release" workflow).
-It checks that the tag matches every package version.
-Then it checks every package with `dart pub publish --dry-run` (in the workspace, so it needs no wait for pub.dev).
-Then it uploads the packages in dependency order (`bin/publish_order.py`), with `--skip-validation`.
-So it does not wait for pub.dev to serve each new version. If pub.dev refuses an upload, it tries again every 15 seconds, for up to 10 minutes.
+It checks that the tag matches the version in `packages/<folder>/pubspec.yaml`.
+Then it runs the tests. Then it checks that every sibling it needs is on pub.dev (`ci/check-siblings.sh`; if not: "release <dep> first"). Then it checks the package with `dart pub publish --dry-run`
+(in the workspace, so it needs no wait for pub.dev).
+Then it uploads that one package, with `--skip-validation`.
+If pub.dev refuses an upload, it tries again every 15 seconds, for up to 10 minutes.
 
-If one package fails (for example, automated publishing is off):
+A `dox_core-v*` tag also deploys the docs. The `docs-v*` tag deploys only the docs.
+
+If the package fails (for example, automated publishing is off):
 
 1. Fix the cause.
 2. Run `gh run rerun <run id> --failed`.
 
-Packages that are already published are skipped.
+If the version is already on pub.dev, it is skipped.
 
 To test without publishing, run the Release workflow by hand (workflow_dispatch).
-That is a dry run only.
+Pick one package, or `all`. That is a dry run only.
 
 ## 4. Release the project template
 
