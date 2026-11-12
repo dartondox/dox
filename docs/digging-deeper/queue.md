@@ -857,14 +857,15 @@ A listener gets a `QueueEvent`:
 | `id` | the job id |
 | `queue` | the queue name |
 | `attempts` | the try number. `0` for `queued`, `looping` and `stopping` |
-| `error`, `stack` | the error and its stack trace, for `exceptionOccurred` and `failing` |
+| `error`, `stack` | the error and its stack trace, for `exceptionOccurred`, `failing` and `batchFailed` |
 | `delay` | the wait, for `queued` and `released` |
 | `batch` | the `Batch`, for the [batch events](#batch-events). `null` for other events |
 
 - Listeners are per isolate. Register them where the app starts, like in a provider. Then the web app and each worker have them.
 - A listener can be async. The queue waits for it.
 - A listener that throws is logged. It never stops the worker or the dispatch.
-- The `sync` driver, `dispatchSync()`, `dispatchAfterResponse()` and `Queue.fake()` fire no events.
+- The `sync` driver, `dispatchSync()` and `dispatchAfterResponse()` fire no job events. The `sync` driver does fire the [batch events](#batch-events).
+- `Queue.fake()` fires no events.
 - `Queue.forgetListeners()` removes all listeners, for example between tests.
 
 ### Batch events

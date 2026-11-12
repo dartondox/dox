@@ -246,19 +246,24 @@ Make sure `jobs: jobRegistry` is set in your [queue config](queue.md#1-config).
 
 ### 3. Set the hook
 
-The hook gets the broadcast and puts it on the queue. Set it in a provider:
+The hook gets the broadcast and puts it on the queue. Add it to the `setup()` of the `BroadcastProvider` from [Turn it on](#turn-it-on), next to the channel rules. Keep the rules:
 
 ```dart title="lib/providers/broadcast_provider.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_queue/dox_queue.dart';
 import 'package:dox_socketio/dox_socketio.dart';
+import 'package:my_app/app/models/user/user.model.dart';
 
 import '../app/jobs/broadcast.job.dart';
 
-/// Puts ShouldBroadcastQueued events on the queue.
 class BroadcastProvider extends DoxProvider {
   @override
   void setup() {
+    Broadcast.channel('orders.{id}', (Object? user, String id) {
+      return (user as User).id.toString() == id;
+    });
+
+    // puts ShouldBroadcastQueued events on the queue
     Broadcast.useQueue(queueBroadcast);
   }
 
@@ -268,8 +273,6 @@ class BroadcastProvider extends DoxProvider {
 }
 ```
 
-You can keep this in the provider that holds your channel rules. Run `dart run build_runner build` again, so the generated container finds a new provider.
-
 The payload is JSON: `{channels, event, data, except}`. `except` is the `toOthers` socket id.
 
 ### 4. Use the Redis adapter
@@ -278,7 +281,7 @@ The worker is its own process. It starts your providers, so it gets its own Sock
 So the worker must reach the clients of the web server through Redis.
 
 Set the [Redis adapter](../packages/socketio.md#many-servers-redis-adapter) in `SocketIoConfig`. The web server and the worker use the same config, so both use the same Redis.
-Or set [`Broadcast.emitter`](#send-from-a-process-with-no-socketio-server) in the worker.
+A `Broadcast.emitter` does not help here. The worker has its own Socket.IO server, and `Broadcast.deliver` sends through that server first.
 
 ### 5. Run the worker
 
@@ -345,7 +348,8 @@ socket.on('client-typing', (channel, data) => console.log(channel, data));
 - When a whisper is refused, the ack is `{ok: false, error}`. The error is, for example, `not subscribed` or `data is too big`.
 - With whisper off, a `client event` is ignored, with no ack.
 - The `client-` prefix keeps a whisper apart from server events. Do not give a server event (`broadcastAs`) a name that starts with `client-`.
-- It uses the same wire format as Laravel Echo. So `channel.whisper('typing', data)` and `listenForWhisper('typing', ...)` of Laravel Echo work.
+- The event names and the whisper format follow Laravel Echo. So `channel.whisper('typing', data)` and `listenForWhisper('typing', ...)` use the same names.
+- Laravel Echo sends `auth` as an object of headers. This server refuses that. So Echo can not join a private or presence channel on its own. Log the socket in with [`SocketAuth`](../packages/socketio.md#log-in-a-socket), or send your own `subscribe` with the token, as shown in [The client](#the-client). Then whispers work.
 
 ## Limits and settings
 
