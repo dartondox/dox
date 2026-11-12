@@ -6,7 +6,7 @@ icon: lucide/square-terminal
 
 The `dox` CLI creates projects and files, runs the dev server, builds for production and runs migrations.
 
-Every `make:*` command also answers to its `create:*` name.
+Many `make:*` commands also answer to a `create:*` name.
 Run `dox help` to see all commands. Run `dox help <command>` for one command.
 
 ## Installation
@@ -40,6 +40,12 @@ dart pub global deactivate dox
 | `dox make:middleware <name>` | create a middleware |
 | `dox make:dto <name>` | create a DTO (typed, checked input) |
 | `dox make:serializer <name>` | create a serializer |
+| `dox make:provider <name>` | create a provider in `lib/providers` |
+| `dox make:command <name>` | create a command in `lib/app/commands` and add it to the commands list |
+| `dox make:mail <name> [--no-view]` | create a mailable in `lib/app/mail`, and its view unless you pass `--no-view` |
+| `dox make:view <name>` | create a `.dox.html` view in `resources/views` |
+| `dox make:test <name> [--unit]` | create a test in `test/` that uses `DoxTestClient`, or a plain one with `--unit` |
+| `dox route:list [--json]` | list every route of the app, without starting the server |
 | `dox make:model <name> [-m] [-c] [-r] [--api] [-f] [-s] [-a]` | create a model, and with the options its migration, controller, factory and seeder |
 | `dox make:migration <name> [--sql]` | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
@@ -120,6 +126,13 @@ dox make:controller Blog --model=Post  # resource controller that uses the Post 
 dox make:middleware Auth        # lib/app/http/middleware/auth.middleware.dart
 dox make:dto CreateBlog         # lib/app/dtos/create_blog/create_blog.dto.dart
 dox make:serializer Blog        # lib/app/serializers/blog.serializer.dart
+dox make:provider Cache         # lib/providers/cache_provider.dart
+dox make:command send_report    # lib/app/commands/send_report_command.dart, run it with dox app:send-report
+dox make:mail Welcome           # lib/app/mail/welcome_mail.dart and resources/views/emails/welcome.dox.html
+dox make:mail Welcome --no-view # the mail only, with a plain text body
+dox make:view emails/welcome    # resources/views/emails/welcome.dox.html
+dox make:test Ping              # test/ping_test.dart, starts the app with DoxTestClient
+dox make:test Math --unit       # test/math_test.dart, a plain test
 dox make:model Blog -m          # lib/app/models/blog/blog.model.dart and a create_blogs_table migration
 dox make:model Blog -mcr        # model, migration and a resource controller
 dox make:model Blog -a          # model, migration, factory, seeder and a resource controller
@@ -129,6 +142,7 @@ dox make:migration create_blogs_table --sql    # .sql file
 
 - `-r` (or `--resource`) adds the methods `index`, `create`, `store`, `show`, `edit`, `update` and `destroy`. `--api` adds the same methods without `create` and `edit`.
 - `make:model` options: `-m` migration, `-c` controller, `-r` resource controller, `--api` resource controller without `create` and `edit`, `-f` factory, `-s` seeder, `-a` migration, factory, seeder and resource controller. Join them, like `-mfs`. See [CLI reference](../reference/cli.md#dox-makemodel).
+- `dox route:list` prints the routes of the app. See [`dox route:list`](../reference/cli.md#dox-routelist).
 - Word breaks are kept. `BlogPost` makes `blog_post.controller.dart` with the class `BlogPostController`.
 - After `make:controller` or `make:dto`, run `dox build_runner:build` (or keep `dox serve` running). See [Validation](../the-basic/validation.md).
 - The table of a model is its name in plural snake case: `BlogPost` makes `blog_posts`. The model gets `@DoxModel(table: 'blog_posts')`.

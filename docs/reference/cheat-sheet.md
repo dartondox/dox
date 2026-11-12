@@ -51,6 +51,12 @@ dox make:model Blog -m             # model + migration
 dox make:model Blog -a             # + migration, factory, seeder, resource controller
 dox make:migration create_blogs_table [--sql]
 dox make:job SendWelcomeEmail
+dox make:provider Cache
+dox make:command send_report       # run it with dox app:send-report
+dox make:mail Welcome [--no-view]
+dox make:view emails/welcome
+dox make:test Ping [--unit]
+dox route:list [--json]            # no server start
 dox migrate                        # migration:run
 dox migrate --seed                 # then run the seeders
 dox migration:rollback --step=1

@@ -82,6 +82,8 @@ dox:
   commands: package:my_app/commands.dart
 ```
 
+To make the command file, run `dox make:command send_report`. It writes `lib/app/commands/send_report_command.dart`, adds the command to `lib/app/commands/commands.dart`, and sets the `dox: commands:` key for you. The command name is `app:send-report`. See [`dox make:command`](../reference/cli.md#dox-makecommand).
+
 ## Exit codes and errors
 
 - When `run` ends, `dox` exits with code 0.

@@ -258,6 +258,8 @@ class WelcomeMail extends Mailable {
 }
 ```
 
+To make a mailable, run `dox make:mail Welcome`. It writes `lib/app/mail/welcome_mail.dart` and the view `resources/views/emails/welcome.dox.html`. Add `--no-view` for a mail with a plain text body and no view. See [`dox make:mail`](../reference/cli.md#dox-makemail).
+
 Then send it, or put it on the queue:
 
 ```dart
