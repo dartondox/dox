@@ -20,6 +20,8 @@ Put your tests in the `test/` folder. Run them with:
 dart test
 ```
 
+To make a test file, run `dox make:test Ping`. It writes `test/ping_test.dart` with a `DoxTestClient`. Add `--unit` for a plain test that does not start the app. See [`dox make:test`](../reference/cli.md#dox-maketest).
+
 ## Test HTTP routes
 
 `DoxTestClient` from `package:dox_core/testing.dart` starts your app inside the test and sends requests to it.

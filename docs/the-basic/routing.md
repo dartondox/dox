@@ -48,6 +48,8 @@ See [Dependency injection: routers and providers](dependency-injection.md#router
 
 The leading `/` in a path is optional. `'ping'` and `'/ping'` are the same route.
 
+To see every route of your app, run `dox route:list`. It does not start the server. See [`dox route:list`](../reference/cli.md#dox-routelist).
+
 ## Route methods
 
 ```dart

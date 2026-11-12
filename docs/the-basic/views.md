@@ -26,6 +26,8 @@ class AppViewProvider extends ViewProvider {
 }
 ```
 
+To make a view file, run `dox make:view emails/welcome`. It writes `resources/views/emails/welcome.dox.html`. See [`dox make:view`](../reference/cli.md#dox-makeview).
+
 ## Render a view
 
 `view()` renders a template and sends it as HTML. Leave out the `.dox.html` extension.

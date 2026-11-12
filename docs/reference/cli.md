@@ -12,12 +12,12 @@ How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 
 Rules that apply to every command:
 
-- `dox` with no command prints `Could not find a command. Run `dox help` for more information.` and exits with code 1.
-- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`, and a hint about the `dox: commands:` key. It exits with code 1.
+- `dox` with no command prints ``Could not find a command. Run `dox help` for more information.`` and exits with code 1.
+- An unknown command prints ``Could not find a command named "<name>". Run `dox help` for more information.``, and a hint about the `dox: commands:` key. It exits with code 1.
 - A command that is not built in can come from a package or from the app. See [Package commands](../digging-deeper/package-commands.md).
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
-- Every `make:*` command also answers to its `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
+- Many `make:*` commands also answer to a `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
 - A `make:*` command does not overwrite. When the file exists it prints `<name> already exists` and stops.
 
 ## Project
@@ -151,7 +151,7 @@ Writes `lib/config/env.dart`, the typed env class, from `.env.example`.
 
 - Stops with `.env.example is missing.` (exit code 1) when there is no example file.
 - Stops with `lib/config/env.dart is already there. Delete it to make it again.` (exit code 1) when the file exists.
-- Prints `Run `dart run build_runner build` to make env.g.dart.` when done.
+- Prints ``Run `dart run build_runner build` to make env.g.dart.`` when done.
 
 Rules for each key: a whole number (like `3000` or `-1`) gives `int get x => <value>;`, `true`/`false` give `bool get x => <value>;`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
 
@@ -166,7 +166,7 @@ dox env:check
 Loads `AppEnv` from `lib/config/env.dart` with the real environment and `.env`. Prints `The env is valid.` or an `EnvException` with every missing or bad key (exit code 1).
 
 It writes a small script to `.dart_tool/dox/env_check.dart` and runs it with `dart run`. It needs `lib/config/env.dart` and a `name:` in `pubspec.yaml`.
-Without `lib/config/env.dart` it prints `lib/config/env.dart is missing. Run `dox env:generate` first.` (exit code 1).
+Without `lib/config/env.dart` it prints ``lib/config/env.dart is missing. Run `dox env:generate` first.`` (exit code 1).
 
 Source: `lib/src/tools/env_tools.dart` (`envCheck`).
 
@@ -223,7 +223,7 @@ Aliases: `--help`, `-h`. Without a command: lists every command by category. Wit
 dox make:controller <name> [-r|--resource] [--api] [--model=<model>]
 ```
 
-Alias: `create:controller`. The other `make:*` commands below have the same kind of alias.
+Alias: `create:controller`. Some other `make:*` commands have a `create:*` alias too. The Command list table at the end shows which.
 
 | Option | Meaning |
 | --- | --- |
@@ -264,7 +264,7 @@ dox make:dto <name>
 
 Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
 The class name has no `Dto` at the end: `dox make:dto CreateBlog` gives the class `CreateBlog` in `lib/app/dtos/create_blog/create_blog.dto.dart`.
-A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.`
+A trailing `Dto` in the name is removed. Prints ``Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.``
 
 Template: `_getSample` in `lib/src/tools/create_dto.dart`.
 
@@ -278,6 +278,93 @@ Writes `lib/app/serializers/<name>.serializer.dart`: a class `<Name>Serializer e
 A trailing `Serializer` in the name is removed.
 
 Template: `_getSample` in `lib/src/tools/create_serializer.dart`.
+
+### `dox make:provider`
+
+```
+dox make:provider <name>
+```
+
+Writes `lib/providers/<name>_provider.dart`: a class `<Name>Provider extends DoxProvider` with an empty `setup()` and an optional `shutdown()`.
+A trailing `Provider` in the name is removed: `dox make:provider Cache` gives `CacheProvider` in `lib/providers/cache_provider.dart`.
+Prints ``Run `dox build_runner:build` to add it to the container.`` Dox finds the provider after that. See [Providers](../digging-deeper/providers.md).
+
+Template: `createProvider` in `lib/src/tools/make_files.dart`.
+
+### `dox make:command`
+
+```
+dox make:command <name>
+```
+
+Writes `lib/app/commands/<name>_command.dart`: a class `<Name>Command extends Command`. Its name is `app:<name>`, and `_` in the name becomes `-`. So `dox make:command send_report` makes the command `app:send-report`.
+A trailing `Command` in the name is removed.
+
+It also does two more things:
+
+- It adds the class to the `commands` list in `lib/app/commands/commands.dart`. It makes that file when it is missing.
+- It adds `commands: package:<app>/app/commands/commands.dart` under `dox:` in `pubspec.yaml`, when that key is not set.
+
+Then it prints ``Run `dart pub get`, then `dox app:send-report`.``
+
+It makes all the changes or none. When `pubspec.yaml` or `commands.dart` is not in the shape it expects, it prints what to add by hand, exits with code 1 and writes nothing. When `dox: commands:` already points to another library, it does the same.
+
+See [Package commands](../digging-deeper/package-commands.md#add-a-command-to-your-app).
+
+Template: `createCommand` in `lib/src/tools/make_files.dart`.
+
+### `dox make:mail`
+
+```
+dox make:mail <name> [--no-view]
+```
+
+| Form | Writes |
+| --- | --- |
+| plain | `lib/app/mail/<name>_mail.dart` and the view `resources/views/emails/<name>.dox.html` |
+| `--no-view` | `lib/app/mail/<name>_mail.dart` only, with a plain text body |
+
+The class is `<Name>Mail extends Mailable`. It takes the recipient `Address` in its constructor. A comment shows how to send it and how to queue it. A trailing `Mail` in the name is removed.
+With the view, the mail has `view` set to `emails/<name>` and a `data` map with `name`. With `--no-view`, it has a `text` getter.
+It makes both files or none.
+
+After it writes the files, it prints a hint for each package that `pubspec.yaml` does not have yet: `dox_mailer`, and `dox_view` when there is a view.
+With a view, it also prints that the default view settings work (`resources/views`), and that you only add a `ViewProvider` with a `ViewConfig` to change them.
+
+See [Mail](../digging-deeper/mail.md#mailables).
+
+Template: `createMail` in `lib/src/tools/make_files.dart`.
+
+### `dox make:view`
+
+```
+dox make:view <name>
+```
+
+Writes `resources/views/<name>.dox.html` with a small sample: `<h1>Hello, {{ name }}</h1>`.
+A name with `/` makes a folder: `dox make:view emails/welcome` writes `resources/views/emails/welcome.dox.html`.
+Each part of the name becomes `snake_case`: `Pages/About` gives `resources/views/pages/about.dox.html`.
+
+See [Views](../the-basic/views.md).
+
+Template: `createView` in `lib/src/tools/make_files.dart`.
+
+### `dox make:test`
+
+```
+dox make:test <name> [--unit]
+```
+
+| Form | Writes |
+| --- | --- |
+| plain | `test/<name>_test.dart` that starts the app with `DoxTestClient` and checks `GET /ping` for status 200. Change the path to match your route. |
+| `--unit` | `test/<name>_test.dart` with a plain `package:test` test. It does not start the app. |
+
+A trailing `Test` in the name is removed.
+
+See [Testing](../digging-deeper/testing.md).
+
+Template: `createTest` in `lib/src/tools/make_files.dart`.
 
 ### `dox make:model`
 
@@ -346,6 +433,58 @@ The Dart template depends on the name:
 | anything else | a comment | a comment |
 
 Templates: `dartMigrationSource`, `migrateEntrySource` and `_sampleSql` in `lib/src/tools/create_migration.dart`.
+
+## Routes
+
+### `dox route:list`
+
+```
+dox route:list [--json]
+```
+
+Prints every route of the app: method, path, name, handler and middleware. Run it in the app folder.
+
+```
+METHOD  PATH           NAME  HANDLER             MIDDLEWARE
+GET     /api/ping            ApiController.pong  LogMiddleware
+GET     /ping                WebController.pong  LogMiddleware
+GET     /docs                serve
+GET     /openapi.json        serve
+GET     /openapi.yaml        serve
+
+5 routes
+```
+
+| Option | Meaning |
+| --- | --- |
+| `--json` | Print the same data as one JSON list. |
+
+```bash
+dox route:list --json
+```
+
+```json
+[{"method":"GET","path":"/api/ping","name":null,"handler":"ApiController.pong","middleware":["LogMiddleware"]}]
+```
+
+Each item has `method`, `path`, `name`, `handler` and `middleware`. The example shows the first route only.
+
+How to read the table:
+
+- A controller route shows `Controller.method`. A function shows its name, or `Closure` when it has none.
+- Fallback routes have the method `FALLBACK`. Handlers added with `Route.mount` have the method `MOUNT`.
+- A `Route.websocket` route shows `WebSocket` as its handler.
+- A route with a domain shows the domain in front of the path.
+
+It does not start the server. It writes a small script to `.dart_tool/dox/route_list.dart` and runs it. The script loads the routes of your routers with `Dox().loadRoutes()`.
+
+Providers do not run. A route that a provider adds in `setup()` is not in the list. The Socket.IO mount is one example.
+
+Your `dox_core` must have `Dox().loadRoutes()`.
+
+Errors go to stderr, so `--json` output stays clean for scripts. Without a Dox app in the folder, or with an unknown option, the command exits with code 1.
+
+Source: `lib/src/tools/route_list.dart`.
 
 ## Migrations
 
@@ -494,6 +633,12 @@ See [Scheduler](../digging-deeper/scheduler.md) for the task methods. See [Queue
 | `make:controller` | `create:controller` | Development |
 | `make:middleware` | `create:middleware` | Development |
 | `make:dto` | `create:dto` | Development |
+| `make:provider` | | Development |
+| `make:command` | | Development |
+| `make:mail` | | Development |
+| `make:view` | | Development |
+| `make:test` | | Development |
+| `route:list` | | Development |
 | `build` | | Build |
 | `build_runner:build` | | Build Runner |
 | `build_runner:watch` | | Build Runner |

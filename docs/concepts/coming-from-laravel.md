@@ -358,7 +358,7 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | `php artisan serve` | `dox serve` (or `dox s`), with hot restart and `build_runner watch` |
 | `php artisan make:resource` | `dox make:serializer` |
 | `php artisan key:generate` | `dox key:generate` |
-| `php artisan route:list` | not there. Use the OpenAPI docs page at `/docs`. |
+| `php artisan route:list` | `dox route:list` (also `--json`) |
 | `php artisan tinker` | not there |
 | `php artisan optimize` | `dox build` (one native binary in `build/bundle`) |
 | `php artisan queue:work` | `dox queue:work` |

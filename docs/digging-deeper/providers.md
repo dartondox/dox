@@ -40,6 +40,8 @@ class ORMProvider extends DoxProvider {
 }
 ```
 
+To make the file, run `dox make:provider Cache`. It writes `lib/providers/cache_provider.dart` with an empty `setup()`. See [`dox make:provider`](../reference/cli.md#dox-makeprovider).
+
 ## Register it
 
 You do not need to. Dox finds every class that extends `DoxProvider`.
