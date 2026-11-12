@@ -322,6 +322,7 @@ The default `chunkSize` is `1000`.
 - Relations of `preload()` load for each chunk.
 - In a transaction on Postgres or MySQL, `cursor()` with `preload()` throws a `StateError`.
   The one connection of the transaction is busy. Use `lazy()` there.
+- In a transaction on Postgres or MySQL, do not run another query of the same transaction inside a `cursor()` loop. It waits forever, because the stream holds the one connection. Use `lazy()` there.
 - Query listeners and the [slow query log](index.md#slow-query-log) see a `cursor()` query once, when its first chunk comes.
   The time is the time to the first chunk.
 

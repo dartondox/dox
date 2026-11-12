@@ -292,7 +292,7 @@ Keys of `extra`:
 | postgres, mysql | `threads` | `int` | `1` | Rust threads of the native driver. Only the first pool sets it. |
 | postgres, mysql | `requestTimeout` | `Duration` | 300 s | The longest wait for one request (a free connection, the connect and the query). Over it, the request fails. |
 | postgres, mysql | `maxConnectionAge` | `Duration` | none on Postgres, 12 hours on MySQL | Close a connection older than this, once it has no query. |
-| postgres, mysql | `idleTimeout` | `Duration` | kept on Postgres, 12 hours on MySQL | Close a free connection that is not used for this long. |
+| postgres, mysql | `idleTimeout` | `Duration` | no limit on Postgres, 12 hours on MySQL | Close a free connection that is not used for this long. |
 | mysql | `serverKill` | `bool` | `true` | Stop a cancelled or timed out query on the server with `KILL`. Set `false` behind a proxy like ProxySQL. |
 | mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |

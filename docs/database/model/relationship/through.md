@@ -44,11 +44,14 @@ class Country extends CountryGenerator {
   Post? latestPost;
 
   static Model<Post> newest(Post q) {
-    q.orderBy('post.id', 'desc');
+    q.orderBy('post.id');
     return q;
   }
 }
 ```
+
+With `HasOneThrough`, when several rows match, the last row of the query wins.
+So `newest` orders by `post.id` from low to high, and the highest id is the last row.
 
 Run `dart run build_runner build` after you add a relationship.
 

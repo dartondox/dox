@@ -111,7 +111,7 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 | `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
 | `requestTimeout` | 300 s | The longest wait for one request. |
 | `maxConnectionAge` | no limit | A connection older than this is closed once it has no query. |
-| `idleTimeout` | kept | A free connection not used for this long is closed. |
+| `idleTimeout` | no limit | A free connection not used for this long is closed. |
 | `sslMode` | `disable` | TLS mode, see [TLS](#tls). |
 | `sslRootCert` | none | Path of a PEM file with the CA certificates to trust for `verify-ca` and `verify-full`, see [TLS](#tls). |
 | `timeZone` | `UTC` | Time zone of the session. |
@@ -176,7 +176,7 @@ PgNativePool pool = PgNativePool.open(
 
 - `requestTimeout` (default 300 s): the longest wait for one request. A request is a free connection, the connect and the query. Over it, the request fails with a `PgException` that says `timeout`. A CancelRequest stops the query on the server, and its connection is closed. A transaction with no request for this long is rolled back.
 - `maxConnectionAge` (default: no limit): a connection older than this is closed when it is next free. It is never closed while a query or a transaction uses it. This helps behind a load balancer, or to follow a DNS change after a failover.
-- `idleTimeout` (default: kept): a free connection that is not used for this long is closed. A new one opens when it is needed.
+- `idleTimeout` (default: no limit): a free connection that is not used for this long is closed. A new one opens when it is needed.
 
 `fromUrl` takes the same three. Isolates share one pool only when all settings are the same.
 

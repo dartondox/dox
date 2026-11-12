@@ -82,6 +82,39 @@ also give `driver.pool.handle` (an `int`) to another isolate and use
 
 A `CREATE`, `ALTER`, `RENAME` or `DROP` makes every connection prepare its statements again. If your app runs `CREATE TEMP TABLE` or `DROP` on every request, this happens each time. Do it once at start up, not per request.
 
+## Use it without the ORM
+
+```dart
+MysqlNativePool pool = MysqlNativePool.open(
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'app',
+);
+
+MysqlNativeResult result = await pool.query(
+  'SELECT id, name FROM users WHERE id = ?',
+  parameters: <Object?>[1],
+);
+print(result.rows); // [{id: 1, name: Ada}]
+
+MysqlNativeResult insert = await pool.query(
+  'INSERT INTO users (name) VALUES (@name)',
+  parameters: <String, dynamic>{'name': 'Bob'},
+);
+print(insert.insertId); // the new AUTO_INCREMENT id
+print(insert.affectedRows); // 1
+
+int tx = await pool.begin();
+await pool.execute('UPDATE users SET name = ?', parameters: <Object?>['Cy'], transaction: tx);
+await pool.commit(tx); // or pool.rollback(tx)
+```
+
+- `parameters` is a list for `?`, or a map for `@name`.
+- `execute` is like `query`, but the rows are not sent back to Dart.
+- A transaction runs on one connection. Its queries run in the order you
+  send them.
+
 ## Pool settings
 
 All are optional. In the ORM, put them in `extra` (see [Pool settings](index.md#pool-settings)).
@@ -102,7 +135,7 @@ MysqlNativePool pool = MysqlNativePool.open(
 ```
 
 - `requestTimeout` (default 300 s): the longest wait for one request. A request is a free connection, the connect and the query. Over it, the request fails, and its connection is closed. A transaction with no request for this long is rolled back.
-- `maxConnectionAge` (default 12 hours in the ORM): a connection older than this is closed once it has no query. It is a real age, also for a busy connection.
+- `maxConnectionAge` (default: 12 hours in the ORM config, no limit in `MysqlNativePool.open`): a connection older than this is closed once it has no query. It is a real age, also for a busy connection.
 - `idleTimeout` (default 12 hours): a connection with no traffic for this long is closed once it has no query.
 - `serverKill` (default `true`): the driver stops a cancelled or timed out query on the server with `KILL QUERY`, sent on a new connection. In a url, the option is `server_kill`.
 
@@ -150,39 +183,6 @@ await for (MysqlNativeResult chunk in pool.stream('SELECT * FROM logs', chunkSiz
 - The server stops a connection whose client does not read for `net_write_timeout` (60 s by default). Do not pause a stream for longer.
 
 In the ORM, use [`cursor()`](query-builder.md#lazy-lazybyid-and-cursor).
-
-## Use it without the ORM
-
-```dart
-MysqlNativePool pool = MysqlNativePool.open(
-  host: 'localhost',
-  user: 'root',
-  password: 'password',
-  database: 'app',
-);
-
-MysqlNativeResult result = await pool.query(
-  'SELECT id, name FROM users WHERE id = ?',
-  parameters: <Object?>[1],
-);
-print(result.rows); // [{id: 1, name: Ada}]
-
-MysqlNativeResult insert = await pool.query(
-  'INSERT INTO users (name) VALUES (@name)',
-  parameters: <String, dynamic>{'name': 'Bob'},
-);
-print(insert.insertId); // the new AUTO_INCREMENT id
-print(insert.affectedRows); // 1
-
-int tx = await pool.begin();
-await pool.execute('UPDATE users SET name = ?', parameters: <Object?>['Cy'], transaction: tx);
-await pool.commit(tx); // or pool.rollback(tx)
-```
-
-- `parameters` is a list for `?`, or a map for `@name`.
-- `execute` is like `query`, but the rows are not sent back to Dart.
-- A transaction runs on one connection. Its queries run in the order you
-  send them.
 
 ## Types
 

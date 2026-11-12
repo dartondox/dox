@@ -322,7 +322,7 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | `threads` | Postgres, MySQL | `1` | Rust threads of the native driver. |
 | `requestTimeout` | Postgres, MySQL | 300 s | The longest wait for one request. |
 | `maxConnectionAge` | Postgres, MySQL | none on Postgres, 12 hours on MySQL | A connection older than this is closed once it has no query. |
-| `idleTimeout` | Postgres, MySQL | kept on Postgres, 12 hours on MySQL | A connection not used for this long is closed. |
+| `idleTimeout` | Postgres, MySQL | no limit on Postgres, 12 hours on MySQL | A connection not used for this long is closed. |
 | `serverKill` | MySQL | `true` | Stop a cancelled or timed out query on the server with `KILL`. |
 | `preparedStatementCacheSize` | MySQL, SQLite | `100` | Prepared statements kept per connection. |
 | `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require`, `verify-ca` or `verify-full`. |
