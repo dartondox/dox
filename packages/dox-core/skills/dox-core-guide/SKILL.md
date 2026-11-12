@@ -111,12 +111,15 @@ Route.middleware(<dynamic>[ApiKeyMiddleware()], () {  // middleware for every ro
 });
 Route.get('/users/{id}', (UserController c) => c.show).name('users.show');
 route('users.show', params: <String, Object>{'id': 5}); // '/users/5'
+route('users.show', params: <String, Object>{'id': 5, 'tab': 'a'}); // '/users/5?tab=a'
+route('users.show', params: <String, Object>{'id': 5}, absolute: true); // APP_URL + '/users/5'
 Route.get('/users/{id}', (UserController c) => c.show).where('id', '[0-9]+');
 Route.get('/posts/{page?}', (int? page) => 'page ${page ?? 1}'); // optional param
 Route.health('/health');                          // answers 200 {"status": "ok"}
 ```
 
 - `Route.resource` skips a method that the controller does not have.
+- A `route()` param that is not in the path goes to the query string. When `params` and `query` have the same key, `query` wins.
 - Do not add the same method and path twice.
 
 ## Controllers

@@ -1,5 +1,7 @@
 ## Unreleased
 
+- New: `route()` and `Route.url()` put a param that is not in the path into the query string. Before, it threw an `ArgumentError`. When `params` and `query` have the same key, `query` wins.
+- New: `route(..., absolute: true)` and `Route.url(..., absolute: true)` give the full url, with `APP_URL` (or `baseUrl:`) in front, like `Route.signedUrl`.
 - New: `Dox().addGlobalMiddleware(middleware)`. A provider calls it in `setup()` to add global middleware. They run on every route (and on mounts), before the app's `globalMiddleware`. The same middleware added twice runs once. `Dox().allGlobalMiddleware` gives the full list.
 - Ships an AI agent skill (dox-core-guide). Install it in your app with `dart run skills@ get`.
 - Requires Dart 3.14 or newer.
