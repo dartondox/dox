@@ -158,6 +158,19 @@ class User {
       expect(out, isNot(contains("m['full_name']")));
     });
 
+    test('onTrashed alone is a hook', () async {
+      String out = await _generate('''
+@DoxModel(softDelete: true)
+class Note {
+  @Column()
+  String? name;
+
+  void onTrashed() {}
+}
+''');
+      expect(out, contains('bool get hasModelHooks => true;'));
+    });
+
     test('no computed getters, no setComputedValues override', () async {
       String out = await _generate('''
 @DoxModel()
