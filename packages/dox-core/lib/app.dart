@@ -322,6 +322,8 @@ class Dox {
   /// the same kinds as `globalMiddleware`. Use a top-level function or a
   /// const instance, so a restart does not add it twice. The list is
   /// cleared at each start, before the providers run.
+  /// Add it from a provider's `setup()`, which runs on every start.
+  /// Anything added before the app starts is cleared.
   void addGlobalMiddleware(Object middleware) {
     GlobalMiddleware.add(middleware);
   }

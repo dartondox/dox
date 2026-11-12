@@ -5,6 +5,7 @@ import 'dart:collection';
 ///
 /// dox_core clears the list each time the app starts, before the
 /// providers run `setup()`. So add from `setup()`.
+/// Anything added before the app starts is cleared.
 class GlobalMiddleware {
   static final List<Object> _items = <Object>[];
   static List<Object> _view = UnmodifiableListView<Object>(_items);
