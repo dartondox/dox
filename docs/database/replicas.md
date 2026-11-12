@@ -89,6 +89,8 @@ await ReplicaDriver.stickyScope(() async {
 ```
 
 A sticky query outside any scope prints a warning once.
+A new app prints this warning once at start, because the migrations run before the server starts.
+This one warning at start is expected.
 
 ## With `DATABASE_URL`
 

@@ -137,7 +137,7 @@ MysqlNativePool pool = MysqlNativePool.open(
 - `requestTimeout` (default 300 s): the longest wait for one request. A request is a free connection, the connect and the query. Over it, the request fails, and its connection is closed. A transaction with no request for this long is rolled back.
 - `maxConnectionAge` (default: 12 hours in the ORM config, no limit in `MysqlNativePool.open`): a connection older than this is closed once it has no query. It is a real age, also for a busy connection.
 - `idleTimeout` (default 12 hours): a connection with no traffic for this long is closed once it has no query.
-- `serverKill` (default `true`): the driver stops a cancelled or timed out query on the server with `KILL QUERY`, sent on a new connection. In a url, the option is `server_kill`.
+- `serverKill` (default `true`): the driver stops a cancelled or timed out query on the server with `KILL QUERY`, sent on a new connection. In the url of `MysqlNativePool.fromUrl`, the option is `server_kill`. In `DATABASE_URL` of the ORM, use `?serverKill=false`.
 
 A connection that runs a query is never closed by these.
 

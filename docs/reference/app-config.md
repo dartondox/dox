@@ -306,8 +306,6 @@ Keys of `extra`:
 
 A time key takes a `Duration`, or a number of seconds. See [Pool settings](../database/index.md#pool-settings).
 
-The `database.dart` of a new project also sets `collation` for MySQL. No driver reads `collation`, so it changes nothing.
-
 ## AuthConfig
 
 Auth is not a field of `AppConfig`. A provider calls `Auth.initialize(AuthConfig(...))` in its `setup()`.

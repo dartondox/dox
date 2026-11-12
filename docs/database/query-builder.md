@@ -335,7 +335,14 @@ Give a `QueryCancelToken` to a query with `cancelWith()`.
 QueryCancelToken token = QueryCancelToken();
 Future<List<Actor>> actors = Actor().where('age', '>', 18).cancelWith(token).get();
 
-token.cancel(); // the query throws PgQueryCancelledException or MysqlQueryCancelledException
+token.cancel();
+try {
+  await actors;
+} on PgQueryCancelledException {
+  // Postgres: the query was stopped
+} on MysqlQueryCancelledException {
+  // MySQL: the query was stopped
+}
 ```
 
 - A token that is cancelled already fails a new query at once.

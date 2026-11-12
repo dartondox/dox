@@ -9,7 +9,7 @@ icon: lucide/hash
 It does not load the rows. It adds a subquery to the select,
 so you get the counts with the same query.
 
-It works with `hasOne`, `hasMany`, `manyToMany`, `morphOne` and `morphMany` relations.
+It works with `hasOne`, `hasMany`, `hasOneThrough`, `hasManyThrough`, `manyToMany`, `morphOne` and `morphMany` relations.
 
 ```dart
 @DoxModel()
