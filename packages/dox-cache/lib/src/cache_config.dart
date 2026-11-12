@@ -1,3 +1,4 @@
+import 'cache_encrypter.dart';
 import 'cache_lock.dart';
 
 /// Cache settings.
@@ -17,6 +18,7 @@ class CacheConfig {
     required this.defaultStore,
     required this.stores,
     this.flags = const CacheFlags(),
+    this.encrypter,
   });
 
   /// Name of the store used by `CacheManager.store()`.
@@ -27,6 +29,11 @@ class CacheConfig {
 
   /// Opt-in behaviors that change the defaults. All off by default.
   final CacheFlags flags;
+
+  /// Used by every store with `'encrypt': true` (file and Redis stores).
+  /// A store with that option and no encrypter throws a [StateError]
+  /// when it is built.
+  final CacheEncrypter? encrypter;
 }
 
 /// Opt-in behaviors of the cache that change the defaults. Every flag is

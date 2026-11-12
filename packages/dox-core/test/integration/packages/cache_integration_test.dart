@@ -12,6 +12,11 @@ AppConfig config = AppConfig(
     stores: <String, Map<String, dynamic>>{
       'memory': <String, dynamic>{'driver': 'memory'},
       'file': <String, dynamic>{'driver': 'file', 'path': 'storage/test-cache'},
+      'secret': <String, dynamic>{
+        'driver': 'file',
+        'path': 'storage/test-cache-secret',
+        'encrypt': true,
+      },
     },
   ),
   exceptionHandler: const _QuietExceptionHandler(),
@@ -24,8 +29,13 @@ void main() {
 
   tearDownAll(() async {
     await Dox().cache.close();
-    Directory dir = Directory('storage/test-cache');
-    if (dir.existsSync()) dir.deleteSync(recursive: true);
+    for (String path in <String>[
+      'storage/test-cache',
+      'storage/test-cache-secret',
+    ]) {
+      Directory dir = Directory(path);
+      if (dir.existsSync()) dir.deleteSync(recursive: true);
+    }
   });
 
   group('Cache facade |', () {
@@ -69,6 +79,47 @@ void main() {
         expect(await Cache().store(store).decrement('n'), 1);
       });
     }
+
+    test('encrypt: true works with the APP_KEY and no encrypter', () async {
+      await Cache().store('secret').put('card', 'card-1234-secret');
+      expect(await Cache().store('secret').get('card'), 'card-1234-secret');
+      expect(await Cache().store('secret').increment('n'), 1);
+      for (FileSystemEntity file in Directory(
+        'storage/test-cache-secret',
+      ).listSync(recursive: true).whereType<File>()) {
+        expect((file as File).readAsStringSync(), isNot(contains('card-1234')));
+      }
+    });
+
+    test(
+      'encrypt: true works on Redis with the APP_KEY',
+      () async {
+        CacheManager manager = CacheManager(
+          CacheConfig(
+            defaultStore: 'redis',
+            stores: <String, Map<String, dynamic>>{
+              'redis': <String, dynamic>{
+                'driver': 'redis',
+                'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
+                'port': int.parse(Platform.environment['REDIS_PORT'] ?? '6379'),
+                'prefix': 'dox_core_enc_test:',
+                'encrypt': true,
+              },
+            },
+            encrypter: const CryptCacheEncrypter(),
+          ),
+        );
+        Cache cache = Cache(manager: manager);
+        await cache.put('card', 'card-1234-secret');
+        expect(await cache.get('card'), 'card-1234-secret');
+        expect(await cache.increment('n'), 1);
+        await manager.store().flush();
+        await manager.close();
+      },
+      skip: Platform.environment['REDIS_PORT'] == null
+          ? 'set REDIS_PORT to run it'
+          : false,
+    );
 
     test('default store comes from the config', () async {
       await Cache().put('default', 'memory');

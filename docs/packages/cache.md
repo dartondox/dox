@@ -234,6 +234,42 @@ On Redis, a prefix with no `:` at the end gets one, so `app` does not match the 
     `flush` deletes only the keys with the prefix. It never runs `FLUSHDB`.
     An empty prefix makes `flush` throw.
 
+## Encrypt the cache
+
+By default the cache keeps plain JSON. Anyone who can read the cache file or the Redis database can read the values.
+To hide them, add `'encrypt': true` to a `file` or `redis` store, and give the config an encrypter. In a Dox app, the normal `Dox().cache` has the encrypter set for you. A `CacheManager` you build yourself needs `encrypter:` (for example `const CryptCacheEncrypter()`). Without Dox, write your own class:
+
+```dart
+class MyEncrypter implements CacheEncrypter {
+  @override
+  String encrypt(String text) => myEncrypt(text);
+
+  @override
+  String decrypt(String text) => myDecrypt(text); // throw on bad input
+}
+
+CacheConfig(defaultStore: 'file', stores: stores, encrypter: MyEncrypter());
+```
+
+Then turn it on per store:
+
+```dart
+'file': {'driver': 'file', 'path': 'storage/cache', 'encrypt': true},
+```
+
+- It is off by default. A store without the option is not changed.
+- In a Dox app the values are encrypted with your `APP_KEY`. Old keys in `previousKeys` can still read old entries.
+- When the key changes, the old entries cannot be read. They count as a miss. The cache then fills again.
+- A store with `'encrypt': true` and no encrypter throws a `StateError` when it is built, for every store type.
+- On a `file` store, the whole file is encrypted, also the expiry time. Lock files are not encrypted. They hold no values.
+- On a `redis` store, a plain `int` stays plain text, so `increment` and `decrement` still work. Every other value is encrypted. Tag counters are `int` values, so they stay plain too. To keep a secret number encrypted, store it as a `String`.
+- A `memory` or `null` store does not encrypt. Its values never leave the process. The option still needs an encrypter, or building the store throws.
+- The option must be `true` or `false`. Any other type, like `'true'`, throws an `ArgumentError`.
+- Old plain values read as a miss after you turn the option on. The one exception is an `int` on Redis, which is plain by design and still reads as a value.
+- On a `file` store, `prune` deletes files that cannot be decrypted. After a key change with no previous keys, or in a folder that apps with different keys share, `prune` removes those files.
+- Cache keys and tag names are not encrypted. A value is not tied to its key, so someone who can write to Redis or the cache folder can copy an encrypted value to another key. Encryption protects against reading only.
+- `maxValueBytes` is checked on the plain JSON size. The stored encrypted text is about a third bigger.
+
 ## File driver
 
 - Each prefix has its own sub folder inside `path`. `flush` deletes only the files of that prefix.
