@@ -1,3 +1,7 @@
+## Unreleased
+
+- Requires Dart 3.14 or newer.
+
 ## 3.1.3
 
 - Version bump only, to match the other packages.

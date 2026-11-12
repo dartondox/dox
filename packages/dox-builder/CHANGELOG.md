@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Requires Dart 3.14 or newer.
 - New: DTOs read `@Dto(trim: true)`, `@Dto(coerce: true)` and `@Dto(attributes: {...})`. Needs the next dox_validation.
 - New: `@After` and `@Before` take `'today'`, `'tomorrow'`, `'yesterday'` and the input key of another `DateTime` field. New `@AfterOrEqual` and `@BeforeOrEqual`. A text that is not a date, a word or a `DateTime` field stops the build. The words and fields work with any dox_validation. `@AfterOrEqual` and `@BeforeOrEqual` need the next dox_validation.
 - New: DTOs read `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` and `@ExcludeUnless`. Each one on an always-required field stops the build, like `@RequiredIf`. Needs the next dox_validation.
