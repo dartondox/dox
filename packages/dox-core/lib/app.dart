@@ -356,6 +356,21 @@ class Dox {
     return OpenApiDocument(config.openApi).write(dir);
   }
 
+  /// register the routes of the app routers and give them, without a
+  /// server and without providers. `dox route:list` uses this.
+  /// Providers do not run, because their `setup()` may connect to a
+  /// database or start a worker. So a route that a provider adds in
+  /// `setup()` is not in the list. Call it once: a second call adds the
+  /// routes again.
+  /// ```
+  /// Dox().initialize(appConfig);
+  /// List<RouteData> routes = Dox().loadRoutes();
+  /// ```
+  List<RouteData> loadRoutes() {
+    _registerRoute();
+    return Route().routes;
+  }
+
   /// ################ end ###########
 
   /// read the parameter types of every controller once, at start.

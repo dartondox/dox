@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `Dox().loadRoutes()` registers the routes of the app routers and gives them, without a server and without providers. `dox route:list` uses it.
 - New: `CoreFlags`, opt-in behaviors that work like Laravel, as `AppConfig(flags: ...)`. All are off by default, so nothing changes until you turn one on. `CoreFlags.all()` turns on every flag. `Dox().flags` gives the flags of the current isolate.
 - New: `CoreFlags.laravelErrors` sends a `422` as `{"message": "...", "errors": {"field": ["..."]}}`. The OpenAPI `ValidationError` schema follows it.
 - New: `CoreFlags.onlyPresent` makes `req.only([...])` leave out keys that are not in the input.
