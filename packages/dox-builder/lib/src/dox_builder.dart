@@ -159,6 +159,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       }
 
       ${_getCodeForSetColumnValue(visitor)}
+      ${_getCodeForCopyColumns(visitor)}
       $computedCode
     }
     ${_getCodeForScopeExtension(visitor)}
@@ -478,6 +479,26 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
           $content
         }
         return false;
+      }
+    """;
+  }
+
+  /// `$copyColumnsFrom()` sets every column field to the field of another
+  /// model of the same class. refresh() uses it, so a column with a cast
+  /// or a beforeGet gets its value from the row too.
+  String _getCodeForCopyColumns(ModelVisitor visitor) {
+    String className = visitor.className;
+    String content = '';
+    for (String fieldName in visitor.columns.keys) {
+      content += "..$fieldName = o.$fieldName\n";
+    }
+    return """
+      @override
+      bool \$copyColumnsFrom(Model<$className> other) {
+        $className o = other as $className;
+        (this as $className)
+          $content;
+        return true;
       }
     """;
   }
