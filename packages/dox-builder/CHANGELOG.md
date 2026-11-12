@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: the OpenAPI schema of a model reads `visibleFields`, like `hidden`: with a list, only its keys are in the schema. Needs the next dox_orm for `toJson()` to match.
 - New: `onTrashed()` counts as a model hook, so a model with only that hook gets `hasModelHooks`. Needs the next dox_orm.
 - New: models get `$copyColumnsFrom()`. It copies every column field from another model of the same class. `refresh()` in the next dox_orm uses it, so it works for columns with a cast or a `beforeGet`. Nothing else calls it, so reads and saves do no extra work.
 - New: models read `@HasManyThrough` and `@HasOneThrough`. Needs the next dox_orm.
