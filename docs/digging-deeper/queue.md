@@ -857,7 +857,7 @@ A listener gets a `QueueEvent`:
 | `id` | the job id |
 | `queue` | the queue name |
 | `attempts` | the try number. `0` for `queued`, `looping` and `stopping` |
-| `error`, `stack` | the error and its stack trace, for `exceptionOccurred`, `failing` and `batchFailed` |
+| `error`, `stack` | the error and its stack trace, for `exceptionOccurred` and `failing`. `batchFailed` has `error` only |
 | `delay` | the wait, for `queued` and `released` |
 | `batch` | the `Batch`, for the [batch events](#batch-events). `null` for other events |
 
