@@ -278,6 +278,9 @@ Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_co
 | `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter(file: File('queries.log'))` or your own. `FileQueryPrinter(file: ..., buffered: true)` writes in the background, so a query does not wait for the disk. Then call `await printer.flush()` before `exit()`, or the last lines are lost. |
 | `logRedact` | `List<String>` | `[]` | Names of values to hide in the query log. A value shows as `***` when its key ends with one of these names, in any case. `['password', 'token']` hides `password`, `users.password` and `remember_token`. Only the log changes. The query gets the real values. The list of the default connection counts for every query. The list of a named connection counts too, for the queries on that connection. |
 | `slowQueryMs` | `int?` | `null` | Log each query that takes longer than this many milliseconds, with `printer`. `0` logs every query. `null` turns it off. It works with `debug` off. Values named in `logRedact` show as `***`. A failed query is not logged. |
+| `read` | `List<Map<String, dynamic>>?` | `null` | Read replica hosts. Each map can change `host`, `port`, `user`, `password`, `database` and `extra`. See [Read replicas](../database/replicas.md). |
+| `write` | `Map<String, dynamic>?` | `null` | Settings of the write host, in the same form as one `read` map. Only used with `read`. |
+| `sticky` | `bool` | `false` | With `read`: after a write, the reads of the same request go to the write host. |
 | `extra` | `Map<String, dynamic>` | `{}` | Driver options. See below. |
 | `driverFactory` | `DBDriver Function(ConnectionConfig)?` | `null` | Your own driver class. It wins over every other setting. |
 
@@ -287,6 +290,10 @@ Keys of `extra`:
 | --- | --- | --- | --- | --- |
 | postgres, mysql | `maxConnectionCount` | `int` | `10` | Most open connections, for the whole process. |
 | postgres, mysql | `threads` | `int` | `1` | Rust threads of the native driver. Only the first pool sets it. |
+| postgres, mysql | `requestTimeout` | `Duration` | 300 s | The longest wait for one request (a free connection, the connect and the query). Over it, the request fails. |
+| postgres, mysql | `maxConnectionAge` | `Duration` | none on Postgres, 12 hours on MySQL | Close a connection older than this, once it has no query. |
+| postgres, mysql | `idleTimeout` | `Duration` | kept on Postgres, 12 hours on MySQL | Close a free connection that is not used for this long. |
+| mysql | `serverKill` | `bool` | `true` | Stop a cancelled or timed out query on the server with `KILL`. Set `false` behind a proxy like ProxySQL. |
 | mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
 | postgres | `sslRootCert` | `String` | none | Path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL`. |
@@ -294,11 +301,12 @@ Keys of `extra`:
 | postgres | `timeZone` | `String` | `UTC` | Session time zone. |
 | postgres | `applicationName` | `String` | none | Name of the app in `pg_stat_activity`. |
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |
-| mysql | `maxConnectionAge` | `Duration` | 12 hours | Close and reopen a connection after this time. |
 | sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
 | sqlite | `background` | `bool` | `false` | `true` (or `1`, `'true'`, `'1'`, so `?background=true` in `DATABASE_URL` works) runs the queries in a helper isolate, so a slow query does not block the request isolate. Each query costs one message hop. See [SQLite](../database/index.md#run-queries-in-a-helper-isolate). |
 
-The `database.dart` of a new project also sets `maxConnectionAge` for Postgres and `collation` for MySQL. The Postgres driver does not read `maxConnectionAge`, and no driver reads `collation`. So these two keys change nothing.
+A time key takes a `Duration`, or a number of seconds. See [Pool settings](../database/index.md#pool-settings).
+
+The `database.dart` of a new project also sets `collation` for MySQL. No driver reads `collation`, so it changes nothing.
 
 ## AuthConfig
 

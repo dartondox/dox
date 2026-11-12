@@ -66,7 +66,10 @@ The driver reads the normal fields of the `ConnectionConfig` (`host`,
 | Key | Default | What it does |
 |---|---|---|
 | `maxConnectionCount` | `10` | Most connections in the pool. |
-| `maxConnectionAge` | 12 hours | A connection older than this is closed and opened again. |
+| `requestTimeout` | 300 s | The longest wait for one request. |
+| `maxConnectionAge` | 12 hours | A connection older than this is closed once it has no query. |
+| `idleTimeout` | 12 hours | A connection with no traffic for this long is closed. |
+| `serverKill` | `true` | Stop a cancelled or timed out query on the server with `KILL`. |
 | `preparedStatementCacheSize` | `100` | Prepared statements kept per connection. |
 | `threads` | `1` | Rust threads for all pools of the process. Only the first pool sets it. One thread is the fastest for most apps. |
 | `verifyCertificate` | `true` | With `useSSL`, TLS checks the server certificate. Set it to `false` only for a self-signed certificate in development. |
@@ -79,9 +82,74 @@ also give `driver.pool.handle` (an `int`) to another isolate and use
 
 A `CREATE`, `ALTER`, `RENAME` or `DROP` makes every connection prepare its statements again. If your app runs `CREATE TEMP TABLE` or `DROP` on every request, this happens each time. Do it once at start up, not per request.
 
-A request (pool slot, connect and query) fails after 300 s with no
-answer. A transaction that gets no request for 300 s is rolled back, so
-its connection goes back to the pool.
+## Pool settings
+
+All are optional. In the ORM, put them in `extra` (see [Pool settings](index.md#pool-settings)).
+Without the ORM, pass them to `MysqlNativePool.open`.
+A time is a `Duration`.
+
+```dart
+MysqlNativePool pool = MysqlNativePool.open(
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'app',
+  requestTimeout: const Duration(seconds: 30),
+  maxConnectionAge: const Duration(minutes: 30),
+  idleTimeout: const Duration(minutes: 5),
+  serverKill: true,
+);
+```
+
+- `requestTimeout` (default 300 s): the longest wait for one request. A request is a free connection, the connect and the query. Over it, the request fails, and its connection is closed. A transaction with no request for this long is rolled back.
+- `maxConnectionAge` (default 12 hours in the ORM): a connection older than this is closed once it has no query. It is a real age, also for a busy connection.
+- `idleTimeout` (default 12 hours): a connection with no traffic for this long is closed once it has no query.
+- `serverKill` (default `true`): the driver stops a cancelled or timed out query on the server with `KILL QUERY`, sent on a new connection. In a url, the option is `server_kill`.
+
+A connection that runs a query is never closed by these.
+
+!!! warning "Behind a proxy"
+    The `KILL` goes on a new connection.
+    Behind a proxy or a load balancer (like ProxySQL, or a cloud endpoint over many servers), that connection may reach another server.
+    The `KILL` may then hit another session.
+    Set `serverKill: false` there.
+    A cancelled query then fails in Dart at once, but it runs to its end on the server.
+    A timed out query only has its socket closed.
+
+The `KILL` connection also counts for `max_user_connections`.
+A `KILL` that fails prints a warning on stderr.
+
+## Cancel a query
+
+```dart
+MysqlCancelToken token = MysqlCancelToken();
+Future<MysqlNativeResult> slow = pool.query('SELECT SLEEP(10)', cancelToken: token);
+token.cancel(); // slow fails with MysqlQueryCancelledException
+```
+
+- `query`, `execute` and `stream` take `cancelToken`.
+- Not started yet: it does not run. Running: the driver sends `KILL QUERY`, so the server stops it (see `serverKill`). Ended already: nothing changes.
+- In a transaction, the next queries wait until the `KILL` has its answer, so it can only stop the cancelled query.
+- When more queries wait on the same connection, the cancelled one runs to its end instead, and its rows are dropped.
+- A connection that got a `KILL QUERY` closes once it has no query. Inside a transaction it stays, and the transaction goes on.
+
+In the ORM, use [`cancelWith()`](query-builder.md#cancel-a-query).
+
+## Stream rows
+
+```dart
+await for (MysqlNativeResult chunk in pool.stream('SELECT * FROM logs', chunkSize: 1000)) {
+  print(chunk.rows.length); // up to 1000
+}
+```
+
+- Each event is a chunk of up to `chunkSize` rows, with the same columns and rows as `query`.
+- Rows are read from the server as they come. Rust reads at most 2 chunks ahead of your listener. A paused listener stops the reading, so a big result does not fill the memory.
+- Stop listening (`break` in `await for`) to stop the query. It is stopped with `KILL QUERY`, and the connection is closed.
+- Outside a transaction, a stream gets a connection of its own. Pass `transaction:` to stream inside a transaction.
+- The server stops a connection whose client does not read for `net_write_timeout` (60 s by default). Do not pause a stream for longer.
+
+In the ORM, use [`cursor()`](query-builder.md#lazy-lazybyid-and-cursor).
 
 ## Use it without the ORM
 

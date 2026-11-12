@@ -320,7 +320,10 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 |---|---|---|---|
 | `maxConnectionCount` | Postgres, MySQL | `10` | Most connections in the pool. |
 | `threads` | Postgres, MySQL | `1` | Rust threads of the native driver. |
-| `maxConnectionAge` | MySQL | 12 hours | A connection older than this is opened again. |
+| `requestTimeout` | Postgres, MySQL | 300 s | The longest wait for one request. |
+| `maxConnectionAge` | Postgres, MySQL | none on Postgres, 12 hours on MySQL | A connection older than this is closed once it has no query. |
+| `idleTimeout` | Postgres, MySQL | kept on Postgres, 12 hours on MySQL | A connection not used for this long is closed. |
+| `serverKill` | MySQL | `true` | Stop a cancelled or timed out query on the server with `KILL`. |
 | `preparedStatementCacheSize` | MySQL, SQLite | `100` | Prepared statements kept per connection. |
 | `sslMode` | Postgres | `disable` | TLS mode: `disable`, `prefer`, `require`, `verify-ca` or `verify-full`. |
 | `sslRootCert` | Postgres | none | Path of a PEM file with the CA certificates to trust for `verify-ca` and `verify-full`. |
@@ -329,6 +332,35 @@ DATABASE_URL=mysql://app:secret@/app?socket=/var/run/mysqld/mysqld.sock
 | `applicationName` | Postgres | none | Name of the app in `pg_stat_activity`. |
 | `busyTimeout` | SQLite | `5000` | Milliseconds a query waits for a lock. |
 | `background` | SQLite | `false` | `true` (or `1`, `'true'`, `'1'`) runs the queries in a helper isolate. See [Run queries in a helper isolate](#run-queries-in-a-helper-isolate). |
+
+### Pool settings
+
+`requestTimeout`, `maxConnectionAge`, `idleTimeout` and `serverKill` set how the pool treats its connections.
+A time is a `Duration`, or a number of seconds.
+So `?requestTimeout=30` in `DATABASE_URL` works.
+
+```dart
+extra: <String, dynamic>{
+  'maxConnectionCount': 10,
+  'requestTimeout': const Duration(seconds: 30),
+  'maxConnectionAge': const Duration(minutes: 30),
+  'idleTimeout': const Duration(minutes: 5),
+  'serverKill': false, // MySQL only
+},
+```
+
+- `requestTimeout`: a request is a free connection, the connect and the query.
+  Over this time it fails, and its connection is closed.
+  A transaction with no request for this long is rolled back.
+- `maxConnectionAge`: a connection older than this is closed and opened again.
+  It is never closed while it runs a query or a transaction.
+  This helps behind a load balancer, or after a database failover.
+- `idleTimeout`: a free connection that is not used for this long is closed.
+- `serverKill` (MySQL): the server stops a cancelled or timed out query with `KILL QUERY`.
+  Set it to `false` behind a proxy like ProxySQL, because the `KILL` may reach another server.
+  Then a cancelled query stops in Dart at once, but it runs to its end on the server.
+
+To stop one query by hand, see [Cancel a query](query-builder.md#cancel-a-query).
 
 ### Table and column names are quoted
 
