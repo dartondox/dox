@@ -135,7 +135,7 @@ DOLLAR="\${HOME}"
 RAW='a\nb ${HOME}'
 TICK=`a\nb`
 OPEN="no end
-""");
+""", expand: true);
     expect(env['LINES'], 'a\nb\tc');
     expect(env['QUOTE'], 'say "hi" # not a comment');
     expect(env['SLASH'], r'C:\dir\x');
@@ -162,6 +162,7 @@ HOME=from-file
 REAL=${HOME}
 """,
       known: <String, String>{'DOX_KNOWN': 'k'},
+      expand: true,
     );
     expect(env['URL'], 'postgres://localhost:5432/db');
     expect(env['QUOTED'], 'localhost:5432');
@@ -175,6 +176,7 @@ REAL=${HOME}
       Env.parse(
         r'A=${DOX_KNOWN}',
         known: <String, String>{'DOX_KNOWN': 'k'},
+        expand: true,
       )['A'],
       'k',
     );
@@ -188,10 +190,26 @@ DOX_B=${DOX_A}
 LIST=a
 LIST=${LIST}:b
 LIST=${LIST}:c
-''');
+''', expand: true);
     expect(env['SELF'], r'${SELF}');
     expect(env['DOX_A'], r'${DOX_B}');
     expect(env['DOX_B'], r'${DOX_B}');
     expect(env['LIST'], 'a:b:c');
+  });
+
+  test('.env: envExpand off reads values as they are written', () {
+    Map<String, String> env = Env.parse(r'''
+DOX_X=1
+PATH_DIR="C:\new"
+QUOTE="say \"hi\""
+LITERAL=${DOX_X}
+QUOTED_LITERAL="${DOX_X}"
+export EXPORTED=yes
+''');
+    expect(env['PATH_DIR'], r'C:\new');
+    expect(env['QUOTE'], r'say \');
+    expect(env['LITERAL'], r'${DOX_X}');
+    expect(env['QUOTED_LITERAL'], r'${DOX_X}');
+    expect(env['EXPORTED'], 'yes');
   });
 }

@@ -35,12 +35,16 @@ void main() {
     });
   });
 
-  test(r'.env.testing can use ${KEY} of .env', () {
+  test(r'with envExpand, .env.testing can use ${KEY} of .env', () {
     File('${dir.path}/.env.testing').writeAsStringSync(
       r'DB_NAME=${DB_NAME}_test'
       '\n',
     );
+    expect(load(testing: true)['DB_NAME'], r'${DB_NAME}_test');
+    Env.flags = const CoreFlags(envExpand: true);
+    addTearDown(() => Env.flags = const CoreFlags());
     expect(load(testing: true)['DB_NAME'], 'app_test');
+    expect(Env().expanded, isTrue);
   });
 
   test('.env.testing is not read outside tests', () {

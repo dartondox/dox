@@ -375,8 +375,9 @@ class TimerMiddleware implements IDoxNextMiddleware {
 Read env values from the typed `env` of `lib/config/env.dart`, like `env.appPort`.
 Never call `Env.get()` on a hot path, and never put secrets in code.
 
-In `.env`, `URL=http://${HOST}:${PORT}` uses keys above it (a real env var wins). It works unquoted and in `"..."`, not in `'...'`.
-In `"..."`, `\n` and `\t` are a new line and a tab. `export KEY=value` lines work. `KEY=` (empty) gives the default.
+`export KEY=value` lines work in `.env`. `KEY=` (empty) gives the default.
+With `CoreFlags(envExpand: true)`, `URL=http://${HOST}:${PORT}` uses keys above it (a real env var wins), unquoted and in `"..."`, not in `'...'`. In `"..."`, `\n` and `\t` are a new line and a tab.
+The `.env` file is read before `AppConfig`, so also set `Env.flags = flags;` at the top of `main()`.
 
 To add a key:
 

@@ -16,6 +16,7 @@ class CoreFlags {
     this.replaceHeaders = false,
     this.decryptServerError = false,
     this.cacheCopies = false,
+    this.envExpand = false,
   });
 
   /// Every flag on.
@@ -27,7 +28,8 @@ class CoreFlags {
       htmlStrings = true,
       replaceHeaders = true,
       decryptServerError = true,
-      cacheCopies = true;
+      cacheCopies = true,
+      envExpand = true;
 
   /// A 422 answer is `{"message": "...", "errors": {"field": ["..."]}}`,
   /// with all messages of each field. Off: `{"field": "first message"}`.
@@ -70,4 +72,21 @@ class CoreFlags {
   /// the first one does not change. Off: they change the same object.
   // NEXT MAJOR: make this the default, then remove the flag.
   final bool cacheCopies;
+
+  /// `.env` values can use `${OTHER}` (unquoted or in `"..."`), and a
+  /// `"..."` value reads `\n`, `\t`, `\"`, `\\` and `\$`. Off: values are
+  /// read as they are written.
+  ///
+  /// The `.env` file is read before `AppConfig` is made (the config reads
+  /// env values). So also set `Env.flags` at the top of `main()`, before
+  /// any env value is read:
+  /// ```
+  /// const CoreFlags flags = CoreFlags(envExpand: true);
+  /// void main() {
+  ///   Env.flags = flags;
+  ///   Dox().initialize(AppConfig(..., flags: flags));
+  /// }
+  /// ```
+  // NEXT MAJOR: make this the default, then remove the flag.
+  final bool envExpand;
 }

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:dox_core/interfaces/core_flags.dart';
+
 class Env {
   static final Env _singleton = Env._internal();
 
@@ -18,9 +20,19 @@ class Env {
   /// variable still wins over both. [testing] is [isTesting] by default.
   void load({File? file, bool? testing}) {
     if (env.isEmpty) {
+      expanded = flags.envExpand;
       env = _loadEnv(file: file, testing: testing ?? isTesting);
     }
   }
+
+  /// The flags the `.env` file is read with. Only `envExpand` is used.
+  /// Set it at the top of `main()`, before any env value is read: the
+  /// file is read once, before `AppConfig` exists. See
+  /// `CoreFlags.envExpand`.
+  static CoreFlags flags = const CoreFlags();
+
+  /// True when the loaded `.env` was read with `envExpand`.
+  bool expanded = false;
 
   /// True when `APP_ENV=testing` is a real environment variable, or the
   /// code runs under `dart test`.
@@ -108,7 +120,11 @@ class Env {
     Map<String, String> known = const <String, String>{},
   }) {
     if (!file.existsSync()) return <String, String>{};
-    return parse(file.readAsStringSync(), known: known);
+    return parse(
+      file.readAsStringSync(),
+      known: known,
+      expand: flags.envExpand,
+    );
   }
 
   /// Reads the text of a `.env` file.
@@ -118,6 +134,8 @@ class Env {
   /// - `KEY="a # b"`: quotes (`"`, `'` or `` ` ``) keep the value as it is,
   ///   also a `#`. The quotes are removed.
   /// - `KEY=abc#def` stays `abc#def` (no space before the `#`).
+  ///
+  /// With [expand] (`CoreFlags.envExpand`):
   /// - `${OTHER}` is the value of `OTHER`, in an unquoted or a `"` value.
   ///   A real environment variable wins, then a key above this line (or
   ///   in [known]). An unknown name stays as it is: `${OTHER}`.
@@ -126,6 +144,7 @@ class Env {
   static Map<String, String> parse(
     String contents, {
     Map<String, String> known = const <String, String>{},
+    bool expand = false,
   }) {
     Map<String, String> data = <String, String>{};
     String? lookup(String name) =>
@@ -138,7 +157,7 @@ class Env {
       if (equal < 1) continue;
       data[text.substring(0, equal).trim()] = _value(
         text.substring(equal + 1),
-        lookup,
+        expand ? lookup : null,
       );
     }
     return data;
@@ -148,18 +167,22 @@ class Env {
 
   static final RegExp _variable = RegExp(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\}');
 
-  static String _value(String raw, String? Function(String) lookup) {
+  /// [lookup] is null when `envExpand` is off: the value is read as it
+  /// is written.
+  static String _value(String raw, String? Function(String)? lookup) {
     String value = raw.trim();
-    if (value.startsWith('"')) {
+    if (lookup != null && value.startsWith('"')) {
       String? text = _doubleQuoted(value, lookup);
       if (text != null) return text;
-    } else if (value.isNotEmpty && '\'`'.contains(value[0])) {
+    } else if (value.isNotEmpty && '"\'`'.contains(value[0])) {
       int end = value.indexOf(value[0], 1);
       if (end > 0) return value.substring(1, end);
     }
     Match? comment = _comment.firstMatch(value);
     if (comment != null) value = value.substring(0, comment.start);
-    return value.trim().replaceAllMapped(
+    value = value.trim();
+    if (lookup == null) return value;
+    return value.replaceAllMapped(
       _variable,
       (Match match) => lookup(match[1]!) ?? match[0]!,
     );
