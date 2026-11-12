@@ -116,7 +116,7 @@ In a Dox app, use `'atomic_writes': true` in the disk map.
 A failed or stopped upload then never leaves a partial file, and the old file stays. Temp file names end with `.dox-upload.tmp`, and `listAll()` hides them.
 It is off by default.
 
-`LocalDriverConfig(permissions: LocalPermissions())` makes visibility the file mode, like Laravel.
+`LocalDriverConfig(permissions: LocalPermissions())` makes visibility the file mode.
 In a Dox app, use `'permissions': true` in the disk map.
 `setVisibility` then runs `chmod` and `getVisibility` reads the mode of the file.
 The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`.

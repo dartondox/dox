@@ -67,7 +67,7 @@ Actor? byName = await Actor().find('name', 'John Wick');
 ### `getFirst` and `first`
 
 Returns the first row of the query, or `null`.
-`first()` does the same, with the Laravel name.
+`first()` does the same.
 
 ```dart
 Actor? actor = await Actor().where('age', '>', 60).orderBy('age').getFirst();
@@ -588,7 +588,7 @@ await Actor().whereDay('created_at', 15).get();
 - On Postgres, a `timestamptz` is read in the session time zone (UTC by default).
   If the connection sets another `timeZone`, a `DateTime` value does not match.
 - On Postgres, a column with fractions of a second does not equal a time without them.
-  For example, `10:00:00.5` is not `10:00:00`. Laravel works the same way.
+  For example, `10:00:00.5` is not `10:00:00`.
 
 | Database | `whereDate` | `whereYear` |
 | --- | --- | --- |
@@ -629,7 +629,7 @@ await Actor().whereJsonDoesntContain('tags', 'horror').get();
 
 !!! note
     `whereJsonDoesntContain` on a row that does not have the key is not the same on every database.
-    SQLite and MariaDB keep the row. Postgres and MySQL drop it. Laravel works the same way.
+    SQLite and MariaDB keep the row. Postgres and MySQL drop it.
 
 ### JSON columns
 
@@ -740,7 +740,6 @@ await Actor()
 ```
 
 `whenValue` runs the function when the value is not `null`. The function gets the value, and it is not `null` there.
-It is like Laravel `when($value, fn)`.
 
 ```dart
 await Actor()
@@ -1328,7 +1327,7 @@ await Actor().where('id', 1).increment('views', 1, <String, dynamic>{'status': '
   `Actor().increment('views')` with no `where` throws a `StateError` and runs no query.
 
 On a model from the table, they change only the row of that model.
-`update` on a model from the table does the same, like Laravel: `await actor!.update({'name': 'AJ'})`.
+`update` on a model from the table does the same: `await actor!.update({'name': 'AJ'})`.
 It runs one query and fires no model events. Use `save()` for the events and `updated_at`.
 The field of the model gets the new value too.
 This example has an `int? views` column field on `Actor`.

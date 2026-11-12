@@ -63,7 +63,7 @@ Route.delete('/blogs/{id}', (BlogController c) => c.destroy);
 !!! info
     There are also `Route.options`, `Route.copy`, `Route.view`, `Route.link`, `Route.unlink`,
     `Route.purge`, `Route.lock`, `Route.unlock` and `Route.propfind`.
-    These are HTTP methods. `Route.view` is the WebDAV `VIEW` method. It does not render a template like Laravel `Route::view`.
+    These are HTTP methods. `Route.view` is the WebDAV `VIEW` method. It does not render a template.
     To show a template, use a GET route: `Route.get('welcome', (DoxRequest req) => view(req, 'welcome'))` with `view()` of `dox_view`.
 
     `Route.health('/health')` adds a health check route. It answers `200` with `{"status": "ok"}`.

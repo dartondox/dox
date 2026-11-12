@@ -5,7 +5,7 @@ Annotations and interfaces that the Dox packages share.
 [![pub package](https://img.shields.io/pub/v/dox_annotation.svg)](https://pub.dev/packages/dox_annotation)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
-Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
+Part of [Dox](https://dartondox.dev), a web backend framework for Dart.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
 
 ## How it is used

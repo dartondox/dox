@@ -267,7 +267,7 @@ Blog created = await Blog().create(<String, dynamic>{
 
 `create()`, `insert()`, `update()`, `upsert()` and the find or create methods take keys from a map.
 If they took every key, `User().create(req.body)` with `{"is_admin": 1}` would make an admin.
-So a model is guarded by default, like Laravel.
+So a model is guarded by default.
 Set `fillable` to the keys that may be taken from a map.
 
 ```dart
@@ -326,10 +326,9 @@ await Model.unguarded(() async {
 - Work that starts inside the callback and finishes later also runs with the check off.
   This means timers, futures that are not awaited, and stream listeners.
   So await everything inside the callback.
-- In Laravel, a query `update()` ignores `fillable`.
-  In Dox, a query `update()` keeps the check, so `update(req.body)` stays safe.
-  Use `forceUpdate()` when you need the Laravel behaviour.
-- Model events that fire inside `forceCreate()` and `forceUpdate()` (like `created`) also run with the check off, like Laravel.
+- A query `update()` keeps the check, so `update(req.body)` stays safe.
+  Use `forceUpdate()` when you need to skip the check.
+- Model events that fire inside `forceCreate()` and `forceUpdate()` (like `created`) also run with the check off.
   A `create()` or `update()` inside such a hook skips `fillable` too.
 
 ### Find or create
@@ -414,7 +413,7 @@ Blog other = blog.replicate(<String>['slug']);
 ```
 
 - Relations are not copied.
-- Like Laravel, it copies `deleted_at`. A copy of a soft deleted model is soft deleted too.
+- It copies `deleted_at`. A copy of a soft deleted model is soft deleted too.
 - A column in the list that can not be `null`, or that is not a column, throws an `ArgumentError`.
 
 ## Delete

@@ -146,7 +146,7 @@ def on_post_build(config):
     index = [
         "# Dox",
         "",
-        "> Dox is a web backend framework for Dart, like Laravel: routing, an ORM,",
+        "> Dox is a web backend framework for Dart: routing, an ORM,",
         "> migrations, typed validation, auth and a CLI. It runs on a Rust HTTP",
         "> server, one isolate per CPU core, and builds to one native binary.",
         "",

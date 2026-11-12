@@ -5,7 +5,7 @@ The core of the Dox framework: HTTP server, router, requests, responses, DTO inp
 [![pub package](https://img.shields.io/pub/v/dox_core.svg)](https://pub.dev/packages/dox_core)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
-Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
+Part of [Dox](https://dartondox.dev), a web backend framework for Dart.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
 
 ## Install

@@ -60,7 +60,7 @@ The generated method takes the same arguments, without the query.
 `@Scope(global: true)` adds the scope to every query of the model.
 This includes `get()`, `find()`, `all()`, `count()`, `paginate()`,
 query updates and deletes, and relation queries.
-A global scope counts as a `where`, like Laravel: `Post().delete()` deletes only the rows in the scope.
+A global scope counts as a `where`: `Post().delete()` deletes only the rows in the scope.
 With `withoutGlobalScopes()` and no `where`, the write throws a `StateError`.
 
 ```dart

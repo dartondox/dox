@@ -60,7 +60,7 @@ The rename makes a new file. So the folder must be writable, the file gets the d
 ```
 
 A local disk has no per-file access rules by default. `setVisibility()` does nothing there, and `getVisibility()` gives the disk `visibility`.
-To make visibility the file mode, like Laravel, add `'permissions': true`. It is off by default.
+To make visibility the file mode, add `'permissions': true`. It is off by default.
 Then `setVisibility()` runs `chmod` and `getVisibility()` reads the mode of the file.
 The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`.
 To change them, give a map with a `file` and a `dir` key. Each has a `public` and a `private` mode. A mode that is not there keeps its default. A key that is not one of these is ignored.
