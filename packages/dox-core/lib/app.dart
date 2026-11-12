@@ -359,6 +359,7 @@ class Dox {
 
   /// register the routes of the app routers and give them, without a
   /// server and without providers. `dox route:list` uses this.
+  /// When `config.openApi` is on, the docs routes are in it too.
   /// Providers do not run, because their `setup()` may connect to a
   /// database or start a worker. So a route that a provider adds in
   /// `setup()` is not in the list.
@@ -373,6 +374,8 @@ class Dox {
     _clearRoutes();
     try {
       _registerRoute();
+      // like startProviders: the docs routes, when OpenAPI is on
+      if (config.openApi.isEnabled) OpenApiDocument(config.openApi).register();
       Route route = Route();
       return AppRoutes(
         routes: List<RouteData>.of(route.routes),

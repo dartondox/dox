@@ -49,10 +49,11 @@ class _Provider extends DoxProvider {
 Future<void> _raw(HttpRequest req) async {}
 
 void main() {
-  void init() {
+  void init({bool openApi = false}) {
     Dox().initialize(
       AppConfig(
         appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        openApi: OpenApiConfig(enabled: openApi),
         globalMiddleware: <dynamic>[_Global()],
         routers: <Router>[_ApiRouter()],
         providers: <DoxProvider>[_Provider()],
@@ -103,5 +104,23 @@ void main() {
     );
     expect(Route().fallbacks, hasLength(1));
     expect(_Provider.setups, greaterThan(0));
+  });
+
+  test('loadRoutes adds the OpenAPI routes when OpenAPI is on', () {
+    init(openApi: true);
+    int setups = _Provider.setups;
+    Dox().loadRoutes();
+    List<String> paths = <String>[
+      for (RouteData r in Dox().loadRoutes().routes) r.path,
+    ];
+    expect(paths, <String>[
+      '/api/ping',
+      '/users',
+      '/docs',
+      '/openapi.json',
+      '/openapi.yaml',
+    ]);
+    expect(Route().routes, isEmpty);
+    expect(_Provider.setups, setups);
   });
 }
