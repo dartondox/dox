@@ -288,6 +288,68 @@ await Actor().where('age', '>', 100).chunkById(100, (List<Actor> actors) async {
   Use `chunk()`.
 - To use another column, add `column: 'uuid'`. The column must be unique.
 
+### `lazy`, `lazyById` and `cursor`
+
+These give the rows as a `Stream`, one row at a time.
+You do not write a function. Use `await for`.
+
+```dart
+await for (Actor actor in Actor().where('age', '>=', 18).lazy()) {
+  print(actor.name);
+}
+
+await for (Actor actor in Actor().orderBy('id').cursor(chunkSize: 500)) {
+  print(actor.name);
+}
+```
+
+`lazy()` and `lazyById()` read the rows in chunks, with many queries.
+`cursor()` runs one query, and the driver streams the rows.
+
+| Method | Queries | How it pages |
+|---|---|---|
+| `lazy({chunkSize})` | many | By id when there is no `orderBy()`. With `OFFSET` when there is an `orderBy()`, a `limit()` or an `offset()`. |
+| `lazyById({chunkSize, column})` | many | By id (or the unique `column`) like `chunkById()`. It throws a `StateError` with an `orderBy()`. |
+| `cursor({chunkSize})` | one | The database sends the rows when you are ready for more. |
+
+The default `chunkSize` is `1000`.
+
+- Stop reading (`break`, or `.take(10)`) to stop the queries.
+- `lazy()` starts at the `offset()` of the query and stops after its `limit()`.
+- `lazy()` works on every database. It also works on a [`union`](#union) or a [`fromSub`](#fromsub) query.
+- `cursor()` does not fill the memory with a big result.
+  Postgres uses a server-side portal. MySQL sends the rows as they come. SQLite uses a statement cursor.
+- Relations of `preload()` load for each chunk.
+- In a transaction on Postgres or MySQL, `cursor()` with `preload()` throws a `StateError`.
+  The one connection of the transaction is busy. Use `lazy()` there.
+- In a transaction on Postgres or MySQL, do not run another query of the same transaction inside a `cursor()` loop. It waits forever, because the stream holds the one connection. Use `lazy()` there.
+- Query listeners and the [slow query log](index.md#slow-query-log) see a `cursor()` query once, when its first chunk comes.
+  The time is the time to the first chunk.
+
+## Cancel a query
+
+Give a `QueryCancelToken` to a query with `cancelWith()`.
+`token.cancel()` stops the query on Postgres and MySQL.
+
+```dart
+QueryCancelToken token = QueryCancelToken();
+Future<List<Actor>> actors = Actor().where('age', '>', 18).cancelWith(token).get();
+
+token.cancel();
+try {
+  await actors;
+} on PgQueryCancelledException {
+  // Postgres: the query was stopped
+} on MysqlQueryCancelledException {
+  // MySQL: the query was stopped
+}
+```
+
+- A token that is cancelled already fails a new query at once.
+- The relation queries of `preload()` use the token too.
+- `cursor()` takes a token too.
+- SQLite does not support cancel. The query runs to its end.
+
 ## Aggregates
 
 `sum`, `avg`, `min` and `max` return one value for all rows that match.

@@ -535,8 +535,8 @@ await blog.save();
 
 A model can load related models.
 See [HasOne](relationship/has-one.md), [HasMany](relationship/has-many.md),
-[BelongsTo](relationship/belongs-to.md), [ManyToMany](relationship/many-to-many.md)
-and [Polymorphic](relationship/polymorphic.md).
+[BelongsTo](relationship/belongs-to.md), [ManyToMany](relationship/many-to-many.md),
+[HasManyThrough](relationship/through.md) and [Polymorphic](relationship/polymorphic.md).
 
 !!! note "After `reload()` or a preload"
     `await user.reload()` and a preload set the relation fields again, also when there is no related row.

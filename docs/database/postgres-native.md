@@ -109,6 +109,9 @@ The driver reads these keys from `extra` of the `ConnectionConfig`:
 | Key | Default | What it does |
 |---|---|---|
 | `maxConnectionCount` | `10` | Most connections in the pool, for the whole process. |
+| `requestTimeout` | 300 s | The longest wait for one request. |
+| `maxConnectionAge` | no limit | A connection older than this is closed once it has no query. |
+| `idleTimeout` | no limit | A free connection not used for this long is closed. |
 | `sslMode` | `disable` | TLS mode, see [TLS](#tls). |
 | `sslRootCert` | none | Path of a PEM file with the CA certificates to trust for `verify-ca` and `verify-full`, see [TLS](#tls). |
 | `timeZone` | `UTC` | Time zone of the session. |
@@ -123,9 +126,7 @@ pool closes when the last isolate closes it. You can also give
 `PostgresNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
 
 Each connection keeps up to 512 prepared statements. When it is full, it
-drops the one used longest ago. A request (pool slot, connect and query)
-fails after 300 s with no answer. A transaction that gets no request for
-300 s is rolled back.
+drops the one used longest ago.
 
 A `CREATE`, `ALTER` or `DROP` makes every connection prepare its statements again. If your app runs `CREATE TEMP TABLE` or `DROP` on every request, this happens each time. Do this once at start up, not per request.
 
@@ -155,6 +156,78 @@ await pool.commit(tx); // or pool.rollback(tx)
   send them.
 - `PgNativePool.fromUrl('postgres://user:pass@host:5432/db?sslmode=require')`
   makes a pool from a url.
+
+## Pool settings
+
+All are optional. In the ORM, put them in `extra` (see [Pool settings](index.md#pool-settings)).
+Without the ORM, pass them to `PgNativePool.open`:
+
+```dart
+PgNativePool pool = PgNativePool.open(
+  host: 'localhost',
+  user: 'postgres',
+  password: 'postgres',
+  database: 'postgres',
+  requestTimeout: const Duration(seconds: 30),
+  maxConnectionAge: const Duration(minutes: 30),
+  idleTimeout: const Duration(minutes: 5),
+);
+```
+
+- `requestTimeout` (default 300 s): the longest wait for one request. A request is a free connection, the connect and the query. Over it, the request fails with a `PgException` that says `timeout`. A CancelRequest stops the query on the server, and its connection is closed. A transaction with no request for this long is rolled back.
+- `maxConnectionAge` (default: no limit): a connection older than this is closed when it is next free. It is never closed while a query or a transaction uses it. This helps behind a load balancer, or to follow a DNS change after a failover.
+- `idleTimeout` (default: no limit): a free connection that is not used for this long is closed. A new one opens when it is needed.
+
+`fromUrl` takes the same three. Isolates share one pool only when all settings are the same.
+
+## Cancel a query
+
+```dart
+PgCancelToken token = PgCancelToken();
+Future<PgNativeResult> slow = pool.query('SELECT pg_sleep(60)', cancelToken: token);
+token.cancel();
+try {
+  await slow;
+} on PgQueryCancelledException {
+  print('stopped');
+}
+```
+
+- Cancel before the query starts: it does not run.
+- Cancel while it runs: the driver sends a Postgres CancelRequest, and the future fails with `PgQueryCancelledException`.
+- Cancel after it ended: nothing happens. You keep the result.
+- A query with a token gets a connection for itself, so the cancel can not stop another query.
+- In a transaction, a cancelled query is an error, so Postgres aborts the transaction. Roll it back.
+- One token can stop many queries. Use it in the isolate that made it.
+- The CancelRequest goes in plain text on a new connection, like libpq before Postgres 17.
+
+In the ORM, use [`cancelWith()`](query-builder.md#cancel-a-query).
+
+## Stream rows
+
+For a big result, `stream` gives the rows in chunks.
+Each chunk is a `PgNativeResult` with up to `chunkSize` rows (default 1000).
+
+```dart
+await for (PgNativeResult chunk in pool.stream(
+  'SELECT * FROM events WHERE day = @day',
+  parameters: <String, dynamic>{'day': '2026-01-01'},
+  chunkSize: 500,
+)) {
+  for (Map<String, dynamic> row in chunk.rows) {
+    // ...
+  }
+}
+```
+
+- The query runs on a server-side portal. The driver asks for the next chunk only when your listener is ready. So only about two chunks are in memory, also for millions of rows.
+- The query starts when you listen. Stop listening (`break` in `await for`) to stop it. Its connection is free again.
+- `cancelToken` stops it too. Then the stream fails with `PgQueryCancelledException`.
+- An error comes as a stream error, then the stream ends.
+- It holds one connection until it ends. A paused listener that waits longer than `requestTimeout` fails with a timeout.
+- It works in a transaction (`transaction: tx`). Other queries of that transaction wait until the stream ends.
+
+In the ORM, use [`cursor()`](query-builder.md#lazy-lazybyid-and-cursor).
 
 ## Values
 
@@ -195,7 +268,9 @@ A server error throws `PgServerException`. It has `code` (the SQLSTATE, eg.
 `23505` for a unique violation), `severity`, `message`, and `detail`, `hint`,
 `schema`, `table`, `column` and `constraint` when the server sends them.
 Other errors (eg. the server is down, a TLS error, a timeout) throw
-`PgException`. Both come from `package:dox_orm/dox_orm.dart`.
+`PgException`. A query stopped with a cancel token throws
+`PgQueryCancelledException`, which is a `PgException`.
+They come from `package:dox_orm/dox_orm.dart`.
 
 ```dart
 try {
@@ -204,7 +279,3 @@ try {
   if (error.code == '23505') print('taken: ${error.constraint}');
 }
 ```
-
-## Not yet
-
-- `maxConnectionAge` and `queryTimeout` are not read.
