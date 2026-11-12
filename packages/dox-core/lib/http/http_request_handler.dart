@@ -30,7 +30,7 @@ void _handle(HttpRequest req) {
     /// a path with no route at all gets 404 for any `_method`, so its
     /// body is not read
     if (req.method == 'POST' &&
-        MethodOverride.enabledIn(Dox().config.globalMiddleware) &&
+        MethodOverride.enabledIn(Dox().allGlobalMiddleware) &&
         httpPathHasRoute(req)) {
       _withMethodOverride(req);
       return;
@@ -195,7 +195,7 @@ final Expando<bool> _started = Expando<bool>();
 /// read here, so the handler can still read it. `terminate` steps run
 /// once the answer is sent.
 void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
-  List<dynamic> global = Dox().config.globalMiddleware;
+  List<dynamic> global = Dox().allGlobalMiddleware;
   (RawRequestHandler, List<dynamic>, RouteData)? cached = _mountRoutes[prefix];
   RouteData route;
   if (cached != null &&

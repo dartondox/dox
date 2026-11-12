@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `GlobalMiddleware`, a small shared list that packages use to add global middleware at startup. A package that does not depend on `dox_core` can use it. `GlobalMiddleware.clear()` is for tests.
 - Requires Dart 3.14 or newer.
 
 ## 3.1.3

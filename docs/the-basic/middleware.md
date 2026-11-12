@@ -351,7 +351,20 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-The order is: global middleware, then router middleware, then group middleware, then route middleware.
+A provider can add global middleware with `Dox().addGlobalMiddleware(...)`. They run before the app's `globalMiddleware`. A second add of the same middleware is skipped.
+
+The list is cleared at each start, before the providers run. Add package middleware from a provider's `setup()`, which runs on every start. Anything added before the app starts is cleared. Use a top-level function or a `const` instance. The providers do not run for `dox route:list`, so it does not show this middleware.
+
+```dart
+class AuditProvider extends DoxProvider {
+  @override
+  Future<void> setup() async {
+    Dox().addGlobalMiddleware(AuditMiddleware());
+  }
+}
+```
+
+The order is: package middleware from providers, then the app's global middleware, then router middleware, then group middleware, then route middleware.
 
 ```mermaid
 flowchart LR

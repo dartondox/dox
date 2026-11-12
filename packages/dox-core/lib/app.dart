@@ -316,6 +316,36 @@ class Dox {
     Logger.warn(message);
   }
 
+  /// Add a global middleware from a package. Call it in the `setup()` of a
+  /// [DoxProvider]. It runs on every route, before the app's own
+  /// `globalMiddleware`. A second add of the same one is skipped. It takes
+  /// the same kinds as `globalMiddleware`. Use a top-level function or a
+  /// const instance, so a restart does not add it twice. The list is
+  /// cleared at each start, before the providers run.
+  /// Add it from a provider's `setup()`, which runs on every start.
+  /// Anything added before the app starts is cleared.
+  void addGlobalMiddleware(Object middleware) {
+    GlobalMiddleware.add(middleware);
+  }
+
+  List<dynamic>? _allGlobalSource;
+  int _allGlobalVersion = -1;
+  List<dynamic> _allGlobal = const <dynamic>[];
+
+  /// the middleware that packages added, then `config.globalMiddleware`.
+  /// the same list is given until one of them changes.
+  List<dynamic> get allGlobalMiddleware {
+    List<Object> added = GlobalMiddleware.items;
+    if (added.isEmpty) return config.globalMiddleware;
+    if (!identical(_allGlobalSource, config.globalMiddleware) ||
+        _allGlobalVersion != GlobalMiddleware.version) {
+      _allGlobalSource = config.globalMiddleware;
+      _allGlobalVersion = GlobalMiddleware.version;
+      _allGlobal = <dynamic>[...added, ...config.globalMiddleware];
+    }
+    return _allGlobal;
+  }
+
   /// ####### functions need to run on isolate #######
 
   /// add providers that run in every isolate when it starts
@@ -332,6 +362,8 @@ class Dox {
   /// this is internal core use only
   /// your app do not need to call this function
   Future<void> startProviders() async {
+    // a restart builds the package middleware again
+    GlobalMiddleware.clear();
     _addContainerProviders();
     for (DoxProvider provider in doxProviders) {
       await provider.setup();
@@ -443,7 +475,7 @@ class Dox {
     for (Router router in _routers()) {
       Route.prefix(router.prefix);
       Route.resetWithNewMiddleware(<dynamic>[
-        ...config.globalMiddleware,
+        ...allGlobalMiddleware,
         ...router.middleware,
       ]);
       router.register();

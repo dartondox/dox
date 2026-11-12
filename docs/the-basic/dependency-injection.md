@@ -231,6 +231,8 @@ AppConfig appConfig = AppConfig(
 A listed class comes first. The others follow. No class runs twice.
 A listed provider is also the instance that the container gives.
 
+A provider can add global middleware with `Dox().addGlobalMiddleware(...)` in `setup()`. They run before the app's `globalMiddleware`. See [Middleware](middleware.md).
+
 ## Use the container in code
 
 `Dox().ioc` is the container of the current isolate.
