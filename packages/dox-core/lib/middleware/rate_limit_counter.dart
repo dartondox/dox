@@ -5,6 +5,7 @@ import 'dart:isolate';
 ///
 /// The main isolate owns the counts. The other isolates send each
 /// increment to it through a [SendPort] and wait for the new count.
+/// [incrementAndRead] also reads a second key in the same message.
 /// `DoxIsolate` gives every isolate it starts the [port] of the main
 /// isolate, and the isolate calls [connect] with it.
 ///
@@ -29,7 +30,7 @@ class RateLimitCounter {
   SendPort? _owner;
   ReceivePort? _replies;
   int _nextId = 0;
-  final Map<int, Completer<int>> _waiting = <int, Completer<int>>{};
+  final Map<int, Completer<List<int>>> _waiting = <int, Completer<List<int>>>{};
 
   /// The port other isolates send their increments to. Opened on the
   /// first call, in the isolate that owns the counts (the main isolate).
@@ -46,21 +47,37 @@ class RateLimitCounter {
 
   /// Adds one to [key] and gives the new count. A new key, or a key
   /// older than [ttl], starts at 1.
-  Future<int> increment(String key, Duration ttl) {
-    int ttlMs = ttl.inMilliseconds;
+  Future<int> increment(String key, Duration ttl) async {
+    List<int> counts = await _send(key, ttl.inMilliseconds, null);
+    return counts[0];
+  }
+
+  /// Adds one to [key] and also reads [other] with no change to it.
+  /// Gives the new count of [key] and the count of [other] (0 when it
+  /// is missing or older than its ttl). It is one message to the owner.
+  Future<(int, int)> incrementAndRead(
+    String key,
+    String other,
+    Duration ttl,
+  ) async {
+    List<int> counts = await _send(key, ttl.inMilliseconds, other);
+    return (counts[0], counts[1]);
+  }
+
+  Future<List<int>> _send(String key, int ttlMs, String? other) {
     SendPort? owner = _owner;
-    if (owner == null) return Future<int>.value(_increment(key, ttlMs));
+    if (owner == null) return Future<List<int>>.value(_run(key, ttlMs, other));
 
     ReceivePort replies = _replies ??= ReceivePort()..listen(_onReply);
     int id = _nextId++;
-    Completer<int> done = Completer<int>();
+    Completer<List<int>> done = Completer<List<int>>();
     _waiting[id] = done;
-    owner.send(<Object>[replies.sendPort, id, key, ttlMs]);
+    owner.send(<Object?>[replies.sendPort, id, key, ttlMs, other]);
     return done.future.timeout(
       timeout,
       onTimeout: () {
         _waiting.remove(id);
-        return _increment(key, ttlMs);
+        return _run(key, ttlMs, other);
       },
     );
   }
@@ -80,13 +97,23 @@ class RateLimitCounter {
   void _serve(dynamic message) {
     List<Object?> m = message as List<Object?>;
     SendPort reply = m[0] as SendPort;
-    int count = _increment(m[2] as String, m[3] as int);
-    reply.send(<int>[m[1] as int, count]);
+    List<int> counts = _run(m[2] as String, m[3] as int, m[4] as String?);
+    reply.send(<Object>[m[1] as int, counts]);
   }
 
   void _onReply(dynamic message) {
-    List<int> m = message as List<int>;
-    _waiting.remove(m[0])?.complete(m[1]);
+    List<Object> m = message as List<Object>;
+    _waiting.remove(m[0] as int)?.complete(m[1] as List<int>);
+  }
+
+  /// the new count of [key], then the count of [other] when given
+  List<int> _run(String key, int ttlMs, String? other) {
+    int hits = _increment(key, ttlMs);
+    if (other == null) return <int>[hits];
+    _Count? count = _counts[other];
+    int now = DateTime.now().millisecondsSinceEpoch;
+    if (count == null || count.expiresAt <= now) return <int>[hits, 0];
+    return <int>[hits, count.hits];
   }
 
   int _increment(String key, int ttlMs) {
