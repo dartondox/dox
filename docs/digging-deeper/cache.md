@@ -12,7 +12,7 @@ It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 
 | Driver | Where the data is | Shared between isolates | Locks |
 | --- | --- | --- | --- |
-| `file` | files in a folder (default `storage/cache`) | yes, on the same machine | no |
+| `file` | files in a folder (default `storage/cache`) | yes, on the same machine | yes, on the same machine |
 | `memory` | a map inside the isolate | no | yes |
 | `redis` | a Redis server | yes, also between machines | yes |
 | `null` | nowhere. It stores nothing | - | no |

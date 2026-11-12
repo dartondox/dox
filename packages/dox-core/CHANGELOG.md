@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Ships an AI agent skill (dox-core-guide). Install it in your app with `dart run skills@ get`.
 - New: `Dox().loadRoutes()` registers the routes of the app routers and gives them as `AppRoutes` (routes, fallbacks and mounts), without a server and without providers. When OpenAPI is on, the docs routes (`/docs`, `/openapi.json`, `/openapi.yaml`) are in it too. It is safe to call more than once: the route list is empty before and after the call, so a later `startServer()` starts clean. `dox route:list` uses it.
 - New: `RouteData.isWebSocket` is true for a route added with `Route.websocket`.
 - Fix: `Route.group`, `Route.domain`, `Route.middleware`, `Route.enabledCors` and `Route.disabledCors` restore the prefix, name prefix, domain, middleware and CORS setting also when the callback throws. Before, the next routes got the wrong path, name or middleware.

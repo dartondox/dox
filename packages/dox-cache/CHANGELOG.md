@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Ships an AI agent skill (dox-cache-guide). Install it in your app with `dart run skills@ get`.
 - New: `CacheFlags`, opt-in behaviors that work like Laravel, as `CacheConfig(flags: ...)`. All are off by default. `CacheFlags.all()` turns on every flag.
 - New: `CacheFlags.lockThrows` makes `lock.block(timeout)` with no callback throw `LockTimeoutException` when the time is over, not give `false`.
 - New: `CacheLock.throwOnTimeout` picks this for one lock. A store sets it from the flag. `CacheStore` takes `flags:`.
