@@ -37,7 +37,7 @@ These stop the app at start, so a bad route never reaches a request.
 | `Route name "<name>" is used twice: <method> <path> and <method> <path>.` | Two routes have the same name. | Give one of them another name. |
 | `Invalid argument (name): No route has this name: "<name>"` | `route()` or `Route.url()` with a name that no route has. | Check the name and the group `name:` prefix. |
 | `Invalid argument(s): Route "<name>" (<path>) needs the param "<param>".` | `route()` without a value for a `{param}`. | Pass it in `params:`. |
-| `Invalid argument(s): Route "<name>" (<path>) has no param "<key>". ...` | `route()` with a param the path does not have. | Remove it, or pass it in `query:`. |
+| `Invalid argument(s): An absolute url needs a host. ...` | `route()` with `absolute: true` and no `APP_URL` and no `baseUrl:`. | Set `APP_URL`, or pass `baseUrl:`. |
 | `Bad state: No bound value of type <T> for the route param "<param>". ...` | `req.bound<T>()` for a param with no `Route.bind`, or of another type. | Add `Route.bind<T>('<param>', ...)`. |
 | `Route <where>: the controller has more path params than the route has {...} params (<n>).` | The method asks for more path params than the path has. | Add the `{param}` to the path, or remove the parameter. |
 | `Route <where>: a controller can have one @Dto only.` | Two DTO parameters. | Merge them into one DTO. |

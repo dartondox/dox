@@ -32,6 +32,42 @@ The default `report` prints the error and the stack with the logger.
 
 See [HTTP exceptions](../reference/http-exceptions.md) for the built-in exception classes.
 
+## An HTML error page
+
+By default an error is sent as JSON. In `development` or `local`, a `500` is plain text with the error text. A browser that opens a bad URL sees JSON or text, not a page.
+To send an HTML page to browsers, turn on `htmlErrors`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  htmlErrors: true,
+  // ...
+);
+```
+
+The page has the status and its title, like `404 Not Found`.
+It loads no files from outside.
+
+- Only a request that does not want JSON gets the page. A request wants JSON (`DoxRequest.expectsJson()`) when it has an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request does not want JSON, so it gets the page.
+- Only when `APP_ENV` is `development` or `local`, the page also shows the error text and the stack trace.
+- A JSON client gets the same answer as without `htmlErrors`.
+- A validation error does not change. It keeps its `422` JSON or its redirect.
+- An answer from your own `ExceptionHandler.render` does not change.
+
+To make your own page, set `errorPage`. It gets the status, the error, the stack trace and a `debug` flag.
+`debug` is `true` when `APP_ENV` is `development` or `local`.
+Escape every value you put in the page.
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  htmlErrors: true,
+  errorPage: (int status, Object error, StackTrace stack, bool debug) =>
+      '<h1>Sorry, error $status</h1>',
+  // ...
+);
+```
+
+`defaultErrorPage` is the default. You can call it from your own function, for example for the statuses you do not handle.
+
 ## Your own handler
 
 Extend `ExceptionHandler`. Override one method or both.

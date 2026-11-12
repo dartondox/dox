@@ -89,7 +89,9 @@ DB_PASSWORD=postgres
 - The value is everything after the first `=`. A second `=` is kept.
 - `#` after a space starts a comment: `KEY=abc # note` gives `abc`. `KEY=abc#def` stays `abc#def`.
 - A value in quotes (`"`, `'` or `` ` ``) is kept as it is, also a `#`. The quotes are removed.
-- An empty value, or the text `null`, counts as missing.
+- An empty value (`KEY=`), or the text `null`, counts as missing. So `Env.get` gives the default.
+- `export KEY=value` is read like `KEY=value`.
+- With `CoreFlags.envExpand`, `${OTHER}` and `"..."` escapes work. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another).
 - The file is read once per isolate, from the current working directory.
 - In tests (`dart test`, or `APP_ENV=testing` as a real environment variable), Dox also reads `.env.testing` next to `.env`. Its keys win over the keys of `.env`. A real environment variable still wins over both.
 
