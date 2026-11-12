@@ -1480,6 +1480,12 @@ Prints the SQL and the values of the query when it runs.
 await Actor().debug(true).where('age', 60).get();
 ```
 
+With the default `PrettyQueryPrinter`, it prints one line:
+
+```
+▌ [db:default] SELECT * FROM "actor" WHERE "age" = 60;
+```
+
 To print all queries, set `debug: true` in the `ConnectionConfig`.
 See [Database](index.md#config).
 
