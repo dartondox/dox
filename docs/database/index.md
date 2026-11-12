@@ -219,6 +219,10 @@ flags: const OrmFlags(pluralTableNames: true, sumReturnsZero: true),
 | `selectRawAdds` | `selectRaw()` replaces the select list. | It adds to it, so `select('a').selectRaw('count(*) as c')` selects both. |
 | `groupByAdds` | A second `groupBy()` replaces the first. | It adds to the first. `groupByRaw()` too. |
 | `lastPageAtLeastOne` | `paginate()` gives `lastPage` `0` when there are no rows. | It gives `1`. |
+| `updateSetsUpdatedAt` | A model query `update()`, like `Blog().where('id', 1).update({...})`, does not touch `updated_at`. | It sets `updated_at`, unless the data already has it. |
+| `incrementFiresEvents` | `increment()` and `decrement()` on a model do not fire events or set `updated_at`. | They fire `saving`, `updating`, `updated` and `saved`, and set `updated_at`. A hook that cancels stops the write. |
+| `preloadUnknownThrows` | `preload('typo')` loads nothing, with no error. | It throws an `ArgumentError`. With a dot path, each level is checked. |
+| `toJsonLoadedRelations` | `toJson()` has only the relations named in `preload()`. | It also has the relations loaded with `$getRelation()`. |
 | `laravelPostgresTypes` | On Postgres, `timestamps()` and `softDeletes()` make `TIMESTAMPTZ`, and `json()` makes `JSONB`. | A new table gets `TIMESTAMP` and `JSON`. |
 
 - `OrmFlags.all()` turns on every flag. New apps can start with it.
