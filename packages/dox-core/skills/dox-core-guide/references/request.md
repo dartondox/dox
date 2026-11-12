@@ -42,6 +42,19 @@ class UploadImage {
 ```
 
 A temp upload file is deleted when the response is sent. Save it (`store`, `moveTo`) before you return.
-`input.image.store('images')` needs the `dox_storage` package.
+`store()` comes from the `dox_storage` package. Add it to `pubspec.yaml` and import it:
+
+```dart
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_storage/dox_storage.dart';
+
+@Inject()
+class UploadController {
+  Future<Map<String, String>> upload(UploadImage input) async {
+    String path = await input.image.store('images');
+    return <String, String>{'path': path};
+  }
+}
+```
 
 Docs: https://dartondox.dev/latest/the-basic/request/

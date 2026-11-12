@@ -49,7 +49,7 @@ In a Dox app you do not set this up yourself. Set the stores in `config/cache.da
 - Drivers: `memory` (with an optional LRU size limit), `file`, `redis` and `null`.
 - `get`, `put`, `add`, `forget`, `many`, `putMany`, `increment`, `pull`, `remember`.
 - Tags: `store.tags(['users']).flush()` removes only those items.
-- Atomic locks with `lock(name, ttl)`: `get()`, `release()`, `block(timeout)`. Memory and Redis only.
+- Atomic locks with `lock(name, ttl)`: `get()`, `release()`, `block(timeout)`. Memory, file and Redis.
 - A key prefix per store. Redis `flush` deletes only keys with the prefix.
 - Your own driver with `cache.extend(name, factory)`.
 
