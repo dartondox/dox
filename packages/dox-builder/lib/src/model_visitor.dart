@@ -25,6 +25,8 @@ const List<String> _relationTypes = <String>[
   'HasMany',
   'BelongsTo',
   'ManyToMany',
+  'HasOneThrough',
+  'HasManyThrough',
   'MorphOne',
   'MorphMany',
   'MorphTo',
@@ -127,6 +129,9 @@ class ModelVisitor {
       DartType? modelType = object?.getField('model')?.toTypeValue();
       String? model = modelType == null ? null : typeCode(modelType, library);
 
+      /// the model in the middle of a through relation
+      DartType? throughType = object?.getField('through')?.toTypeValue();
+
       String? relationType = _annotationName(relationMeta);
       bool morphTo = relationType == 'MorphTo';
 
@@ -146,6 +151,13 @@ class ModelVisitor {
         'idColumn': object?.getField('idColumn')?.toStringValue(),
         'ownerKey': object?.getField('ownerKey')?.toStringValue(),
         'dataType': typeCode(element.type, library),
+        'through': throughType == null
+            ? null
+            : typeCode(throughType, library).replaceFirst('?', ''),
+        'throughForeignKey': object
+            ?.getField('throughForeignKey')
+            ?.toStringValue(),
+        'throughLocalKey': object?.getField('throughLocalKey')?.toStringValue(),
         'localKey': object?.getField('localKey')?.toStringValue(),
         'foreignKey': object?.getField('foreignKey')?.toStringValue(),
         'onQuery': _functionName(object, 'onQuery'),

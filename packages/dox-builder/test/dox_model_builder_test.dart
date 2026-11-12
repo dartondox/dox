@@ -47,6 +47,17 @@ class ManyToMany {
   final bool withTimestamps;
   const ManyToMany(this.model, {this.withPivot, this.withTimestamps = false});
 }
+class HasManyThrough {
+  final Type model;
+  final Type through;
+  final String? throughForeignKey;
+  const HasManyThrough(this.model, {required this.through, this.throughForeignKey});
+}
+class HasOneThrough {
+  final Type model;
+  final Type through;
+  const HasOneThrough(this.model, {required this.through});
+}
 class MorphMany {
   final Type model;
   final String name;
@@ -220,6 +231,41 @@ class User {
         contains("withPivot:const<String>['role','note'],withTimestamps:true"),
       );
       expect(flat, contains('manyToMany<User,User>(list,()=>User());'));
+    });
+
+    test('through relations', () async {
+      String out = await _generate('''
+@DoxModel()
+class Country {
+  @HasManyThrough(Post, through: User, throughForeignKey: 'author_id')
+  List<Post> posts = <Post>[];
+
+  @HasOneThrough(Post, through: User)
+  Post? post;
+}
+@DoxModel()
+class User {}
+@DoxModel()
+class Post {}
+''');
+      String flat = out.replaceAll(RegExp(r'\s'), '');
+      expect(
+        flat,
+        contains(
+          "hasManyThrough<Country,Post>(list,()=>Post(),"
+          "through:()=>User(),throughForeignKey:'author_id',);",
+        ),
+      );
+      expect(flat, contains('getHasManyThrough<Country,Post>('));
+      expect(
+        flat,
+        contains(
+          'hasOneThrough<Country,Post>(list,()=>Post(),through:()=>User(),);',
+        ),
+      );
+
+      /// a one-row relation: no row gives null
+      expect(flat, contains('i.post=result[i.tempIdValue.toString()];'));
     });
 
     test('morph relations', () async {
