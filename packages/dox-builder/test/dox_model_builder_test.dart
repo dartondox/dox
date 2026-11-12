@@ -533,6 +533,34 @@ class Post {
       expect(flat, isNot(contains("case 'created_at'")));
     });
 
+    test('\$copyColumnsFrom copies every column field', () async {
+      String out = await _generate('''
+@DoxModel(createdAt: 'made_at', updatedAt: null)
+class Post {
+  @Column(cast: JsonCast())
+  Map<String, dynamic>? meta;
+
+  @Column()
+  String? o;
+
+  @HasMany(Post)
+  List<Post> replies = <Post>[];
+}
+''');
+      String flat = out.replaceAll(RegExp(r'\s+'), ' ');
+      expect(
+        flat,
+        contains(
+          r'@override bool $copyColumnsFrom(Model<Post> other) { '
+          'Post o = other as Post; (this as Post) ..id = o.id ..meta = o.meta '
+          '..o = o.o ..createdAt = o.createdAt; return true; }',
+        ),
+      );
+
+      /// a relation is not a column
+      expect(flat, isNot(contains('..replies = o.replies')));
+    });
+
     test('setColumnValue has the timestamp columns', () async {
       String out = await _generate('''
 @DoxModel(createdAt: 'made_at')
