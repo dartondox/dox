@@ -44,6 +44,12 @@ void main() async {
 
 In a Dox app you do not set this up yourself. Set the stores in `config/cache.dart` and use `Cache()`.
 
+## Encrypt values
+
+Add `'encrypt': true` to a `file` or `redis` store, and pass `encrypter:` to `CacheConfig`.
+In a Dox app the `Dox().cache` encrypter uses your `APP_KEY`.
+On Redis, plain ints stay plain, so `increment` still works.
+
 ## Features
 
 - Drivers: `memory` (with an optional LRU size limit), `file`, `redis` and `null`.

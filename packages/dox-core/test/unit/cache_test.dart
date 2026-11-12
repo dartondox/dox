@@ -135,8 +135,26 @@ void main() {
       expect(out.stores['file']!.containsKey('prefix'), isFalse);
     });
 
-    test('no app name keeps the config', () {
-      expect(identical(Cache.withAppPrefix(config, '  '), config), isTrue);
+    test('no app name keeps the stores', () {
+      CacheConfig result = Cache.withAppPrefix(config, '  ');
+      expect(identical(result.stores, config.stores), isTrue);
+      expect(result.defaultStore, config.defaultStore);
+    });
+
+    test('no app name and an encrypter gives the same config', () {
+      CacheConfig own = CacheConfig(
+        defaultStore: 'redis',
+        stores: config.stores,
+        encrypter: const CryptCacheEncrypter(),
+      );
+      expect(identical(Cache.withAppPrefix(own, '  '), own), isTrue);
+    });
+
+    test('the config gets the APP_KEY encrypter when it has none', () {
+      expect(
+        Cache.withAppPrefix(config, 'x').encrypter,
+        isA<CryptCacheEncrypter>(),
+      );
     });
   });
 }

@@ -198,6 +198,12 @@ The `CacheStore` methods have the same names as `Cache()`: `get`, `getRaw`, `put
 `rememberForever`, `flexible`, `touch`. In a Dox app, `Cache().repository` is the `CacheStore`
 and `Dox().cache` is the `CacheManager`.
 
+## Encrypt values
+
+Add `'encrypt': true` to a `file` or `redis` store. It uses the `encrypter` of `CacheConfig`.
+In a Dox app the normal `Dox().cache` has it set (the `APP_KEY` one). A `CacheManager` you build needs `encrypter:`.
+On Redis, plain ints stay plain, so `increment` still works.
+
 ## Tests
 
 Replace the cache with a memory store, so tests do not write files or need Redis:

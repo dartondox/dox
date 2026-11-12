@@ -59,26 +59,36 @@ class Cache {
   /// [config] where each Redis store with no `prefix` gets
   /// `<app name>_cache:`, so two apps on one Redis do not share keys.
   /// `My Shop` gives `my_shop_cache:`. An empty [appName] changes nothing,
-  /// so the dox_cache default stays.
+  /// so the dox_cache default stays for the prefix.
+  ///
+  /// When the config has no `encrypter`, the result gets one built on
+  /// `Crypt` (the `APP_KEY`). A store then only needs `'encrypt': true`.
   static CacheConfig withAppPrefix(CacheConfig config, String appName) {
     String name = appName
         .trim()
         .toLowerCase()
         .replaceAll(RegExp(r'[^a-z0-9]+'), '_')
         .replaceAll(RegExp(r'^_+|_+$'), '');
-    if (name.isEmpty) return config;
-    Map<String, Map<String, dynamic>> stores = <String, Map<String, dynamic>>{
-      for (MapEntry<String, Map<String, dynamic>> store
-          in config.stores.entries)
-        store.key:
-            store.value['driver'] == 'redis' && store.value['prefix'] == null
-            ? <String, dynamic>{...store.value, 'prefix': '${name}_cache:'}
-            : store.value,
-    };
+    if (name.isEmpty && config.encrypter != null) return config;
+    Map<String, Map<String, dynamic>> stores = name.isEmpty
+        ? config.stores
+        : <String, Map<String, dynamic>>{
+            for (MapEntry<String, Map<String, dynamic>> store
+                in config.stores.entries)
+              store.key:
+                  store.value['driver'] == 'redis' &&
+                      store.value['prefix'] == null
+                  ? <String, dynamic>{
+                      ...store.value,
+                      'prefix': '${name}_cache:',
+                    }
+                  : store.value,
+          };
     return CacheConfig(
       defaultStore: config.defaultStore,
       stores: stores,
       flags: config.flags,
+      encrypter: config.encrypter ?? const CryptCacheEncrypter(),
     );
   }
 

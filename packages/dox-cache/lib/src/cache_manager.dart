@@ -18,8 +18,13 @@ import 'drivers/redis_driver.dart';
 class CacheManager {
   CacheManager(this.config, {this.clock = const CacheClock()}) {
     _factories[CacheConstants.memoryDriver] = MemoryDriverFactory(clock);
-    _factories[CacheConstants.fileDriver] = FileDriverFactory(clock);
-    _factories[CacheConstants.redisDriver] = const RedisDriverFactory();
+    _factories[CacheConstants.fileDriver] = FileDriverFactory(
+      clock,
+      config.encrypter,
+    );
+    _factories[CacheConstants.redisDriver] = RedisDriverFactory(
+      config.encrypter,
+    );
     _factories[CacheConstants.nullDriver] = const NullDriverFactory();
   }
 
@@ -76,6 +81,21 @@ class CacheManager {
     Map<String, dynamic>? options = config.stores[storeName];
     if (options == null) {
       throw ArgumentError('Cache store "$storeName" is not configured');
+    }
+    Object? encrypt = options[CacheConstants.encryptOption];
+    if (encrypt != null && encrypt is! bool) {
+      throw ArgumentError(
+        'Cache store "$storeName": encrypt must be true or false, '
+        'not ${encrypt.runtimeType}',
+      );
+    }
+    if (encrypt == true && config.encrypter == null) {
+      throw StateError(
+        'Cache store "$storeName" has encrypt: true, '
+        'but CacheConfig has no encrypter. '
+        'Memory and null stores need an encrypter too, '
+        'even though they do not encrypt.',
+      );
     }
     String? driverName = options[CacheConstants.driverOption] as String?;
     CacheDriverFactory? factory = _factories[driverName];

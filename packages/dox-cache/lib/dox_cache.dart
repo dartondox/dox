@@ -4,6 +4,7 @@ library;
 export 'src/cache_clock.dart';
 export 'src/cache_config.dart';
 export 'src/cache_driver.dart';
+export 'src/cache_encrypter.dart';
 export 'src/cache_lock.dart';
 export 'src/cache_manager.dart';
 export 'src/cache_store.dart';

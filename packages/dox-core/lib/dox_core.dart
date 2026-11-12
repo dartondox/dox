@@ -4,6 +4,7 @@ export 'package:dox_annotation/dox_annotation.dart';
 export 'package:dox_cache/dox_cache.dart'
     show
         CacheConfig,
+        CacheEncrypter,
         CacheFlags,
         CacheLock,
         CacheManager,
@@ -29,6 +30,7 @@ export 'app.dart';
 
 /// cache
 export 'cache/cache.dart';
+export 'cache/crypt_cache_encrypter.dart';
 export 'constants/constants.dart';
 export 'env/env.dart';
 export 'env/env_reader.dart';

@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 import 'package:ioredis/ioredis.dart';
 
 import '../cache_driver.dart';
+import '../cache_encrypter.dart';
 import '../cache_lock.dart';
 import '../constants/cache_constants.dart';
 
@@ -14,6 +15,14 @@ import '../constants/cache_constants.dart';
 /// not used. Set [prefix] instead. `flush` deletes only keys that start
 /// with [prefix] (SCAN, then DEL). It never runs FLUSHDB.
 /// Redis error replies throw `RedisError` (from ioredis).
+///
+/// With an [encrypter], every value is encrypted before it is written.
+/// One rule keeps counters working: a plain `int` is stored as plain JSON
+/// text, so `INCRBY` still works. Every other value is encrypted. On read,
+/// text that is a plain integer is the number. Any other text is
+/// decrypted. When that fails (wrong key or changed text), it reads as a
+/// miss. `increment` on an encrypted value throws a `RedisError`, as it
+/// does for any value that is not a number.
 class RedisDriver extends CacheDriver {
   /// A [prefix] that does not end with `:` gets one, so the prefix
   /// `app` never matches the keys of `app2`.
@@ -21,6 +30,7 @@ class RedisDriver extends CacheDriver {
     this.redis, {
     String prefix = CacheConstants.defaultPrefix,
     this.maxValueBytes,
+    this.encrypter,
   }) : prefix = withSeparator(prefix);
 
   /// The connection. Inject your own or use [RedisDriverFactory].
@@ -32,6 +42,11 @@ class RedisDriver extends CacheDriver {
   /// Values bigger than this throw [ArgumentError]. Null (the default)
   /// means no limit.
   final int? maxValueBytes;
+
+  /// Encrypts the values. Null means plain JSON.
+  final CacheEncrypter? encrypter;
+
+  static final RegExp _plainInt = RegExp(r'^-?\d+$');
 
   /// Delete the lock only when the owner token matches.
   static const String _releaseScript = '''
@@ -64,14 +79,15 @@ return 0''';
   @override
   Future<dynamic> get(String key) async {
     Object? reply = await redis.sendCommand(<String>['GET', prefix + key]);
-    return reply == null ? null : jsonDecode(reply.toString());
+    return _decode(reply);
   }
 
   /// The stored JSON text. No decode.
   @override
   Future<String?> getRaw(String key) async {
     Object? reply = await redis.sendCommand(<String>['GET', prefix + key]);
-    return reply == null ? null : CacheDriver.liveText(reply.toString());
+    String? text = _plainText(reply);
+    return text == null ? null : CacheDriver.liveText(text);
   }
 
   /// GET with no decode.
@@ -84,7 +100,7 @@ return 0''';
   @override
   Future<dynamic> pull(String key) async {
     Object? reply = await redis.sendCommand(<String>['GETDEL', prefix + key]);
-    return reply == null ? null : jsonDecode(reply.toString());
+    return _decode(reply);
   }
 
   /// PEXPIRE, or PERSIST for a null [ttl].
@@ -113,8 +129,7 @@ return 0''';
       for (String key in keys) prefix + key,
     ]) as List<dynamic>;
     for (int i = 0; i < keys.length; i++) {
-      Object? reply = replies[i];
-      result[keys[i]] = reply == null ? null : jsonDecode(reply.toString());
+      result[keys[i]] = _decode(replies[i]);
     }
     return result;
   }
@@ -233,16 +248,41 @@ return 0''';
   }
 
   List<String> _setCommand(String key, Object? value, Duration? ttl) {
-    String text = jsonEncode(value);
+    String plain = jsonEncode(value);
     int? limit = maxValueBytes;
-    if (limit != null && utf8.encode(text).length > limit) {
+    if (limit != null && utf8.encode(plain).length > limit) {
       throw ArgumentError('Cache value of "$key" is bigger than $limit bytes');
     }
-    List<String> command = <String>['SET', prefix + key, text];
+    List<String> command = <String>['SET', prefix + key, _encode(value, plain)];
     if (ttl != null) {
       command.addAll(<String>['PX', _milliseconds(ttl)]);
     }
     return command;
+  }
+
+  /// The text to store. A plain int stays plain, so INCRBY works.
+  String _encode(Object? value, String plain) {
+    CacheEncrypter? secret = encrypter;
+    return secret == null || value is int ? plain : secret.encrypt(plain);
+  }
+
+  /// The JSON text of a [reply], decrypted when needed. Null for a miss,
+  /// also when it cannot be decrypted.
+  String? _plainText(Object? reply) {
+    if (reply == null) return null;
+    String text = reply.toString();
+    CacheEncrypter? secret = encrypter;
+    if (secret == null || _plainInt.hasMatch(text)) return text;
+    try {
+      return secret.decrypt(text);
+    } on Object {
+      return null;
+    }
+  }
+
+  dynamic _decode(Object? reply) {
+    String? text = _plainText(reply);
+    return text == null ? null : jsonDecode(text);
   }
 
   /// Redis needs at least 1 ms.
@@ -284,11 +324,13 @@ class RedisLock extends CacheLock {
 
 /// Builds a [RedisDriver] with a new connection.
 /// Options: host, port, username, password, db, tls, prefix, pool_size,
-/// max_value_bytes.
+/// max_value_bytes, encrypt (needs an encrypter).
 /// pool_size is the most connections to open (ioredis maxConnection).
 /// ioredis shares one connection and only opens more for blocking commands.
 class RedisDriverFactory implements CacheDriverFactory {
-  const RedisDriverFactory();
+  const RedisDriverFactory([this._encrypter]);
+
+  final CacheEncrypter? _encrypter;
 
   /// Wait before reconnect: 50 ms per try, at most 2 s.
   static Duration retryDelay(int times) {
@@ -321,6 +363,9 @@ class RedisDriverFactory implements CacheDriverFactory {
           options[CacheConstants.prefixOption] as String? ??
           CacheConstants.defaultPrefix,
       maxValueBytes: options[CacheConstants.maxValueBytesOption] as int?,
+      encrypter: options[CacheConstants.encryptOption] == true
+          ? _encrypter
+          : null,
     );
   }
 }
