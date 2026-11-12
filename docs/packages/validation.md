@@ -285,7 +285,7 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
 - `prohibited()` and `prohibitedIf()` come after `optional()`. They treat empty values in different ways:
     - `prohibited()`: a missing key or blank text passes. Any other sent value fails, also `null`, `[]`, `0` and `false`.
     - `prohibitedIf()`: when the condition matches, a missing key, `null`, blank text and an empty list or map pass. `0`, `false` and any other value fail.
-- `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact words.
+- `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact words: `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"` for `accepted()`, and `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"` for `declined()`. The text is case sensitive.
 - `gtField`, `gteField`, `ltField` and `lteField` compare with another key. A missing other key fails.
 - The rules are explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing).
 - `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
