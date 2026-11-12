@@ -129,8 +129,8 @@ dox make:serializer Blog        # lib/app/serializers/blog.serializer.dart
 dox make:provider Cache         # lib/providers/cache_provider.dart
 dox make:command send_report    # lib/app/commands/send_report_command.dart, run it with dox app:send-report
 dox make:mail Welcome           # lib/app/mail/welcome_mail.dart and resources/views/emails/welcome.dox.html
-dox make:mail Welcome --no-view # the mail only, with a plain text body
-dox make:view emails/welcome    # resources/views/emails/welcome.dox.html
+dox make:mail Invoice --no-view # the mail only, with a plain text body
+dox make:view pages/about       # resources/views/pages/about.dox.html
 dox make:test Ping              # test/ping_test.dart, starts the app with DoxTestClient
 dox make:test Math --unit       # test/math_test.dart, a plain test
 dox make:model Blog -m          # lib/app/models/blog/blog.model.dart and a create_blogs_table migration

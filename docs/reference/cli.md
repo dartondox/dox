@@ -12,8 +12,8 @@ How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
 
 Rules that apply to every command:
 
-- `dox` with no command prints `Could not find a command. Run `dox help` for more information.` and exits with code 1.
-- An unknown command prints `Could not find a command named "<name>". Run `dox help` for more information.`, and a hint about the `dox: commands:` key. It exits with code 1.
+- `dox` with no command prints ``Could not find a command. Run `dox help` for more information.`` and exits with code 1.
+- An unknown command prints ``Could not find a command named "<name>". Run `dox help` for more information.``, and a hint about the `dox: commands:` key. It exits with code 1.
 - A command that is not built in can come from a package or from the app. See [Package commands](../digging-deeper/package-commands.md).
 - Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
 - A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
@@ -151,7 +151,7 @@ Writes `lib/config/env.dart`, the typed env class, from `.env.example`.
 
 - Stops with `.env.example is missing.` (exit code 1) when there is no example file.
 - Stops with `lib/config/env.dart is already there. Delete it to make it again.` (exit code 1) when the file exists.
-- Prints `Run `dart run build_runner build` to make env.g.dart.` when done.
+- Prints ``Run `dart run build_runner build` to make env.g.dart.`` when done.
 
 Rules for each key: a whole number (like `3000` or `-1`) gives `int get x => <value>;`, `true`/`false` give `bool get x => <value>;`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
 
@@ -166,7 +166,7 @@ dox env:check
 Loads `AppEnv` from `lib/config/env.dart` with the real environment and `.env`. Prints `The env is valid.` or an `EnvException` with every missing or bad key (exit code 1).
 
 It writes a small script to `.dart_tool/dox/env_check.dart` and runs it with `dart run`. It needs `lib/config/env.dart` and a `name:` in `pubspec.yaml`.
-Without `lib/config/env.dart` it prints `lib/config/env.dart is missing. Run `dox env:generate` first.` (exit code 1).
+Without `lib/config/env.dart` it prints ``lib/config/env.dart is missing. Run `dox env:generate` first.`` (exit code 1).
 
 Source: `lib/src/tools/env_tools.dart` (`envCheck`).
 
@@ -264,7 +264,7 @@ dox make:dto <name>
 
 Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
 The class name has no `Dto` at the end: `dox make:dto CreateBlog` gives the class `CreateBlog` in `lib/app/dtos/create_blog/create_blog.dto.dart`.
-A trailing `Dto` in the name is removed. Prints `Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.`
+A trailing `Dto` in the name is removed. Prints ``Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.``
 
 Template: `_getSample` in `lib/src/tools/create_dto.dart`.
 
@@ -287,7 +287,7 @@ dox make:provider <name>
 
 Writes `lib/providers/<name>_provider.dart`: a class `<Name>Provider extends DoxProvider` with an empty `setup()` and an optional `shutdown()`.
 A trailing `Provider` in the name is removed: `dox make:provider Cache` gives `CacheProvider` in `lib/providers/cache_provider.dart`.
-Prints `Run `dox build_runner:build` to add it to the container.` Dox finds the provider after that. See [Providers](../digging-deeper/providers.md).
+Prints ``Run `dox build_runner:build` to add it to the container.`` Dox finds the provider after that. See [Providers](../digging-deeper/providers.md).
 
 Template: `createProvider` in `lib/src/tools/make_files.dart`.
 
@@ -305,7 +305,7 @@ It also does two more things:
 - It adds the class to the `commands` list in `lib/app/commands/commands.dart`. It makes that file when it is missing.
 - It adds `commands: package:<app>/app/commands/commands.dart` under `dox:` in `pubspec.yaml`, when that key is not set.
 
-Then it prints `Run `dart pub get`, then `dox app:send-report`.`
+Then it prints ``Run `dart pub get`, then `dox app:send-report`.``
 
 It makes all the changes or none. When `pubspec.yaml` or `commands.dart` is not in the shape it expects, it prints what to add by hand, exits with code 1 and writes nothing. When `dox: commands:` already points to another library, it does the same.
 
@@ -479,7 +479,7 @@ It does not start the server. It writes a small script to `.dart_tool/dox/route_
 
 Providers do not run. A route that a provider adds in `setup()` is not in the list. The Socket.IO mount is one example.
 
-Your `dox_core` must have `Dox().loadRoutes()`. When it does not, the command says so and tells you to run `dart pub upgrade dox_core`.
+Your `dox_core` must have `Dox().loadRoutes()`.
 
 Errors go to stderr, so `--json` output stays clean for scripts. Without a Dox app in the folder, or with an unknown option, the command exits with code 1.
 

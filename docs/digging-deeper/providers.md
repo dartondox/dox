@@ -40,7 +40,7 @@ class ORMProvider extends DoxProvider {
 }
 ```
 
-To make the file, run `dox make:provider Orm`. It writes `lib/providers/orm_provider.dart` with an empty `setup()`. See [`dox make:provider`](../reference/cli.md#dox-makeprovider).
+To make the file, run `dox make:provider Cache`. It writes `lib/providers/cache_provider.dart` with an empty `setup()`. See [`dox make:provider`](../reference/cli.md#dox-makeprovider).
 
 ## Register it
 
