@@ -85,21 +85,19 @@ void main() {
   });
 
   test('starting twice does not add a new instance twice', () async {
-    GlobalMiddleware.clear();
     DoxTestClient second = await DoxTestClient.start(
       AppConfig(
         appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        providers: <DoxProvider>[InstanceProvider(), InstanceProvider()],
+        providers: <DoxProvider>[InstanceProvider()],
         routers: <Router>[TestRouter()],
       ),
     );
     await second.close();
-    expect(GlobalMiddleware.items.whereType<Inst>().length, 2);
-    GlobalMiddleware.clear();
+    expect(GlobalMiddleware.items.whereType<Inst>().length, 1);
+    // the providers stay in Dox, so they run again on the next start
     DoxTestClient third = await DoxTestClient.start(
       AppConfig(
         appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        providers: <DoxProvider>[InstanceProvider()],
         routers: <Router>[TestRouter()],
       ),
     );
