@@ -880,7 +880,7 @@ Use another connection of `config/database.dart` with `QueueConfig(connection: '
 `failed_jobs.failed_at` is the time the job failed. It has one of two types:
 
 - A big integer: unix time in milliseconds. This is the default.
-- A timestamp in UTC, like Laravel. Turn it on with `failedAtTimestamp: true`.
+- A timestamp in UTC. Turn it on with `failedAtTimestamp: true`.
 
 `FailedJob.failedAt` is the same `DateTime` with both types.
 

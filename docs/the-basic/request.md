@@ -72,7 +72,7 @@ Dot keys also work in `filled`, `exists`, `missing`, `boolean`, `integer`, `file
 
 The flags `onlyPresent` and `hasKeyOnly` make `only` leave out missing keys and `has` only check the key. See [Core flags](../reference/app-config.md#core-flags).
 
-Form and query keys with brackets give lists and maps, like in Laravel:
+Form and query keys with brackets give lists and maps:
 
 | Input | `req.input(...)` gives |
 | --- | --- |

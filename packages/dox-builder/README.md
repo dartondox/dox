@@ -5,7 +5,7 @@ Code generator for Dox apps. It runs with `build_runner`.
 [![pub package](https://img.shields.io/pub/v/dox_builder.svg)](https://pub.dev/packages/dox_builder)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/dartondox/dox/blob/main/LICENSE)
 
-Part of [Dox](https://dartondox.dev), a web backend framework for Dart, like Laravel.
+Part of [Dox](https://dartondox.dev), a web backend framework for Dart.
 Source code: [github.com/dartondox/dox](https://github.com/dartondox/dox).
 
 ## Install

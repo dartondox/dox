@@ -124,7 +124,7 @@ To stop early, return a response and do not call `next()`.
 
 ## Run code after the answer is sent
 
-A middleware can run code after the answer has gone to the client, like `terminate` in Laravel.
+A middleware can run code after the answer has gone to the client, in its `terminate` method.
 Use it for work the client should not wait for: logs, metrics, cleanup.
 Implement `IDoxTerminableMiddleware`:
 

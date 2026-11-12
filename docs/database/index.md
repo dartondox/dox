@@ -185,7 +185,7 @@ After you add a provider, run `dart run build_runner build`.
 
 ### ORM flags
 
-`OrmFlags` turns on ORM behaviors that work like Laravel.
+`OrmFlags` turns on opt-in ORM behaviors.
 Each flag is off by default. With all flags off, the ORM works as this page and the other database pages say.
 Pass the flags as `flags:` in `DatabaseConfig`:
 
@@ -207,7 +207,7 @@ flags: const OrmFlags(pluralTableNames: true, sumReturnsZero: true),
 |---|---|---|
 | `skipCleanUpdateEvents` | `save()` with no changes fires `saving`, `updating`, `updated` and `saved`. | It fires only `saving` and `saved`. A model with a `Map` or `List` field always counts as changed. A save with changes runs `beforeSave` two times, and a save with no changes runs it one time. |
 | `belongsToKeyFromRelation` | The default `belongsTo` foreign key comes from the class name: `@BelongsTo(User) User? author` uses `user_id`. | It comes from the relation name: `author_id`. |
-| `pluralTableNames` | The default table name is singular: `User` uses `user`. | It is plural, with the same English rules as Laravel: `users`, `blog_posts`, `categories`. |
+| `pluralTableNames` | The default table name is singular: `User` uses `user`. | It is plural, with English plural rules: `users`, `blog_posts`, `categories`. |
 | `createWritesNull` | `create()` does not send a `null` key, so the column default is used. | It writes `NULL` for a key that is `null` in the map. |
 | `sumReturnsZero` | `sum()` gives `null` when no row matches. | It gives `0`. |
 | `selectRawAdds` | `selectRaw()` replaces the select list. | It adds to it, so `select('a').selectRaw('count(*) as c')` selects both. |

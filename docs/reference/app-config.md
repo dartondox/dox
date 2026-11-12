@@ -50,11 +50,11 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
 | `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
-| `flags` | `CoreFlags` | `CoreFlags()` (all off) | Opt-in behaviors that work like Laravel. See [Core flags](#core-flags). |
+| `flags` | `CoreFlags` | `CoreFlags()` (all off) | Opt-in core behaviors. See [Core flags](#core-flags). |
 
 ## Core flags
 
-`CoreFlags` turns on behaviors that work like Laravel. Every flag is off by default.
+`CoreFlags` turns on opt-in behaviors. Every flag is off by default.
 Turn on the ones you want:
 
 ```dart
@@ -122,7 +122,7 @@ Source: `packages/dox-cache/lib/src/cache_config.dart`. Option keys: `packages/d
 | --- | --- | --- | --- |
 | `defaultStore` | `String` | required | The store `Cache()` uses when no store is named. |
 | `stores` | `Map<String, Map<String, dynamic>>` | required | Store name to options. Each store needs a `driver` option. |
-| `flags` | `CacheFlags` | `CacheFlags()` (all off) | Opt-in behaviors that work like Laravel. See below. |
+| `flags` | `CacheFlags` | `CacheFlags()` (all off) | Opt-in cache behaviors. See below. |
 
 `CacheFlags` has one flag. `CacheFlags.all()` turns it on.
 

@@ -107,14 +107,14 @@ The Dart type decides. You do not write `required` or `nullable`.
 - Rules on an optional field run only when it has a value.
 - A default value is used only when the key is missing. The rules do not check it.
 - **An empty string counts as missing.** So a required `String` rejects `""`. Add `@AllowEmpty()` to keep `""`.
-- **Spaces are kept.** So `"   "` passes `required`, unless the field has `@Trim()`. To trim every text field of a DTO (like Laravel's `TrimStrings`), use `@Dto(trim: true)`. Then `"   "` counts as missing. It works like `@Trim()` on each `String` field and on the text items of its lists and maps. A nested DTO uses its own `@Dto(trim:)`.
-- To read `""` as `null` instead (like Laravel's `ConvertEmptyStringsToNull`), use `@Dto(emptyStringsToNull: true)`. With `@Dto(trim: true)` too, blank text like `"  "` is `null` as well. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`. A field that is not nullable but has a default gets `required` too, because `null` is not a missing key.
+- **Spaces are kept.** So `"   "` passes `required`, unless the field has `@Trim()`. To trim every text field of a DTO, use `@Dto(trim: true)`. Then `"   "` counts as missing. It works like `@Trim()` on each `String` field and on the text items of its lists and maps. A nested DTO uses its own `@Dto(trim:)`.
+- To read `""` as `null` instead, use `@Dto(emptyStringsToNull: true)`. With `@Dto(trim: true)` too, blank text like `"  "` is `null` as well. Then `{"bio": ""}` clears a `Maybe<String?>` field. A required field still gets `required`. A field that is not nullable but has a default gets `required` too, because `null` is not a missing key.
 - `@OrDefault()` turns a bad value into the default, with no error.
     - It works on any field, in a body or a query.
     - Example: `@OrDefault() @NotIn(<int>[0]) final int page;` with `this.page = 1` reads `page=abc` and `page=0` as `1`.
     - The field needs a default, a nullable type or a `Maybe` type. A `Maybe` field gets `Maybe.missing()`.
     - Errors from async rules (`@Unique`, `@Exists`, your `AsyncRule`) and from `validate()` are not dropped. They run later, on the built object, and still give `422`.
-- Three [opt-in flags](../packages/validation.md#opt-in-flags) make DTOs work more like Laravel: get all errors at once, reject `[]` in a required list, and reject `""` in a `Maybe` field.
+- Three [opt-in flags](../packages/validation.md#opt-in-flags) change how DTOs are checked: get all errors at once, reject `[]` in a required list, and reject `""` in a `Maybe` field.
 
 ### Missing or `null`? (for PATCH)
 
@@ -310,7 +310,7 @@ When a check fails, Dox answers `422` with one message per field:
 
 The key is the path to the value, with the input keys. List items use the index.
 
-The flag `laravelErrors` sends `{"message": "...", "errors": {"field": ["..."]}}` instead, like Laravel. See [Core flags](../reference/app-config.md#core-flags).
+The flag `laravelErrors` sends `{"message": "...", "errors": {"field": ["..."]}}` instead. See [Core flags](../reference/app-config.md#core-flags).
 
 For another error shape, read `error.issues` of the `ValidationException` in your `ExceptionHandler`. Each issue has its `dottedPath`, its rule `code` (like `min_length`), its `message` and its `params`.
 
@@ -357,7 +357,7 @@ Placeholders: `{field}` (the last key), `{value}`, and rule values like `{min}` 
 ### Names for `{field}`
 
 By default `{field}` is the key, like `The first_name is required`.
-To show another name, give attribute names, like Laravel's custom attributes.
+To show another name, give attribute names.
 A key with no name still shows the key.
 
 On the DTO:

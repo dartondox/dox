@@ -65,7 +65,7 @@ Details:
 - Length counts characters (Unicode code points). `é` counts as 1.
 - `@Url()` needs `http` or `https` and a host.
 - `@Uuid()` takes any version. Upper or lower case.
-- `@Ulid()` takes 26 Crockford base32 characters, upper or lower case, like Laravel `ulid`. The first one is `0` to `7`.
+- `@Ulid()` takes 26 Crockford base32 characters, upper or lower case. The first one is `0` to `7`.
 - `@Regex(pattern, {message})` must match the **whole** value. You do not need `^` and `$`.
   The regex is checked when the generator runs. A bad regex stops the build.
 - `@Alpha()`, `@AlphaNumeric()` and `@AlphaDash()` use ASCII letters `a-z`, `A-Z`. `@AlphaDash()` also allows digits `0-9`, `-` and `_`.
@@ -73,7 +73,7 @@ Details:
 
 ## More text rules
 
-For `String` fields. Like the Laravel rules with the same names.
+For `String` fields.
 
 | Annotation | Code | Message | JSON Schema |
 | --- | --- | --- | --- |
@@ -94,16 +94,16 @@ For `String` fields. Like the Laravel rules with the same names.
   time zone `e`, `T`, `P`, `p`, `O`, `Z`, `I`;
   full `U`, `c`, `r`.
   Put `\` before a letter to use it as text, like `Y-m-d\TH:i`. Any other letter stops the build (and throws an `ArgumentError` in `v.string().dateFormat()`). Other characters must be there as they are.
-  Like Laravel, `j`, `n`, `g`, `G`, `z` and `U` take no leading zero: `j/n/Y` rejects `01/02/2024`.
+  `j`, `n`, `g`, `G`, `z` and `U` take no leading zero: `j/n/Y` rejects `01/02/2024`.
   `e` and `T` take any name that looks like a time zone. They do not check that it is a real one.
   The date must exist: `2023-02-29` fails. Names need the case shown (`Jan`, not `jan`). A day name must fit the date. The field stays a `String`. Use a `DateTime` field for ISO 8601 dates.
 - `@Password` options: `min` (default 8), `letters`, `mixedCase` (one upper and one lower case letter), `numbers`, `symbols`. They are all off by default.
   Letters, numbers and symbols are Unicode, so `é` is a letter. `{rules}` lists the options you set, like `at least 8 characters, one number, and one symbol`, or `at least 8 characters and one number`.
-  It does not check leaked passwords (Laravel `uncompromised`).
+  It does not check leaked passwords.
 
 ## Other fields
 
-These read another key of the same object. The other key is the input key, like `account_type`, not the Dart name `accountType`. If you give the Dart name of a field with another key, the build stops. `@Confirmed` and `@Same` compare the raw input of both keys, like Laravel. So `@Trim` does not change the compare.
+These read another key of the same object. The other key is the input key, like `account_type`, not the Dart name `accountType`. If you give the Dart name of a field with another key, the build stops. `@Confirmed` and `@Same` compare the raw input of both keys. So `@Trim` does not change the compare.
 
 | Annotation | Code | Message |
 | --- | --- | --- |
@@ -127,12 +127,12 @@ These read another key of the same object. The other key is the input key, like 
 - `@RequiredIf` and `@RequiredWith` work on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops.
 - `@RequiredIf('type', ['company', 'shop'])` takes a list: any of the values makes the field required. `"true"` matches `true`, `"1"` matches `1`. An enum value matches its name: `@RequiredIf('role', Role.admin)` matches `"admin"`.
 - `@RequiredWith(['phone', 'email'])`: the field is required when any of the keys is there and not empty.
-- `@RequiredUnless('type', 'guest')` is Laravel `required_unless`: the field is required unless `type` is `guest`. A missing `type` counts as `null`, so the field is required then. It takes a list of values like `@RequiredIf`.
+- `@RequiredUnless('type', 'guest')` makes the field required unless `type` is `guest`. A missing `type` counts as `null`, so the field is required then. It takes a list of values like `@RequiredIf`.
 - `@RequiredWithout(['email'])`: the field is required when any of the keys is missing or empty. `@RequiredWithoutAll(['email', 'phone'])`: when all of them are missing or empty.
 - `@RequiredUnless`, `@RequiredWithout` and `@RequiredWithoutAll` follow the same rules as `@RequiredIf`: a nullable, `Maybe` or default field, and input keys.
-- `@Different('old_password')` is Laravel `different`. It compares the raw input like `@Same`. A missing other key passes.
-- `@ProhibitedIf('type', 'guest')` is Laravel `prohibited_if`: when `type` is `guest`, the field must be missing or empty. Empty is `null`, blank text, an empty list or an empty map. `0` and `false` fail. This is not the same as `@Prohibited()`, which fails on `null` and `[]`: Laravel does it this way too. It reads `type` and matches like `@RequiredIf`.
-- `@GreaterThanField`, `@GreaterThanOrEqualField`, `@LessThanField` and `@LessThanOrEqualField` are Laravel `gt`, `gte`, `lt` and `lte` with a field. They are for `int`, `double` and `num` fields. They read the raw input of the other key: a number, or number text from a form. Like Laravel, a missing other key (or one that is not a number) fails.
+- `@Different('old_password')` needs a value that is not the same as the other key. It compares the raw input like `@Same`. A missing other key passes.
+- `@ProhibitedIf('type', 'guest')` means: when `type` is `guest`, the field must be missing or empty. Empty is `null`, blank text, an empty list or an empty map. `0` and `false` fail. This is not the same as `@Prohibited()`, which fails on `null` and `[]`. It reads `type` and matches like `@RequiredIf`.
+- `@GreaterThanField`, `@GreaterThanOrEqualField`, `@LessThanField` and `@LessThanOrEqualField` compare a value with another field. They are for `int`, `double` and `num` fields. They read the raw input of the other key: a number, or number text from a form. A missing other key (or one that is not a number) fails.
   `{min}` and `{max}` in the message are the other key. They use the codes of `@GreaterThan`, `@Min`, `@LessThan` and `@Max`.
 - On a `List<T>` field, `@Different` checks the whole list, not each item. The field compare rules do not fit a list.
 - Missing means: not there, `null`, blank text, an empty list or an empty map.
@@ -140,7 +140,7 @@ These read another key of the same object. The other key is the input key, like 
 
 ## Present or missing
 
-These check if a key is sent and has a value. Like Laravel.
+These check if a key is sent and has a value.
 
 | Annotation | Code | Message |
 | --- | --- | --- |
@@ -153,8 +153,8 @@ These check if a key is sent and has a value. Like Laravel.
 - `@Filled()`: a missing key passes. A key that is sent must have a value: not `null`, not blank text, not an empty list.
 - `@Present()`: the key must be sent. Its value may be `null` or empty.
 - `@Filled()` and `@Present()` are for a nullable, `Maybe` or default field, like `@RequiredIf`. They run in step 1.
-- `@Prohibited()`: the key must be missing, or blank text like `""` or `"  "`. Any other sent value fails, also `null`, `[]`, `{}`, `0` and `false`. This is what Laravel's `prohibited` rule does by itself. It reads the raw input, so it runs before the type check, in step 1. It is for a nullable, `Maybe` or default field.
-- `@Accepted()` takes `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"`. `@Declined()` takes `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"`. The text is case sensitive, like Laravel.
+- `@Prohibited()`: the key must be missing, or blank text like `""` or `"  "`. Any other sent value fails, also `null`, `[]`, `{}`, `0` and `false`. It reads the raw input, so it runs before the type check, in step 1. It is for a nullable, `Maybe` or default field.
+- `@Accepted()` takes `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"`. `@Declined()` takes `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"`. The text is case sensitive.
   Use them on a `bool` field with no default. Then a missing value fails with `required`. In a form, `yes` and `on` turn into `true` first. In a JSON body a `bool` field takes only `true` and `false`, unless the DTO has `@Dto(coerce: true)`.
 
 ```dart
@@ -172,7 +172,7 @@ final String? note; // the key must be there, null is fine
 | `@ExcludeIf('type', 'person')` | when `type` is `person`, the field is skipped |
 | `@ExcludeUnless('type', 'company')` | unless `type` is `company`, the field is skipped |
 
-- A skipped field is not read and not checked. It gets its default, `null` or `Maybe.missing()`, as if it was not sent. Like Laravel `exclude_if` and `exclude_unless`, where the field is left out of the validated data.
+- A skipped field is not read and not checked. It gets its default, `null` or `Maybe.missing()`, as if it was not sent. The field is left out of the validated data.
 - They read the raw input of the other key, and match like `@RequiredIf` (also with a list of values).
 - `@ExcludeIf`: a missing other key does not skip. `@ExcludeUnless`: a missing other key counts as `null`, so the field is skipped.
 - They are for a nullable, `Maybe` or default field. On an always-required field the build stops.
@@ -225,7 +225,7 @@ For `int`, `double` and `num` fields (and list items).
 | `@In([1, 2, 3])` | `in` | `The selected {field} is invalid. Valid options are {values}` | `enum` |
 | `@NotIn([0])` | `not_in` | `The {field} field cannot be {value}` | `not: {enum}` |
 
-The values are `num`. `@Min(1.5)` on an `int` field stops the build. `@Range` is Laravel `between`.
+The values are `num`. `@Min(1.5)` on an `int` field stops the build. `@Range` checks that a number is between two values.
 
 ## Lists
 
@@ -299,7 +299,7 @@ For `RequestFile` and `List<RequestFile>` fields.
   It reads only the image header of PNG, GIF, WebP and JPEG files, never the whole file.
   Any other file, or a broken or cut short header, fails.
   For a JPEG over 1 MB, Dox reads the first 128 KB. A JPEG with more photo metadata than that before its size fails.
-  Like Laravel, a `ratio` passes when it is off by less than one pixel.
+  A `ratio` passes when it is off by less than one pixel.
 - The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.
 
 With fluent schemas, the same rules are on `v.file()`. Sizes there are in bytes, not text:
@@ -385,7 +385,7 @@ How each field type reads input. The short table is in [Types](validation.md#typ
 ## The order of checks
 
 1. Read the input and convert types. Change text (`@Trim`, `@Lowercase`, `@Uppercase`). Find missing required fields.
-2. The field rules, top to bottom. The first rule that fails stops the other rules of that field, like Laravel `bail`. So there is no `@Bail`. A fluent schema runs all rules, unless you add `.bail()`. See [Stop at the first error](../packages/validation.md#stop-at-the-first-error).
+2. The field rules, top to bottom. The first rule that fails stops the other rules of that field. So there is no `@Bail`. A fluent schema runs all rules, unless you add `.bail()`. See [Stop at the first error](../packages/validation.md#stop-at-the-first-error).
 3. The `validate()` method (nested DTOs first, then the parent).
 4. Async rules (`@Unique`, `@Exists`, your `AsyncRule`), one at a time, in field order.
 

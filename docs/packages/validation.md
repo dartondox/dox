@@ -259,7 +259,7 @@ They use the same codes and messages as the DTO annotations. See the [rules refe
 - `requiredIf` and `requiredWith` come after `optional()` or `nullish()`.
   Then a missing, `null` or blank value is an error when the condition is true.
 
-More Laravel rules:
+More rules:
 
 ```dart
 final ObjectSchema order = v.object(<String, Schema<Object?>>{
@@ -282,11 +282,11 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
 
 - `requiredUnless`, `requiredWithout`, `requiredWithoutAll`, `filled` and `present` come after `optional()`, like `requiredIf`.
 - `present()` needs the key. Add `.nullable()` to allow `null`.
-- `prohibited()` and `prohibitedIf()` come after `optional()`. Like Laravel, they treat empty values in different ways:
+- `prohibited()` and `prohibitedIf()` come after `optional()`. They treat empty values in different ways:
     - `prohibited()`: a missing key or blank text passes. Any other sent value fails, also `null`, `[]`, `0` and `false`.
     - `prohibitedIf()`: when the condition matches, a missing key, `null`, blank text and an empty list or map pass. `0`, `false` and any other value fail.
-- `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact Laravel words.
-- `gtField`, `gteField`, `ltField` and `lteField` compare with another key, like Laravel `gt:field`. A missing other key fails.
+- `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact words: `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"` for `accepted()`, and `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"` for `declined()`. The text is case sensitive.
+- `gtField`, `gteField`, `ltField` and `lteField` compare with another key. A missing other key fails.
 - The rules are explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing).
 - `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
 - For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
@@ -295,7 +295,7 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
 
 #### Stop at the first error
 
-A fluent schema runs all rules of a value, and gives one error for each failed rule. Add `.bail()` to stop at the first failed rule, like Laravel `bail`. A DTO always does this.
+A fluent schema runs all rules of a value, and gives one error for each failed rule. Add `.bail()` to stop at the first failed rule. A DTO always does this.
 
 ```dart
 v.string().min(8).email().bail().safeParse('ab');
@@ -310,7 +310,7 @@ v.string().min(8).email().bail().safeParse('ab');
 
 #### Skip a field
 
-`excludeIf(other, value)` and `excludeUnless(other, value)` skip a field of `v.object()`, like Laravel `exclude_if` and `exclude_unless`. When they match, the field is not checked, and its key is not in the output.
+`excludeIf(other, value)` and `excludeUnless(other, value)` skip a field of `v.object()`. When they match, the field is not checked, and its key is not in the output.
 
 ```dart
 final ObjectSchema account = v.object(<String, Schema<Object?>>{
@@ -335,7 +335,7 @@ account.parse(<String, dynamic>{'type': 'person', 'vat_number': 'x'});
 
 #### The presence verifier
 
-`exists` and `unique` ask a `PresenceVerifier` (like in Laravel). `dox_orm` sets one when the database starts, so in a Dox app they just work.
+`exists` and `unique` ask a `PresenceVerifier`. `dox_orm` sets one when the database starts, so in a Dox app they just work.
 Outside Dox, or with another database layer, set your own. Each isolate has its own value, so set it in a provider's `setup()`, which runs in every isolate:
 
 ```dart

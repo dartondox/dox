@@ -186,7 +186,7 @@ Do not start `dox s` yet. The first way below makes a migration first.
 ## Access tokens
 
 An access token is an API token that you can revoke at any time.
-It is like an AdonisJS access token or a Laravel Sanctum token.
+It is like an AdonisJS access token.
 
 - A token looks like `oat_12.<secret>`. `12` is the row id in the token table.
 - The table keeps only a SHA-256 hash of the secret. You see the plain token once, when you make it.
@@ -1198,7 +1198,7 @@ String? token = await Auth(guard: 'admin').attempt(credentials);
 
 Route.get('/admin', <dynamic>[AuthMiddleware(guard: 'admin'), (AdminController c) => c.index]);
 
-// try the guards in order, like Laravel auth:web,api
+// try the guards in order
 Route.get('/me', <dynamic>[AuthMiddleware(guards: <String>['web', 'api']), (UserController c) => c.me]);
 ```
 

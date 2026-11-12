@@ -29,7 +29,7 @@ The same password gives a different hash each time.
 bool ok = Hash.verify('secret', user.password!);
 ```
 
-`Hash.verify(password, hashedPassword)` returns `true` when the password matches. `Hash.check` is the same, with the Laravel name.
+`Hash.verify(password, hashedPassword)` returns `true` when the password matches. `Hash.check` does the same.
 It returns `false` when the password does not match, or when `hashedPassword` is not a valid bcrypt hash (for example an empty string).
 
 ## Without blocking the server
