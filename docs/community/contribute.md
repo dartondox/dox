@@ -19,7 +19,7 @@ git clone git@github.com:dartondox/dox.git
 ### 2. Install melos
 
 The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces).
-The melos config is in the root `pubspec.yaml` (under `melos:`). Use Dart 3.13 or newer.
+The melos config is in the root `pubspec.yaml` (under `melos:`). Use Dart 3.14 or newer.
 
 ```bash
 dart pub global activate melos
