@@ -168,6 +168,7 @@ A test does not run `bin/server.dart`. So set `Env.flags = flags;` at the top of
 
 ```dart title="test/http_test.dart"
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/testing.dart';
 import 'package:my_app/config/app.dart';
 import 'package:test/test.dart';
 

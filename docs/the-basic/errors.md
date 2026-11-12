@@ -49,7 +49,7 @@ It loads no files from outside.
 
 - Only a request that does not want JSON gets the page. A request wants JSON (`DoxRequest.expectsJson()`) when it has an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request does not want JSON, so it gets the page.
 - Only when `APP_ENV` is `development` or `local`, the page also shows the error text and the stack trace.
-- JSON clients still get JSON.
+- A JSON client gets the same answer as without `htmlErrors`.
 - A validation error does not change. It keeps its `422` JSON or its redirect.
 - An answer from your own `ExceptionHandler.render` does not change.
 
