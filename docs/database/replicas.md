@@ -88,7 +88,8 @@ await ReplicaDriver.stickyScope(() async {
 });
 ```
 
-The warning shows once, when a read from a replica follows a write, outside a request.
+dox_orm prints a warning on stderr, once, when sticky cannot work: a read from a replica that follows a write, outside `stickyScope()`.
+In a Dox app every request runs inside a scope, so the warning only shows for scripts, jobs or startup code.
 
 ## With `DATABASE_URL`
 
