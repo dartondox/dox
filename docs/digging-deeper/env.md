@@ -164,6 +164,26 @@ void main() async {
 
 `my_app` is the `name` in your `pubspec.yaml`.
 
+A test does not run `bin/server.dart`. So set `Env.flags = flags;` at the top of the `main()` of each test file too, before the app or the client starts:
+
+```dart title="test/http_test.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:my_app/config/app.dart';
+import 'package:test/test.dart';
+
+void main() {
+  Env.flags = flags;
+  late DoxTestClient client;
+
+  setUpAll(() async {
+    client = await DoxTestClient.start(appConfig);
+  });
+  // ...
+}
+```
+
+Without it, `${OTHER}` stays as written in the test, and Dox prints the warning.
+
 The server isolates follow the main isolate. You set nothing for them.
 When the flag is on in `AppConfig` but `.env` was read without it, Dox prints a warning at start, once in each isolate.
 
