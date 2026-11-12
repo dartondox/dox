@@ -116,13 +116,14 @@ CRLF=yes\r
 
   test('.env: export KEY=value', () {
     Map<String, String> env = Env.parse(
-      'export A=1\nexport   B="two"\nexport=3\nexporter=4\n',
+      'export A=1\nexport   B="two"\nexport=3\nexporter=4\nexport\tC=5\n',
     );
     expect(env, <String, String>{
       'A': '1',
       'B': 'two',
       'export': '3',
       'exporter': '4',
+      'C': '5',
     });
   });
 

@@ -28,7 +28,8 @@ class Env {
   /// The flags the `.env` file is read with. Only `envExpand` is used.
   /// Set it at the top of `main()`, before any env value is read: the
   /// file is read once, before `AppConfig` exists. See
-  /// `CoreFlags.envExpand`.
+  /// `CoreFlags.envExpand`. The server isolates read `.env` the same way
+  /// as the main isolate, without more setup.
   static CoreFlags flags = const CoreFlags();
 
   /// True when the loaded `.env` was read with `envExpand`.
@@ -152,7 +153,7 @@ class Env {
     for (String line in contents.split('\n')) {
       String text = line.trim();
       if (text.isEmpty || text.startsWith('#')) continue;
-      if (text.startsWith('export ')) text = text.substring(7).trimLeft();
+      text = text.replaceFirst(_export, '');
       int equal = text.indexOf('=');
       if (equal < 1) continue;
       data[text.substring(0, equal).trim()] = _value(
@@ -164,6 +165,8 @@ class Env {
   }
 
   static final RegExp _comment = RegExp(r'(^|\s)#');
+
+  static final RegExp _export = RegExp(r'^export\s+');
 
   static final RegExp _variable = RegExp(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\}');
 
