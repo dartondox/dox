@@ -869,7 +869,7 @@ class Route {
   }
 
   /// a route for the WebDAV `VIEW` HTTP method. It does not render a
-  /// template like Laravel `Route::view`. For that, use a GET route:
+  /// template. To render a template, use a GET route:
   /// `Route.get('welcome', (DoxRequest req) => view(req, 'welcome'))`
   /// with `view()` of dox_view.
   /// ```

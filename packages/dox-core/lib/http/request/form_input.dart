@@ -46,7 +46,7 @@ class FormInput {
     return changed ? _packMap(root) : root;
   }
 
-  /// The input for `req.body` and `req.query`, like PHP and Laravel:
+  /// The input for `req.body` and `req.query`, like PHP:
   /// bracket keys nest (`tags[]=a&tags[]=b` gives `{'tags': ['a', 'b']}`),
   /// and a repeated plain key keeps its last value.
   /// [flat] (the last value of each key) is given back as it is when no

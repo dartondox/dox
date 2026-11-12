@@ -72,6 +72,10 @@ Dox take the security of our framework seriously. If you identify any security v
 
 We welcome contributions from the community! If you'd like to contribute to the Dox framework, please fork the repo and PR to us. Please visit [contribution guide](/docs/community/contribute.md) for more information.
 
+## Credits
+
+Dox is inspired by [Laravel](https://laravel.com).
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).

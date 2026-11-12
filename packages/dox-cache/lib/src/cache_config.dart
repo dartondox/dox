@@ -25,11 +25,11 @@ class CacheConfig {
   /// Store name to options. Each needs a 'driver' option.
   final Map<String, Map<String, dynamic>> stores;
 
-  /// Opt-in behaviors that work like Laravel. All off by default.
+  /// Opt-in behaviors that change the defaults. All off by default.
   final CacheFlags flags;
 }
 
-/// Opt-in behaviors of the cache that work like Laravel. Every flag is
+/// Opt-in behaviors of the cache that change the defaults. Every flag is
 /// off by default.
 /// ```
 /// CacheConfig(defaultStore: 'file', stores: stores,
