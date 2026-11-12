@@ -9,6 +9,10 @@
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/blog/background-jobs-and-scheduled-tasks/</loc>
+         <lastmod>2026-11-12</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/blog/build-a-dart-api-with-dox/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
@@ -29,6 +33,10 @@
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/blog/full-stack-app-with-inertia/</loc>
+         <lastmod>2026-11-12</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/blog/live-updates-with-socketio/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
@@ -41,11 +49,11 @@
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
-         <loc>https://dartondox.dev/blog/category/performance/</loc>
+         <loc>https://dartondox.dev/blog/category/guides/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
-         <loc>https://dartondox.dev/blog/category/guides/</loc>
+         <loc>https://dartondox.dev/blog/category/performance/</loc>
          <lastmod>2026-11-12</lastmod>
     </url>
     <url>
