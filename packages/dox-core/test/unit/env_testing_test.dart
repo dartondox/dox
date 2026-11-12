@@ -35,6 +35,14 @@ void main() {
     });
   });
 
+  test(r'.env.testing can use ${KEY} of .env', () {
+    File('${dir.path}/.env.testing').writeAsStringSync(
+      r'DB_NAME=${DB_NAME}_test'
+      '\n',
+    );
+    expect(load(testing: true)['DB_NAME'], 'app_test');
+  });
+
   test('.env.testing is not read outside tests', () {
     expect(load(testing: false)['DB_NAME'], 'app');
   });

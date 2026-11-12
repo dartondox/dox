@@ -96,44 +96,100 @@ class Env {
     File envFile = file ?? File('${Directory.current.path}/.env');
     Map<String, String> data = _read(envFile);
     if (testing) {
-      data.addAll(_read(File('${envFile.parent.path}/.env.testing')));
+      data.addAll(
+        _read(File('${envFile.parent.path}/.env.testing'), known: data),
+      );
     }
     return data;
   }
 
-  static Map<String, String> _read(File file) {
+  static Map<String, String> _read(
+    File file, {
+    Map<String, String> known = const <String, String>{},
+  }) {
     if (!file.existsSync()) return <String, String>{};
-    return parse(file.readAsStringSync());
+    return parse(file.readAsStringSync(), known: known);
   }
 
   /// Reads the text of a `.env` file.
   /// - `KEY=value`, one per line. Lines that start with `#` are comments.
+  ///   `export KEY=value` is read like `KEY=value`.
   /// - `KEY=value # note`: a `#` after a space starts a comment.
   /// - `KEY="a # b"`: quotes (`"`, `'` or `` ` ``) keep the value as it is,
   ///   also a `#`. The quotes are removed.
   /// - `KEY=abc#def` stays `abc#def` (no space before the `#`).
-  static Map<String, String> parse(String contents) {
+  /// - `${OTHER}` is the value of `OTHER`, in an unquoted or a `"` value.
+  ///   A real environment variable wins, then a key above this line (or
+  ///   in [known]). An unknown name stays as it is: `${OTHER}`.
+  /// - In a `"` value, `\n`, `\t`, `\"`, `\\` and `\$` become a new line,
+  ///   a tab, `"`, `\` and `$`. A `'` or `` ` `` value stays raw.
+  static Map<String, String> parse(
+    String contents, {
+    Map<String, String> known = const <String, String>{},
+  }) {
     Map<String, String> data = <String, String>{};
+    String? lookup(String name) =>
+        Platform.environment[name] ?? data[name] ?? known[name];
     for (String line in contents.split('\n')) {
       String text = line.trim();
       if (text.isEmpty || text.startsWith('#')) continue;
+      if (text.startsWith('export ')) text = text.substring(7).trimLeft();
       int equal = text.indexOf('=');
       if (equal < 1) continue;
-      data[text.substring(0, equal).trim()] = _value(text.substring(equal + 1));
+      data[text.substring(0, equal).trim()] = _value(
+        text.substring(equal + 1),
+        lookup,
+      );
     }
     return data;
   }
 
   static final RegExp _comment = RegExp(r'(^|\s)#');
 
-  static String _value(String raw) {
+  static final RegExp _variable = RegExp(r'\$\{([A-Za-z_][A-Za-z0-9_]*)\}');
+
+  static String _value(String raw, String? Function(String) lookup) {
     String value = raw.trim();
-    if (value.isNotEmpty && '"\'`'.contains(value[0])) {
+    if (value.startsWith('"')) {
+      String? text = _doubleQuoted(value, lookup);
+      if (text != null) return text;
+    } else if (value.isNotEmpty && '\'`'.contains(value[0])) {
       int end = value.indexOf(value[0], 1);
       if (end > 0) return value.substring(1, end);
     }
     Match? comment = _comment.firstMatch(value);
     if (comment != null) value = value.substring(0, comment.start);
-    return value.trim();
+    return value.trim().replaceAllMapped(
+      _variable,
+      (Match match) => lookup(match[1]!) ?? match[0]!,
+    );
+  }
+
+  /// the text inside the `"` quotes at the start of [value], with escapes
+  /// and `${NAME}` done. null when the closing quote is missing.
+  static String? _doubleQuoted(String value, String? Function(String) lookup) {
+    StringBuffer out = StringBuffer();
+    for (int i = 1; i < value.length; i++) {
+      String char = value[i];
+      if (char == '"') return out.toString();
+      if (char == r'\' && i + 1 < value.length) {
+        String next = value[++i];
+        out.write(switch (next) {
+          'n' => '\n',
+          't' => '\t',
+          '"' || r'\' || r'$' => next,
+          _ => '\\$next',
+        });
+        continue;
+      }
+      Match? match = char == r'$' ? _variable.matchAsPrefix(value, i) : null;
+      if (match != null) {
+        out.write(lookup(match[1]!) ?? match[0]);
+        i = match.end - 1;
+        continue;
+      }
+      out.write(char);
+    }
+    return null;
   }
 }

@@ -1,5 +1,8 @@
 ## Unreleased
 
+- New: `.env` values can use `${OTHER}`, unquoted or in `"..."` (not in `'...'`). It reads a real environment variable first, then a key above it (`.env.testing` also sees the keys of `.env`). An unknown name stays as it is.
+- New: in a `"..."` `.env` value, `\n`, `\t`, `\"`, `\\` and `\$` become a new line, a tab, `"`, `\` and `$`. `'...'` stays raw. Check a `"..."` value that has a `\` (like a Windows path).
+- New: `export KEY=value` lines in `.env` are read like `KEY=value`.
 - New: `AppConfig(htmlErrors: true)` sends a small HTML error page to a request that does not want JSON (see `DoxRequest.expectsJson`). Off by default, so errors stay JSON. In `development` or `local` the page also shows the error text and the stack trace. JSON clients, validation errors and answers from `ExceptionHandler.render` do not change. `AppConfig(errorPage: ...)` replaces the page; `defaultErrorPage` is the default.
 - New: `DoxRequest.expectsJsonFor(headers)` is `expectsJson()` for the headers of a raw `HttpRequest`.
 - New: `Route.resource(..., parameter: 'photo')` names the param of one item `{photo}` instead of `{id}`, so `Route.bind` and model binding work on resource routes. The default is still `{id}`.
