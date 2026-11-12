@@ -1,5 +1,7 @@
 ## Unreleased
 
+- New: `AppConfig(htmlErrors: true)` sends a small HTML error page to a request that does not want JSON (see `DoxRequest.expectsJson`). Off by default, so errors stay JSON. In `development` or `local` the page also shows the error text and the stack trace. JSON clients, validation errors and answers from `ExceptionHandler.render` do not change. `AppConfig(errorPage: ...)` replaces the page; `defaultErrorPage` is the default.
+- New: `DoxRequest.expectsJsonFor(headers)` is `expectsJson()` for the headers of a raw `HttpRequest`.
 - New: `Route.resource(..., parameter: 'photo')` names the param of one item `{photo}` instead of `{id}`, so `Route.bind` and model binding work on resource routes. The default is still `{id}`.
 - New: `route()` and `Route.url()` put a param that is not in the path into the query string. Before, it threw an `ArgumentError`. When `params` and `query` have the same key, `query` wins.
 - New: `route(..., absolute: true)` and `Route.url(..., absolute: true)` give the full url, with `APP_URL` (or `baseUrl:`) in front, like `Route.signedUrl`.

@@ -273,6 +273,12 @@ Throw an HTTP exception to answer with an error:
 For another status, extend `IHttpException` and set `code`, `errorCode` and `message`.
 Any other error gives `500`. The error text is only sent when `APP_ENV` is `development` or `local`.
 
+Errors are JSON by default. For a browser app, set `AppConfig(htmlErrors: true)`.
+Then a request that does not want JSON (no JSON `Accept`, not XHR) gets a small HTML page with the status.
+In `development` or `local` it also shows the error text and the stack trace.
+JSON clients, validation errors and answers from `ExceptionHandler.render` do not change.
+To make your own page, set `errorPage: (int status, Object error, StackTrace stack, bool debug) => '...'`. Escape every value.
+
 ## Recipe: a new API endpoint
 
 Goal: `POST /api/posts` checks the input, saves a post and answers with JSON.

@@ -174,6 +174,22 @@ void main() {
       expect(handler.reported, isEmpty);
     });
 
+    test('htmlErrors is off: a browser still gets JSON', () async {
+      HttpClient client = HttpClient();
+      try {
+        HttpClientRequest req = await client.get('localhost', port, '/fail/x');
+        req.headers.set('accept', 'text/html');
+        HttpClientResponse res = await req.close();
+        expect(res.headers.contentType?.mimeType, 'application/json');
+        expect(
+          await utf8.decodeStream(res),
+          '{"code":"not_found","message":"GET /fail/x not found"}',
+        );
+      } finally {
+        client.close();
+      }
+    });
+
     test('a 5xx http exception is reported', () async {
       expect((await get('/fail/internal')).$1, 500);
       expect(handler.reported.single, isA<InternalErrorException>());

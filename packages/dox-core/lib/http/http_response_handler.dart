@@ -147,7 +147,7 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   /// in development. it is reported by the `ExceptionHandler` in every env.
   if (payload is Exception || payload is Error) {
     res.statusCode = HttpStatus.internalServerError;
-    payload = _showErrors()
+    payload = showErrors()
         ? payload.toString()
         : InternalErrorException().toResponse();
   }
@@ -183,7 +183,9 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
 String? _shownFor;
 bool _show = false;
 
-bool _showErrors() {
+/// True when `APP_ENV` is `development` or `local`: error text may be
+/// sent to the client then.
+bool showErrors() {
   String env = Env.get<String>('APP_ENV');
   if (!identical(env, _shownFor)) {
     String lower = env.toLowerCase();

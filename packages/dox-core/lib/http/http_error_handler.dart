@@ -61,5 +61,29 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
     /// send the default answer for the first error.
     Logger.danger('ExceptionHandler failed: $handlerError\n$handlerStack');
   }
+  if (identical(payload, error)) payload = _htmlPage(req, error, stackTrace);
   return payload;
+}
+
+/// the HTML error page of `AppConfig.htmlErrors`, or [error] itself (the
+/// JSON answer) when it is off, the client wants JSON, or it is a
+/// validation error (it keeps its 422 JSON or its redirect).
+Object _htmlPage(HttpRequest req, Object error, StackTrace stackTrace) {
+  AppConfig config = Dox().config;
+  if (!config.htmlErrors || error is ValidationException) return error;
+  try {
+    if (DoxRequest.expectsJsonFor(req.headers)) return error;
+    int status = error is IHttpException
+        ? error.code
+        : HttpStatus.internalServerError;
+    DoxResponse page = response(
+      config.errorPage(status, error, stackTrace, showErrors()),
+    ).statusCode(status).contentType(ContentType.html);
+    if (error is HttpStatusException) page.withHeaders(error.headers);
+    return page;
+  } catch (pageError, pageStack) {
+    /// a repeated header or a broken renderer: send the JSON answer
+    Logger.danger('The error page failed: $pageError\n$pageStack');
+    return error;
+  }
 }
