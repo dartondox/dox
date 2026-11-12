@@ -23,7 +23,7 @@ A JSON API for blog posts.
 
 ## What you need
 
-- Dart **3.13** or newer: `dart --version`.
+- Dart **3.14** or newer: `dart --version`.
 - `curl`, to call the API.
 - About 15 minutes.
 

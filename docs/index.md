@@ -133,7 +133,7 @@ it was run.
 
 ## Run it in two minutes
 
-You need [Dart](https://dart.dev/get-dart) 3.13 or newer. Nothing else: the
+You need [Dart](https://dart.dev/get-dart) 3.14 or newer. Nothing else: the
 starter project uses SQLite, so there is no database to install.
 
 ```bash

@@ -155,6 +155,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 Change `my_app` to the name of your app in `pubspec.yaml`.
 
 - `debug: true` prints each SQL query and its values. The app template turns it on only in development.
+  The default printer, `PrettyQueryPrinter`, prints one line per query with the values put into the SQL.
+  You can copy the SQL and run it in psql, mysql or the sqlite CLI:
+
+  ```
+  ▌ [db:default] SELECT * FROM "users" WHERE "email" = 'a@b.com' LIMIT 1;
+  ```
 - `user`, `password`, `host` and `port` are not used by SQLite.
 
 Start the ORM in a provider. The app template already has this file.
@@ -415,8 +421,15 @@ It is off by default. It works with `debug` off, so you can use it in production
 ```
 
 The log line goes to the query `printer`.
-It has the time, the connection name and the SQL, like `Slow query (812 ms, postgres): select ...`.
-A value named in `logRedact` shows as `***`.
+It has the connection name, the time and the SQL.
+`PrettyQueryPrinter` (the default) prints it like this:
+
+```
+▌ [db:postgres SLOW 812ms] SELECT * FROM "orders" WHERE "user_id" = 42;
+```
+
+Other printers, like `ConsoleQueryPrinter` and `FileQueryPrinter`, get `Slow query (812 ms, postgres): select ...`.
+A value named in `logRedact` shows as `***` (`'***'` in the `PrettyQueryPrinter` line).
 Set `slowQueryMs` to `0` to log every query.
 A failed query is not logged here.
 With `debug` on, a slow query of the query builder shows twice: the debug line before it runs, and the slow line with its time after it.
