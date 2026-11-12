@@ -88,9 +88,8 @@ await ReplicaDriver.stickyScope(() async {
 });
 ```
 
-A sticky query outside any scope prints a warning once.
-A new app prints this warning once at start, because the migrations run before the server starts.
-This one warning at start is expected.
+dox_orm prints a warning on stderr, once, when sticky cannot work: a read from a replica that follows a write, outside `stickyScope()`.
+In a Dox app every request runs inside a scope, so the warning only shows for scripts, jobs or startup code.
 
 ## With `DATABASE_URL`
 
