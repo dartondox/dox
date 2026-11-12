@@ -237,7 +237,7 @@ On Redis, a prefix with no `:` at the end gets one, so `app` does not match the 
 ## Encrypt the cache
 
 By default the cache keeps plain JSON. Anyone who can read the cache file or the Redis database can read the values.
-To hide them, add `'encrypt': true` to a `file` or `redis` store, and give the config an encrypter. In a Dox app the encrypter is set for you. Without Dox, write your own class:
+To hide them, add `'encrypt': true` to a `file` or `redis` store, and give the config an encrypter. In a Dox app, the normal `Dox().cache` has the encrypter set for you. A `CacheManager` you build yourself needs `encrypter:` (for example `const CryptCacheEncrypter()`). Without Dox, write your own class:
 
 ```dart
 class MyEncrypter implements CacheEncrypter {

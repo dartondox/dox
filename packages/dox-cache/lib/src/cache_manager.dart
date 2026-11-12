@@ -93,7 +93,8 @@ class CacheManager {
       throw StateError(
         'Cache store "$storeName" has encrypt: true, '
         'but CacheConfig has no encrypter. '
-        'This is also so for memory and null stores, which do not encrypt.',
+        'Memory and null stores need an encrypter too, '
+        'even though they do not encrypt.',
       );
     }
     String? driverName = options[CacheConstants.driverOption] as String?;

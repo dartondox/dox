@@ -80,7 +80,7 @@ To hide them, add `'encrypt': true` to a `file` or `redis` store:
 ```
 
 - It is off by default. A store without the option is not changed.
-- The values are encrypted with your `APP_KEY`. Old keys in `previousKeys` can still read old entries.
+- The normal `Dox().cache` has the encrypter set for you, and values are encrypted with your `APP_KEY`. A `CacheManager` you build yourself needs `encrypter:` (for example `const CryptCacheEncrypter()`). Old keys in `previousKeys` can still read old entries.
 - When the key changes, the old entries cannot be read. They count as a miss. The cache then fills again.
 - On a `file` store, the whole file is encrypted, also the expiry time. Lock files are not encrypted. They hold no values.
 - On a `redis` store, a plain `int` stays plain text, so `increment` and `decrement` still work. Every other value is encrypted. Tag counters are `int` values, so they stay plain too. To keep a secret number encrypted, store it as a `String`.

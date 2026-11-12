@@ -21,7 +21,7 @@ void main() {
       );
       expect(encrypter.decrypt(secret), '{"a":1}');
       Dox().initialize(AppConfig(appKey: newKey));
-      expect(() => encrypter.decrypt(secret), throwsA(isA<Object>()));
+      expect(() => encrypter.decrypt(secret), throwsA(isA<DecryptException>()));
     });
   });
 }

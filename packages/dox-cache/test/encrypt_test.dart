@@ -206,6 +206,14 @@ Future<void> main() async {
       expect(await driver.fileFor('old').exists(), isFalse);
     });
 
+    test('prune deletes a file that cannot be decrypted', () async {
+      await CacheStore(FileDriver(directory: dir, encrypter: rightKey))
+          .put('k', 'v');
+      FileDriver other = FileDriver(directory: dir, encrypter: wrongKey);
+      expect(await other.prune(), 1);
+      expect(await other.fileFor('k').exists(), isFalse);
+    });
+
     test('the manager turns it on with the store option', () async {
       CacheManager cache = CacheManager(
         CacheConfig(
