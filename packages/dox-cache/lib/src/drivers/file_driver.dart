@@ -5,6 +5,7 @@ import 'package:crypto/crypto.dart';
 
 import '../cache_clock.dart';
 import '../cache_driver.dart';
+import '../cache_encrypter.dart';
 import '../cache_lock.dart';
 import '../constants/cache_constants.dart';
 
@@ -18,6 +19,11 @@ import '../constants/cache_constants.dart';
 /// `{"value": ..., "expires_at": <ms or null>}`. Writes go to a temp file
 /// first and then rename, so a reader never sees half a file.
 ///
+/// With an [encrypter], the whole entry text (value and expiry time) is
+/// encrypted before it is written. A file that cannot be decrypted (wrong
+/// key, changed text, or a plain file from before) reads as a miss. Lock
+/// files are not encrypted. They hold no values.
+///
 /// A read never deletes a file. An expired file stays until it is
 /// written again, removed, or [prune] runs. Set [pruneEvery] to run
 /// [prune] by itself in the background once every that many writes.
@@ -30,6 +36,7 @@ class FileDriver extends CacheDriver {
     this.prefix = CacheConstants.defaultPrefix,
     this._clock = const CacheClock(),
     this.pruneEvery = CacheConstants.filePruneEvery,
+    this.encrypter,
   }) : directory = directory ?? Directory(CacheConstants.defaultFilePath);
 
   /// Base folder of the cache. Stores keep their files in sub folders.
@@ -43,6 +50,9 @@ class FileDriver extends CacheDriver {
   /// Run [prune] in the background once every this many writes.
   /// 0 (the default) turns it off.
   final int pruneEvery;
+
+  /// Encrypts the entry text. Null means plain JSON.
+  final CacheEncrypter? encrypter;
 
   int _writes = 0;
   bool _pruning = false;
@@ -237,8 +247,11 @@ class FileDriver extends CacheDriver {
     }
     Map<String, dynamic> entry;
     try {
-      entry = jsonDecode(text) as Map<String, dynamic>;
-    } on FormatException {
+      CacheEncrypter? secret = encrypter;
+      entry = jsonDecode(
+        secret == null ? text : secret.decrypt(text),
+      ) as Map<String, dynamic>;
+    } on Object {
       return null;
     }
     int? expiresAt = entry[CacheConstants.fileExpiresAtField] as int?;
@@ -253,6 +266,7 @@ class FileDriver extends CacheDriver {
       CacheConstants.fileValueField: value,
       CacheConstants.fileExpiresAtField: expiresAt,
     });
+    text = encrypter?.encrypt(text) ?? text;
     File file = fileFor(key);
     File temp = _tempFor(file);
     try {
@@ -424,11 +438,13 @@ class FileLock extends CacheLock {
   }
 }
 
-/// Builds a [FileDriver]. Options: path, prefix, prune_every.
+/// Builds a [FileDriver]. Options: path, prefix, prune_every, encrypt.
+/// `encrypt: true` needs an encrypter.
 class FileDriverFactory implements CacheDriverFactory {
-  const FileDriverFactory([this._clock = const CacheClock()]);
+  const FileDriverFactory([this._clock = const CacheClock(), this._encrypter]);
 
   final CacheClock _clock;
+  final CacheEncrypter? _encrypter;
 
   @override
   CacheDriver create(Map<String, dynamic> options) {
@@ -444,6 +460,9 @@ class FileDriverFactory implements CacheDriverFactory {
           options[CacheConstants.pruneEveryOption] as int? ??
           CacheConstants.filePruneEvery,
       clock: _clock,
+      encrypter: options[CacheConstants.encryptOption] == true
+          ? _encrypter
+          : null,
     );
   }
 }

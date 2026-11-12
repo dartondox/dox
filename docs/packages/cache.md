@@ -234,6 +234,38 @@ On Redis, a prefix with no `:` at the end gets one, so `app` does not match the 
     `flush` deletes only the keys with the prefix. It never runs `FLUSHDB`.
     An empty prefix makes `flush` throw.
 
+## Encrypt the cache
+
+By default the cache keeps plain JSON. Anyone who can read the cache file or the Redis database can read the values.
+To hide them, add `'encrypt': true` to a `file` or `redis` store, and give the config an encrypter. In a Dox app the encrypter is set for you. Without Dox, write your own class:
+
+```dart
+class MyEncrypter implements CacheEncrypter {
+  @override
+  String encrypt(String text) => myEncrypt(text);
+
+  @override
+  String decrypt(String text) => myDecrypt(text); // throw on bad input
+}
+
+CacheConfig(defaultStore: 'file', stores: stores, encrypter: MyEncrypter());
+```
+
+Then turn it on per store:
+
+```dart
+'file': {'driver': 'file', 'path': 'storage/cache', 'encrypt': true},
+```
+
+- It is off by default. A store without the option is not changed.
+- In a Dox app the values are encrypted with your `APP_KEY`. Old keys in `previousKeys` can still read old entries.
+- When the key changes, the old entries cannot be read. They count as a miss. The cache then fills again.
+- A store with `'encrypt': true` and no encrypter throws a `StateError` when it is built.
+- On a `file` store, the whole file is encrypted, also the expiry time. Lock files are not encrypted. They hold no values.
+- On a `redis` store, a plain `int` stays plain text, so `increment` and `decrement` still work. Every other value is encrypted. Tag counters are `int` values, so they stay plain too.
+- A `memory` store ignores the option. Its values never leave the process.
+- A store that is not encrypted yet reads as a miss after you turn the option on.
+
 ## File driver
 
 - Each prefix has its own sub folder inside `path`. `flush` deletes only the files of that prefix.

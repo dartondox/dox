@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: a cache store with `'encrypt': true` encrypts its values with the `APP_KEY` (`Crypt`). Old keys in `previousKeys` can still read old entries. No setup is needed: `CryptCacheEncrypter` is the default. Set `CacheConfig(encrypter: ...)` to use your own. `CacheEncrypter` is exported from dox_core.
 - New: `Dox().addGlobalMiddleware(middleware)`. A provider calls it in `setup()` to add global middleware. They run on every route (and on mounts), before the app's `globalMiddleware`. The same middleware added twice runs once. `Dox().allGlobalMiddleware` gives the full list.
 - Ships an AI agent skill (dox-core-guide). Install it in your app with `dart run skills@ get`.
 - Requires Dart 3.14 or newer.

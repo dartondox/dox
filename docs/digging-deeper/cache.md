@@ -70,6 +70,23 @@ Each store is made once per isolate, the first time you use it.
 A `redis` store with no `prefix` gets `<app name>_cache:` from `APP_NAME`, like `my_shop_cache:`. So two apps on one Redis do not share keys. The other drivers use `dox_cache:`.
 You rarely need `pool_size`: the cache sends no blocking commands, so each isolate uses about one Redis connection.
 
+## Encrypt the cache
+
+By default the cache keeps plain JSON. Anyone who can read the cache file or the Redis database can read the values.
+To hide them, add `'encrypt': true` to a `file` or `redis` store:
+
+```dart
+'file': {'driver': 'file', 'path': 'storage/cache', 'encrypt': true},
+```
+
+- It is off by default. A store without the option is not changed.
+- The values are encrypted with your `APP_KEY`. Old keys in `previousKeys` can still read old entries.
+- When the key changes, the old entries cannot be read. They count as a miss. The cache then fills again.
+- On a `file` store, the whole file is encrypted, also the expiry time. Lock files are not encrypted. They hold no values.
+- On a `redis` store, a plain `int` stays plain text, so `increment` and `decrement` still work. Every other value is encrypted. Tag counters are `int` values, so they stay plain too.
+- A `memory` store ignores the option. Its values never leave the process.
+- A store that is not encrypted yet reads as a miss after you turn the option on.
+
 ## Values are JSON
 
 A value must be a JSON type: `Map`, `List`, `String`, `num`, `bool` or `null`.
