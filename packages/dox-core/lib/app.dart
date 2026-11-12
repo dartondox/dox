@@ -319,13 +319,15 @@ class Dox {
   /// Add a global middleware from a package. Call it in the `setup()` of a
   /// [DoxProvider]. It runs on every route, before the app's own
   /// `globalMiddleware`. A second add of the same one is skipped. It takes
-  /// the same kinds as `globalMiddleware`.
+  /// the same kinds as `globalMiddleware`. Use a top-level function or a
+  /// const instance, so a restart does not add it twice. The list is
+  /// cleared at each start, before the providers run.
   void addGlobalMiddleware(Object middleware) {
     GlobalMiddleware.add(middleware);
   }
 
   List<dynamic>? _allGlobalSource;
-  int _allGlobalCount = -1;
+  int _allGlobalVersion = -1;
   List<dynamic> _allGlobal = const <dynamic>[];
 
   /// the middleware that packages added, then `config.globalMiddleware`.
@@ -334,9 +336,9 @@ class Dox {
     List<Object> added = GlobalMiddleware.items;
     if (added.isEmpty) return config.globalMiddleware;
     if (!identical(_allGlobalSource, config.globalMiddleware) ||
-        _allGlobalCount != added.length) {
+        _allGlobalVersion != GlobalMiddleware.version) {
       _allGlobalSource = config.globalMiddleware;
-      _allGlobalCount = added.length;
+      _allGlobalVersion = GlobalMiddleware.version;
       _allGlobal = <dynamic>[...added, ...config.globalMiddleware];
     }
     return _allGlobal;
@@ -358,6 +360,8 @@ class Dox {
   /// this is internal core use only
   /// your app do not need to call this function
   Future<void> startProviders() async {
+    // a restart builds the package middleware again
+    GlobalMiddleware.clear();
     _addContainerProviders();
     for (DoxProvider provider in doxProviders) {
       await provider.setup();

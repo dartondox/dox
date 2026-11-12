@@ -30,6 +30,16 @@ class PackageProvider extends DoxProvider {
   }
 }
 
+class Inst implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) => null;
+}
+
+class InstanceProvider extends DoxProvider {
+  @override
+  Future<void> setup() async => Dox().addGlobalMiddleware(Inst());
+}
+
 class TestRouter extends Router {
   @override
   void register() {
@@ -74,10 +84,41 @@ void main() {
         .expectHeader('x-package', 'yes');
   });
 
+  test('starting twice does not add a new instance twice', () async {
+    GlobalMiddleware.clear();
+    DoxTestClient second = await DoxTestClient.start(
+      AppConfig(
+        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        providers: <DoxProvider>[InstanceProvider(), InstanceProvider()],
+        routers: <Router>[TestRouter()],
+      ),
+    );
+    await second.close();
+    expect(GlobalMiddleware.items.whereType<Inst>().length, 2);
+    GlobalMiddleware.clear();
+    DoxTestClient third = await DoxTestClient.start(
+      AppConfig(
+        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        providers: <DoxProvider>[InstanceProvider()],
+        routers: <Router>[TestRouter()],
+      ),
+    );
+    await third.close();
+    expect(GlobalMiddleware.items.whereType<Inst>().length, 1);
+  });
+
+  test('clear then add gives the new list', () {
+    GlobalMiddleware.clear();
+    GlobalMiddleware.add(fromPackage);
+    expect(Dox().allGlobalMiddleware.first, fromPackage);
+    GlobalMiddleware.clear();
+    GlobalMiddleware.add(plain);
+    expect(Dox().allGlobalMiddleware.first, plain);
+  });
+
   test('a function with plain types is a next middleware', () {
     // this line does not compile unless it matches
     NextMiddlewareFunction asNext = plain;
     expect(asNext, isNotNull);
-    expect(GlobalMiddleware.items, <Object>[fromPackage, plain]);
   });
 }
