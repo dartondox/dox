@@ -1,6 +1,6 @@
 # Dox
 
-> Dox is a web backend framework for Dart, like Laravel: routing, an ORM,
+> Dox is a web backend framework for Dart: routing, an ORM,
 > migrations, typed validation, auth and a CLI. It runs on a Rust HTTP
 > server, one isolate per CPU core, and builds to one native binary.
 
@@ -10,6 +10,7 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 
 - [Getting Started](https://dartondox.dev/latest/)
 - [Installation](https://dartondox.dev/latest/getting-started/installation/)
+- [Add a package](https://dartondox.dev/latest/getting-started/add-a-package/)
 - [Build a blog API](https://dartondox.dev/latest/tutorial/)
 - [Step 1: Create the project](https://dartondox.dev/latest/tutorial/01-create-project/)
 - [Step 2: Model and migration](https://dartondox.dev/latest/tutorial/02-model-and-migration/)
@@ -42,6 +43,7 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 - [Queue](https://dartondox.dev/latest/digging-deeper/queue/)
 - [Mail](https://dartondox.dev/latest/digging-deeper/mail/)
 - [Notifications](https://dartondox.dev/latest/digging-deeper/notifications/)
+- [Broadcasting](https://dartondox.dev/latest/digging-deeper/broadcasting/)
 - [Scheduler](https://dartondox.dev/latest/digging-deeper/scheduler/)
 - [File Storage](https://dartondox.dev/latest/digging-deeper/file-storage/)
 - [Environment Variables](https://dartondox.dev/latest/digging-deeper/env/)
@@ -61,6 +63,7 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 - [Factories](https://dartondox.dev/latest/database/factories/)
 - [Seeders](https://dartondox.dev/latest/database/seeders/)
 - [Schema builder](https://dartondox.dev/latest/database/schema/)
+- [Read replicas](https://dartondox.dev/latest/database/replicas/)
 - [Native Postgres driver](https://dartondox.dev/latest/database/postgres-native/)
 - [Native MySQL driver](https://dartondox.dev/latest/database/mysql-native/)
 - [Model](https://dartondox.dev/latest/database/model/)
@@ -73,6 +76,7 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 - [HasMany](https://dartondox.dev/latest/database/model/relationship/has-many/)
 - [BelongsTo](https://dartondox.dev/latest/database/model/relationship/belongs-to/)
 - [ManyToMany](https://dartondox.dev/latest/database/model/relationship/many-to-many/)
+- [HasManyThrough](https://dartondox.dev/latest/database/model/relationship/through/)
 - [Polymorphic](https://dartondox.dev/latest/database/model/relationship/polymorphic/)
 - [Authentication](https://dartondox.dev/latest/security/authentication/)
 - [Authorization](https://dartondox.dev/latest/security/authorization/)
