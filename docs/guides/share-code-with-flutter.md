@@ -39,7 +39,7 @@ version: 0.1.0
 publish_to: none
 
 environment:
-  sdk: ^3.14.0
+  sdk: ^3.13.0
 
 ```
 
@@ -170,7 +170,7 @@ name: app
 publish_to: none
 
 environment:
-  sdk: ^3.14.0
+  sdk: ^3.13.0
 
 dependencies:
   flutter:

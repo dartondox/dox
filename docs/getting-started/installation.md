@@ -6,7 +6,7 @@ icon: lucide/download
 
 This page shows how to install the Dox CLI, make a new project and start the server.
 
-Dox needs **Dart 3.14** or newer.
+Dox needs **Dart 3.13** or newer.
 
 ## Install the CLI
 

@@ -13,7 +13,6 @@
 - New: a cache store with `'encrypt': true` encrypts its values with the `APP_KEY` (`Crypt`). Old keys in `previousKeys` can still read old entries. No setup is needed: `CryptCacheEncrypter` is the default. Set `CacheConfig(encrypter: ...)` to use your own. `CacheEncrypter` is exported from dox_core. `CryptCacheEncrypter.encrypt` throws a `StateError` when `APP_KEY` is empty.
 - New: `Dox().addGlobalMiddleware(middleware)`. A provider calls it in `setup()` to add global middleware. They run on every route (and on mounts), before the app's `globalMiddleware`. The same middleware added twice runs once. `Dox().allGlobalMiddleware` gives the full list.
 - Ships an AI agent skill (dox-core-guide). Install it in your app with `dart run skills@ get`.
-- Requires Dart 3.14 or newer.
 - New: `Dox().loadRoutes()` registers the routes of the app routers and gives them as `AppRoutes` (routes, fallbacks and mounts), without a server and without providers. When OpenAPI is on, the docs routes (`/docs`, `/openapi.json`, `/openapi.yaml`) are in it too. It is safe to call more than once: the route list is empty before and after the call, so a later `startServer()` starts clean. `dox route:list` uses it.
 - New: `RouteData.isWebSocket` is true for a route added with `Route.websocket`.
 - Fix: `Route.group`, `Route.domain`, `Route.middleware`, `Route.enabledCors` and `Route.disabledCors` restore the prefix, name prefix, domain, middleware and CORS setting also when the callback throws. Before, the next routes got the wrong path, name or middleware.
