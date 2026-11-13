@@ -23,7 +23,19 @@ It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
     So a value you put in one isolate is missing in the others.
     Use `redis` or `database` when all isolates and servers must see the same data.
 
+## Install
+
+```bash
+dox add cache
+```
+
+Add `--store=redis` (or `memory`, `file`, `database`) to pick the default store. `database` needs `dox add orm` first.
+It writes the cache config and the `CACHE_STORE` key. It never overwrites a file, so it is safe to run twice.
+A new app already has it.
+
 ## Config
+
+### Set it up by hand
 
 A new project already has `lib/config/cache.dart`, with a `file` store and a `memory` store.
 `CACHE_STORE` in `.env` picks the default store (`file` when it is not set).

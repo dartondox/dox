@@ -14,10 +14,18 @@ The `dox_queue` package gives you jobs, two drivers (Redis and sync), retries, d
 ## Install
 
 ```bash
-dart pub add dox_queue
+dox add queue
 ```
 
-Or run `dox add queue [--driver=database|redis|sync]` (`database` is the default). It adds the package and writes the config, the provider, `bin/queue.dart` and a sample job. It never overwrites a file.
+Add `--driver=redis` or `--driver=sync` to pick another driver. `database` is the default, and it needs `dox add orm` first.
+It adds the package and writes the config, the provider, `bin/queue.dart` and a sample job. It never overwrites a file, so it is safe to run twice.
+A new app already has it.
+
+### Set it up by hand
+
+```bash
+dart pub add dox_queue
+```
 
 The job builder is in `dox_builder`. Your app already runs `build_runner` with it, so nothing else is needed.
 
