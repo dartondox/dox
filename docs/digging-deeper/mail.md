@@ -19,7 +19,8 @@ dox add mailer
 ```
 
 Add `--transport=smtp` (or `resend`, `mailgun`, `postmark`, `ses`) to pick a transport. `log` is the default.
-It adds the package and writes the mail config, the provider and the `MAIL_*` keys. It never overwrites a file, so it is safe to run twice.
+It adds the package and writes the mail config and the provider. It adds `MAIL_MAILER`, `MAIL_FROM` and the keys of the transport to `.env`.
+When the app has `dox_view`, it also makes the `resources/views/emails` folder. It never overwrites a file, so it is safe to run twice.
 
 ### Set it up by hand
 

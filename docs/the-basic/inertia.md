@@ -17,7 +17,8 @@ The `dox_inertia` package is the server side of Inertia. Use it with the Inertia
 dox add inertia
 ```
 
-It does steps 1 to 3 of [Set it up by hand](#set-it-up-by-hand) (root view, config, provider). It prints the Vite steps. Vite and the middleware are still yours.
+It adds the package and does steps 1 to 3 of [Set it up by hand](#set-it-up-by-hand) (root view, config, provider).
+Then do steps 4 to 6 (Vite, the built files and the middleware) yourself. It prints a short list of them.
 It never overwrites a file, so it is safe to run twice.
 
 ## Set it up by hand

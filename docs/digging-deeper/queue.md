@@ -17,8 +17,9 @@ The `dox_queue` package gives you jobs, two drivers (Redis and sync), retries, d
 dox add queue
 ```
 
-Add `--driver=redis` or `--driver=sync` to pick another driver. `database` is the default, and it needs `dox add orm` first.
+Add `--driver=redis` or `--driver=sync` to pick another driver. `database` is the default.
 It adds the package and writes the config, the provider, `bin/queue.dart` and a sample job. It never overwrites a file, so it is safe to run twice.
+`database` also adds `dox_queue_database` and the jobs tables migration. It needs `dox add orm` first. `redis` adds the `REDIS_*` keys.
 A new app already has it.
 
 ### Set it up by hand

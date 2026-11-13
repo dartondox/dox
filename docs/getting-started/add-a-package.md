@@ -16,7 +16,7 @@ dox add orm
 2. Runs `dart pub get`.
 3. Runs the setup command of the package, `dox orm:install`.
 
-The setup command writes the config files, adds the keys to `.env` and `.env.example`, and runs `build_runner`.
+The setup command writes the config files, adds the keys to `.env` and `.env.example`, and runs `build_runner` when the package needs it.
 At the end it prints what it did and the next steps.
 
 A package with no setup command is only added. `dox add` then says so.

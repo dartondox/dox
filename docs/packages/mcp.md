@@ -18,7 +18,7 @@ It serves tools to MCP clients (Claude, ChatGPT, IDE agents) over the Streamable
 dox add mcp
 ```
 
-It adds the package and `lib/config/mcp.dart` with an `McpServer` and a sample tool. You add the route and the auth.
+It adds the package, `lib/config/mcp.dart` with an `McpServer`, and a sample tool in `lib/app/mcp/echo.tool.dart`. You add the route and the auth.
 It never overwrites a file, so it is safe to run twice.
 
 ### Set it up by hand

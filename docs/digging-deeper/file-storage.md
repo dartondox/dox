@@ -8,16 +8,6 @@ icon: lucide/hard-drive
 
 It is in the [`dox_storage`](../packages/storage.md) package. A new project already has it.
 
-## Install
-
-```bash
-dox add storage
-```
-
-Add `--disk=s3` to make `s3` the default disk. `local` is the default.
-It writes `lib/config/storage.dart` and the `STORAGE_DISK` key. It never overwrites a file, so it is safe to run twice.
-A new app already has it. To set it up by hand, follow [Config](#config).
-
 ```dart
 import 'package:dox_storage/dox_storage.dart';
 
@@ -27,6 +17,16 @@ Route.post('/avatar', (DoxRequest req) async {
   return <String, String>{'path': path}; // /avatars/<uuid>.png
 });
 ```
+
+## Install
+
+```bash
+dox add storage
+```
+
+It writes `lib/config/storage.dart`, the provider, the `storage` folder and the `STORAGE_DISK=local` key. It never overwrites a file, so it is safe to run twice.
+Add `--disk=s3` to also add an `s3` disk and the `AWS_*` keys. `STORAGE_DISK` stays `local`, so the app starts before you fill in the keys. Fill them in, then set `STORAGE_DISK=s3`.
+To set it up by hand, follow [Config](#config).
 
 ## Config
 

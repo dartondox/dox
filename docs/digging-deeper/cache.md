@@ -29,13 +29,13 @@ It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 dox add cache
 ```
 
-Add `--store=redis` (or `memory`, `file`, `database`) to pick the default store. `database` needs `dox add orm` first.
-It writes the cache config and the `CACHE_STORE` key. It never overwrites a file, so it is safe to run twice.
-A new app already has it.
+Add `--store=redis` (or `memory`, `database`) to pick the default store. `file` is the default.
+It writes `lib/config/cache.dart`, adds it to `lib/config/app.dart` and adds the `CACHE_STORE` key. `redis` also adds the `REDIS_*` keys.
+`database` also adds `dox_cache_database`, its provider and the cache table migration. It needs `dox add orm` first.
+It never overwrites a file, so it is safe to run twice.
+A new app already has it. To set it up by hand, follow [Config](#config).
 
 ## Config
-
-### Set it up by hand
 
 A new project already has `lib/config/cache.dart`, with a `file` store and a `memory` store.
 `CACHE_STORE` in `.env` picks the default store (`file` when it is not set).

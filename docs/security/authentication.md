@@ -47,11 +47,15 @@ Do these steps once, then follow one of the ways below.
 dox add auth
 ```
 
-It needs the ORM and a `User` model first (`dox add orm`). A new app has both.
-It does steps 1, 4 and 5 below and writes the tokens migration. Then run `dox migrate`.
+It needs the ORM (`dox add orm`) and a `User` model in `lib/app/models/user/user.model.dart` (`dox make:model User -m`) first. A new app has both.
+It does steps 1, 4 and 5 below.
+It also writes the token table migration of [Access tokens](#access-tokens), so you do not need `dox auth:tokens-table` there. Run `dox migrate`.
+Then do steps 2, 3 and 6 yourself.
 It never overwrites a file, so it is safe to run twice.
 
 ### Set it up by hand
+
+Do all the steps below when you do not use `dox add auth`.
 
 ### 1. Add the package
 
