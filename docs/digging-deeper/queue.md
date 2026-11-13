@@ -9,7 +9,7 @@ A queue runs slow work in the background, so the request can answer at once.
 A worker process does the work later.
 
 Use it to send emails, call slow APIs, make reports or resize images.
-The `dox_queue` package gives you jobs, three drivers (Redis, database and sync), retries, delays and a worker.
+The `dox_queue` package gives you jobs, two drivers (Redis and sync), retries, delays and a worker. The database driver is in the `dox_queue_database` package, see [Database driver](#database-driver).
 
 ## Install
 
@@ -23,7 +23,7 @@ dart pub add dox_queue
 
 1. You write a job class with `@Job()`.
 2. `dart run build_runner build` writes `lib/generated/jobs.g.dart`. It knows how to save and load each job.
-3. Your code calls `dispatch()`. The job is saved in Redis or in the database.
+3. Your code calls `dispatch()`. The job is saved in Redis, or in the database with `dox_queue_database`.
 4. A worker (`dart run bin/queue.dart`) takes the job and runs its `handle()` method.
 
 ## Set up
@@ -48,11 +48,11 @@ QueueConfig queueConfig = QueueConfig(
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `driver` | `sync` | `sync`, `database` or `redis` |
+| `driver` | `sync` | `sync`, `database` (needs `dox_queue_database`) or `redis` |
 | `jobs` | empty | `jobRegistry` from `lib/generated/jobs.g.dart` |
 | `redis` | 127.0.0.1:6379 | `RedisOptions(host: ..., port: ..., password: ...)` for the `redis` driver. `QueueConfig.redisFromEnv()` reads it from the env. |
 | `prefix` | `dox_queue:` | the start of every Redis key |
-| `connection` | default | the dox_orm connection name, for the `database` driver |
+| `connection` | default | the dox_orm connection name, for `dox_queue_database` |
 | `retryAfter` | 90 seconds | when a worker does not finish a job in this time, another worker can take it |
 | `workInProcess` | `false` | run a worker inside the web server, see [Small apps](#small-apps-a-worker-in-the-web-server) |
 | `workerQueues` | `['default']` | the queues of the in-process worker |
@@ -60,7 +60,7 @@ QueueConfig queueConfig = QueueConfig(
 | `workerTimeoutGrace` | none | the `--timeout-grace` wait of the in-process worker, see [Retries and failed jobs](#retries-and-failed-jobs) |
 | `serializeSync` | `false` | opt-in: the `sync` driver saves the job and reads it back before it runs, see [Sync](#sync) |
 | `connections` | none | opt-in: more queue connections by name, see [Queue connections](#queue-connections) |
-| `afterCommit` | `false` | opt-in: push jobs that are dispatched inside a transaction only after it commits, see [Dispatch after the commit](#dispatch-after-the-commit) |
+| `afterCommit` | `false` | opt-in: push jobs that are dispatched inside a transaction only after it commits (needs `dox_queue_database`), see [Dispatch after the commit](#dispatch-after-the-commit) |
 
 !!! warning "Keep `retryAfter` bigger than your longest job"
     `retryAfter` is how Dox finds the job of a crashed worker.
@@ -99,9 +99,34 @@ Future<void> main(List<String> args) async {
 
 The worker starts the providers of your app (database, cache, queue). It does not start the HTTP server.
 
-### 4. Tables
+### 4. Database driver and tables
 
-The `jobs` and `failed_jobs` tables are only for the database driver.
+The database driver, [job batches](#job-batches) and `afterCommit` are in the `dox_queue_database` package. Skip this step when you use only Redis or sync and none of these.
+
+```bash
+dart pub add dox_queue_database
+```
+
+Register it in your queue provider, before `super.setup()`:
+
+```dart title="lib/providers/queue_provider.dart"
+import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_queue_database/dox_queue_database.dart';
+
+import '../config/queue.dart';
+
+class AppQueueProvider extends QueueProvider {
+  AppQueueProvider() : super(queueConfig);
+
+  @override
+  Future<void> setup() async {
+    QueueDatabase.register();
+    await super.setup();
+  }
+}
+```
+
+The `jobs` and `failed_jobs` tables are for the database driver.
 The `job_batches` table is for [job batches](#job-batches). If you use batches, you need it with every driver.
 
 Run `dox queue:table`. It writes a migration in `db/migration` that makes all three tables. Then run `dox migrate`.
@@ -111,16 +136,16 @@ dox queue:table
 dox migrate
 ```
 
-`queue:table` is a [package command](package-commands.md) of `dox_queue`. It does not overwrite: when a `create_queue_tables` migration is already there, it prints so and stops.
+`queue:table` is a [package command](package-commands.md) of `dox_queue_database`. It does not overwrite: when a `create_queue_tables` migration is already there, it prints so and stops.
 
 The migration it writes looks like this. You can also write it by hand. `QueueTables.up` makes the `jobs` and `failed_jobs` tables. `QueueTables.upBatches` makes the `job_batches` table.
 
 ```dart title="db/migration/2026_10_25_000000_create_queue_tables.dart"
 // ignore_for_file: file_names
 import 'package:dox_migration/dox_migration.dart';
-import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_queue_database/dox_queue_database.dart';
 
-/// The jobs, failed_jobs and job_batches tables of dox_queue.
+/// The jobs, failed_jobs and job_batches tables of dox_queue_database.
 class CreateQueueTables extends Migration {
   @override
   Future<void> up(Schema schema) async {
@@ -309,6 +334,7 @@ It does not go on the queue. So it has no job id and no retry. Outside a request
 ### Dispatch after the commit
 
 A job that you dispatch inside a database transaction is pushed at once.
+This option needs `dox_queue_database` (see [step 4](#4-database-driver-and-tables)). Without it, a dispatch with `afterCommit` on throws a `StateError`.
 A worker can run it before the transaction commits, or after it rolls back.
 Then the job reads data that is not saved yet, or data that is never saved.
 
@@ -340,7 +366,7 @@ Then `afterCommit: false` on one dispatch pushes that job at once.
 
 `Queue.fake()` keeps the job when you call `dispatch()`, also when the transaction later rolls back.
 
-It uses [`QueryBuilder.afterCommit()`](../database/transactions.md#run-code-after-the-commit) of dox_orm.
+It works through [`QueryBuilder.afterCommit()`](../database/transactions.md#run-code-after-the-commit) of dox_orm, set up by `dox_queue_database`.
 
 ### Queue an email
 
@@ -351,9 +377,7 @@ await Mail.queue(message);
 await Mail.later(Duration(minutes: 10), message, queue: 'emails');
 ```
 
-dox_queue has a built-in job for it. It is not in `lib/generated/jobs.g.dart`, and you do not need to add it.
-
-Deploy the worker together with the web app. An old worker does not know this job, so it fails the queued emails.
+The mail jobs are part of dox_mailer. The queue provider and a worker run them.
 
 ## Run the worker
 
@@ -698,25 +722,10 @@ print(batch.id);
 ### The table
 
 A batch is saved in the `job_batches` table. It uses the database connection of `QueueConfig.connection`, also with the Redis driver and the `sync` driver.
-`dox queue:table` makes this table for a new app.
-An app that already ran the `queue:table` migration adds it in a new migration:
-
-```dart
-class CreateJobBatchesTable extends Migration {
-  @override
-  Future<void> up(Schema schema) async {
-    await QueueTables.upBatches(schema);
-  }
-
-  @override
-  Future<void> down(Schema schema) async {
-    await QueueTables.downBatches(schema);
-  }
-}
-```
+Batches need `dox_queue_database`: install it, call `QueueDatabase.register()` in your queue provider, and run `dox queue:table`. See [step 4](#4-database-driver-and-tables).
+Without the package, `Queue.batch()` throws a `StateError` that says to add `dox_queue_database`.
 
 An app that does not use batches does not need the table. If you use batches, you need it with every driver.
-Without it, `dispatch()` throws a `StateError` that names `QueueTables.upBatches()`.
 
 ### Callbacks
 
@@ -898,10 +907,12 @@ Queue.batchFailed((QueueEvent event) => alert(event.batch!.id, event.error));
 | Driver | Where jobs are | Needs |
 | --- | --- | --- |
 | `sync` | nowhere: `dispatch()` runs the job at once | nothing |
-| `database` | the `jobs` and `failed_jobs` tables | Postgres, MySQL 8+, MariaDB 10.6+ or SQLite |
+| `database` | the `jobs` and `failed_jobs` tables | `dox_queue_database`, and Postgres, MySQL 8+, MariaDB 10.6+ or SQLite |
 | `redis` | Redis lists and sorted sets | Redis |
 
-### Database
+### Database driver
+
+The database driver is in the `dox_queue_database` package. Install it and register it in your queue provider (see [step 4](#4-database-driver-and-tables)). Without the registration, `QueueConfig(driver: 'database')` throws an `ArgumentError` that names the package.
 
 Jobs are rows in the `jobs` table. Failed jobs are rows in `failed_jobs`.
 
@@ -1163,7 +1174,7 @@ To read the jobs, use `queue.pushed`. Each item has the `job`, the `queue` name 
 - `Queue.chain()` and `Queue.batch()` are kept too. Read chains in `queue.chains` and batches in `queue.batches`. The chains of a batch are in `PendingBatch.chains`. Their jobs are not in `queue.pushed`. Nothing is saved or run, and the batch tables are not needed. In a faked batch, `add()` adds to the batch, `cancel()` does nothing and `Queue.findBatch()` gives `null`.
 - `dispatchSync()` runs the job now. `dispatchAfterResponse()` runs it after the answer, or soon outside a request. The fake does not stop them. It keeps their jobs in `queue.dispatchedSync` and `queue.dispatchedAfterResponse` (not in `queue.pushed`). `queue.clear()` empties these lists too.
 - The fake does not encode the job. A job that is missing from `QueueConfig.jobs`, or has data that is not JSON, passes a faked test but fails for real.
-- The fake also catches `Mail.queue()`, but only when `Mail.fake()` is off. When both are on, `Mail.fake()` catches the email first. See [Mail](mail.md#testing).
+- The fake also catches `Mail.queue()` on the default queue, but only when `Mail.fake()` is off. It does not catch a custom queue set with `Mail.useQueue()`. When both are on, `Mail.fake()` catches the email first. See [Mail](mail.md#testing).
 
 To test a job alone, call `handle()`:
 
@@ -1171,7 +1182,7 @@ To test a job alone, call `handle()`:
 await SendWelcomeEmail(userId: 1).handle();
 ```
 
-To test the queue itself, use the `database` driver with SQLite `:memory:`, and run a worker that stops when the queue is empty:
+To test the queue itself, use the `database` driver of `dox_queue_database` with SQLite `:memory:`, and run a worker that stops when the queue is empty:
 
 ```dart
 await Worker(
@@ -1230,5 +1241,5 @@ Future<void> main() async {
 ```
 
 - `WorkerOptions` takes the same settings as the flags of `work`: `queues`, `concurrency`, `once`, `tries`, `timeout`, `sleep` and `stopWhenEmpty`.
-- The `database` driver uses the default `dox_orm` connection. Set it up first with `SqlQueryBuilder.initializeWithDatabaseConfig(...)`.
+- The `database` driver needs `dox_queue_database`. Call `QueueDatabase.register()` before `Queue.configure()`. It uses the default `dox_orm` connection. Set it up first with `SqlQueryBuilder.initializeWithDatabaseConfig(...)`.
 - No services are in the Dox container. Make the services of a job in `handle()`.

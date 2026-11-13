@@ -23,7 +23,9 @@ dependency_overrides:
   dox_orm:
     path: ../../../dox-orm/packages/dox-orm
   dox_queue:
-    path: ../../../dox-queue
+    path: ../../../dox-queue/packages/dox-queue
+  dox_queue_database:
+    path: ../../../dox-queue/packages/dox-queue-database
   dox_scheduler:
     path: ../../../dox-scheduler
   dox_socketio:

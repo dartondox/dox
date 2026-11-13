@@ -73,7 +73,7 @@ A builder-only fix needs a `dox_builder` release only. It does not need a `dox_c
 
 The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
 See [Native packages](#native-packages) below.
-`dox_orm`, `dox_migration`, `dox_socketio`, `dox_storage`, `dox_queue`, `dox_scheduler`, `dox_inertia`, `dox_view` and `dox_mailer` are not in this repo either.
+`dox_orm`, `dox_migration`, `dox_socketio`, `dox_storage`, `dox_queue`, `dox_queue_database`, `dox_scheduler`, `dox_inertia`, `dox_view` and `dox_mailer` are not in this repo either.
 See [Packages in other repos](#packages-in-other-repos).
 
 **New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
@@ -133,7 +133,7 @@ Optional: add yourself as a required reviewer, and allow only the tags `dox_anno
 | `dox_validation` | [dartondox/dox-validation](https://github.com/dartondox/dox-validation) |
 | `dox_socketio` | [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio) |
 | `dox_storage` | [dartondox/dox-storage](https://github.com/dartondox/dox-storage) |
-| `dox_queue` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
+| `dox_queue`, `dox_queue_database` | [dartondox/dox-queue](https://github.com/dartondox/dox-queue) |
 | `dox_scheduler` | [dartondox/dox-scheduler](https://github.com/dartondox/dox-scheduler) |
 | `dox_inertia` | [dartondox/dox-inertia](https://github.com/dartondox/dox-inertia) |
 | `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |

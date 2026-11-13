@@ -146,6 +146,7 @@ The starter project also has an `AGENTS.md` file with the rules of the project.
 | `dox_cache_database` | [cache in a database table](../packages/cache.md#database-store) |
 | `dox_socketio` | [Socket.IO server](../packages/socketio.md) |
 | `dox_queue` | [background jobs](../digging-deeper/queue.md) |
+| `dox_queue_database` | [queue in a database table](../digging-deeper/queue.md#database-driver) |
 | `dox_scheduler` | [scheduled tasks](../digging-deeper/scheduler.md) |
 | `dox_mailer` | [send email](../digging-deeper/mail.md) |
 | `dox_view` | [HTML views](../the-basic/views.md) |
