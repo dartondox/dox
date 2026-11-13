@@ -42,9 +42,6 @@ class JobRegistryBuilder implements Builder {
   static final AssetId _queue = AssetId('dox_queue', 'lib/dox_queue.dart');
   static final AssetId _mailer = AssetId('dox_mailer', 'lib/dox_mailer.dart');
 
-  /// the builder of dox_queue 3.1. That dox_queue writes the file itself.
-  static final AssetId _oldBuilder = AssetId('dox_queue', 'lib/builder.dart');
-
   @override
   Map<String, List<String>> get buildExtensions {
     return const <String, List<String>>{
@@ -57,9 +54,6 @@ class JobRegistryBuilder implements Builder {
     // an app without dox_queue gets no jobs.g.dart: it would not compile
     if (!await buildStep.canRead(_queue)) return;
     if (!await _dependsOnQueue(buildStep)) return;
-    // dox_queue 3.1 has its own builder for this file. Two builders of one
-    // file stop build_runner, so leave it to that one.
-    if (await buildStep.canRead(_oldBuilder)) return;
     Resolver resolver = buildStep.resolver;
     List<JobEntry> entries = <JobEntry>[];
     List<AssetId> ids = await buildStep

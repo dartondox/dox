@@ -1,7 +1,15 @@
 ## Unreleased
 
 - New: the job builder moved here from dox_queue. It writes `lib/generated/jobs.g.dart` with every `@Job()` class, the same file as before. It runs only in an app that has dox_queue in `dependencies` or `dev_dependencies`. (When the build can not read the app's `pubspec.yaml`, it runs when the app can import dox_queue.) If your `build.yaml` names the builder `dox_queue:jobs`, change it to `dox_builder:jobs`.
-- Upgrade dox_builder and dox_queue together. With dox_queue 3.1, the job builder writes nothing, so the builder of that dox_queue keeps making `jobs.g.dart` (two builders of one file stop `build_runner`). With a new dox_queue and an old dox_builder, no builder makes `jobs.g.dart`.
+- Breaking: this dox_builder needs dox_queue 3.2 or newer. With dox_queue 3.1, both packages have a builder for `jobs.g.dart`, and `build_runner` stops at start with "outputs collide". Run `dart pub upgrade` to move both together. An app that must stay on dox_queue 3.1 turns off the new builder, and the dox_queue 3.1 builder keeps making the file:
+  ```yaml
+  # build.yaml of the app
+  targets:
+    $default:
+      builders:
+        dox_builder:jobs:
+          enabled: false
+  ```
 - New: when the app can import dox_mailer, `jobs.g.dart` also lists the mail jobs of `Mail.queue()` (`SendQueuedMail` and `SendEncryptedQueuedMail`). So the worker can read them before `Mail.configure()` runs. The saved job names do not change. A dox_mailer without these classes (3.1) gets no mail lines.
 - Finds `DoxProvider` classes from `dox_annotation`. Release it together with `dox_annotation` and `dox_core`. An app must upgrade dox_builder together with dox_core, or its providers are not found.
 - New: the OpenAPI schema of a model reads `visibleFields`, like `hidden`: with a list, only its keys are in the schema. Needs the next dox_orm for `toJson()` to match.

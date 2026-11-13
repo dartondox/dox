@@ -138,19 +138,6 @@ void main() {
     );
   });
 
-  test('writes nothing when dox_queue has its own builder (3.1)', () async {
-    await testBuilder(
-      buildJobRegistry(BuilderOptions.empty),
-      <String, String>{
-        'dox_queue|lib/dox_queue.dart': _queue,
-        'dox_queue|lib/builder.dart': '// the old builder',
-        'a|lib/user.dart': 'class User {}',
-      },
-      rootPackage: 'a',
-      outputs: <String, Object>{},
-    );
-  });
-
   test('writes nothing when dox_queue is not a direct dependency', () async {
     await testBuilder(
       buildJobRegistry(BuilderOptions.empty),
