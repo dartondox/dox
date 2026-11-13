@@ -40,10 +40,18 @@ class Installer {
   final ProcessRunner _runner;
 
   /// one line per step, for [printSummary]
-  final List<String> lines = <String>[];
+  final List<String> _lines = <String>[];
+
+  /// the lines that [printSummary] prints, read only. Add one with [note].
+  List<String> get lines => List<String>.unmodifiable(_lines);
 
   /// false when a step failed (a `dart` command or a missing file)
   bool ok = true;
+
+  /// add a line to the summary, for a step that is not in this class.
+  /// Start it with `created`, `added`, `skipped` or `failed` and two
+  /// spaces, like the other lines.
+  void note(String line) => _lines.add(line);
 
   File _file(String path) => File('${root.path}/$path');
 
@@ -62,12 +70,12 @@ class Installer {
   bool writeFile(String path, String content) {
     File file = _file(path);
     if (file.existsSync()) {
-      lines.add('skipped  $path (already there)');
+      note('skipped  $path (already there)');
       return false;
     }
     file.createSync(recursive: true);
     file.writeAsStringSync(content);
-    lines.add('created  $path');
+    note('created  $path');
     return true;
   }
 
@@ -76,51 +84,104 @@ class Installer {
     Directory folder = Directory('${root.path}/$path');
     if (folder.existsSync()) return;
     folder.createSync(recursive: true);
-    lines.add('created  $path/');
+    note('created  $path/');
   }
 
   /// add `KEY=value` to `.env.example` and `.env` when the key is not in
-  /// the file. A file that is not there is skipped.
+  /// the file. A key that is there is never changed. A file that is not
+  /// there is skipped.
   void addEnv(String key, String value) {
+    List<String> added = <String>[];
+    List<String> skipped = <String>[];
+    RegExp line = RegExp(
+      '^[ \\t]*(export[ \\t]+)?${RegExp.escape(key)}[ \\t]*=',
+      multiLine: true,
+    );
     for (String name in <String>['.env.example', '.env']) {
       File file = _file(name);
       if (!file.existsSync()) continue;
       String text = file.readAsStringSync();
-      if (RegExp(
-        '^\\s*(export\\s+)?$key\\s*=',
-        multiLine: true,
-      ).hasMatch(text)) {
+      if (line.hasMatch(text)) {
+        skipped.add(name);
         continue;
       }
       if (text.isNotEmpty && !text.endsWith('\n')) text = '$text\n';
       file.writeAsStringSync('$text$key=$value\n');
-      lines.add('added    $key to $name');
+      added.add(name);
+    }
+    if (added.isNotEmpty) note('added    $key to ${added.join(', ')}');
+    if (skipped.isNotEmpty) {
+      note('skipped  $key in ${skipped.join(', ')} (already there)');
+    }
+    if (added.isEmpty && skipped.isEmpty) {
+      note('skipped  $key: there is no .env or .env.example');
     }
   }
 
-  /// add [getter] (like `String get dbName => 'db/dox.sqlite';`) to the
-  /// `AppEnv` class of `lib/config/env.dart`, when a getter with the same
-  /// name is not there. Run [buildRunner] after it.
+  /// add [getter] (like `String get dbName => 'db/dox.sqlite';`, with
+  /// optional `///` lines above it) to the `AppEnv` class of
+  /// `lib/config/env.dart`, when the class has no member with the same
+  /// name. Run [buildRunner] after it.
+  ///
+  /// When the file or the class is not found, or its braces do not
+  /// match, it changes nothing, adds a hint to the summary and sets [ok]
+  /// to false.
   void addEnvGetter(String getter) {
     String path = 'lib/config/env.dart';
-    String name = RegExp(r'get\s+(\w+)').firstMatch(getter)!.group(1)!;
+    RegExpMatch? named = RegExp(r'\bget\s+(\w+)\s*(=>|;)').firstMatch(getter);
+    if (named == null) throw ArgumentError('Not a getter: $getter');
+    String name = named.group(1)!;
     File file = _file(path);
     String text = file.existsSync() ? file.readAsStringSync() : '';
-    int start = text.indexOf('abstract class AppEnv');
-
-    /// `dart format` puts the closing `}` of a class alone at the start
-    /// of a line
-    int end = start == -1 ? -1 : text.indexOf('\n}', start);
+    RegExpMatch? head = RegExp(
+      r'^abstract\s+class\s+AppEnv\b[^{;]*\{',
+      multiLine: true,
+    ).firstMatch(text);
+    int end = head == null ? -1 : _closingBrace(text, head.end);
     if (end == -1) {
-      lines.add('skipped  $name: add `$getter` to AppEnv in $path');
+      note(
+        'failed   $name: add `${getter.split('\n').last.trim()}` to AppEnv in $path',
+      );
       ok = false;
       return;
     }
-    if (RegExp('get\\s+$name\\b').hasMatch(text.substring(start, end))) return;
-    file.writeAsStringSync(
-      '${text.substring(0, end)}\n\n  $getter${text.substring(end)}',
-    );
-    lines.add('added    $name to AppEnv in $path');
+    String body = text.substring(head!.end, end);
+    if (RegExp('\\b$name\\b').hasMatch(body)) {
+      note('skipped  $name in AppEnv (already there)');
+      return;
+    }
+    String before = text.substring(0, end).trimRight();
+    String gap = before.endsWith('{') ? '\n' : '\n\n';
+    file.writeAsStringSync('$before$gap  $getter\n${text.substring(end)}');
+    note('added    $name to AppEnv in $path');
+  }
+
+  /// the index of the `}` that closes the `{` just before [start], or -1.
+  /// Braces in `//` comments and in one-line strings do not count.
+  int _closingBrace(String text, int start) {
+    int depth = 1;
+    for (int i = start; i < text.length; i++) {
+      String char = text[i];
+      if (char == '/' && i + 1 < text.length && text[i + 1] == '/') {
+        int newline = text.indexOf('\n', i);
+        if (newline == -1) return -1;
+        i = newline;
+      } else if (char == "'" || char == '"') {
+        int close = i + 1;
+        while (close < text.length && text[close] != char) {
+          if (text[close] == '\n') return -1;
+          if (text[close] == r'\') close++;
+          close++;
+        }
+        i = close;
+      } else if (char == '{') {
+        depth++;
+      } else if (char == '}') {
+        depth--;
+        if (depth == 0) return i;
+      }
+    }
+    return -1;
   }
 
   /// true when [package] is in `dependencies` or `dev_dependencies` of
@@ -142,7 +203,7 @@ class Installer {
   Future<bool> addDependency(String package, {bool dev = false}) async {
     if (hasDependency(package)) return true;
     bool done = await _dart(<String>['pub', 'add', if (dev) '--dev', package]);
-    lines.add(
+    note(
       done
           ? 'added    $package${dev ? ' (dev)' : ''}'
           : 'failed   dart pub add $package',
@@ -153,7 +214,7 @@ class Installer {
   /// `dart run build_runner build`, to make the generated files again
   Future<bool> buildRunner() async {
     bool done = await _dart(<String>['run', 'build_runner', 'build']);
-    lines.add(done ? 'ran      build_runner' : 'failed   build_runner');
+    note(done ? 'ran      build_runner' : 'failed   build_runner');
     return done;
   }
 
@@ -161,7 +222,7 @@ class Installer {
   /// step failed.
   void printSummary(List<String> nextSteps) {
     print('');
-    for (String line in lines) {
+    for (String line in _lines) {
       print('  $line');
     }
     if (!ok) {

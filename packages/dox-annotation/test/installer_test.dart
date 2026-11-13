@@ -86,18 +86,49 @@ void main() {
     installer.addEnv('DB_NAME', 'other');
     expect(read('.env'), 'APP_KEY=x\nDB_NAME=db/dox.sqlite\n');
     expect(read('.env.example'), 'DB_NAME=keep\n');
+    expect(installer.lines, <String>[
+      'added    DB_NAME to .env',
+      'skipped  DB_NAME in .env.example (already there)',
+      'skipped  DB_NAME in .env.example, .env (already there)',
+    ]);
   });
 
-  test('addEnv skips a file that is not there', () {
+  test('addEnv sees a key with export, spaces or CRLF', () {
+    for (String text in <String>[
+      'export DB_NAME=a\n',
+      'DB_NAME = a\n',
+      '  DB_NAME\t=a\n',
+      'APP=1\r\nDB_NAME=a\r\n',
+      'DB_NAME=',
+    ]) {
+      File('${root.path}/.env').writeAsStringSync(text);
+      installer.addEnv('DB_NAME', 'b');
+      expect(read('.env'), text, reason: text);
+    }
+  });
+
+  test('addEnv adds a key that is only in a comment or a longer key', () {
+    File('${root.path}/.env').writeAsStringSync('# DB_NAME=a\nDB_NAME_X=1');
+    installer.addEnv('DB_NAME', 'b');
+    expect(read('.env'), '# DB_NAME=a\nDB_NAME_X=1\nDB_NAME=b\n');
+  });
+
+  test('addEnv says so when there is no .env file', () {
     installer.addEnv('DB_NAME', 'x');
     expect(File('${root.path}/.env').existsSync(), isFalse);
-    expect(installer.lines, isEmpty);
+    expect(installer.lines, <String>[
+      'skipped  DB_NAME: there is no .env or .env.example',
+    ]);
   });
 
-  test('addEnvGetter adds a getter to AppEnv once', () {
+  void writeEnv(String text) {
     File('${root.path}/lib/config/env.dart')
       ..createSync(recursive: true)
-      ..writeAsStringSync(envDart);
+      ..writeAsStringSync(text);
+  }
+
+  test('addEnvGetter adds a getter to AppEnv once', () {
+    writeEnv(envDart);
     installer.addEnvGetter("String get dbName => 'db/dox.sqlite';");
     installer.addEnvGetter("String get dbName => 'other';");
     installer.addEnvGetter("String get appName => 'other';");
@@ -111,13 +142,88 @@ abstract class AppEnv {
 
 final AppEnv env = AppEnv.load();
 ''');
+    expect(installer.lines, <String>[
+      'added    dbName to AppEnv in lib/config/env.dart',
+      'skipped  dbName in AppEnv (already there)',
+      'skipped  appName in AppEnv (already there)',
+    ]);
     expect(installer.ok, isTrue);
   });
 
-  test('addEnvGetter fails with a hint when there is no AppEnv', () {
+  test('addEnvGetter keeps the doc comment of the getter', () {
+    writeEnv('abstract class AppEnv {}\n');
+    installer.addEnvGetter('/// the port\n  int? get dbPort;');
+    expect(
+      read('lib/config/env.dart'),
+      'abstract class AppEnv {\n  /// the port\n  int? get dbPort;\n}\n',
+    );
+  });
+
+  test('addEnvGetter finds the end of the class by its braces', () {
+    writeEnv('''
+abstract class AppEnv {
+  String get a => '}';
+  // a } in a comment
+  Map<String, int> get b => <String, int>{};
+}
+
+class Other {
+}
+''');
+    installer.addEnvGetter('String get c;');
+    expect(read('lib/config/env.dart'), '''
+abstract class AppEnv {
+  String get a => '}';
+  // a } in a comment
+  Map<String, int> get b => <String, int>{};
+
+  String get c;
+}
+
+class Other {
+}
+''');
+  });
+
+  test('addEnvGetter skips a member with the same name', () {
+    String text =
+        "abstract class AppEnv {\n  static const String dbHost = 'x';\n}\n";
+    writeEnv(text);
+    installer.addEnvGetter('String get dbHost;');
+    expect(read('lib/config/env.dart'), text);
+    expect(installer.ok, isTrue);
+  });
+
+  test('addEnvGetter changes nothing when it is not sure', () {
+    for (String text in <String>[
+      'abstract class AppEnvironment {\n}\n',
+      '/// abstract class AppEnv {\nclass Other {\n}\n',
+      'abstract class AppEnv {\n  String get a;\n',
+      'class AppEnv {\n}\n',
+    ]) {
+      writeEnv(text);
+      installer = Installer(root: root, runner: runner);
+      installer.addEnvGetter('String get dbName;');
+      expect(read('lib/config/env.dart'), text, reason: text);
+      expect(installer.ok, isFalse, reason: text);
+      expect(
+        installer.lines.single,
+        'failed   dbName: add `String get dbName;` to AppEnv in '
+        'lib/config/env.dart',
+      );
+    }
+  });
+
+  test('addEnvGetter fails with a hint when there is no env.dart', () {
     installer.addEnvGetter('String get dbName;');
     expect(installer.ok, isFalse);
     expect(installer.lines.single, contains('add `String get dbName;`'));
+  });
+
+  test('lines is read only, note adds a line', () {
+    installer.note('added    hooks to pubspec.yaml');
+    expect(installer.lines, <String>['added    hooks to pubspec.yaml']);
+    expect(() => installer.lines.add('x'), throwsUnsupportedError);
   });
 
   test('hasDependency looks only in dependencies and dev_dependencies', () {

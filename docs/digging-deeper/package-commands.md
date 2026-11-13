@@ -145,10 +145,11 @@ class HelloInstallCommand extends Command {
 | --- | --- |
 | `writeFile(path, content)` | Writes the file only when it is not there. |
 | `makeFolder(path)` | Makes the folder when it is not there. |
-| `addEnv(key, value)` | Adds `KEY=value` to `.env.example` and `.env` when the key is missing. |
-| `addEnvGetter(getter)` | Adds a getter to `AppEnv` in `lib/config/env.dart` when it is missing. |
+| `addEnv(key, value)` | Adds `KEY=value` to `.env.example` and `.env` when the key is missing. A key that is there is never changed. |
+| `addEnvGetter(getter)` | Adds a getter to `AppEnv` in `lib/config/env.dart` when the class has no member with that name. When it can not find the class, it changes nothing and prints a hint. |
 | `addDependency(package, dev: false)` | Runs `dart pub add` when the app does not have the package. |
 | `buildRunner()` | Runs `dart run build_runner build`. |
+| `note(line)` | Adds your own line to the summary, like `added    hooks to pubspec.yaml`. |
 | `printSummary(nextSteps)` | Prints what was done and the next steps. Sets exit code 1 when a step failed. |
 
 Then:

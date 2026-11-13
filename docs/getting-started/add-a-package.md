@@ -42,4 +42,6 @@ So you can run `dox add` again. It only adds what is missing.
 | --- | --- |
 | `dox add orm [--driver=sqlite\|postgres\|mysql]` | The ORM and migrations. See [Database](../database/index.md). |
 
+The first `dox add orm` can download (or build) the Postgres and MySQL drivers once, also the one you do not use. After it, `pubspec.yaml` skips the unused drivers, so later builds do not get them.
+
 To add a setup command to your own package, see [Package commands](../digging-deeper/package-commands.md#ship-an-install-command).
