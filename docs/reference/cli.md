@@ -50,6 +50,19 @@ The new project already has `bin/server.dart`, `bin/migrate.dart`, `bin/seed.dar
 
 Source: `lib/src/tools/create_project.dart`.
 
+### `dox add`
+
+```
+dox add <package> [--dev] [options]
+```
+
+Adds a Dox package and sets it up. `orm` is short for `dox_orm`.
+It runs `dart pub add`, then `dart pub get`, then the `<package>:install` command of the package with the options, like `dox add orm --driver=postgres`.
+A package with no `<package>:install` command is only added.
+See [Add a package](../getting-started/add-a-package.md).
+
+Source: `lib/src/tools/add_package.dart`.
+
 ### `dox serve`
 
 ```
