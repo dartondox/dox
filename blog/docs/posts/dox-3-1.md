@@ -364,7 +364,7 @@ Docs: [OpenAPI](/latest/packages/openapi/)
 ### CLI
 
 - Package commands: a package adds its own `dox` commands with the `dox: commands:` key in its `pubspec.yaml`. `dox help` lists them. They work in a pub workspace too.
-- `package:dox_annotation/command.dart` with `Command` and `MigrationFile`, to write these commands.
+- `package:dox_core/command.dart` with `Command` and `MigrationFile`, to write these commands.
 - `dox migrate` makes `bin/migrate.dart` when it is missing.
 - `dox key:generate --show` prints a new key and writes nothing.
 - `--step` given twice is an error.
