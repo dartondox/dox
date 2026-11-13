@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `DoxProvider`. It moved here from `dox_core`, so a package below `dox_core` can have a provider. `package:dox_annotation/dox_annotation.dart` exports it.
 - New: `package:dox_annotation/command.dart` with `Command` and `MigrationFile`. They moved here from `dox_core`, so a package below `dox_core` can add `dox` commands.
 - New: `GlobalMiddleware`, a small shared list that packages use to add global middleware at startup. A package that does not depend on `dox_core` can use it. `GlobalMiddleware.clear()` is for tests.
 - Requires Dart 3.14 or newer.

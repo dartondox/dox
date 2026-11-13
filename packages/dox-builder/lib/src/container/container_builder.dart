@@ -196,13 +196,18 @@ class DoxContainerBuilder implements Builder {
     );
   }
 
-  /// true when [element] extends or implements the dox_core class [name]
+  /// true when [element] extends or implements the class [name] of dox_core
+  /// or dox_annotation (`DoxProvider` is in dox_annotation, `Router` in
+  /// dox_core)
   bool _isA(ClassElement element, String name) {
     for (InterfaceType type in element.allSupertypes) {
       InterfaceElement other = type.element;
       if (other.displayName != name) continue;
       String uri = other.library.uri.toString();
-      if (uri.startsWith('package:dox_core/')) return true;
+      if (uri.startsWith('package:dox_core/') ||
+          uri.startsWith('package:dox_annotation/')) {
+        return true;
+      }
     }
     return false;
   }
