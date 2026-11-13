@@ -138,6 +138,58 @@ void main() {
     );
   });
 
+  test('writes nothing when dox_queue has its own builder (3.1)', () async {
+    await testBuilder(
+      buildJobRegistry(BuilderOptions.empty),
+      <String, String>{
+        'dox_queue|lib/dox_queue.dart': _queue,
+        'dox_queue|lib/builder.dart': '// the old builder',
+        'a|lib/user.dart': 'class User {}',
+      },
+      rootPackage: 'a',
+      outputs: <String, Object>{},
+    );
+  });
+
+  test('writes nothing when dox_queue is not a direct dependency', () async {
+    await testBuilder(
+      buildJobRegistry(BuilderOptions.empty),
+      <String, String>{
+        'dox_queue|lib/dox_queue.dart': _queue,
+        'dox_mailer|lib/dox_mailer.dart': _mailer,
+        'a|pubspec.yaml': 'name: a\ndependencies:\n  dox_mailer: any\n',
+        'a|lib/user.dart': 'class User {}',
+      },
+      rootPackage: 'a',
+      outputs: <String, Object>{
+        // the test copies of dox_queue and dox_mailer have no pubspec
+        'dox_queue|lib/generated/jobs.g.dart': anything,
+        'dox_mailer|lib/generated/jobs.g.dart': anything,
+      },
+    );
+  });
+
+  test('writes the file when dox_queue is in the app pubspec', () async {
+    String output = await _generate(<String, String>{
+      'a|pubspec.yaml': 'name: a\ndependencies:\n  dox_queue: ^3.2.0\n',
+      'a|lib/user.dart': 'class User {}',
+    });
+    expect(output, contains('const JobRegistry jobRegistry'));
+  });
+
+  test('hasDirectDependency reads dependencies and dev_dependencies', () {
+    bool has(String yaml) {
+      return JobRegistryBuilder.hasDirectDependency(yaml, 'dox_queue');
+    }
+
+    expect(has('dependencies:\n  dox_queue: ^3.2.0\n'), isTrue);
+    expect(has('dev_dependencies:\n  dox_queue:\n    path: ../q\n'), isTrue);
+    expect(has('dependencies:\n  # dox_queue: ^3.2.0\n'), isFalse);
+    expect(has('dependencies:\n  dox_queue_database: ^3.2.0\n'), isFalse);
+    expect(has('dependency_overrides:\n  dox_queue: any\n'), isFalse);
+    expect(has('name: a\n'), isFalse);
+  });
+
   test('a job with no fields has no unused variable', () async {
     String output = await _generate(<String, String>{
       'a|lib/jobs.dart':

@@ -28,7 +28,7 @@ class JobEntry {
 /// `@Job()` class of the app, and the code to save and load each one.
 /// Give it to the app: `QueueConfig(jobs: jobRegistry)`.
 ///
-/// It runs only in an app that can import dox_queue. When the app can
+/// It runs only in an app that depends on dox_queue. When the app can
 /// import dox_mailer too, the mail jobs of `Mail.queue()` are added.
 ///
 /// The parameters of the unnamed constructor are saved. Each one needs
@@ -42,6 +42,9 @@ class JobRegistryBuilder implements Builder {
   static final AssetId _queue = AssetId('dox_queue', 'lib/dox_queue.dart');
   static final AssetId _mailer = AssetId('dox_mailer', 'lib/dox_mailer.dart');
 
+  /// the builder of dox_queue 3.1. That dox_queue writes the file itself.
+  static final AssetId _oldBuilder = AssetId('dox_queue', 'lib/builder.dart');
+
   @override
   Map<String, List<String>> get buildExtensions {
     return const <String, List<String>>{
@@ -53,6 +56,10 @@ class JobRegistryBuilder implements Builder {
   Future<void> build(BuildStep buildStep) async {
     // an app without dox_queue gets no jobs.g.dart: it would not compile
     if (!await buildStep.canRead(_queue)) return;
+    if (!await _dependsOnQueue(buildStep)) return;
+    // dox_queue 3.1 has its own builder for this file. Two builders of one
+    // file stop build_runner, so leave it to that one.
+    if (await buildStep.canRead(_oldBuilder)) return;
     Resolver resolver = buildStep.resolver;
     List<JobEntry> entries = <JobEntry>[];
     List<AssetId> ids = await buildStep
@@ -83,6 +90,36 @@ class JobRegistryBuilder implements Builder {
       AssetId(buildStep.inputId.package, output),
       formatter.format(code),
     );
+  }
+
+  /// true when dox_queue is in `dependencies` or `dev_dependencies` of
+  /// the app, not only a dependency of a dependency (like dox_mailer).
+  /// When the build can not read the pubspec, it trusts [canRead].
+  Future<bool> _dependsOnQueue(BuildStep buildStep) async {
+    AssetId pubspec = AssetId(buildStep.inputId.package, 'pubspec.yaml');
+    if (!await buildStep.canRead(pubspec)) return true;
+    return hasDirectDependency(
+      await buildStep.readAsString(pubspec),
+      'dox_queue',
+    );
+  }
+
+  /// true when [name] is a key under `dependencies:` or
+  /// `dev_dependencies:` of the pubspec text [yaml]
+  // ponytail: a line scan, not a YAML parser; pubspecs list one key per line
+  static bool hasDirectDependency(String yaml, String name) {
+    String? section;
+    RegExp key = RegExp('^\\s+${RegExp.escape(name)}\\s*:');
+    for (String line in yaml.split('\n')) {
+      if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
+      if (!line.startsWith(' ') && !line.startsWith('\t')) {
+        section = line.split(':').first.trim();
+        continue;
+      }
+      bool deps = section == 'dependencies' || section == 'dev_dependencies';
+      if (deps && key.hasMatch(line)) return true;
+    }
+    return false;
   }
 
   /// true when the app can import a dox_mailer that has the mail jobs.
