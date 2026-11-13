@@ -21,6 +21,8 @@ A provider fixes this: each isolate runs `setup()` itself.
 
 Extend `DoxProvider` and put your code in `setup()`. `setup()` can be `async`. Dox waits for it.
 
+A package that does not use `dox_core` imports `DoxProvider` from `package:dox_annotation/provider.dart`.
+
 ```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_orm/dox_orm.dart';

@@ -5,17 +5,14 @@ import 'package:build_test/build_test.dart';
 import 'package:dox_builder/dox_builder.dart';
 import 'package:test/test.dart';
 
-/// a small copy of dox_core: the builder finds Router and DoxProvider by
-/// name, in a dox_core library.
+/// a small copy of dox_core: the builder finds Router by name, in a
+/// dox_core library. DoxProvider is the real one from dox_annotation.
 const String _core = '''
 export 'package:dox_annotation/dox_annotation.dart';
+export 'package:dox_annotation/provider.dart';
 
 abstract class Router {
   void register();
-}
-abstract class DoxProvider {
-  dynamic setup();
-  dynamic shutdown() {}
 }
 class IocContainer {}
 ''';
@@ -31,6 +28,10 @@ export 'src/inject_annotation.dart';
     ).readAsStringSync(),
     'dox_annotation|lib/src/inject_annotation.dart': File(
       '../dox-annotation/lib/src/inject_annotation.dart',
+    ).readAsStringSync(),
+    'dox_annotation|lib/provider.dart': "export 'src/dox_provider.dart';",
+    'dox_annotation|lib/src/dox_provider.dart': File(
+      '../dox-annotation/lib/src/dox_provider.dart',
     ).readAsStringSync(),
     'dox_core|lib/dox_core.dart': _core,
     ...app,
@@ -259,6 +260,26 @@ class OrmProvider extends DoxProvider {
       expect(out, isNot(contains('BaseRouter')));
     });
 
+    test('a provider from dox_annotation is found', () async {
+      String out = await _generate(<String, String>{
+        'a|lib/a.dart': '''
+import 'package:dox_annotation/provider.dart';
+class RedisProvider extends DoxProvider {
+  dynamic setup() {}
+}
+''',
+      });
+      expect(
+        out,
+        contains(
+          _flat(
+            'c.provider<i1.RedisProvider>((IocContainer c) => '
+            'i1.RedisProvider());',
+          ),
+        ),
+      );
+    });
+
     test('a class named Router of another package is not a router', () async {
       await testBuilder(
         buildDoxContainer(BuilderOptions.empty),
@@ -271,6 +292,26 @@ class Web extends Router {}
         rootPackage: 'a',
         outputs: <String, Object>{},
       );
+    });
+
+    test('a class named DoxProvider of the app is not a provider', () async {
+      String out = await _generate(<String, String>{
+        'a|lib/a.dart':
+            '''
+$_import
+@Inject()
+class Repo {}
+abstract class DoxProvider {
+  dynamic setup();
+}
+class MyProvider extends DoxProvider {
+  dynamic setup() {}
+}
+''',
+      });
+      expect(out, contains('Repo'));
+      expect(out, isNot(contains('c.provider<')));
+      expect(out, isNot(contains('MyProvider')));
     });
 
     test('model binders, by primary key type', () async {

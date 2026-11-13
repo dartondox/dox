@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dox_core/command.dart';
+import 'package:dox_annotation/command.dart';
 
 /// `dox cache:table`: write a migration that makes the table of the
 /// database cache store (`CacheTables`).

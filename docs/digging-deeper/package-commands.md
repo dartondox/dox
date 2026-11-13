@@ -29,6 +29,8 @@ dox queue:table
 
 A command extends `Command` from `package:dox_core/command.dart`.
 
+A package that does not use `dox_core` imports `package:dox_annotation/command.dart` instead.
+
 ```dart title="lib/src/commands/hello_command.dart"
 import 'package:dox_core/command.dart';
 

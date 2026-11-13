@@ -1,6 +1,7 @@
 library;
 
 export 'package:dox_annotation/dox_annotation.dart';
+export 'package:dox_annotation/provider.dart';
 export 'package:dox_cache/dox_cache.dart'
     show
         CacheConfig,
@@ -65,7 +66,6 @@ export 'http/response/stream_file.dart';
 /// interfaces
 export 'interfaces/app_config.dart';
 export 'interfaces/core_flags.dart';
-export 'interfaces/dox_provider.dart';
 export 'interfaces/next_middleware.dart';
 export 'interfaces/response_handler_interface.dart';
 export 'interfaces/router.dart';
