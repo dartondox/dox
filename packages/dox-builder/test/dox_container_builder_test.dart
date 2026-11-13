@@ -294,6 +294,26 @@ class Web extends Router {}
       );
     });
 
+    test('a class named DoxProvider of the app is not a provider', () async {
+      String out = await _generate(<String, String>{
+        'a|lib/a.dart':
+            '''
+$_import
+@Inject()
+class Repo {}
+abstract class DoxProvider {
+  dynamic setup();
+}
+class MyProvider extends DoxProvider {
+  dynamic setup() {}
+}
+''',
+      });
+      expect(out, contains('Repo'));
+      expect(out, isNot(contains('c.provider<')));
+      expect(out, isNot(contains('MyProvider')));
+    });
+
     test('model binders, by primary key type', () async {
       String out = await _generate(<String, String>{
         'a|lib/models.dart':
