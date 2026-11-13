@@ -5,7 +5,7 @@ repository: https://github.com/dartondox/dox
 homepage: https://dartondox.dev
 
 environment:
-  sdk: ^3.14.0
+  sdk: ^3.13.0
 resolution: workspace
 
 dev_dependencies:
