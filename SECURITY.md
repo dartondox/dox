@@ -27,6 +27,5 @@ This policy covers the packages in this repo:
 - `dox_annotation`
 - `dox_builder`
 - `dox_cache`
-- `dox_cache_database`
 
 Packages in other dartondox repos have their own `SECURITY.md`, or use the same process in their repo.

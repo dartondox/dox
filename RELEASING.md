@@ -21,7 +21,7 @@ Then raise its constraint (like `dox_http_native: ^x.y.z`) in the Dox packages t
 
 These packages are not released from this repo either:
 
-- `dox_orm` and `dox_migration`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The two share one version.
+- `dox_orm`, `dox_migration` and `dox_cache_database`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The three share one version.
 - `dox_auth`: [dartondox/dox-auth](https://github.com/dartondox/dox-auth)
 - `dox_openapi`: [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi)
 - `dox_validation`: [dartondox/dox-validation](https://github.com/dartondox/dox-validation)
@@ -39,7 +39,7 @@ The dependencies go one way only, so release the repos in this order:
 1. The native packages.
 2. `dox-validation` and `dox-openapi`. They depend on no other Dox package.
 3. This repo. `dox_core` depends on `dox_validation` and `dox_openapi`.
-4. `dox-orm`. It depends on `dox_annotation` and `dox_validation`.
+4. `dox-orm`. It depends on `dox_annotation`, `dox_cache` and `dox_validation`.
 5. `dox-auth`, the CLI and the other package repos. They depend on `dox_core` or `dox_orm`.
 6. The project template (`dox-sample`).
 
@@ -66,7 +66,7 @@ git checkout -b release-x.y.z origin/main
 
 Branch name: use the same name in every repo of a release, like `release-x.y.z`, so CI can clone the sibling repos on that branch (`ci/clone-siblings.sh`). A release that touches only the `dox` repo may use `release-<package>-x.y.z`.
 
-Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cache`, `dox_core`, `dox_cache_database`).
+Do this for each package that changed (`dox_annotation`, `dox_builder`, `dox_cache`, `dox_core`).
 
 1. Run `bin/bump.sh <package> x.y.z`. It sets `version:` of that one package only.
 2. If a package needs the new version of a sibling, raise that constraint by hand
@@ -84,7 +84,7 @@ Wait for CI, then squash merge it.
 
 Tag the merge commit on `main`. The tag is `<package>-vx.y.z`. One tag publishes one package.
 If several packages changed, tag them one by one in dependency order:
-`dox_annotation`, `dox_cache`, `dox_builder`, `dox_core`, `dox_cache_database` (the order of `bin/publish_order.py`).
+`dox_annotation`, `dox_cache`, `dox_builder`, `dox_core` (the order of `bin/publish_order.py`).
 Wait until the run of one tag is done (and the package is on pub.dev) before you push the next tag.
 
 ```sh

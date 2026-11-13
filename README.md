@@ -39,13 +39,13 @@ Dox is a powerful framework specifically developed for web application backend d
 
 ## Repos
 
-This repo holds `dox_core`, `dox_annotation`, `dox_builder`, `dox_cache` and `dox_cache_database`.
+This repo holds `dox_core`, `dox_annotation`, `dox_builder` and `dox_cache`.
 Some packages live in their own repos:
 
 | Package | Repo |
 | --- | --- |
 | `dox` (the CLI) | [dartondox/dox-cli](https://github.com/dartondox/dox-cli) |
-| `dox_orm`, `dox_migration` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_orm`, `dox_migration`, `dox_cache_database` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
 | `dox_auth` | [dartondox/dox-auth](https://github.com/dartondox/dox-auth) |
 | `dox_openapi` | [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi) |
 | `dox_validation` | [dartondox/dox-validation](https://github.com/dartondox/dox-validation) |

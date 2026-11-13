@@ -13,7 +13,6 @@ on:
       - 'dox_annotation-v*'
       - 'dox_builder-v*'
       - 'dox_cache-v*'
-      - 'dox_cache_database-v*'
       - 'dox_core-v*'
   workflow_dispatch:
     inputs:
@@ -25,7 +24,6 @@ on:
           - dox_annotation
           - dox_builder
           - dox_cache
-          - dox_cache_database
           - dox_core
         default: all
 

@@ -13,7 +13,6 @@ on:
       - 'dox_annotation-v*'
       - 'dox_builder-v*'
       - 'dox_cache-v*'
-      - 'dox_cache_database-v*'
       - 'dox_core-v*'
   workflow_call:
 
@@ -82,15 +81,14 @@ jobs:
   # The test entries are in ci/test-matrix.json. Each entry has:
   # - packages: folders under packages/ to run `dart test` in.
   # - vars: env vars for `dart test`.
-  # - services: containers to start (redis, postgres, mariadb, mysql84).
+  # - services: containers to start (redis).
   # - group: the job that runs it (`unit`).
   # - locks: what the entry can not share with another entry at the same
   #   time. See ci/run-group.py.
   # The server is native (dox_http_native). Its build hook downloads a
   # ready-built library. There is no dart:io server.
-  # The database packages (dox_orm, dox_migration) and their database tests
-  # live in dartondox/dox-orm. dox_cache_database runs its tests on
-  # Postgres, MariaDB and MySQL 8.4 here. dox_auth, dox_openapi, dox_validation,
+  # The database packages (dox_orm, dox_migration, dox_cache_database) and
+  # their database tests live in dartondox/dox-orm. dox_auth, dox_openapi, dox_validation,
   # dox_socketio, dox_storage and the dox CLI have their own repos too.
   #
   # One job, not one job per entry: each job waits in the queue and pays
@@ -98,7 +96,7 @@ jobs:
   # in its own copy of the repo, so they share no files.
   # The job is skipped when no entry is picked.
 
-  # Redis and the databases are started when an entry needs them.
+  # Redis is started when an entry needs it.
   unit:
     needs: changes
     if: needs.changes.outputs.unit != '[]'
@@ -110,16 +108,13 @@ jobs:
       # On a tag nothing uses the clones, so it skips them.
       - if: github.ref_type != 'tag'
         run: ci/clone-siblings.sh && ci/use-siblings.sh
-      # Caches the Rust dependencies of dox_http_native and the native
-      # database drivers.
+      # Caches the Rust dependencies of dox_http_native.
       - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
         if: github.ref_type != 'tag'
         with:
           workspaces: |
             ../dox-http-native/native -> target
-            ../dox-postgres-native/native -> target
-            ../dox-mysql-native/native -> target
-      # Builds the native libraries of the clones, for this machine only.
+      # Builds the native library of the clone, for this machine only.
       - run: ci/use-siblings.sh build
       - name: Start services
         if: needs.changes.outputs.unit_services != ''
