@@ -8,6 +8,8 @@ This page shows the full API of `dox_cache`, the cache behind `Cache()` in Dox.
 
 It has `remember`, tags, atomic locks and four drivers.
 
+To set up or change the cache config in an existing app, run `dox add cache` (or `dox add cache --store=redis`, `--store=memory`, `--store=database`). See [Add a package](../getting-started/add-a-package.md).
+
 ## In a Dox app
 
 `dox_core` uses `dox_cache` and exports it. There is nothing to install.

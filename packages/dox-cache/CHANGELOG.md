@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `dox cache:install [--store=file|redis|memory|database]`, run by `dox add cache`. It writes `lib/config/cache.dart`, the `CACHE_STORE` key and the `AppEnv` getters, and adds `cache: cache` to `lib/config/app.dart`. With `--store=database` it also adds `dox_cache_database`, its provider and the cache table migration. It never overwrites a file. dox_cache now depends on dox_annotation.
 - New: `'encrypt': true` on a `file` or `redis` store encrypts the values. It is off by default, so nothing changes for stores without it. Set `CacheConfig(encrypter: ...)` with a `CacheEncrypter`. A store with `'encrypt': true` and no encrypter throws a `StateError`, for every store type. Memory and null stores do not encrypt. An `encrypt` value that is not `true` or `false` throws an `ArgumentError`.
 - On Redis, a plain `int` stays plain text when encryption is on, so `increment` and `decrement` still work. Every other value is encrypted. To keep a secret number encrypted, store it as a `String`.
 - A value that cannot be decrypted (wrong key, changed text) reads as a miss. An old plain value reads as a miss too, except an `int` on Redis.

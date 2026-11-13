@@ -41,6 +41,9 @@ These steps start from a new app made with `dox create my_app`.
 It has a SQLite database, a `User` model and a `users` table with `name`, `email` and `password` columns.
 Do these steps once, then follow one of the ways below.
 
+!!! tip "Short way"
+    In an app with the ORM and a `User` model, `dox add auth` does steps 1, 4 and 5 and writes the tokens migration. Then run `dox migrate`.
+
 ### 1. Add the package
 
 A new app does not have `dox_auth`. Add it:
