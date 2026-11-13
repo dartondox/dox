@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 /// dox_core library. DoxProvider is the real one from dox_annotation.
 const String _core = '''
 export 'package:dox_annotation/dox_annotation.dart';
+export 'package:dox_annotation/provider.dart';
 
 abstract class Router {
   void register();
@@ -20,7 +21,6 @@ Map<String, String> _sources(Map<String, String> app) {
   return <String, String>{
     'dox_annotation|lib/dox_annotation.dart': '''
 export 'src/dox_model.dart';
-export 'src/dox_provider.dart';
 export 'src/inject_annotation.dart';
 ''',
     'dox_annotation|lib/src/dox_model.dart': File(
@@ -29,6 +29,7 @@ export 'src/inject_annotation.dart';
     'dox_annotation|lib/src/inject_annotation.dart': File(
       '../dox-annotation/lib/src/inject_annotation.dart',
     ).readAsStringSync(),
+    'dox_annotation|lib/provider.dart': "export 'src/dox_provider.dart';",
     'dox_annotation|lib/src/dox_provider.dart': File(
       '../dox-annotation/lib/src/dox_provider.dart',
     ).readAsStringSync(),
@@ -262,7 +263,7 @@ class OrmProvider extends DoxProvider {
     test('a provider from dox_annotation is found', () async {
       String out = await _generate(<String, String>{
         'a|lib/a.dart': '''
-import 'package:dox_annotation/dox_annotation.dart';
+import 'package:dox_annotation/provider.dart';
 class RedisProvider extends DoxProvider {
   dynamic setup() {}
 }

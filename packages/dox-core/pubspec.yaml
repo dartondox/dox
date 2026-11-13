@@ -15,6 +15,8 @@ dependencies:
   mime: ^2.1.0
   string_scanner: ^1.4.1
   uuid: ^4.6.0
+  # Raise to the dox_annotation release that has provider.dart and command.dart
+  # before releasing.
   dox_annotation: ^3.1.3
   dox_cache: ^3.1.3
   dox_http_native: ^3.0.3

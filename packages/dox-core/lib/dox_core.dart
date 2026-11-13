@@ -1,6 +1,7 @@
 library;
 
 export 'package:dox_annotation/dox_annotation.dart';
+export 'package:dox_annotation/provider.dart';
 export 'package:dox_cache/dox_cache.dart'
     show
         CacheConfig,
