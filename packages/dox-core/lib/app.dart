@@ -365,7 +365,8 @@ class Dox {
     doxProviders.add(provider);
   }
 
-  /// run `setup()` of every provider, then register the routes
+  /// run `setup()` of every provider, register the routes, then run
+  /// `boot()` of every provider
   /// this is internal core use only
   /// your app do not need to call this function
   Future<void> startProviders() async {
@@ -378,6 +379,9 @@ class Dox {
     _registerRoute();
     _resolveControllers();
     if (config.openApi.isEnabled) OpenApiDocument(config.openApi).register();
+    for (DoxProvider provider in doxProviders) {
+      await provider.boot();
+    }
   }
 
   /// write `openapi.json` and `openapi.yaml` of the app routes into [dir].

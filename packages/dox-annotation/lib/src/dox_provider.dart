@@ -26,6 +26,11 @@ abstract class DoxProvider {
   /// are registered.
   FutureOr<void> setup();
 
+  /// Runs once in every isolate after `setup()` of every provider is
+  /// done, so the other providers are ready. Use it for work that needs
+  /// them, eg. a background worker. Optional.
+  FutureOr<void> boot() {}
+
   /// Runs once in every isolate when the server stops, eg. to close
   /// database or Redis connections. It runs after the open requests are
   /// done (on SIGTERM, SIGINT or `Dox().stop()`). Optional.

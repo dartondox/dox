@@ -155,7 +155,7 @@ Future<User> signUp(SignUp body) async {
 
 `queue()` renders the email at once and puts it on the queue.
 The request answers right away. A worker sends the email.
-You need no job class for this. `dox_queue` has a built-in job for email.
+You need no job class for this. `dox_mailer` has a built-in job for email.
 
 ## 4. Write a job
 

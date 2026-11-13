@@ -91,7 +91,7 @@ s.call('report', () => SendReport().dispatch()).hourly();
 
 The task only puts the job on the queue. A queue worker runs it.
 
-To send the job to a queue connection, pass it to `dispatch()`:
+To send the job to a queue connection, pass `connection:` to `dispatch()`:
 
 ```dart
 void schedule(Schedule s) {
@@ -101,7 +101,7 @@ void schedule(Schedule s) {
 ```
 
 The task name must be unique in the schedule.
-`connection:` is a [queue connection](queue.md#queue-connections). Without it, the main connection is used.
+`connection:` of `dispatch()` is a [queue connection](queue.md#queue-connections). Without it, the main connection is used.
 
 ### Processes and dox commands
 
