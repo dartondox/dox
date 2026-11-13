@@ -23,6 +23,8 @@ Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You add a
 dart pub add dox_socketio
 ```
 
+Or run `dox add socketio`. It does steps 1 to 3 and 5 for you. Add `--broadcasting` to turn on [broadcasting](../digging-deeper/broadcasting.md).
+
 ### 2. The provider
 
 The provider starts Socket.IO in every isolate. Put it in `lib/providers/`, so the generated container finds it:
