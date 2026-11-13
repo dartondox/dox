@@ -12,7 +12,7 @@ slug: dox-3-2
 
 # Dox 3.2 is out
 
-Dox 3.2 adds read replicas, streaming queries, model dirty tracking, job batches and chains, a database cache store, broadcasting for Socket.IO, sub-minute schedules, layouts in views, and many more features and fixes.
+Dox 3.2 adds `dox add` to set up a package with one command, read replicas, streaming queries, model dirty tracking, job batches and chains, a database cache store, broadcasting for Socket.IO, sub-minute schedules, layouts in views, and many more features and fixes.
 
 <!-- more -->
 
@@ -62,6 +62,20 @@ Update this Dox app to Dox 3.2.
 ```
 
 ## New
+
+### Add a package with one command
+
+`dox add` adds a Dox package and sets it up: config files, provider, `bin/` file, migrations and `.env` keys. It never overwrites a file, so you can run it again.
+
+```bash
+dox add orm --driver=postgres
+dox add queue
+dox add mailer --transport=smtp
+```
+
+It works for `orm`, `queue`, `scheduler`, `mailer`, `cache`, `auth`, `storage`, `socketio`, `view`, `inertia` and `mcp`. Each package ships its own setup command, so a package you write can have one too.
+
+Docs: [Add a package](/latest/getting-started/add-a-package/)
 
 ### Opt-in flags
 
