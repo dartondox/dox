@@ -28,7 +28,12 @@ abstract class DoxProvider {
 
   /// Runs once in every isolate after `setup()` of every provider is
   /// done, so the other providers are ready. Use it for work that needs
-  /// them, eg. a background worker. Optional.
+  /// them, eg. a background worker. Optional. The web server, the queue
+  /// worker (`bin/queue.dart`) and the scheduler (`bin/schedule.dart`)
+  /// call it. `Dox().writeOpenApi()` does not: it runs only `setup()`.
+  /// The boots run one by one, in the provider order, and each is awaited.
+  /// When one throws, the start fails with its error and the next ones do
+  /// not run.
   FutureOr<void> boot() {}
 
   /// Runs once in every isolate when the server stops, eg. to close
