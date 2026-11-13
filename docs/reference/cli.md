@@ -500,7 +500,7 @@ A failed run prints the error and sets exit code 1.
 | Command | Aliases | What it does |
 | --- | --- | --- |
 | `dox migration:run` | `dox migrate` | Run the migrations that did not run yet. |
-| `dox migration:rollback [--step=<count>] [--force]` | `dox migrate:rollback` | Undo the last batch, or the last `<count>` migrations. `--step 2` works too. Any other option prints `Invalid option <x>, use --step=<count> or --force` (exit code 1). |
+| `dox migration:rollback [--step=<count>] [--batch=<number>] [--force]` | `dox migrate:rollback` | Undo the last batch, the last `<count>` migrations, or only batch `<number>`. `--step 2` and `--batch 3` work too. Give `--step` or `--batch`, not both. Any other option prints `Invalid option <x>, use --step=<count>, --batch=<number> or --force` (exit code 1). |
 | `dox migration:reset` | `dox migrate:reset` | Undo every migration. |
 | `dox migration:refresh` | `dox migrate:refresh` | Undo every migration, then run them all again. |
 | `dox migration:fresh` | `dox migrate:fresh` | Drop every table, then run all migrations. |
@@ -510,7 +510,7 @@ A failed run prints the error and sets exit code 1.
 
 `--force` after `migration:rollback`, `migration:reset`, `migration:refresh` or `migration:fresh` skips the question they ask when `APP_ENV=production` and stdin is a terminal. Without a terminal they print a warning and run.
 
-`bin/migrate.dart` takes the same commands: `dart run bin/migrate.dart <run|rollback [--step=n]|reset|refresh|fresh|status>`. With no command it runs `run`.
+`bin/migrate.dart` takes the same commands: `dart run bin/migrate.dart <run|rollback [--step=n|--batch=n]|reset|refresh|fresh|status>`. With no command it runs `run`.
 
 ## Factories and seeders
 

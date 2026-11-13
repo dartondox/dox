@@ -106,6 +106,7 @@ So your migrations run as part of your app code.
 | `dox migration:run` | Run the migrations that did not run yet. Short name: `dox migrate`. |
 | `dox migration:rollback` | Undo the last batch. |
 | `dox migration:rollback --step=2` | Undo the last 2 migrations, even across batches. |
+| `dox migration:rollback --batch=3` | Undo only the migrations of batch 3. |
 | `dox migration:reset` | Undo all migrations. |
 | `dox migration:refresh` | Undo all migrations, then run them again. |
 | `dox migration:fresh` | Drop all tables, then run all migrations. It also drops tables that no migration made. |

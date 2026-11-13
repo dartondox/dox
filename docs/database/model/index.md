@@ -416,6 +416,44 @@ Blog other = blog.replicate(<String>['slug']);
 - It copies `deleted_at`. A copy of a soft deleted model is soft deleted too.
 - A column in the list that can not be `null`, or that is not a column, throws an `ArgumentError`.
 
+### Changed columns
+
+A model knows which columns changed since it was read or saved.
+The names are column names, like `user_id`, not the Dart field names.
+
+```dart
+Blog? blog = await Blog().find(1);
+blog!.title = 'New title';
+
+blog.isDirty();                     // true
+blog.isDirty('title');              // true
+blog.isDirty(<String>['body']);     // false
+blog.isClean('body');               // true
+blog.getDirty();                    // {title: New title}
+blog.getOriginal('title');          // the old title
+
+await blog.save();
+blog.wasChanged('title');           // true
+blog.getChanges();                  // {title: New title, updated_at: ...}
+```
+
+- `getChanges()` and `wasChanged()` tell what the last `save()` changed.
+  `update()`, `increment()`, `decrement()`, `touch()`, `restore()` and a soft delete on the model count as a save too.
+
+### Read the row again
+
+`refresh()` reads the row again and sets the fields of this model. It also loads the relations again, like `reload()`.
+`fresh()` gives a new model of the row. This model does not change.
+
+```dart
+Blog? blog = await Blog().find(1);
+await blog!.refresh();          // this model now has the values of the table
+Blog? now = await blog.fresh(); // a new model, or null when the row is gone
+```
+
+- Both read by primary key from the write database. They find a soft deleted row too, and skip global scopes.
+- `refresh()` throws a `StateError` on a model that is not in the table, and a `ModelNotFoundException` when the row is gone.
+
 ## Delete
 
 ```dart
@@ -443,6 +481,13 @@ await deleted?.restore(); // sets deleted_at back to NULL, and updated_at
   To delete every row on purpose, use `Blog().whereRaw('1 = 1').delete()`.
   See [write every row](../query-builder.md#write-every-row).
 
+On a model with soft deletes, `trashed()` is true when its `deleted_at` is set:
+
+```dart
+Blog? blog = await Blog().withTrash().find(1);
+if (blog!.trashed()) await blog.restore();
+```
+
 `save()`, `touch()`, `delete()`, `forceDelete()` and `restore()` fire [model events](events.md).
 
 ## Convert to a map or JSON
@@ -469,6 +514,21 @@ class User extends UserGenerator {
   @override
   List<String> get hidden => <String>['password', 'remember_token'];
 }
+```
+
+`visibleFields` is the opposite: `toJson()` keeps only these fields. Empty (the default) keeps every field.
+
+```dart
+@override
+List<String> get visibleFields => const <String>['id', 'name'];
+```
+
+`makeHidden()` and `makeVisible()` change the fields of one model, or of a list of models.
+`makeVisible()` also shows a field that is in `hidden`.
+
+```dart
+return user.makeVisible(<String>['email']).toJson();
+return users.makeHidden(<String>['phone']);
 ```
 
 ### Computed values
@@ -537,6 +597,41 @@ A model can load related models.
 See [HasOne](relationship/has-one.md), [HasMany](relationship/has-many.md),
 [BelongsTo](relationship/belongs-to.md), [ManyToMany](relationship/many-to-many.md),
 [HasManyThrough](relationship/through.md) and [Polymorphic](relationship/polymorphic.md).
+
+### Nested and filtered preload
+
+A dot path loads the relations of the loaded rows too. It runs one query for each level.
+
+```dart
+List<User> users = await User().preload('posts.comments').get();
+```
+
+A callback adds conditions to the query of the relation. With a dot path, it is for the last relation.
+
+```dart
+await User().preload('posts', (QueryBuilder<dynamic> q) {
+  q.where('published', true);
+}).get();
+
+// all posts, and only the approved comments of each post
+await User().preload('posts.comments', (QueryBuilder<dynamic> q) {
+  q.where('approved', true);
+}).get();
+```
+
+### Save through a relation
+
+These methods set the foreign key for you. They work with `@HasMany`, `@HasOne`, `@MorphMany` and `@MorphOne`.
+
+```dart
+Blog blog = (await Blog().find(1))!;
+Comment c = await blog.createRelated<Comment>('comments', <String, dynamic>{'body': 'hi'});
+await blog.saveRelated('comments', Comment()..body = 'hi');
+await blog.saveManyRelated('comments', <Comment>[c1, c2]);
+```
+
+- `createRelated()` uses `create()`, so `fillable`, events and timestamps work. The foreign key does not need to be in `fillable`.
+- For a `@BelongsTo`, `comment.associate('blog', blog)` sets the key and `comment.dissociate('blog')` sets it to null. Call `save()` after them.
 
 !!! note "After `reload()` or a preload"
     `await user.reload()` and a preload set the relation fields again, also when there is no related row.

@@ -16,11 +16,12 @@ It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 | `memory` | a map inside the isolate | no | yes |
 | `redis` | a Redis server | yes, also between machines | yes |
 | `null` | nowhere. It stores nothing | - | no |
+| `database` | a table in your database, from [`dox_cache_database`](../packages/cache.md#database-store) | yes, also between machines | yes |
 
 !!! warning "Many isolates"
     Dox runs one isolate per CPU core. Each isolate has its own `memory` store.
     So a value you put in one isolate is missing in the others.
-    Use `redis` when all isolates and servers must see the same data.
+    Use `redis` or `database` when all isolates and servers must see the same data.
 
 ## Config
 

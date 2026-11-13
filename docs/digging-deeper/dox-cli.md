@@ -49,7 +49,7 @@ dart pub global deactivate dox
 | `dox make:model <name> [-m] [-c] [-r] [--api] [-f] [-s] [-a]` | create a model, and with the options its migration, controller, factory and seeder |
 | `dox make:migration <name> [--sql]` | create a Dart migration, or a `.sql` one with `--sql` |
 | `dox migration:run` (or `dox migrate`) | run new migrations |
-| `dox migration:rollback [--step=N]` | undo the last batch, or the last N migrations |
+| `dox migration:rollback [--step=N] [--batch=N]` | undo the last batch, the last N migrations, or only batch N |
 | `dox migration:reset` | undo all migrations |
 | `dox migration:refresh` | undo all, then run all again |
 | `dox migration:fresh` (or `migrate:fresh`) | drop all tables, then run all migrations |
@@ -178,6 +178,7 @@ dox migration:run                # or: dox migrate
 dox migration:status
 dox migration:rollback           # undo the last batch
 dox migration:rollback --step=2  # undo the last 2 migrations
+dox migration:rollback --batch=3 # undo only batch 3
 dox migration:reset              # undo all migrations
 dox migration:refresh            # undo all migrations, then run them again
 dox migration:fresh              # drop all tables, then run all migrations

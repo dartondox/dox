@@ -47,6 +47,8 @@ All hooks come in pairs: one runs before the query, one after it.
 | `onForceDeleting` | `onForceDeleted` | `forceDelete()`: really removes a soft-deleted row |
 | `onRestoring` | `onRestored` | `restore()`: brings back a soft-deleted row |
 
+`onTrashed` runs after `onDeleted`, when a soft delete changed the row. It has no before hook.
+
 - A **before hook** runs before the query. The row is not written yet. You can change values, or [cancel](#stop-an-operation) the operation.
 - An **after hook** runs after the query. The row is written, and a new model has its `id`. Use it for side effects.
 - Declare the hooks in the model class itself. The generator looks there.
@@ -59,7 +61,7 @@ All hooks come in pairs: one runs before the query, one after it.
 | `save()` on a loaded model | `saving` → `updating` → *UPDATE* → `updated` → `saved` |
 | `create({...})` | the same as `save()` on a new model |
 | `firstOrCreate()`, `updateOrCreate()` | the same as `save()` when they create or update a row |
-| `delete()` | `deleting` → *DELETE or soft delete* → `deleted` |
+| `delete()` | `deleting` → *DELETE or soft delete* → `deleted` (→ `trashed` after a soft delete) |
 | `forceDelete()` | `forceDeleting` → `deleting` → *DELETE* → `deleted` → `forceDeleted` |
 | `restore()` | `restoring` → *UPDATE deleted_at = NULL and updated_at* → `restored` |
 | `touch()` | `saving` → `updating` → *UPDATE updated_at* → `updated` → `saved` (`touchQuietly()` fires none) |
@@ -181,6 +183,15 @@ class ObserverProvider extends DoxProvider {
 ```
 
 Dox finds `ObserverProvider` by itself, like every `DoxProvider`. Run `dart run build_runner build` after you add it.
+
+To hear about soft deletes, add the `TrashedObserver` mixin and override `onTrashed(T model)`:
+
+```dart
+class PostObserver extends ModelObserver<Post> with TrashedObserver<Post> {
+  @override
+  void onTrashed(Post post) => print('trashed ${post.id}');
+}
+```
 
 - You can add more than one observer to a model.
 - `Model.forgetObservers<User>()` removes the observers of `User`. `Model.forgetObservers()` removes all.

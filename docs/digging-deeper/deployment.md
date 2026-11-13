@@ -59,32 +59,45 @@ A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratc
 
 ```dockerfile
 FROM dart:stable AS build
+
+# Resolve dependencies first, so this layer is cached.
 WORKDIR /app
 COPY pubspec.* ./
 RUN dart pub get
+
 COPY . .
 RUN dart pub get --offline
-RUN dart run build_runner build --delete-conflicting-outputs
-RUN dart build cli --target bin/server.dart --output build
 
-# the queue worker and the scheduler are binaries too
-RUN dart build cli --target bin/queue.dart --output build/queue \
-  && cp build/queue/bundle/bin/queue build/bundle/bin/ \
-  && dart build cli --target bin/schedule.dart --output build/schedule \
-  && cp build/schedule/bundle/bin/schedule build/bundle/bin/
+# The dox CLI. `dox build` runs build_runner, then AOT-compiles
+# bin/server.dart, bin/queue.dart and bin/schedule.dart with
+# `dart build cli`. It puts all of them in build/bundle/bin, the native
+# libraries in build/bundle/lib and the migrations in build/bundle/db.
+# The queue worker and the scheduler run as their own processes:
+# `/app/bin/queue work` and `/app/bin/schedule work`.
+ARG DOX_VERSION=^3.0.0
+RUN dart pub global activate dox "$DOX_VERSION"
+RUN /root/.pub-cache/bin/dox build
 
+# Lay out the final file tree:
+# /app/bin/server, /app/bin/queue, /app/bin/schedule, /app/lib (native
+# libraries), /app/db/migration, /app/storage and a writable /tmp
+# (uploads bigger than 1 MB are streamed to a temp file).
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  && cp -r db /out/app/db \
   # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
   && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
   && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
 
+# Minimal serving image: the AOT runtime files from the dart image
+# (`/runtime/`) plus our bundle. No Dart SDK, no source code.
 FROM scratch
 COPY --from=build /runtime/ /
 COPY --from=build /out/ /
 WORKDIR /app
+
+# Config comes from env variables. The image has no .env file,
+# so secrets stay out of it.
 EXPOSE 3000
 CMD ["/app/bin/server"]
 ```
@@ -107,8 +120,31 @@ A new `.env` uses SQLite. The compose services set `DB_CONNECTION=postgres` and 
 
 A new app skips the Postgres driver in `pubspec.yaml`, because it uses SQLite. Remove the `dox_postgres_native` skip lines before you run the compose app. See [Skip unused drivers](../database/index.md#skip-unused-drivers).
 
-The queue worker and the scheduler run as their own processes. The compose file has a `worker` service for the queue. In the image, start them with `/app/bin/queue work` and `/app/bin/schedule work`.
 See [Docker](../guides/docker.md) for a health check in the image.
+
+## Server, queue worker and scheduler
+
+One image has three binaries. Run each one as its own process:
+
+| Process | Command |
+| --- | --- |
+| web server | `/app/bin/server` (the default `CMD`) |
+| queue worker | `/app/bin/queue work` |
+| scheduler | `/app/bin/schedule work` |
+
+The image is `FROM scratch`, so it has no shell. Start the other binaries with `--entrypoint`:
+
+```bash
+docker run -d -p 3000:3000 --env-file .env my-app
+docker run -d --env-file .env --entrypoint /app/bin/queue my-app work
+docker run -d --env-file .env --entrypoint /app/bin/schedule my-app work
+```
+
+In compose, use `command: ["/app/bin/queue", "work"]`. The `worker` service of a new app does this.
+
+- Only the server runs the migrations, when it starts. The worker and the scheduler do not. Start the server first.
+- Without Docker, run `./bin/queue work` and `./bin/schedule work` in `build/bundle`, for example as two more systemd services.
+- For a small app, `QueueConfig(inProcess: true)` runs the jobs inside the server, and `ScheduleConfig(inProcess: true)` runs the schedule there. Then you need only the server. Heavy jobs slow down requests. See [Small apps](queue.md#small-apps-a-worker-in-the-web-server).
 
 ## HTTPS: put a proxy in front
 

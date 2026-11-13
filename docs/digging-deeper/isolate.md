@@ -90,7 +90,8 @@ Dox copies the `AppConfig`, the providers and the routes you added before `start
 1. runs `setup()` of each provider (for example, it opens the database pool),
 2. registers the routes of your routers,
 3. reads the parameter types of each controller once,
-4. starts its HTTP server.
+4. runs `boot()` of each provider,
+5. starts its HTTP server.
 
 Because the config and providers are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Providers](providers.md).
 
