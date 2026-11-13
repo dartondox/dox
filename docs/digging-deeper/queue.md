@@ -1106,6 +1106,8 @@ QueueConfig queueConfig = QueueConfig(
 
 The first isolate of the web server then runs jobs too. When the server stops, it waits for the running jobs.
 
+Only the web server runs this worker. The scheduler process (`bin/schedule.dart`) does not.
+
 !!! warning "Heavy jobs slow down your API"
     The jobs share the isolate with web requests.
     A long or CPU heavy job makes requests on that isolate slow.
