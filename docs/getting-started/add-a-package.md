@@ -41,6 +41,16 @@ So you can run `dox add` again. It only adds what is missing.
 | Command | What it sets up |
 | --- | --- |
 | `dox add orm [--driver=sqlite\|postgres\|mysql]` | The ORM and migrations. See [Database](../database/index.md). |
+| `dox add queue [--driver=database\|redis\|sync]` | Queued jobs and `bin/queue.dart`. `database` is the default and needs `dox add orm` first. See [Queue](../digging-deeper/queue.md). |
+| `dox add scheduler` | Scheduled tasks and `bin/schedule.dart`. See [Scheduler](../digging-deeper/scheduler.md). |
+| `dox add mailer [--transport=log\|smtp\|resend\|mailgun\|postmark\|ses]` | Mail. `log` is the default. See [Mail](../digging-deeper/mail.md). |
+| `dox add cache [--store=file\|redis\|memory\|database]` | Cache stores. `database` needs `dox add orm` first. See [Cache](../digging-deeper/cache.md). |
+| `dox add auth` | Access token auth. Needs `dox add orm` and a `User` model first. See [Authentication](../security/authentication.md). |
+| `dox add storage [--disk=local\|s3]` | File storage. See [File storage](../digging-deeper/file-storage.md). |
+| `dox add socketio [--broadcasting]` | Socket.IO, and broadcasting with the flag. See [Socket.IO](../packages/socketio.md). |
+| `dox add view` | Views and `resources/views/`. See [Views](../the-basic/views.md). |
+| `dox add inertia` | The server side of Inertia. It prints the Vite steps. See [Inertia](../the-basic/inertia.md). |
+| `dox add mcp` | An MCP server with a sample tool. See [MCP](../packages/mcp.md). |
 
 The first `dox add orm` can download (or build) the Postgres and MySQL drivers once, also the one you do not use. After it, `pubspec.yaml` skips the unused drivers, so later builds do not get them.
 
