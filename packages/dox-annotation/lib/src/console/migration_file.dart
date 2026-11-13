@@ -9,7 +9,7 @@ import 'dart:io';
 ///
 /// Keep the name rules the same as `createMigration` and
 /// `nextMigrationTime` in dox-cli (`lib/src/tools/create_migration.dart`).
-/// dox-cli can not use dox_core yet, so the rules are in both places.
+/// dox-cli does not use this class yet, so the rules are in both places.
 class MigrationFile {
   /// [folder] is `db/migration` of the current folder by default.
   MigrationFile({Directory? folder})

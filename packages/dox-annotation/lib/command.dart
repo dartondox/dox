@@ -5,5 +5,5 @@
 /// See the "Package commands" docs page.
 library;
 
-export 'console/command.dart';
-export 'console/migration_file.dart';
+export 'src/console/command.dart';
+export 'src/console/migration_file.dart';

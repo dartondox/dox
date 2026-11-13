@@ -27,10 +27,10 @@ dox queue:table
 
 ### 1. Write the command
 
-A command extends `Command` from `package:dox_core/command.dart`.
+A command extends `Command` from `package:dox_annotation/command.dart`. A package or an app imports it from `dox_annotation`, so a package does not need `dox_core` for this. Add `dox_annotation` to your `pubspec.yaml`.
 
 ```dart title="lib/src/commands/hello_command.dart"
-import 'package:dox_core/command.dart';
+import 'package:dox_annotation/command.dart';
 
 class HelloCommand extends Command {
   @override
@@ -57,7 +57,7 @@ class HelloCommand extends Command {
 Make one library with a top-level `commands` list:
 
 ```dart title="lib/commands.dart"
-import 'package:dox_core/command.dart';
+import 'package:dox_annotation/command.dart';
 
 import 'src/commands/hello_command.dart';
 

@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Breaking: `package:dox_core/command.dart` is removed. `Command` and `MigrationFile` moved to `dox_annotation`. Import `package:dox_annotation/command.dart` instead.
 - New: `RateLimit(sliding: true)` uses a sliding window. A client can no longer send 2 x `max` requests around the edge of a window. The count is the count of this window plus a part of the count of the window before. That part gets smaller as the window goes on. `Retry-After` is the time until one more request fits. Off by default: the fixed window works as before.
 - New: `CoreFlags.envExpand`. `.env` values can use `${OTHER}`, unquoted or in `"..."` (not in `'...'`). It reads a real environment variable first, then a key above it (`.env.testing` also sees the keys of `.env`). An unknown name stays as it is. In a `"..."` value, `\n`, `\t`, `\"`, `\\` and `\$` become a new line, a tab, `"`, `\` and `$`. Off by default: values are read as before. The `.env` file is read before `AppConfig` exists, so also set `Env.flags = flags` at the top of `main()`. The server isolates read `.env` the same way as the main isolate. `Dox().initialize` warns when the flag is on in `AppConfig` but `.env` was read without it.
 - New: `export KEY=value` lines in `.env` are read like `KEY=value`.
