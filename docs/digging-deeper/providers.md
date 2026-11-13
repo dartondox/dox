@@ -6,9 +6,10 @@ icon: lucide/blocks
 
 A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.
 
-A provider has two methods:
+A provider has three methods:
 
 - `setup()` runs when the app starts. You must write it.
+- `boot()` runs after `setup()` of every provider is done. It is optional. See [Boot](#boot).
 - `shutdown()` runs when the app stops. It is optional.
 
 ## Why providers
@@ -104,6 +105,27 @@ Then it registers the routes and starts the server, so routes can use what a pro
 See [What each isolate does at start](isolate.md#what-each-isolate-does-at-start).
 
 `dox openapi:generate` also runs `setup()` of every provider, because it needs the routes.
+
+## Boot
+
+`boot()` runs in each isolate after `setup()` of every provider is done. So all other providers are ready.
+Use it for work that needs them, like a background worker. The boots run one by one, in the provider order.
+
+```dart
+class ReportProvider extends DoxProvider {
+  @override
+  void setup() {}
+
+  @override
+  Future<void> boot() async {
+    // every provider has run setup() here
+  }
+}
+```
+
+The web server and the queue worker (`bin/queue.dart`) run `boot()`.
+The scheduler (`bin/schedule.dart`) and `dox openapi:generate` do not. They run only `setup()`.
+The queue `inProcess` worker starts in `boot()`, so it does not run in the scheduler process.
 
 ## Clean up on shutdown
 
