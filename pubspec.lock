@@ -218,53 +218,52 @@ packages:
     source: hosted
     version: "3.1.14"
   dox_http_native:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-http-native"
-      relative: false
-    source: path
+      name: dox_http_native
+      sha256: "3b824e361391d45eb59bd2ae588bc5232c65a76bb932431a1a7c355d2c84d88c"
+      url: "https://pub.dev"
+    source: hosted
     version: "3.0.4"
-  dox_migration:
-    dependency: "direct overridden"
-    description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-orm/packages/dox-migration"
-      relative: false
-    source: path
-    version: "3.1.0"
   dox_mysql_native:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-mysql-native"
-      relative: false
-    source: path
+      name: dox_mysql_native
+      sha256: b81c8b0941b687be24de837e98e4a5e5271e378e4082c5d074a56f625d527b7f
+      url: "https://pub.dev"
+    source: hosted
     version: "3.0.3"
   dox_openapi:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-openapi"
-      relative: false
-    source: path
+      name: dox_openapi
+      sha256: "44b928047dfe99525ee9dac219ef50a28c7560f44b0bada27589499240359c31"
+      url: "https://pub.dev"
+    source: hosted
     version: "3.1.0"
   dox_orm:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-orm/packages/dox-orm"
-      relative: false
-    source: path
+      name: dox_orm
+      sha256: d8562a13cd5a0865d92412e268e39b185ac2dbb738bc8ffedb3d6d8ac95d25c1
+      url: "https://pub.dev"
+    source: hosted
     version: "3.1.0"
   dox_postgres_native:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-postgres-native"
-      relative: false
-    source: path
+      name: dox_postgres_native
+      sha256: "24a081904afcb7eae414bcf62bdf632bd083f51213776c9e9ef43dff6321b664"
+      url: "https://pub.dev"
+    source: hosted
     version: "3.0.4"
   dox_validation:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/dox-validation"
-      relative: false
-    source: path
+      name: dox_validation
+      sha256: "2bc67273cce46cd33d4f01e71e7f6c687f6917479cc92570b8e8f5ebcdc23aab"
+      url: "https://pub.dev"
+    source: hosted
     version: "3.1.2"
   ffi:
     dependency: transitive
@@ -363,11 +362,12 @@ packages:
     source: hosted
     version: "1.1.0"
   ioredis:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "/Users/zinkyawkyaw/projects/dox/ioredis"
-      relative: false
-    source: path
+      name: ioredis
+      sha256: b1360155ec2e73c2c15da947205c31b4d6fd922b129ef39f59f88305a968a562
+      url: "https://pub.dev"
+    source: hosted
     version: "3.0.2"
   json_annotation:
     dependency: transitive
