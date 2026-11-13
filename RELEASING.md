@@ -21,7 +21,7 @@ Then raise its constraint (like `dox_http_native: ^x.y.z`) in the Dox packages t
 
 These packages are not released from this repo either:
 
-- `dox_orm` and `dox_migration`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The two share one version.
+- `dox_orm`, `dox_migration` and `dox_cache_database`: [dartondox/dox-orm](https://github.com/dartondox/dox-orm). The three share one version.
 - `dox_auth`: [dartondox/dox-auth](https://github.com/dartondox/dox-auth)
 - `dox_openapi`: [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi)
 - `dox_validation`: [dartondox/dox-validation](https://github.com/dartondox/dox-validation)
@@ -39,7 +39,7 @@ The dependencies go one way only, so release the repos in this order:
 1. The native packages.
 2. `dox-validation` and `dox-openapi`. They depend on no other Dox package.
 3. This repo. `dox_core` depends on `dox_validation` and `dox_openapi`.
-4. `dox-orm`. It depends on `dox_annotation` and `dox_validation`.
+4. `dox-orm`. It depends on `dox_annotation`, `dox_cache` and `dox_validation`.
 5. `dox-auth`, the CLI and the other package repos. They depend on `dox_core` or `dox_orm`.
 6. The project template (`dox-sample`).
 
