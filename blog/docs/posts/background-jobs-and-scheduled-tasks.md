@@ -155,7 +155,7 @@ Future<User> signUp(SignUp body) async {
 
 `queue()` renders the email at once and puts it on the queue.
 The request answers right away. A worker sends the email.
-You need no job class for this. `dox_queue` has a built-in job for email.
+You need no job class for this. `dox_mailer` has a built-in job for email.
 
 ## 4. Write a job
 
@@ -309,7 +309,7 @@ services:
 - The worker keeps your code in memory. Restart it on each deploy.
 
 For a small app, you can skip the extra processes.
-`QueueConfig(workInProcess: true)` runs jobs inside the web server, and `ScheduleConfig(inProcess: true)` runs the schedule there too.
+`QueueConfig(inProcess: true)` runs jobs inside the web server, and `ScheduleConfig(inProcess: true)` runs the schedule there too.
 Use separate processes when the jobs get heavy, so they do not slow down your API.
 
 ## 7. Failed jobs

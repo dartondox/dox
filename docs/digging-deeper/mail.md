@@ -378,7 +378,7 @@ To send one email on more than one channel, see [Notifications](notifications.md
 
 Sending an email can take a second or more. With a queue, the request does not wait. A queue worker sends the email later.
 
-This needs [dox_queue](queue.md). Set up its config, its provider and a worker first. Then:
+This uses [dox_queue](queue.md), which dox_mailer depends on. You only need the dox_queue `QueueProvider` and a worker. The mail jobs are part of dox_mailer, and `Mail.configure()` registers them, so the worker can read them. The worker (`bin/queue.dart`) must also run `MailProvider`, or the mail jobs fail (also the ones saved by 3.1). Then:
 
 ```dart
 await Mail.queue(message);
@@ -414,7 +414,9 @@ await Mail.mailer('ses').queue(message, queue: 'emails');
     An email has personal data. When other people can read Redis or the `jobs` table, use `encrypt: true`.
     With `encrypt: true`, a send error is encrypted with the app key too. The plain text of the error is only its type and code, for example `RedactedMailError: MailException (code 550). Details are encrypted: ...`.
     The full error text, with the answer of the server, is inside the encrypted part (at most the first 64K characters, counted in UTF-16 code units).
-    To read it, take a `FailedJob` from `Queue.driver.failed()` and call `RedactedMailError.decrypt(job.error)`. It works with the app key or any key in `AppConfig.previousKeys`.
+    To read it, take a `FailedJob` from `Queue.driver.failed()` and call `RedactedMailError.decrypt(job.error)` (from `package:dox_mailer/dox_mailer.dart`). It works with the app key or any key in `AppConfig.previousKeys`.
+
+By default `Mail.queue()` and `Mail.later()` use the dox_queue queue. To use another queue, call `Mail.useQueue(queue)` (`null` goes back to the dox_queue queue).
 
 In tests, `Mail.fake()` also catches `Mail.queue()` and `Mail.later()`. The email goes to `mail.queued`, not to the job queue. You need no queue setup. See [Testing](#testing).
 

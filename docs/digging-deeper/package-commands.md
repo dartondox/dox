@@ -10,14 +10,14 @@ Your app can add its own commands too.
 You do not write a `bin` file, and you do not register anything.
 The `dox` CLI finds the commands by itself.
 
-For example, `dox queue:table` comes from the `dox_queue` package, and `dox auth:tokens-table` comes from the `dox_auth` package.
+For example, `dox queue:table` comes from the `dox_queue_database` package, and `dox auth:tokens-table` comes from the `dox_auth` package.
 
 ## Use a package command
 
 Add the package and run `dart pub get`. Then run the command:
 
 ```bash
-dart pub add dox_queue
+dart pub add dox_queue_database
 dox queue:table
 ```
 

@@ -144,7 +144,7 @@ Run `dart run build_runner build` after you add or change a job. It updates `lib
 
 The `queue` method of the controller above dispatches it. `dispatch()` returns the id of the job.
 
-A new app uses the `database` driver (`lib/config/queue.dart`).
+A new app uses the `database` driver (`lib/config/queue.dart`). It comes from the `dox_queue_database` package, which the queue provider registers.
 Its jobs tables come from the migration `db/migration/..._create_queue_tables.dart`. The server runs it at start.
 
 Start the worker next to the server, in a second terminal:

@@ -1,4 +1,5 @@
 import 'package:dox_queue/dox_queue.dart';
+import 'package:dox_queue_database/dox_queue_database.dart';
 import 'package:my_app/config/queue.dart';
 
 /// Queue provider
@@ -8,4 +9,11 @@ import 'package:my_app/config/queue.dart';
 /// (Dox finds every DoxProvider class, see lib/generated/container.g.dart).
 class AppQueueProvider extends QueueProvider {
   AppQueueProvider() : super(queueConfig);
+
+  @override
+  Future<void> setup() async {
+    // the database driver, batches and afterCommit (dox_queue_database)
+    QueueDatabase.register();
+    await super.setup();
+  }
 }
