@@ -27,6 +27,19 @@ Do not invent methods. The lists below are the real API.
 Dox runs one isolate per CPU core. Each isolate has its own `memory` store.
 A value you put in one isolate is missing in the others. Use `redis` when all isolates and servers must see it.
 
+## Set up
+
+An app that has no `lib/config/cache.dart` (or you want another store):
+
+```bash
+dox add cache                    # file store (default)
+dox add cache --store=redis      # also: memory, database
+```
+
+It writes `lib/config/cache.dart`, the `CACHE_STORE` key and the `AppEnv` getters, and wires `cache: cache` in `lib/config/app.dart`.
+`--store=database` also adds `dox_cache_database`, its provider and the cache table migration (needs `dox add orm` first). Then run `dox migrate`.
+It never overwrites a file, so it is safe to run twice.
+
 ## Config in a Dox app
 
 The stores are in `lib/config/cache.dart`. `lib/config/app.dart` passes them as `AppConfig(cache: cache)`.

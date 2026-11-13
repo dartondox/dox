@@ -8,6 +8,8 @@ icon: lucide/hard-drive
 
 It is in the [`dox_storage`](../packages/storage.md) package. A new project already has it.
 
+To add it to an app that does not have it, run `dox add storage` (or `dox add storage --disk=s3`). See [Add a package](../getting-started/add-a-package.md).
+
 ```dart
 import 'package:dox_storage/dox_storage.dart';
 
