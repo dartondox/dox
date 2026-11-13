@@ -38,6 +38,12 @@ class Dox {
   /// isolate Id
   int isolateId = 1;
 
+  /// True only in the web server process (`startServer()` and its
+  /// isolates). It is false in `bin/queue.dart`, the scheduler and tests
+  /// that only start providers. A provider can use it to do work only
+  /// when the app really serves requests.
+  bool isWebServer = false;
+
   /// The number of isolates that really run the app. It is the same in
   /// every isolate. Dox sets it when the server starts: from
   /// [totalIsolate] or `config.totalIsolate`, and 1 on Windows. It is 1
@@ -128,6 +134,7 @@ class Dox {
     }
 
     isolateCount = isolatesToSpawn;
+    isWebServer = true;
     if (isolatesToSpawn > 1) {
       await DoxIsolate().spawn(isolatesToSpawn);
     }
