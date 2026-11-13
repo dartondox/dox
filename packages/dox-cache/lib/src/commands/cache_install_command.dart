@@ -147,7 +147,7 @@ class CacheInstallCommand extends Command {
       if (depth == 1) top.write(char);
     }
     if (depth != 0) return false;
-    if (RegExp(r'(^|[\s,(])cache\s*:').hasMatch(top.toString())) {
+    if (RegExp(r'(^|[,(])\s*cache\s*:').hasMatch(top.toString())) {
       installer.note('skipped  cache in lib/config/app.dart (already there)');
       return true;
     }
@@ -156,10 +156,11 @@ class CacheInstallCommand extends Command {
         madeConfig ||
         RegExp(r'\bCacheConfig\s+cache\b').hasMatch(config.readAsStringSync());
     if (!ours) return false;
+    String nl = text.contains('\r\n') ? '\r\n' : '\n';
     text =
-        '${text.substring(0, open)}\n'
-        '  /// Cache stores (config/cache.dart)\n'
-        '  cache: cache,\n'
+        '${text.substring(0, open)}$nl'
+        '  /// Cache stores (config/cache.dart)$nl'
+        '  cache: cache,$nl'
         '${text.substring(open)}';
     String import = "import 'package:$app/config/cache.dart';";
     if (!text.contains(import)) {
@@ -168,8 +169,8 @@ class CacheInstallCommand extends Command {
         multiLine: true,
       ).allMatches(text);
       text = imports.isEmpty
-          ? '$import\n\n$text'
-          : '${text.substring(0, imports.first.start)}$import\n'
+          ? '$import$nl$nl$text'
+          : '${text.substring(0, imports.first.start)}$import$nl'
                 '${text.substring(imports.first.start)}';
     }
     file.writeAsStringSync(text);
@@ -183,35 +184,76 @@ class CacheInstallCommand extends Command {
     StringBuffer out = StringBuffer();
     int i = 0;
     while (i < text.length) {
-      String char = text[i];
-      int end = i + 1;
-      if (text.startsWith('//', i)) {
-        end = text.indexOf('\n', i);
-        if (end == -1) end = text.length;
-      } else if (text.startsWith('/*', i)) {
-        end = text.indexOf('*/', i + 2);
-        end = end == -1 ? text.length : end + 2;
-      } else if (char == "'" || char == '"') {
-        String quote = text.startsWith(char * 3, i) ? char * 3 : char;
-        bool raw = i > 0 && text[i - 1] == 'r';
-        end = i + quote.length;
-        while (end < text.length && !text.startsWith(quote, end)) {
-          if (text[end] == r'\' && !raw) end++;
-          end++;
-        }
-        end = end + quote.length;
-      } else {
-        out.write(char);
+      int end = _skipNonCode(text, i);
+      if (end == i) {
+        out.write(text[i]);
         i++;
         continue;
       }
-      if (end > text.length) end = text.length;
       for (int k = i; k < end; k++) {
         out.write(text[k] == '\n' ? '\n' : ' ');
       }
       i = end;
     }
     return out.toString();
+  }
+
+  /// the index after the comment or string that starts at [i], or [i] when
+  /// [i] starts code
+  static int _skipNonCode(String text, int i) {
+    String char = text[i];
+    if (text.startsWith('//', i)) {
+      int end = text.indexOf('\n', i);
+      return end == -1 ? text.length : end;
+    }
+    if (text.startsWith('/*', i)) {
+      /// block comments nest in Dart
+      int depth = 1;
+      int end = i + 2;
+      while (end < text.length && depth > 0) {
+        if (text.startsWith('/*', end)) {
+          depth++;
+          end += 2;
+        } else if (text.startsWith('*/', end)) {
+          depth--;
+          end += 2;
+        } else {
+          end++;
+        }
+      }
+      return end;
+    }
+    if (char != "'" && char != '"') return i;
+    String quote = text.startsWith(char * 3, i) ? char * 3 : char;
+    bool raw = i > 0 && text[i - 1] == 'r';
+    int end = i + quote.length;
+    while (end < text.length && !text.startsWith(quote, end)) {
+      if (text[end] == r'\' && !raw) {
+        end += 2;
+      } else if (!raw && text.startsWith(r'${', end)) {
+        end = _interpolationEnd(text, end + 2);
+      } else {
+        end++;
+      }
+    }
+    return end > text.length ? text.length : end + quote.length;
+  }
+
+  /// the index after the `}` that closes a `${` ([start] is after the `${`)
+  static int _interpolationEnd(String text, int start) {
+    int depth = 1;
+    int i = start;
+    while (i < text.length && depth > 0) {
+      int end = _skipNonCode(text, i);
+      if (end != i) {
+        i = end;
+        continue;
+      }
+      if (text[i] == '{') depth++;
+      if (text[i] == '}') depth--;
+      i++;
+    }
+    return i;
   }
 
   /// write the cache table migration, unless a `create_cache_table`

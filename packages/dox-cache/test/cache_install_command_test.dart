@@ -214,6 +214,55 @@ void main() {
     await expectAppUntouched('${appDart}AppConfig other = AppConfig(\n);\n');
   });
 
+  /// installs with [app] as app.dart and expects `cache: cache,` was added
+  Future<String> installWired(String app) async {
+    File('${root.path}/lib/config/app.dart').writeAsStringSync(app);
+    await install(<String>[]);
+    expect(exitCode, 0);
+    String result = read('lib/config/app.dart');
+    expect(result, contains('cache: cache,'));
+    return result;
+  }
+
+  test('CRLF files get CRLF lines', () async {
+    String result = await installWired(appDart.replaceAll('\n', '\r\n'));
+    expect(result.replaceAll('\r\n', ''), isNot(contains('\n')));
+  });
+
+  test('cache: after a ternary does not count as wired', () async {
+    await installWired(
+      appDart.replaceFirst(
+        'appKey: env.appKey,',
+        'appKey: ok ? cache : other,\n  n: ok ? cache : other,',
+      ),
+    );
+  });
+
+  test('an empty AppConfig() and a one-line call are wired', () async {
+    String empty = await installWired('AppConfig a = AppConfig();\n');
+    expect(empty, contains('AppConfig(\n'));
+    File('${root.path}/lib/config/cache.dart').deleteSync();
+    await installWired('AppConfig a = AppConfig(appKey: 1);\n');
+  });
+
+  test('a ) in raw, triple-quoted and interpolated strings', () async {
+    String q = "'";
+    String triple = q * 3;
+    await installWired(
+      'AppConfig a = AppConfig(\n'
+      '  a: r$q)$q,\n'
+      '  b: ${triple}x)$triple,\n'
+      '  c: $q\${f($q)$q)}$q,\n'
+      ');\n',
+    );
+  });
+
+  test('a nested block comment hides AppConfig( and cache:', () async {
+    String app = '/* a /* AppConfig( cache: x */ AppConfig( */\n$appDart';
+    String result = await installWired(app);
+    expect(result, startsWith('/* a /* AppConfig('));
+  });
+
   test(
     'without AppEnv it gives a hint, exit code 1, and changes nothing',
     () async {
