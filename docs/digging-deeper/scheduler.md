@@ -16,6 +16,8 @@ A task runs once per tick, even when many isolates or servers run the schedule.
 dart pub add dox_scheduler
 ```
 
+Or run `dox add scheduler`. It adds the package and writes the three files below. It never overwrites a file.
+
 ## Set up in a Dox app
 
 A new app from `dox create` already has these files. In another app, add them:

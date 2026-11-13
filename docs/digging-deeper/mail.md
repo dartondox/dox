@@ -18,6 +18,8 @@ Send slow emails from the [queue](queue.md) with `Mail.queue()`, so the request 
 dart pub add dox_mailer
 ```
 
+Or run `dox add mailer [--transport=log|smtp|resend|mailgun|postmark|ses]`. It adds the package and writes the mail config, the provider and the `MAIL_*` keys. It never overwrites a file.
+
 ## Set up
 
 ### 1. Config
