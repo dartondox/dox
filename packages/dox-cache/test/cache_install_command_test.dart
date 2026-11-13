@@ -97,6 +97,9 @@ void main() {
     expect(read('lib/config/env.dart'), contains('int get redisPort => 6379;'));
     expect(read('.env'), contains('CACHE_STORE=redis\n'));
     expect(read('.env'), contains('REDIS_HOST=127.0.0.1\n'));
+    expect(read('.env'), contains('REDIS_PASSWORD=\n'));
+    expect(read('lib/config/cache.dart'), contains('env.redisPassword'));
+    expect(read('lib/config/env.dart'), contains('String? get redisPassword;'));
   });
 
   test('memory sets CACHE_STORE', () async {
@@ -163,6 +166,52 @@ void main() {
     File('${root.path}/lib/config/app.dart').writeAsStringSync(mine);
     await install(<String>[]);
     expect(read('lib/config/app.dart'), mine);
+  });
+
+  /// installs with [app] as app.dart and checks it did not change
+  Future<void> expectAppUntouched(String app) async {
+    File('${root.path}/lib/config/app.dart').writeAsStringSync(app);
+    await install(<String>[]);
+    expect(exitCode, 0);
+    expect(read('lib/config/app.dart'), app);
+  }
+
+  test('AppConfig( in a comment is not edited', () async {
+    await expectAppUntouched(
+      '// AppConfig(\nfinal int x = 1;\n'
+      'final int y = 2; // use AppConfig( here\n',
+    );
+  });
+
+  test('cache: in a comment or a string does not count as wired', () async {
+    String app = appDart.replaceFirst(
+      '// keep this comment',
+      "// cache: old\n  name: 'cache: x',",
+    );
+    File('${root.path}/lib/config/app.dart').writeAsStringSync(app);
+    await install(<String>[]);
+    expect(read('lib/config/app.dart'), contains('  cache: cache,\n'));
+  });
+
+  test('cache: in another call does not count as wired', () async {
+    String app = appDart.replaceFirst(
+      'appKey: env.appKey,',
+      'appKey: env.appKey,\n  other: Other(cache: x),',
+    );
+    File('${root.path}/lib/config/app.dart').writeAsStringSync(app);
+    await install(<String>[]);
+    expect(read('lib/config/app.dart'), contains('  cache: cache,\n'));
+  });
+
+  test('a custom variable name in cache.dart leaves app.dart alone', () async {
+    File('${root.path}/lib/config/cache.dart')
+      ..createSync(recursive: true)
+      ..writeAsStringSync('CacheConfig myCache = CacheConfig();\n');
+    await expectAppUntouched(appDart);
+  });
+
+  test('two AppConfig( calls leave app.dart alone', () async {
+    await expectAppUntouched('${appDart}AppConfig other = AppConfig(\n);\n');
   });
 
   test(

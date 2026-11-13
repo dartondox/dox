@@ -64,11 +64,14 @@ class CacheInstallCommand extends Command {
       await installer.addDependency('dox_cache_database');
     }
 
-    installer.writeFile('lib/config/cache.dart', cacheConfig(app, store));
+    bool madeConfig = installer.writeFile(
+      'lib/config/cache.dart',
+      cacheConfig(app, store),
+    );
     if (store == 'database') {
       installer.writeFile('lib/providers/cache_provider.dart', cacheProvider);
     }
-    bool wired = _addToAppConfig(installer, app);
+    bool wired = _addToAppConfig(installer, app, madeConfig);
 
     Map<String, String> keys = envKeys(store);
     for (String key in keys.keys) {
@@ -85,8 +88,9 @@ class CacheInstallCommand extends Command {
         .readAsStringSync();
     installer.printSummary(<String>[
       if (!wired)
-        'Add `cache: cache` to AppConfig in lib/config/app.dart '
-            '(import lib/config/cache.dart).',
+        'Add this line to the AppConfig(...) call in lib/config/app.dart '
+            '(use the name of your CacheConfig variable): `cache: cache,` '
+            "and `import 'package:$app/config/cache.dart';`.",
       if (!config.contains("'$store'"))
         "lib/config/cache.dart has no '$store' store. Add one, see the "
             'cache docs.',
@@ -117,24 +121,46 @@ class CacheInstallCommand extends Command {
   }
 
   /// add `cache: cache` and the import of `lib/config/cache.dart` to the
-  /// `AppConfig(...)` call of `lib/config/app.dart`. Nothing changes when
-  /// the file already has a `cache:` argument. Returns false when the
-  /// file or the call is not found, so the caller prints a hint.
-  bool _addToAppConfig(Installer installer, String app) {
+  /// `AppConfig(...)` call of `lib/config/app.dart`. It edits the file only
+  /// when it has the template shape: exactly one `AppConfig(` call (comments
+  /// and strings do not count), and `lib/config/cache.dart` was just made or
+  /// has `CacheConfig cache`. A call that has a `cache:` argument is left
+  /// alone. Returns false when it changed nothing and the caller must print
+  /// the hint.
+  bool _addToAppConfig(Installer installer, String app, bool madeConfig) {
     File file = File('${installer.root.path}/lib/config/app.dart');
     if (!file.existsSync()) return false;
     String text = file.readAsStringSync();
-    if (RegExp(r'\bcache\s*:').hasMatch(text)) {
+    String code = _maskCommentsAndStrings(text);
+    List<RegExpMatch> calls = RegExp(r'\bAppConfig\s*\(')
+        .allMatches(code)
+        .toList();
+    if (calls.length != 1) return false;
+    int open = calls.single.end;
+    int depth = 1;
+    int close = open;
+    StringBuffer top = StringBuffer();
+    for (; close < code.length && depth > 0; close++) {
+      String char = code[close];
+      if (char == '(' || char == '[' || char == '{') depth++;
+      if (char == ')' || char == ']' || char == '}') depth--;
+      if (depth == 1) top.write(char);
+    }
+    if (depth != 0) return false;
+    if (RegExp(r'(^|[\s,(])cache\s*:').hasMatch(top.toString())) {
       installer.note('skipped  cache in lib/config/app.dart (already there)');
       return true;
     }
-    RegExpMatch? call = RegExp(r'\bAppConfig\(').firstMatch(text);
-    if (call == null) return false;
+    File config = File('${installer.root.path}/lib/config/cache.dart');
+    bool ours =
+        madeConfig ||
+        RegExp(r'\bCacheConfig\s+cache\b').hasMatch(config.readAsStringSync());
+    if (!ours) return false;
     text =
-        '${text.substring(0, call.end)}\n'
+        '${text.substring(0, open)}\n'
         '  /// Cache stores (config/cache.dart)\n'
         '  cache: cache,\n'
-        '${text.substring(call.end)}';
+        '${text.substring(open)}';
     String import = "import 'package:$app/config/cache.dart';";
     if (!text.contains(import)) {
       Iterable<RegExpMatch> imports = RegExp(
@@ -149,6 +175,43 @@ class CacheInstallCommand extends Command {
     file.writeAsStringSync(text);
     installer.note('added    cache to lib/config/app.dart');
     return true;
+  }
+
+  /// [text] with every comment and string turned into spaces (new lines
+  /// stay), so a search finds only real code and the indexes stay the same
+  static String _maskCommentsAndStrings(String text) {
+    StringBuffer out = StringBuffer();
+    int i = 0;
+    while (i < text.length) {
+      String char = text[i];
+      int end = i + 1;
+      if (text.startsWith('//', i)) {
+        end = text.indexOf('\n', i);
+        if (end == -1) end = text.length;
+      } else if (text.startsWith('/*', i)) {
+        end = text.indexOf('*/', i + 2);
+        end = end == -1 ? text.length : end + 2;
+      } else if (char == "'" || char == '"') {
+        String quote = text.startsWith(char * 3, i) ? char * 3 : char;
+        bool raw = i > 0 && text[i - 1] == 'r';
+        end = i + quote.length;
+        while (end < text.length && !text.startsWith(quote, end)) {
+          if (text[end] == r'\' && !raw) end++;
+          end++;
+        }
+        end = end + quote.length;
+      } else {
+        out.write(char);
+        i++;
+        continue;
+      }
+      if (end > text.length) end = text.length;
+      for (int k = i; k < end; k++) {
+        out.write(text[k] == '\n' ? '\n' : ' ');
+      }
+      i = end;
+    }
+    return out.toString();
   }
 
   /// write the cache table migration, unless a `create_cache_table`
@@ -172,6 +235,7 @@ class CacheInstallCommand extends Command {
       if (store == 'redis') ...<String>[
         "String get redisHost => '127.0.0.1';",
         'int get redisPort => 6379;',
+        '/// empty: no password\n  String? get redisPassword;',
       ],
     ];
   }
@@ -183,6 +247,7 @@ class CacheInstallCommand extends Command {
       if (store == 'redis') ...<String, String>{
         'REDIS_HOST': '127.0.0.1',
         'REDIS_PORT': '6379',
+        'REDIS_PASSWORD': '',
       },
     };
   }
@@ -220,6 +285,7 @@ ${_extraStore(store)}  },
       'driver': 'redis',
       'host': env.redisHost,
       'port': env.redisPort,
+      'password': env.redisPassword,
       'prefix': 'app_cache:',
     },
 ''',
@@ -256,7 +322,9 @@ class AppCacheProvider extends DoxProvider {
 }
 ''';
 
-  /// the migration of the cache table, the same as `dox cache:table` makes
+  /// the migration of the cache table, the same as `dox cache:table` makes.
+  /// It is a copy of `CacheTableCommand.source()` in dox_cache_database
+  /// (dox-orm repo), which dox_cache can not import. Keep the two the same.
   static const String cacheTableMigration = '''
 // ignore_for_file: file_names
 import 'package:dox_cache_database/dox_cache_database.dart';
