@@ -14,12 +14,18 @@ The `dox_inertia` package is the server side of Inertia. Use it with the Inertia
 ## Install
 
 ```bash
-dart pub add dox_inertia
+dox add inertia
 ```
 
-Or run `dox add inertia`. It does steps 1 to 3 of [Set up](#set-up) (root view, config, provider). Vite and the middleware are still yours.
+It adds the package and does steps 1 to 3 of [Set it up by hand](#set-it-up-by-hand) (root view, config, provider).
+Then do steps 4 to 6 (Vite, the built files and the middleware) yourself. It prints a short list of them.
+It never overwrites a file, so it is safe to run twice.
 
-## Set up
+## Set it up by hand
+
+```bash
+dart pub add dox_inertia
+```
 
 ### 1. Root view
 

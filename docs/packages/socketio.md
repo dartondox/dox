@@ -17,13 +17,25 @@ Socket.IO is the way to do realtime in Dox.
 
 Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You add a provider, a config, a namespace and one env key.
 
+### Install
+
+```bash
+dox add socketio
+```
+
+Add `--broadcasting` to turn on [broadcasting](../digging-deeper/broadcasting.md).
+It adds the package, the provider, the config and the env key (steps 1 to 3 and 5 below). It never overwrites a file, so it is safe to run twice.
+Then do steps 4 and 6 yourself.
+
+### Set it up by hand
+
+Do all the steps below when you do not use `dox add socketio`.
+
 ### 1. Install
 
 ```bash
 dart pub add dox_socketio
 ```
-
-Or run `dox add socketio`. It does steps 1 to 3 and 5 for you. Add `--broadcasting` to turn on [broadcasting](../digging-deeper/broadcasting.md).
 
 ### 2. The provider
 

@@ -13,10 +13,16 @@ The `dox_view` package has a template engine like Edge.js. Templates are `.dox.h
 ## Install
 
 ```bash
-dart pub add dox_view
+dox add view
 ```
 
-Or run `dox add view`. It also adds the provider, the `resources/views` folder and a sample view.
+It adds the package, the provider, the `resources/views` folder and a sample view. It never overwrites a file, so it is safe to run twice.
+
+### Set it up by hand
+
+```bash
+dart pub add dox_view
+```
 
 Add the provider in `lib/`, so every isolate sets up the engine:
 

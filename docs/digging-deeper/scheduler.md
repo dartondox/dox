@@ -13,10 +13,17 @@ A task runs once per tick, even when many isolates or servers run the schedule.
 ## Install
 
 ```bash
-dart pub add dox_scheduler
+dox add scheduler
 ```
 
-Or run `dox add scheduler`. It adds the package and writes the three files below. It never overwrites a file.
+It adds the package and writes the three files below. It never overwrites a file, so it is safe to run twice.
+A new app already has it.
+
+### Set it up by hand
+
+```bash
+dart pub add dox_scheduler
+```
 
 ## Set up in a Dox app
 
