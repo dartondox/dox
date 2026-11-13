@@ -17,6 +17,8 @@ The `dox_inertia` package is the server side of Inertia. Use it with the Inertia
 dart pub add dox_inertia
 ```
 
+Or run `dox add inertia`. It does steps 1 to 3 of [Set up](#set-up) (root view, config, provider). Vite and the middleware are still yours.
+
 ## Set up
 
 ### 1. Root view

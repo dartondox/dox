@@ -16,6 +16,8 @@ The `dox_view` package has a template engine like Edge.js. Templates are `.dox.h
 dart pub add dox_view
 ```
 
+Or run `dox add view`. It also adds the provider, the `resources/views` folder and a sample view.
+
 Add the provider in `lib/`, so every isolate sets up the engine:
 
 ```dart title="lib/providers/view_provider.dart"

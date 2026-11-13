@@ -18,6 +18,8 @@ It serves tools to MCP clients (Claude, ChatGPT, IDE agents) over the Streamable
 dart pub add dox_mcp
 ```
 
+Or run `dox add mcp`. It adds `lib/config/mcp.dart` with an `McpServer` and a sample tool. You add the route and the auth.
+
 ## Use
 
 Write a tool:
