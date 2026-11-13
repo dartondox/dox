@@ -33,13 +33,12 @@ Two packages are new: `dox_cache_database` and `dox_queue_database`.
     dart pub upgrade
     ```
 
-3. Make the generated code again:
+3. Make the [Breaking changes](#breaking-changes) that apply to your app.
+4. Make the generated code again:
 
     ```bash
     dox build_runner:build
     ```
-
-4. Read [Breaking changes](#breaking-changes). Some changes need a code change.
 
 ### Update with an AI agent
 
@@ -51,9 +50,10 @@ Update this Dox app to Dox 3.2.
 1. Read the release post: https://dartondox.dev/blog/dox-3-2/
    Follow the "How to update" steps and every item in "Breaking changes"
    that applies to this app. Also check the "Rare cases" list.
-2. Set every Dox package in pubspec.yaml to ^3.2.0. Run
-   `dart pub upgrade`, then `dox build_runner:build`.
-3. Run `dart run skills@ get` to get the Dox 3.2 agent skills, and use
+2. Set every Dox package in pubspec.yaml to ^3.2.0 and run
+   `dart pub upgrade`. Make the breaking changes, then run
+   `dox build_runner:build`.
+3. Run `dart run skills@ get --all` to get the Dox 3.2 agent skills, and use
    them for the code changes.
 4. Run `dart analyze` and `dart test`. Fix every error.
 5. Do not change app behaviour that is not part of the update.
@@ -67,13 +67,13 @@ Update this Dox app to Dox 3.2.
 
 Behaviors that change old results are opt-in. Each package has a flags class. Every flag is off by default, so nothing changes until you turn one on. `.all()` turns on all of them.
 
-- `CoreFlags` (in `AppConfig(flags: ...)`): `envExpand`, `onlyPresent`, `cookieDefaults`, `hasKeyOnly`, `htmlStrings`, `replaceHeaders`, `decryptServerError`, `cacheCopies` and one that changes the shape of a `422`.
+- `CoreFlags` (in `AppConfig(flags: ...)`): `envExpand`, `onlyPresent`, `cookieDefaults`, `hasKeyOnly`, `htmlStrings`, `replaceHeaders`, `decryptServerError`, `cacheCopies` and a flag for the shape of a `422`.
 - `OrmFlags` (in `DatabaseConfig(flags: ...)`): `skipCleanUpdateEvents`, `belongsToKeyFromRelation`, `pluralTableNames`, `createWritesNull`, `sumReturnsZero`, `selectRawAdds`, `groupByAdds`, `lastPageAtLeastOne`, a Postgres column type flag, `toJsonLoadedRelations`, `preloadUnknownThrows`, `updateSetsUpdatedAt` and `incrementFiresEvents`.
 - `AuthFlags` (in `AuthConfig(flags: ...)`): `forbidGuest`, `jsonNoRedirect` and `endSessionsOnPasswordChange`.
 - `ValidationFlags` (`Validator.flags = ...`): `emptyStringsToNull`, `unicodeAlpha`, `shortInMessage`, a message key flag, `dtoAllErrors`, `dtoRejectEmptyList` and `dtoMaybeRejectsEmpty`.
 - `CacheFlags` (in `CacheConfig(flags: ...)`): `lockThrows`.
 
-Docs: [App config](/latest/reference/app-config/)
+Docs: [Core flags](/latest/reference/app-config/#core-flags), [ORM flags](/latest/database/#orm-flags), [Validation flags](/latest/packages/validation/#opt-in-flags), [Auth flags](/latest/security/authorization/#auth-flags)
 
 ### ORM and database
 
@@ -109,7 +109,7 @@ Docs: [Replicas](/latest/database/replicas/), [Transactions](/latest/database/tr
 
 ### Queue
 
-- New package `dox_queue_database`: the `database` driver, batches and `afterCommit`. `DatabaseQueueProvider` sets it up for you.
+- New package `dox_queue_database`: the `database` driver, batches, `afterCommit`, `QueueTables` and `dox queue:table`. `DatabaseQueueProvider` sets it up for you.
 - The generated `jobs.g.dart` now also lists the mail jobs of `dox_mailer`, so a worker knows them without extra setup.
 - `QueueConfig(inProcess: true)` runs a worker inside the web server. It is the same name as `ScheduleConfig(inProcess:)`. The old name `workInProcess` still works, but is deprecated.
 - Job batches: `Queue.batch(jobs)` with `then`, `catchError`, `whenComplete`, `progress`, `allowFailures()` and `cancel()`. A batch can hold chains. They need `dox_queue_database`.
@@ -123,7 +123,6 @@ Docs: [Replicas](/latest/database/replicas/), [Transactions](/latest/database/tr
 - Named connections: `QueueConfig(connections: {...})`, `dispatch(connection: ...)` and `--connection=NAME`. `failed_jobs` gets a nullable `connection` column. A table without it keeps working.
 - `QueueConfig(failedAtTimestamp: true)`, `QueueConfig(serializeSync: true)` and `Queue.extend(name, factory)`.
 - `Queue.fake()` keeps `dispatchedSync` and `dispatchedAfterResponse`.
-- New package `dox_queue_database`: the `database` driver, the batch store, `afterCommit` support, `QueueTables` and `dox queue:table`.
 
 Docs: [Queue](/latest/digging-deeper/queue/), [Background work](/latest/guides/background-work/)
 
@@ -243,18 +242,20 @@ Docs: [CLI](/latest/reference/cli/), [Package commands](/latest/digging-deeper/p
 
 ### AI skills
 
-Most packages now ship an AI agent skill, like `dox-core-guide` and `dox-orm-guide`. Install them in your app:
+Most packages now ship an AI agent skill, like `dox-core-guide` and `dox-orm-guide`. `skills get` finds the packages in your `pubspec.yaml`, so list `dox_cache`, `dox_validation` and `dox_openapi` there too to get their skills. Install them in your app:
 
 ```bash
-dart run skills@ get
+dart run skills@ get --all
 ```
+
+A 3.1 app can delete the old `.agents/skills/dox` folder and the `.claude/skills/dox` link.
 
 ## Breaking changes
 
 These are the changes that most apps need to act on.
 
 - **Upgrade the Dox packages together.** The new `dox_builder` finds providers in `dox_annotation`, so an old `dox_builder` does not find them. The native drivers changed too, so upgrade `dox_postgres_native` and `dox_mysql_native` together with `dox_orm`.
-- **New field names in the JSON logs.** In `Logger` lines, `level` is now `status` and `name` is now `logger.name`. In `LogMiddleware` lines, `source_ip` is now `network.client.ip` and `request_id` is now `http.request_id`. Check your log parsers and dashboards. `LogMiddleware` now also follows `LoggerConfig`: with the logger off, or its `level` above `info`, no request lines are written.
+- **New field names in the JSON logs.** In `Logger` lines, `level` is now `status` and `name` is now `logger.name`. The values are lower case now (`info`, `warn`, `danger`). In `LogMiddleware` lines, `source_ip` is now `network.client.ip` and `request_id` is now `http.request_id`. Check your log parsers and dashboards. `LogMiddleware` now also follows `LoggerConfig`: with the logger off, or its `level` above `info`, no request lines are written.
 - **The database queue moved to its own package.** Only apps that use the `database` queue driver need these steps:
 
     1. Add the package:
@@ -266,12 +267,18 @@ These are the changes that most apps need to act on.
     2. Make `AppQueueProvider` extend `DatabaseQueueProvider` in place of `QueueProvider`:
 
         ```dart
+        import 'package:dox_queue_database/dox_queue_database.dart';
+
         class AppQueueProvider extends DatabaseQueueProvider {
           AppQueueProvider() : super(queueConfig);
         }
         ```
 
+        Remove the old `package:dox_queue/dox_queue.dart` import if nothing else uses it.
+        If you skip this step, the app still builds and starts. The first `dispatch()` then fails, so check it by hand.
+
     3. In your `create_queue_tables` migration, import `package:dox_queue_database/dox_queue_database.dart`.
+    4. Only if you want job batches: add a new migration that calls `QueueTables.upBatches(schema)`.
 
     Mail jobs that are already in a queue keep their names, so they still run.
 
