@@ -1193,7 +1193,7 @@ For many jobs, switch to <code>redis</code>.</p>
 </span></code></pre></div>
 <p><code>queue()</code> renders the email at once and puts it on the queue.
 The request answers right away. A worker sends the email.
-You need no job class for this. <code>dox_queue</code> has a built-in job for email.</p>
+You need no job class for this. <code>dox_mailer</code> has a built-in job for email.</p>
 <h2 id="4-write-a-job">4. Write a job</h2>
 <p>For your own work, write a job class.
 The daily summary loads the open tasks of a user and emails them:</p>
@@ -1320,7 +1320,7 @@ Run them next to each other. For example with Docker Compose:</p>
 <li>The worker keeps your code in memory. Restart it on each deploy.</li>
 </ul>
 <p>For a small app, you can skip the extra processes.
-<code>QueueConfig(workInProcess: true)</code> runs jobs inside the web server, and <code>ScheduleConfig(inProcess: true)</code> runs the schedule there too.
+<code>QueueConfig(inProcess: true)</code> runs jobs inside the web server, and <code>ScheduleConfig(inProcess: true)</code> runs the schedule there too.
 Use separate processes when the jobs get heavy, so they do not slow down your API.</p>
 <h2 id="7-failed-jobs">7. Failed jobs</h2>
 <p>When <code>handle()</code> throws, the worker waits the <code>backoff</code> time and tries again.
