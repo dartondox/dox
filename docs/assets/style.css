@@ -476,3 +476,13 @@ body::before {
   -webkit-mask-image: radial-gradient(ellipse 50% 65% at 50% 35%, #000 30%, transparent 100%);
   mask-image: radial-gradient(ellipse 50% 65% at 50% 35%, #000 30%, transparent 100%);
 }
+
+/* Blog list: a thin line between the posts. */
+.md-post--excerpt {
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-post--excerpt:last-of-type {
+  border-bottom: none;
+}

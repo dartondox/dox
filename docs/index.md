@@ -1,6 +1,6 @@
 ---
 title: Getting Started
-description: Dox is a fast web backend framework for Dart. Routing, an ORM, migrations, typed validation, auth and a CLI, on a Rust HTTP server.
+description: Dox is a fast web backend framework for Dart. Routing, an ORM, migrations, typed validation, auth and a CLI, on a native HTTP server.
 hide:
   - toc
 ---
@@ -59,7 +59,7 @@ class BlogController {
 2.  `@Dto()` marks an input class. `build_runner` generates the checks from the fields and their types.
 3.  The generated schema. The same schema feeds the OpenAPI docs.
 4.  Ask for the DTO as a parameter. Dox reads the query (or the body), checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
-5.  The ORM. The same code runs on Postgres, MySQL and SQLite. Postgres and MySQL use native Rust drivers.
+5.  The ORM. The same code runs on Postgres, MySQL and SQLite. Postgres and MySQL use native drivers.
 
 </div>
 
@@ -177,13 +177,13 @@ at a time.
 
 -   :material-lightning-bolt: **Fast by default**
 
-    A Rust HTTP server, one isolate per CPU core and streamed bodies.
+    A native HTTP server, one isolate per CPU core and streamed bodies.
     `dox build` makes one native binary. See [Performance](digging-deeper/performance.md).
 
 -   :material-database-outline: **ORM and query builder**
 
     Models, relations, migrations and transactions for Postgres, MySQL/MariaDB and SQLite.
-    Postgres and MySQL use native Rust drivers. See [Database](database/index.md).
+    Postgres and MySQL use native drivers. See [Database](database/index.md).
 
 -   :material-check-decagram-outline: **Typed validation**
 

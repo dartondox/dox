@@ -1,5 +1,5 @@
 site_name: "DOX"
-site_description: "Dox is a fast web backend framework for Dart: routing, an ORM, migrations, typed validation, auth and a CLI, on a Rust HTTP server."
+site_description: "Dox is a fast web backend framework for Dart: routing, an ORM, migrations, typed validation, auth and a CLI, on a native HTTP server."
 repo_url: https://github.com/dartondox/dox
 edit_uri: edit/main/docs/
 # The site root. mike adds the version folder itself. canonical_version
