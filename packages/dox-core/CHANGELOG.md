@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `Dox().isWebServer`. It is true only in the web server process (`startServer()` and its isolates). It is false in `bin/queue.dart`, the scheduler and tests. A provider can use it to skip work that only a web server needs, like a startup warning.
 - New: after `setup()` of every provider (and the routes), the app runs `boot()` of every provider (see `DoxProvider.boot()` of dox_annotation).
 - Changed: `Command`, `MigrationFile` and `DoxProvider` now live in dox_annotation. `package:dox_core/command.dart` and `package:dox_core/dox_core.dart` still export them. dox_core needs the dox_builder release that finds providers from dox_annotation, so upgrade dox_builder together with dox_core.
 - New: `RateLimit(sliding: true)` uses a sliding window. A client can no longer send 2 x `max` requests around the edge of a window. The count is the count of this window plus a part of the count of the window before. That part gets smaller as the window goes on. `Retry-After` is the time until one more request fits. Off by default: the fixed window works as before.
