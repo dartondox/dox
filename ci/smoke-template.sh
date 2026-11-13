@@ -14,6 +14,8 @@
 #
 # Env: TEMPLATE_VERSION (optional) is passed to `dox create --version`.
 # Without it, `dox create` picks the newest template of this major.
+# A dox-sample branch with the same name as the PR wins over both (not on
+# a tag).
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
 
@@ -51,6 +53,26 @@ cd "$work"
 dox create smoke_app ${TEMPLATE_VERSION:+--version "$TEMPLATE_VERSION"}
 # `dox create` prints its errors, so check the result here
 [ -f smoke_app/pubspec.yaml ] || { echo "::error::dox create made no app"; exit 1; }
+
+# A PR that also changes the template: when dartondox/dox-sample has a
+# branch with the same name as this PR (like ci/clone-siblings.sh), the
+# app is made from that branch, not the released template. On a tag it
+# stays the released template.
+branch=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME:-}}
+sample=https://github.com/dartondox/dox-sample.git
+if [ "${GITHUB_REF_TYPE:-}" != tag ] && [ -n "$branch" ] &&
+  git ls-remote --exit-code "$sample" "refs/heads/$branch" >/dev/null; then
+  echo "template: dox-sample branch $branch"
+  rm -rf smoke_app
+  git clone -q --depth 1 --branch "$branch" "$sample" smoke_app
+  rm -rf smoke_app/.git
+  # what `dox create` does: the project name, and .env with a new key
+  grep -rlI dox_sample smoke_app | while read -r f; do
+    sed -i.bak 's/dox_sample/smoke_app/g' "$f" && rm "$f.bak"
+  done
+  cp smoke_app/.env.example smoke_app/.env
+  (cd smoke_app && dox key:generate --force)
+fi
 cd smoke_app
 # a port that a dev server on 3000 does not hold
 port=39123

@@ -309,7 +309,7 @@ services:
 - The worker keeps your code in memory. Restart it on each deploy.
 
 For a small app, you can skip the extra processes.
-`QueueConfig(workInProcess: true)` runs jobs inside the web server, and `ScheduleConfig(inProcess: true)` runs the schedule there too.
+`QueueConfig(inProcess: true)` runs jobs inside the web server, and `ScheduleConfig(inProcess: true)` runs the schedule there too.
 Use separate processes when the jobs get heavy, so they do not slow down your API.
 
 ## 7. Failed jobs

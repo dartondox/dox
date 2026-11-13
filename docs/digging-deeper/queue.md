@@ -54,7 +54,7 @@ QueueConfig queueConfig = QueueConfig(
 | `prefix` | `dox_queue:` | the start of every Redis key |
 | `connection` | default | the dox_orm connection name, for `dox_queue_database` |
 | `retryAfter` | 90 seconds | when a worker does not finish a job in this time, another worker can take it |
-| `workInProcess` | `false` | run a worker inside the web server, see [Small apps](#small-apps-a-worker-in-the-web-server) |
+| `inProcess` | `false` | run a worker inside the web server, see [Small apps](#small-apps-a-worker-in-the-web-server) |
 | `workerQueues` | `['default']` | the queues of the in-process worker |
 | `workerConcurrency` | `1` | jobs at once in the in-process worker |
 | `workerTimeoutGrace` | none | the `--timeout-grace` wait of the in-process worker, see [Retries and failed jobs](#retries-and-failed-jobs) |
@@ -980,7 +980,7 @@ A MySQL and MariaDB `TIMESTAMP` can not hold a time after 2038-01-19.
 !!! warning "Stop all workers first, also on other servers"
     A worker reads the column type when it first uses `failed_jobs`, and keeps it. A worker that is still running writes numbers into the timestamp column. On SQLite this works without an error, and then pruning and the order by time are wrong.
 
-1. Stop all workers, on every server. Stop the app too when it has `workInProcess: true`.
+1. Stop all workers, on every server. Stop the app too when it has `inProcess: true`.
 2. Run the SQL for your database below, in a new migration (`await schema.driver.execute('...');` for each line) or in a database client.
 3. Set `failedAtTimestamp: true` in the queue config.
 4. Start the workers again.
@@ -1088,19 +1088,19 @@ dart run bin/queue.dart failed --connection=database
 ```
 
 - An entry uses only `driver`, `redis`, `prefix`, `connection` (the dox_orm one), `retryAfter` and `serializeSync`. The `jobs` of the main config count for all connections.
-- The in-process worker (`workInProcess`) runs the jobs of the main connection only.
+- The in-process worker (`inProcess`) runs the jobs of the main connection only.
 - Two `database` connections on the same dox_orm connection share the `jobs` and `failed_jobs` tables. Give each one its own dox_orm connection. If they share, `failed --connection=X` lists all failed jobs of the table, not only those of X.
 - `Queue.fake()` keeps the name in `PushedJob.connection`.
 
 ## Small apps: a worker in the web server
 
-You can skip the worker process. Set `workInProcess: true`:
+You can skip the worker process. Set `inProcess: true`:
 
 ```dart
 QueueConfig queueConfig = QueueConfig(
   driver: 'database',
   jobs: jobRegistry,
-  workInProcess: true,
+  inProcess: true,
 );
 ```
 
