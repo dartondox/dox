@@ -50,6 +50,7 @@ Other commands:
 - `dox key:generate`: write a new `APP_KEY` to `.env`.
 - `dox env:check`: check `.env` against `lib/config/env.dart`.
 - `dox build`: build the native binaries for production.
+- `dox add <x>`: add the package `dox_x` and set it up with its `<x>:install` command, like `dox add orm --driver=postgres`. Words after the name go to that command. It never overwrites a file, so it is safe to run twice. Use it, not `dart pub add`, to add a Dox package.
 - `dox help`: list all commands. Newer CLI versions have more commands. Check `dox help` before you use one.
 
 Never use `dart run` or `dox s` in production. Use `dox build`.

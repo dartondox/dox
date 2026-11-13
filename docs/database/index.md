@@ -22,10 +22,17 @@ flowchart LR
 ## Install
 
 The query builder and the models are in the `dox_orm` package.
+The app template already has it. To add it to an app that does not have it, run:
 
 ```bash
-dart pub add dox_orm
+dox add orm --driver=sqlite
 ```
+
+`--driver` is `sqlite` (the default), `postgres` or `mysql`.
+It adds `dox_orm` and `dox_migration`, writes `lib/config/database.dart`, the ORM provider, `bin/migrate.dart` and `db/migration/`, and adds the `DB_*` keys to `.env`.
+It never overwrites a file. See [Add a package](../getting-started/add-a-package.md).
+
+To add only the package, run `dart pub add dox_orm`.
 
 ```dart
 import 'package:dox_orm/dox_orm.dart';

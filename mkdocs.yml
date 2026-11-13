@@ -119,6 +119,7 @@ nav:
   - Getting Started:
     - index.md
     - getting-started/installation.md
+    - getting-started/add-a-package.md
     - Tutorial:
       - tutorial/index.md
       - tutorial/01-create-project.md

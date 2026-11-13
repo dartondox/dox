@@ -106,6 +106,60 @@ if (path == null) {
 
 `create` returns `null` and writes nothing when a migration with this name is already there, with any time in its name. `dox migrate` writes `db/migration/migrations.dart` again before it runs, and makes `bin/migrate.dart` when it is missing. So `dox migrate` runs the new file.
 
+## Ship an install command
+
+`dox add <x>` adds the package `dox_x`, then runs its `<x>:install` command.
+So a package that needs setup (config files, `.env` keys, a provider) ships an `<x>:install` command.
+The `dox` CLI has no code of any package.
+
+Use `Installer` from `package:dox_annotation/install.dart`. Each step is safe to run twice: it never overwrites a file and never adds a key twice.
+
+```dart title="lib/src/commands/hello_install_command.dart"
+import 'package:dox_annotation/command.dart';
+import 'package:dox_annotation/install.dart';
+
+class HelloInstallCommand extends Command {
+  @override
+  String get name => 'hello:install';
+
+  @override
+  String get description => 'Set up dox_hello in this app';
+
+  @override
+  Future<void> run(List<String> args) async {
+    Installer installer = Installer();
+    String app = installer.appName;
+    installer.writeFile(
+      'lib/config/hello.dart',
+      "import 'package:$app/config/env.dart';\n",
+    );
+    installer.addEnvGetter("String get helloName => 'world';");
+    installer.addEnv('HELLO_NAME', 'world');
+    await installer.buildRunner();
+    installer.printSummary(<String>['Restart the server.']);
+  }
+}
+```
+
+| Method | What it does |
+| --- | --- |
+| `writeFile(path, content)` | Writes the file only when it is not there. |
+| `makeFolder(path)` | Makes the folder when it is not there. |
+| `addEnv(key, value)` | Adds `KEY=value` to `.env.example` and `.env` when the key is missing. A key that is there is never changed. |
+| `addEnvGetter(getter)` | Adds a getter to `AppEnv` in `lib/config/env.dart` when the class has no member with that name. When it can not find the class, it changes nothing and prints a hint. |
+| `addDependency(package, dev: false)` | Runs `dart pub add` when the app does not have the package. |
+| `buildRunner()` | Runs `dart run build_runner build`. |
+| `note(line)` | Adds your own line to the summary, like `added    hooks to pubspec.yaml`. |
+| `printSummary(nextSteps)` | Prints what was done and the next steps. Sets exit code 1 when a step failed. |
+
+Then:
+
+- Read the options from `args`, like `--driver=postgres`. Give a good default, so `dox add <x>` with no options works.
+- Test it on an app made without your package. Run it twice and check that nothing changes the second time.
+- Add `dox add <x>` to the skill of your package (`skills/<name>/SKILL.md`), so AI agents set it up the same way.
+
+`dox_orm` has an example: `orm:install`.
+
 ## Rules
 
 - A built-in command always wins. When a package has a command with the same name as a built-in one, `dox` runs the built-in one. `dox help` marks the package command as not used.
