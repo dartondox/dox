@@ -19,9 +19,11 @@ include: package:lints/recommended.yaml
 #   rules:
 #     - camel_case_types
 
-# analyzer:
-#   exclude:
-#     - path/to/excluded/files/**
+# the job test reads test/fixtures/jobs as text: they import dox_queue,
+# which is not a dependency
+analyzer:
+  exclude:
+    - test/fixtures/jobs/**
 
 # For more information about the core and recommended set of lints, see
 # https://dart.dev/go/core-lints

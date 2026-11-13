@@ -17,7 +17,7 @@ The `dox_queue` package gives you jobs, two drivers (Redis and sync), retries, d
 dart pub add dox_queue
 ```
 
-`dox_queue` has a builder. Your app already runs `build_runner` for `dox_builder`, so nothing else is needed.
+The job builder is in `dox_builder`. Your app already runs `build_runner` with it, so nothing else is needed.
 
 ## How it works
 
@@ -107,22 +107,15 @@ The database driver, [job batches](#job-batches) and `afterCommit` are in the `d
 dart pub add dox_queue_database
 ```
 
-Register it in your queue provider, before `super.setup()`:
+Make your queue provider extend `DatabaseQueueProvider` in place of `QueueProvider`. It turns them on:
 
 ```dart title="lib/providers/queue_provider.dart"
-import 'package:dox_queue/dox_queue.dart';
 import 'package:dox_queue_database/dox_queue_database.dart';
 
 import '../config/queue.dart';
 
-class AppQueueProvider extends QueueProvider {
+class AppQueueProvider extends DatabaseQueueProvider {
   AppQueueProvider() : super(queueConfig);
-
-  @override
-  Future<void> setup() async {
-    QueueDatabase.register();
-    await super.setup();
-  }
 }
 ```
 
@@ -722,7 +715,7 @@ print(batch.id);
 ### The table
 
 A batch is saved in the `job_batches` table. It uses the database connection of `QueueConfig.connection`, also with the Redis driver and the `sync` driver.
-Batches need `dox_queue_database`: install it, call `QueueDatabase.register()` in your queue provider, and run `dox queue:table`. See [step 4](#4-database-driver-and-tables).
+Batches need `dox_queue_database`: install it, extend `DatabaseQueueProvider` in your queue provider, and run `dox queue:table`. See [step 4](#4-database-driver-and-tables).
 Without the package, `Queue.batch()` throws a `StateError` that says to add `dox_queue_database`.
 
 An app that does not use batches does not need the table. If you use batches, you need it with every driver.
@@ -1196,11 +1189,11 @@ await Worker(
 
 ## Without Dox
 
-`dox_queue` also works in a plain Dart app. Add `build_runner`, so it writes `lib/generated/jobs.g.dart`:
+`dox_queue` also works in a plain Dart app. Add `build_runner` and `dox_builder`, so it writes `lib/generated/jobs.g.dart`:
 
 ```bash
 dart pub add dox_queue dox_core
-dart pub add dev:build_runner
+dart pub add dev:build_runner dev:dox_builder
 ```
 
 Write your jobs like in [Write a job](#write-a-job), and run `dart run build_runner build`.
@@ -1243,5 +1236,5 @@ Future<void> main() async {
 ```
 
 - `WorkerOptions` takes the same settings as the flags of `work`: `queues`, `concurrency`, `once`, `tries`, `timeout`, `sleep` and `stopWhenEmpty`.
-- The `database` driver needs `dox_queue_database`. Call `QueueDatabase.register()` before `Queue.configure()`. It uses the default `dox_orm` connection. Set it up first with `SqlQueryBuilder.initializeWithDatabaseConfig(...)`.
+- The `database` driver needs `dox_queue_database`. There are no providers here, so call `QueueDatabase.register()` before `Queue.configure()`. It uses the default `dox_orm` connection. Set it up first with `SqlQueryBuilder.initializeWithDatabaseConfig(...)`.
 - No services are in the Dox container. Make the services of a job in `handle()`.

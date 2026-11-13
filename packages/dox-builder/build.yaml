@@ -42,3 +42,13 @@ builders:
     build_extensions: { "$lib$": ["generated/container.g.dart"] }
     auto_apply: dependents
     build_to: source
+
+  # lib/generated/jobs.g.dart: every @Job class of the app (and the mail jobs
+  # of dox_mailer), for QueueConfig(jobs: jobRegistry) of dox_queue. Only in
+  # an app that can import dox_queue.
+  jobs:
+    import: "package:dox_builder/dox_builder.dart"
+    builder_factories: ["buildJobRegistry"]
+    build_extensions: { "$lib$": ["generated/jobs.g.dart"] }
+    auto_apply: dependents
+    build_to: source

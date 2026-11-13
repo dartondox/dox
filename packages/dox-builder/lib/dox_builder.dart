@@ -6,6 +6,7 @@ import 'package:dox_builder/src/dox_builder.dart';
 import 'package:dox_builder/src/dto/dto_generator.dart';
 import 'package:dox_builder/src/dto/dto_registry_builder.dart';
 import 'package:dox_builder/src/env_builder.dart';
+import 'package:dox_builder/src/job/job_registry_builder.dart';
 import 'package:dox_builder/src/openapi/openapi_builder.dart';
 import 'package:source_gen/source_gen.dart';
 
@@ -14,6 +15,7 @@ export 'src/dto/dto_generator.dart';
 export 'src/dto/dto_model.dart';
 export 'src/dto/dto_registry_builder.dart';
 export 'src/dto/dto_writer.dart';
+export 'src/job/job_registry_builder.dart';
 export 'src/schema/dto_schema.dart';
 export 'src/schema/json_schema_reader.dart';
 export 'src/schema/model_schema.dart';
@@ -36,4 +38,10 @@ Builder buildDoxOpenApi(BuilderOptions options) => const DoxOpenApiBuilder();
 /// providers and model binders of the app.
 Builder buildDoxContainer(BuilderOptions options) {
   return const DoxContainerBuilder();
+}
+
+/// Writes `lib/generated/jobs.g.dart` with every `@Job()` class of the app,
+/// for `QueueConfig(jobs: jobRegistry)` of dox_queue.
+Builder buildJobRegistry(BuilderOptions options) {
+  return const JobRegistryBuilder();
 }

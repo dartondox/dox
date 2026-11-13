@@ -226,4 +226,4 @@ The app makes `storage/` when it writes files (the local disk, the file cache, u
 | `lib/generated/` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 
-`build_runner` with `dox_builder` makes the model classes, the DTO checks, the typed env class and the OpenAPI docs.
+`build_runner` with `dox_builder` makes the model classes, the DTO checks, the typed env class, the OpenAPI docs and the list of queue jobs.

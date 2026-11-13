@@ -1,5 +1,7 @@
 ## Unreleased
 
+- New: the job builder moved here from dox_queue. It writes `lib/generated/jobs.g.dart` with every `@Job()` class, the same file as before. It runs only in an app that can import dox_queue. If your `build.yaml` names the builder `dox_queue:jobs`, change it to `dox_builder:jobs`.
+- New: when the app can import dox_mailer, `jobs.g.dart` also lists the mail jobs of `Mail.queue()` (`SendQueuedMail` and `SendEncryptedQueuedMail`). So the worker can read them before `Mail.configure()` runs. The saved job names do not change. A dox_mailer without these classes (3.1) gets no mail lines.
 - Finds `DoxProvider` classes from `dox_annotation`. Release it together with `dox_annotation` and `dox_core`. An app must upgrade dox_builder together with dox_core, or its providers are not found.
 - New: the OpenAPI schema of a model reads `visibleFields`, like `hidden`: with a list, only its keys are in the schema. Needs the next dox_orm for `toJson()` to match.
 - New: `onTrashed()` counts as a model hook, so a model with only that hook gets `hasModelHooks`. Needs the next dox_orm.
