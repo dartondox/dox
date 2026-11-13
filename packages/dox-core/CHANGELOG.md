@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.0
 
 - New: `Dox().isWebServer`. It is true only in the web server process (`startServer()` and its isolates). It is false in `bin/queue.dart`, the scheduler and tests. A provider can use it to skip work that only a web server needs, like a startup warning.
 - New: after `setup()` of every provider (and the routes), the app runs `boot()` of every provider (see `DoxProvider.boot()` of dox_annotation).
