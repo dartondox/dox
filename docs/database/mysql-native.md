@@ -142,15 +142,16 @@ MysqlNativePool pool = MysqlNativePool.open(
 A connection that runs a query is never closed by these.
 
 The `KILL` connection goes to the same address as the connection of the query.
-Each connection reads the server name once after login (`@@server_uuid`, on MariaDB the hostname, port and `server_id`).
+With `serverKill` on, each connection reads the server name once after login (`@@server_uuid`, on MariaDB the hostname, port and `server_id`).
 The `KILL` is sent only when both connections name the same server. Else no `KILL` is sent, and a warning is printed.
 This small query shows in the general log and the audit log of the server.
 
 !!! warning "Behind a proxy"
     The `KILL` goes on a new connection.
     Behind a proxy or a load balancer (like ProxySQL, or a cloud endpoint over many servers), that connection may reach another server.
-    The server name check then sends no `KILL`, so it can not hit another session.
-    You can also set `serverKill: false` there.
+    The server name check stops a `KILL` that reaches another server.
+    Two servers with the same `server_uuid` (eg. a copied data folder) still look like one server.
+    Behind a proxy with its own connection ids, like ProxySQL, set `serverKill: false`.
     A cancelled query then fails in Dart at once, but it runs to its end on the server.
     A timed out query only has its socket closed.
 

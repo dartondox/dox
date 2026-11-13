@@ -123,6 +123,7 @@ Modifiers come after the column type. They can be chained:
 | `primary()` | Make the column the primary key. | |
 | `unsigned()` | `UNSIGNED`. | MySQL only. Others ignore it. |
 | `comment('text')` | Column comment. | Postgres and MySQL. SQLite ignores it. |
+| `collation('utf8mb4_bin')` | Column collation, eg. so `A` and `a` are two keys. | MySQL and MariaDB only. Postgres and SQLite ignore it. Text columns only, others throw an `ArgumentError`. Give it again in `.change()`. |
 | `after('column')` | Put the new column after another one. | MySQL only, only in `schema.table`. Others add it at the end. |
 | `change()` | Change an existing column (in `schema.table`). | See [Change columns](#change-columns). |
 

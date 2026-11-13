@@ -157,15 +157,6 @@ The methods have the same names as the hooks. Each one gets the model. Override 
 
 A before method can stop the operation with `CancelModelEvent`, like a before hook.
 
-To hear about soft deletes, add the `TrashedObserver` mixin and override `onTrashed(T model)`:
-
-```dart
-class PostObserver extends ModelObserver<Post> with TrashedObserver<Post> {
-  @override
-  void onTrashed(Post post) => print('trashed ${post.id}');
-}
-```
-
 ```dart title="lib/app/observers/user.observer.dart"
 class UserObserver extends ModelObserver<User> {
   final Mailer mailer;
@@ -192,6 +183,15 @@ class ObserverProvider extends DoxProvider {
 ```
 
 Dox finds `ObserverProvider` by itself, like every `DoxProvider`. Run `dart run build_runner build` after you add it.
+
+To hear about soft deletes, add the `TrashedObserver` mixin and override `onTrashed(T model)`:
+
+```dart
+class PostObserver extends ModelObserver<Post> with TrashedObserver<Post> {
+  @override
+  void onTrashed(Post post) => print('trashed ${post.id}');
+}
+```
 
 - You can add more than one observer to a model.
 - `Model.forgetObservers<User>()` removes the observers of `User`. `Model.forgetObservers()` removes all.

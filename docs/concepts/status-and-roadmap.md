@@ -27,8 +27,8 @@ Each package has its own version number. Some packages live in their own repos. 
 | `dox` (CLI) | `dox create`, `dox serve`, `dox build`, `make:*`, `migration:*`, `db:seed`, `queue:*`, `schedule:*`, package commands | Stable | 132 tests in 12 files |
 | `dox_migration` | Migrations for Postgres, MySQL, MariaDB and SQLite | Stable | 36 tests in 5 files. CI runs them on each database. |
 | `dox_auth` | JWT and session auth guards and middleware, access tokens you can revoke, gates and policies | Stable | 201 tests in 8 files |
-| `dox_cache` | Memory, file and Redis cache, tags, locks, encryption | Stable | 94 tests in 4 files, with Redis in CI |
-| `dox_cache_database` | The database cache store, for `dox_cache` | New | 41 tests in 3 files, with SQLite, Postgres, MariaDB and MySQL in CI |
+| `dox_cache` | Memory, file and Redis cache, tags, locks, encryption | Stable | 126 tests in 7 files, with Redis in CI |
+| `dox_cache_database` | The database cache store, for `dox_cache` | New | 78 tests in 4 files, with SQLite, Postgres, MariaDB and MySQL in CI |
 | `dox_storage` | Local disk and S3 (and S3-compatible) storage | Stable | 153 tests in 10 files, with MinIO in CI |
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | Stable | 63 tests in 4 files |
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | Stable | 119 tests in 11 files, with Redis and the real `socket.io-client` in CI |
