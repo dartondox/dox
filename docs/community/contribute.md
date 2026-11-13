@@ -66,7 +66,7 @@ The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELE
    If the package needs a newer sibling, raise that constraint by hand.
    Close the `## Unreleased` section of its `CHANGELOG.md`.
 2. Merge the release PR, then push the tag `<package>-v<version>`. This publishes that package to pub.dev.
-   Release in dependency order: `dox_annotation`, `dox_cache`, `dox_builder`, `dox_cache_database`, `dox_core`.
+   Release in dependency order: `dox_annotation`, `dox_cache`, `dox_builder`, `dox_core`.
 3. Release the matching `dox-sample` template.
 
 A builder-only fix needs a `dox_builder` release only. It does not need a `dox_core` release.
@@ -120,14 +120,14 @@ On pub.dev:
 
 On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`.
 The publish job runs in it.
-Optional: add yourself as a required reviewer, and allow only the tags `dox_annotation-v*`, `dox_builder-v*`, `dox_cache-v*`, `dox_cache_database-v*` and `dox_core-v*`.
+Optional: add yourself as a required reviewer, and allow only the tags `dox_annotation-v*`, `dox_builder-v*`, `dox_cache-v*` and `dox_core-v*`.
 
 ## Packages in other repos
 
 | Package | Repo |
 | --- | --- |
 | `dox` (the CLI) | [dartondox/dox-cli](https://github.com/dartondox/dox-cli) |
-| `dox_orm`, `dox_migration` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
+| `dox_orm`, `dox_migration`, `dox_cache_database` | [dartondox/dox-orm](https://github.com/dartondox/dox-orm) |
 | `dox_auth` | [dartondox/dox-auth](https://github.com/dartondox/dox-auth) |
 | `dox_openapi` | [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi) |
 | `dox_validation` | [dartondox/dox-validation](https://github.com/dartondox/dox-validation) |

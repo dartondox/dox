@@ -10,7 +10,6 @@ workspace:
   - packages/dox-annotation
   - packages/dox-builder
   - packages/dox-cache
-  - packages/dox-cache-database
   - packages/dox-core
 
 dev_dependencies:
