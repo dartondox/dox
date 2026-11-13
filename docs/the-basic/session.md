@@ -164,6 +164,7 @@ A cookie can hold about 4 KB. A session that is too big gives an error. Keep the
 The cookie only has a random session id (encrypted too). The data lives in a cache store.
 Use `redis` when you run more than one isolate or more than one server: then all of them see the same sessions.
 A `memory` store is good for tests. It is not shared between isolates.
+With no Redis, a [database store](../packages/cache.md#database-store) shares the sessions too: `SessionConfig(driver: 'cache', store: 'database')`.
 
 ## When the session is read and saved
 

@@ -57,6 +57,7 @@ Then set `CACHE_STORE=redis` in `.env`.
 | `file` | one JSON file per key in a folder | Yes (same machine) |
 | `redis` | Redis, with the [ioredis](https://pub.dev/packages/ioredis) package | Yes |
 | `null` | stores nothing. Use it to turn caching off | - |
+| `database` | a table in your database, from the `dox_cache_database` package. See [Database store](#database-store) | Yes |
 
 !!! warning
     Dox runs many isolates. Each isolate has its own `memory` cache.
@@ -288,6 +289,53 @@ int deleted = await (store.driver as FileDriver).prune();
 ```
 
 - `prune()` takes the key lock that `add`, `increment` and `touch` use, so it never deletes their new value. A plain `put` takes no lock. If a `put` writes a key at the same moment `prune()` deletes it, the new value is lost. It is only a cache miss.
+
+## Database store
+
+The `dox_cache_database` package keeps the cache in a table of your database. All servers that use the same database share the cache, the locks and the sessions, with no Redis. It works on SQLite, Postgres, MySQL and MariaDB.
+
+Install it and make the table:
+
+```bash
+dart pub add dox_cache_database
+dox cache:table
+dox migrate
+```
+
+`dox cache:table` writes a migration that calls `CacheTables.up(schema)`. Give `--table=<name>` for another table name.
+
+Register the driver when the app starts, before the first use of the store:
+
+```dart
+import 'package:dox_cache_database/dox_cache_database.dart';
+
+Dox().cache.extend(
+  'database',
+  DatabaseCacheDriverFactory(Dox().cache.config.encrypter),
+);
+```
+
+Then add a store to `lib/config/cache.dart`:
+
+```dart
+'database': <String, dynamic>{
+  'driver': 'database',
+  'table': 'cache', // optional, default `cache`
+  'connection': 'cache', // optional, default the default connection
+  'prefix': 'app:', // optional
+  'encrypt': true, // optional
+},
+```
+
+- A full key (the prefix and the key) may have at most 255 characters. A longer key throws an `ArgumentError`.
+- Cache calls inside an app transaction on the same connection join that transaction. Their writes roll back with it, and other servers do not see a lock until the commit. Give the store its own `connection` (a second connection with the same database settings) to keep the cache out of app transactions.
+- An expired row reads as a miss, but it stays in the table. Call `prune()` from time to time, eg. in a schedule:
+
+```dart
+int deleted = await (store.driver as DatabaseCacheDriver).prune();
+```
+
+- Expiry times come from the clock of each server. Keep the clocks of your servers in sync.
 
 ## Your own driver
 

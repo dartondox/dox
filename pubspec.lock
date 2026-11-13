@@ -225,6 +225,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.4"
+  dox_mysql_native:
+    dependency: transitive
+    description:
+      name: dox_mysql_native
+      sha256: b81c8b0941b687be24de837e98e4a5e5271e378e4082c5d074a56f625d527b7f
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.3"
   dox_openapi:
     dependency: transitive
     description:
@@ -233,6 +241,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.0"
+  dox_orm:
+    dependency: transitive
+    description:
+      name: dox_orm
+      sha256: d8562a13cd5a0865d92412e268e39b185ac2dbb738bc8ffedb3d6d8ac95d25c1
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
+  dox_postgres_native:
+    dependency: transitive
+    description:
+      name: dox_postgres_native
+      sha256: "24a081904afcb7eae414bcf62bdf632bd083f51213776c9e9ef43dff6321b664"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.4"
   dox_validation:
     dependency: transitive
     description:
@@ -409,6 +433,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.6"
+  native_toolchain_c:
+    dependency: transitive
+    description:
+      name: native_toolchain_c
+      sha256: "120b6fc66acd8a5ddeaeb1e59b78836bb3ec9919bd9d9dfb1e2401985710c2c0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.19.6"
   node_preamble:
     dependency: transitive
     description:
@@ -569,6 +601,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.2"
+  sqlite3:
+    dependency: transitive
+    description:
+      name: sqlite3
+      sha256: "8765980411f9b6733534efe9d014fad0750fa649590598772c04692deb34886b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.9.1"
   stack_trace:
     dependency: transitive
     description:

@@ -143,6 +143,7 @@ The starter project also has an `AGENTS.md` file with the rules of the project.
 | `dox_openapi` | [OpenAPI docs](../packages/openapi.md) |
 | `dox_storage` | [file storage: local, S3](../packages/storage.md) |
 | `dox_cache` | [cache: memory, file, Redis](../packages/cache.md) |
+| `dox_cache_database` | [cache in a database table](../packages/cache.md#database-store) |
 | `dox_socketio` | [Socket.IO server](../packages/socketio.md) |
 | `dox_queue` | [background jobs](../digging-deeper/queue.md) |
 | `dox_scheduler` | [scheduled tasks](../digging-deeper/scheduler.md) |

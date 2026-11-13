@@ -1,0 +1,27 @@
+name: dox_cache_database
+description: A database cache store for dox_cache. Shares cache, locks and sessions between servers on SQLite, Postgres or MySQL, with no Redis.
+version: 3.1.0
+repository: https://github.com/dartondox/dox
+homepage: https://dartondox.dev
+
+environment:
+  sdk: ^3.14.0
+resolution: workspace
+
+dependencies:
+  # Raise to the dox_cache release that has CacheEncrypter and
+  # CacheConstants.encryptOption before releasing this package.
+  dox_cache: ^3.1.3
+  dox_core: ^3.1.3
+  # Raise to the dox_orm release that has ColumnDefinition.collation(),
+  # DBDriver.hasOpenTransaction and ReplicaDriver before releasing this
+  # package.
+  dox_orm: ^3.1.0
+
+dev_dependencies:
+  lints: ^6.1.0
+  test: ^1.33.0
+
+# The `dox` CLI finds the commands of this package here (`dox cache:table`).
+dox:
+  commands: package:dox_cache_database/commands.dart
