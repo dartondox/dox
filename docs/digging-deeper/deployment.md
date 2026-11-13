@@ -74,7 +74,7 @@ RUN dart pub get --offline
 # libraries in build/bundle/lib and the migrations in build/bundle/db.
 # The queue worker and the scheduler run as their own processes:
 # `/app/bin/queue work` and `/app/bin/schedule work`.
-ARG DOX_VERSION=^3.0.0
+ARG DOX_VERSION=^3.2.0
 RUN dart pub global activate dox "$DOX_VERSION"
 RUN /root/.pub-cache/bin/dox build
 

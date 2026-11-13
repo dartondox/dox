@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.0
 
 - New: `package:dox_annotation/install.dart` with `Installer`, the steps of a `<package>:install` command that `dox add` runs. `writeFile` (only when the file is not there), `makeFolder`, `addEnv` (to `.env` and `.env.example`, only when the key is missing), `addEnvGetter` (to `AppEnv` in `lib/config/env.dart`), `addDependency` (`dart pub add`, also `dev`), `buildRunner`, `note` (add your own summary line) and `printSummary`. `lines` is read only. Every step is safe to run twice. It is not in the `dox_annotation.dart` barrel.
 - New: `DoxProvider.boot()`. It runs once in every isolate after `setup()` of every provider is done. Optional, the default does nothing. dox_queue starts its in-process worker there, so the other providers (eg. the mail jobs) are ready first.
