@@ -168,6 +168,8 @@ They do not run on the web, iOS or Android.
 
 A ready-built native library is downloaded for you, so you do not need Rust.
 
+On Linux, the ready-built library needs glibc 2.35 or newer, for example Ubuntu 22.04 or Debian 12. On older Linux, or on Alpine, build the library yourself. The [dox_pdf_lib README](https://pub.dev/packages/dox_pdf_lib) shows how.
+
 ## Without Dox
 
 The same code works in any Dart program. Call `PDFDocument.create()` or `generate(...)`, then write the bytes to a file:
