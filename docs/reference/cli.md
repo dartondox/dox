@@ -85,7 +85,7 @@ You can use both options together.
 What it does:
 
 1. Starts `dart run --resident bin/server.dart` and prints its output. The `--resident` flag keeps a background compiler that only recompiles changed files. So restarts are fast. `dox serve` stops that compiler when it exits.
-2. Runs the server with the Dart VM service on a free port on `localhost`. Hot reload needs it. The server prints a DevTools link at start. Open it for the debugger, the CPU profiler and memory snapshots. VS Code can also attach to the VM service address ("Dart: Attach to Dart Process").
+2. Runs the server with the Dart VM service on a free port on `localhost`. Hot reload needs it. The server prints the VM service link at start. Open it in a browser to get DevTools: the debugger, the CPU profiler and memory snapshots. VS Code can also attach to the VM service address ("Dart: Attach to Dart Process").
 3. When the server is up, starts `dart run build_runner watch` (unless the option is set).
 4. Watches the project folder. It ignores `build/` and hidden folders like `.dart_tool/`. It waits until no file changed for 200 ms. With build_runner, a restart also waits for the generated files. A hot reload does not wait for build_runner.
 
