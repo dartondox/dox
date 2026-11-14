@@ -32,6 +32,8 @@ The docs come from three places:
     );
     ```
 
+    The import of `generated/openapi.g.dart` shows an error until the builder runs in step 3.
+
 2. Add it to `AppConfig`:
 
     ```dart title="lib/config/app.dart"
@@ -53,7 +55,8 @@ The docs come from three places:
     Run it again after you change routes, controllers, request classes or models.
     `dox build_runner:watch` does it for you while you work.
 
-4. Start the app and open `http://localhost:3000/docs`.
+4. Make sure `.env` has `APP_ENV=development`. Then start the app and open `http://localhost:3000/docs`.
+    Without `APP_ENV=development`, `/docs` gives 404.
     The document is built on the first `/docs` request, then kept.
 
 !!! note
