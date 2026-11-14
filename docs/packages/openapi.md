@@ -21,7 +21,7 @@ The docs come from three places:
 ## Setup (optional)
 
 !!! note "Made with `dox create`?"
-    Your app already serves `/docs`, `/openapi.json` and `/openapi.yaml`. You need no setup for that.
+    Your app already serves `/docs`, `/openapi.json` and `/openapi.yaml` while `APP_ENV` is `development`. The template `.env` sets this. You need no setup for that.
     But the config does not have `openApiRegistry` yet. So each route shows only its path and method.
     Do the steps below when you want the full docs from your code (annotations, request and response schemas), or when you want to change the title or other options.
 
@@ -413,7 +413,9 @@ By default the docs are off in production. `enabled: true` is the quick way to t
 This section is the other way: make the document at build time, put the files in the image, and serve the files.
 The URLs stay the same: `/docs`, `/openapi.json` and `/openapi.yaml`.
 
-1. Make `bin/openapi.dart`. See [Write the files](#write-the-files).
+You need two files first: `lib/config/openapi.dart` (see [Setup](#setup-optional)) and `bin/openapi.dart` (see [Write the files](#write-the-files)). An app made with `dox create` has neither file.
+
+1. Make both files, if you do not have them yet.
 
 2. Add a controller that serves the files:
 
@@ -476,15 +478,21 @@ The URLs stay the same: `/docs`, `/openapi.json` and `/openapi.yaml`.
 
     `openApi` is the config of `lib/config/openapi.dart`. Import it, and the controller, in this file.
 
-4. Make the files in the Docker build, and copy them into the image. Add these lines to the `Dockerfile`:
+4. Make the files in the Docker build, and copy them into the image. Change the `Dockerfile` in two places.
+    First, in the build stage, right after `RUN /root/.pub-cache/bin/dox build`, add:
 
     ```dockerfile title="Dockerfile"
-    # in the build stage, after `dox build`
     RUN APP_KEY=00000000000000000000000000000000 /root/.pub-cache/bin/dox openapi:generate docs/openapi
+    ```
 
-    # in the step that lays out /out/app
-    RUN mkdir -p /out/app/docs ... \
-      && cp -r docs/openapi /out/app/docs/openapi ...
+    Second, in the `RUN` step that lays out `/out`, add `/out/app/docs` to the `mkdir -p` list. Add one line to the `&&` chain after the `cp -r build/bundle/. /out/app/` line:
+
+    ```dockerfile title="Dockerfile"
+    RUN mkdir -p /out/app/storage /out/app/docs /out/tmp \
+      && chmod 1777 /out/tmp \
+      && cp -r build/bundle/. /out/app/ \
+      && cp -r docs/openapi /out/app/docs/openapi \
+      # ... the lines that follow stay as they are
     ```
 
     `bin/openapi.dart` starts your app config, so it needs `APP_KEY`. The dummy key is only for this step. It is not in the image.
