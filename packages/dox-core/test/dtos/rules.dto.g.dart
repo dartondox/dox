@@ -60,6 +60,7 @@ class _$CreateUserDto extends DtoSchema<CreateUser> {
     Object? c4;
     c4 = s.list(s.read(input, 'tags'), p, 'tags', _m);
     if (c4 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'tags'];
       List<String> o0 = <String>[];
       for (int i0 = 0; i0 < c4.length; i0++) {
@@ -71,10 +72,10 @@ class _$CreateUserDto extends DtoSchema<CreateUser> {
           o0.add(x0 as String);
         }
       }
-      c4 = o0;
+      c4 = s.issues.length != b0 ? invalid : o0;
     }
     if (c4 == null) s.required(p, 'tags', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is String) {
       if (!(c0.runes.length >= 3 && c0.runes.length <= 50)) {
         s.fail(
@@ -279,7 +280,7 @@ class _$TextRulesDto extends DtoSchema<TextRules> {
     // dash: String?
     Object? c16;
     c16 = s.string(s.read(input, 'dash'), p, 'dash', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is String) {
       if (!(c0.runes.length >= 2 && c0.runes.length <= 4)) {
         s.fail(
@@ -695,6 +696,7 @@ class _$ChangeTextDto extends DtoSchema<ChangeText> {
     // blank: String?
     Object? c4;
     c4 = s.string(s.read(input, 'blank'), p, 'blank', _m, trim: true);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return ChangeText(
       trimmed: c0 is Undefined ? null : c0 as String?,
@@ -806,7 +808,7 @@ class _$NumberRulesDto extends DtoSchema<NumberRules> {
     // notInNum: int?
     Object? c7;
     c7 = s.integer(s.read(input, 'not_in_num'), p, 'not_in_num', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is int) {
       if (!(c0 >= 18)) {
         s.fail(
@@ -1035,6 +1037,7 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
     Object? c0;
     c0 = s.list(s.read(input, 'min_items'), p, 'min_items', _m);
     if (c0 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'min_items'];
       List<int> o0 = <int>[];
       for (int i0 = 0; i0 < c0.length; i0++) {
@@ -1046,12 +1049,13 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
           o0.add(x0 as int);
         }
       }
-      c0 = o0;
+      c0 = s.issues.length != b0 ? invalid : o0;
     }
     // maxItems: List<String>?
     Object? c1;
     c1 = s.list(s.read(input, 'max_items'), p, 'max_items', _m);
     if (c1 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'max_items'];
       List<String> o0 = <String>[];
       for (int i0 = 0; i0 < c1.length; i0++) {
@@ -1063,12 +1067,13 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
           o0.add(x0 as String);
         }
       }
-      c1 = o0;
+      c1 = s.issues.length != b0 ? invalid : o0;
     }
     // unique: List<String>?
     Object? c2;
     c2 = s.list(s.read(input, 'unique'), p, 'unique', _m);
     if (c2 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'unique'];
       List<String> o0 = <String>[];
       for (int i0 = 0; i0 < c2.length; i0++) {
@@ -1080,12 +1085,13 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
           o0.add(x0 as String);
         }
       }
-      c2 = o0;
+      c2 = s.issues.length != b0 ? invalid : o0;
     }
     // emails: List<String>?
     Object? c3;
     c3 = s.list(s.read(input, 'emails'), p, 'emails', _m);
     if (c3 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'emails'];
       List<String> o0 = <String>[];
       for (int i0 = 0; i0 < c3.length; i0++) {
@@ -1097,9 +1103,9 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
           o0.add(x0 as String);
         }
       }
-      c3 = o0;
+      c3 = s.issues.length != b0 ? invalid : o0;
     }
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is List<int>) {
       if (!(c0.length >= 1)) {
         s.fail(
@@ -1269,7 +1275,7 @@ class _$DateRulesDto extends DtoSchema<DateRules> {
     // before: DateTime?
     Object? c1;
     c1 = s.date(s.read(input, 'before'), p, 'before', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is DateTime) {
       if (!(c0.isAfter(_d0))) {
         s.fail(
@@ -1402,6 +1408,7 @@ class _$AllTypesDto extends DtoSchema<AllTypes> {
     Object? c7;
     c7 = s.list(s.read(input, 'list'), p, 'list', _m);
     if (c7 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'list'];
       List<int> o0 = <int>[];
       for (int i0 = 0; i0 < c7.length; i0++) {
@@ -1413,12 +1420,13 @@ class _$AllTypesDto extends DtoSchema<AllTypes> {
           o0.add(x0 as int);
         }
       }
-      c7 = o0;
+      c7 = s.issues.length != b0 ? invalid : o0;
     }
     // map: Map<String, int>?
     Object? c8;
     c8 = s.object(s.read(input, 'map'), p, 'map', _m);
     if (c8 is Map) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'map'];
       Map<String, int> o0 = <String, int>{};
       for (MapEntry<dynamic, dynamic> n0 in c8.entries) {
@@ -1431,7 +1439,7 @@ class _$AllTypesDto extends DtoSchema<AllTypes> {
           o0[k0] = x0 as int;
         }
       }
-      c8 = o0;
+      c8 = s.issues.length != b0 ? invalid : o0;
     }
     // any: Object?
     Object? c9;
@@ -1439,6 +1447,7 @@ class _$AllTypesDto extends DtoSchema<AllTypes> {
     // raw: Map<String, dynamic>?
     Object? c10;
     c10 = s.object(s.read(input, 'raw'), p, 'raw', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return AllTypes(
       s: c0 is Undefined ? null : c0 as String?,
@@ -1602,6 +1611,7 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers> {
     Object? c2;
     c2 = s.list(s.read(input, 'tags'), p, 'tags', _m);
     if (c2 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'tags'];
       List<String> o0 = <String>[];
       for (int i0 = 0; i0 < c2.length; i0++) {
@@ -1613,9 +1623,10 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers> {
           o0.add(x0 as String);
         }
       }
-      c2 = o0;
+      c2 = s.issues.length != b0 ? invalid : o0;
     }
     if (c2 == null) s.required(p, 'tags', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return SearchUsers(
       q: c0 is Undefined ? null : c0 as String?,
@@ -1707,6 +1718,7 @@ class _$StrictInputDto extends DtoSchema<StrictInput> {
     Object? c0;
     c0 = s.string(s.read(input, 'name'), p, 'name', _m);
     if (c0 == null || c0 is Undefined) s.required(p, 'name', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return StrictInput(name: c0 as String);
   }
@@ -1778,7 +1790,7 @@ class _$WithMessagesDto extends DtoSchema<WithMessages> {
     // nick: String?
     Object? c3;
     c3 = s.string(s.read(input, 'nick'), p, 'nick', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c3 is String) {
       if (!(c3.runes.length >= 3)) {
         s.fail(
@@ -1874,6 +1886,7 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys> {
     Object? c1;
     c1 = s.string(s.read(input, 'emailAddress'), p, 'emailAddress', _m);
     if (c1 == null || c1 is Undefined) s.required(p, 'emailAddress', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return SignUpKeys(firstName: c0 as String, email: c1 as String);
   }
@@ -1935,6 +1948,7 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> {
     Object? c0;
     c0 = s.string(s.read(input, 'firstName'), p, 'firstName', _m);
     if (c0 == null || c0 is Undefined) s.required(p, 'firstName', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return CamelKeys(firstName: c0 as String);
   }
@@ -1993,8 +2007,8 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser> {
     // age: Maybe<int>
     Object? c1;
     c1 = s.integer(s.read(input, 'age'), p, 'age', _m);
-    if (c1 == null) s.required(p, 'age', _m);
-    if (s.issues.length != e) return null;
+    if (c1 == null || s.sentEmpty(c1, input, 'age')) s.required(p, 'age', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is String) {
       if (!(c0.runes.length <= 5)) {
         s.fail(
@@ -2094,7 +2108,8 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
     // countryCode: Maybe<String>
     Object? c5;
     c5 = s.string(s.read(input, 'country_code'), p, 'country_code', _m);
-    if (c5 == null) s.required(p, 'country_code', _m);
+    if (c5 == null || s.sentEmpty(c5, input, 'country_code'))
+      s.required(p, 'country_code', _m);
     // phone: String?
     Object? c6;
     c6 = s.string(s.read(input, 'phone'), p, 'phone', _m);
@@ -2120,6 +2135,7 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
     Object? c10;
     c10 = s.list(s.read(input, 'tags'), p, 'tags', _m);
     if (c10 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'tags'];
       List<String> o0 = <String>[];
       for (int i0 = 0; i0 < c10.length; i0++) {
@@ -2131,7 +2147,7 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
           o0.add(x0 as String);
         }
       }
-      c10 = o0;
+      c10 = s.issues.length != b0 ? invalid : o0;
     }
     // pin: String?
     Object? c11;
@@ -2198,7 +2214,7 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
       'plan_note',
       _m,
     );
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is String) {
       if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
         s.failRule(const Confirmed(), p, 'password', c0, _m);
@@ -2484,7 +2500,7 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword> {
     Object? c0;
     c0 = s.string(s.read(input, 'password'), p, 'password', _m);
     if (c0 == null || c0 is Undefined) s.required(p, 'password', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is String) {
       if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
         s.failRule(const Confirmed(), p, 'password', c0, _m);
