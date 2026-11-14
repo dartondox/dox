@@ -68,7 +68,7 @@ The docs come from three places:
     The docs are on only when `APP_ENV` is `development` or `local`.
     If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden.
     Set `APP_ENV=development` in your `.env` and in CI.
-    To change this, use `enabled` in [Config options](#config-options).
+    To turn the docs on in production, see [Turn the docs on in production](#turn-the-docs-on-in-production).
 
 ## Describe a route
 
@@ -310,7 +310,7 @@ When a method has both, the annotation wins. `@Summary` replaces the first line 
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local` |
+| `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local`. See [Turn the docs on in production](#turn-the-docs-on-in-production) |
 | `info` | `Info(title: 'Dox API', version: '1.0.0')` | title and version of the API |
 | `servers` | `[]` | base URLs, like `[Server('https://api.my.app')]` |
 | `registry` | empty | `openApiRegistry` from `lib/generated/openapi.g.dart` |
@@ -321,7 +321,34 @@ When a method has both, the annotation wins. `@Summary` replaces the first line 
 | `include` | `[]` (all routes) | only these paths go in the docs, like `['/api/*']` |
 | `exclude` | `[]` | these paths are left out, like `['/api/internal/*']` |
 
-In production the docs are off, unless you set `enabled: true`.
+In production the docs are off, unless you set `enabled: true`. See [Turn the docs on in production](#turn-the-docs-on-in-production).
+
+### Turn the docs on in production
+
+By default `enabled` is `null`. Then Dox looks at `APP_ENV`:
+
+| `APP_ENV` value | Are the docs on? |
+| --- | --- |
+| `development` | yes |
+| `local` | yes |
+| `production` | no. `/docs`, `/openapi.json` and `/openapi.yaml` give 404 |
+| not set | no. Dox treats the app as production |
+
+To turn the docs on in every environment, also production, set `enabled: true`:
+
+```dart title="lib/config/openapi.dart"
+OpenApiConfig openApi = OpenApiConfig(
+  enabled: true,
+  info: Info(title: 'Blog API', version: '1.0.0'),
+  registry: openApiRegistry,
+);
+```
+
+!!! warning
+    `/docs` has no login. In production, anyone can see every route of your API.
+    Only do this for a public API.
+
+`enabled: false` turns the docs off in every environment.
 
 ### The docs page
 

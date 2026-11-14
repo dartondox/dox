@@ -258,6 +258,8 @@ curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/docs           # 404
 curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/openapi.json   # 404
 ```
 
+To turn the docs on in production, set `enabled: true`. See [OpenAPI: turn the docs on in production](../packages/openapi.md#turn-the-docs-on-in-production).
+
 To show the docs on staging too, but never in production, set `enabled` yourself:
 
 ```dart title="lib/config/openapi.dart"
