@@ -76,7 +76,7 @@ dart pub global deactivate dox
 | `dox key:generate [--show] [--force]` | make a new `APP_KEY`. `--show` prints a key and writes nothing. In production it asks first, `--force` skips |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
-| `dox openapi:generate [dir]` | run `bin/openapi.dart` to write `openapi.json` and `openapi.yaml` (default `storage/openapi`). A new project has no `bin/openapi.dart` yet, see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
+| `dox openapi:generate [dir]` | run `bin/openapi.dart` to write `openapi.json` and `openapi.yaml` (default `storage/openapi`). A new project has no `bin/openapi.dart` yet, see [OpenAPI](../packages/openapi.md#write-the-files) |
 | `dox update` | update the CLI |
 | `dox version` (or `dox -v`) | show the CLI version |
 | `dox help [command]` | show help |
