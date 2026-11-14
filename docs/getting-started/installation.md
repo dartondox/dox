@@ -67,10 +67,11 @@ dox s
 
 `dox s` does two things:
 
+- It runs `dart run bin/server.dart`. When you change a file in `lib/app/`, it hot reloads the new code. No restart is needed. For routes, providers, config and other start-up code, it restarts the server.
 - It runs `dart run build_runner watch`, so generated files stay up to date.
-- It runs `dart run bin/server.dart`, and restarts it when a `.dart` file changes.
 
 To skip the builder, use `dox s --ignore-build-runner`.
+To turn hot reload off, use `dox s --no-reload`.
 To start the server without the CLI, run `dart run bin/server.dart`.
 
 At each start it also runs the new migrations in `db/migration`.

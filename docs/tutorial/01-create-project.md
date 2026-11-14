@@ -44,7 +44,7 @@ The app reads these keys through the typed class in `lib/config/env.dart`. See [
 dox s
 ```
 
-`dox s` runs the code generator and the server. It restarts the server when you save a `.dart` file.
+`dox s` runs the code generator and the server. It hot reloads your code when you save a file in `lib/app/`. It restarts the server for routes, config and other start-up code.
 The first start is slower, because it compiles the SQLite library.
 At the first start it also runs the migrations of the template.
 The last line is a JSON log line with this message:
