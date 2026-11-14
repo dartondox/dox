@@ -105,7 +105,7 @@ dox s --ignore-build-runner       # do not run build_runner watch
 ```
 
 `dox serve` runs `dart run bin/server.dart`.
-When a file in `lib/app/` changes, it hot reloads the new code into the running server. This takes about 0.1 to 0.2 seconds. The server also prints a DevTools link for the debugger and profiler.
+When a file in `lib/app/` changes, it hot reloads the new code into the running server. This takes about 0.1 to 0.2 seconds. The server also prints the VM service link. Open it in a browser to get DevTools, the debugger and profiler.
 When routes, providers, config, `lib/generated/`, `bin/`, `db/` or a generated `.g.dart` file change, it restarts the server. A failed hot reload also restarts it.
 Hot reload does not run code again that already ran once. A changed static or global value keeps its old value until a restart.
 It also runs `build_runner watch` after the server is up, so generated files stay up to date. One save gives one restart.
