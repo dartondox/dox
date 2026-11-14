@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.1
 
 - Fix: `Env.get` read as the first env read of the app saw only the shell, because nothing had loaded `.env` yet. Now every env read (`Env.get`, `Env.appEnv`, `Env().env`) loads `.env` once when it is not loaded. After that it is a plain map read, also when there is no `.env` file. Setting `Env().env` in a test counts as loaded, so the file is not put on top. When the `.env` file can not be read (like bad UTF-8), every read throws again; it never looks like an empty file.
 - New: `AppConfig.isDevelopment`. It is true when the env `APP_ENV` is `development` (not `local`). Not set means production, so false. It reads the env on each call, so it works before the server starts and in every isolate. Use it for config like a database `debug` flag, in place of a computed getter in the env class: every env getter is an env key.
