@@ -68,7 +68,11 @@ abstract class AppEnv {
     expect(out, contains("String? appName = r.string('APP_NAME');"));
     expect(out, contains("r.need('APP_NAME');"));
     expect(out, contains('appName: appName!,'));
-    expect(out, contains("int dbPort = r.integer('DB_PORT') ?? d.dbPort;"));
+    expect(out, contains("int? dbPort = r.integer('DB_PORT');"));
+    expect(out, contains(r'final int? _$dbPort;'));
+    expect(out, contains(r'late final int dbPort = _$dbPort ?? super.dbPort;'));
+    expect(out, contains(r'_$dbPort = dbPort'));
+    expect(out, contains(r'$env.dbPort;'));
     expect(out, contains("r.decimal('RATE')"));
     expect(out, contains("r.number('RATIO')"));
     expect(out, contains("r.boolean('APP_DEBUG')"));
@@ -78,17 +82,48 @@ abstract class AppEnv {
     expect(out, contains("r.duration('CACHE_TTL')"));
     expect(out, contains("r.enumByName('LOG_LEVEL', Level.values)"));
     expect(out, contains("r.list('HOSTS')"));
-    expect(out, contains(r'class _$AppEnvDefaults extends AppEnv'));
+    expect(out, isNot(contains('Defaults')));
   });
 
-  test('DoxEnvBuilder | no defaults class without defaults', () async {
+  test('DoxEnvBuilder | a default can use another getter', () async {
+    String out = await _generate('''
+@DoxEnv()
+abstract class AppEnv {
+  String get appEnv => 'production';
+  bool get isDevelopment => appEnv == 'development';
+  String? get region => null;
+}
+''');
+    expect(
+      out,
+      contains(r'late final String appEnv = _$appEnv ?? super.appEnv;'),
+    );
+    expect(
+      out,
+      contains(
+        r'late final bool isDevelopment = '
+        r'_$isDevelopment ?? super.isDevelopment;',
+      ),
+    );
+    // a nullable getter with a body keeps one `?`
+    expect(out, contains(r'final String? _$region;'));
+    expect(
+      out,
+      contains(r'late final String? region = _$region ?? super.region;'),
+    );
+    expect(out, isNot(contains('String??')));
+  });
+
+  test('DoxEnvBuilder | no defaults, no late fields', () async {
     String out = await _generate('''
 @DoxEnv()
 abstract class AppEnv {
   String get appKey;
 }
 ''');
-    expect(out, isNot(contains('Defaults')));
+    expect(out, contains('final String appKey;'));
+    expect(out, isNot(contains('late')));
+    expect(out, isNot(contains('super.')));
   });
 
   test('DoxEnvBuilder | unsupported type fails', () async {

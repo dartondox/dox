@@ -1,18 +1,21 @@
-# dox_core only uses the generator for the DTOs of its tests and benchmark.
+# dox_core only uses the generator for the DTOs and env class of its tests,
+# and for its benchmark.
 targets:
   $default:
     sources:
       - lib/**
       - test/dtos/**
+      - test/env/**
       - benchmark/**
       - $package$
     builders:
       # the model and DTO builder runs on lib/** by default. The DTOs of
-      # the tests and the benchmark are outside lib/.
+      # the tests, the test env class and the benchmark are outside lib/.
       dox_builder:
         generate_for:
           - lib/**
           - test/dtos/**
+          - test/env/**
           - benchmark/**
       dox_builder:openapi:
         enabled: false

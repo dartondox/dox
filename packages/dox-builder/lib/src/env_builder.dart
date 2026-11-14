@@ -10,11 +10,14 @@ import 'util.dart';
 
 /// Writes `_$<Class>` for a `@DoxEnv()` class.
 ///
-/// Each getter becomes a final field. `load()` reads every key once, then
-/// throws one `EnvException` with all missing or bad keys.
+/// `load()` reads every key once, then throws one `EnvException` with all
+/// missing or bad keys.
 /// - key: `@EnvKey('X')`, or the getter name in UPPER_SNAKE case
-/// - a getter with a body is the default (any expression, read only when
-///   the key is missing)
+/// - a getter with a body is the default (any expression, used only when
+///   the key is missing). The body runs on the loaded env, so it may use
+///   other getters: `appEnv == 'development'` sees the real `APP_ENV`.
+///   `load()` works out every default once, so a default that throws stops
+///   the app at startup.
 /// - a nullable getter with no body is optional
 /// - other getters with no body are required
 class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
@@ -32,7 +35,6 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
     }
     String name = element.displayName;
     String generated = '_\$$name';
-    String defaults = '_\$${name}Defaults';
 
     List<_EnvField> fields = <_EnvField>[];
     for (GetterElement getter in element.getters) {
@@ -43,47 +45,44 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
 
     StringBuffer declarations = StringBuffer();
     StringBuffer params = StringBuffer();
+    List<String> inits = <String>[];
     StringBuffer reads = StringBuffer();
     StringBuffer args = StringBuffer();
-    StringBuffer defaultGetters = StringBuffer();
-    bool hasDefault = false;
+    StringBuffer touches = StringBuffer();
 
     for (_EnvField f in fields) {
-      declarations.writeln('@override\nfinal ${f.type} ${f.name};');
-      params.writeln('required this.${f.name},');
       String read = "r.${f.readCall}";
+      String nullableType = f.nullable ? f.type : '${f.type}?';
+      reads.writeln('$nullableType ${f.name} = $read;');
       if (f.hasDefault) {
-        hasDefault = true;
-        reads.writeln('${f.type} ${f.name} = $read ?? d.${f.name};');
-        args.writeln('${f.name}: ${f.name},');
-      } else if (f.nullable) {
-        reads.writeln('${f.type} ${f.name} = $read;');
-        args.writeln('${f.name}: ${f.name},');
-      } else {
-        reads.writeln("${f.type}? ${f.name} = $read;");
-        reads.writeln('r.need(${_literal.string(f.key)});');
-        args.writeln('${f.name}: ${f.name}!,');
-      }
-      if (!f.hasDefault) {
-        defaultGetters.writeln(
-          '@override\n${f.type} get ${f.name} => '
-          'throw StateError(${_literal.string('${f.key} has no default')});',
+        // `_$x` holds the raw env value. `x` is `late` so the getter body
+        // runs on this object and sees the loaded values of other keys.
+        String raw = '_\$${f.name}';
+        declarations.writeln(
+          'final $nullableType $raw;\n'
+          '@override\n'
+          'late final ${f.type} ${f.name} = $raw ?? super.${f.name};',
         );
+        params.writeln('required $nullableType ${f.name},');
+        inits.add('$raw = ${f.name}');
+        args.writeln('${f.name}: ${f.name},');
+        touches.writeln('\$env.${f.name};');
+      } else {
+        declarations.writeln('@override\nfinal ${f.type} ${f.name};');
+        params.writeln('required this.${f.name},');
+        if (f.nullable) {
+          args.writeln('${f.name}: ${f.name},');
+        } else {
+          reads.writeln('r.need(${_literal.string(f.key)});');
+          args.writeln('${f.name}: ${f.name}!,');
+        }
       }
     }
 
-    String defaultsClass = hasDefault
-        ? '''
-/// gives the getter bodies of [$name] (the defaults)
-class $defaults extends $name {
-  $defaultGetters
-}
-'''
-        : '';
-    String defaultsLocal = hasDefault ? '$defaults d = $defaults();' : '';
+    String initList = inits.isEmpty ? '' : ' : ${inits.join(', ')}';
     String constructor = fields.isEmpty
         ? '$generated._();'
-        : '$generated._({$params});';
+        : '$generated._({$params})$initList;';
 
     return '''
 class $generated extends $name {
@@ -92,17 +91,17 @@ class $generated extends $name {
   $declarations
 
   /// reads and checks every key once. Throws `EnvException` with all
-  /// missing or bad keys.
+  /// missing or bad keys. Then works out every default once, so a default
+  /// that throws stops the app here, at startup.
   static $name load([EnvReader? reader]) {
     EnvReader r = reader ?? EnvReader();
-    $defaultsLocal
     $reads
     r.check();
-    return $generated._($args);
+    $generated \$env = $generated._($args);
+    $touches
+    return \$env;
   }
 }
-
-$defaultsClass
 ''';
   }
 }

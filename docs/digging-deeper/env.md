@@ -57,7 +57,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 ### The rules
 
 - **Key**: the getter name in UPPER_SNAKE case. `appName` reads `APP_NAME`, `s3Bucket` reads `S3_BUCKET`. Use `@EnvKey('X')` for another name.
-- **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can not read another env getter.
+- **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can read another env getter and sees its loaded value, so `appEnv == 'development'` uses the real `APP_ENV`.
 - **Optional**: a nullable getter with no body (`String? get s3Bucket;`). It is `null` when the key is missing.
 - **Required**: any other getter with no body. A missing key stops the app.
 - **Empty**: an empty value (or the text `null`) counts as missing.

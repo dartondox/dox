@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: in a `@DoxEnv()` class, a getter body that uses another getter saw the default of that getter, not the loaded value. So `bool get isDevelopment => appEnv == 'development';` was false even with `APP_ENV=development`. Now a getter body runs on the loaded env and sees the real values. A key that is set still wins over the body. A default that throws still stops the app in `load()`. Run `dart run build_runner build` to get the new `env.g.dart`.
+
 ## 3.2.0
 
 - New: the job builder moved here from dox_queue. It writes `lib/generated/jobs.g.dart` with every `@Job()` class, the same file as before. It runs only in an app that has dox_queue in `dependencies` or `dev_dependencies`. (When the build can not read the app's `pubspec.yaml`, it runs when the app can import dox_queue.) If your `build.yaml` names the builder `dox_queue:jobs`, change it to `dox_builder:jobs`.

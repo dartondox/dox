@@ -1,0 +1,24 @@
+import 'package:dox_core/dox_core.dart';
+
+part 'app_env.g.dart';
+
+/// A typed env class for the env tests. Run `dart run build_runner build`
+/// in packages/dox-core after you change it.
+@DoxEnv()
+abstract class AppEnv {
+  static AppEnv load([EnvReader? reader]) {
+    return _$AppEnv.load(reader);
+  }
+
+  String get appEnv => 'production';
+
+  bool get isDevelopment => appEnv == 'development';
+
+  String? get region => null;
+
+  /// throws when BROKEN is missing, to test that load() still fails
+  String get broken {
+    if (appEnv == 'broken') throw StateError('bad default');
+    return 'ok';
+  }
+}
