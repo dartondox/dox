@@ -6,6 +6,7 @@ import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
 import 'requirements/handler.dart';
+import '../utils/test_app_key.dart';
 
 /// a clock the tests can move
 DateTime clock = DateTime.utc(2026, 1, 1, 12);
@@ -98,7 +99,7 @@ void main() {
   setUpAll(() async {
     client = await DoxTestClient.start(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         routers: <Router>[SecurityRouter()],
         responseHandler: ResponseHandler(),
         trustedProxies: <String>['127.0.0.1'],

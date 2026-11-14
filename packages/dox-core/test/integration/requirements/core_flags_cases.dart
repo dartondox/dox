@@ -4,6 +4,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../../utils/test_app_key.dart';
+
 /// sets a header on the response before the route runs
 class PresetHeader implements IDoxNextMiddleware {
   @override
@@ -123,7 +125,7 @@ void coreFlagTests(CoreFlags flags) {
   setUpAll(() async {
     client = await DoxTestClient.start(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         routers: <Router>[FlagsRouter(), HeaderRouter()],
         exceptionHandler: handler,
         flags: flags,

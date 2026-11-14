@@ -54,19 +54,19 @@ class EnvReader {
   int? integer(String key) {
     String? value = raw(key);
     if (value == null) return null;
-    return int.tryParse(value) ?? _invalid(key, 'an int', value);
+    return int.tryParse(value) ?? _invalid(key, 'an int');
   }
 
   double? decimal(String key) {
     String? value = raw(key);
     if (value == null) return null;
-    return double.tryParse(value) ?? _invalid(key, 'a double', value);
+    return double.tryParse(value) ?? _invalid(key, 'a double');
   }
 
   num? number(String key) {
     String? value = raw(key);
     if (value == null) return null;
-    return num.tryParse(value) ?? _invalid(key, 'a number', value);
+    return num.tryParse(value) ?? _invalid(key, 'a number');
   }
 
   /// true, 1, yes, on / false, 0, no, off (any case)
@@ -79,13 +79,13 @@ class EnvReader {
       case 'false' || '0' || 'no' || 'off':
         return false;
     }
-    return _invalid(key, 'a bool (true/false, 1/0, yes/no)', value);
+    return _invalid(key, 'a bool (true/false, 1/0, yes/no)');
   }
 
   Uri? uri(String key) {
     String? value = raw(key);
     if (value == null) return null;
-    return Uri.tryParse(value) ?? _invalid(key, 'a Uri', value);
+    return Uri.tryParse(value) ?? _invalid(key, 'a Uri');
   }
 
   /// a number with a unit: `500ms`, `30s`, `5m`, `2h`, `1d`.
@@ -95,21 +95,29 @@ class EnvReader {
     if (value == null) return null;
     RegExpMatch? match = _durationPattern.firstMatch(value.toLowerCase());
     if (match == null) {
-      return _invalid(key, 'a Duration (like 500ms, 30s, 5m, 2h, 1d)', value);
+      return _invalid(key, 'a Duration (like 500ms, 30s, 5m, 2h, 1d)');
     }
-    int amount = int.parse(match.group(1)!);
-    return switch (match.group(2)) {
-      'ms' => Duration(milliseconds: amount),
-      'm' => Duration(minutes: amount),
-      'h' => Duration(hours: amount),
-      'd' => Duration(days: amount),
-      _ => Duration(seconds: amount),
+    int microseconds = switch (match.group(2)) {
+      'ms' => Duration.microsecondsPerMillisecond,
+      'm' => Duration.microsecondsPerMinute,
+      'h' => Duration.microsecondsPerHour,
+      'd' => Duration.microsecondsPerDay,
+      _ => Duration.microsecondsPerSecond,
     };
+    int? amount = int.tryParse(match.group(1)!);
+    // too big for an int, or for a Duration
+    if (amount == null || amount > _maxInt ~/ microseconds) {
+      return _invalid(key, 'a Duration that is not too big');
+    }
+    return Duration(microseconds: amount * microseconds);
   }
+
+  static const int _maxInt = 9223372036854775807;
 
   static final RegExp _durationPattern = RegExp(r'^(\d+)\s*(ms|s|m|h|d)?$');
 
   /// comma separated: `a, b,c` is `['a', 'b', 'c']`. Empty items are dropped.
+  /// Only commas (`,`) counts as missing, so the default is used.
   List<String>? list(String key) {
     String? value = raw(key);
     if (value == null) return null;
@@ -118,7 +126,7 @@ class EnvReader {
       String text = item.trim();
       if (text.isNotEmpty) result.add(text);
     }
-    return result;
+    return result.isEmpty ? null : result;
   }
 
   /// an enum value by its name, in any case
@@ -133,7 +141,7 @@ class EnvReader {
     for (T item in values) {
       names.add(item.name);
     }
-    return _invalid(key, 'one of ${names.join(', ')}', value);
+    return _invalid(key, 'one of ${names.join(', ')}');
   }
 
   /// saves an error when the required [key] is missing
@@ -146,8 +154,10 @@ class EnvReader {
     if (_errors.isNotEmpty) throw EnvException(List<String>.of(_errors));
   }
 
-  Null _invalid(String key, String expected, String value) {
-    _errors.add('$key must be $expected, not "$value"');
+  /// saves an error for [key]. The value is never in the text: it may be
+  /// a secret, and the error goes to the startup log and to CI output.
+  Null _invalid(String key, String expected) {
+    _errors.add('$key must be $expected');
     return null;
   }
 }

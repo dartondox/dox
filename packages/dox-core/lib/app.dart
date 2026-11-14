@@ -299,11 +299,18 @@ class Dox {
     stderr.writeln(corsCredentialsWarning);
   }
 
-  /// old sample keys from `.env.example` files. they are public on
-  /// GitHub, so anyone could sign tokens and cookies with them.
+  /// sample keys from `.env.example` files, docs and test fixtures. they
+  /// are public on GitHub, so anyone could sign tokens and cookies with
+  /// them. keep old ones here: people may have copied them.
   static const List<String> _publicKeys = <String>[
     'ZrNbOZJAjC2MDzqehhsGV2DzFFI4pz5R',
     'KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0',
+    '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+    '3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e',
+    'I56ADIaMto31rXQVjS5Sqc9cp8vxgoBb',
+    '00000000000000000000000000000000',
+    'the-new-32-character-app-key....',
+    'the-old-32-character-app-key....',
   ];
 
   /// stop at startup when `APP_KEY` is missing, not exactly 32
@@ -323,7 +330,7 @@ class Dox {
     } else {
       return;
     }
-    String env = Env.get<String>('APP_ENV').toLowerCase();
+    String env = Env.appEnv;
     if (!<String>['development', 'local', 'test', 'testing'].contains(env)) {
       throw StateError(message);
     }

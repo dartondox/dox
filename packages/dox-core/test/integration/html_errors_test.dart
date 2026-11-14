@@ -5,6 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
 class TeapotException implements Exception {}
 
@@ -72,7 +73,7 @@ void main() {
     Route.get('/only-get', (DoxRequest req) => 'ok');
     await startHttpServer(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: 0,
         totalIsolate: 1,
         exceptionHandler: const TeapotHandler(),

@@ -20,8 +20,6 @@ abstract class AppEnv {
   /// development, staging or production. Not set: production.
   String get appEnv => 'production';
 
-  bool get isDevelopment => appEnv == 'development';
-
   int get appPort => 3000;
 
   /// required: used to sign tokens and encrypt cookies
@@ -37,6 +35,10 @@ abstract class AppEnv {
 
   /// local, s3 or memory
   String get storageDisk => 'local';
+
+  /// a database url, eg. `postgres://user:pass@host:5432/db`.
+  /// When set, it wins over the DB_* keys (see DatabaseConfig.url).
+  String? get databaseUrl;
 
   /// sqlite, postgres or mysql
   String get dbConnection => 'sqlite';

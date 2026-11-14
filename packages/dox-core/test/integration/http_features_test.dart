@@ -5,8 +5,9 @@ import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
-const String appKey = '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt';
+final String appKey = testAppKey;
 const String oldKey = 'zP0q8xN2mVb7Lc4Rt6Yw1Ks3Hd9Fg5Ja';
 
 String get baseUrl => 'http://localhost:${Dox().server.httpServer.port}';

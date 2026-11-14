@@ -169,10 +169,10 @@ DB_USERNAME=admin
 DB_PASSWORD=password
 ```
 
-- `DB_CONNECTION` defaults to `postgres`. The default port is `5432` for postgres and `3306` for mysql.
+- `DB_CONNECTION` defaults to `sqlite`. Any other value than `sqlite`, `postgres` or `mysql` is an error. The default port is `5432` for postgres and `3306` for mysql.
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - `DATABASE_URL` wins over all the `DB_*` keys when it is set.
-- Put comments on their own line. A `#` after a value becomes part of the value.
+- A `#` after a space starts a comment, the same as in the app. `${VAR}` is not expanded, and `.env.testing` is not read.
 
 All keys are in the [Env reference](../reference/env.md#read-by-the-framework).
 

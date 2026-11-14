@@ -4,6 +4,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
 int get port => Dox().server.httpServer.port;
 
@@ -25,7 +26,7 @@ void main() {
     });
     await startHttpServer(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         // the OS picks a free port, so test files can run in parallel
         serverPort: 0,
         totalIsolate: 1,

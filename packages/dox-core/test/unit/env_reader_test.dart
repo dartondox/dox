@@ -87,7 +87,7 @@ void main() {
             (EnvException e) => e.errors,
             'errors',
             <Matcher>[
-              contains('PORT must be an int, not "abc"'),
+              equals('PORT must be an int'),
               contains('DEBUG must be a bool'),
               contains('TTL must be a Duration'),
               contains('LEVEL must be one of debug, info'),
@@ -96,6 +96,65 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('a list with only commas is missing', () {
+      EnvReader r = reader(<String, String>{'HOSTS': ' , ,'});
+      expect(r.list('HOSTS'), isNull);
+      r.check();
+    });
+
+    test('a too big duration is a bad value, saved for check()', () {
+      EnvReader r = reader(<String, String>{
+        'A': '99999999999999999999s',
+        'B': '9223372036854775807d',
+      });
+      expect(r.duration('A'), isNull);
+      expect(r.duration('B'), isNull);
+      expect(
+        r.check,
+        throwsA(
+          isA<EnvException>().having(
+            (EnvException e) => e.errors,
+            'errors',
+            <Matcher>[
+              contains('A must be a Duration'),
+              contains('B must be a Duration'),
+            ],
+          ),
+        ),
+      );
+    });
+
+    test('an error never shows the value, it may be a secret', () {
+      const String secret = 'fake-secret-for-test';
+      EnvReader r = reader(<String, String>{
+        'A': secret,
+        'B': secret,
+        'C': secret,
+        'D': secret,
+        'E': secret,
+        'F': secret,
+        'G': '99999999999999999999s',
+        'H': 'http://[$secret',
+      });
+      r.integer('A');
+      r.decimal('B');
+      r.number('C');
+      r.boolean('D');
+      r.duration('E');
+      r.enumByName('F', Level.values);
+      r.duration('G');
+      r.uri('H');
+      try {
+        r.check();
+        fail('check() must throw');
+      } on EnvException catch (e) {
+        expect(e.errors, hasLength(8));
+        expect(e.toString(), isNot(contains(secret)));
+        expect(e.toString(), isNot(contains('9999')));
+        expect(e.errors, contains('F must be one of debug, info'));
+      }
     });
   });
 }

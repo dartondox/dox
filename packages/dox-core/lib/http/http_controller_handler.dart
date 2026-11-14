@@ -72,7 +72,7 @@ final Set<Object> _warnedNull = <Object>{};
 bool? _warnNullOn;
 
 bool _isDevelopment() {
-  String env = Env.get<String>('APP_ENV').toLowerCase();
+  String env = Env.appEnv;
   return env == 'development' || env == 'local';
 }
 

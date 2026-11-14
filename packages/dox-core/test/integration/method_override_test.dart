@@ -2,6 +2,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 const Map<String, String> form = <String, String>{
   'content-type': 'application/x-www-form-urlencoded',
 };
@@ -37,7 +39,7 @@ class CsrfRouter extends Router {
 
 AppConfig config(List<dynamic> global) {
   return AppConfig(
-    appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+    appKey: testAppKey,
     globalMiddleware: global,
     routers: <Router>[FormRouter(), CsrfRouter()],
   );

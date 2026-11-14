@@ -8,6 +8,13 @@ import 'package:dox_core/dox_core.dart';
 class AppConfig {
   final String appKey;
 
+  /// True when the env `APP_ENV` is `development`. Not set means
+  /// production, so false. `local` is false too.
+  /// It reads the env on each call, so it works before the server starts
+  /// and in every isolate. Use it for config like `prettyPrint` or a
+  /// database `debug` flag.
+  bool get isDevelopment => Env.appEnv == 'development';
+
   /// Old `APP_KEY`s, to change the key without logging out every user.
   /// Encrypted cookies and cookie sessions made with one of them can
   /// still be read. New ones are made with [appKey] only. Remove an old

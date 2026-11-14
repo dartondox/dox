@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -10,13 +11,20 @@ import 'util.dart';
 
 /// Writes `_$<Class>` for a `@DoxEnv()` class.
 ///
-/// Each getter becomes a final field. `load()` reads every key once, then
-/// throws one `EnvException` with all missing or bad keys.
-/// - key: `@EnvKey('X')`, or the getter name in UPPER_SNAKE case
-/// - a getter with a body is the default (any expression, read only when
-///   the key is missing)
+/// `load()` reads every key once, then throws one `EnvException` with all
+/// missing or bad keys.
+/// - key: `@EnvKey('X')` (also through a const variable), or the getter
+///   name in UPPER_SNAKE case (`dbURL` => `DB_URL`)
+/// - a getter with a body is the default (any expression, used only when
+///   the key is missing). The body runs on the loaded env, so it may use
+///   other getters: `'http://localhost:$appPort'` sees the real
+///   `APP_PORT`. Every getter is an env key, also this one (`APP_URL`).
+///   `load()` works out every default once, so a default that throws stops
+///   the app at startup.
 /// - a nullable getter with no body is optional
 /// - other getters with no body are required
+/// - only getters of the class itself are read. Getters from a superclass
+///   or a mixin are not. An instance field is a build error.
 class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
   @override
   String generateForAnnotatedElement(
@@ -32,58 +40,66 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
     }
     String name = element.displayName;
     String generated = '_\$$name';
-    String defaults = '_\$${name}Defaults';
 
     List<_EnvField> fields = <_EnvField>[];
     for (GetterElement getter in element.getters) {
-      if (getter.isOriginDeclaration && !getter.isStatic) {
-        fields.add(_EnvField.from(getter));
+      if (getter.isStatic) continue;
+      if (!getter.isOriginDeclaration) {
+        // the getter of a field: a field can never be read from the env
+        throw InvalidGenerationSourceError(
+          'Env class $name has the field "${getter.displayName}". '
+          'Use a getter: `String get ${getter.displayName};` (required) or '
+          '`String get ${getter.displayName} => ...;` (with a default).',
+          element: getter,
+        );
       }
+      fields.add(_EnvField.from(getter));
     }
 
     StringBuffer declarations = StringBuffer();
     StringBuffer params = StringBuffer();
+    List<String> inits = <String>[];
     StringBuffer reads = StringBuffer();
     StringBuffer args = StringBuffer();
-    StringBuffer defaultGetters = StringBuffer();
-    bool hasDefault = false;
+    StringBuffer touches = StringBuffer();
 
     for (_EnvField f in fields) {
-      declarations.writeln('@override\nfinal ${f.type} ${f.name};');
-      params.writeln('required this.${f.name},');
-      String read = "r.${f.readCall}";
+      String read = "\$r.${f.readCall}";
+      String nullableType = f.nullable ? f.type : '${f.type}?';
+      reads.writeln('$nullableType ${f.name} = $read;');
       if (f.hasDefault) {
-        hasDefault = true;
-        reads.writeln('${f.type} ${f.name} = $read ?? d.${f.name};');
-        args.writeln('${f.name}: ${f.name},');
-      } else if (f.nullable) {
-        reads.writeln('${f.type} ${f.name} = $read;');
-        args.writeln('${f.name}: ${f.name},');
-      } else {
-        reads.writeln("${f.type}? ${f.name} = $read;");
-        reads.writeln('r.need(${_literal.string(f.key)});');
-        args.writeln('${f.name}: ${f.name}!,');
-      }
-      if (!f.hasDefault) {
-        defaultGetters.writeln(
-          '@override\n${f.type} get ${f.name} => '
-          'throw StateError(${_literal.string('${f.key} has no default')});',
+        // `_$x` holds the raw env value. `x` is `late` so the getter body
+        // runs on this object and sees the loaded values of other keys.
+        String raw = '_\$${f.name}';
+        declarations.writeln(
+          'final $nullableType $raw;\n'
+          '@override\n'
+          'late final ${f.type} ${f.name} = $raw ?? super.${f.name};',
         );
+        params.writeln('required $nullableType ${f.name},');
+        inits.add('$raw = ${f.name}');
+        args.writeln('${f.name}: ${f.name},');
+        touches.writeln('\$env.${f.name};');
+      } else {
+        declarations.writeln('@override\nfinal ${f.type} ${f.name};');
+        params.writeln('required this.${f.name},');
+        if (f.nullable) {
+          args.writeln('${f.name}: ${f.name},');
+        } else {
+          reads.writeln('\$r.need(${_literal.string(f.key)});');
+          args.writeln('${f.name}: ${f.name}!,');
+        }
       }
     }
 
-    String defaultsClass = hasDefault
-        ? '''
-/// gives the getter bodies of [$name] (the defaults)
-class $defaults extends $name {
-  $defaultGetters
-}
-'''
-        : '';
-    String defaultsLocal = hasDefault ? '$defaults d = $defaults();' : '';
+    String loopMessage = _literal.string(
+      'A default of $name reads the global `env`. Use the getter directly: '
+      'write `appEnv`, not `env.appEnv`.',
+    );
+    String initList = inits.isEmpty ? '' : ' : ${inits.join(', ')}';
     String constructor = fields.isEmpty
         ? '$generated._();'
-        : '$generated._({$params});';
+        : '$generated._({$params})$initList;';
 
     return '''
 class $generated extends $name {
@@ -91,18 +107,30 @@ class $generated extends $name {
 
   $declarations
 
+  /// true while [load] runs. A default that reads the global `env` calls
+  /// [load] again, and would loop until the stack overflows.
+  static bool _\$\$loading = false;
+
   /// reads and checks every key once. Throws `EnvException` with all
-  /// missing or bad keys.
-  static $name load([EnvReader? reader]) {
-    EnvReader r = reader ?? EnvReader();
-    $defaultsLocal
-    $reads
-    r.check();
-    return $generated._($args);
+  /// missing or bad keys. Then works out every default once, so a default
+  /// that throws stops the app here, at startup.
+  static $name load([EnvReader? \$reader]) {
+    if (_\$\$loading) {
+      throw StateError($loopMessage);
+    }
+    _\$\$loading = true;
+    try {
+      EnvReader \$r = \$reader ?? EnvReader();
+      $reads
+      \$r.check();
+      $generated \$env = $generated._($args);
+      $touches
+      return \$env;
+    } finally {
+      _\$\$loading = false;
+    }
   }
 }
-
-$defaultsClass
 ''';
   }
 }
@@ -144,13 +172,12 @@ class _EnvField {
   }
 
   static String? _envKey(GetterElement getter) {
+    // by the type of the value, so `@EnvKey('X')` and a const variable
+    // that holds an `EnvKey` both work
     for (ElementAnnotation m in getter.metadata.annotations) {
-      Element? e = m.element;
-      String? annotation = e is ConstructorElement
-          ? e.enclosingElement.displayName
-          : e?.displayName;
-      if (annotation == 'EnvKey') {
-        return m.computeConstantValue()?.getField('name')?.toStringValue();
+      DartObject? value = m.computeConstantValue();
+      if (value?.type?.element?.displayName == 'EnvKey') {
+        return value!.getField('name')?.toStringValue();
       }
     }
     return null;
@@ -186,14 +213,28 @@ class _EnvField {
   }
 }
 
-/// `appName` => `APP_NAME`, `s3Bucket` => `S3_BUCKET`
+/// `appName` => `APP_NAME`, `s3Bucket` => `S3_BUCKET`.
+/// A run of capitals is one word: `dbURL` => `DB_URL`,
+/// `httpURLPath` => `HTTP_URL_PATH`.
 String upperSnake(String name) {
   StringBuffer out = StringBuffer();
   for (int i = 0; i < name.length; i++) {
     String char = name[i];
-    bool upper = char != char.toLowerCase();
-    if (upper && i > 0) out.write('_');
+    if (i > 0 && _isUpper(char)) {
+      String before = name[i - 1];
+      bool afterLower = _isLower(before) || _isDigit(before);
+      // the last capital of a run starts the next word: `URLPath`
+      bool endsRun =
+          _isUpper(before) && i + 1 < name.length && _isLower(name[i + 1]);
+      if (afterLower || endsRun) out.write('_');
+    }
     out.write(char.toUpperCase());
   }
   return out.toString();
 }
+
+bool _isUpper(String char) => char != char.toLowerCase();
+
+bool _isLower(String char) => char != char.toUpperCase();
+
+bool _isDigit(String char) => '0123456789'.contains(char);

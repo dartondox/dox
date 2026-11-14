@@ -56,8 +56,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 
 ### The rules
 
-- **Key**: the getter name in UPPER_SNAKE case. `appName` reads `APP_NAME`, `s3Bucket` reads `S3_BUCKET`. Use `@EnvKey('X')` for another name.
-- **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can not read another env getter.
+- **Key**: the getter name in UPPER_SNAKE case. `appName` reads `APP_NAME`, `s3Bucket` reads `S3_BUCKET`. A run of capitals is one word: `dbURL` reads `DB_URL`. Use `@EnvKey('X')` for another name.
+- **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can read another env getter and sees its loaded value: `String get appUrl => 'http://localhost:$appPort';` uses the real `APP_PORT`.
+- **Every getter is a key**: an env getter is always one env key and nothing more. Also a getter whose body uses other getters: `appUrl` above reads `APP_URL`, and when `APP_URL` is set, it wins over the body.
+- **No computed values**: a value like "is development" is not an env key, so it does not go in the env class. Use `appConfig.isDevelopment` from the app config. It is `true` when `APP_ENV` is `development`.
+- **Use the getter, not `env`**: in a default, write `appEnv`, never `env.appEnv`. The global `env` is not ready while it loads. The app stops at startup with a `StateError`: "A default of AppEnv reads the global `env`. Use the getter directly".
+- **Only this class**: the builder reads the getters of the `@DoxEnv()` class itself. Getters from a superclass or a mixin are not read from the env. A field (`final String x = ...;`) is a build error: use a getter.
 - **Optional**: a nullable getter with no body (`String? get s3Bucket;`). It is `null` when the key is missing.
 - **Required**: any other getter with no body. A missing key stops the app.
 - **Empty**: an empty value (or the text `null`) counts as missing.
@@ -83,8 +87,10 @@ Any other type is a build error.
 ```
 EnvException: the env is not valid
   - APP_KEY is missing
-  - DB_PORT must be an int, not "abc"
+  - DB_PORT must be an int
 ```
+
+The error names the key, never the value. A value may be a secret, and this text goes to the log and to CI output.
 
 This happens once, when the app starts. After that, `env.dbPort` is a plain field read.
 
@@ -104,7 +110,7 @@ Dox reads values from these places:
 
 ```ini title=".env"
 APP_NAME=dox
-APP_KEY=3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e
+APP_KEY=<output of dox key:generate>
 DB_PORT=5432
 ```
 
@@ -113,10 +119,11 @@ DB_PORT=5432
 - A `=` inside the value is kept: `TOKEN=a=b` gives `a=b`.
 - A line that starts with `#` is a comment.
 - A `#` after a space starts a comment: `APP_PORT=3000 # dev` gives `3000`.
-- A `#` with no space before it is kept: `DB_PASSWORD=abc#123` gives `abc#123`.
+- A `#` with no space before it is kept: `DB_PASSWORD=abc#123` gives `abc#123`, and `COLOR=#fff` gives `#fff`.
 - A `#` inside quotes is kept: `DB_PASSWORD="abc # 123"` gives `abc # 123`.
 - `export KEY=value` is read like `KEY=value`.
-- `KEY=` (empty) gives the default value, like a key that is not there.
+- `KEY=` (empty, or only spaces) gives the default value, like a key that is not there.
+- One line is one value. A quoted value can not go over more lines, so a multi-line PEM key does not work. Turn on `envExpand` (below) and write it on one line with `\n`: `JWT_KEY="-----BEGIN KEY-----\nabc\n-----END KEY-----"`. Or keep the key in a file and put the file path in the env.
 
 ### Use one value in another
 
@@ -138,6 +145,8 @@ The `.env` file is read before `AppConfig` exists. So you must set the flag in t
 
 1. `Env.flags = flags;` at the top of `main()`, before any env value is read.
 2. The same flags in `AppConfig(flags: flags)`.
+
+Set `Env.flags` at the very top of `main()`, before any env read. The first env read (like `Env.get()` or `env.appName`) loads `.env` with the flags of that moment, and the file is not read again. If the flags were not set yet, `Dox().initialize` prints a warning.
 
 ```dart title="lib/config/app.dart"
 import 'package:dox_core/dox_core.dart';

@@ -50,9 +50,9 @@ These stop the app at start, so a bad route never reaches a request.
 | Text | When | What to do |
 | --- | --- | --- |
 | `EnvException: the env is not valid` then `  - <KEY> is missing` | `AppEnv.load()` found a required key with no value. | Set the key, or give the getter a default. |
-| `  - <KEY> must be <type>, not "<value>"` | A value does not fit the getter type. | Fix the value. Check for a `# comment` after it. |
+| `  - <KEY> must be <type>` | A value does not fit the getter type. | Fix the value. Check for a `# comment` after it. |
 | `Env key "<KEY>" is not set and has no default` | `Env.get<int>()`, `<num>`, `<double>` or `<bool>` with no value and no default. | Set the key, or pass a default. |
-| `Env key "<KEY>" is not a valid <type>: "<value>"` | `Env.get<int>()` (or another type) got text that is not that type. | Fix the value. |
+| `Env key "<KEY>" is not a valid <type>` | `Env.get<int>()` (or another type) got text that is not that type. | Fix the value. |
 
 See [Environment variables](../digging-deeper/env.md).
 

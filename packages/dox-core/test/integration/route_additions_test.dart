@@ -6,6 +6,8 @@ import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 dynamic addHeader(DoxRequest req) {
   req.httpRequest.response.headers.set('x-global', 'yes');
   return req;
@@ -79,7 +81,7 @@ void main() {
   setUpAll(() async {
     client = await DoxTestClient.start(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         globalMiddleware: <dynamic>[addHeader],
         routers: <Router>[ExtraRouter()],
       ),

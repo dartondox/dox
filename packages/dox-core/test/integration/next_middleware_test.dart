@@ -3,6 +3,8 @@ import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 List<String> calls = <String>[];
 
 class Around implements IDoxNextMiddleware {
@@ -74,10 +76,7 @@ void main() {
 
   setUpAll(() async {
     client = await DoxTestClient.start(
-      AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        routers: <Router>[NextRouter()],
-      ),
+      AppConfig(appKey: testAppKey, routers: <Router>[NextRouter()]),
     );
   });
 

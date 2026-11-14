@@ -126,6 +126,7 @@ Put the connections in `lib/config/database.dart`.
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/app.dart';
 import 'package:my_app/config/env.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
@@ -139,7 +140,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'mysql': ConnectionConfig(
       driver: Driver.mysql, // also for MariaDB
@@ -149,12 +150,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'sqlite': ConnectionConfig(
       driver: Driver.sqlite,
       database: env.dbName, // file path, like db/dox.sqlite, or ':memory:'
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
   },
 );
@@ -258,7 +259,7 @@ DB_PASSWORD=postgres
 ### `DATABASE_URL`
 
 Many hosts (Fly, Render, Heroku and others) give you one database url.
-Dox reads it from the `DATABASE_URL` environment variable.
+Dox reads it from the `DATABASE_URL` key, in `.env` or in the shell. The shell wins.
 
 The rule: **when `DATABASE_URL` is set, it wins.**
 It replaces the config of the default connection (`DatabaseConfig.connection`).
@@ -282,20 +283,26 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`. This works for SQLite too, like `sqlite://db/dox.sqlite?background=true`.
 
-The ORM reads `DATABASE_URL` from the real environment, not from `.env`.
-To use a url from `.env`, or any other url, give it yourself:
+The app passes the url in, through the env class:
 
-```dart
-DatabaseConfig(
-  connection: 'postgres',
+```dart title="lib/config/env.dart"
+String? get databaseUrl;
+```
+
+```dart title="lib/config/database.dart"
+DatabaseConfig databaseConfig = DatabaseConfig(
+  url: env.databaseUrl,
+  connection: env.dbConnection,
   connections: {...},
-  url: Env.get<String?>('DATABASE_URL'),
 );
 ```
 
+So the app and `dox migrate` use the same url, from `.env` or the shell.
+An app whose `lib/config/database.dart` has no `url: env.databaseUrl` line reads `DATABASE_URL` only from the shell, not from `.env`.
+
 An empty `url` (`url: ''`) turns `DATABASE_URL` off.
 To make one `ConnectionConfig` from a url, use `ConnectionConfig.fromUrl(url)`.
-[Migrations](migration.md#database-settings) read `DATABASE_URL` too, also from `.env`.
+[Migrations](migration.md#database-settings) read `DATABASE_URL` too, from `.env` or the shell.
 
 ### Unix socket
 
@@ -460,7 +467,7 @@ It is off by default. It works with `debug` off, so you can use it in production
 'postgres': ConnectionConfig(
   driver: Driver.postgres,
   // ...
-  debug: env.isDevelopment,
+  debug: appConfig.isDevelopment,
   slowQueryMs: 500,
 ),
 ```

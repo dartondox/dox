@@ -5,6 +5,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 const String oldKey = 'old-key-old-key-old-key-old-key!';
 
 /// what the error reports saw
@@ -168,7 +170,7 @@ void main() {
   setUpAll(() async {
     client = await DoxTestClient.start(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         previousKeys: <String>[oldKey],
         routers: <Router>[CoreRouter()],
         exceptionHandler: const RecordingHandler(),

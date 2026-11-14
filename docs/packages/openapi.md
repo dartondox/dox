@@ -482,7 +482,7 @@ You need two files first: `lib/config/openapi.dart` (see [Setup](#setup-optional
     First, in the build stage, right after `RUN /root/.pub-cache/bin/dox build`, add:
 
     ```dockerfile title="Dockerfile"
-    RUN APP_KEY=00000000000000000000000000000000 /root/.pub-cache/bin/dox openapi:generate docs/openapi
+    RUN APP_KEY=only-for-the-build-not-a-key /root/.pub-cache/bin/dox openapi:generate docs/openapi
     ```
 
     Second, in the `RUN` step that lays out `/out`, add `/out/app/docs` to the `mkdir -p` list. Add one line to the `&&` chain after the `cp -r build/bundle/. /out/app/` line:

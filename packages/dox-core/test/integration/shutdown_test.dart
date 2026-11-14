@@ -9,6 +9,7 @@ import 'package:test/test.dart';
 
 import '../utils/free_port.dart';
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
 class Cleanup extends DoxProvider {
   int calls = 0;
@@ -64,7 +65,7 @@ void main() {
       Route.get('/slow', slow);
       await startHttpServer(
         AppConfig(
-          appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+          appKey: testAppKey,
           // the OS picks a free port, so test files can run in parallel
           serverPort: 0,
           totalIsolate: 1,

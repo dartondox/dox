@@ -2,13 +2,15 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 
+import '../../utils/test_app_key.dart';
+
 /// a small app for the SIGTERM test. Args: port, isolates.
 /// `/slow` prints `slow start` and answers after 700 ms. Prints `ready`
 /// when it serves and `cleanup <isolate>` when a provider shutdown runs.
 void main(List<String> args) async {
   Dox().initialize(
     AppConfig(
-      appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+      appKey: testAppKey,
       serverPort: int.parse(args[0]),
       totalIsolate: int.parse(args[1]),
       routers: <Router>[SlowRouter()],

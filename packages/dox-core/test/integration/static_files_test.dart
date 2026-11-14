@@ -5,6 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
 /// sends [request] as is, reads until the server closes
 Future<String> raw(int port, String request) async {
@@ -58,7 +59,7 @@ void main() {
     await File('${public.path}/route.js').writeAsString('from file');
     await startHttpServer(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: 0,
         totalIsolate: 1,
         cors: const CORSConfig(origin: '*'),

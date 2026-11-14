@@ -1,6 +1,8 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 class _Probe extends DoxProvider {
   static bool? seen;
 
@@ -13,7 +15,7 @@ void main() {
     expect(Dox().isWebServer, isFalse);
     Dox().initialize(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: 0,
         totalIsolate: 1,
         providers: <DoxProvider>[_Probe()],

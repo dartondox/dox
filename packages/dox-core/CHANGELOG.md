@@ -1,3 +1,15 @@
+## Unreleased
+
+- Fix: `Env.get` read as the first env read of the app saw only the shell, because nothing had loaded `.env` yet. Now every env read (`Env.get`, `Env.appEnv`, `Env().env`) loads `.env` once when it is not loaded. After that it is a plain map read, also when there is no `.env` file. Setting `Env().env` in a test counts as loaded, so the file is not put on top. When the `.env` file can not be read (like bad UTF-8), every read throws again; it never looks like an empty file.
+- New: `AppConfig.isDevelopment`. It is true when the env `APP_ENV` is `development` (not `local`). Not set means production, so false. It reads the env on each call, so it works before the server starts and in every isolate. Use it for config like a database `debug` flag, in place of a computed getter in the env class: every env getter is an env key.
+- New: `Env.appEnv` gives `APP_ENV` in lower case. It loads `.env` first when nothing did yet, so it gives the same answer when it is the first env read. `Dox().checkAppKey()`, `HealthCheck`, `OpenApiConfig.isEnabled` and the null middleware warning use it now. `showErrors()` keeps its own read, so its per-request cache stays the same.
+- Security: an env error printed the bad value, like `DB_PORT must be an int, not "..."`. A value may be a secret, and the error goes to the startup log and to CI output. Now `EnvException` and the `Env.get` cast error name only the key and the expected type.
+- Security: more public sample keys are refused by the `APP_KEY` check at startup: the keys from the docs, the dox_core test fixture and the sample app. They get the same rule as the old sample keys: an error outside development, local, test and testing, and a warning in those. If your `APP_KEY` is one of them, run `dox key:generate`.
+- Fix: in `.env`, an unquoted value that starts with `#` was read as empty. So `DB_PASSWORD=#Secret1` used the default. Now `KEY=#fff` keeps `#fff`, as the docs say. `KEY= #x` and `KEY=a #x` are still comments.
+- Fix: `Env.get` read a value with only spaces as text, so `Env.get<int>('MAIL_PORT', 587)` threw for `MAIL_PORT="  "`. Now only spaces counts as empty and gives the default, the same as `EnvReader`.
+- Fix: `EnvReader.list` of only commas (`,`) gave an empty list. Now it counts as missing, so the default is used.
+- Fix: a `Duration` too big for an int (`99999999999999999999s`) threw a `FormatException` right away, and a big one (`9223372036854775807d`) gave a wrong value. Now both are bad values, listed by `check()` with the others.
+
 ## 3.2.0
 
 - New: `Dox().isWebServer`. It is true only in the web server process (`startServer()` and its isolates). It is false in `bin/queue.dart`, the scheduler and tests. A provider can use it to skip work that only a web server needs, like a startup warning.

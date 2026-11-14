@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 
 import '../utils/free_port.dart';
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
 void main() {
   setUpAll(() => Env().load());
@@ -57,9 +58,7 @@ void main() {
       int port = await freePort();
       Env().env['PORT'] = '$port';
       Route.get('/listen', (DoxRequest req) => 'ok');
-      await startHttpServer(
-        AppConfig(appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt', totalIsolate: 1),
-      );
+      await startHttpServer(AppConfig(appKey: testAppKey, totalIsolate: 1));
       try {
         HttpServer server = Dox().server.httpServer;
         expect(server, isA<NativeHttpServer>());

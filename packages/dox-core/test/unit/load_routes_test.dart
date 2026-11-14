@@ -4,6 +4,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 class _Global implements IDoxMiddleware {
   @override
   dynamic handle(IDoxRequest req) => req;
@@ -52,7 +54,7 @@ void main() {
   void init({bool openApi = false}) {
     Dox().initialize(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         openApi: OpenApiConfig(enabled: openApi),
         globalMiddleware: <dynamic>[_Global()],
         routers: <Router>[_ApiRouter()],

@@ -4,6 +4,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 /// the last second of a 5 minute window
 DateTime endOfWindow() => DateTime.utc(2026, 1, 1, 13, 4, 59);
 
@@ -38,7 +40,7 @@ void main() {
     await probe.close();
     Dox().initialize(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: port,
         host: '127.0.0.1',
         totalIsolate: 4,

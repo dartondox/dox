@@ -1,3 +1,12 @@
+## Unreleased
+
+- New: a default that reads the global `env` (like `env.appEnv`) stopped the app with a stack overflow. Now `load()` throws a clear `StateError` that says to use the getter directly.
+- Fix: a run of capitals in an env getter name is one word now. `dbURL` read `DB_U_R_L`, now it reads `DB_URL`. Also `jwtTTL` => `JWT_TTL` and `httpURLPath` => `HTTP_URL_PATH`. Names like `s3Bucket` and `oauth2ClientId` do not change. If your `.env` has a key like `DB_U_R_L`, rename it, or use `@EnvKey('DB_U_R_L')`.
+- Fix: `@EnvKey` through a const variable (`const k = EnvKey('X');` then `@k`) was ignored. Now it is read.
+- Fix: an env getter named `r` or `reader` made `env.g.dart` fail to compile. The generated `load()` now uses `$r` and `$reader`.
+- Fix: an instance field in a `@DoxEnv()` class was not read from the env, with no warning. Now it is a build error that says to use a getter.
+- Fix: in a `@DoxEnv()` class, a getter body that uses another getter saw the default of that getter, not the loaded value. So `String get appUrl => 'http://localhost:$appPort';` gave port 3000 even with `APP_PORT=4000`. Now a getter body runs on the loaded env and sees the real values. A key that is set still wins over the body. A default that throws still stops the app in `load()`. Run `dart run build_runner build` to get the new `env.g.dart`.
+
 ## 3.2.0
 
 - New: the job builder moved here from dox_queue. It writes `lib/generated/jobs.g.dart` with every `@Job()` class, the same file as before. It runs only in an app that has dox_queue in `dependencies` or `dev_dependencies`. (When the build can not read the app's `pubspec.yaml`, it runs when the app can import dox_queue.) If your `build.yaml` names the builder `dox_queue:jobs`, change it to `dox_builder:jobs`.

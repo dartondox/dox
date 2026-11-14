@@ -4,10 +4,11 @@ import '../handler.dart';
 import '../middleware/custom_middleware.dart';
 import '../../../dtos/dtos.dart';
 import 'api_router.dart';
+import '../../../utils/test_app_key.dart';
 
 AppConfig config = AppConfig(
   /// application key
-  appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+  appKey: testAppKey,
 
   /// the OS picks a free port, so test files can run in parallel
   serverPort: 0,
