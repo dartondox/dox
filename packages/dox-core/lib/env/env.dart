@@ -37,12 +37,18 @@ class Env {
   /// When the app runs its tests, it also reads `.env.testing` (next to
   /// `.env`). Its keys win over the keys of `.env`. A real environment
   /// variable still wins over both. [testing] is [isTesting] by default.
+  ///
+  /// When the read throws (like a file that is not UTF-8), nothing is
+  /// kept and the next read tries again, so it throws again. A broken
+  /// file never looks like an empty one.
   void load({File? file, bool? testing}) {
-    _loaded = true;
     if (_env.isEmpty) {
-      expanded = flags.envExpand;
+      bool expand = flags.envExpand;
+      // a new map: the old one stays empty when the read throws
       _env = _loadEnv(file: file, testing: testing ?? isTesting);
+      expanded = expand;
     }
+    _loaded = true;
   }
 
   /// The flags the `.env` file is read with. Only `envExpand` is used.

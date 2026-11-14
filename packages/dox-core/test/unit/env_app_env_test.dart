@@ -155,4 +155,24 @@ void main() {
       'null',
     );
   });
+
+  test('a .env that can not be read throws on every read', () async {
+    // bad UTF-8 bytes: reading the file throws
+    File('${dir.path}/.env').writeAsBytesSync(<int>[75, 49, 61, 0xff, 0xfe]);
+    String code = '''
+  for (int i = 0; i < 2; i++) {
+    try {
+      print(Env.get('K1', 'dflt'));
+    } on FileSystemException {
+      print('throws');
+    }
+  }
+  try {
+    print(Env().env.length);
+  } on FileSystemException {
+    print('throws');
+  }
+''';
+    expect(await runCode(code, null, noShell), 'throws\nthrows\nthrows');
+  });
 }
