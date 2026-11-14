@@ -86,8 +86,10 @@ Any other type is a build error.
 ```
 EnvException: the env is not valid
   - APP_KEY is missing
-  - DB_PORT must be an int, not "abc"
+  - DB_PORT must be an int
 ```
+
+The error names the key, never the value. A value may be a secret, and this text goes to the log and to CI output.
 
 This happens once, when the app starts. After that, `env.dbPort` is a plain field read.
 
@@ -107,7 +109,7 @@ Dox reads values from these places:
 
 ```ini title=".env"
 APP_NAME=dox
-APP_KEY=3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e
+APP_KEY=<output of dox key:generate>
 DB_PORT=5432
 ```
 

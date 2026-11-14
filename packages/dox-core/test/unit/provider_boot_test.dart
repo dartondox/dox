@@ -1,6 +1,8 @@
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 /// what the providers did, in order
 List<String> _steps = <String>[];
 
@@ -38,9 +40,7 @@ class _Broken extends DoxProvider {
 
 Future<void> _start(List<DoxProvider> providers) async {
   _steps.clear();
-  Dox().initialize(
-    AppConfig(appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt', providers: providers),
-  );
+  Dox().initialize(AppConfig(appKey: testAppKey, providers: providers));
   Dox().doxProviders.clear();
   Dox().addProviders(Dox().config.providers);
   await Dox().startProviders();

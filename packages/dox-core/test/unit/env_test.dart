@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 void main() {
   parseTests();
 
@@ -16,7 +18,7 @@ void main() {
 
   test('ENV get key', () {
     String key = Env.get('APP_KEY');
-    expect(key, '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt');
+    expect(key, 'test-fixture-not-a-key');
   });
 
   test('ENV get key which not exist', () {
@@ -65,6 +67,20 @@ void main() {
     expect(Env.get<bool>('DOX_MISSING_KEY', false), isFalse);
   });
 
+  test('a bad typed value is not in the error, it may be a secret', () {
+    Env().env['DOX_SECRET_PORT'] = 'fake-secret-for-test';
+    expect(
+      () => Env.get<int>('DOX_SECRET_PORT'),
+      throwsA(
+        isA<ArgumentError>().having(
+          (ArgumentError e) => e.toString(),
+          'text',
+          allOf(contains('DOX_SECRET_PORT'), isNot(contains('fake-secret'))),
+        ),
+      ),
+    );
+  });
+
   test('missing number with no default throws a clear error', () {
     expect(() => Env.get<int>('DOX_MISSING_KEY'), throwsArgumentError);
     expect(() => Env.get<int>('BAD_PORT'), throwsArgumentError);
@@ -87,6 +103,13 @@ void main() {
       '832b1c5fb42a3e48e3167d3ad7d77b241e28fca0d5a7f931832b1c5fb42a3e48',
       'ZrNbOZJAjC2MDzqehhsGV2DzFFI4pz5R',
       'KKep5qC6uHlAgrwaQTQewgMRSIqQnoj0',
+      // sample keys from docs, test fixtures and other Dox repos
+      '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+      '3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e',
+      'I56ADIaMto31rXQVjS5Sqc9cp8vxgoBb',
+      '00000000000000000000000000000000',
+      'the-new-32-character-app-key....',
+      'the-old-32-character-app-key....',
     ]) {
       Dox().config = AppConfig(appKey: key);
       Env().env.remove('APP_ENV');
@@ -98,7 +121,7 @@ void main() {
         expect(() => Dox().checkAppKey(), returnsNormally);
       }
     }
-    Dox().config = AppConfig(appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt');
+    Dox().config = AppConfig(appKey: testAppKey);
     Env().env.remove('APP_ENV');
     expect(() => Dox().checkAppKey(), returnsNormally);
   });

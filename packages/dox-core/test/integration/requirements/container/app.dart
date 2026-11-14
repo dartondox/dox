@@ -1,5 +1,7 @@
 import 'package:dox_core/dox_core.dart';
 
+import '../../../utils/test_app_key.dart';
+
 /// a small app wired like `lib/generated/container.g.dart` wires a real one
 
 class UserRepository {
@@ -111,7 +113,7 @@ void registerContainer(IocContainer c) {
 
 AppConfig containerConfig({int port = 0, int isolates = 1}) {
   return AppConfig(
-    appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+    appKey: testAppKey,
     serverPort: port,
     totalIsolate: isolates,
     container: registerContainer,

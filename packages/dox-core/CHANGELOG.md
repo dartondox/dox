@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Security: an env error printed the bad value, like `DB_PORT must be an int, not "..."`. A value may be a secret, and the error goes to the startup log and to CI output. Now `EnvException` and the `Env.get` cast error name only the key and the expected type.
+- Security: more public sample keys are refused by the `APP_KEY` check at startup: the keys from the docs, the dox_core test fixture and the sample app. They get the same rule as the old sample keys: an error outside development, local, test and testing, and a warning in those. If your `APP_KEY` is one of them, run `dox key:generate`.
 - Fix: in `.env`, an unquoted value that starts with `#` was read as empty. So `DB_PASSWORD=#Secret1` used the default. Now `KEY=#fff` keeps `#fff`, as the docs say. `KEY= #x` and `KEY=a #x` are still comments.
 - Fix: `Env.get` read a value with only spaces as text, so `Env.get<int>('MAIL_PORT', 587)` threw for `MAIL_PORT="  "`. Now only spaces counts as empty and gives the default, the same as `EnvReader`.
 - Fix: `EnvReader.list` of only commas (`,`) gave an empty list. Now it counts as missing, so the default is used.

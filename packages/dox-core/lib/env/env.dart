@@ -91,7 +91,8 @@ class Env {
       _ => value,
     };
     if (result == null) {
-      throw ArgumentError('Env key "$key" is not a valid $type: "$value"');
+      // not the value: it may be a secret
+      throw ArgumentError('Env key "$key" is not a valid $type');
     }
     return result as T;
   }

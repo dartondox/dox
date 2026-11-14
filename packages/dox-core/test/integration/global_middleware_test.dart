@@ -2,6 +2,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 List<String> calls = <String>[];
 
 Future<DoxResponse> fromPackage(DoxRequest req, Next next) async {
@@ -58,7 +60,7 @@ void main() {
     GlobalMiddleware.clear();
     client = await DoxTestClient.start(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         globalMiddleware: <dynamic>[appFirst],
         providers: <DoxProvider>[PackageProvider()],
         routers: <Router>[TestRouter()],
@@ -87,7 +89,7 @@ void main() {
   test('starting twice does not add a new instance twice', () async {
     DoxTestClient second = await DoxTestClient.start(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         providers: <DoxProvider>[InstanceProvider()],
         routers: <Router>[TestRouter()],
       ),
@@ -96,10 +98,7 @@ void main() {
     expect(GlobalMiddleware.items.whereType<Inst>().length, 1);
     // the providers stay in Dox, so they run again on the next start
     DoxTestClient third = await DoxTestClient.start(
-      AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        routers: <Router>[TestRouter()],
-      ),
+      AppConfig(appKey: testAppKey, routers: <Router>[TestRouter()]),
     );
     await third.close();
     expect(GlobalMiddleware.items.whereType<Inst>().length, 1);

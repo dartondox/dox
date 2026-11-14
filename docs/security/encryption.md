@@ -80,8 +80,8 @@ With `previousKeys`, users stay logged in while you change it.
 2. Run `dox key:generate`. It writes a new `APP_KEY`. Now `.env` has both:
 
     ```bash title=".env"
-    APP_KEY=the-new-32-character-app-key....
-    APP_PREVIOUS_KEYS=the-old-32-character-app-key....
+    APP_KEY=<the new key from dox key:generate>
+    APP_PREVIOUS_KEYS=<the old APP_KEY>
     ```
 
 3. Read it in the env class, and give it to `AppConfig`:

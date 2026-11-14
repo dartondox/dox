@@ -9,10 +9,11 @@ import 'package:test/test.dart';
 import '../utils/free_port.dart';
 import 'requirements/config/api_router.dart';
 import 'requirements/handler.dart';
+import '../utils/test_app_key.dart';
 
 AppConfig isolateConfig(int port) => AppConfig(
   /// application key
-  appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+  appKey: testAppKey,
 
   /// a free port, known before the start: all 5 isolates share it.
   /// Port 0 would give each isolate its own port.

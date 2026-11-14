@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
+import '../../utils/test_app_key.dart';
+
 AppConfig config = AppConfig(
-  appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+  appKey: testAppKey,
 
   totalIsolate: 1,
   cache: CacheConfig(

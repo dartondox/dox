@@ -3,6 +3,7 @@ import 'package:dox_core/utils/log_buffer.dart';
 import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
 /// a provider whose shutdown fails, with a handler that fails too,
 /// so `stopIsolate` throws on purpose
@@ -33,7 +34,7 @@ void main() {
     LogBuffer.writer = written.add;
     await startHttpServer(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: 0,
         totalIsolate: 1,
         providers: <DoxProvider>[BrokenProvider()],

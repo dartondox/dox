@@ -6,10 +6,11 @@ import 'package:dox_http_native/dox_http_native.dart';
 import 'package:test/test.dart';
 
 import '../utils/start_http_server.dart';
+import '../utils/test_app_key.dart';
 
 AppConfig nativeConfig() {
   return AppConfig(
-    appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+    appKey: testAppKey,
     // the OS picks a free port, so test files can run in parallel
     serverPort: 0,
     totalIsolate: 1,
@@ -157,7 +158,7 @@ void main() {
     });
     await startHttpServer(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: 0,
         totalIsolate: 1,
         webSocketAllowedOrigins: <String>['https://app.example.com'],
@@ -210,7 +211,7 @@ void main() {
     Route.get('/idle', (DoxRequest req) => 'ok');
     await startHttpServer(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: 0,
         totalIsolate: 1,
         idleTimeout: const Duration(milliseconds: 300),
@@ -229,7 +230,7 @@ void main() {
     Route.get('/cap', (DoxRequest req) => 'ok');
     await startHttpServer(
       AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
+        appKey: testAppKey,
         serverPort: 0,
         totalIsolate: 1,
         maxConnections: 1,

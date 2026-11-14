@@ -4,6 +4,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 String header(String name) {
   return DownloadableFile(
     ContentType.binary,
@@ -35,7 +37,7 @@ void main() {
 
   test('a non-ASCII name downloads, no 500', () async {
     DoxTestClient client = await DoxTestClient.start(
-      AppConfig(appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt'),
+      AppConfig(appKey: testAppKey),
     );
     Route.get('/download', (DoxRequest req) {
       return DownloadableFile(

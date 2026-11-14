@@ -87,7 +87,7 @@ void main() {
             (EnvException e) => e.errors,
             'errors',
             <Matcher>[
-              contains('PORT must be an int, not "abc"'),
+              equals('PORT must be an int'),
               contains('DEBUG must be a bool'),
               contains('TTL must be a Duration'),
               contains('LEVEL must be one of debug, info'),
@@ -124,6 +124,37 @@ void main() {
           ),
         ),
       );
+    });
+
+    test('an error never shows the value, it may be a secret', () {
+      const String secret = 'fake-secret-for-test';
+      EnvReader r = reader(<String, String>{
+        'A': secret,
+        'B': secret,
+        'C': secret,
+        'D': secret,
+        'E': secret,
+        'F': secret,
+        'G': '99999999999999999999s',
+        'H': 'http://[$secret',
+      });
+      r.integer('A');
+      r.decimal('B');
+      r.number('C');
+      r.boolean('D');
+      r.duration('E');
+      r.enumByName('F', Level.values);
+      r.duration('G');
+      r.uri('H');
+      try {
+        r.check();
+        fail('check() must throw');
+      } on EnvException catch (e) {
+        expect(e.errors, hasLength(8));
+        expect(e.toString(), isNot(contains(secret)));
+        expect(e.toString(), isNot(contains('9999')));
+        expect(e.errors, contains('F must be one of debug, info'));
+      }
     });
   });
 }

@@ -4,6 +4,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
 
+import '../utils/test_app_key.dart';
+
 List<String> log = <String>[];
 
 class AfterRouter extends Router {
@@ -40,10 +42,7 @@ void main() {
   setUpAll(() async {
     AfterResponse.enable();
     client = await DoxTestClient.start(
-      AppConfig(
-        appKey: '4HyiSrq4N5Nfg6bOadIhbFEI8zbUkpxt',
-        routers: <Router>[AfterRouter()],
-      ),
+      AppConfig(appKey: testAppKey, routers: <Router>[AfterRouter()]),
     );
   });
 
