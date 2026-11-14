@@ -377,9 +377,9 @@ LoggerConfig logger = LoggerConfig(
   enabled: true,
   level: env.logLevel,
   /// colored text is slow. JSON lines in production.
-  // env.appEnv, not appConfig.isDevelopment: appConfig is built from
+  // Env.appEnv, not appConfig.isDevelopment: appConfig is built from
   // this logger, so reading appConfig here would loop.
-  prettyPrint: env.appEnv == 'development',
+  prettyPrint: Env.appEnv == 'development',
 );
 ```
 

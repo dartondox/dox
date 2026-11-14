@@ -23,5 +23,5 @@ LoggerConfig logger = LoggerConfig(
   /// can have huge impact on performance.
   // not appConfig.isDevelopment: appConfig is built from this logger,
   // so reading it here loops until the stack overflows.
-  prettyPrint: env.appEnv == 'development',
+  prettyPrint: Env.appEnv == 'development',
 );

@@ -8,5 +8,5 @@ LoggerConfig logger = LoggerConfig(
   // colors on your machine, one JSON line per log in staging and production
   // not appConfig.isDevelopment: appConfig is built from this logger,
   // so reading it here loops until the stack overflows.
-  prettyPrint: env.appEnv == 'development',
+  prettyPrint: Env.appEnv == 'development',
 );
