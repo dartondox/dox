@@ -4,7 +4,7 @@ icon: lucide/file-code
 
 # API docs with OpenAPI
 
-Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.
+Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.
 
 ## What you need
 
@@ -121,7 +121,7 @@ Where each part comes from:
 | Part | Comes from |
 | --- | --- |
 | `tags: ["Post"]` | the class name `PostController`, without `Controller` |
-| `summary` | the first line of the `///` comment: `/// POST /api/posts` |
+| `summary` | no `@Summary` here, so the first line of the `///` comment: `/// POST /api/posts` |
 | `requestBody` | the argument `SavePost body` of `store` |
 | `401` and `bearerAuth` | `AuthMiddleware` on the route |
 | `422` | the route has a request class |
@@ -171,7 +171,7 @@ And this is its schema in `/openapi.json`:
 | `@Length(min: 3, max: 100)` | `"minLength": 3, "maxLength": 100` |
 | `@MinLength(10)` | `"minLength": 10` |
 | `@Email()` (in `RegisterUser`) | `"format": "email"` |
-| `/// A comment` or `@Describe('...')` | `"description"`. `@Describe` wins over the comment |
+| `@Describe('...')` or `/// A comment` | `"description"`. `@Describe` wins over the comment |
 | `@Trim()`, `@Lowercase()`, `@Unique(...)` | nothing. They change or check the value on the server only |
 
 A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`.
@@ -181,20 +181,19 @@ When you change a rule, run `build_runner` again, and the docs change with it.
 
 ## 6. Make the docs better
 
-Write a `///` comment on a controller method. The first line is the summary. The rest is the description.
-Add `@Tags` and `@Response` (from `dox_core`) when the automatic result is not what you want.
+Put annotations on a controller method: `@Summary`, `@Description`, `@Tags` and `@Response` (from `dox_core`).
+A `///` comment on the method also works for the summary and the description.
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 @Inject()
 class PostController {
-  /// List all posts
-  ///
-  /// Newest posts are not first. There is no paging yet.
+  @Summary('List all posts')
+  @Description('Newest posts are not first. There is no paging yet.')
   Future<List<Post>> index(DoxRequest req) async {
     return Post().all();
   }
 
-  /// Create a post
+  @Summary('Create a post')
   @Tags(<String>['Posts'])
   @Response(201, Post, description: 'The new post')
   Future<DoxResponse> store(SavePost body) async {
@@ -243,10 +242,10 @@ Run `dart run build_runner build` again and restart the app. The real result:
 
 - `@Response(201, Post)` replaces the empty `200`. The docs now match the real status code.
 - `@Tags(['Posts'])` moves the route to the group "Posts" in the docs page.
-- `@Summary('...')` and `@Description('...')` set the text without a `///` comment.
+- `@Summary('...')` and `@Description('...')` set the text. A `///` comment gives the same result. When a method has both, the annotation wins.
 - `@ApiIgnore()` leaves a method (or a whole controller) out of the docs.
 
-See [OpenAPI: change the docs](../packages/openapi.md#change-the-docs-optional) for all annotations.
+See [OpenAPI: describe a route](../packages/openapi.md#describe-a-route) for all annotations.
 
 ## 7. Turn it off in production
 
@@ -273,7 +272,7 @@ OpenApiConfig openApi = OpenApiConfig(
     `enabled: true` in production shows every route of your API to anyone. Only do it for a public API.
 
 To give the document to a front-end team without a running server, write it to files with `dox openapi:generate`.
-See [OpenAPI: write the files](../packages/openapi.md#write-the-files-dox-openapigenerate).
+See [OpenAPI: write the files](../packages/openapi.md#write-the-files).
 
 ## Check it
 
