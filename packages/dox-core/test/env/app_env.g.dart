@@ -36,32 +36,46 @@ class _$AppEnv extends AppEnv {
   @override
   late final String broken = _$broken ?? super.broken;
 
+  /// true while [load] runs. A default that reads the global `env` calls
+  /// [load] again, and would loop until the stack overflows.
+  static bool _$$loading = false;
+
   /// reads and checks every key once. Throws `EnvException` with all
   /// missing or bad keys. Then works out every default once, so a default
   /// that throws stops the app here, at startup.
   static AppEnv load([EnvReader? $reader]) {
-    EnvReader $r = $reader ?? EnvReader();
-    String? appEnv = $r.string('APP_ENV');
-    bool? isDevelopment = $r.boolean('IS_DEVELOPMENT');
-    String? region = $r.string('REGION');
-    String? r = $r.string('R');
-    String? reader = $r.string('READER');
-    String? broken = $r.string('BROKEN');
+    if (_$$loading) {
+      throw StateError(
+        'A default of AppEnv reads the global `env`. Use the getter directly: write `appEnv`, not `env.appEnv`.',
+      );
+    }
+    _$$loading = true;
+    try {
+      EnvReader $r = $reader ?? EnvReader();
+      String? appEnv = $r.string('APP_ENV');
+      bool? isDevelopment = $r.boolean('IS_DEVELOPMENT');
+      String? region = $r.string('REGION');
+      String? r = $r.string('R');
+      String? reader = $r.string('READER');
+      String? broken = $r.string('BROKEN');
 
-    $r.check();
-    _$AppEnv $env = _$AppEnv._(
-      appEnv: appEnv,
-      isDevelopment: isDevelopment,
-      region: region,
-      r: r,
-      reader: reader,
-      broken: broken,
-    );
-    $env.appEnv;
-    $env.isDevelopment;
-    $env.region;
-    $env.broken;
+      $r.check();
+      _$AppEnv $env = _$AppEnv._(
+        appEnv: appEnv,
+        isDevelopment: isDevelopment,
+        region: region,
+        r: r,
+        reader: reader,
+        broken: broken,
+      );
+      $env.appEnv;
+      $env.isDevelopment;
+      $env.region;
+      $env.broken;
 
-    return $env;
+      return $env;
+    } finally {
+      _$$loading = false;
+    }
   }
 }

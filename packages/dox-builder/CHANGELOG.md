@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: a default that reads the global `env` (like `env.appEnv`) stopped the app with a stack overflow. Now `load()` throws a clear `StateError` that says to use the getter directly.
 - Fix: a run of capitals in an env getter name is one word now. `dbURL` read `DB_U_R_L`, now it reads `DB_URL`. Also `jwtTTL` => `JWT_TTL` and `httpURLPath` => `HTTP_URL_PATH`. Names like `s3Bucket` and `oauth2ClientId` do not change. If your `.env` has a key like `DB_U_R_L`, rename it, or use `@EnvKey('DB_U_R_L')`.
 - Fix: `@EnvKey` through a const variable (`const k = EnvKey('X');` then `@k`) was ignored. Now it is read.
 - Fix: an env getter named `r` or `reader` made `env.g.dart` fail to compile. The generated `load()` now uses `$r` and `$reader`.

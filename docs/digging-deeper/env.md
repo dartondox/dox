@@ -59,7 +59,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 - **Key**: the getter name in UPPER_SNAKE case. `appName` reads `APP_NAME`, `s3Bucket` reads `S3_BUCKET`. A run of capitals is one word: `dbURL` reads `DB_URL`. Use `@EnvKey('X')` for another name.
 - **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can read another env getter and sees its loaded value, so `appEnv == 'development'` uses the real `APP_ENV`.
 - **Every getter is a key**: also a getter whose body uses other getters. `bool get isDevelopment => appEnv == 'development';` reads `IS_DEVELOPMENT`. When `IS_DEVELOPMENT` is set, it wins over the body.
-- **Use the getter, not `env`**: in a default, write `appEnv`, never `env.appEnv`. The global `env` is not ready while it loads. The app stops with a stack overflow.
+- **Use the getter, not `env`**: in a default, write `appEnv`, never `env.appEnv`. The global `env` is not ready while it loads. The app stops at startup with a `StateError`: "A default of AppEnv reads the global `env`. Use the getter directly".
 - **Only this class**: the builder reads the getters of the `@DoxEnv()` class itself. Getters from a superclass or a mixin are not read from the env. A field (`final String x = ...;`) is a build error: use a getter.
 - **Optional**: a nullable getter with no body (`String? get s3Bucket;`). It is `null` when the key is missing.
 - **Required**: any other getter with no body. A missing key stops the app.

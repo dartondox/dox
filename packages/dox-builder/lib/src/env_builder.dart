@@ -91,6 +91,10 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
       }
     }
 
+    String loopMessage = _literal.string(
+      'A default of $name reads the global `env`. Use the getter directly: '
+      'write `appEnv`, not `env.appEnv`.',
+    );
     String initList = inits.isEmpty ? '' : ' : ${inits.join(', ')}';
     String constructor = fields.isEmpty
         ? '$generated._();'
@@ -102,16 +106,28 @@ class $generated extends $name {
 
   $declarations
 
+  /// true while [load] runs. A default that reads the global `env` calls
+  /// [load] again, and would loop until the stack overflows.
+  static bool _\$\$loading = false;
+
   /// reads and checks every key once. Throws `EnvException` with all
   /// missing or bad keys. Then works out every default once, so a default
   /// that throws stops the app here, at startup.
   static $name load([EnvReader? \$reader]) {
-    EnvReader \$r = \$reader ?? EnvReader();
-    $reads
-    \$r.check();
-    $generated \$env = $generated._($args);
-    $touches
-    return \$env;
+    if (_\$\$loading) {
+      throw StateError($loopMessage);
+    }
+    _\$\$loading = true;
+    try {
+      EnvReader \$r = \$reader ?? EnvReader();
+      $reads
+      \$r.check();
+      $generated \$env = $generated._($args);
+      $touches
+      return \$env;
+    } finally {
+      _\$\$loading = false;
+    }
   }
 }
 ''';

@@ -210,4 +210,24 @@ abstract class AppEnv {
 ''');
     expect(errors, contains('has the field "appName"'));
   });
+
+  test(
+    'DoxEnvBuilder | load() stops a default that reads the global env',
+    () async {
+      String out = await _generate('''
+@DoxEnv()
+abstract class AppEnv {
+  String get appEnv => 'production';
+  String? get loading;
+}
+''');
+      expect(out, contains(r'static bool _$$loading = false;'));
+      expect(out, contains(r'if (_$$loading) {'));
+      expect(out, contains('A default of AppEnv reads the global `env`.'));
+      expect(out, contains(r'_$$loading = false;'));
+      expect(out, contains('finally'));
+      // a getter named `loading` has its own raw field, no clash
+      expect(out, contains(r'final String? loading;'));
+    },
+  );
 }

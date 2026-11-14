@@ -2,6 +2,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:test/test.dart';
 
 import '../env/app_env.dart';
+import '../env/loop_env.dart';
 
 AppEnv load(Map<String, String> dotEnv) {
   return AppEnv.load(
@@ -45,6 +46,28 @@ void main() {
       );
       AppEnv env = load(<String, String>{'APP_ENV': 'broken', 'BROKEN': 'x'});
       expect(env.broken, 'x');
+    });
+
+    test('a default that reads the global env gives a clear error', () {
+      expect(
+        () => loopEnv,
+        throwsA(
+          isA<StateError>().having(
+            (StateError e) => e.message,
+            'message',
+            contains('A default of LoopEnv reads the global `env`'),
+          ),
+        ),
+      );
+      // the failed load does not block the next one
+      LoopEnv env = LoopEnv.load(
+        EnvReader(
+          environment: const <String, String>{},
+          dotEnv: <String, String>{'IS_DEVELOPMENT': 'true'},
+        ),
+      );
+      expect(env.isDevelopment, isTrue);
+      expect(load(<String, String>{}).appEnv, 'production');
     });
   });
 }
