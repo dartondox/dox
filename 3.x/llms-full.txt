@@ -11929,7 +11929,7 @@ dart pub global deactivate dox
 | `dox key:generate [--show] [--force]` | make a new `APP_KEY`. `--show` prints a key and writes nothing. In production it asks first, `--force` skips |
 | `dox env:generate` | make `lib/config/env.dart` (the typed env class) from `.env.example`, see [Environment Variables](env.md) |
 | `dox env:check` | check the env against `lib/config/env.dart`. Prints every missing or bad key (exit code 1) |
-| `dox openapi:generate [dir]` | run `bin/openapi.dart` to write `openapi.json` and `openapi.yaml` (default `storage/openapi`). A new project has no `bin/openapi.dart` yet, see [OpenAPI](../packages/openapi.md#write-the-files-dox-openapigenerate) |
+| `dox openapi:generate [dir]` | run `bin/openapi.dart` to write `openapi.json` and `openapi.yaml` (default `storage/openapi`). A new project has no `bin/openapi.dart` yet, see [OpenAPI](../packages/openapi.md#write-the-files) |
 | `dox update` | update the CLI |
 | `dox version` (or `dox -v`) | show the CLI version |
 | `dox help [command]` | show help |
@@ -23613,124 +23613,99 @@ Source: https://dartondox.dev/latest/packages/openapi/
 
 # OpenAPI
 
-This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.
+This page shows how to make OpenAPI 3.1 docs for your Dox API, how to describe each route, and how to change the result.
 
-You write no docs code. You get a [Scalar](https://github.com/scalar/scalar) docs page at `/docs`, plus `/openapi.json` and `/openapi.yaml`.
+You get three things:
+
+- `/docs`: a [Scalar](https://github.com/scalar/scalar) page with every route and "Try it" buttons.
+- `/openapi.json`: the OpenAPI document as JSON.
+- `/openapi.yaml`: the same document as YAML.
 
 The docs come from three places:
 
 - **the routes**: method, path, path params, middleware (login),
 - **the request classes**: a `@Dto` class,
-- **the controllers**: the `///` comment, the arguments and the return type of each method.
+- **the controllers**: the annotations (`@Summary`, `@Response` and more), the arguments and the return type of each method.
 
-## In a Dox app
+## Setup (optional)
 
-### 1. Run the builder
+!!! note "Made with `dox create`?"
+    Your app already serves `/docs`, `/openapi.json` and `/openapi.yaml` while `APP_ENV` is `development`. The template `.env` sets this. You need no setup for that.
+    But the config does not have `openApiRegistry` yet. So each route shows only its path and method.
+    Do the steps below when you want the full docs from your code (annotations, request and response schemas), or when you want to change the title or other options.
 
-```bash
-dart run build_runner build      # or: dox build_runner:build
-```
+1. Write the config. Pass the generated `openApiRegistry` to it:
 
-`dox_builder` reads your code and writes `lib/generated/openapi.g.dart`.
-Run it again after you change routes, controllers, request classes or models.
-`dox build_runner:watch` does it for you while you work.
+    ```dart title="lib/config/openapi.dart"
+    import 'package:dox_core/dox_core.dart';
+    import 'package:my_app/generated/openapi.g.dart';
 
-### 2. Pass the result to the config
+    OpenApiConfig openApi = OpenApiConfig(
+      info: Info(title: 'Blog API', version: '1.0.0'),
+      registry: openApiRegistry,
+    );
+    ```
 
-```dart title="lib/config/openapi.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:my_app/generated/openapi.g.dart';
+    The import of `generated/openapi.g.dart` shows an error until the builder runs in step 3.
 
-OpenApiConfig openApi = OpenApiConfig(
-  info: Info(title: 'Blog API', version: '1.0.0'),
-  registry: openApiRegistry,
-);
-```
+2. Add it to `AppConfig`:
 
-```dart title="lib/config/app.dart"
-import 'package:my_app/config/openapi.dart';
+    ```dart title="lib/config/app.dart"
+    import 'package:my_app/config/openapi.dart';
 
-AppConfig appConfig = AppConfig(
-  openApi: openApi,
-  // ...
-);
-```
+    AppConfig appConfig = AppConfig(
+      openApi: openApi,
+      // ...
+    );
+    ```
 
-| Option | Default | What it does |
-| --- | --- | --- |
-| `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local` |
-| `info` | `Info(title: 'Dox API', version: '1.0.0')` | title and version of the API |
-| `servers` | `[]` | base URLs, like `[Server('https://api.my.app')]` |
-| `registry` | empty | `openApiRegistry` from `lib/generated/openapi.g.dart` |
-| `securitySchemes`, `securityByMiddleware` | `{}` | see [Login schemes](#login-schemes) |
-| `ui` | `DocsUi.scalar` | the docs page: `DocsUi.scalar` or `DocsUi.swagger` |
-| `scalar` | `ScalarOptions()` | see [The docs page](#the-docs-page) |
-| `pageTitle` | `info.title` | title of the `/docs` page |
-| `include` | `[]` (all routes) | only these paths go in the docs, like `['/api/*']` |
-| `exclude` | `[]` | these paths are left out, like `['/api/internal/*']` |
+3. Run the builder:
 
-If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden. Set `APP_ENV=development` in your `.env` and in CI.
+    ```bash
+    dart run build_runner build      # or: dox build_runner:build
+    ```
 
-### 3. Open `/docs`
+    `dox_builder` reads your code and writes `lib/generated/openapi.g.dart`.
+    Run it again after you change routes, controllers, request classes or models.
+    `dox build_runner:watch` does it for you while you work.
 
-Start the app and open `http://localhost:3000/docs`.
-In production the docs are off, unless you set `enabled: true`.
-The document is built on the first `/docs` request, then kept.
+4. Make sure `.env` has `APP_ENV=development`. Then start the app and open `http://localhost:3000/docs`.
+    Without `APP_ENV=development`, `/docs` gives 404.
+    The document is built on the first `/docs` request, then kept.
 
-### The docs page
+!!! note
+    The docs are on only when `APP_ENV` is `development` or `local`.
+    If `APP_ENV` is not set, Dox treats the app as production: `/docs` is off and error details are hidden.
+    Set `APP_ENV=development` in your `.env` and in CI.
+    To turn the docs on in production, see [Turn the docs on in production](#turn-the-docs-on-in-production).
 
-The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads `/openapi.json`.
-Change the look with `scalar:`:
+## Describe a route
 
-```dart
-OpenApiConfig(
-  registry: openApiRegistry,
-  pageTitle: 'Blog API docs',
-  scalar: ScalarOptions(theme: ScalarTheme.purple, darkMode: true),
-);
-```
-
-| Option | Default | What it does |
-| --- | --- | --- |
-| `theme` | `ScalarTheme.default_` | Color theme. Same names as Scalar: `moon`, `purple`, `deepSpace`, `saturn`, `kepler`, `mars` and more. |
-| `darkMode` | `false` | Start in dark mode. The user can still switch. |
-| `showDownloadButton` | `true` | Show the button that downloads the document. |
-| `proxyUrl` | `null` | Send "Try it" requests through this proxy. Off by default, so requests go from the browser straight to your API. |
-
-`pageTitle` and all options are escaped, so a value can not break the page.
-
-To use Swagger UI instead, set `ui:`:
-
-```dart
-OpenApiConfig(registry: openApiRegistry, ui: DocsUi.swagger);
-```
-
-## What you write, what you get
-
-A normal controller. There are no docs annotations here:
+Put annotations on a controller method. They are all in `dox_core`.
 
 ```dart
 class BlogController {
-  /// Get one blog
-  ///
-  /// Deleted blogs are not found.
+  @Summary('Get one blog')
+  @Description('Deleted blogs are not found.')
+  @Tags(<String>['Blogs'])
   Future<Blog?> show(DoxRequest req, String id) async {
     return Blog().find(id);
   }
 
-  /// Create a blog
-  Future<Blog> store(CreateBlog body) async { ... }
+  @Summary('Create a blog')
+  @Response(201, Blog, description: 'The new blog')
+  Future<DoxResponse> store(CreateBlog body) async { ... }
 }
 
 // routes
 Route.get('/blogs/{id}', <dynamic>[AuthMiddleware(), (BlogController c) => c.show]);
 ```
 
-The generated docs for `GET /blogs/{id}`:
+Here is what you get. The generated docs for `GET /blogs/{id}`:
 
 ```yaml
 get:
-  tags: [Blog]
+  tags: [Blogs]
   summary: Get one blog
   description: Deleted blogs are not found.
   operationId: BlogController.show
@@ -23760,37 +23735,39 @@ Blog:
     created_at: {type: [string, "null"], format: date-time}
 ```
 
-## How each part is found
+Annotations are all optional. Without them, Dox fills in the docs for you, see [What Dox fills in for you](#what-dox-fills-in-for-you).
 
-| Part of the docs | Where it comes from |
+Another example, with a request and more than one answer:
+
+```dart
+@Summary('Log in')
+@Description('Gives a bearer token for the Authorization header.')
+@Tags(<String>['Auth'])
+@Request(LoginUser)
+@Response(200, LoginResult)
+@Response(401, null, description: 'Wrong email or password')
+Future<dynamic> login(DoxRequest req) async { ... }
+```
+
+| Annotation | What it does |
 | --- | --- |
-| path, method | the live route table |
-| path param types | the controller arguments after the first one, in order. `int id` gives `integer` |
-| tags | the controller class name without `Controller` (`BlogController` gives `Blog`) |
-| operationId | `Class.method`, for example `BlogController.show` |
-| summary | the first line of the `///` comment |
-| description | the rest of the `///` comment |
-| request | see [Request](#request) below |
-| 200 answer | the return type, see [Response](#response) below |
-| `401` and a login scheme | `@Security` on a middleware class, or a middleware whose class name ends with `AuthMiddleware`. See [Login schemes](#login-schemes) |
-| `401` and `403` | the `Can` middleware on the route, or a `req.authorize(...)` call in the controller method |
-| `403` | the `GuestMiddleware` or `ValidateSignature` middleware on the route, or a `Gate.authorize(...)` call in the controller method |
-| `404` | the path has a `{param}`. The short path of an optional param, like `/blog`, has no `404` |
-| `422` | the route has a request class, or the controller method calls `req.validate<T>()` or `req.validateSchema(...)`. The body is `{field: message}` |
-| `500` | every route |
+| `@Summary('text')` | short title. Default: the first line of the `///` comment |
+| `@Description('text')` | longer text. Default: the rest of the `///` comment |
+| `@Tags(['Users'])` | groups. On a method or on the class |
+| `@Request(T)` | the request class. Body or query by the HTTP method |
+| `@Body(T)` | the request class, always the body |
+| `@Query(T)` | the request class, always the query |
+| `@Response(status, Type, description: '')` | one answer. Add more than one for more codes. With a `2xx` one, the return type is not used |
+| `@ApiDeprecated()` | marks the route as deprecated. Dart `@Deprecated` works too |
+| `@ApiIgnore()` | leaves the method (or the whole class) out of the docs. To leave out routes by path, use `include` and `exclude` in `OpenApiConfig` |
+| `@DoxController(tag: 'Users')` | for a class that the builder can not see in a `Route.get(...)` call |
 
-`Can`, `GuestMiddleware` and `ValidateSignature` are found by their class name. `req.authorize(...)` is found when it is called on the request (`DoxRequest` or `IDoxRequest`) in the controller method. `Gate.authorize(...)` is found when `Gate` is the class of `dox_auth`. A `@Response` with the same status wins over an automatic answer.
+The `Type` of `@Response` can be a model, `List<User>`, a `@Dto`, a `Serializer` or a basic type like `String`.
 
-`GuestMiddleware(redirectTo: ...)` also shows a `403`, but the app sends a redirect. Put `@Response(403, ...)` on the method to replace it.
+Each annotation also has a lower case name, like `@summary('Log in')`.
+Only `@Response` has none, because `response()` is already a `dox_core` helper.
 
-Routes that the builder does not know (for example inline closures) still get a basic entry.
-
-An optional param shows as two paths. The route `/blog/{id?}` gives `/blog/{id}` and `/blog`. OpenAPI path params must always be required.
-An optional param in the middle, like `/a/{x?}/b`, also gives the path without it: `/a/{x}/b` and `/a/b`.
-Optional params next to each other are dropped from the right, the same way the Dox router matches them.
-When the summary and operation id are made from the path, the short path gets its own, like `GET /blog` and `getBlog`.
-
-### Request
+## Request
 
 The builder looks in this order. The first one wins.
 
@@ -23829,7 +23806,7 @@ The keys are the same as the keys the DTO reads: snake_case by default (`postCod
 or `@Name('key')`, or `@Dto(keyCase: KeyCase.field)`.
 Each rule annotation adds its JSON Schema keys. See the [rules reference](../the-basic/validation-rules.md).
 
-### Response
+## Response
 
 The return type of the method gives the `200` answer. `Future<T>` counts as `T`.
 
@@ -23847,40 +23824,7 @@ The return type of the method gives the `200` answer. `Future<T>` counts as `T`.
 A model schema has the primary key, the `@Column` fields, `created_at`, `updated_at`,
 the relations (only there when loaded) and the `@Computed` getters.
 
-## Change the docs (optional)
-
-Add these to a controller method when the automatic result is not what you want.
-They are all in `dox_core`.
-
-```dart
-@Summary('Log in')
-@Description('Gives a bearer token for the Authorization header.')
-@Tags(<String>['Auth'])
-@Request(LoginUser)
-@Response(200, LoginResult)
-@Response(401, null, description: 'Wrong email or password')
-Future<dynamic> login(DoxRequest req) async { ... }
-```
-
-| Annotation | What it does |
-| --- | --- |
-| `@Summary('text')` | short title. Default: the first line of the `///` comment |
-| `@Description('text')` | longer text. Default: the rest of the `///` comment |
-| `@Tags(['Users'])` | groups. On a method or on the class |
-| `@Request(T)` | the request class. Body or query by the HTTP method |
-| `@Body(T)` | the request class, always the body |
-| `@Query(T)` | the request class, always the query |
-| `@Response(status, Type, description: '')` | one answer. Add more than one for more codes. With a `2xx` one, the return type is not used |
-| `@ApiDeprecated()` | marks the route as deprecated. Dart `@Deprecated` works too |
-| `@ApiIgnore()` | leaves the method (or the whole class) out of the docs. To leave out routes by path, use `include` and `exclude` in `OpenApiConfig` |
-| `@DoxController(tag: 'Users')` | for a class that the builder can not see in a `Route.get(...)` call |
-
-The `Type` of `@Response` can be a model, `List<User>`, a `@Dto`, a `Serializer` or a basic type like `String`.
-
-Each annotation also has a lower case name, like `@summary('Log in')`.
-Only `@Response` has none, because `response()` is already a `dox_core` helper.
-
-### Login schemes
+## Login schemes
 
 Put `@Security` above a middleware class. Every route with this middleware gets the scheme in the docs.
 Run `dart run build_runner build` after you add it.
@@ -23923,19 +23867,129 @@ OpenApiConfig(
 );
 ```
 
-## How a route finds its docs
+## What Dox fills in for you
 
-The builder saves the docs of each controller method, and each `Route.get(...)` / `Route.resource(...)` call it finds.
-At runtime, Dox matches each route handler by its method name, HTTP method and the end of its path.
-If there is no match, it picks the only method with that name and the same argument types.
-Group prefixes (like `api/`) do not matter.
+You do not have to write all of the above. A normal controller already gets docs. Annotations only change the result.
 
-!!! tip
-    Two controllers can have a method with the same name, like `index`.
-    When the route names the class, like `(LinkController c) => c.index` or `Route.get<LinkController>(...)`,
-    only methods of that class match. With a plain `links.index`, the path of the route call decides.
+| Part of the docs | Where it comes from |
+| --- | --- |
+| path, method | the live route table |
+| path param types | the controller arguments after the first one, in order. `int id` gives `integer` |
+| tags | the controller class name without `Controller` (`BlogController` gives `Blog`) |
+| operationId | `Class.method`, for example `BlogController.show` |
+| summary | `@Summary`. Else the first line of the `///` comment |
+| description | `@Description`. Else the rest of the `///` comment |
+| request | see [Request](#request) |
+| 200 answer | the return type, see [Response](#response) |
+| `401` and a login scheme | `@Security` on a middleware class, or a middleware whose class name ends with `AuthMiddleware`. See [Login schemes](#login-schemes) |
+| `401` and `403` | the `Can` middleware on the route, or a `req.authorize(...)` call in the controller method |
+| `403` | the `GuestMiddleware` or `ValidateSignature` middleware on the route, or a `Gate.authorize(...)` call in the controller method |
+| `404` | the path has a `{param}`. The short path of an optional param, like `/blog`, has no `404` |
+| `422` | the route has a request class, or the controller method calls `req.validate<T>()` or `req.validateSchema(...)`. The body is `{field: message}` |
+| `500` | every route |
 
-### Write the files: `dox openapi:generate`
+`Can`, `GuestMiddleware` and `ValidateSignature` are found by their class name. `req.authorize(...)` is found when it is called on the request (`DoxRequest` or `IDoxRequest`) in the controller method. `Gate.authorize(...)` is found when `Gate` is the class of `dox_auth`. A `@Response` with the same status wins over an automatic answer.
+
+`GuestMiddleware(redirectTo: ...)` also shows a `403`, but the app sends a redirect. Put `@Response(403, ...)` on the method to replace it.
+
+Routes that the builder does not know (for example inline closures) still get a basic entry.
+
+An optional param shows as two paths. The route `/blog/{id?}` gives `/blog/{id}` and `/blog`. OpenAPI path params must always be required.
+An optional param in the middle, like `/a/{x?}/b`, also gives the path without it: `/a/{x}/b` and `/a/b`.
+Optional params next to each other are dropped from the right, the same way the Dox router matches them.
+When the summary and operation id are made from the path, the short path gets its own, like `GET /blog` and `getBlog`.
+
+### `///` comments (optional)
+
+A `///` comment on a method also sets the summary and the description.
+The first line is the summary. The rest is the description.
+
+```dart
+/// Get one blog
+///
+/// Deleted blogs are not found.
+Future<Blog?> show(DoxRequest req, String id) async {
+  return Blog().find(id);
+}
+```
+
+When a method has both, the annotation wins. `@Summary` replaces the first line of the comment, and `@Description` replaces the rest.
+
+## Config options
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `enabled` | `null` | `true` or `false` turns the docs routes on or off. `null`: on only when `APP_ENV` is `development` or `local`. See [Turn the docs on in production](#turn-the-docs-on-in-production) |
+| `info` | `Info(title: 'Dox API', version: '1.0.0')` | title and version of the API |
+| `servers` | `[]` | base URLs, like `[Server('https://api.my.app')]` |
+| `registry` | empty | `openApiRegistry` from `lib/generated/openapi.g.dart` |
+| `securitySchemes`, `securityByMiddleware` | `{}` | see [Login schemes](#login-schemes) |
+| `ui` | `DocsUi.scalar` | the docs page: `DocsUi.scalar` or `DocsUi.swagger` |
+| `scalar` | `ScalarOptions()` | see [The docs page](#the-docs-page) |
+| `pageTitle` | `info.title` | title of the `/docs` page |
+| `include` | `[]` (all routes) | only these paths go in the docs, like `['/api/*']` |
+| `exclude` | `[]` | these paths are left out, like `['/api/internal/*']` |
+
+In production the docs are off, unless you set `enabled: true`. See [Turn the docs on in production](#turn-the-docs-on-in-production).
+
+### Turn the docs on in production
+
+By default `enabled` is `null`. Then Dox looks at `APP_ENV`:
+
+| `APP_ENV` value | Are the docs on? |
+| --- | --- |
+| `development` | yes |
+| `local` | yes |
+| `production` | no. `/docs`, `/openapi.json` and `/openapi.yaml` give 404 |
+| not set | no. Dox treats the app as production |
+
+To turn the docs on in every environment, also production, set `enabled: true`:
+
+```dart title="lib/config/openapi.dart"
+OpenApiConfig openApi = OpenApiConfig(
+  enabled: true,
+  info: Info(title: 'Blog API', version: '1.0.0'),
+  registry: openApiRegistry,
+);
+```
+
+!!! warning
+    `/docs` has no login. In production, anyone can see every route of your API.
+    Only do this for a public API.
+
+`enabled: false` turns the docs off in every environment.
+
+### The docs page
+
+The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads `/openapi.json`.
+Change the look with `scalar:`:
+
+```dart
+OpenApiConfig(
+  registry: openApiRegistry,
+  pageTitle: 'Blog API docs',
+  scalar: ScalarOptions(theme: ScalarTheme.purple, darkMode: true),
+);
+```
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `theme` | `ScalarTheme.default_` | Color theme. Same names as Scalar: `moon`, `purple`, `deepSpace`, `saturn`, `kepler`, `mars` and more. |
+| `darkMode` | `false` | Start in dark mode. The user can still switch. |
+| `showDownloadButton` | `true` | Show the button that downloads the document. |
+| `proxyUrl` | `null` | Send "Try it" requests through this proxy. Off by default, so requests go from the browser straight to your API. |
+
+`pageTitle` and all options are escaped, so a value can not break the page.
+
+To use Swagger UI instead, set `ui:`:
+
+```dart
+OpenApiConfig(registry: openApiRegistry, ui: DocsUi.swagger);
+```
+
+## Write the files
+
+Use `dox openapi:generate` to write the document to files.
 
 ```bash
 dox openapi:generate              # storage/openapi/openapi.json and openapi.yaml
@@ -23959,6 +24013,120 @@ Future<void> main(List<String> args) async {
 ```
 
 `writeOpenApi` runs your providers and registers the routes. It does not start the server.
+
+To serve these files in production, see [Production setup](#production-setup).
+
+## Production setup
+
+By default the docs are off in production. `enabled: true` is the quick way to turn them on, see [Turn the docs on in production](#turn-the-docs-on-in-production).
+This section is the other way: make the document at build time, put the files in the image, and serve the files.
+The URLs stay the same: `/docs`, `/openapi.json` and `/openapi.yaml`.
+
+You need two files first: `lib/config/openapi.dart` (see [Setup](#setup-optional)) and `bin/openapi.dart` (see [Write the files](#write-the-files)). An app made with `dox create` has neither file.
+
+1. Make both files, if you do not have them yet.
+
+2. Add a controller that serves the files:
+
+    ```dart title="lib/app/http/controllers/docs.controller.dart"
+    import 'dart:io';
+
+    import 'package:dox_core/dox_core.dart';
+    import 'package:dox_openapi/dox_openapi.dart'
+        show OpenApiConstants, OpenApiServer;
+    import 'package:my_app/config/openapi.dart';
+
+    @Inject()
+    class DocsController {
+      /// The same Scalar page as the live docs. It loads `/openapi.json`.
+      final String _page = OpenApiServer(
+        OpenApi(info: openApi.info),
+        pageTitle: openApi.pageTitle,
+        ui: openApi.ui,
+        scalar: openApi.scalar,
+      ).docsPage().body;
+
+      DoxResponse page() {
+        return response(_page)
+            .contentType(ContentType.parse(OpenApiConstants.htmlContentType));
+      }
+
+      DoxResponse json() {
+        return _file('openapi.json', OpenApiConstants.jsonContentType);
+      }
+
+      DoxResponse yaml() {
+        return _file('openapi.yaml', OpenApiConstants.yamlContentType);
+      }
+
+      DoxResponse _file(String name, String contentType) {
+        File file = File('docs/openapi/$name');
+        if (!file.existsSync()) throw NotFoundHttpException();
+        return response(file.readAsStringSync())
+            .contentType(ContentType.parse(contentType));
+      }
+    }
+    ```
+
+    A new app has `dox_openapi` in its `pubspec.yaml`. If yours does not, run `dart pub add dox_openapi`.
+    Run the builder again after you add the controller.
+
+3. Add the routes. Add them only when the live docs are off, so the routes do not clash in development:
+
+    ```dart title="lib/routes/web.dart"
+    @override
+    void register() {
+      if (!openApi.isEnabled) {
+        Route.get('/docs', (DocsController c) => c.page);
+        Route.get('/openapi.json', (DocsController c) => c.json);
+        Route.get('/openapi.yaml', (DocsController c) => c.yaml);
+      }
+      // ...
+    }
+    ```
+
+    `openApi` is the config of `lib/config/openapi.dart`. Import it, and the controller, in this file.
+
+4. Make the files in the Docker build, and copy them into the image. Change the `Dockerfile` in two places.
+    First, in the build stage, right after `RUN /root/.pub-cache/bin/dox build`, add:
+
+    ```dockerfile title="Dockerfile"
+    RUN APP_KEY=00000000000000000000000000000000 /root/.pub-cache/bin/dox openapi:generate docs/openapi
+    ```
+
+    Second, in the `RUN` step that lays out `/out`, add `/out/app/docs` to the `mkdir -p` list. Add one line to the `&&` chain after the `cp -r build/bundle/. /out/app/` line:
+
+    ```dockerfile title="Dockerfile"
+    RUN mkdir -p /out/app/storage /out/app/docs /out/tmp \
+      && chmod 1777 /out/tmp \
+      && cp -r build/bundle/. /out/app/ \
+      && cp -r docs/openapi /out/app/docs/openapi \
+      # ... the lines that follow stay as they are
+    ```
+
+    `bin/openapi.dart` starts your app config, so it needs `APP_KEY`. The dummy key is only for this step. It is not in the image.
+    If a provider of your app connects to a database in `setup()`, that database must be reachable in the build step.
+    The server runs in `/app`, so the controller reads `/app/docs/openapi/`.
+
+5. Start the image with `APP_ENV=production` and open `/docs`.
+
+!!! warning
+    The route has no login. Anyone can open `/docs` and see every route of your API.
+    To protect it, put a middleware on the three routes.
+
+To test it on your machine, run `dox openapi:generate docs/openapi`, then start the app with `APP_ENV=production`.
+
+## How a route finds its docs
+
+The builder saves the docs of each controller method, and each `Route.get(...)` / `Route.resource(...)` call it finds.
+At runtime, Dox matches each route handler by its method name, HTTP method and the end of its path.
+If there is no match, it picks the only method with that name and the same argument types.
+Group prefixes (like `api/`) do not matter.
+
+!!! tip
+    Two controllers can have a method with the same name, like `index`.
+    When the route names the class, like `(LinkController c) => c.index` or `Route.get<LinkController>(...)`,
+    only methods of that class match. With a plain `links.index`, the path of the route call decides.
 
 ## Without Dox
 
@@ -27811,7 +27979,7 @@ Source: https://dartondox.dev/latest/guides/api-docs-with-openapi/
 
 # API docs with OpenAPI
 
-Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.
+Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.
 
 ## What you need
 
@@ -27819,6 +27987,8 @@ Turn on OpenAPI docs for the blog API, open the docs page, and make the docs bet
 - `build_runner` and `dox_builder`. A new app has both. `dox_core` already has `dox_openapi`, so you add no package.
 
 ## 1. Write the config
+
+An app made with `dox create` already serves the docs pages, but each route shows only its path and method. These steps add the full docs from your code.
 
 `build_runner` writes `lib/generated/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
 
@@ -27928,7 +28098,7 @@ Where each part comes from:
 | Part | Comes from |
 | --- | --- |
 | `tags: ["Post"]` | the class name `PostController`, without `Controller` |
-| `summary` | the first line of the `///` comment: `/// POST /api/posts` |
+| `summary` | no `@Summary` here, so the first line of the `///` comment: `/// POST /api/posts` |
 | `requestBody` | the argument `SavePost body` of `store` |
 | `401` and `bearerAuth` | `AuthMiddleware` on the route |
 | `422` | the route has a request class |
@@ -27978,7 +28148,7 @@ And this is its schema in `/openapi.json`:
 | `@Length(min: 3, max: 100)` | `"minLength": 3, "maxLength": 100` |
 | `@MinLength(10)` | `"minLength": 10` |
 | `@Email()` (in `RegisterUser`) | `"format": "email"` |
-| `/// A comment` or `@Describe('...')` | `"description"`. `@Describe` wins over the comment |
+| `@Describe('...')` or `/// A comment` | `"description"`. `@Describe` wins over the comment |
 | `@Trim()`, `@Lowercase()`, `@Unique(...)` | nothing. They change or check the value on the server only |
 
 A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`.
@@ -27988,20 +28158,19 @@ When you change a rule, run `build_runner` again, and the docs change with it.
 
 ## 6. Make the docs better
 
-Write a `///` comment on a controller method. The first line is the summary. The rest is the description.
-Add `@Tags` and `@Response` (from `dox_core`) when the automatic result is not what you want.
+Put annotations on a controller method: `@Summary`, `@Description`, `@Tags` and `@Response` (from `dox_core`).
+A `///` comment on the method also works for the summary and the description.
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 @Inject()
 class PostController {
-  /// List all posts
-  ///
-  /// Newest posts are not first. There is no paging yet.
+  @Summary('List all posts')
+  @Description('Newest posts are not first. There is no paging yet.')
   Future<List<Post>> index(DoxRequest req) async {
     return Post().all();
   }
 
-  /// Create a post
+  @Summary('Create a post')
   @Tags(<String>['Posts'])
   @Response(201, Post, description: 'The new post')
   Future<DoxResponse> store(SavePost body) async {
@@ -28050,10 +28219,10 @@ Run `dart run build_runner build` again and restart the app. The real result:
 
 - `@Response(201, Post)` replaces the empty `200`. The docs now match the real status code.
 - `@Tags(['Posts'])` moves the route to the group "Posts" in the docs page.
-- `@Summary('...')` and `@Description('...')` set the text without a `///` comment.
+- `@Summary('...')` and `@Description('...')` set the text. A `///` comment gives the same result. When a method has both, the annotation wins.
 - `@ApiIgnore()` leaves a method (or a whole controller) out of the docs.
 
-See [OpenAPI: change the docs](../packages/openapi.md#change-the-docs-optional) for all annotations.
+See [OpenAPI: describe a route](../packages/openapi.md#describe-a-route) for all annotations.
 
 ## 7. Turn it off in production
 
@@ -28063,6 +28232,10 @@ This is the default. `enabled` is `null`, so the docs routes are on only when `A
 curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/docs           # 404
 curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/openapi.json   # 404
 ```
+
+To turn the docs on in production, set `enabled: true`. See [OpenAPI: turn the docs on in production](../packages/openapi.md#turn-the-docs-on-in-production).
+
+To build the document at build time and serve the files in production, see [OpenAPI: production setup](../packages/openapi.md#production-setup).
 
 To show the docs on staging too, but never in production, set `enabled` yourself:
 
@@ -28080,7 +28253,7 @@ OpenApiConfig openApi = OpenApiConfig(
     `enabled: true` in production shows every route of your API to anyone. Only do it for a public API.
 
 To give the document to a front-end team without a running server, write it to files with `dox openapi:generate`.
-See [OpenAPI: write the files](../packages/openapi.md#write-the-files-dox-openapigenerate).
+See [OpenAPI: write the files](../packages/openapi.md#write-the-files).
 
 ## Check it
 

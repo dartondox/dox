@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.">
+        <meta name="description" content="Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="API docs with OpenAPI | Dox">
-  <meta property="og:description" content="Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.">
+  <meta property="og:description" content="Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.">
   <meta property="og:url" content="https://dartondox.dev/latest/guides/api-docs-with-openapi/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="API docs with OpenAPI | Dox">
-  <meta name="twitter:description" content="Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.">
+  <meta name="twitter:description" content="Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -6955,13 +6955,14 @@
 
 
 <h1 id="api-docs-with-openapi">API docs with OpenAPI</h1>
-<p>Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with comments and annotations.</p>
+<p>Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>The blog API from the <a href="../../tutorial/01-create-project/">tutorial</a>, or any Dox app.</li>
 <li><code>build_runner</code> and <code>dox_builder</code>. A new app has both. <code>dox_core</code> already has <code>dox_openapi</code>, so you add no package.</li>
 </ul>
 <h2 id="1-write-the-config">1. Write the config</h2>
+<p>An app made with <code>dox create</code> already serves the docs pages, but each route shows only its path and method. These steps add the full docs from your code.</p>
 <p><code>build_runner</code> writes <code>lib/generated/openapi.g.dart</code>. Its <code>openApiRegistry</code> holds what the builder found in your routes, controllers, DTOs and models. Pass it to an <code>OpenApiConfig</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/openapi.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/generated/openapi.g.dart'</span><span class="p">;</span>
@@ -7074,7 +7075,7 @@
 </tr>
 <tr>
 <td><code>summary</code></td>
-<td>the first line of the <code>///</code> comment: <code>/// POST /api/posts</code></td>
+<td>no <code>@Summary</code> here, so the first line of the <code>///</code> comment: <code>/// POST /api/posts</code></td>
 </tr>
 <tr>
 <td><code>requestBody</code></td>
@@ -7152,7 +7153,7 @@
 <td><code>"format": "email"</code></td>
 </tr>
 <tr>
-<td><code>/// A comment</code> or <code>@Describe('...')</code></td>
+<td><code>@Describe('...')</code> or <code>/// A comment</code></td>
 <td><code>"description"</code>. <code>@Describe</code> wins over the comment</td>
 </tr>
 <tr>
@@ -7165,30 +7166,29 @@
 Keys in <code>hidden</code> are left out. That is why <code>User</code> has no <code>password</code>.</p>
 <p>When you change a rule, run <code>build_runner</code> again, and the docs change with it.</p>
 <h2 id="6-make-the-docs-better">6. Make the docs better</h2>
-<p>Write a <code>///</code> comment on a controller method. The first line is the summary. The rest is the description.
-Add <code>@Tags</code> and <code>@Response</code> (from <code>dox_core</code>) when the automatic result is not what you want.</p>
+<p>Put annotations on a controller method: <code>@Summary</code>, <code>@Description</code>, <code>@Tags</code> and <code>@Response</code> (from <code>dox_core</code>).
+A <code>///</code> comment on the method also works for the summary and the description.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/post.controller.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@Inject</span><span class="p">()</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">PostController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="c1">/// List all posts</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="c1">///</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="c1">/// Newest posts are not first. There is no paging yet.</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">index</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">all</span><span class="p">();</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="c1">/// Create a post</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="nd">@Tags</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Posts'</span><span class="p">])</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="nd">@Response</span><span class="p">(</span><span class="m">201</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'The new post'</span><span class="p">)</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">SavePost</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">    </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Post</span><span class="p">()</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">      </span><span class="p">..</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">title</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="p">..</span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">body</span><span class="p">;</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">post</span><span class="p">).</span><span class="n">statusCode</span><span class="p">(</span><span class="m">201</span><span class="p">);</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="p">}</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nd">@Summary</span><span class="p">(</span><span class="s1">'List all posts'</span><span class="p">)</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nd">@Description</span><span class="p">(</span><span class="s1">'Newest posts are not first. There is no paging yet.'</span><span class="p">)</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">index</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">all</span><span class="p">();</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="nd">@Summary</span><span class="p">(</span><span class="s1">'Create a post'</span><span class="p">)</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="nd">@Tags</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Posts'</span><span class="p">])</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="nd">@Response</span><span class="p">(</span><span class="m">201</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'The new post'</span><span class="p">)</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">SavePost</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Post</span><span class="p">()</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">      </span><span class="p">..</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">title</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">      </span><span class="p">..</span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">body</span><span class="p">;</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">post</span><span class="p">).</span><span class="n">statusCode</span><span class="p">(</span><span class="m">201</span><span class="p">);</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Run <code>dart run build_runner build</code> again and restart the app. The real result:</p>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">"get"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
@@ -7222,15 +7222,17 @@ Add <code>@Tags</code> and <code>@Response</code> (from <code>dox_core</code>) w
 <ul>
 <li><code>@Response(201, Post)</code> replaces the empty <code>200</code>. The docs now match the real status code.</li>
 <li><code>@Tags(['Posts'])</code> moves the route to the group "Posts" in the docs page.</li>
-<li><code>@Summary('...')</code> and <code>@Description('...')</code> set the text without a <code>///</code> comment.</li>
+<li><code>@Summary('...')</code> and <code>@Description('...')</code> set the text. A <code>///</code> comment gives the same result. When a method has both, the annotation wins.</li>
 <li><code>@ApiIgnore()</code> leaves a method (or a whole controller) out of the docs.</li>
 </ul>
-<p>See <a href="../../packages/openapi/#change-the-docs-optional">OpenAPI: change the docs</a> for all annotations.</p>
+<p>See <a href="../../packages/openapi/#describe-a-route">OpenAPI: describe a route</a> for all annotations.</p>
 <h2 id="7-turn-it-off-in-production">7. Turn it off in production</h2>
 <p>This is the default. <code>enabled</code> is <code>null</code>, so the docs routes are on only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. With <code>APP_ENV=production</code> all three routes give <code>404</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-o<span class="w"> </span>/dev/null<span class="w"> </span>-w<span class="w"> </span><span class="s1">'%{http_code}\n'</span><span class="w"> </span>http://localhost:3000/docs<span class="w">           </span><span class="c1"># 404</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>curl<span class="w"> </span>-o<span class="w"> </span>/dev/null<span class="w"> </span>-w<span class="w"> </span><span class="s1">'%{http_code}\n'</span><span class="w"> </span>http://localhost:3000/openapi.json<span class="w">   </span><span class="c1"># 404</span>
 </span></code></pre></div>
+<p>To turn the docs on in production, set <code>enabled: true</code>. See <a href="../../packages/openapi/#turn-the-docs-on-in-production">OpenAPI: turn the docs on in production</a>.</p>
+<p>To build the document at build time and serve the files in production, see <a href="../../packages/openapi/#production-setup">OpenAPI: production setup</a>.</p>
 <p>To show the docs on staging too, but never in production, set <code>enabled</code> yourself:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/openapi.dart</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/config/env.dart'</span><span class="p">;</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
@@ -7245,7 +7247,7 @@ Add <code>@Tags</code> and <code>@Response</code> (from <code>dox_core</code>) w
 <p><code>enabled: true</code> in production shows every route of your API to anyone. Only do it for a public API.</p>
 </div>
 <p>To give the document to a front-end team without a running server, write it to files with <code>dox openapi:generate</code>.
-See <a href="../../packages/openapi/#write-the-files-dox-openapigenerate">OpenAPI: write the files</a>.</p>
+See <a href="../../packages/openapi/#write-the-files">OpenAPI: write the files</a>.</p>
 <h2 id="check-it">Check it</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>curl<span class="w"> </span>-s<span class="w"> </span>http://localhost:3000/openapi.json<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">5</span>
 </span></code></pre></div>

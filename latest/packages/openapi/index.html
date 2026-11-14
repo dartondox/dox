@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.">
+        <meta name="description" content="This page shows how to make OpenAPI 3.1 docs for your Dox API, how to describe each route, and how to change the result.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="OpenAPI | Dox">
-  <meta property="og:description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.">
+  <meta property="og:description" content="This page shows how to make OpenAPI 3.1 docs for your Dox API, how to describe each route, and how to change the result.">
   <meta property="og:url" content="https://dartondox.dev/latest/packages/openapi/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="OpenAPI | Dox">
-  <meta name="twitter:description" content="This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.">
+  <meta name="twitter:description" content="This page shows how to make OpenAPI 3.1 docs for your Dox API, how to describe each route, and how to change the result.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -5026,44 +5026,105 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#in-a-dox-app" class="md-nav__link">
+  <a href="#setup-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In a Dox app
+        Setup (optional)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="In a Dox app">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#describe-a-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Describe a route
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#login-schemes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Login schemes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-dox-fills-in-for-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Dox fills in for you
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Dox fills in for you">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-run-the-builder" class="md-nav__link">
+  <a href="#comments-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Run the builder
+        /// comments (optional)
       
     </span>
   </a>
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#2-pass-the-result-to-the-config" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Pass the result to the config
+        Config options
       
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Config options">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#3-open-docs" class="md-nav__link">
+  <a href="#turn-the-docs-on-in-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Open /docs
+        Turn the docs on in production
       
     </span>
   </a>
@@ -5087,10 +5148,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-you-write-what-you-get" class="md-nav__link">
+  <a href="#write-the-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you write, what you get
+        Write the files
       
     </span>
   </a>
@@ -5098,69 +5159,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-each-part-is-found" class="md-nav__link">
+  <a href="#production-setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How each part is found
+        Production setup
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="How each part is found">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Request
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#response" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Response
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#change-the-docs-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Change the docs (optional)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Change the docs (optional)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#login-schemes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Login schemes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5172,23 +5177,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="How a route finds its docs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#write-the-files-dox-openapigenerate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write the files: dox openapi:generate
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -6883,44 +6871,105 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#in-a-dox-app" class="md-nav__link">
+  <a href="#setup-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In a Dox app
+        Setup (optional)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="In a Dox app">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#describe-a-route" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Describe a route
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#request" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Request
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#login-schemes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Login schemes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-dox-fills-in-for-you" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Dox fills in for you
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="What Dox fills in for you">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#1-run-the-builder" class="md-nav__link">
+  <a href="#comments-optional" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Run the builder
+        /// comments (optional)
       
     </span>
   </a>
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#2-pass-the-result-to-the-config" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#config-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Pass the result to the config
+        Config options
       
     </span>
   </a>
   
-</li>
+    <nav class="md-nav" aria-label="Config options">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#3-open-docs" class="md-nav__link">
+  <a href="#turn-the-docs-on-in-production" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Open /docs
+        Turn the docs on in production
       
     </span>
   </a>
@@ -6944,10 +6993,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-you-write-what-you-get" class="md-nav__link">
+  <a href="#write-the-files" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What you write, what you get
+        Write the files
       
     </span>
   </a>
@@ -6955,69 +7004,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-each-part-is-found" class="md-nav__link">
+  <a href="#production-setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How each part is found
+        Production setup
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="How each part is found">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Request
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#response" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Response
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#change-the-docs-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Change the docs (optional)
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Change the docs (optional)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#login-schemes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Login schemes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7029,23 +7022,6 @@
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="How a route finds its docs">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#write-the-files-dox-openapigenerate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write the files: dox openapi:generate
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7086,355 +7062,125 @@
 
 
 <h1 id="openapi">OpenAPI</h1>
-<p>This page shows how Dox makes OpenAPI 3.1 docs for your API, and how to change them.</p>
-<p>You write no docs code. You get a <a href="https://github.com/scalar/scalar">Scalar</a> docs page at <code>/docs</code>, plus <code>/openapi.json</code> and <code>/openapi.yaml</code>.</p>
+<p>This page shows how to make OpenAPI 3.1 docs for your Dox API, how to describe each route, and how to change the result.</p>
+<p>You get three things:</p>
+<ul>
+<li><code>/docs</code>: a <a href="https://github.com/scalar/scalar">Scalar</a> page with every route and "Try it" buttons.</li>
+<li><code>/openapi.json</code>: the OpenAPI document as JSON.</li>
+<li><code>/openapi.yaml</code>: the same document as YAML.</li>
+</ul>
 <p>The docs come from three places:</p>
 <ul>
 <li><strong>the routes</strong>: method, path, path params, middleware (login),</li>
 <li><strong>the request classes</strong>: a <code>@Dto</code> class,</li>
-<li><strong>the controllers</strong>: the <code>///</code> comment, the arguments and the return type of each method.</li>
+<li><strong>the controllers</strong>: the annotations (<code>@Summary</code>, <code>@Response</code> and more), the arguments and the return type of each method.</li>
 </ul>
-<h2 id="in-a-dox-app">In a Dox app</h2>
-<h3 id="1-run-the-builder">1. Run the builder</h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w">      </span><span class="c1"># or: dox build_runner:build</span>
+<h2 id="setup-optional">Setup (optional)</h2>
+<div class="admonition note">
+<p class="admonition-title">Made with <code>dox create</code>?</p>
+<p>Your app already serves <code>/docs</code>, <code>/openapi.json</code> and <code>/openapi.yaml</code> while <code>APP_ENV</code> is <code>development</code>. The template <code>.env</code> sets this. You need no setup for that.
+But the config does not have <code>openApiRegistry</code> yet. So each route shows only its path and method.
+Do the steps below when you want the full docs from your code (annotations, request and response schemas), or when you want to change the title or other options.</p>
+</div>
+<ol>
+<li>
+<p>Write the config. Pass the generated <code>openApiRegistry</code> to it:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/openapi.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/openapi.g.dart'</span><span class="p">;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="nl">info:</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Blog API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>The import of <code>generated/openapi.g.dart</code> shows an error until the builder runs in step 3.</p>
+</li>
+<li>
+<p>Add it to <code>AppConfig</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/openapi.dart'</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nl">openApi:</span><span class="w"> </span><span class="n">openApi</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">);</span>
+</span></code></pre></div>
+</li>
+<li>
+<p>Run the builder:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w">      </span><span class="c1"># or: dox build_runner:build</span>
 </span></code></pre></div>
 <p><code>dox_builder</code> reads your code and writes <code>lib/generated/openapi.g.dart</code>.
 Run it again after you change routes, controllers, request classes or models.
 <code>dox build_runner:watch</code> does it for you while you work.</p>
-<h3 id="2-pass-the-result-to-the-config">2. Pass the result to the config</h3>
-<div class="language-dart highlight"><span class="filename">lib/config/openapi.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/openapi.g.dart'</span><span class="p">;</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nl">info:</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Blog API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">);</span>
+</li>
+<li>
+<p>Make sure <code>.env</code> has <code>APP_ENV=development</code>. Then start the app and open <code>http://localhost:3000/docs</code>.
+    Without <code>APP_ENV=development</code>, <code>/docs</code> gives 404.
+    The document is built on the first <code>/docs</code> request, then kept.</p>
+</li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The docs are on only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.
+If <code>APP_ENV</code> is not set, Dox treats the app as production: <code>/docs</code> is off and error details are hidden.
+Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI.
+To turn the docs on in production, see <a href="#turn-the-docs-on-in-production">Turn the docs on in production</a>.</p>
+</div>
+<h2 id="describe-a-route">Describe a route</h2>
+<p>Put annotations on a controller method. They are all in <code>dox_core</code>.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">BlogController</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nd">@Summary</span><span class="p">(</span><span class="s1">'Get one blog'</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nd">@Description</span><span class="p">(</span><span class="s1">'Deleted blogs are not found.'</span><span class="p">)</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nd">@Tags</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Blogs'</span><span class="p">])</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nd">@Summary</span><span class="p">(</span><span class="s1">'Create a blog'</span><span class="p">)</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nd">@Response</span><span class="p">(</span><span class="m">201</span><span class="p">,</span><span class="w"> </span><span class="n">Blog</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'The new blog'</span><span class="p">)</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">CreateBlog</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">}</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1">// routes</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/blogs/{id}'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="p">(</span><span class="n">BlogController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">]);</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/openapi.dart'</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">openApi:</span><span class="w"> </span><span class="n">openApi</span><span class="p">,</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">);</span>
-</span></code></pre></div>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Default</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>enabled</code></td>
-<td><code>null</code></td>
-<td><code>true</code> or <code>false</code> turns the docs routes on or off. <code>null</code>: on only when <code>APP_ENV</code> is <code>development</code> or <code>local</code></td>
-</tr>
-<tr>
-<td><code>info</code></td>
-<td><code>Info(title: 'Dox API', version: '1.0.0')</code></td>
-<td>title and version of the API</td>
-</tr>
-<tr>
-<td><code>servers</code></td>
-<td><code>[]</code></td>
-<td>base URLs, like <code>[Server('https://api.my.app')]</code></td>
-</tr>
-<tr>
-<td><code>registry</code></td>
-<td>empty</td>
-<td><code>openApiRegistry</code> from <code>lib/generated/openapi.g.dart</code></td>
-</tr>
-<tr>
-<td><code>securitySchemes</code>, <code>securityByMiddleware</code></td>
-<td><code>{}</code></td>
-<td>see <a href="#login-schemes">Login schemes</a></td>
-</tr>
-<tr>
-<td><code>ui</code></td>
-<td><code>DocsUi.scalar</code></td>
-<td>the docs page: <code>DocsUi.scalar</code> or <code>DocsUi.swagger</code></td>
-</tr>
-<tr>
-<td><code>scalar</code></td>
-<td><code>ScalarOptions()</code></td>
-<td>see <a href="#the-docs-page">The docs page</a></td>
-</tr>
-<tr>
-<td><code>pageTitle</code></td>
-<td><code>info.title</code></td>
-<td>title of the <code>/docs</code> page</td>
-</tr>
-<tr>
-<td><code>include</code></td>
-<td><code>[]</code> (all routes)</td>
-<td>only these paths go in the docs, like <code>['/api/*']</code></td>
-</tr>
-<tr>
-<td><code>exclude</code></td>
-<td><code>[]</code></td>
-<td>these paths are left out, like <code>['/api/internal/*']</code></td>
-</tr>
-</tbody>
-</table>
-<p>If <code>APP_ENV</code> is not set, Dox treats the app as production: <code>/docs</code> is off and error details are hidden. Set <code>APP_ENV=development</code> in your <code>.env</code> and in CI.</p>
-<h3 id="3-open-docs">3. Open <code>/docs</code></h3>
-<p>Start the app and open <code>http://localhost:3000/docs</code>.
-In production the docs are off, unless you set <code>enabled: true</code>.
-The document is built on the first <code>/docs</code> request, then kept.</p>
-<h3 id="the-docs-page">The docs page</h3>
-<p>The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads <code>/openapi.json</code>.
-Change the look with <code>scalar:</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">OpenApiConfig</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">pageTitle:</span><span class="w"> </span><span class="s1">'Blog API docs'</span><span class="p">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">scalar:</span><span class="w"> </span><span class="n">ScalarOptions</span><span class="p">(</span><span class="nl">theme:</span><span class="w"> </span><span class="n">ScalarTheme</span><span class="p">.</span><span class="n">purple</span><span class="p">,</span><span class="w"> </span><span class="nl">darkMode:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">);</span>
-</span></code></pre></div>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Default</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>theme</code></td>
-<td><code>ScalarTheme.default_</code></td>
-<td>Color theme. Same names as Scalar: <code>moon</code>, <code>purple</code>, <code>deepSpace</code>, <code>saturn</code>, <code>kepler</code>, <code>mars</code> and more.</td>
-</tr>
-<tr>
-<td><code>darkMode</code></td>
-<td><code>false</code></td>
-<td>Start in dark mode. The user can still switch.</td>
-</tr>
-<tr>
-<td><code>showDownloadButton</code></td>
-<td><code>true</code></td>
-<td>Show the button that downloads the document.</td>
-</tr>
-<tr>
-<td><code>proxyUrl</code></td>
-<td><code>null</code></td>
-<td>Send "Try it" requests through this proxy. Off by default, so requests go from the browser straight to your API.</td>
-</tr>
-</tbody>
-</table>
-<p><code>pageTitle</code> and all options are escaped, so a value can not break the page.</p>
-<p>To use Swagger UI instead, set <code>ui:</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">OpenApiConfig</span><span class="p">(</span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span><span class="w"> </span><span class="nl">ui:</span><span class="w"> </span><span class="n">DocsUi</span><span class="p">.</span><span class="n">swagger</span><span class="p">);</span>
-</span></code></pre></div>
-<h2 id="what-you-write-what-you-get">What you write, what you get</h2>
-<p>A normal controller. There are no docs annotations here:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">BlogController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="c1">/// Get one blog</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="c1">///</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="c1">/// Deleted blogs are not found.</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="c1">/// Create a blog</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">CreateBlog</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">}</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="c1">// routes</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/blogs/{id}'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="p">(</span><span class="n">BlogController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">]);</span>
-</span></code></pre></div>
-<p>The generated docs for <code>GET /blogs/{id}</code>:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">get</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Blog</span><span class="p p-Indicator">]</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get one blog</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deleted blogs are not found.</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nt">operationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BlogController.show</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nt">parameters</span><span class="p">:</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">id</span><span class="p p-Indicator">,</span><span class="nt"> in</span><span class="p">:</span><span class="w"> </span><span class="nv">path</span><span class="p p-Indicator">,</span><span class="nt"> required</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> schema</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="nv">string</span><span class="p p-Indicator">}}</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nt">responses</span><span class="p">:</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="s">"200"</span><span class="p p-Indicator">:</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">      </span><span class="nt">content</span><span class="p">:</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">        </span><span class="nt">application/json</span><span class="p">:</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">          </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">"#/components/schemas/Blog"</span><span class="p p-Indicator">}</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="s">"401"</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="nv">Not logged in</span><span class="p p-Indicator">}</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="s">"404"</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="nv">Not found</span><span class="p p-Indicator">}</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="s">"500"</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="nv">Server error</span><span class="p p-Indicator">}</span>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">  </span><span class="nt">security</span><span class="p">:</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">bearerAuth</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
+<p>Here is what you get. The generated docs for <code>GET /blogs/{id}</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">get</span><span class="p">:</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Blogs</span><span class="p p-Indicator">]</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Get one blog</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deleted blogs are not found.</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">operationId</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">BlogController.show</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">parameters</span><span class="p">:</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="nv">id</span><span class="p p-Indicator">,</span><span class="nt"> in</span><span class="p">:</span><span class="w"> </span><span class="nv">path</span><span class="p p-Indicator">,</span><span class="nt"> required</span><span class="p">:</span><span class="w"> </span><span class="nv">true</span><span class="p p-Indicator">,</span><span class="nt"> schema</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="nv">string</span><span class="p p-Indicator">}}</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="nt">responses</span><span class="p">:</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">    </span><span class="s">"200"</span><span class="p p-Indicator">:</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="nt">content</span><span class="p">:</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">        </span><span class="nt">application/json</span><span class="p">:</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">          </span><span class="nt">schema</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">"#/components/schemas/Blog"</span><span class="p p-Indicator">}</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="s">"401"</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="nv">Not logged in</span><span class="p p-Indicator">}</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">    </span><span class="s">"404"</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="nv">Not found</span><span class="p p-Indicator">}</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="s">"500"</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="nv">Server error</span><span class="p p-Indicator">}</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">  </span><span class="nt">security</span><span class="p">:</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">bearerAuth</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[]</span>
 </span></code></pre></div>
 <p><code>Blog</code> is in <code>components/schemas</code>, made from the model:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">Blog</span><span class="p">:</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">properties</span><span class="p">:</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">    </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="nv">integer</span><span class="p p-Indicator">}</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"null"</span><span class="p p-Indicator">]}</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">anyOf</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[{</span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">"#/components/schemas/User"</span><span class="p p-Indicator">},</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"null"</span><span class="p p-Indicator">}]}</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"null"</span><span class="p p-Indicator">],</span><span class="nt"> format</span><span class="p">:</span><span class="w"> </span><span class="nv">date-time</span><span class="p p-Indicator">}</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">Blog</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">object</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">properties</span><span class="p">:</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="nv">integer</span><span class="p p-Indicator">}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"null"</span><span class="p p-Indicator">]}</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">    </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">anyOf</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[{</span><span class="nt">$ref</span><span class="p">:</span><span class="w"> </span><span class="s">"#/components/schemas/User"</span><span class="p p-Indicator">},</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">"null"</span><span class="p p-Indicator">}]}</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="nt">created_at</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">string</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">"null"</span><span class="p p-Indicator">],</span><span class="nt"> format</span><span class="p">:</span><span class="w"> </span><span class="nv">date-time</span><span class="p p-Indicator">}</span>
 </span></code></pre></div>
-<h2 id="how-each-part-is-found">How each part is found</h2>
-<table>
-<thead>
-<tr>
-<th>Part of the docs</th>
-<th>Where it comes from</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>path, method</td>
-<td>the live route table</td>
-</tr>
-<tr>
-<td>path param types</td>
-<td>the controller arguments after the first one, in order. <code>int id</code> gives <code>integer</code></td>
-</tr>
-<tr>
-<td>tags</td>
-<td>the controller class name without <code>Controller</code> (<code>BlogController</code> gives <code>Blog</code>)</td>
-</tr>
-<tr>
-<td>operationId</td>
-<td><code>Class.method</code>, for example <code>BlogController.show</code></td>
-</tr>
-<tr>
-<td>summary</td>
-<td>the first line of the <code>///</code> comment</td>
-</tr>
-<tr>
-<td>description</td>
-<td>the rest of the <code>///</code> comment</td>
-</tr>
-<tr>
-<td>request</td>
-<td>see <a href="#request">Request</a> below</td>
-</tr>
-<tr>
-<td>200 answer</td>
-<td>the return type, see <a href="#response">Response</a> below</td>
-</tr>
-<tr>
-<td><code>401</code> and a login scheme</td>
-<td><code>@Security</code> on a middleware class, or a middleware whose class name ends with <code>AuthMiddleware</code>. See <a href="#login-schemes">Login schemes</a></td>
-</tr>
-<tr>
-<td><code>401</code> and <code>403</code></td>
-<td>the <code>Can</code> middleware on the route, or a <code>req.authorize(...)</code> call in the controller method</td>
-</tr>
-<tr>
-<td><code>403</code></td>
-<td>the <code>GuestMiddleware</code> or <code>ValidateSignature</code> middleware on the route, or a <code>Gate.authorize(...)</code> call in the controller method</td>
-</tr>
-<tr>
-<td><code>404</code></td>
-<td>the path has a <code>{param}</code>. The short path of an optional param, like <code>/blog</code>, has no <code>404</code></td>
-</tr>
-<tr>
-<td><code>422</code></td>
-<td>the route has a request class, or the controller method calls <code>req.validate&lt;T&gt;()</code> or <code>req.validateSchema(...)</code>. The body is <code>{field: message}</code></td>
-</tr>
-<tr>
-<td><code>500</code></td>
-<td>every route</td>
-</tr>
-</tbody>
-</table>
-<p><code>Can</code>, <code>GuestMiddleware</code> and <code>ValidateSignature</code> are found by their class name. <code>req.authorize(...)</code> is found when it is called on the request (<code>DoxRequest</code> or <code>IDoxRequest</code>) in the controller method. <code>Gate.authorize(...)</code> is found when <code>Gate</code> is the class of <code>dox_auth</code>. A <code>@Response</code> with the same status wins over an automatic answer.</p>
-<p><code>GuestMiddleware(redirectTo: ...)</code> also shows a <code>403</code>, but the app sends a redirect. Put <code>@Response(403, ...)</code> on the method to replace it.</p>
-<p>Routes that the builder does not know (for example inline closures) still get a basic entry.</p>
-<p>An optional param shows as two paths. The route <code>/blog/{id?}</code> gives <code>/blog/{id}</code> and <code>/blog</code>. OpenAPI path params must always be required.
-An optional param in the middle, like <code>/a/{x?}/b</code>, also gives the path without it: <code>/a/{x}/b</code> and <code>/a/b</code>.
-Optional params next to each other are dropped from the right, the same way the Dox router matches them.
-When the summary and operation id are made from the path, the short path gets its own, like <code>GET /blog</code> and <code>getBlog</code>.</p>
-<h3 id="request">Request</h3>
-<p>The builder looks in this order. The first one wins.</p>
-<ol>
-<li><code>@Body(T)</code>, <code>@Query(T)</code> or <code>@Request(T)</code> on the method.</li>
-<li>An argument whose type is a <code>@Dto</code> class: <code>store(CreateBlog body)</code>.</li>
-<li>A <code>req.validate&lt;T&gt;()</code> call in the method, where <code>T</code> is a <code>@Dto</code> class.</li>
-</ol>
-<p>For <code>POST</code>, <code>PUT</code> and <code>PATCH</code> the request is the JSON body.
-For other methods each field is one query parameter.
-<code>@Dto(source: Source.query)</code> or <code>Source.body</code> chooses the place by hand.
-The route <code>body:</code> option still works, and it wins over all of these.</p>
-<p>A <code>@Dto</code> class:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@Dto</span><span class="p">()</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateBlog</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nd">@Length</span><span class="p">(</span><span class="nl">min:</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="nl">max:</span><span class="w"> </span><span class="m">200</span><span class="p">)</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="c1">/// Text of the blog.</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">description</span><span class="p">;</span><span class="w">   </span><span class="c1">// nullable: optional</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">views</span><span class="p">;</span><span class="w">             </span><span class="c1">// default: optional, `default: 0`</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">Status</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w">         </span><span class="c1">// enum: only `draft` or `published`</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Tag</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tags</span><span class="p">;</span><span class="w">        </span><span class="c1">// a list of another @Dto class</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">CreateBlog</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">description</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">views</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">tags</span><span class="p">});</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>The keys are the same as the keys the DTO reads: snake_case by default (<code>postCode</code> is <code>post_code</code>),
-or <code>@Name('key')</code>, or <code>@Dto(keyCase: KeyCase.field)</code>.
-Each rule annotation adds its JSON Schema keys. See the <a href="../../the-basic/validation-rules/">rules reference</a>.</p>
-<h3 id="response">Response</h3>
-<p>The return type of the method gives the <code>200</code> answer. <code>Future&lt;T&gt;</code> counts as <code>T</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Return type</th>
-<th>Schema</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>a model (<code>@DoxModel</code>)</td>
-<td><code>$ref</code> to the model. Keys in <code>hidden</code> are left out</td>
-</tr>
-<tr>
-<td><code>List&lt;Model&gt;</code></td>
-<td>an array of the model</td>
-</tr>
-<tr>
-<td>a <code>@Dto</code> class</td>
-<td><code>$ref</code> to the class</td>
-</tr>
-<tr>
-<td>a <code>Serializer&lt;Model&gt;</code></td>
-<td>the map that <code>convert()</code> returns, else the model</td>
-</tr>
-<tr>
-<td><code>Pagination</code></td>
-<td><code>total</code>, <code>per_page</code>, <code>last_page</code>, <code>current_page</code>, <code>data</code></td>
-</tr>
-<tr>
-<td><code>String</code>, <code>int</code>, <code>bool</code>, <code>Map</code>, <code>List</code></td>
-<td>the basic JSON type</td>
-</tr>
-<tr>
-<td><code>dynamic</code></td>
-<td>the types of the <code>return</code> values. A map literal gives its keys. Exceptions are left out</td>
-</tr>
-<tr>
-<td><code>DoxResponse</code>, <code>void</code></td>
-<td>no schema</td>
-</tr>
-</tbody>
-</table>
-<p>A model schema has the primary key, the <code>@Column</code> fields, <code>created_at</code>, <code>updated_at</code>,
-the relations (only there when loaded) and the <code>@Computed</code> getters.</p>
-<h2 id="change-the-docs-optional">Change the docs (optional)</h2>
-<p>Add these to a controller method when the automatic result is not what you want.
-They are all in <code>dox_core</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@Summary</span><span class="p">(</span><span class="s1">'Log in'</span><span class="p">)</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nd">@Description</span><span class="p">(</span><span class="s1">'Gives a bearer token for the Authorization header.'</span><span class="p">)</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nd">@Tags</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Auth'</span><span class="p">])</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nd">@Request</span><span class="p">(</span><span class="n">LoginUser</span><span class="p">)</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="nd">@Response</span><span class="p">(</span><span class="m">200</span><span class="p">,</span><span class="w"> </span><span class="n">LoginResult</span><span class="p">)</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="nd">@Response</span><span class="p">(</span><span class="m">401</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'Wrong email or password'</span><span class="p">)</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">login</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<p>Annotations are all optional. Without them, Dox fills in the docs for you, see <a href="#what-dox-fills-in-for-you">What Dox fills in for you</a>.</p>
+<p>Another example, with a request and more than one answer:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Summary</span><span class="p">(</span><span class="s1">'Log in'</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="nd">@Description</span><span class="p">(</span><span class="s1">'Gives a bearer token for the Authorization header.'</span><span class="p">)</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="nd">@Tags</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Auth'</span><span class="p">])</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nd">@Request</span><span class="p">(</span><span class="n">LoginUser</span><span class="p">)</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="nd">@Response</span><span class="p">(</span><span class="m">200</span><span class="p">,</span><span class="w"> </span><span class="n">LoginResult</span><span class="p">)</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="nd">@Response</span><span class="p">(</span><span class="m">401</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'Wrong email or password'</span><span class="p">)</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">login</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7489,16 +7235,95 @@ They are all in <code>dox_core</code>.</p>
 <p>The <code>Type</code> of <code>@Response</code> can be a model, <code>List&lt;User&gt;</code>, a <code>@Dto</code>, a <code>Serializer</code> or a basic type like <code>String</code>.</p>
 <p>Each annotation also has a lower case name, like <code>@summary('Log in')</code>.
 Only <code>@Response</code> has none, because <code>response()</code> is already a <code>dox_core</code> helper.</p>
-<h3 id="login-schemes">Login schemes</h3>
+<h2 id="request">Request</h2>
+<p>The builder looks in this order. The first one wins.</p>
+<ol>
+<li><code>@Body(T)</code>, <code>@Query(T)</code> or <code>@Request(T)</code> on the method.</li>
+<li>An argument whose type is a <code>@Dto</code> class: <code>store(CreateBlog body)</code>.</li>
+<li>A <code>req.validate&lt;T&gt;()</code> call in the method, where <code>T</code> is a <code>@Dto</code> class.</li>
+</ol>
+<p>For <code>POST</code>, <code>PUT</code> and <code>PATCH</code> the request is the JSON body.
+For other methods each field is one query parameter.
+<code>@Dto(source: Source.query)</code> or <code>Source.body</code> chooses the place by hand.
+The route <code>body:</code> option still works, and it wins over all of these.</p>
+<p>A <code>@Dto</code> class:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@Dto</span><span class="p">()</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateBlog</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nd">@Length</span><span class="p">(</span><span class="nl">min:</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="nl">max:</span><span class="w"> </span><span class="m">200</span><span class="p">)</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="c1">/// Text of the blog.</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">description</span><span class="p">;</span><span class="w">   </span><span class="c1">// nullable: optional</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">views</span><span class="p">;</span><span class="w">             </span><span class="c1">// default: optional, `default: 0`</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">Status</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w">         </span><span class="c1">// enum: only `draft` or `published`</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Tag</span><span class="o">&gt;</span><span class="w"> </span><span class="n">tags</span><span class="p">;</span><span class="w">        </span><span class="c1">// a list of another @Dto class</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">CreateBlog</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">description</span><span class="p">,</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">views</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">      </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">tags</span><span class="p">});</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The keys are the same as the keys the DTO reads: snake_case by default (<code>postCode</code> is <code>post_code</code>),
+or <code>@Name('key')</code>, or <code>@Dto(keyCase: KeyCase.field)</code>.
+Each rule annotation adds its JSON Schema keys. See the <a href="../../the-basic/validation-rules/">rules reference</a>.</p>
+<h2 id="response">Response</h2>
+<p>The return type of the method gives the <code>200</code> answer. <code>Future&lt;T&gt;</code> counts as <code>T</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Return type</th>
+<th>Schema</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a model (<code>@DoxModel</code>)</td>
+<td><code>$ref</code> to the model. Keys in <code>hidden</code> are left out</td>
+</tr>
+<tr>
+<td><code>List&lt;Model&gt;</code></td>
+<td>an array of the model</td>
+</tr>
+<tr>
+<td>a <code>@Dto</code> class</td>
+<td><code>$ref</code> to the class</td>
+</tr>
+<tr>
+<td>a <code>Serializer&lt;Model&gt;</code></td>
+<td>the map that <code>convert()</code> returns, else the model</td>
+</tr>
+<tr>
+<td><code>Pagination</code></td>
+<td><code>total</code>, <code>per_page</code>, <code>last_page</code>, <code>current_page</code>, <code>data</code></td>
+</tr>
+<tr>
+<td><code>String</code>, <code>int</code>, <code>bool</code>, <code>Map</code>, <code>List</code></td>
+<td>the basic JSON type</td>
+</tr>
+<tr>
+<td><code>dynamic</code></td>
+<td>the types of the <code>return</code> values. A map literal gives its keys. Exceptions are left out</td>
+</tr>
+<tr>
+<td><code>DoxResponse</code>, <code>void</code></td>
+<td>no schema</td>
+</tr>
+</tbody>
+</table>
+<p>A model schema has the primary key, the <code>@Column</code> fields, <code>created_at</code>, <code>updated_at</code>,
+the relations (only there when loaded) and the <code>@Computed</code> getters.</p>
+<h2 id="login-schemes">Login schemes</h2>
 <p>Put <code>@Security</code> above a middleware class. Every route with this middleware gets the scheme in the docs.
 Run <code>dart run build_runner build</code> after you add it.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">/// `Authorization: Bearer &lt;api key&gt;`. Not a JWT.</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nd">@Security</span><span class="p">.</span><span class="n">bearer</span><span class="p">(</span><span class="nl">format:</span><span class="w"> </span><span class="s1">'API key'</span><span class="p">)</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiKeyAuthMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="c1">/// `X-API-Key: &lt;key&gt;`</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="nd">@Security</span><span class="p">.</span><span class="n">apiKey</span><span class="p">(</span><span class="nl">header:</span><span class="w"> </span><span class="s1">'X-API-Key'</span><span class="p">)</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">HeaderKeyMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">/// `Authorization: Bearer &lt;api key&gt;`. Not a JWT.</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nd">@Security</span><span class="p">.</span><span class="n">bearer</span><span class="p">(</span><span class="nl">format:</span><span class="w"> </span><span class="s1">'API key'</span><span class="p">)</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiKeyAuthMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="c1">/// `X-API-Key: &lt;key&gt;`</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nd">@Security</span><span class="p">.</span><span class="n">apiKey</span><span class="p">(</span><span class="nl">header:</span><span class="w"> </span><span class="s1">'X-API-Key'</span><span class="p">)</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">HeaderKeyMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -7527,18 +7352,364 @@ Use <code>scheme: 'myName'</code> to pick another name.</p>
 <p>A middleware without <code>@Security</code> whose class name ends with <code>AuthMiddleware</code> gets <code>bearerAuth</code>: a bearer token with no format, because Dox can not know if it is a JWT.</p>
 <p>For a key in the query or a cookie, or to change a scheme without the builder, set it in the config.
 The config wins over <code>@Security</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">OpenApiConfig</span><span class="p">(</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nl">securitySchemes:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">SecurityScheme</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">    </span><span class="s1">'apiKey'</span><span class="o">:</span><span class="w"> </span><span class="n">SecurityScheme</span><span class="p">.</span><span class="n">apiKey</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'X-API-Key'</span><span class="p">),</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nl">securityByMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="s1">'ApiKeyMiddleware'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;</span><span class="p">[</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">      </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="s1">'apiKey'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[]},</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="p">],</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">OpenApiConfig</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">securitySchemes:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">SecurityScheme</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="s1">'apiKey'</span><span class="o">:</span><span class="w"> </span><span class="n">SecurityScheme</span><span class="p">.</span><span class="n">apiKey</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'X-API-Key'</span><span class="p">),</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nl">securityByMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;&gt;</span><span class="p">{</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="s1">'ApiKeyMiddleware'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;&gt;</span><span class="p">[</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">      </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="p">{</span><span class="s1">'apiKey'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[]},</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="p">],</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="p">);</span>
 </span></code></pre></div>
+<h2 id="what-dox-fills-in-for-you">What Dox fills in for you</h2>
+<p>You do not have to write all of the above. A normal controller already gets docs. Annotations only change the result.</p>
+<table>
+<thead>
+<tr>
+<th>Part of the docs</th>
+<th>Where it comes from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>path, method</td>
+<td>the live route table</td>
+</tr>
+<tr>
+<td>path param types</td>
+<td>the controller arguments after the first one, in order. <code>int id</code> gives <code>integer</code></td>
+</tr>
+<tr>
+<td>tags</td>
+<td>the controller class name without <code>Controller</code> (<code>BlogController</code> gives <code>Blog</code>)</td>
+</tr>
+<tr>
+<td>operationId</td>
+<td><code>Class.method</code>, for example <code>BlogController.show</code></td>
+</tr>
+<tr>
+<td>summary</td>
+<td><code>@Summary</code>. Else the first line of the <code>///</code> comment</td>
+</tr>
+<tr>
+<td>description</td>
+<td><code>@Description</code>. Else the rest of the <code>///</code> comment</td>
+</tr>
+<tr>
+<td>request</td>
+<td>see <a href="#request">Request</a></td>
+</tr>
+<tr>
+<td>200 answer</td>
+<td>the return type, see <a href="#response">Response</a></td>
+</tr>
+<tr>
+<td><code>401</code> and a login scheme</td>
+<td><code>@Security</code> on a middleware class, or a middleware whose class name ends with <code>AuthMiddleware</code>. See <a href="#login-schemes">Login schemes</a></td>
+</tr>
+<tr>
+<td><code>401</code> and <code>403</code></td>
+<td>the <code>Can</code> middleware on the route, or a <code>req.authorize(...)</code> call in the controller method</td>
+</tr>
+<tr>
+<td><code>403</code></td>
+<td>the <code>GuestMiddleware</code> or <code>ValidateSignature</code> middleware on the route, or a <code>Gate.authorize(...)</code> call in the controller method</td>
+</tr>
+<tr>
+<td><code>404</code></td>
+<td>the path has a <code>{param}</code>. The short path of an optional param, like <code>/blog</code>, has no <code>404</code></td>
+</tr>
+<tr>
+<td><code>422</code></td>
+<td>the route has a request class, or the controller method calls <code>req.validate&lt;T&gt;()</code> or <code>req.validateSchema(...)</code>. The body is <code>{field: message}</code></td>
+</tr>
+<tr>
+<td><code>500</code></td>
+<td>every route</td>
+</tr>
+</tbody>
+</table>
+<p><code>Can</code>, <code>GuestMiddleware</code> and <code>ValidateSignature</code> are found by their class name. <code>req.authorize(...)</code> is found when it is called on the request (<code>DoxRequest</code> or <code>IDoxRequest</code>) in the controller method. <code>Gate.authorize(...)</code> is found when <code>Gate</code> is the class of <code>dox_auth</code>. A <code>@Response</code> with the same status wins over an automatic answer.</p>
+<p><code>GuestMiddleware(redirectTo: ...)</code> also shows a <code>403</code>, but the app sends a redirect. Put <code>@Response(403, ...)</code> on the method to replace it.</p>
+<p>Routes that the builder does not know (for example inline closures) still get a basic entry.</p>
+<p>An optional param shows as two paths. The route <code>/blog/{id?}</code> gives <code>/blog/{id}</code> and <code>/blog</code>. OpenAPI path params must always be required.
+An optional param in the middle, like <code>/a/{x?}/b</code>, also gives the path without it: <code>/a/{x}/b</code> and <code>/a/b</code>.
+Optional params next to each other are dropped from the right, the same way the Dox router matches them.
+When the summary and operation id are made from the path, the short path gets its own, like <code>GET /blog</code> and <code>getBlog</code>.</p>
+<h3 id="comments-optional"><code>///</code> comments (optional)</h3>
+<p>A <code>///</code> comment on a method also sets the summary and the description.
+The first line is the summary. The rest is the description.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">/// Get one blog</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="c1">///</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1">/// Deleted blogs are not found.</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>When a method has both, the annotation wins. <code>@Summary</code> replaces the first line of the comment, and <code>@Description</code> replaces the rest.</p>
+<h2 id="config-options">Config options</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td><code>null</code></td>
+<td><code>true</code> or <code>false</code> turns the docs routes on or off. <code>null</code>: on only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. See <a href="#turn-the-docs-on-in-production">Turn the docs on in production</a></td>
+</tr>
+<tr>
+<td><code>info</code></td>
+<td><code>Info(title: 'Dox API', version: '1.0.0')</code></td>
+<td>title and version of the API</td>
+</tr>
+<tr>
+<td><code>servers</code></td>
+<td><code>[]</code></td>
+<td>base URLs, like <code>[Server('https://api.my.app')]</code></td>
+</tr>
+<tr>
+<td><code>registry</code></td>
+<td>empty</td>
+<td><code>openApiRegistry</code> from <code>lib/generated/openapi.g.dart</code></td>
+</tr>
+<tr>
+<td><code>securitySchemes</code>, <code>securityByMiddleware</code></td>
+<td><code>{}</code></td>
+<td>see <a href="#login-schemes">Login schemes</a></td>
+</tr>
+<tr>
+<td><code>ui</code></td>
+<td><code>DocsUi.scalar</code></td>
+<td>the docs page: <code>DocsUi.scalar</code> or <code>DocsUi.swagger</code></td>
+</tr>
+<tr>
+<td><code>scalar</code></td>
+<td><code>ScalarOptions()</code></td>
+<td>see <a href="#the-docs-page">The docs page</a></td>
+</tr>
+<tr>
+<td><code>pageTitle</code></td>
+<td><code>info.title</code></td>
+<td>title of the <code>/docs</code> page</td>
+</tr>
+<tr>
+<td><code>include</code></td>
+<td><code>[]</code> (all routes)</td>
+<td>only these paths go in the docs, like <code>['/api/*']</code></td>
+</tr>
+<tr>
+<td><code>exclude</code></td>
+<td><code>[]</code></td>
+<td>these paths are left out, like <code>['/api/internal/*']</code></td>
+</tr>
+</tbody>
+</table>
+<p>In production the docs are off, unless you set <code>enabled: true</code>. See <a href="#turn-the-docs-on-in-production">Turn the docs on in production</a>.</p>
+<h3 id="turn-the-docs-on-in-production">Turn the docs on in production</h3>
+<p>By default <code>enabled</code> is <code>null</code>. Then Dox looks at <code>APP_ENV</code>:</p>
+<table>
+<thead>
+<tr>
+<th><code>APP_ENV</code> value</th>
+<th>Are the docs on?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>development</code></td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>local</code></td>
+<td>yes</td>
+</tr>
+<tr>
+<td><code>production</code></td>
+<td>no. <code>/docs</code>, <code>/openapi.json</code> and <code>/openapi.yaml</code> give 404</td>
+</tr>
+<tr>
+<td>not set</td>
+<td>no. Dox treats the app as production</td>
+</tr>
+</tbody>
+</table>
+<p>To turn the docs on in every environment, also production, set <code>enabled: true</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/openapi.dart</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">OpenApiConfig</span><span class="w"> </span><span class="n">openApi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiConfig</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nl">enabled:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nl">info:</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Blog API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p><code>/docs</code> has no login. In production, anyone can see every route of your API.
+Only do this for a public API.</p>
+</div>
+<p><code>enabled: false</code> turns the docs off in every environment.</p>
+<h3 id="the-docs-page">The docs page</h3>
+<p>The page loads Scalar from the jsDelivr CDN, at a fixed version, and reads <code>/openapi.json</code>.
+Change the look with <code>scalar:</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">OpenApiConfig</span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">pageTitle:</span><span class="w"> </span><span class="s1">'Blog API docs'</span><span class="p">,</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nl">scalar:</span><span class="w"> </span><span class="n">ScalarOptions</span><span class="p">(</span><span class="nl">theme:</span><span class="w"> </span><span class="n">ScalarTheme</span><span class="p">.</span><span class="n">purple</span><span class="p">,</span><span class="w"> </span><span class="nl">darkMode:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>theme</code></td>
+<td><code>ScalarTheme.default_</code></td>
+<td>Color theme. Same names as Scalar: <code>moon</code>, <code>purple</code>, <code>deepSpace</code>, <code>saturn</code>, <code>kepler</code>, <code>mars</code> and more.</td>
+</tr>
+<tr>
+<td><code>darkMode</code></td>
+<td><code>false</code></td>
+<td>Start in dark mode. The user can still switch.</td>
+</tr>
+<tr>
+<td><code>showDownloadButton</code></td>
+<td><code>true</code></td>
+<td>Show the button that downloads the document.</td>
+</tr>
+<tr>
+<td><code>proxyUrl</code></td>
+<td><code>null</code></td>
+<td>Send "Try it" requests through this proxy. Off by default, so requests go from the browser straight to your API.</td>
+</tr>
+</tbody>
+</table>
+<p><code>pageTitle</code> and all options are escaped, so a value can not break the page.</p>
+<p>To use Swagger UI instead, set <code>ui:</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">OpenApiConfig</span><span class="p">(</span><span class="nl">registry:</span><span class="w"> </span><span class="n">openApiRegistry</span><span class="p">,</span><span class="w"> </span><span class="nl">ui:</span><span class="w"> </span><span class="n">DocsUi</span><span class="p">.</span><span class="n">swagger</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="write-the-files">Write the files</h2>
+<p>Use <code>dox openapi:generate</code> to write the document to files.</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>dox<span class="w"> </span>openapi:generate<span class="w">              </span><span class="c1"># storage/openapi/openapi.json and openapi.yaml</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>dox<span class="w"> </span>openapi:generate<span class="w"> </span>docs/api<span class="w">     </span><span class="c1"># another folder</span>
+</span></code></pre></div>
+<p>It runs <code>bin/openapi.dart</code> of your app.
+A new app does not have this file. Make it with this code:</p>
+<div class="language-dart highlight"><span class="filename">bin/openapi.dart</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">writeOpenApi</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">isEmpty</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">'storage/openapi'</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">first</span><span class="p">);</span>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="n">exit</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>writeOpenApi</code> runs your providers and registers the routes. It does not start the server.</p>
+<p>To serve these files in production, see <a href="#production-setup">Production setup</a>.</p>
+<h2 id="production-setup">Production setup</h2>
+<p>By default the docs are off in production. <code>enabled: true</code> is the quick way to turn them on, see <a href="#turn-the-docs-on-in-production">Turn the docs on in production</a>.
+This section is the other way: make the document at build time, put the files in the image, and serve the files.
+The URLs stay the same: <code>/docs</code>, <code>/openapi.json</code> and <code>/openapi.yaml</code>.</p>
+<p>You need two files first: <code>lib/config/openapi.dart</code> (see <a href="#setup-optional">Setup</a>) and <code>bin/openapi.dart</code> (see <a href="#write-the-files">Write the files</a>). An app made with <code>dox create</code> has neither file.</p>
+<ol>
+<li>
+<p>Make both files, if you do not have them yet.</p>
+</li>
+<li>
+<p>Add a controller that serves the files:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/controllers/docs.controller.dart</span><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_openapi/dox_openapi.dart'</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">    </span><span class="k">show</span><span class="w"> </span><span class="n">OpenApiConstants</span><span class="p">,</span><span class="w"> </span><span class="n">OpenApiServer</span><span class="p">;</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/openapi.dart'</span><span class="p">;</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="nd">@Inject</span><span class="p">()</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="kd">class</span><span class="w"> </span><span class="nc">DocsController</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="w">  </span><span class="c1">/// The same Scalar page as the live docs. It loads `/openapi.json`.</span>
+</span><span id="__span-16-11"><a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">_page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiServer</span><span class="p">(</span>
+</span><span id="__span-16-12"><a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="w">    </span><span class="n">OpenApi</span><span class="p">(</span><span class="nl">info:</span><span class="w"> </span><span class="n">openApi</span><span class="p">.</span><span class="n">info</span><span class="p">),</span>
+</span><span id="__span-16-13"><a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="w">    </span><span class="nl">pageTitle:</span><span class="w"> </span><span class="n">openApi</span><span class="p">.</span><span class="n">pageTitle</span><span class="p">,</span>
+</span><span id="__span-16-14"><a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a><span class="w">    </span><span class="nl">ui:</span><span class="w"> </span><span class="n">openApi</span><span class="p">.</span><span class="n">ui</span><span class="p">,</span>
+</span><span id="__span-16-15"><a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="w">    </span><span class="nl">scalar:</span><span class="w"> </span><span class="n">openApi</span><span class="p">.</span><span class="n">scalar</span><span class="p">,</span>
+</span><span id="__span-16-16"><a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="w">  </span><span class="p">).</span><span class="n">docsPage</span><span class="p">().</span><span class="n">body</span><span class="p">;</span>
+</span><span id="__span-16-17"><a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>
+</span><span id="__span-16-18"><a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">page</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-19"><a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">_page</span><span class="p">)</span>
+</span><span id="__span-16-20"><a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a><span class="w">        </span><span class="p">.</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">OpenApiConstants</span><span class="p">.</span><span class="n">htmlContentType</span><span class="p">));</span>
+</span><span id="__span-16-21"><a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-16-22"><a id="__codelineno-16-22" name="__codelineno-16-22" href="#__codelineno-16-22"></a>
+</span><span id="__span-16-23"><a id="__codelineno-16-23" name="__codelineno-16-23" href="#__codelineno-16-23"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">json</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-24"><a id="__codelineno-16-24" name="__codelineno-16-24" href="#__codelineno-16-24"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">_file</span><span class="p">(</span><span class="s1">'openapi.json'</span><span class="p">,</span><span class="w"> </span><span class="n">OpenApiConstants</span><span class="p">.</span><span class="n">jsonContentType</span><span class="p">);</span>
+</span><span id="__span-16-25"><a id="__codelineno-16-25" name="__codelineno-16-25" href="#__codelineno-16-25"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-16-26"><a id="__codelineno-16-26" name="__codelineno-16-26" href="#__codelineno-16-26"></a>
+</span><span id="__span-16-27"><a id="__codelineno-16-27" name="__codelineno-16-27" href="#__codelineno-16-27"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">yaml</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-28"><a id="__codelineno-16-28" name="__codelineno-16-28" href="#__codelineno-16-28"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">_file</span><span class="p">(</span><span class="s1">'openapi.yaml'</span><span class="p">,</span><span class="w"> </span><span class="n">OpenApiConstants</span><span class="p">.</span><span class="n">yamlContentType</span><span class="p">);</span>
+</span><span id="__span-16-29"><a id="__codelineno-16-29" name="__codelineno-16-29" href="#__codelineno-16-29"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-16-30"><a id="__codelineno-16-30" name="__codelineno-16-30" href="#__codelineno-16-30"></a>
+</span><span id="__span-16-31"><a id="__codelineno-16-31" name="__codelineno-16-31" href="#__codelineno-16-31"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">_file</span><span class="p">(</span><span class="kt">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">contentType</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-32"><a id="__codelineno-16-32" name="__codelineno-16-32" href="#__codelineno-16-32"></a><span class="w">    </span><span class="n">File</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'docs/openapi/</span><span class="si">$</span><span class="n">name</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-16-33"><a id="__codelineno-16-33" name="__codelineno-16-33" href="#__codelineno-16-33"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">file</span><span class="p">.</span><span class="n">existsSync</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">();</span>
+</span><span id="__span-16-34"><a id="__codelineno-16-34" name="__codelineno-16-34" href="#__codelineno-16-34"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">file</span><span class="p">.</span><span class="n">readAsStringSync</span><span class="p">())</span>
+</span><span id="__span-16-35"><a id="__codelineno-16-35" name="__codelineno-16-35" href="#__codelineno-16-35"></a><span class="w">        </span><span class="p">.</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="n">contentType</span><span class="p">));</span>
+</span><span id="__span-16-36"><a id="__codelineno-16-36" name="__codelineno-16-36" href="#__codelineno-16-36"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-16-37"><a id="__codelineno-16-37" name="__codelineno-16-37" href="#__codelineno-16-37"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>A new app has <code>dox_openapi</code> in its <code>pubspec.yaml</code>. If yours does not, run <code>dart pub add dox_openapi</code>.
+Run the builder again after you add the controller.</p>
+</li>
+<li>
+<p>Add the routes. Add them only when the live docs are off, so the routes do not clash in development:</p>
+<div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@override</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">openApi</span><span class="p">.</span><span class="n">isEnabled</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/docs'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DocsController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">page</span><span class="p">);</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/openapi.json'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DocsController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">json</span><span class="p">);</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/openapi.yaml'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DocsController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">yaml</span><span class="p">);</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>openApi</code> is the config of <code>lib/config/openapi.dart</code>. Import it, and the controller, in this file.</p>
+</li>
+<li>
+<p>Make the files in the Docker build, and copy them into the image. Change the <code>Dockerfile</code> in two places.
+    First, in the build stage, right after <code>RUN /root/.pub-cache/bin/dox build</code>, add:</p>
+<div class="language-dockerfile highlight"><span class="filename">Dockerfile</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">RUN</span><span class="w"> </span><span class="nv">APP_KEY</span><span class="o">=</span><span class="m">00000000000000000000000000000000</span><span class="w"> </span>/root/.pub-cache/bin/dox<span class="w"> </span>openapi:generate<span class="w"> </span>docs/openapi
+</span></code></pre></div>
+<p>Second, in the <code>RUN</code> step that lays out <code>/out</code>, add <code>/out/app/docs</code> to the <code>mkdir -p</code> list. Add one line to the <code>&amp;&amp;</code> chain after the <code>cp -r build/bundle/. /out/app/</code> line:</p>
+<div class="language-dockerfile highlight"><span class="filename">Dockerfile</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">RUN</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/out/app/storage<span class="w"> </span>/out/app/docs<span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>chmod<span class="w"> </span><span class="m">1777</span><span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>build/bundle/.<span class="w"> </span>/out/app/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>docs/openapi<span class="w"> </span>/out/app/docs/openapi<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span>#<span class="w"> </span>...<span class="w"> </span>the<span class="w"> </span>lines<span class="w"> </span>that<span class="w"> </span>follow<span class="w"> </span>stay<span class="w"> </span>as<span class="w"> </span>they<span class="w"> </span>are
+</span></code></pre></div>
+<p><code>bin/openapi.dart</code> starts your app config, so it needs <code>APP_KEY</code>. The dummy key is only for this step. It is not in the image.
+If a provider of your app connects to a database in <code>setup()</code>, that database must be reachable in the build step.
+The server runs in <code>/app</code>, so the controller reads <code>/app/docs/openapi/</code>.</p>
+</li>
+<li>
+<p>Start the image with <code>APP_ENV=production</code> and open <code>/docs</code>.</p>
+</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The route has no login. Anyone can open <code>/docs</code> and see every route of your API.
+To protect it, put a middleware on the three routes.</p>
+</div>
+<p>To test it on your machine, run <code>dox openapi:generate docs/openapi</code>, then start the app with <code>APP_ENV=production</code>.</p>
 <h2 id="how-a-route-finds-its-docs">How a route finds its docs</h2>
 <p>The builder saves the docs of each controller method, and each <code>Route.get(...)</code> / <code>Route.resource(...)</code> call it finds.
 At runtime, Dox matches each route handler by its method name, HTTP method and the end of its path.
@@ -7550,64 +7721,46 @@ Group prefixes (like <code>api/</code>) do not matter.</p>
 When the route names the class, like <code>(LinkController c) =&gt; c.index</code> or <code>Route.get&lt;LinkController&gt;(...)</code>,
 only methods of that class match. With a plain <code>links.index</code>, the path of the route call decides.</p>
 </div>
-<h3 id="write-the-files-dox-openapigenerate">Write the files: <code>dox openapi:generate</code></h3>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>dox<span class="w"> </span>openapi:generate<span class="w">              </span><span class="c1"># storage/openapi/openapi.json and openapi.yaml</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>dox<span class="w"> </span>openapi:generate<span class="w"> </span>docs/api<span class="w">     </span><span class="c1"># another folder</span>
-</span></code></pre></div>
-<p>It runs <code>bin/openapi.dart</code> of your app.
-A new app does not have this file. Make it with this code:</p>
-<div class="language-dart highlight"><span class="filename">bin/openapi.dart</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">writeOpenApi</span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="n">isEmpty</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s1">'storage/openapi'</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">first</span><span class="p">);</span>
-</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">  </span><span class="n">exit</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
-</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="p">}</span>
-</span></code></pre></div>
-<p><code>writeOpenApi</code> runs your providers and registers the routes. It does not start the server.</p>
 <h2 id="without-dox">Without Dox</h2>
 <p><code>dox_openapi</code> also works on its own. Describe routes by hand with <code>ApiDoc</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_openapi/dox_openapi.dart'</span><span class="p">;</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="n">ApiDoc</span><span class="w"> </span><span class="n">docs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ApiDoc</span><span class="p">();</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">docs</span><span class="p">.</span><span class="n">schema</span><span class="p">(</span><span class="s1">'User'</span><span class="p">,</span><span class="w"> </span><span class="n">userSchema</span><span class="p">);</span><span class="w"> </span><span class="c1">// returns a $ref</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">docs</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/users/{id}'</span><span class="p">,</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">    </span><span class="nl">summary:</span><span class="w"> </span><span class="s1">'Get one user'</span><span class="p">,</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">    </span><span class="nl">tags:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'users'</span><span class="p">],</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">    </span><span class="nl">params:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'type'</span><span class="o">:</span><span class="w"> </span><span class="s1">'integer'</span><span class="p">}},</span>
-</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="nl">responses:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">      </span><span class="m">200</span><span class="o">:</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">schema:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'The user'</span><span class="p">),</span>
-</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">      </span><span class="m">404</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">description:</span><span class="w"> </span><span class="s1">'Not found'</span><span class="p">),</span>
-</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">    </span><span class="p">});</span>
-</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>
-</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="n">OpenApi</span><span class="w"> </span><span class="n">api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApi</span><span class="p">(</span><span class="nl">info:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'My API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span><span class="w"> </span><span class="nl">docs:</span><span class="w"> </span><span class="n">docs</span><span class="p">);</span>
-</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>
-</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="n">api</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span><span class="w">                              </span><span class="c1">// Map</span>
-</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="n">api</span><span class="p">.</span><span class="n">toJsonString</span><span class="p">();</span><span class="w">                        </span><span class="c1">// pretty JSON</span>
-</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="n">api</span><span class="p">.</span><span class="n">toYaml</span><span class="p">();</span><span class="w">                              </span><span class="c1">// YAML</span>
-</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="kd">await</span><span class="w"> </span><span class="n">api</span><span class="p">.</span><span class="n">writeFiles</span><span class="p">(</span><span class="s1">'storage/openapi'</span><span class="p">);</span><span class="w">   </span><span class="c1">// openapi.json + openapi.yaml</span>
-</span><span id="__span-14-21"><a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>
-</span><span id="__span-14-22"><a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a><span class="c1">// Serve the docs from your own server</span>
-</span><span id="__span-14-23"><a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a><span class="n">OpenApiServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiServer</span><span class="p">(</span><span class="n">api</span><span class="p">);</span><span class="w"> </span><span class="c1">// Swagger UI: OpenApiServer(api, ui: DocsUi.swagger)</span>
-</span><span id="__span-14-24"><a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a><span class="n">OpenApiResponse</span><span class="o">?</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">handle</span><span class="p">(</span><span class="s1">'/docs'</span><span class="p">);</span><span class="w"> </span><span class="c1">// also '/openapi.json' and '/openapi.yaml'</span>
-</span><span id="__span-14-25"><a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">page</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-26"><a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a><span class="w">  </span><span class="c1">// send page.body with the header Content-Type: page.contentType</span>
-</span><span id="__span-14-27"><a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_openapi/dox_openapi.dart'</span><span class="p">;</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">ApiDoc</span><span class="w"> </span><span class="n">docs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ApiDoc</span><span class="p">();</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">docs</span><span class="p">.</span><span class="n">schema</span><span class="p">(</span><span class="s1">'User'</span><span class="p">,</span><span class="w"> </span><span class="n">userSchema</span><span class="p">);</span><span class="w"> </span><span class="c1">// returns a $ref</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="n">docs</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/users/{id}'</span><span class="p">,</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="nl">summary:</span><span class="w"> </span><span class="s1">'Get one user'</span><span class="p">,</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">    </span><span class="nl">tags:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'users'</span><span class="p">],</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">    </span><span class="nl">params:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'type'</span><span class="o">:</span><span class="w"> </span><span class="s1">'integer'</span><span class="p">}},</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">    </span><span class="nl">responses:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a><span class="w">      </span><span class="m">200</span><span class="o">:</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">schema:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'The user'</span><span class="p">),</span>
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">      </span><span class="m">404</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">description:</span><span class="w"> </span><span class="s1">'Not found'</span><span class="p">),</span>
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">    </span><span class="p">});</span>
+</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>
+</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a><span class="n">OpenApi</span><span class="w"> </span><span class="n">api</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApi</span><span class="p">(</span><span class="nl">info:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Info</span><span class="p">(</span><span class="nl">title:</span><span class="w"> </span><span class="s1">'My API'</span><span class="p">,</span><span class="w"> </span><span class="nl">version:</span><span class="w"> </span><span class="s1">'1.0.0'</span><span class="p">),</span><span class="w"> </span><span class="nl">docs:</span><span class="w"> </span><span class="n">docs</span><span class="p">);</span>
+</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>
+</span><span id="__span-20-17"><a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="n">api</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span><span class="w">                              </span><span class="c1">// Map</span>
+</span><span id="__span-20-18"><a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a><span class="n">api</span><span class="p">.</span><span class="n">toJsonString</span><span class="p">();</span><span class="w">                        </span><span class="c1">// pretty JSON</span>
+</span><span id="__span-20-19"><a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a><span class="n">api</span><span class="p">.</span><span class="n">toYaml</span><span class="p">();</span><span class="w">                              </span><span class="c1">// YAML</span>
+</span><span id="__span-20-20"><a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a><span class="kd">await</span><span class="w"> </span><span class="n">api</span><span class="p">.</span><span class="n">writeFiles</span><span class="p">(</span><span class="s1">'storage/openapi'</span><span class="p">);</span><span class="w">   </span><span class="c1">// openapi.json + openapi.yaml</span>
+</span><span id="__span-20-21"><a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a>
+</span><span id="__span-20-22"><a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a><span class="c1">// Serve the docs from your own server</span>
+</span><span id="__span-20-23"><a id="__codelineno-20-23" name="__codelineno-20-23" href="#__codelineno-20-23"></a><span class="n">OpenApiServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">OpenApiServer</span><span class="p">(</span><span class="n">api</span><span class="p">);</span><span class="w"> </span><span class="c1">// Swagger UI: OpenApiServer(api, ui: DocsUi.swagger)</span>
+</span><span id="__span-20-24"><a id="__codelineno-20-24" name="__codelineno-20-24" href="#__codelineno-20-24"></a><span class="n">OpenApiResponse</span><span class="o">?</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">handle</span><span class="p">(</span><span class="s1">'/docs'</span><span class="p">);</span><span class="w"> </span><span class="c1">// also '/openapi.json' and '/openapi.yaml'</span>
+</span><span id="__span-20-25"><a id="__codelineno-20-25" name="__codelineno-20-25" href="#__codelineno-20-25"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">page</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-20-26"><a id="__codelineno-20-26" name="__codelineno-20-26" href="#__codelineno-20-26"></a><span class="w">  </span><span class="c1">// send page.body with the header Content-Type: page.contentType</span>
+</span><span id="__span-20-27"><a id="__codelineno-20-27" name="__codelineno-20-27" href="#__codelineno-20-27"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>A schema can be a JSON Schema <code>Map</code>, a <a href="../validation/"><code>dox_validation</code></a> schema, or any object with <code>toJsonSchema()</code>.
 Paths can use <code>{id}</code> or <code>:id</code>. Both become <code>{id}</code>.
 <code>responses</code> takes status codes as <code>int</code> keys. To use a text key like <code>default</code> or <code>2XX</code>, pass <code>namedResponses</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">docs</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/users/{id}'</span><span class="p">,</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="nl">responses:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">      </span><span class="m">200</span><span class="o">:</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">schema:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'The user'</span><span class="p">),</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="nl">namedResponses:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">      </span><span class="s1">'default'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">description:</span><span class="w"> </span><span class="s1">'Any other error'</span><span class="p">),</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">    </span><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">docs</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'GET'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/users/{id}'</span><span class="p">,</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="nl">responses:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">      </span><span class="m">200</span><span class="o">:</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">schema:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="nl">description:</span><span class="w"> </span><span class="s1">'The user'</span><span class="p">),</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="nl">namedResponses:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">      </span><span class="s1">'default'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ResponseDoc</span><span class="p">(</span><span class="nl">description:</span><span class="w"> </span><span class="s1">'Any other error'</span><span class="p">),</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="p">});</span>
 </span></code></pre></div>
 <p><code>namedResponses</code> come after <code>responses</code>. When the same key is in both, the one in <code>namedResponses</code> wins.
 <code>DoxRouteAdapter().addTo(docs, routes)</code> adds a basic entry for each route you did not describe.</p>
