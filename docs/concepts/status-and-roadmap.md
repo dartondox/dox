@@ -35,6 +35,8 @@ Each package has its own version number. Some packages live in their own repos. 
 | `dox_queue` | Queues and jobs, the Redis and sync drivers, chains, batches, workers | New | 46 tests in 7 files. Most queue tests run in `dox_queue_database`, on every store. |
 | `dox_queue_database` | The database queue driver, the batch store and `afterCommit` for `dox_queue` | New | 234 tests in 16 files, with SQLite, Postgres, MariaDB and Redis in CI |
 | `dox_scheduler` | Run tasks on a schedule | New | 106 tests in 6 files, with Redis in CI |
+| [`dox_pdf_lib`](../packages/pdf.md) | Create, load and edit PDFs: pages, text, shapes, SVG paths, images, custom fonts, forms, attachments, metadata, PDF/A and PDF/X. Rust core through `dart:ffi`, on macOS, Linux and Windows. | New | 122 tests in 18 files |
+| [`dox_pdf_me`](../packages/pdf.md) | Make PDFs from pdfme templates and inputs, built on `dox_pdf_lib` | New | 234 tests in 12 files |
 | [`dox_mcp`](../packages/mcp.md) | MCP server: tools for AI clients over Streamable HTTP, signed sessions | New | 15 tests in 1 file |
 | `dox_view` | [Views](../the-basic/views.md): `.dox.html` templates with layouts and components | New | 40 tests in 2 files |
 | [`dox_inertia`](../the-basic/inertia.md) | Inertia.js server side: single page apps with React, Vue or Svelte and Dox controllers | New | 34 tests in 2 files |
