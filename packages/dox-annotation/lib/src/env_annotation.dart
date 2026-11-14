@@ -11,9 +11,8 @@
 ///
 ///   String get appName; // APP_NAME, required
 ///   int get appPort => 3000; // APP_PORT, default 3000
-///   String get appEnv => 'production';
 ///   // a default may use other getters. It sees their loaded values.
-///   bool get isDevelopment => appEnv == 'development';
+///   String get appUrl => 'http://localhost:$appPort'; // APP_URL
 ///   @EnvKey('AWS_BUCKET')
 ///   String? get s3Bucket; // optional
 /// }

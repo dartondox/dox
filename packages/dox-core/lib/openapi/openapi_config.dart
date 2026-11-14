@@ -84,7 +84,7 @@ class OpenApiConfig {
   bool get isEnabled {
     bool? value = enabled;
     if (value != null) return value;
-    String env = Env.get<String>('APP_ENV').toLowerCase();
+    String env = Env.appEnv;
     return env == 'development' || env == 'local';
   }
 }

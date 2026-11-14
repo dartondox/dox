@@ -86,6 +86,23 @@ void main() {
     expect(() => Env.get<int>('BAD_PORT'), throwsArgumentError);
   });
 
+  test('AppConfig.isDevelopment is true only for APP_ENV=development', () {
+    AppConfig config = AppConfig(appKey: testAppKey);
+    Map<String, bool> cases = <String, bool>{
+      'development': true,
+      'DEVELOPMENT': true,
+      'production': false,
+      'local': false,
+      'staging': false,
+    };
+    for (MapEntry<String, bool> item in cases.entries) {
+      Env().env['APP_ENV'] = item.key;
+      expect(config.isDevelopment, item.value, reason: item.key);
+    }
+    Env().env.remove('APP_ENV');
+    expect(config.isDevelopment, isFalse);
+  });
+
   test('empty APP_KEY fails at startup in production', () {
     Dox().config = AppConfig(appKey: '');
     Env().env['APP_ENV'] = 'production';

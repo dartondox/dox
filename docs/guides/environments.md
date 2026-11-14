@@ -45,8 +45,6 @@ abstract class AppEnv {
   /// development, staging or production. Not set: production.
   String get appEnv => 'production';
 
-  bool get isDevelopment => appEnv == 'development';
-
   int get appPort => 3000;
 
   /// required: used to sign tokens and encrypt cookies
@@ -126,13 +124,16 @@ LoggerConfig logger = LoggerConfig(
   name: env.appName,
   enabled: true,
   level: env.logLevel,
-  // colors on your machine, one JSON line per log in staging and production
-  prettyPrint: env.isDevelopment,
+  // colors on your machine, one JSON line per log in staging and production.
+  // env.appEnv, not appConfig.isDevelopment: appConfig is built from
+  // this logger, so reading appConfig here would loop.
+  prettyPrint: env.appEnv == 'development',
 );
 ```
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/app.dart';
 import 'package:my_app/config/env.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
@@ -146,12 +147,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       // print every query on your machine only
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'sqlite': ConnectionConfig(
       driver: Driver.sqlite,
       database: env.dbName,
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
   },
 );
@@ -236,7 +237,7 @@ Start as staging on another port. The real variables win over `.env`:
 APP_ENV=staging APP_PORT=4000 dart run bin/server.dart
 ```
 
-The app listens on `4000`. `env.appEnv` is `'staging'`, and `env.isDevelopment` is `false`.
+The app listens on `4000`. `env.appEnv` is `'staging'`, and `appConfig.isDevelopment` is `false`.
 
 ## Things that differ per environment
 

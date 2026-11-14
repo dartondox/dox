@@ -43,7 +43,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | Variable | Getter | Type | Default | Used for |
 | --- | --- | --- | --- | --- |
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
-| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Any value except `production` turns on `LogMiddleware` in the new project (one log line per request, if the logger is enabled). Also read by the framework (see above). |
+| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `appConfig.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Any value except `production` turns on `LogMiddleware` in the new project (one log line per request, if the logger is enabled). Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local`, `test` and `testing`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |

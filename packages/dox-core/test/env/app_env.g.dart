@@ -9,22 +9,27 @@ part of 'app_env.dart';
 class _$AppEnv extends AppEnv {
   _$AppEnv._({
     required String? appEnv,
-    required bool? isDevelopment,
+    required int? appPort,
+    required String? appUrl,
     required String? region,
     required this.r,
     required this.reader,
     required String? broken,
   }) : _$appEnv = appEnv,
-       _$isDevelopment = isDevelopment,
+       _$appPort = appPort,
+       _$appUrl = appUrl,
        _$region = region,
        _$broken = broken;
 
   final String? _$appEnv;
   @override
   late final String appEnv = _$appEnv ?? super.appEnv;
-  final bool? _$isDevelopment;
+  final int? _$appPort;
   @override
-  late final bool isDevelopment = _$isDevelopment ?? super.isDevelopment;
+  late final int appPort = _$appPort ?? super.appPort;
+  final String? _$appUrl;
+  @override
+  late final String appUrl = _$appUrl ?? super.appUrl;
   final String? _$region;
   @override
   late final String? region = _$region ?? super.region;
@@ -53,7 +58,8 @@ class _$AppEnv extends AppEnv {
     try {
       EnvReader $r = $reader ?? EnvReader();
       String? appEnv = $r.string('APP_ENV');
-      bool? isDevelopment = $r.boolean('IS_DEVELOPMENT');
+      int? appPort = $r.integer('APP_PORT');
+      String? appUrl = $r.string('APP_URL');
       String? region = $r.string('REGION');
       String? r = $r.string('R');
       String? reader = $r.string('READER');
@@ -62,14 +68,16 @@ class _$AppEnv extends AppEnv {
       $r.check();
       _$AppEnv $env = _$AppEnv._(
         appEnv: appEnv,
-        isDevelopment: isDevelopment,
+        appPort: appPort,
+        appUrl: appUrl,
         region: region,
         r: r,
         reader: reader,
         broken: broken,
       );
       $env.appEnv;
-      $env.isDevelopment;
+      $env.appPort;
+      $env.appUrl;
       $env.region;
       $env.broken;
 

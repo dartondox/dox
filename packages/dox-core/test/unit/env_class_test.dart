@@ -13,27 +13,27 @@ AppEnv load(Map<String, String> dotEnv) {
 void main() {
   group('typed env class |', () {
     test('a default sees the loaded value of another key', () {
-      AppEnv env = load(<String, String>{'APP_ENV': 'development'});
-      expect(env.appEnv, 'development');
-      expect(env.isDevelopment, isTrue);
+      AppEnv env = load(<String, String>{'APP_PORT': '4000'});
+      expect(env.appPort, 4000);
+      expect(env.appUrl, 'http://localhost:4000');
     });
 
-    test('no APP_ENV uses the default of both getters', () {
+    test('no APP_PORT uses the default of both getters', () {
       AppEnv env = load(<String, String>{});
-      expect(env.appEnv, 'production');
-      expect(env.isDevelopment, isFalse);
+      expect(env.appPort, 3000);
+      expect(env.appUrl, 'http://localhost:3000');
       expect(env.region, isNull);
     });
 
     test('a set key wins over the getter body', () {
       AppEnv env = load(<String, String>{
-        'APP_ENV': 'development',
-        'IS_DEVELOPMENT': 'false',
+        'APP_PORT': '4000',
+        'APP_URL': 'https://dox.dev',
         'REGION': 'eu',
         'R': 'r',
         'READER': 'reader',
       });
-      expect(env.isDevelopment, isFalse);
+      expect(env.appUrl, 'https://dox.dev');
       expect(env.region, 'eu');
       expect(env.r, 'r');
       expect(env.reader, 'reader');
@@ -63,10 +63,10 @@ void main() {
       LoopEnv env = LoopEnv.load(
         EnvReader(
           environment: const <String, String>{},
-          dotEnv: <String, String>{'IS_DEVELOPMENT': 'true'},
+          dotEnv: <String, String>{'APP_URL': 'https://dox.dev'},
         ),
       );
-      expect(env.isDevelopment, isTrue);
+      expect(env.appUrl, 'https://dox.dev');
       expect(load(<String, String>{}).appEnv, 'production');
     });
   });

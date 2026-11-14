@@ -1,9 +1,10 @@
+import 'package:blog/config/app.dart';
 import 'package:blog/config/env.dart';
 import 'package:dox_orm/dox_orm.dart';
 
 /// Print every SQL query only in development.
 /// Printing each query costs time, so it is off in production.
-bool _debug = env.isDevelopment;
+bool _debug = appConfig.isDevelopment;
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   /// Connection

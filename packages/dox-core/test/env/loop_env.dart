@@ -10,9 +10,9 @@ abstract class LoopEnv {
     return _$LoopEnv.load(reader);
   }
 
-  String get appEnv => 'production';
+  int get appPort => 3000;
 
-  bool get isDevelopment => loopEnv.appEnv == 'development';
+  String get appUrl => 'http://localhost:${loopEnv.appPort}';
 }
 
 final LoopEnv loopEnv = LoopEnv.load(

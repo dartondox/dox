@@ -74,6 +74,10 @@ class Env {
     return _cast<T>(key, value);
   }
 
+  /// `APP_ENV` in lower case. Empty when it is not set, which means
+  /// production.
+  static String get appEnv => get<String>('APP_ENV').toLowerCase();
+
   static T _missing<T>(String key) {
     if (null is T) return null as T;
     if (<T>[] is List<String>) return '' as T;

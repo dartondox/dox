@@ -12,7 +12,10 @@ abstract class AppEnv {
 
   String get appEnv => 'production';
 
-  bool get isDevelopment => appEnv == 'development';
+  int get appPort => 3000;
+
+  /// a default that uses another getter
+  String get appUrl => 'http://localhost:$appPort';
 
   String? get region => null;
 

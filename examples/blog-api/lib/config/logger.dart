@@ -21,5 +21,7 @@ LoggerConfig logger = LoggerConfig(
   /// -------------------------------
   /// It is highly advised NOT to use `prettyPrint` in production, since it
   /// can have huge impact on performance.
-  prettyPrint: env.isDevelopment,
+  // not appConfig.isDevelopment: appConfig is built from this logger,
+  // so reading it here loops until the stack overflows.
+  prettyPrint: env.appEnv == 'development',
 );

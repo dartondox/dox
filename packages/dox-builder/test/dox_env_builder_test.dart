@@ -110,21 +110,18 @@ abstract class AppEnv {
     String out = await _generate('''
 @DoxEnv()
 abstract class AppEnv {
-  String get appEnv => 'production';
-  bool get isDevelopment => appEnv == 'development';
+  int get appPort => 3000;
+  String get appUrl => 'http://localhost:\$appPort';
   String? get region => null;
 }
 ''');
     expect(
       out,
-      contains(r'late final String appEnv = _$appEnv ?? super.appEnv;'),
+      contains(r'late final int appPort = _$appPort ?? super.appPort;'),
     );
     expect(
       out,
-      contains(
-        r'late final bool isDevelopment = '
-        r'_$isDevelopment ?? super.isDevelopment;',
-      ),
+      contains(r'late final String appUrl = _$appUrl ?? super.appUrl;'),
     );
     // a nullable getter with a body keeps one `?`
     expect(out, contains(r'final String? _$region;'));

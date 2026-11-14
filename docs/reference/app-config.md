@@ -377,16 +377,19 @@ LoggerConfig logger = LoggerConfig(
   enabled: true,
   level: env.logLevel,
   /// colored text is slow. JSON lines in production.
-  prettyPrint: env.isDevelopment,
+  // env.appEnv, not appConfig.isDevelopment: appConfig is built from
+  // this logger, so reading appConfig here would loop.
+  prettyPrint: env.appEnv == 'development',
 );
 ```
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/app.dart';
 import 'package:my_app/config/env.dart';
 
 /// Print every SQL query only in development.
-bool _debug = env.isDevelopment;
+bool _debug = appConfig.isDevelopment;
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   connection: env.dbConnection,

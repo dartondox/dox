@@ -330,7 +330,7 @@ class Dox {
     } else {
       return;
     }
-    String env = Env.get<String>('APP_ENV').toLowerCase();
+    String env = Env.appEnv;
     if (!<String>['development', 'local', 'test', 'testing'].contains(env)) {
       throw StateError(message);
     }

@@ -17,7 +17,8 @@ import 'util.dart';
 ///   name in UPPER_SNAKE case (`dbURL` => `DB_URL`)
 /// - a getter with a body is the default (any expression, used only when
 ///   the key is missing). The body runs on the loaded env, so it may use
-///   other getters: `appEnv == 'development'` sees the real `APP_ENV`.
+///   other getters: `'http://localhost:$appPort'` sees the real
+///   `APP_PORT`. Every getter is an env key, also this one (`APP_URL`).
 ///   `load()` works out every default once, so a default that throws stops
 ///   the app at startup.
 /// - a nullable getter with no body is optional

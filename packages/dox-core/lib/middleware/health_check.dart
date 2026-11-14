@@ -84,7 +84,7 @@ class HealthCheck {
   }
 
   static bool _showErrors() {
-    String env = Env.get<String>('APP_ENV').toLowerCase();
+    String env = Env.appEnv;
     return env == 'development' || env == 'local';
   }
 }

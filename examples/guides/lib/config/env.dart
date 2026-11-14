@@ -20,8 +20,6 @@ abstract class AppEnv {
   /// development, staging or production. Not set: production.
   String get appEnv => 'production';
 
-  bool get isDevelopment => appEnv == 'development';
-
   int get appPort => 3000;
 
   /// required: used to sign tokens and encrypt cookies

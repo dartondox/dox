@@ -7,16 +7,16 @@ part of 'loop_env.dart';
 // **************************************************************************
 
 class _$LoopEnv extends LoopEnv {
-  _$LoopEnv._({required String? appEnv, required bool? isDevelopment})
-    : _$appEnv = appEnv,
-      _$isDevelopment = isDevelopment;
+  _$LoopEnv._({required int? appPort, required String? appUrl})
+    : _$appPort = appPort,
+      _$appUrl = appUrl;
 
-  final String? _$appEnv;
+  final int? _$appPort;
   @override
-  late final String appEnv = _$appEnv ?? super.appEnv;
-  final bool? _$isDevelopment;
+  late final int appPort = _$appPort ?? super.appPort;
+  final String? _$appUrl;
   @override
-  late final bool isDevelopment = _$isDevelopment ?? super.isDevelopment;
+  late final String appUrl = _$appUrl ?? super.appUrl;
 
   /// true while [load] runs. A default that reads the global `env` calls
   /// [load] again, and would loop until the stack overflows.
@@ -34,16 +34,13 @@ class _$LoopEnv extends LoopEnv {
     _$$loading = true;
     try {
       EnvReader $r = $reader ?? EnvReader();
-      String? appEnv = $r.string('APP_ENV');
-      bool? isDevelopment = $r.boolean('IS_DEVELOPMENT');
+      int? appPort = $r.integer('APP_PORT');
+      String? appUrl = $r.string('APP_URL');
 
       $r.check();
-      _$LoopEnv $env = _$LoopEnv._(
-        appEnv: appEnv,
-        isDevelopment: isDevelopment,
-      );
-      $env.appEnv;
-      $env.isDevelopment;
+      _$LoopEnv $env = _$LoopEnv._(appPort: appPort, appUrl: appUrl);
+      $env.appPort;
+      $env.appUrl;
 
       return $env;
     } finally {

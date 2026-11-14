@@ -126,6 +126,7 @@ Put the connections in `lib/config/database.dart`.
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/app.dart';
 import 'package:my_app/config/env.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
@@ -139,7 +140,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'mysql': ConnectionConfig(
       driver: Driver.mysql, // also for MariaDB
@@ -149,12 +150,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'sqlite': ConnectionConfig(
       driver: Driver.sqlite,
       database: env.dbName, // file path, like db/dox.sqlite, or ':memory:'
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
   },
 );
@@ -460,7 +461,7 @@ It is off by default. It works with `debug` off, so you can use it in production
 'postgres': ConnectionConfig(
   driver: Driver.postgres,
   // ...
-  debug: env.isDevelopment,
+  debug: appConfig.isDevelopment,
   slowQueryMs: 500,
 ),
 ```
