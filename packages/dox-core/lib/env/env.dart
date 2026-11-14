@@ -9,7 +9,26 @@ class Env {
     return _singleton;
   }
 
-  Map<String, String> env = <String, String>{};
+  Map<String, String> _env = <String, String>{};
+
+  /// True after the first [load], or after [env] was set.
+  bool _loaded = false;
+
+  /// The values of the `.env` file. The first read loads the file, so a
+  /// read gives the same answer whether or not something loaded it before.
+  /// After that it is a plain map read: the file is never read again.
+  Map<String, String> get env {
+    if (!_loaded) load();
+    return _env;
+  }
+
+  /// Sets the values, for tests. It counts as loaded: the next read does
+  /// not put the `.env` file on top. Call [load] on an empty map to read
+  /// the file again.
+  set env(Map<String, String> value) {
+    _env = value;
+    _loaded = true;
+  }
 
   Env._internal();
 
@@ -20,9 +39,9 @@ class Env {
   /// variable still wins over both. [testing] is [isTesting] by default.
   void load({File? file, bool? testing}) {
     _loaded = true;
-    if (env.isEmpty) {
+    if (_env.isEmpty) {
       expanded = flags.envExpand;
-      env = _loadEnv(file: file, testing: testing ?? isTesting);
+      _env = _loadEnv(file: file, testing: testing ?? isTesting);
     }
   }
 
@@ -62,6 +81,8 @@ class Env {
   ///
   /// A real environment variable wins over the `.env` file, so a docker
   /// or systemd deploy can pass config without a `.env` file.
+  /// The first read loads `.env` when nothing did yet, so the answer is the
+  /// same whether or not something read the env before.
   static T get<T>(String key, [dynamic defaultValue]) {
     String? value = Platform.environment[key] ?? Env().env[key];
     // only spaces counts as empty, the same as `EnvReader`
@@ -75,17 +96,9 @@ class Env {
     return _cast<T>(key, value);
   }
 
-  /// True after the first [load], so [appEnv] reads the file only once.
-  bool _loaded = false;
-
   /// `APP_ENV` in lower case. Empty when it is not set, which means
-  /// production. It loads `.env` first when nothing did yet, so the
-  /// answer does not depend on what was read before it.
-  static String get appEnv {
-    Env instance = Env();
-    if (!instance._loaded) instance.load();
-    return get<String>('APP_ENV').toLowerCase();
-  }
+  /// production. Like [get], it loads `.env` first when nothing did yet.
+  static String get appEnv => get<String>('APP_ENV').toLowerCase();
 
   static T _missing<T>(String key) {
     if (null is T) return null as T;

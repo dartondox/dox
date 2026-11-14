@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: `Env.get` read as the first env read of the app saw only the shell, because nothing had loaded `.env` yet. Now every env read (`Env.get`, `Env.appEnv`, `Env().env`) loads `.env` once when it is not loaded. After that it is a plain map read, also when there is no `.env` file. Setting `Env().env` in a test counts as loaded, so the file is not put on top.
 - New: `AppConfig.isDevelopment`. It is true when the env `APP_ENV` is `development` (not `local`). Not set means production, so false. It reads the env on each call, so it works before the server starts and in every isolate. Use it for config like a database `debug` flag, in place of a computed getter in the env class: every env getter is an env key.
 - New: `Env.appEnv` gives `APP_ENV` in lower case. It loads `.env` first when nothing did yet, so it gives the same answer when it is the first env read. Dox uses it in every place that reads `APP_ENV`.
 - Security: an env error printed the bad value, like `DB_PORT must be an int, not "..."`. A value may be a secret, and the error goes to the startup log and to CI output. Now `EnvException` and the `Env.get` cast error name only the key and the expected type.

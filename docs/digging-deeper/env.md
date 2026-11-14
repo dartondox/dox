@@ -146,6 +146,8 @@ The `.env` file is read before `AppConfig` exists. So you must set the flag in t
 1. `Env.flags = flags;` at the top of `main()`, before any env value is read.
 2. The same flags in `AppConfig(flags: flags)`.
 
+Set `Env.flags` at the very top of `main()`, before any env read. The first env read (like `Env.get()` or `env.appName`) loads `.env` with the flags of that moment, and the file is not read again. If the flags were not set yet, `Dox().initialize` prints a warning.
+
 ```dart title="lib/config/app.dart"
 import 'package:dox_core/dox_core.dart';
 
