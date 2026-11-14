@@ -211,7 +211,8 @@ nav:
     - packages/storage.md
     - packages/cache.md
     - packages/socketio.md
-    - packages/pdf.md
+    - packages/pdf-lib.md
+    - packages/pdfme.md
     - packages/mcp.md
   - Guides:
     - guides/index.md
