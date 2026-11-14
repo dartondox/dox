@@ -97,19 +97,27 @@ class EnvReader {
     if (match == null) {
       return _invalid(key, 'a Duration (like 500ms, 30s, 5m, 2h, 1d)', value);
     }
-    int amount = int.parse(match.group(1)!);
-    return switch (match.group(2)) {
-      'ms' => Duration(milliseconds: amount),
-      'm' => Duration(minutes: amount),
-      'h' => Duration(hours: amount),
-      'd' => Duration(days: amount),
-      _ => Duration(seconds: amount),
+    int microseconds = switch (match.group(2)) {
+      'ms' => Duration.microsecondsPerMillisecond,
+      'm' => Duration.microsecondsPerMinute,
+      'h' => Duration.microsecondsPerHour,
+      'd' => Duration.microsecondsPerDay,
+      _ => Duration.microsecondsPerSecond,
     };
+    int? amount = int.tryParse(match.group(1)!);
+    // too big for an int, or for a Duration
+    if (amount == null || amount > _maxInt ~/ microseconds) {
+      return _invalid(key, 'a Duration that is not too big', value);
+    }
+    return Duration(microseconds: amount * microseconds);
   }
+
+  static const int _maxInt = 9223372036854775807;
 
   static final RegExp _durationPattern = RegExp(r'^(\d+)\s*(ms|s|m|h|d)?$');
 
   /// comma separated: `a, b,c` is `['a', 'b', 'c']`. Empty items are dropped.
+  /// Only commas (`,`) counts as missing, so the default is used.
   List<String>? list(String key) {
     String? value = raw(key);
     if (value == null) return null;
@@ -118,7 +126,7 @@ class EnvReader {
       String text = item.trim();
       if (text.isNotEmpty) result.add(text);
     }
-    return result;
+    return result.isEmpty ? null : result;
   }
 
   /// an enum value by its name, in any case

@@ -16,6 +16,11 @@ abstract class AppEnv {
 
   String? get region => null;
 
+  /// these names are also locals in the generated load()
+  String? get r;
+
+  String? get reader;
+
   /// throws when BROKEN is missing, to test that load() still fails
   String get broken {
     if (appEnv == 'broken') throw StateError('bad default');

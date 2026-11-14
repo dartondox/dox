@@ -26,7 +26,7 @@ If `APP_ENV` is not set or empty, Dox treats the app as production: `/docs` is o
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
 | `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
-| `DB_CONNECTION` | `dox_migration` (`DbConnection.config()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
+| `DB_CONNECTION` | `dox_migration` (`DbConnection.config()`) | sqlite | `sqlite`, `postgres` or `mysql`. Any other value is an error. | `DB_CONNECTION=postgres` |
 | `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Unix socket: the folder for Postgres, the socket file for MySQL. | `DB_HOST=127.0.0.1` |
 | `DB_PORT` | `dox_migration` | `5432` (postgres), `3306` (mysql) | Database port. | `DB_PORT=5432` |
 | `DB_USERNAME` | `dox_migration` | `postgres` (postgres), `root` (mysql) | Database user. | `DB_USERNAME=app` |
@@ -89,7 +89,7 @@ DB_PASSWORD=postgres
 - The value is everything after the first `=`. A second `=` is kept.
 - `#` after a space starts a comment: `KEY=abc # note` gives `abc`. `KEY=abc#def` stays `abc#def`.
 - A value in quotes (`"`, `'` or `` ` ``) is kept as it is, also a `#`. The quotes are removed.
-- An empty value (`KEY=`), or the text `null`, counts as missing. So `Env.get` gives the default.
+- An empty value (`KEY=`), a value with only spaces, or the text `null`, counts as missing. So `Env.get` gives the default.
 - `export KEY=value` is read like `KEY=value`.
 - With `CoreFlags.envExpand`, `${OTHER}` and `"..."` escapes work. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another).
 - The file is read once per isolate, from the current working directory.

@@ -29,9 +29,13 @@ void main() {
         'APP_ENV': 'development',
         'IS_DEVELOPMENT': 'false',
         'REGION': 'eu',
+        'R': 'r',
+        'READER': 'reader',
       });
       expect(env.isDevelopment, isFalse);
       expect(env.region, 'eu');
+      expect(env.r, 'r');
+      expect(env.reader, 'reader');
     });
 
     test('a default that throws still fails in load()', () {

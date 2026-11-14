@@ -63,7 +63,10 @@ class Env {
   /// or systemd deploy can pass config without a `.env` file.
   static T get<T>(String key, [dynamic defaultValue]) {
     String? value = Platform.environment[key] ?? Env().env[key];
-    if (value == null || value.isEmpty || value.toLowerCase() == 'null') {
+    // only spaces counts as empty, the same as `EnvReader`
+    if (value == null ||
+        value.trim().isEmpty ||
+        value.trim().toLowerCase() == 'null') {
       if (defaultValue == null) return _missing<T>(key);
       if (defaultValue is T) return defaultValue;
       value = defaultValue.toString();
@@ -134,7 +137,10 @@ class Env {
   /// - `KEY=value # note`: a `#` after a space starts a comment.
   /// - `KEY="a # b"`: quotes (`"`, `'` or `` ` ``) keep the value as it is,
   ///   also a `#`. The quotes are removed.
-  /// - `KEY=abc#def` stays `abc#def` (no space before the `#`).
+  /// - `KEY=abc#def` stays `abc#def` and `KEY=#fff` stays `#fff` (no space
+  ///   before the `#`).
+  /// - One line is one value. A quoted value can not go over more lines.
+  ///   With [expand], write a new line as `\n` inside `"` quotes.
   ///
   /// With [expand] (`CoreFlags.envExpand`):
   /// - `${OTHER}` is the value of `OTHER`, in an unquoted or a `"` value.
@@ -164,7 +170,9 @@ class Env {
     return data;
   }
 
-  static final RegExp _comment = RegExp(r'(^|\s)#');
+  /// a `#` after a space or tab. Checked on the text right after `=`, so
+  /// `KEY=#fff` keeps `#fff` and `KEY= #x` is a comment.
+  static final RegExp _comment = RegExp(r'\s#');
 
   static final RegExp _export = RegExp(r'^export\s+');
 
@@ -181,8 +189,8 @@ class Env {
       int end = value.indexOf(value[0], 1);
       if (end > 0) return value.substring(1, end);
     }
-    Match? comment = _comment.firstMatch(value);
-    if (comment != null) value = value.substring(0, comment.start);
+    Match? comment = _comment.firstMatch(raw);
+    if (comment != null) value = raw.substring(0, comment.start);
     value = value.trim();
     if (lookup == null) return value;
     return value.replaceAllMapped(

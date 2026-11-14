@@ -229,6 +229,8 @@ expect(env.dbPort, 5433);
 
 A missing or bad key throws an `EnvException`. So you can also test that your app stops on a bad env. See [Environment Variables](env.md).
 
+Only the getters read through the `EnvReader`. A default (getter body) that calls `Env.get()` or `Platform.environment` reads the real env and `.env`, not the values you pass. Use other getters in a default, like `appEnv == 'development'`.
+
 ## Test the database
 
 A test that uses models needs a real database. Run the migrations once in `setUpAll`.

@@ -43,6 +43,20 @@ void main() {
     expect(Env.get<int>('DOX_EMPTY_2', 5), 5);
   });
 
+  test('a value with only spaces gives the default, like EnvReader', () {
+    Env().env['DOX_SPACES'] = '  ';
+    expect(Env.get<int>('DOX_SPACES', 587), 587);
+    expect(Env.get('DOX_SPACES', 'fallback'), 'fallback');
+    expect(Env.get<String?>('DOX_SPACES'), isNull);
+    expect(
+      EnvReader(
+        environment: const <String, String>{},
+        dotEnv: <String, String>{'DOX_SPACES': '  '},
+      ).integer('DOX_SPACES'),
+      isNull,
+    );
+  });
+
   test('typed values', () {
     expect(Env.get<int>('PORT_TEXT'), 8080);
     expect(Env.get<int>('DOX_MISSING_KEY', 3000), 3000);
@@ -112,6 +126,23 @@ CRLF=yes\r
     expect(env['URL'], 'postgres://u:p@h/db?a=b');
     expect(env['CRLF'], 'yes');
     expect(env.containsKey('# a comment line'), isFalse);
+  });
+
+  test('.env: a value can start with #', () {
+    for (bool expand in <bool>[false, true]) {
+      Map<String, String> env = Env.parse('''
+PASSWORD=#Secret1
+COLOR=#fff # note
+SPACE= #x
+AFTER=a #x
+TAB=	#x
+''', expand: expand);
+      expect(env['PASSWORD'], '#Secret1');
+      expect(env['COLOR'], '#fff');
+      expect(env['SPACE'], '');
+      expect(env['AFTER'], 'a');
+      expect(env['TAB'], '');
+    }
   });
 
   test('.env: export KEY=value', () {

@@ -1,3 +1,10 @@
+## Unreleased
+
+- Fix: in `.env`, an unquoted value that starts with `#` was read as empty. So `DB_PASSWORD=#Secret1` used the default. Now `KEY=#fff` keeps `#fff`, as the docs say. `KEY= #x` and `KEY=a #x` are still comments.
+- Fix: `Env.get` read a value with only spaces as text, so `Env.get<int>('MAIL_PORT', 587)` threw for `MAIL_PORT="  "`. Now only spaces counts as empty and gives the default, the same as `EnvReader`.
+- Fix: `EnvReader.list` of only commas (`,`) gave an empty list. Now it counts as missing, so the default is used.
+- Fix: a `Duration` too big for an int (`99999999999999999999s`) threw a `FormatException` right away, and a big one (`9223372036854775807d`) gave a wrong value. Now both are bad values, listed by `check()` with the others.
+
 ## 3.2.0
 
 - New: `Dox().isWebServer`. It is true only in the web server process (`startServer()` and its isolates). It is false in `bin/queue.dart`, the scheduler and tests. A provider can use it to skip work that only a web server needs, like a startup warning.

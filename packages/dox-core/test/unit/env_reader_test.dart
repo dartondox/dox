@@ -97,5 +97,33 @@ void main() {
         ),
       );
     });
+
+    test('a list with only commas is missing', () {
+      EnvReader r = reader(<String, String>{'HOSTS': ' , ,'});
+      expect(r.list('HOSTS'), isNull);
+      r.check();
+    });
+
+    test('a too big duration is a bad value, saved for check()', () {
+      EnvReader r = reader(<String, String>{
+        'A': '99999999999999999999s',
+        'B': '9223372036854775807d',
+      });
+      expect(r.duration('A'), isNull);
+      expect(r.duration('B'), isNull);
+      expect(
+        r.check,
+        throwsA(
+          isA<EnvException>().having(
+            (EnvException e) => e.errors,
+            'errors',
+            <Matcher>[
+              contains('A must be a Duration'),
+              contains('B must be a Duration'),
+            ],
+          ),
+        ),
+      );
+    });
   });
 }

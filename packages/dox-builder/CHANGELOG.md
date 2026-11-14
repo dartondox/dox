@@ -1,5 +1,9 @@
 ## Unreleased
 
+- Fix: a run of capitals in an env getter name is one word now. `dbURL` read `DB_U_R_L`, now it reads `DB_URL`. Also `jwtTTL` => `JWT_TTL` and `httpURLPath` => `HTTP_URL_PATH`. Names like `s3Bucket` and `oauth2ClientId` do not change. If your `.env` has a key like `DB_U_R_L`, rename it, or use `@EnvKey('DB_U_R_L')`.
+- Fix: `@EnvKey` through a const variable (`const k = EnvKey('X');` then `@k`) was ignored. Now it is read.
+- Fix: an env getter named `r` or `reader` made `env.g.dart` fail to compile. The generated `load()` now uses `$r` and `$reader`.
+- Fix: an instance field in a `@DoxEnv()` class was not read from the env, with no warning. Now it is a build error that says to use a getter.
 - Fix: in a `@DoxEnv()` class, a getter body that uses another getter saw the default of that getter, not the loaded value. So `bool get isDevelopment => appEnv == 'development';` was false even with `APP_ENV=development`. Now a getter body runs on the loaded env and sees the real values. A key that is set still wins over the body. A default that throws still stops the app in `load()`. Run `dart run build_runner build` to get the new `env.g.dart`.
 
 ## 3.2.0

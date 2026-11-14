@@ -11,6 +11,8 @@ class _$AppEnv extends AppEnv {
     required String? appEnv,
     required bool? isDevelopment,
     required String? region,
+    required this.r,
+    required this.reader,
     required String? broken,
   }) : _$appEnv = appEnv,
        _$isDevelopment = isDevelopment,
@@ -26,6 +28,10 @@ class _$AppEnv extends AppEnv {
   final String? _$region;
   @override
   late final String? region = _$region ?? super.region;
+  @override
+  final String? r;
+  @override
+  final String? reader;
   final String? _$broken;
   @override
   late final String broken = _$broken ?? super.broken;
@@ -33,18 +39,22 @@ class _$AppEnv extends AppEnv {
   /// reads and checks every key once. Throws `EnvException` with all
   /// missing or bad keys. Then works out every default once, so a default
   /// that throws stops the app here, at startup.
-  static AppEnv load([EnvReader? reader]) {
-    EnvReader r = reader ?? EnvReader();
-    String? appEnv = r.string('APP_ENV');
-    bool? isDevelopment = r.boolean('IS_DEVELOPMENT');
-    String? region = r.string('REGION');
-    String? broken = r.string('BROKEN');
+  static AppEnv load([EnvReader? $reader]) {
+    EnvReader $r = $reader ?? EnvReader();
+    String? appEnv = $r.string('APP_ENV');
+    bool? isDevelopment = $r.boolean('IS_DEVELOPMENT');
+    String? region = $r.string('REGION');
+    String? r = $r.string('R');
+    String? reader = $r.string('READER');
+    String? broken = $r.string('BROKEN');
 
-    r.check();
+    $r.check();
     _$AppEnv $env = _$AppEnv._(
       appEnv: appEnv,
       isDevelopment: isDevelopment,
       region: region,
+      r: r,
+      reader: reader,
       broken: broken,
     );
     $env.appEnv;

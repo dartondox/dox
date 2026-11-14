@@ -1,3 +1,4 @@
+import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -12,7 +13,8 @@ import 'util.dart';
 ///
 /// `load()` reads every key once, then throws one `EnvException` with all
 /// missing or bad keys.
-/// - key: `@EnvKey('X')`, or the getter name in UPPER_SNAKE case
+/// - key: `@EnvKey('X')` (also through a const variable), or the getter
+///   name in UPPER_SNAKE case (`dbURL` => `DB_URL`)
 /// - a getter with a body is the default (any expression, used only when
 ///   the key is missing). The body runs on the loaded env, so it may use
 ///   other getters: `appEnv == 'development'` sees the real `APP_ENV`.
@@ -20,6 +22,8 @@ import 'util.dart';
 ///   the app at startup.
 /// - a nullable getter with no body is optional
 /// - other getters with no body are required
+/// - only getters of the class itself are read. Getters from a superclass
+///   or a mixin are not. An instance field is a build error.
 class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
   @override
   String generateForAnnotatedElement(
@@ -38,9 +42,17 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
 
     List<_EnvField> fields = <_EnvField>[];
     for (GetterElement getter in element.getters) {
-      if (getter.isOriginDeclaration && !getter.isStatic) {
-        fields.add(_EnvField.from(getter));
+      if (getter.isStatic) continue;
+      if (!getter.isOriginDeclaration) {
+        // the getter of a field: a field can never be read from the env
+        throw InvalidGenerationSourceError(
+          'Env class $name has the field "${getter.displayName}". '
+          'Use a getter: `String get ${getter.displayName};` (required) or '
+          '`String get ${getter.displayName} => ...;` (with a default).',
+          element: getter,
+        );
       }
+      fields.add(_EnvField.from(getter));
     }
 
     StringBuffer declarations = StringBuffer();
@@ -51,7 +63,7 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
     StringBuffer touches = StringBuffer();
 
     for (_EnvField f in fields) {
-      String read = "r.${f.readCall}";
+      String read = "\$r.${f.readCall}";
       String nullableType = f.nullable ? f.type : '${f.type}?';
       reads.writeln('$nullableType ${f.name} = $read;');
       if (f.hasDefault) {
@@ -73,7 +85,7 @@ class DoxEnvBuilder extends GeneratorForAnnotation<DoxEnv> {
         if (f.nullable) {
           args.writeln('${f.name}: ${f.name},');
         } else {
-          reads.writeln('r.need(${_literal.string(f.key)});');
+          reads.writeln('\$r.need(${_literal.string(f.key)});');
           args.writeln('${f.name}: ${f.name}!,');
         }
       }
@@ -93,10 +105,10 @@ class $generated extends $name {
   /// reads and checks every key once. Throws `EnvException` with all
   /// missing or bad keys. Then works out every default once, so a default
   /// that throws stops the app here, at startup.
-  static $name load([EnvReader? reader]) {
-    EnvReader r = reader ?? EnvReader();
+  static $name load([EnvReader? \$reader]) {
+    EnvReader \$r = \$reader ?? EnvReader();
     $reads
-    r.check();
+    \$r.check();
     $generated \$env = $generated._($args);
     $touches
     return \$env;
@@ -143,13 +155,12 @@ class _EnvField {
   }
 
   static String? _envKey(GetterElement getter) {
+    // by the type of the value, so `@EnvKey('X')` and a const variable
+    // that holds an `EnvKey` both work
     for (ElementAnnotation m in getter.metadata.annotations) {
-      Element? e = m.element;
-      String? annotation = e is ConstructorElement
-          ? e.enclosingElement.displayName
-          : e?.displayName;
-      if (annotation == 'EnvKey') {
-        return m.computeConstantValue()?.getField('name')?.toStringValue();
+      DartObject? value = m.computeConstantValue();
+      if (value?.type?.element?.displayName == 'EnvKey') {
+        return value!.getField('name')?.toStringValue();
       }
     }
     return null;
@@ -185,14 +196,28 @@ class _EnvField {
   }
 }
 
-/// `appName` => `APP_NAME`, `s3Bucket` => `S3_BUCKET`
+/// `appName` => `APP_NAME`, `s3Bucket` => `S3_BUCKET`.
+/// A run of capitals is one word: `dbURL` => `DB_URL`,
+/// `httpURLPath` => `HTTP_URL_PATH`.
 String upperSnake(String name) {
   StringBuffer out = StringBuffer();
   for (int i = 0; i < name.length; i++) {
     String char = name[i];
-    bool upper = char != char.toLowerCase();
-    if (upper && i > 0) out.write('_');
+    if (i > 0 && _isUpper(char)) {
+      String before = name[i - 1];
+      bool afterLower = _isLower(before) || _isDigit(before);
+      // the last capital of a run starts the next word: `URLPath`
+      bool endsRun =
+          _isUpper(before) && i + 1 < name.length && _isLower(name[i + 1]);
+      if (afterLower || endsRun) out.write('_');
+    }
     out.write(char.toUpperCase());
   }
   return out.toString();
 }
+
+bool _isUpper(String char) => char != char.toLowerCase();
+
+bool _isLower(String char) => char != char.toUpperCase();
+
+bool _isDigit(String char) => '0123456789'.contains(char);
