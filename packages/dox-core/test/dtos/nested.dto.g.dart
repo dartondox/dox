@@ -43,7 +43,7 @@ class _$AddressDto extends DtoSchema<Address> {
     Object? c1;
     c1 = s.string(s.read(input, 'post_code'), p, 'post_code', _m);
     if (c1 == null || c1 is Undefined) s.required(p, 'post_code', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c1 is String) {
       if (!(c1.runes.length == 5)) {
         s.fail(
@@ -131,7 +131,7 @@ class _$OrderItemDto extends DtoSchema<OrderItem> {
     Object? c1;
     c1 = s.integer(s.read(input, 'quantity'), p, 'quantity', _m);
     if (c1 == null || c1 is Undefined) s.required(p, 'quantity', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c1 is int) {
       if (!(c1 > 0)) {
         s.fail(
@@ -216,6 +216,7 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder> {
     Object? c1;
     c1 = s.list(s.read(input, 'items'), p, 'items', _m);
     if (c1 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'items'];
       List<OrderItem> o0 = <OrderItem>[];
       for (int i0 = 0; i0 < c1.length; i0++) {
@@ -230,16 +231,19 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder> {
           o0.add(x0 as OrderItem);
         }
       }
-      c1 = o0;
+      c1 = s.issues.length != b0 ? invalid : o0;
     }
-    if (c1 == null || c1 is Undefined) s.required(p, 'items', _m);
+    if (c1 == null || c1 is Undefined || s.emptyList(c1)) {
+      s.required(p, 'items', _m);
+      c1 = invalid;
+    }
     // billing: Address?
     Object? c2;
     c2 = s.object(s.read(input, 'billing'), p, 'billing', _m);
     if (c2 is Map) {
       c2 = $AddressDto.convert(c2, s, <Object>[...p, 'billing']) ?? invalid;
     }
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c1 is List<OrderItem>) {
       if (!(c1.length >= 1)) {
         s.fail(
@@ -399,7 +403,7 @@ class _$SignUpDto extends DtoSchema<SignUp> {
     // endsAt: DateTime?
     Object? c3;
     c3 = s.date(s.read(input, 'ends_at'), p, 'ends_at', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is String) {
       if (!(c0.runes.length >= 8)) {
         s.fail(
@@ -511,6 +515,7 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck> {
     Object? c0;
     c0 = s.string(s.read(input, 'code'), p, 'code', _m);
     if (c0 == null || c0 is Undefined) s.required(p, 'code', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return AsyncCheck(code: c0 as String);
   }

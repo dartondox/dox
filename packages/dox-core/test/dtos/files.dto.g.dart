@@ -40,6 +40,7 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar> {
     Object? c1;
     c1 = s.list(s.read(input, 'documents'), p, 'documents', _m);
     if (c1 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'documents'];
       List<RequestFile> o0 = <RequestFile>[];
       for (int i0 = 0; i0 < c1.length; i0++) {
@@ -51,13 +52,13 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar> {
           o0.add(x0 as RequestFile);
         }
       }
-      c1 = o0;
+      c1 = s.issues.length != b0 ? invalid : o0;
     }
     if (c1 == null) s.required(p, 'documents', _m);
     // title: String?
     Object? c2;
     c2 = s.string(s.read(input, 'title'), p, 'title', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is RequestFile) {
       if (!(FileTypes.matches(c0, SchemaConstants.imageExtensions))) {
         s.fail(

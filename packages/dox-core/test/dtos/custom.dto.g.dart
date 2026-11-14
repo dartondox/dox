@@ -43,6 +43,7 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
     Object? c1;
     c1 = s.list(s.read(input, 'scores'), p, 'scores', _m);
     if (c1 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'scores'];
       List<int> o0 = <int>[];
       for (int i0 = 0; i0 < c1.length; i0++) {
@@ -54,7 +55,7 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
           o0.add(x0 as int);
         }
       }
-      c1 = o0;
+      c1 = s.issues.length != b0 ? invalid : o0;
     }
     if (c1 == null) s.required(p, 'scores', _m);
     // handle: String?
@@ -64,6 +65,7 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
     Object? c3;
     c3 = s.list(s.read(input, 'handles'), p, 'handles', _m);
     if (c3 is List) {
+      int b0 = s.issues.length;
       List<Object> q0 = <Object>[...p, 'handles'];
       List<String> o0 = <String>[];
       for (int i0 = 0; i0 < c3.length; i0++) {
@@ -75,10 +77,10 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
           o0.add(x0 as String);
         }
       }
-      c3 = o0;
+      c3 = s.issues.length != b0 ? invalid : o0;
     }
     if (c3 == null) s.required(p, 'handles', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     if (c0 is String) {
       if (!(const Slug().check(c0, s.context(p, 'slug', c0)))) {
         s.failRule(const Slug(), p, 'slug', c0, _m);
@@ -231,7 +233,7 @@ class _$ListPostsDto extends DtoSchema<ListPosts> {
     Object? c1;
     int f1 = s.issues.length;
     c1 = s.integer(s.read(input, 'days', emptyToNull: true), p, 'days', _m);
-    if (c1 == null) s.required(p, 'days', _m);
+    if (c1 == null || s.sentEmpty(c1, input, 'days')) s.required(p, 'days', _m);
     if (s.dropIssuesAfter(f1)) c1 = undefined;
     // handle: String?
     Object? c2;
@@ -244,7 +246,7 @@ class _$ListPostsDto extends DtoSchema<ListPosts> {
     // note: String?
     Object? c4;
     c4 = s.string(s.read(input, 'note', emptyToNull: true), p, 'note', _m);
-    if (s.issues.length != e) return null;
+    if (s.issues.length != e && !s.allErrors) return null;
     int r0 = s.issues.length;
     if (c0 is int) {
       if (!(const MinValue(1).check(c0, s.context(p, 'page', c0)))) {
