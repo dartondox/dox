@@ -158,7 +158,7 @@ Keep the `db/migration` folder next to the binary if you also have `.sql` migrat
 ## Database settings
 
 The migrations read the `.env` file and the environment variables.
-A real environment variable wins over `.env`, the same as `Env.get()`.
+A real environment variable wins over `.env`, the same as `Env.get()`. The file is read like `Env.get()` reads it (`export`, comments, quotes), but with no `${VAR}` expansion, and `.env.testing` is not read.
 
 When `DATABASE_URL` is set, it wins over all `DB_*` keys. See [`DATABASE_URL`](index.md#database_url).
 

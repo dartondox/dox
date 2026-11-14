@@ -12,7 +12,7 @@ The code reads env vars in three ways:
 
 - `Env.get()` and `EnvReader` (`dox_core`): a real environment variable wins over the `.env` file.
 - `Platform.environment` straight: only the real environment, `.env` is not read.
-- `dox_migration` has its own `loadEnv()`: it reads `.env` and the real environment. A real environment variable wins, the same as `Env.get()`.
+- `dox_migration` has its own `loadEnv()`: it reads `.env` and the real environment. A real environment variable wins. It reads plain lines like `Env.get()` does (`export`, comments, quotes). It has no `${VAR}` expansion and does not read `.env.testing`.
 
 ## Read by the framework
 
@@ -25,7 +25,7 @@ If `APP_ENV` is not set or empty, Dox treats the app as production: `/docs` is o
 | `APP_URL` | `dox_core` (`Route.signedUrl`) | not set | The scheme and host in front of an absolute [signed URL](../security/signed-urls.md). | `APP_URL=https://example.com` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
-| `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
+| `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. The app reads it through `env.databaseUrl` (the line `url: env.databaseUrl` in `lib/config/database.dart`), from `.env` or the shell. The shell wins. An app without that line reads it only from the shell. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
 | `DB_CONNECTION` | `dox_migration` (`DbConnection.config()`) | sqlite | `sqlite`, `postgres` or `mysql`. Any other value is an error. | `DB_CONNECTION=postgres` |
 | `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Unix socket: the folder for Postgres, the socket file for MySQL. | `DB_HOST=127.0.0.1` |
 | `DB_PORT` | `dox_migration` | `5432` (postgres), `3306` (mysql) | Database port. | `DB_PORT=5432` |

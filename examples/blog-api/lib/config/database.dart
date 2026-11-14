@@ -7,6 +7,12 @@ import 'package:dox_orm/dox_orm.dart';
 bool _debug = appConfig.isDevelopment;
 
 DatabaseConfig databaseConfig = DatabaseConfig(
+  /// Database url
+  /// -------------------------------
+  /// `DATABASE_URL` from `.env` or the environment, the same one that
+  /// `dox migrate` reads. When it is set, it wins over the DB_* keys.
+  url: env.databaseUrl,
+
   /// Connection
   /// -------------------------------
   /// The connection to use. It is one key of `connections` below.
