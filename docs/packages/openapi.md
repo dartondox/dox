@@ -18,7 +18,12 @@ The docs come from three places:
 - **the request classes**: a `@Dto` class,
 - **the controllers**: the annotations (`@Summary`, `@Response` and more), the arguments and the return type of each method.
 
-## Setup
+## Setup (optional)
+
+!!! note "Made with `dox create`?"
+    Your app already serves `/docs`, `/openapi.json` and `/openapi.yaml`. You need no setup for that.
+    But the config does not have `openApiRegistry` yet. So each route shows only its path and method.
+    Do the steps below when you want the full docs from your code (annotations, request and response schemas), or when you want to change the title or other options.
 
 1. Write the config. Pass the generated `openApiRegistry` to it:
 

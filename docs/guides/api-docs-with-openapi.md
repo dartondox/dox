@@ -13,6 +13,8 @@ Turn on OpenAPI docs for the blog API, open the docs page, and make the docs bet
 
 ## 1. Write the config
 
+An app made with `dox create` already serves the docs pages, but each route shows only its path and method. These steps add the full docs from your code.
+
 `build_runner` writes `lib/generated/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
 
 ```dart title="lib/config/openapi.dart"
