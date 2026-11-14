@@ -7524,7 +7524,7 @@ A package with no <code>&lt;package&gt;:install</code> command is only added.
 See <a href="../../getting-started/add-a-package/">Add a package</a>.</p>
 <p>Source: <code>lib/src/tools/add_package.dart</code>.</p>
 <h3 id="dox-serve"><code>dox serve</code></h3>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox serve [--ignore-build-runner]
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox serve [--no-reload] [--ignore-build-runner]
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>dox s
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>dox server
 </span></code></pre></div>
@@ -7539,17 +7539,48 @@ See <a href="../../getting-started/add-a-package/">Add a package</a>.</p>
 </thead>
 <tbody>
 <tr>
+<td><code>--no-reload</code></td>
+<td>Turn hot reload off. Every change restarts the server.</td>
+</tr>
+<tr>
 <td><code>--ignore-build-runner</code></td>
 <td>Do not start <code>dart run build_runner watch</code>.</td>
 </tr>
 </tbody>
 </table>
+<p>You can use both options together.</p>
 <p>What it does:</p>
 <ol>
-<li>Starts <code>dart run build_runner watch</code> (unless the option is set).</li>
-<li>Starts <code>dart run bin/server.dart</code> and prints its output.</li>
-<li>Watches the project folder. When a <code>.dart</code> file changes it prints <code>[Dox] File changed: &lt;file&gt;</code>. It waits until no file changed for 500 ms, then kills the server and starts it again.</li>
+<li>Starts <code>dart run --resident bin/server.dart</code> and prints its output. The <code>--resident</code> flag keeps a background compiler that only recompiles changed files. So restarts are fast. <code>dox serve</code> stops that compiler when it exits.</li>
+<li>Runs the server with the Dart VM service on a free port on <code>localhost</code>. Hot reload needs it. The server prints the VM service link at start. Open it in a browser to get DevTools: the debugger, the CPU profiler and memory snapshots. VS Code can also attach to the VM service address ("Dart: Attach to Dart Process").</li>
+<li>When the server is up, starts <code>dart run build_runner watch</code> (unless the option is set).</li>
+<li>Watches the project folder. It ignores <code>build/</code> and hidden folders like <code>.dart_tool/</code>. It waits until no file changed for 200 ms. With build_runner, a restart also waits for the generated files. A hot reload does not wait for build_runner.</li>
 </ol>
+<p>What happens on a change:</p>
+<table>
+<thead>
+<tr>
+<th>Changed</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A <code>.dart</code> file in <code>lib/app/</code> (not <code>.g.dart</code>)</td>
+<td>Hot reload. The new code runs in the server at once, in about 0.1 to 0.2 seconds.</td>
+</tr>
+<tr>
+<td>Routes, providers, config, <code>lib/generated/</code>, <code>bin/</code>, <code>db/</code> or a generated <code>.g.dart</code> file</td>
+<td>The server restarts, because this code or data is built only at start.</td>
+</tr>
+<tr>
+<td>A hot reload that fails, for example a compile error</td>
+<td>The server restarts.</td>
+</tr>
+</tbody>
+</table>
+<p>Hot reload does not run code again that already ran once. For example, a changed static or global value keeps its old value until a restart. Use <code>--no-reload</code> if you do not want this.
+With build_runner, one save gives one restart, after the generated files are written.</p>
 <p>Source: <code>lib/src/tools/server_serve.dart</code>.</p>
 <h3 id="dox-build"><code>dox build</code></h3>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox build

@@ -6950,6 +6950,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#321" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#320_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7554,6 +7565,17 @@
   
     <nav class="md-nav" aria-label="dox_core">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#321_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.1
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#320_3" class="md-nav__link">
@@ -8231,6 +8253,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#321" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#320_1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8837,6 +8870,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#321_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#320_3" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9268,6 +9312,15 @@
 <li>See the <a href="https://github.com/dartondox/dox/pull/112">release notes</a> for all main changes.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
+<h3 id="321">3.2.1</h3>
+<ul>
+<li>New: a default that reads the global <code>env</code> (like <code>env.appEnv</code>) stopped the app with a stack overflow. Now <code>load()</code> throws a clear <code>StateError</code> that says to use the getter directly.</li>
+<li>Fix: a run of capitals in an env getter name is one word now. <code>dbURL</code> read <code>DB_U_R_L</code>, now it reads <code>DB_URL</code>. Also <code>jwtTTL</code> =&gt; <code>JWT_TTL</code> and <code>httpURLPath</code> =&gt; <code>HTTP_URL_PATH</code>. Names like <code>s3Bucket</code> and <code>oauth2ClientId</code> do not change. If your <code>.env</code> has a key like <code>DB_U_R_L</code>, rename it, or use <code>@EnvKey('DB_U_R_L')</code>.</li>
+<li>Fix: <code>@EnvKey</code> through a const variable (<code>const k = EnvKey('X');</code> then <code>@k</code>) was ignored. Now it is read.</li>
+<li>Fix: an env getter named <code>r</code> or <code>reader</code> made <code>env.g.dart</code> fail to compile. The generated <code>load()</code> now uses <code>$r</code> and <code>$reader</code>.</li>
+<li>Fix: an instance field in a <code>@DoxEnv()</code> class was not read from the env, with no warning. Now it is a build error that says to use a getter.</li>
+<li>Fix: in a <code>@DoxEnv()</code> class, a getter body that uses another getter saw the default of that getter, not the loaded value. So <code>String get appUrl =&gt; 'http://localhost:$appPort';</code> gave port 3000 even with <code>APP_PORT=4000</code>. Now a getter body runs on the loaded env and sees the real values. A key that is set still wins over the body. A default that throws still stops the app in <code>load()</code>. Run <code>dart run build_runner build</code> to get the new <code>env.g.dart</code>.</li>
+</ul>
 <h3 id="320_1">3.2.0</h3>
 <ul>
 <li>New: the job builder moved here from dox_queue. It writes <code>lib/generated/jobs.g.dart</code> with every <code>@Job()</code> class, the same file as before. It runs only in an app that has dox_queue in <code>dependencies</code> or <code>dev_dependencies</code>. (When the build can not read the app's <code>pubspec.yaml</code>, it runs when the app can import dox_queue.) If your <code>build.yaml</code> names the builder <code>dox_queue:jobs</code>, change it to <code>dox_builder:jobs</code>.</li>
@@ -9606,6 +9659,18 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
+<h3 id="321_1">3.2.1</h3>
+<ul>
+<li>Fix: <code>Env.get</code> read as the first env read of the app saw only the shell, because nothing had loaded <code>.env</code> yet. Now every env read (<code>Env.get</code>, <code>Env.appEnv</code>, <code>Env().env</code>) loads <code>.env</code> once when it is not loaded. After that it is a plain map read, also when there is no <code>.env</code> file. Setting <code>Env().env</code> in a test counts as loaded, so the file is not put on top. When the <code>.env</code> file can not be read (like bad UTF-8), every read throws again; it never looks like an empty file.</li>
+<li>New: <code>AppConfig.isDevelopment</code>. It is true when the env <code>APP_ENV</code> is <code>development</code> (not <code>local</code>). Not set means production, so false. It reads the env on each call, so it works before the server starts and in every isolate. Use it for config like a database <code>debug</code> flag, in place of a computed getter in the env class: every env getter is an env key.</li>
+<li>New: <code>Env.appEnv</code> gives <code>APP_ENV</code> in lower case. It loads <code>.env</code> first when nothing did yet, so it gives the same answer when it is the first env read. <code>Dox().checkAppKey()</code>, <code>HealthCheck</code>, <code>OpenApiConfig.isEnabled</code> and the null middleware warning use it now. <code>showErrors()</code> keeps its own read, so its per-request cache stays the same.</li>
+<li>Security: an env error printed the bad value, like <code>DB_PORT must be an int, not "..."</code>. A value may be a secret, and the error goes to the startup log and to CI output. Now <code>EnvException</code> and the <code>Env.get</code> cast error name only the key and the expected type.</li>
+<li>Security: more public sample keys are refused by the <code>APP_KEY</code> check at startup: the keys from the docs, the dox_core test fixture and the sample app. They get the same rule as the old sample keys: an error outside development, local, test and testing, and a warning in those. If your <code>APP_KEY</code> is one of them, run <code>dox key:generate</code>.</li>
+<li>Fix: in <code>.env</code>, an unquoted value that starts with <code>#</code> was read as empty. So <code>DB_PASSWORD=#Secret1</code> used the default. Now <code>KEY=#fff</code> keeps <code>#fff</code>, as the docs say. <code>KEY= #x</code> and <code>KEY=a #x</code> are still comments.</li>
+<li>Fix: <code>Env.get</code> read a value with only spaces as text, so <code>Env.get&lt;int&gt;('MAIL_PORT', 587)</code> threw for <code>MAIL_PORT="  "</code>. Now only spaces counts as empty and gives the default, the same as <code>EnvReader</code>.</li>
+<li>Fix: <code>EnvReader.list</code> of only commas (<code>,</code>) gave an empty list. Now it counts as missing, so the default is used.</li>
+<li>Fix: a <code>Duration</code> too big for an int (<code>99999999999999999999s</code>) threw a <code>FormatException</code> right away, and a big one (<code>9223372036854775807d</code>) gave a wrong value. Now both are bad values, listed by <code>check()</code> with the others.</li>
+</ul>
 <h3 id="320_3">3.2.0</h3>
 <ul>
 <li>New: <code>Dox().isWebServer</code>. It is true only in the web server process (<code>startServer()</code> and its isolates). It is false in <code>bin/queue.dart</code>, the scheduler and tests. A provider can use it to skip work that only a web server needs, like a startup warning.</li>

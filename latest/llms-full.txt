@@ -301,10 +301,11 @@ dox s
 
 `dox s` does two things:
 
+- It runs `dart run bin/server.dart`. When you change a file in `lib/app/`, it hot reloads the new code. No restart is needed. For routes, providers, config and other start-up code, it restarts the server.
 - It runs `dart run build_runner watch`, so generated files stay up to date.
-- It runs `dart run bin/server.dart`, and restarts it when a `.dart` file changes.
 
 To skip the builder, use `dox s --ignore-build-runner`.
+To turn hot reload off, use `dox s --no-reload`.
 To start the server without the CLI, run `dart run bin/server.dart`.
 
 At each start it also runs the new migrations in `db/migration`.
@@ -591,7 +592,7 @@ The app reads these keys through the typed class in `lib/config/env.dart`. See [
 dox s
 ```
 
-`dox s` runs the code generator and the server. It restarts the server when you save a `.dart` file.
+`dox s` runs the code generator and the server. It hot reloads your code when you save a file in `lib/app/`. It restarts the server for routes, config and other start-up code.
 The first start is slower, because it compiles the SQLite library.
 At the first start it also runs the migrations of the template.
 The last line is a JSON log line with this message:
@@ -11397,8 +11398,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 
 ### The rules
 
-- **Key**: the getter name in UPPER_SNAKE case. `appName` reads `APP_NAME`, `s3Bucket` reads `S3_BUCKET`. Use `@EnvKey('X')` for another name.
-- **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can not read another env getter.
+- **Key**: the getter name in UPPER_SNAKE case. `appName` reads `APP_NAME`, `s3Bucket` reads `S3_BUCKET`. A run of capitals is one word: `dbURL` reads `DB_URL`. Use `@EnvKey('X')` for another name.
+- **Default**: the getter body. It can be any expression, like `Platform.numberOfProcessors`. It runs only when the key is missing. A default can read another env getter and sees its loaded value: `String get appUrl => 'http://localhost:$appPort';` uses the real `APP_PORT`.
+- **Every getter is a key**: an env getter is always one env key and nothing more. Also a getter whose body uses other getters: `appUrl` above reads `APP_URL`, and when `APP_URL` is set, it wins over the body.
+- **No computed values**: a value like "is development" is not an env key, so it does not go in the env class. Use `appConfig.isDevelopment` from the app config. It is `true` when `APP_ENV` is `development`.
+- **Use the getter, not `env`**: in a default, write `appEnv`, never `env.appEnv`. The global `env` is not ready while it loads. The app stops at startup with a `StateError`: "A default of AppEnv reads the global `env`. Use the getter directly".
+- **Only this class**: the builder reads the getters of the `@DoxEnv()` class itself. Getters from a superclass or a mixin are not read from the env. A field (`final String x = ...;`) is a build error: use a getter.
 - **Optional**: a nullable getter with no body (`String? get s3Bucket;`). It is `null` when the key is missing.
 - **Required**: any other getter with no body. A missing key stops the app.
 - **Empty**: an empty value (or the text `null`) counts as missing.
@@ -11424,8 +11429,10 @@ Any other type is a build error.
 ```
 EnvException: the env is not valid
   - APP_KEY is missing
-  - DB_PORT must be an int, not "abc"
+  - DB_PORT must be an int
 ```
+
+The error names the key, never the value. A value may be a secret, and this text goes to the log and to CI output.
 
 This happens once, when the app starts. After that, `env.dbPort` is a plain field read.
 
@@ -11445,7 +11452,7 @@ Dox reads values from these places:
 
 ```ini title=".env"
 APP_NAME=dox
-APP_KEY=3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e
+APP_KEY=<output of dox key:generate>
 DB_PORT=5432
 ```
 
@@ -11454,10 +11461,11 @@ DB_PORT=5432
 - A `=` inside the value is kept: `TOKEN=a=b` gives `a=b`.
 - A line that starts with `#` is a comment.
 - A `#` after a space starts a comment: `APP_PORT=3000 # dev` gives `3000`.
-- A `#` with no space before it is kept: `DB_PASSWORD=abc#123` gives `abc#123`.
+- A `#` with no space before it is kept: `DB_PASSWORD=abc#123` gives `abc#123`, and `COLOR=#fff` gives `#fff`.
 - A `#` inside quotes is kept: `DB_PASSWORD="abc # 123"` gives `abc # 123`.
 - `export KEY=value` is read like `KEY=value`.
-- `KEY=` (empty) gives the default value, like a key that is not there.
+- `KEY=` (empty, or only spaces) gives the default value, like a key that is not there.
+- One line is one value. A quoted value can not go over more lines, so a multi-line PEM key does not work. Turn on `envExpand` (below) and write it on one line with `\n`: `JWT_KEY="-----BEGIN KEY-----\nabc\n-----END KEY-----"`. Or keep the key in a file and put the file path in the env.
 
 ### Use one value in another
 
@@ -11479,6 +11487,8 @@ The `.env` file is read before `AppConfig` exists. So you must set the flag in t
 
 1. `Env.flags = flags;` at the top of `main()`, before any env value is read.
 2. The same flags in `AppConfig(flags: flags)`.
+
+Set `Env.flags` at the very top of `main()`, before any env read. The first env read (like `Env.get()` or `env.appName`) loads `.env` with the flags of that moment, and the file is not read again. If the flags were not set yet, `Dox().initialize` prints a warning.
 
 ```dart title="lib/config/app.dart"
 import 'package:dox_core/dox_core.dart';
@@ -11886,7 +11896,7 @@ dart pub global deactivate dox
 | Command | What it does |
 | --- | --- |
 | `dox create <name> [--version <v>]` | create a new project |
-| `dox serve` (or `dox s`) | start the dev server with build_runner watch |
+| `dox serve` (or `dox s`) | start the dev server with hot reload and build_runner watch |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
 | `dox make:controller <name> [-r] [--api] [--model=<model>]` | create a controller |
@@ -11953,11 +11963,16 @@ dox create new_blog --version <release tag>
 
 ```bash
 dox serve                         # or: dox s
+dox s --no-reload                 # restart on every change, no hot reload
 dox s --ignore-build-runner       # do not run build_runner watch
 ```
 
-`dox serve` runs `dart run bin/server.dart` and restarts it when a `.dart` file changes.
-It also runs `build_runner watch`, so generated files stay up to date.
+`dox serve` runs `dart run bin/server.dart`.
+When a file in `lib/app/` changes, it hot reloads the new code into the running server. This takes about 0.1 to 0.2 seconds. The server also prints the VM service link. Open it in a browser to get DevTools, the debugger and profiler.
+When routes, providers, config, `lib/generated/`, `bin/`, `db/` or a generated `.g.dart` file change, it restarts the server. A failed hot reload also restarts it.
+Hot reload does not run code again that already ran once. A changed static or global value keeps its old value until a restart.
+It also runs `build_runner watch` after the server is up, so generated files stay up to date. One save gives one restart.
+See [dox serve](../reference/cli.md#dox-serve) for all details.
 
 ### Build for production
 
@@ -12017,10 +12032,10 @@ DB_USERNAME=admin
 DB_PASSWORD=password
 ```
 
-- `DB_CONNECTION` defaults to `postgres`. The default port is `5432` for postgres and `3306` for mysql.
+- `DB_CONNECTION` defaults to `sqlite`. Any other value than `sqlite`, `postgres` or `mysql` is an error. The default port is `5432` for postgres and `3306` for mysql.
 - `DB_DATABASE` works too, in place of `DB_NAME`.
 - `DATABASE_URL` wins over all the `DB_*` keys when it is set.
-- Put comments on their own line. A `#` after a value becomes part of the value.
+- A `#` after a space starts a comment, the same as in the app. `${VAR}` is not expanded, and `.env.testing` is not read.
 
 All keys are in the [Env reference](../reference/env.md#read-by-the-framework).
 
@@ -13347,6 +13362,8 @@ expect(env.dbPort, 5433);
 
 A missing or bad key throws an `EnvException`. So you can also test that your app stops on a bad env. See [Environment Variables](env.md).
 
+Only the getters read through the `EnvReader`. A default (getter body) that calls `Env.get()` or `Platform.environment` reads the real env and `.env`, not the values you pass. Use other getters in a default, like `appEnv == 'development'`.
+
 ## Test the database
 
 A test that uses models needs a real database. Run the migrations once in `setUpAll`.
@@ -13636,6 +13653,7 @@ Put the connections in `lib/config/database.dart`.
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/app.dart';
 import 'package:my_app/config/env.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
@@ -13649,7 +13667,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'mysql': ConnectionConfig(
       driver: Driver.mysql, // also for MariaDB
@@ -13659,12 +13677,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       extra: <String, dynamic>{'maxConnectionCount': 10},
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'sqlite': ConnectionConfig(
       driver: Driver.sqlite,
       database: env.dbName, // file path, like db/dox.sqlite, or ':memory:'
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
   },
 );
@@ -13768,7 +13786,7 @@ DB_PASSWORD=postgres
 ### `DATABASE_URL`
 
 Many hosts (Fly, Render, Heroku and others) give you one database url.
-Dox reads it from the `DATABASE_URL` environment variable.
+Dox reads it from the `DATABASE_URL` key, in `.env` or in the shell. The shell wins.
 
 The rule: **when `DATABASE_URL` is set, it wins.**
 It replaces the config of the default connection (`DatabaseConfig.connection`).
@@ -13792,20 +13810,26 @@ DATABASE_URL=postgres://app:s%40cret@db.example.com:5432/blog?sslmode=require
 - `host=/path` (or `socket=/path`) connects to a Unix socket, like `host=/cloudsql/project:region:instance`. See [Unix socket](#unix-socket).
 - Any other option goes to `extra`, like `?maxConnectionCount=20`. A number becomes an `int`, `true` and `false` a `bool`. This works for SQLite too, like `sqlite://db/dox.sqlite?background=true`.
 
-The ORM reads `DATABASE_URL` from the real environment, not from `.env`.
-To use a url from `.env`, or any other url, give it yourself:
+The app passes the url in, through the env class:
 
-```dart
-DatabaseConfig(
-  connection: 'postgres',
+```dart title="lib/config/env.dart"
+String? get databaseUrl;
+```
+
+```dart title="lib/config/database.dart"
+DatabaseConfig databaseConfig = DatabaseConfig(
+  url: env.databaseUrl,
+  connection: env.dbConnection,
   connections: {...},
-  url: Env.get<String?>('DATABASE_URL'),
 );
 ```
 
+So the app and `dox migrate` use the same url, from `.env` or the shell.
+An app whose `lib/config/database.dart` has no `url: env.databaseUrl` line reads `DATABASE_URL` only from the shell, not from `.env`.
+
 An empty `url` (`url: ''`) turns `DATABASE_URL` off.
 To make one `ConnectionConfig` from a url, use `ConnectionConfig.fromUrl(url)`.
-[Migrations](migration.md#database-settings) read `DATABASE_URL` too, also from `.env`.
+[Migrations](migration.md#database-settings) read `DATABASE_URL` too, from `.env` or the shell.
 
 ### Unix socket
 
@@ -13970,7 +13994,7 @@ It is off by default. It works with `debug` off, so you can use it in production
 'postgres': ConnectionConfig(
   driver: Driver.postgres,
   // ...
-  debug: env.isDevelopment,
+  debug: appConfig.isDevelopment,
   slowQueryMs: 500,
 ),
 ```
@@ -16080,7 +16104,7 @@ Keep the `db/migration` folder next to the binary if you also have `.sql` migrat
 ## Database settings
 
 The migrations read the `.env` file and the environment variables.
-A real environment variable wins over `.env`, the same as `Env.get()`.
+A real environment variable wins over `.env`, the same as `Env.get()`. The file is read like `Env.get()` reads it (`export`, comments, quotes), but with no `${VAR}` expansion, and `.env.testing` is not read.
 
 When `DATABASE_URL` is set, it wins over all `DB_*` keys. See [`DATABASE_URL`](index.md#database_url).
 
@@ -22622,8 +22646,8 @@ With `previousKeys`, users stay logged in while you change it.
 2. Run `dox key:generate`. It writes a new `APP_KEY`. Now `.env` has both:
 
     ```bash title=".env"
-    APP_KEY=the-new-32-character-app-key....
-    APP_PREVIOUS_KEYS=the-old-32-character-app-key....
+    APP_KEY=<the new key from dox key:generate>
+    APP_PREVIOUS_KEYS=<the old APP_KEY>
     ```
 
 3. Read it in the env class, and give it to `AppConfig`:
@@ -24091,7 +24115,7 @@ You need two files first: `lib/config/openapi.dart` (see [Setup](#setup-optional
     First, in the build stage, right after `RUN /root/.pub-cache/bin/dox build`, add:
 
     ```dockerfile title="Dockerfile"
-    RUN APP_KEY=00000000000000000000000000000000 /root/.pub-cache/bin/dox openapi:generate docs/openapi
+    RUN APP_KEY=only-for-the-build-not-a-key /root/.pub-cache/bin/dox openapi:generate docs/openapi
     ```
 
     Second, in the `RUN` step that lays out `/out`, add `/out/app/docs` to the `mkdir -p` list. Add one line to the `&&` chain after the `cp -r build/bundle/. /out/app/` line:
@@ -27249,8 +27273,6 @@ abstract class AppEnv {
   /// development, staging or production. Not set: production.
   String get appEnv => 'production';
 
-  bool get isDevelopment => appEnv == 'development';
-
   int get appPort => 3000;
 
   /// required: used to sign tokens and encrypt cookies
@@ -27330,13 +27352,16 @@ LoggerConfig logger = LoggerConfig(
   name: env.appName,
   enabled: true,
   level: env.logLevel,
-  // colors on your machine, one JSON line per log in staging and production
-  prettyPrint: env.isDevelopment,
+  // colors on your machine, one JSON line per log in staging and production.
+  // Env.appEnv, not appConfig.isDevelopment: appConfig is built from
+  // this logger, so reading appConfig here would loop.
+  prettyPrint: Env.appEnv == 'development',
 );
 ```
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/app.dart';
 import 'package:my_app/config/env.dart';
 
 DatabaseConfig databaseConfig = DatabaseConfig(
@@ -27350,12 +27375,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
       password: env.dbPassword,
       database: env.dbName,
       // print every query on your machine only
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
     'sqlite': ConnectionConfig(
       driver: Driver.sqlite,
       database: env.dbName,
-      debug: env.isDevelopment,
+      debug: appConfig.isDevelopment,
     ),
   },
 );
@@ -27440,7 +27465,7 @@ Start as staging on another port. The real variables win over `.env`:
 APP_ENV=staging APP_PORT=4000 dart run bin/server.dart
 ```
 
-The app listens on `4000`. `env.appEnv` is `'staging'`, and `env.isDevelopment` is `false`.
+The app listens on `4000`. `env.appEnv` is `'staging'`, and `appConfig.isDevelopment` is `false`.
 
 ## Things that differ per environment
 
@@ -28626,7 +28651,7 @@ sudo chmod 600 /etc/blog.env
 systemd reads this file as `root`, before it starts the app as `dox`. So `dox` does not need to read it.
 
 For Postgres, set `DB_CONNECTION=postgres` and add `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_NAME`.
-Or set one `DATABASE_URL`, like `postgres://app:secret@localhost:5432/blog`. It wins over the `DB_*` keys. See [`DATABASE_URL`](../database/index.md#database_url).
+Or set one `DATABASE_URL`, like `postgres://app:secret@localhost:5432/blog`. It wins over the `DB_*` keys. systemd gives it to the app as a real environment variable. See [`DATABASE_URL`](../database/index.md#database_url).
 See [Environments](environments.md) for all keys.
 
 !!! note "Which value wins"
@@ -29229,7 +29254,7 @@ See [CLI](cli.md) and [App config](app-config.md).
 
 ```bash
 dox create my_app                  # newest template
-dox serve                          # dev server + build_runner watch
+dox serve                          # dev server + hot reload + build_runner watch
 dox build                          # AOT bundle in build/bundle
 dox build_runner:build             # make .g.dart files
 dox key:generate                   # APP_KEY in .env
@@ -30202,16 +30227,19 @@ LoggerConfig logger = LoggerConfig(
   enabled: true,
   level: env.logLevel,
   /// colored text is slow. JSON lines in production.
-  prettyPrint: env.isDevelopment,
+  // Env.appEnv, not appConfig.isDevelopment: appConfig is built from
+  // this logger, so reading appConfig here would loop.
+  prettyPrint: Env.appEnv == 'development',
 );
 ```
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/config/app.dart';
 import 'package:my_app/config/env.dart';
 
 /// Print every SQL query only in development.
-bool _debug = env.isDevelopment;
+bool _debug = appConfig.isDevelopment;
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   connection: env.dbConnection,
@@ -30385,7 +30413,7 @@ Source: `lib/src/tools/add_package.dart`.
 ### `dox serve`
 
 ```
-dox serve [--ignore-build-runner]
+dox serve [--no-reload] [--ignore-build-runner]
 dox s
 dox server
 ```
@@ -30396,13 +30424,28 @@ Starts the dev server.
 
 | Option | Meaning |
 | --- | --- |
+| `--no-reload` | Turn hot reload off. Every change restarts the server. |
 | `--ignore-build-runner` | Do not start `dart run build_runner watch`. |
+
+You can use both options together.
 
 What it does:
 
-1. Starts `dart run build_runner watch` (unless the option is set).
-2. Starts `dart run bin/server.dart` and prints its output.
-3. Watches the project folder. When a `.dart` file changes it prints `[Dox] File changed: <file>`. It waits until no file changed for 500 ms, then kills the server and starts it again.
+1. Starts `dart run --resident bin/server.dart` and prints its output. The `--resident` flag keeps a background compiler that only recompiles changed files. So restarts are fast. `dox serve` stops that compiler when it exits.
+2. Runs the server with the Dart VM service on a free port on `localhost`. Hot reload needs it. The server prints the VM service link at start. Open it in a browser to get DevTools: the debugger, the CPU profiler and memory snapshots. VS Code can also attach to the VM service address ("Dart: Attach to Dart Process").
+3. When the server is up, starts `dart run build_runner watch` (unless the option is set).
+4. Watches the project folder. It ignores `build/` and hidden folders like `.dart_tool/`. It waits until no file changed for 200 ms. With build_runner, a restart also waits for the generated files. A hot reload does not wait for build_runner.
+
+What happens on a change:
+
+| Changed | Result |
+| --- | --- |
+| A `.dart` file in `lib/app/` (not `.g.dart`) | Hot reload. The new code runs in the server at once, in about 0.1 to 0.2 seconds. |
+| Routes, providers, config, `lib/generated/`, `bin/`, `db/` or a generated `.g.dart` file | The server restarts, because this code or data is built only at start. |
+| A hot reload that fails, for example a compile error | The server restarts. |
+
+Hot reload does not run code again that already ran once. For example, a changed static or global value keeps its old value until a restart. Use `--no-reload` if you do not want this.
+With build_runner, one save gives one restart, after the generated files are written.
 
 Source: `lib/src/tools/server_serve.dart`.
 
@@ -31022,7 +31065,7 @@ The code reads env vars in three ways:
 
 - `Env.get()` and `EnvReader` (`dox_core`): a real environment variable wins over the `.env` file.
 - `Platform.environment` straight: only the real environment, `.env` is not read.
-- `dox_migration` has its own `loadEnv()`: it reads `.env` and the real environment. A real environment variable wins, the same as `Env.get()`.
+- `dox_migration` has its own `loadEnv()`: it reads `.env` and the real environment. A real environment variable wins. It reads plain lines like `Env.get()` does (`export`, comments, quotes). It has no `${VAR}` expansion and does not read `.env.testing`.
 
 ## Read by the framework
 
@@ -31035,8 +31078,8 @@ If `APP_ENV` is not set or empty, Dox treats the app as production: `/docs` is o
 | `APP_URL` | `dox_core` (`Route.signedUrl`) | not set | The scheme and host in front of an absolute [signed URL](../security/signed-urls.md). | `APP_URL=https://example.com` |
 | `PORT` | `dox_core` (`DoxServer.portFor()`) | not set | The port to listen on, when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set it. `APP_PORT` wins when both are set. Read with `Env.get`. | `PORT=8080` |
 | `APP_HOST` | `dox_core` (`DoxServer.hostFor()`) | not set (all interfaces, `::`) | The host to listen on. `127.0.0.1` keeps the app off the network, for an app behind a proxy on the same machine. `AppConfig.host` wins over it. Read with `Env.get`. | `APP_HOST=127.0.0.1` |
-| `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. `dox_orm` reads it from the real environment only. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
-| `DB_CONNECTION` | `dox_migration` (`DbConnection.config()`) | postgres | `postgres`, `mysql` or `sqlite`. Any other value means postgres. | `DB_CONNECTION=sqlite` |
+| `DATABASE_URL` | `dox_orm` (`DatabaseConfig.url`), `dox_migration` | not set | A database url. When it is set, it wins over `DB_CONNECTION` and the other `DB_*` keys. The app reads it through `env.databaseUrl` (the line `url: env.databaseUrl` in `lib/config/database.dart`), from `.env` or the shell. The shell wins. An app without that line reads it only from the shell. See [Database url](../database/index.md#database_url). | `DATABASE_URL=postgres://app:secret@db:5432/blog?sslmode=require` |
+| `DB_CONNECTION` | `dox_migration` (`DbConnection.config()`) | sqlite | `sqlite`, `postgres` or `mysql`. Any other value is an error. | `DB_CONNECTION=postgres` |
 | `DB_HOST` | `dox_migration` | `localhost` | Database host. A path that starts with `/` is a Unix socket: the folder for Postgres, the socket file for MySQL. | `DB_HOST=127.0.0.1` |
 | `DB_PORT` | `dox_migration` | `5432` (postgres), `3306` (mysql) | Database port. | `DB_PORT=5432` |
 | `DB_USERNAME` | `dox_migration` | `postgres` (postgres), `root` (mysql) | Database user. | `DB_USERNAME=app` |
@@ -31053,7 +31096,7 @@ A new project (`dox create`) reads these keys through its typed env class, `lib/
 | Variable | Getter | Type | Default | Used for |
 | --- | --- | --- | --- | --- |
 | `APP_NAME` | `appName` | `String` | `dox` | `LoggerConfig.name`. |
-| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `env.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Any value except `production` turns on `LogMiddleware` in the new project (one log line per request, if the logger is enabled). Also read by the framework (see above). |
+| `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `appConfig.isDevelopment` is `true` for `development`. It turns on `prettyPrint` of the logger and the query log of the database. Any value except `production` turns on `LogMiddleware` in the new project (one log line per request, if the logger is enabled). Also read by the framework (see above). |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When `APP_PORT` is not set, Dox listens on `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. It must be exactly 32 characters. Run `dox key:generate` for one. The app stops at start when it is missing, has another length, or is a public sample key (only a warning in `development`, `local`, `test` and `testing`). |
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
@@ -31099,7 +31142,7 @@ DB_PASSWORD=postgres
 - The value is everything after the first `=`. A second `=` is kept.
 - `#` after a space starts a comment: `KEY=abc # note` gives `abc`. `KEY=abc#def` stays `abc#def`.
 - A value in quotes (`"`, `'` or `` ` ``) is kept as it is, also a `#`. The quotes are removed.
-- An empty value (`KEY=`), or the text `null`, counts as missing. So `Env.get` gives the default.
+- An empty value (`KEY=`), a value with only spaces, or the text `null`, counts as missing. So `Env.get` gives the default.
 - `export KEY=value` is read like `KEY=value`.
 - With `CoreFlags.envExpand`, `${OTHER}` and `"..."` escapes work. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another).
 - The file is read once per isolate, from the current working directory.
@@ -31782,9 +31825,9 @@ These stop the app at start, so a bad route never reaches a request.
 | Text | When | What to do |
 | --- | --- | --- |
 | `EnvException: the env is not valid` then `  - <KEY> is missing` | `AppEnv.load()` found a required key with no value. | Set the key, or give the getter a default. |
-| `  - <KEY> must be <type>, not "<value>"` | A value does not fit the getter type. | Fix the value. Check for a `# comment` after it. |
+| `  - <KEY> must be <type>` | A value does not fit the getter type. | Fix the value. Check for a `# comment` after it. |
 | `Env key "<KEY>" is not set and has no default` | `Env.get<int>()`, `<num>`, `<double>` or `<bool>` with no value and no default. | Set the key, or pass a default. |
-| `Env key "<KEY>" is not a valid <type>: "<value>"` | `Env.get<int>()` (or another type) got text that is not that type. | Fix the value. |
+| `Env key "<KEY>" is not a valid <type>` | `Env.get<int>()` (or another type) got text that is not that type. | Fix the value. |
 
 See [Environment variables](../digging-deeper/env.md).
 
@@ -32148,6 +32191,15 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
+### 3.2.1
+
+- New: a default that reads the global `env` (like `env.appEnv`) stopped the app with a stack overflow. Now `load()` throws a clear `StateError` that says to use the getter directly.
+- Fix: a run of capitals in an env getter name is one word now. `dbURL` read `DB_U_R_L`, now it reads `DB_URL`. Also `jwtTTL` => `JWT_TTL` and `httpURLPath` => `HTTP_URL_PATH`. Names like `s3Bucket` and `oauth2ClientId` do not change. If your `.env` has a key like `DB_U_R_L`, rename it, or use `@EnvKey('DB_U_R_L')`.
+- Fix: `@EnvKey` through a const variable (`const k = EnvKey('X');` then `@k`) was ignored. Now it is read.
+- Fix: an env getter named `r` or `reader` made `env.g.dart` fail to compile. The generated `load()` now uses `$r` and `$reader`.
+- Fix: an instance field in a `@DoxEnv()` class was not read from the env, with no warning. Now it is a build error that says to use a getter.
+- Fix: in a `@DoxEnv()` class, a getter body that uses another getter saw the default of that getter, not the loaded value. So `String get appUrl => 'http://localhost:$appPort';` gave port 3000 even with `APP_PORT=4000`. Now a getter body runs on the loaded env and sees the real values. A key that is set still wins over the body. A default that throws still stops the app in `load()`. Run `dart run build_runner build` to get the new `env.g.dart`.
+
 ### 3.2.0
 
 - New: the job builder moved here from dox_queue. It writes `lib/generated/jobs.g.dart` with every `@Job()` class, the same file as before. It runs only in an app that has dox_queue in `dependencies` or `dev_dependencies`. (When the build can not read the app's `pubspec.yaml`, it runs when the app can import dox_queue.) If your `build.yaml` names the builder `dox_queue:jobs`, change it to `dox_builder:jobs`.
@@ -32488,6 +32540,18 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox_core
+
+### 3.2.1
+
+- Fix: `Env.get` read as the first env read of the app saw only the shell, because nothing had loaded `.env` yet. Now every env read (`Env.get`, `Env.appEnv`, `Env().env`) loads `.env` once when it is not loaded. After that it is a plain map read, also when there is no `.env` file. Setting `Env().env` in a test counts as loaded, so the file is not put on top. When the `.env` file can not be read (like bad UTF-8), every read throws again; it never looks like an empty file.
+- New: `AppConfig.isDevelopment`. It is true when the env `APP_ENV` is `development` (not `local`). Not set means production, so false. It reads the env on each call, so it works before the server starts and in every isolate. Use it for config like a database `debug` flag, in place of a computed getter in the env class: every env getter is an env key.
+- New: `Env.appEnv` gives `APP_ENV` in lower case. It loads `.env` first when nothing did yet, so it gives the same answer when it is the first env read. `Dox().checkAppKey()`, `HealthCheck`, `OpenApiConfig.isEnabled` and the null middleware warning use it now. `showErrors()` keeps its own read, so its per-request cache stays the same.
+- Security: an env error printed the bad value, like `DB_PORT must be an int, not "..."`. A value may be a secret, and the error goes to the startup log and to CI output. Now `EnvException` and the `Env.get` cast error name only the key and the expected type.
+- Security: more public sample keys are refused by the `APP_KEY` check at startup: the keys from the docs, the dox_core test fixture and the sample app. They get the same rule as the old sample keys: an error outside development, local, test and testing, and a warning in those. If your `APP_KEY` is one of them, run `dox key:generate`.
+- Fix: in `.env`, an unquoted value that starts with `#` was read as empty. So `DB_PASSWORD=#Secret1` used the default. Now `KEY=#fff` keeps `#fff`, as the docs say. `KEY= #x` and `KEY=a #x` are still comments.
+- Fix: `Env.get` read a value with only spaces as text, so `Env.get<int>('MAIL_PORT', 587)` threw for `MAIL_PORT="  "`. Now only spaces counts as empty and gives the default, the same as `EnvReader`.
+- Fix: `EnvReader.list` of only commas (`,`) gave an empty list. Now it counts as missing, so the default is used.
+- Fix: a `Duration` too big for an int (`99999999999999999999s`) threw a `FormatException` right away, and a big one (`9223372036854775807d`) gave a wrong value. Now both are bad values, listed by `check()` with the others.
 
 ### 3.2.0
 

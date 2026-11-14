@@ -7237,6 +7237,7 @@ A key in <code>.env.testing</code> wins over the same key in <code>.env</code>. 
 </span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="n">expect</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="p">,</span><span class="w"> </span><span class="m">5433</span><span class="p">);</span>
 </span></code></pre></div>
 <p>A missing or bad key throws an <code>EnvException</code>. So you can also test that your app stops on a bad env. See <a href="../env/">Environment Variables</a>.</p>
+<p>Only the getters read through the <code>EnvReader</code>. A default (getter body) that calls <code>Env.get()</code> or <code>Platform.environment</code> reads the real env and <code>.env</code>, not the values you pass. Use other getters in a default, like <code>appEnv == 'development'</code>.</p>
 <h2 id="test-the-database">Test the database</h2>
 <p>A test that uses models needs a real database. Run the migrations once in <code>setUpAll</code>.
 Then empty the tables before each test with <code>refreshDatabase()</code> from <code>package:dox_orm/testing.dart</code>:</p>

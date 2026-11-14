@@ -7109,7 +7109,7 @@ The new app template already does this:</p>
 <p>Keep the <code>db/migration</code> folder next to the binary if you also have <code>.sql</code> migrations.</p>
 <h2 id="database-settings">Database settings</h2>
 <p>The migrations read the <code>.env</code> file and the environment variables.
-A real environment variable wins over <code>.env</code>, the same as <code>Env.get()</code>.</p>
+A real environment variable wins over <code>.env</code>, the same as <code>Env.get()</code>. The file is read like <code>Env.get()</code> reads it (<code>export</code>, comments, quotes), but with no <code>${VAR}</code> expansion, and <code>.env.testing</code> is not read.</p>
 <p>When <code>DATABASE_URL</code> is set, it wins over all <code>DB_*</code> keys. See <a href="../#database_url"><code>DATABASE_URL</code></a>.</p>
 <div class="language-bash highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">DB_CONNECTION</span><span class="o">=</span>postgres<span class="w"> </span><span class="c1"># or mysql (also MariaDB), or sqlite</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nv">DB_HOST</span><span class="o">=</span>localhost

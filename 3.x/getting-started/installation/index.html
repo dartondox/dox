@@ -6936,10 +6936,11 @@ values in <code>.env</code>. See <a href="../../database/">Database</a>.</p>
 </span></code></pre></div>
 <p><code>dox s</code> does two things:</p>
 <ul>
+<li>It runs <code>dart run bin/server.dart</code>. When you change a file in <code>lib/app/</code>, it hot reloads the new code. No restart is needed. For routes, providers, config and other start-up code, it restarts the server.</li>
 <li>It runs <code>dart run build_runner watch</code>, so generated files stay up to date.</li>
-<li>It runs <code>dart run bin/server.dart</code>, and restarts it when a <code>.dart</code> file changes.</li>
 </ul>
 <p>To skip the builder, use <code>dox s --ignore-build-runner</code>.
+To turn hot reload off, use <code>dox s --no-reload</code>.
 To start the server without the CLI, run <code>dart run bin/server.dart</code>.</p>
 <p>At each start it also runs the new migrations in <code>db/migration</code>.
 The server uses the port in <code>APP_PORT</code> in the <code>.env</code> file (<code>3000</code> by default).

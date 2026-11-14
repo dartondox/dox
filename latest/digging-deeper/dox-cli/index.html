@@ -7027,7 +7027,7 @@ Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt
 </tr>
 <tr>
 <td><code>dox serve</code> (or <code>dox s</code>)</td>
-<td>start the dev server with build_runner watch</td>
+<td>start the dev server with hot reload and build_runner watch</td>
 </tr>
 <tr>
 <td><code>dox build</code></td>
@@ -7228,10 +7228,15 @@ Run <code>dox help</code> to see all commands. Run <code>dox help &lt;command&gt
 </ul>
 <h3 id="run-the-dev-server">Run the dev server</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dox<span class="w"> </span>serve<span class="w">                         </span><span class="c1"># or: dox s</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>dox<span class="w"> </span>s<span class="w"> </span>--ignore-build-runner<span class="w">       </span><span class="c1"># do not run build_runner watch</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>dox<span class="w"> </span>s<span class="w"> </span>--no-reload<span class="w">                 </span><span class="c1"># restart on every change, no hot reload</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>dox<span class="w"> </span>s<span class="w"> </span>--ignore-build-runner<span class="w">       </span><span class="c1"># do not run build_runner watch</span>
 </span></code></pre></div>
-<p><code>dox serve</code> runs <code>dart run bin/server.dart</code> and restarts it when a <code>.dart</code> file changes.
-It also runs <code>build_runner watch</code>, so generated files stay up to date.</p>
+<p><code>dox serve</code> runs <code>dart run bin/server.dart</code>.
+When a file in <code>lib/app/</code> changes, it hot reloads the new code into the running server. This takes about 0.1 to 0.2 seconds. The server also prints the VM service link. Open it in a browser to get DevTools, the debugger and profiler.
+When routes, providers, config, <code>lib/generated/</code>, <code>bin/</code>, <code>db/</code> or a generated <code>.g.dart</code> file change, it restarts the server. A failed hot reload also restarts it.
+Hot reload does not run code again that already ran once. A changed static or global value keeps its old value until a restart.
+It also runs <code>build_runner watch</code> after the server is up, so generated files stay up to date. One save gives one restart.
+See <a href="../../reference/cli/#dox-serve">dox serve</a> for all details.</p>
 <h3 id="build-for-production">Build for production</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dox<span class="w"> </span>build
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">cd</span><span class="w"> </span>build/bundle
@@ -7280,10 +7285,10 @@ It also runs <code>build_runner watch</code>, so generated files stay up to date
 </span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">password</span>
 </span></code></pre></div>
 <ul>
-<li><code>DB_CONNECTION</code> defaults to <code>postgres</code>. The default port is <code>5432</code> for postgres and <code>3306</code> for mysql.</li>
+<li><code>DB_CONNECTION</code> defaults to <code>sqlite</code>. Any other value than <code>sqlite</code>, <code>postgres</code> or <code>mysql</code> is an error. The default port is <code>5432</code> for postgres and <code>3306</code> for mysql.</li>
 <li><code>DB_DATABASE</code> works too, in place of <code>DB_NAME</code>.</li>
 <li><code>DATABASE_URL</code> wins over all the <code>DB_*</code> keys when it is set.</li>
-<li>Put comments on their own line. A <code>#</code> after a value becomes part of the value.</li>
+<li>A <code>#</code> after a space starts a comment, the same as in the app. <code>${VAR}</code> is not expanded, and <code>.env.testing</code> is not read.</li>
 </ul>
 <p>All keys are in the <a href="../../reference/env/#read-by-the-framework">Env reference</a>.</p>
 <h3 id="run-and-undo-migrations">Run and undo migrations</h3>

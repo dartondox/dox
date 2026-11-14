@@ -7027,8 +7027,12 @@
 </span></code></pre></div>
 <h3 id="the-rules">The rules</h3>
 <ul>
-<li><strong>Key</strong>: the getter name in UPPER_SNAKE case. <code>appName</code> reads <code>APP_NAME</code>, <code>s3Bucket</code> reads <code>S3_BUCKET</code>. Use <code>@EnvKey('X')</code> for another name.</li>
-<li><strong>Default</strong>: the getter body. It can be any expression, like <code>Platform.numberOfProcessors</code>. It runs only when the key is missing. A default can not read another env getter.</li>
+<li><strong>Key</strong>: the getter name in UPPER_SNAKE case. <code>appName</code> reads <code>APP_NAME</code>, <code>s3Bucket</code> reads <code>S3_BUCKET</code>. A run of capitals is one word: <code>dbURL</code> reads <code>DB_URL</code>. Use <code>@EnvKey('X')</code> for another name.</li>
+<li><strong>Default</strong>: the getter body. It can be any expression, like <code>Platform.numberOfProcessors</code>. It runs only when the key is missing. A default can read another env getter and sees its loaded value: <code>String get appUrl =&gt; 'http://localhost:$appPort';</code> uses the real <code>APP_PORT</code>.</li>
+<li><strong>Every getter is a key</strong>: an env getter is always one env key and nothing more. Also a getter whose body uses other getters: <code>appUrl</code> above reads <code>APP_URL</code>, and when <code>APP_URL</code> is set, it wins over the body.</li>
+<li><strong>No computed values</strong>: a value like "is development" is not an env key, so it does not go in the env class. Use <code>appConfig.isDevelopment</code> from the app config. It is <code>true</code> when <code>APP_ENV</code> is <code>development</code>.</li>
+<li><strong>Use the getter, not <code>env</code></strong>: in a default, write <code>appEnv</code>, never <code>env.appEnv</code>. The global <code>env</code> is not ready while it loads. The app stops at startup with a <code>StateError</code>: "A default of AppEnv reads the global <code>env</code>. Use the getter directly".</li>
+<li><strong>Only this class</strong>: the builder reads the getters of the <code>@DoxEnv()</code> class itself. Getters from a superclass or a mixin are not read from the env. A field (<code>final String x = ...;</code>) is a build error: use a getter.</li>
 <li><strong>Optional</strong>: a nullable getter with no body (<code>String? get s3Bucket;</code>). It is <code>null</code> when the key is missing.</li>
 <li><strong>Required</strong>: any other getter with no body. A missing key stops the app.</li>
 <li><strong>Empty</strong>: an empty value (or the text <code>null</code>) counts as missing.</li>
@@ -7077,8 +7081,9 @@
 <p><code>AppEnv.load()</code> reads every key one time. Then it checks them all, and throws one <code>EnvException</code> that lists every missing or bad key:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>EnvException: the env is not valid
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  - APP_KEY is missing
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  - DB_PORT must be an int, not "abc"
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  - DB_PORT must be an int
 </span></code></pre></div>
+<p>The error names the key, never the value. A value may be a secret, and this text goes to the log and to CI output.</p>
 <p>This happens once, when the app starts. After that, <code>env.dbPort</code> is a plain field read.</p>
 <h2 id="where-values-come-from">Where values come from</h2>
 <p>Dox reads values from these places:</p>
@@ -7094,7 +7099,7 @@ So you can keep <code>.env</code> for development and use real variables in prod
 </div>
 <h3 id="the-env-file">The <code>.env</code> file</h3>
 <div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="na">APP_NAME</span><span class="o">=</span><span class="s">dox</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">3f9a1c7e5b2d4f6a8c0e1b3d5f7a9c2e</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">&lt;output of dox key:generate&gt;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="na">DB_PORT</span><span class="o">=</span><span class="s">5432</span>
 </span></code></pre></div>
 <ul>
@@ -7103,10 +7108,11 @@ So you can keep <code>.env</code> for development and use real variables in prod
 <li>A <code>=</code> inside the value is kept: <code>TOKEN=a=b</code> gives <code>a=b</code>.</li>
 <li>A line that starts with <code>#</code> is a comment.</li>
 <li>A <code>#</code> after a space starts a comment: <code>APP_PORT=3000 # dev</code> gives <code>3000</code>.</li>
-<li>A <code>#</code> with no space before it is kept: <code>DB_PASSWORD=abc#123</code> gives <code>abc#123</code>.</li>
+<li>A <code>#</code> with no space before it is kept: <code>DB_PASSWORD=abc#123</code> gives <code>abc#123</code>, and <code>COLOR=#fff</code> gives <code>#fff</code>.</li>
 <li>A <code>#</code> inside quotes is kept: <code>DB_PASSWORD="abc # 123"</code> gives <code>abc # 123</code>.</li>
 <li><code>export KEY=value</code> is read like <code>KEY=value</code>.</li>
-<li><code>KEY=</code> (empty) gives the default value, like a key that is not there.</li>
+<li><code>KEY=</code> (empty, or only spaces) gives the default value, like a key that is not there.</li>
+<li>One line is one value. A quoted value can not go over more lines, so a multi-line PEM key does not work. Turn on <code>envExpand</code> (below) and write it on one line with <code>\n</code>: <code>JWT_KEY="-----BEGIN KEY-----\nabc\n-----END KEY-----"</code>. Or keep the key in a file and put the file path in the env.</li>
 </ul>
 <h3 id="use-one-value-in-another">Use one value in another</h3>
 <p><code>CoreFlags.envExpand</code> is off by default. Turn it on to use <code>${OTHER}</code> in a value:</p>
@@ -7126,6 +7132,7 @@ So you can keep <code>.env</code> for development and use real variables in prod
 <li><code>Env.flags = flags;</code> at the top of <code>main()</code>, before any env value is read.</li>
 <li>The same flags in <code>AppConfig(flags: flags)</code>.</li>
 </ol>
+<p>Set <code>Env.flags</code> at the very top of <code>main()</code>, before any env read. The first env read (like <code>Env.get()</code> or <code>env.appName</code>) loads <code>.env</code> with the flags of that moment, and the file is not read again. If the flags were not set yet, <code>Dox().initialize</code> prints a warning.</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">const</span><span class="w"> </span><span class="n">CoreFlags</span><span class="w"> </span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CoreFlags</span><span class="p">(</span><span class="nl">envExpand:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
