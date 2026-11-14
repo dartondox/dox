@@ -19,6 +19,7 @@ class Env {
   /// `.env`). Its keys win over the keys of `.env`. A real environment
   /// variable still wins over both. [testing] is [isTesting] by default.
   void load({File? file, bool? testing}) {
+    _loaded = true;
     if (env.isEmpty) {
       expanded = flags.envExpand;
       env = _loadEnv(file: file, testing: testing ?? isTesting);
@@ -74,9 +75,17 @@ class Env {
     return _cast<T>(key, value);
   }
 
+  /// True after the first [load], so [appEnv] reads the file only once.
+  bool _loaded = false;
+
   /// `APP_ENV` in lower case. Empty when it is not set, which means
-  /// production.
-  static String get appEnv => get<String>('APP_ENV').toLowerCase();
+  /// production. It loads `.env` first when nothing did yet, so the
+  /// answer does not depend on what was read before it.
+  static String get appEnv {
+    Env instance = Env();
+    if (!instance._loaded) instance.load();
+    return get<String>('APP_ENV').toLowerCase();
+  }
 
   static T _missing<T>(String key) {
     if (null is T) return null as T;

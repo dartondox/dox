@@ -13,10 +13,7 @@ class AppConfig {
   /// It reads the env on each call, so it works before the server starts
   /// and in every isolate. Use it for config like `prettyPrint` or a
   /// database `debug` flag.
-  bool get isDevelopment {
-    Env().load();
-    return Env.appEnv == 'development';
-  }
+  bool get isDevelopment => Env.appEnv == 'development';
 
   /// Old `APP_KEY`s, to change the key without logging out every user.
   /// Encrypted cookies and cookie sessions made with one of them can
