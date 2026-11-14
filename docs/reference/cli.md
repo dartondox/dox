@@ -66,7 +66,7 @@ Source: `lib/src/tools/add_package.dart`.
 ### `dox serve`
 
 ```
-dox serve [--ignore-build-runner]
+dox serve [--no-reload] [--ignore-build-runner]
 dox s
 dox server
 ```
@@ -77,13 +77,28 @@ Starts the dev server.
 
 | Option | Meaning |
 | --- | --- |
+| `--no-reload` | Turn hot reload off. Every change restarts the server. |
 | `--ignore-build-runner` | Do not start `dart run build_runner watch`. |
+
+You can use both options together.
 
 What it does:
 
-1. Starts `dart run build_runner watch` (unless the option is set).
-2. Starts `dart run bin/server.dart` and prints its output.
-3. Watches the project folder. When a `.dart` file changes it prints `[Dox] File changed: <file>`. It waits until no file changed for 500 ms, then kills the server and starts it again.
+1. Starts `dart run --resident bin/server.dart` and prints its output. The `--resident` flag keeps a background compiler that only recompiles changed files. So restarts are fast. `dox serve` stops that compiler when it exits.
+2. Runs the server with the Dart VM service on a free port on `localhost`. Hot reload needs it. The server prints a DevTools link at start. Open it for the debugger, the CPU profiler and memory snapshots. VS Code can also attach to the VM service address ("Dart: Attach to Dart Process").
+3. When the server is up, starts `dart run build_runner watch` (unless the option is set).
+4. Watches the project folder. It ignores `build/` and hidden folders like `.dart_tool/`. It waits until no file changed for 200 ms. With build_runner, a restart also waits for the generated files. A hot reload does not wait for build_runner.
+
+What happens on a change:
+
+| Changed | Result |
+| --- | --- |
+| A `.dart` file in `lib/app/` (not `.g.dart`) | Hot reload. The new code runs in the server at once, in about 0.1 to 0.2 seconds. |
+| Routes, providers, config, `lib/generated/`, `bin/`, `db/` or a generated `.g.dart` file | The server restarts, because this code or data is built only at start. |
+| A hot reload that fails, for example a compile error | The server restarts. |
+
+Hot reload does not run code again that already ran once. For example, a changed static or global value keeps its old value until a restart. Use `--no-reload` if you do not want this.
+With build_runner, one save gives one restart, after the generated files are written.
 
 Source: `lib/src/tools/server_serve.dart`.
 

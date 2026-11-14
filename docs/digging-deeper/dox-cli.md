@@ -33,7 +33,7 @@ dart pub global deactivate dox
 | Command | What it does |
 | --- | --- |
 | `dox create <name> [--version <v>]` | create a new project |
-| `dox serve` (or `dox s`) | start the dev server with build_runner watch |
+| `dox serve` (or `dox s`) | start the dev server with hot reload and build_runner watch |
 | `dox build` | build the native (AOT) bundle into `build/bundle` |
 | `dox build_runner:watch` / `dox build_runner:build` | run the code generator |
 | `dox make:controller <name> [-r] [--api] [--model=<model>]` | create a controller |
@@ -100,11 +100,16 @@ dox create new_blog --version <release tag>
 
 ```bash
 dox serve                         # or: dox s
+dox s --no-reload                 # restart on every change, no hot reload
 dox s --ignore-build-runner       # do not run build_runner watch
 ```
 
-`dox serve` runs `dart run bin/server.dart` and restarts it when a `.dart` file changes.
-It also runs `build_runner watch`, so generated files stay up to date.
+`dox serve` runs `dart run bin/server.dart`.
+When a file in `lib/app/` changes, it hot reloads the new code into the running server. This takes about 0.1 to 0.2 seconds. The server also prints a DevTools link for the debugger and profiler.
+When routes, providers, config, `lib/generated/`, `bin/`, `db/` or a generated `.g.dart` file change, it restarts the server. A failed hot reload also restarts it.
+Hot reload does not run code again that already ran once. A changed static or global value keeps its old value until a restart.
+It also runs `build_runner watch` after the server is up, so generated files stay up to date. One save gives one restart.
+See [dox serve](../reference/cli.md#dox-serve) for all details.
 
 ### Build for production
 

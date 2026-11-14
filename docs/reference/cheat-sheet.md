@@ -37,7 +37,7 @@ See [CLI](cli.md) and [App config](app-config.md).
 
 ```bash
 dox create my_app                  # newest template
-dox serve                          # dev server + build_runner watch
+dox serve                          # dev server + hot reload + build_runner watch
 dox build                          # AOT bundle in build/bundle
 dox build_runner:build             # make .g.dart files
 dox key:generate                   # APP_KEY in .env

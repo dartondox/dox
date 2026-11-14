@@ -16,3 +16,9 @@ How to read this file:
 - [ ] Make every opt-in flag the default, then remove the flags
   - Each flag has a marker comment in the code. Run `rg "NEXT MAJOR"` in every Dox repo and do what each comment says.
 - [ ] WebSocket: add permessage-deflate
+
+### 2. Minor Release
+
+- [] `dox s` is slow on development
+- [] openapi for production
+- [] update openapi documentation
