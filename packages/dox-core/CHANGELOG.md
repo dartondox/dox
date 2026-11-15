@@ -1,5 +1,6 @@
 ## Unreleased
 
+- The AI agent skill (dox-core-guide) has a Performance section and `references/performance.md`: the common mistakes that block the isolate, the right code for each, and strict mode.
 - New: `Dox().compute(task)` runs heavy CPU work (a PDF, an image, a big JSON file) on a worker isolate and gives the result. The server can answer other requests in the meantime. There is one small pool of workers for the whole process, shared by every server isolate. The workers start on the first task. More tasks than workers wait in line, first come first served. An error of the task is thrown to the caller, with its stack trace. A worker that dies is replaced, and its task fails with a clear error. The pool stops with the server and never keeps a command or a test running. The task runs in another isolate, so it can only use values that can be sent between isolates, not the IoC container or a database pool.
 - New: `AppConfig.computeWorkers` sets the number of workers. Default `AppConfig.defaultComputeWorkers` (4).
 - Change: `Hash.makeAsync` and `Hash.verifyAsync` run on the worker pool of `Dox().compute`. Before, each call started a new isolate, so 500 logins at once started 500 isolates. The results are the same. They still work without a server.

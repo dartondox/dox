@@ -1,6 +1,6 @@
 ---
 name: dox-core-guide
-description: How to build HTTP features in a Dox (Dart backend) app with dox_core. Use it when you add or change routes, routers, controllers, DTOs (request validation), serializers, responses, HTTP errors, middleware, providers, services, typed env config (lib/config/env.dart), dox CLI commands, or HTTP tests with DoxTestClient.
+description: How to build HTTP features in a Dox (Dart backend) app with dox_core. Use it when you add or change routes, routers, controllers, DTOs (request validation), serializers, responses, HTTP errors, middleware, providers, services, typed env config (lib/config/env.dart), dox CLI commands, HTTP tests with DoxTestClient, or when you write code that does slow work in a request (heavy CPU work, password hashing, file reads, strict mode warnings).
 ---
 
 # Dox core guide
@@ -420,6 +420,23 @@ dynamic foo = await Cache().get('foo');
 ```
 
 Values must be JSON types. The `dox-cache-guide` skill has the full API.
+
+## Performance
+
+Dart runs one thing at a time in each isolate. Slow work without an `await` makes every
+other request on that isolate wait. The rules:
+
+- Heavy CPU work (a PDF, an image, a huge JSON): `await Dox().compute(() => work(data))`.
+- Passwords in request code: `await Hash.makeAsync(...)` and `await Hash.verifyAsync(...)`, not `Hash.make` or `Hash.verify`.
+- No sync file calls (`readAsStringSync`) in request code.
+- Independent calls: `await (a(), b()).wait` or `Future.wait`, not one `await` after the other.
+- No `static` Map as a cache. Use `Cache().remember(key, duration, fn)`.
+- Always `await` an async call.
+- One shared HTTP or Redis client from the container, not a new one per request.
+- Big uploads and downloads: stream them.
+- A `[strict]` warning in the dev log means one of these happened. Fix the code, do not turn strict mode off.
+
+The wrong and right code for each rule is in `references/performance.md` next to this file.
 
 ## Testing
 
