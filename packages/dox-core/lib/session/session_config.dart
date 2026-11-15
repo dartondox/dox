@@ -28,6 +28,8 @@ class SessionConfig {
 
   /// The cache store name for the `cache` driver, like `redis`, `memory`
   /// or `file`. null uses the default store of `AppConfig.cache`.
+  /// A `memory` store keeps the sessions in the main isolate, so all
+  /// isolates of the server see them (see `SessionMemoryStore`).
   final String? store;
 
   /// The name of the session cookie.

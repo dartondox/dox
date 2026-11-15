@@ -81,6 +81,21 @@ Route.post('/auth/register', <dynamic>[
 
 Behind Caddy, nginx or a load balancer, every request comes from the proxy ip, so all clients share one count. Add the proxy to `AppConfig.trustedProxies`, so `req.ip()` is the real client ip. See [App config](../reference/app-config.md).
 
+## IPv6 clients
+
+A home or a server with IPv6 often gets a whole /64 block. That is 2^64 addresses. By default each address has its own count, so such a client can send from a new address each time and never hit the limit.
+
+Turn on `rateLimitIpv6Prefix` in `CoreFlags` to count each IPv6 client by its /64 prefix:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  flags: CoreFlags(rateLimitIpv6Prefix: true),
+  // ...
+);
+```
+
+All clients in one /64 then share one count. An IPv4 address stays as it is. A `key` function you give is used as it is. To use the same rule in your own key, call `RateLimit.ipBucket(req.ip())`.
+
 ## Where the counts live
 
 When the default [cache](../digging-deeper/cache.md) store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server.
@@ -109,6 +124,7 @@ The count is then the count of this window, plus a part of the window before. Th
 
 - A blocked request still counts, so a client that keeps sending while it is blocked stays blocked.
 - In the main isolate mode, each limited request sends one small message to the main isolate.
+- In the main isolate mode, the counter keeps at most 100,000 clients (about 15 MB). When it is full, it first drops the expired counts, then the oldest ones. A dropped client starts again at 0. New clients are never turned away, so a flood of fake clients can not lock out real users.
 - A `memory` store named in `store` also counts in the main isolate. A store passed in `cacheStore` is used as it is.
 - Sliding window example: 4 requests last minute, 1 this minute, 15 seconds in: the count is `4 x 45/60 + 1 = 4`. `X-RateLimit-Remaining` is `max` minus this count, rounded up. Each count is kept for 2 windows.
 

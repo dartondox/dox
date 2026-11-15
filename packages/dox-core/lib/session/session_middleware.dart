@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/session/session_memory_store.dart';
 import 'package:dox_core/utils/path_pattern.dart';
 
 /// Gives each request a session (`req.session`) and saves it after the
@@ -76,7 +77,10 @@ class SessionMiddleware implements IDoxNextMiddleware {
     }
     _checkDriver(config);
     if (value == null) return Session();
-    Object? stored = await _store(config).get('$_prefix$value');
+    String key = '$_prefix$value';
+    Object? stored = SessionMemoryStore.isMemory(config.store)
+        ? await SessionMemoryStore.instance.get(config.store, key)
+        : await _store(config).get(key);
     if (stored == null) return Session();
     return Session(id: value, read: () => stored);
   }
@@ -102,11 +106,21 @@ class SessionMiddleware implements IDoxNextMiddleware {
         );
       }
     } else {
-      CacheStore store = _store(config);
       String? previous = session.previousId;
-      if (previous != null) await store.forget('$_prefix$previous');
       String id = session.id ??= Session.newId();
-      await store.put('$_prefix$id', payload, config.lifetime);
+      if (SessionMemoryStore.isMemory(config.store)) {
+        // a memory store lives in one isolate: use the one of the main
+        // isolate, so all isolates see the same sessions
+        SessionMemoryStore shared = SessionMemoryStore.instance;
+        if (previous != null) {
+          await shared.forget(config.store, '$_prefix$previous');
+        }
+        await shared.put(config.store, '$_prefix$id', payload, config.lifetime);
+      } else {
+        CacheStore store = _store(config);
+        if (previous != null) await store.forget('$_prefix$previous');
+        await store.put('$_prefix$id', payload, config.lifetime);
+      }
       value = id;
     }
     res.cookie(

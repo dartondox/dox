@@ -37,7 +37,11 @@ Future<List<List<int>>> _countAndReadIn(List<Object> args) async {
 }
 
 void main() {
-  tearDown(RateLimitCounter.instance.close);
+  tearDown(() {
+    RateLimitCounter.instance
+      ..close()
+      ..maxKeys = RateLimitCounter.defaultMaxKeys;
+  });
 
   test('counts in place when not connected', () async {
     RateLimitCounter c = RateLimitCounter.instance;
@@ -97,5 +101,45 @@ void main() {
       4,
       100,
     ));
+  });
+
+  test('the key cap drops expired keys first', () async {
+    RateLimitCounter c = RateLimitCounter.instance..maxKeys = 10;
+    for (int i = 0; i < 5; i++) {
+      await c.increment('short$i', Duration(milliseconds: 10));
+    }
+    for (int i = 0; i < 5; i++) {
+      await c.increment('long$i', Duration(minutes: 1));
+    }
+    await Future<void>.delayed(Duration(milliseconds: 30));
+    expect(await c.increment('long0', Duration(minutes: 1)), 2);
+    expect(await c.increment('new', Duration(minutes: 1)), 1);
+    // the 5 expired keys made room, no live key was dropped
+    expect(c.length, 6);
+    expect(await c.increment('long4', Duration(minutes: 1)), 2);
+  });
+
+  test('a full map drops the oldest keys, it never grows', () async {
+    RateLimitCounter c = RateLimitCounter.instance..maxKeys = 10;
+    for (int i = 0; i < 10; i++) {
+      await c.increment('k$i', Duration(minutes: 1));
+    }
+    expect(await c.increment('k9', Duration(minutes: 1)), 2);
+    for (int i = 0; i < 100; i++) {
+      await c.increment('flood$i', Duration(minutes: 1));
+      expect(c.length, lessThanOrEqualTo(10));
+    }
+    // a new client is counted, not turned away
+    expect(await c.increment('newcomer', Duration(minutes: 1)), 1);
+    // the oldest key was dropped: it starts again at 1
+    expect(await c.increment('k0', Duration(minutes: 1)), 1);
+  });
+
+  test('null maxKeys turns the cap off', () async {
+    RateLimitCounter c = RateLimitCounter.instance..maxKeys = null;
+    for (int i = 0; i < 50; i++) {
+      await c.increment('k$i', Duration(minutes: 1));
+    }
+    expect(c.length, 50);
   });
 }

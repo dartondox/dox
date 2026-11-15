@@ -79,6 +79,7 @@ AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
 | `replaceHeaders` | `res.header(k, v)` replaces a value that a middleware set before. `Vary` and `Set-Cookie` still get one more value. Off: it adds a second value. Pass `replace:` to pick for one call. |
 | `decryptServerError` | A `DecryptException` gives a `500` `server_error`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. |
 | `envExpand` | `.env` values can use `${OTHER}`, and a `"..."` value reads `\n`, `\t`, `\"`, `\\` and `\$`. Also set `Env.flags = flags;` at the top of `main()` in `bin/server.dart` and in your tests, because `.env` is read before `AppConfig` exists. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another). Off: values are read as written. |
+| `rateLimitIpv6Prefix` | The default key of `RateLimit` counts an IPv6 client by its /64 prefix. One home or server gets a whole /64, so with one count per address a client gets a new count with each new address. Clients in one /64 share a count. A `key` you give is used as it is. Off: each full ip has its own count. See [Rate limiting](../security/rate-limiting.md#ipv6-clients). |
 | `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
 
 The cache has its own flag class, `CacheFlags`, in [`CacheConfig`](#cacheconfig).

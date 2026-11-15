@@ -17,6 +17,7 @@ class CoreFlags {
     this.decryptServerError = false,
     this.cacheCopies = false,
     this.envExpand = false,
+    this.rateLimitIpv6Prefix = false,
   });
 
   /// Every flag on.
@@ -29,7 +30,8 @@ class CoreFlags {
       replaceHeaders = true,
       decryptServerError = true,
       cacheCopies = true,
-      envExpand = true;
+      envExpand = true,
+      rateLimitIpv6Prefix = true;
 
   /// A 422 answer is `{"message": "...", "errors": {"field": ["..."]}}`,
   /// with all messages of each field. Off: `{"field": "first message"}`.
@@ -89,4 +91,13 @@ class CoreFlags {
   /// ```
   // NEXT MAJOR: make this the default, then remove the flag.
   final bool envExpand;
+
+  /// The default key of `RateLimit` counts an IPv6 client by its /64
+  /// prefix, and an IPv4-mapped address (`::ffff:1.2.3.4`) as its IPv4
+  /// address. A client with a /64 has 2^64 addresses, so with one count
+  /// per address it gets a fresh count with each new address. Clients in
+  /// the same /64 now share one count. A `key` from the app is used as
+  /// it is. Off: each full ip has its own count.
+  // NEXT MAJOR: make this the default, then remove the flag.
+  final bool rateLimitIpv6Prefix;
 }

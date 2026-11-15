@@ -64,7 +64,9 @@ class RateLimit implements IDoxMiddleware {
   /// the length of one window
   final Duration per;
 
-  /// the client to count for. Default is the client ip.
+  /// the client to count for. Default is the client ip. With
+  /// `CoreFlags.rateLimitIpv6Prefix` an IPv6 client counts by its /64,
+  /// see [ipBucket].
   final RateLimitKey key;
 
   /// Two limits with the same name (and the same key) share one counter.
@@ -91,7 +93,46 @@ class RateLimit implements IDoxMiddleware {
 
   final DateTime Function() _now;
 
-  static String _byIp(DoxRequest req) => req.ip();
+  /// the default [key]: the client ip (after `trustedProxies`), see
+  /// [ipBucket]
+  static String _byIp(DoxRequest req) {
+    String ip = req.ip();
+    return Dox().flags.rateLimitIpv6Prefix ? ipBucket(ip) : ip;
+  }
+
+  /// The count key of [ip] with `CoreFlags.rateLimitIpv6Prefix`:
+  /// - an IPv6 address gives its /64 prefix, eg. `2001:db8:1:2::/64`.
+  ///   One home or one server gets a whole /64, so a client can not get
+  ///   a new count by changing the last 64 bits.
+  /// - an IPv4-mapped IPv6 address (`::ffff:1.2.3.4`) gives the IPv4
+  ///   address (`1.2.3.4`).
+  /// - an IPv4 address, or a value that is not an ip, stays as it is.
+  /// ```
+  /// RateLimit(key: (DoxRequest req) => RateLimit.ipBucket(req.ip()));
+  /// ```
+  static String ipBucket(String ip) {
+    if (!ip.contains(':')) return ip;
+    int zone = ip.indexOf('%');
+    List<int> bytes;
+    try {
+      bytes = Uri.parseIPv6Address(zone < 0 ? ip : ip.substring(0, zone));
+    } on FormatException {
+      return ip;
+    }
+    bool mapped = bytes[10] == 0xff && bytes[11] == 0xff;
+    for (int i = 0; mapped && i < 10; i++) {
+      mapped = bytes[i] == 0;
+    }
+    if (mapped) return bytes.sublist(12).join('.');
+    StringBuffer out = StringBuffer();
+    for (int i = 0; i < 8; i += 2) {
+      out
+        ..write(((bytes[i] << 8) | bytes[i + 1]).toRadixString(16))
+        ..write(':');
+    }
+    out.write(':/64');
+    return out.toString();
+  }
 
   @override
   Future<dynamic> handle(IDoxRequest req) async {
