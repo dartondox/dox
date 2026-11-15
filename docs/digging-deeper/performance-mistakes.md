@@ -86,7 +86,8 @@ This is the N+1 problem. One query loads the rows, then one more query runs for 
 ```dart title="Wrong"
 List<Post> posts = await Post().all();
 for (Post post in posts) {
-  User? author = await post.$getRelation<User>('author'); // one query per post
+  await post.$getRelation('author'); // one query per post
+  User? author = post.author;
 }
 ```
 
