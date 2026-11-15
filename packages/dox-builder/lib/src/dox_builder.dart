@@ -86,6 +86,9 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
 
     var r = _getRelationsCode(visitor, _belongsToHasRelation(element));
     var map = _getCodeForToMap(visitor);
+    String columnValue = _modelHasColumnValue(element)
+        ? _getCodeForColumnValue(visitor)
+        : '';
 
     String computedCode = _getCodeForComputedAndHooks(visitor);
 
@@ -149,6 +152,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         ${map['parseContent']}
         return map;
       }
+      $columnValue
 
       @override
       Map<String, dynamic> convertToMap(dynamic i) {
@@ -289,6 +293,52 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         $content
       }
     """;
+  }
+
+  /// `true` when the `Model` the model sees has `$columnValue()` (a
+  /// newer dox_orm), and the model does not change columnsToMap(). An
+  /// older dox_orm does not get it, so the code still compiles.
+  bool _modelHasColumnValue(ClassElement element) {
+    if (element.getMethod('columnsToMap') != null) return false;
+    Element? model = element.firstFragment.libraryFragment.scope
+        .lookup('Model')
+        .getter;
+    return model is ClassElement && model.getMethod(r'$columnValue') != null;
+  }
+
+  /// `$columnValue()` gives one value of columnsToMap() by its column
+  /// name, without making the map. A column with beforeSave is not in
+  /// the switch: its value needs the whole map.
+  String _getCodeForColumnValue(ModelVisitor visitor) {
+    String className = visitor.className;
+    String content = '';
+    visitor.columns.forEach((fieldName, values) {
+      if (values['beforeSave'] != null) return;
+      content +=
+          "case ${_str(values['jsonKey'])}: "
+          "return ${_toMapValue(fieldName, values)};\n";
+    });
+    return '''
+      @override
+      dynamic \$columnValue(String column) {
+        $className instance = this as $className;
+        switch (column) {
+          $content
+        }
+        return super.\$columnValue(column);
+      }
+    ''';
+  }
+
+  /// the value of a column in columnsToMap()
+  String _toMapValue(String fieldName, Map<String, dynamic> values) {
+    if (values['cast'] != null && values['beforeGet'] == null) {
+      return "_${fieldName}Cast.set(instance.$fieldName)";
+    }
+    if (values['type'] == 'DateTime?') {
+      return "instance.$fieldName?.toIso8601String()";
+    }
+    return "instance.$fieldName";
   }
 
   /// relations that hold one model, not a list
@@ -442,10 +492,11 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         String as = values['nullable'] == false ? " as ${values['type']}" : '';
         setValue = "_${filedName}Cast.get(m[$key])$as";
       } else if (values['type'] == 'DateTime?') {
-        setValue =
-            """m[$key] is DateTime?
-              ? m[$key] as DateTime?
-              : DateTime.parse(m[$key] as String)
+        /// one map read: a DateTime or null is used as it is
+        setValue = """switch (m[$key]) {
+              DateTime? v => v,
+              Object? v => DateTime.parse(v as String),
+            }
           """;
       } else {
         setValue = "m[$key] as ${values['type']}";
@@ -512,15 +563,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     visitor.columns.forEach((filedName, values) {
       String? beforeSave = values['beforeSave'];
       String key = _str(values['jsonKey']);
-      String setValue = '';
-
-      if (values['cast'] != null && values['beforeGet'] == null) {
-        setValue = "_${filedName}Cast.set(instance.$filedName)";
-      } else if (values['type'] == 'DateTime?') {
-        setValue = "instance.$filedName?.toIso8601String()";
-      } else {
-        setValue = "instance.$filedName";
-      }
+      String setValue = _toMapValue(filedName, values);
 
       if (beforeSave != null) {
         parseContent += "map[$key] = $className.$beforeSave(map);\n";

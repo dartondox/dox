@@ -77,6 +77,7 @@ Future<String> _generate(
   String model, {
   String imports = '',
   Map<String, String> files = const <String, String>{},
+  String modelClass = 'class Model<T> {}',
 }) async {
   String output = '';
   await testBuilder(
@@ -86,7 +87,10 @@ Future<String> _generate(
       'dox_annotation|lib/src/dox_model.dart': File(
         '../dox-annotation/lib/src/dox_model.dart',
       ).readAsStringSync(),
-      'a|lib/annotations.dart': _annotations,
+      'a|lib/annotations.dart': _annotations.replaceFirst(
+        'class Model<T> {}',
+        modelClass,
+      ),
       ...files,
       'a|lib/user.dart':
           '''
@@ -201,7 +205,8 @@ class Tag {
       expect(out, contains('get relationsResultMatcher => const <String'));
 
       /// a date from the driver is used as it is
-      expect(out, contains("m['created_at'] is DateTime?"));
+      expect(out, contains("switch (m['created_at'])"));
+      expect(out, contains('DateTime? v => v,'));
       expect(out, contains('bool get readsRowDates => true;'));
 
       /// columnsToMap() has no relations, convertToMap() adds them
@@ -758,6 +763,72 @@ class Post {
           },
         );
         expect(out, isNot(contains('relation:')));
+      });
+    });
+
+    group(r'$columnValue |', () {
+      const String model = '''
+@DoxModel()
+class Item {
+  @Column()
+  String? name;
+
+  @Column(cast: JsonCast())
+  Map<String, dynamic>? meta;
+
+  @Column(beforeSave: Item.lower)
+  String? code;
+
+  static String? lower(Map<String, dynamic> map) =>
+      (map['code'] as String?)?.toLowerCase();
+}
+''';
+
+      test('a dox_orm without it: gets no switch', () async {
+        String out = await _generate(model);
+        expect(out, isNot(contains(r'$columnValue')));
+      });
+
+      test('a dox_orm with it: gets the switch', () async {
+        String out = await _generate(
+          model,
+          modelClass:
+              r'class Model<T> { dynamic $columnValue(String c) => null; }',
+        );
+        String flat = out.replaceAll(RegExp(r'\s'), '');
+        expect(flat, contains(r'dynamic$columnValue(Stringcolumn)'));
+        expect(flat, contains("case'name':returninstance.name;"));
+        expect(
+          flat,
+          contains("case'meta':return_metaCast.set(instance.meta);"),
+        );
+        expect(
+          flat,
+          contains(
+            "case'created_at':returninstance.createdAt?.toIso8601String();",
+          ),
+        );
+
+        /// beforeSave needs the whole map, so it uses columnsToMap()
+        String switchCode = flat.substring(
+          flat.indexOf(r'$columnValue(Stringcolumn)'),
+          flat.indexOf('convertToMap('),
+        );
+        expect(switchCode, isNot(contains("case'code'")));
+        expect(flat, contains(r'returnsuper.$columnValue(column);'));
+      });
+
+      test('a model with its own columnsToMap(): gets no switch', () async {
+        String out = await _generate('''
+@DoxModel()
+class Item {
+  @Column()
+  String? name;
+
+  Map<String, dynamic> columnsToMap() => <String, dynamic>{};
+}
+''', modelClass: r'class Model<T> { dynamic $columnValue(String c) => null; }');
+        expect(out, isNot(contains(r'$columnValue')));
       });
     });
   });
