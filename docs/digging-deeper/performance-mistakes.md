@@ -93,7 +93,7 @@ for (Post post in posts) {
 ```dart title="Right"
 List<Post> posts = await Post().preload('author').get();
 for (Post post in posts) {
-  User? author = post.related<User>('author'); // already loaded
+  User? author = post.author; // already loaded
 }
 ```
 
@@ -231,7 +231,7 @@ Warnings go to stderr with a `[strict]` tag. `blockLimit` is how long code may b
 A route that blocks the isolate for too long warns once:
 
 ```text
-[strict] GET /invoices/:id blocked the isolate for 180 ms (limit 50 ms). Other requests on this isolate had to wait. Move heavy CPU work (like bcrypt, PDF or image work) to await Dox().compute(...), and use Hash.makeAsync or Hash.verifyAsync for passwords.
+[strict] GET /invoices/{id} blocked the isolate for 180 ms (limit 50 ms). Other requests on this isolate had to wait. Move heavy CPU work (like bcrypt, PDF or image work) to await Dox().compute(...), and use Hash.makeAsync or Hash.verifyAsync for passwords.
 ```
 
 Code that blocks the event loop, also after an `await`, warns at most once in 10 seconds. It cannot tell you which code did it:
@@ -257,12 +257,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 );
 ```
 
-`nPlusOneCount` (default 5) is how many row by row loads of one relation in about one second make a warning. `maxRows` (default 1000) is how many rows `get()` or `all()` may read. The warnings go to the logger:
+`nPlusOneCount` (default 5) is how many row by row loads of one relation in about one second make a warning. `maxRows` (default 1000) is how many rows `get()` or `all()` may read. The warnings are printed with a `[db]` tag:
 
 ```text
-Strict mode: possible N+1 query. The relation "author" of Post was loaded row by row 5 times in a short time. Load it for all rows in one query with preload('author').
+[db] Strict mode: possible N+1 query. The relation "author" of Post was loaded row by row 5 times in a short time. Load it for all rows in one query with preload('author').
 ```
 
 ```text
-Strict mode: table "orders" read 25000 rows into memory (the limit is 1000). Use paginate(), chunk(), lazy() or cursor() for big results.
+[db] Strict mode: table "orders" read 25000 rows into memory (the limit is 1000). Use paginate(), chunk(), lazy() or cursor() for big results.
 ```
