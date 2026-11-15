@@ -6,18 +6,31 @@ icon: lucide/git-compare-arrows
 
 A migration changes your database schema step by step, with an `up` method that makes the change and a `down` method that undoes it.
 
-Write migrations in Dart with the [schema builder](schema.md).
-The same migration then works on Postgres, MySQL, MariaDB and SQLite.
-Plain `.sql` migrations work too.
+Migrations are like version control for your database. Your team can share the same schema, and every server can build it with one command. You write migrations in Dart with the [schema builder](schema.md), so the same migration works on Postgres, MySQL, MariaDB and SQLite. Plain `.sql` migrations work too.
 
-## Create a migration
+## Generating migrations
+
+Use the `make:migration` command to make a new migration:
 
 ```bash
 dox make:migration create_users_table
 ```
 
-This makes `db/migration/2026_10_21_120000_create_users_table.dart`.
-The numbers are the date and time when you run the command.
+This makes `db/migration/2026_10_21_120000_create_users_table.dart`. The numbers are the date and time when you run the command, so Dox can run the migrations in the right order.
+
+The name of the migration decides what the new file contains:
+
+| Name | The file has |
+|---|---|
+| `create_users_table` | `schema.create('users', ...)` in `up`, and `dropIfExists('users')` in `down` |
+| `add_avatar_to_users_table` (also `_from_`, `_in_`, `_on_`) | `schema.table('users', ...)` in `up` and `down` |
+| any other name | empty `up` and `down` |
+
+If you also want a model, `dox make:model Blog -m` makes the model and a `create_blogs_table` migration.
+
+## Migration structure
+
+A migration class has two methods. The `up` method adds tables, columns or indexes. The `down` method undoes what `up` did:
 
 ```dart title="db/migration/2026_10_21_120000_create_users_table.dart"
 import 'package:dox_migration/dox_migration.dart';
@@ -38,100 +51,89 @@ class CreateUsersTable extends Migration {
 }
 ```
 
-Add your columns in `up`, for example `table.string('email').unique();`.
-See [Schema](schema.md) for all column types.
+Add your columns in `up`, for example `table.string('email').unique();`. See [Schema](schema.md) for all column types.
 
-The name of the migration decides what the new file contains:
+### Running raw SQL
 
-| Name | The file has |
-|---|---|
-| `create_users_table` | `schema.create('users', ...)` in `up`, and `dropIfExists('users')` in `down` |
-| `add_avatar_to_users_table` (also `_from_`, `_in_`, `_on_`) | `schema.table('users', ...)` in `up` and `down` |
-| any other name | empty `up` and `down` |
-
-- `create:migration` does the same.
-- `dox make:model Blog -m` makes the model and a `create_blogs_table` migration.
-
-!!! info "Raw SQL and data in a Dart migration"
-    `schema.driver` runs raw SQL on the same connection and transaction:
-    `await schema.driver.execute("UPDATE users SET role = 'admin' WHERE id = 1");`
-    Do not use models or `QueryBuilder` in a migration. They use another connection.
-
-## The registry
-
-An AOT build can not load a file at run time.
-So Dox keeps a list of your Dart migrations in `db/migration/migrations.dart`:
+Sometimes you need SQL that the schema builder does not have, or you want to change data. Use `schema.driver`, because it runs on the same connection and transaction as the migration:
 
 ```dart
-// Made by `dox make:migration` and the `dox migration:*` commands.
-// Do not edit, it is made again from the files in this folder.
-import 'package:dox_migration/dox_migration.dart';
-
-import '2026_10_21_120000_create_users_table.dart' as m1;
-
-final List<MigrationEntry> migrations = <MigrationEntry>[
-  MigrationEntry(
-    '2026_10_21_120000_create_users_table',
-    m1.CreateUsersTable(),
-  ),
-];
+await schema.driver.execute("UPDATE users SET role = 'admin' WHERE id = 1");
 ```
 
-- `dox make:migration` and every `dox migration:*` command write this file again.
-  You do not edit it.
-- It lists each file named `YYYY_MM_DD_HHMMSS_name.dart` and its `class ... extends Migration`.
-- The name of a migration is its file name without `.dart`. The order is by name.
+Do not use models or `QueryBuilder` in a migration, because they use another connection.
 
-The first `dox make:migration` also makes `bin/migrate.dart` in your app:
+## Running migrations
 
-```dart
-import 'dart:io';
+Use `migration:run` to run all migrations that did not run yet:
 
-import 'package:dox_migration/dox_migration.dart';
-
-import '../db/migration/migrations.dart';
-
-Future<void> main(List<String> args) async {
-  exitCode = await Migrator(migrations: migrations).run(args);
-}
+```bash
+dox migration:run
 ```
 
-The `dox migration:*` commands run `dart run bin/migrate.dart <command>`.
-So your migrations run as part of your app code.
+The short name `dox migrate` works too. If you want to run the [seeders](seeders.md) after it, add `--seed`.
 
-## Run migrations
+If a migration fails, the error shows its name and the command exits with code `1`. The failed migration is not saved, and the later ones do not run.
 
-| Command | What it does |
-|---|---|
-| `dox migration:run` | Run the migrations that did not run yet. Short name: `dox migrate`. |
-| `dox migration:rollback` | Undo the last batch. |
-| `dox migration:rollback --step=2` | Undo the last 2 migrations, even across batches. |
-| `dox migration:rollback --batch=3` | Undo only the migrations of batch 3. |
-| `dox migration:reset` | Undo all migrations. |
-| `dox migration:refresh` | Undo all migrations, then run them again. |
-| `dox migration:fresh` | Drop all tables, then run all migrations. It also drops tables that no migration made. |
-| `dox migration:status` | Show each migration, its batch, and if it ran. |
+### Checking the status
 
-`migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh` and `migrate:status` are short names.
+The `migration:status` command shows each migration, its batch, and if it ran:
 
-Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run the [seeders](seeders.md) after it.
+```bash
+dox migration:status
+```
 
-When `APP_ENV=production`, `migration:rollback`, `migration:reset`, `migration:refresh` and `migration:fresh` ask before they drop the tables. Type `y` to go on. Add `--force` to skip the question. With no terminal (CI or a deploy script), they print a warning and run.
+### Rolling back migrations
 
-A batch is the group of migrations that ran in one `migration:run`.
-Migrations are undone newest first.
-When the file of a migration that ran is gone, rollback prints `Migration not found: <name>`. It keeps the row of that migration and rolls back the others.
-The ran migrations are saved in the `dox_db_migration` table.
+To undo the last batch, use `migration:rollback`. A batch is the group of migrations that ran in one `migration:run`:
 
-When a migration fails, the error shows its name, and the command exits with code `1`.
-The failed migration is not saved, and the later ones do not run.
+```bash
+dox migration:rollback
+```
 
-You can also run `dart run bin/migrate.dart run` (or `rollback --step=2`, `reset`, `refresh`, `status`) yourself.
+Use `--step` to undo a number of migrations, even across batches. Use `--batch` to undo only one batch:
+
+```bash
+dox migration:rollback --step=2
+
+dox migration:rollback --batch=3
+```
+
+To undo all migrations, use `migration:reset`:
+
+```bash
+dox migration:reset
+```
+
+### Refreshing the database
+
+`migration:refresh` undoes all migrations and then runs them again:
+
+```bash
+dox migration:refresh
+```
+
+`migration:fresh` drops all tables and then runs all migrations. It also drops tables that no migration made, so do not run it on a database you share with other apps:
+
+```bash
+dox migration:fresh
+```
+
+Both commands also take `--seed`.
+
+### Running in production
+
+When `APP_ENV=production`, `migration:rollback`, `migration:reset`, `migration:refresh` and `migration:fresh` ask before they drop tables. Type `y` to go on. Add `--force` to skip the question:
+
+```bash
+dox migration:fresh --force
+```
+
+With no terminal, like in CI or a deploy script, they print a warning and run.
 
 ### Run on server start
 
-The AOT server binary can run the migrations, because the registry is compiled in.
-The new app template already does this:
+The AOT server binary can run the migrations itself, because the migration list is compiled in. The new app template already does this:
 
 ```dart title="bin/server.dart"
 import 'package:dox_core/dox_core.dart';
@@ -151,16 +153,11 @@ void main() async {
 }
 ```
 
-It uses the config from `lib/config/database.dart`, so it also works without a `.env` file.
-
-Keep the `db/migration` folder next to the binary if you also have `.sql` migrations.
+It uses the config from `lib/config/database.dart`, so it also works without a `.env` file. If you also have `.sql` migrations, keep the `db/migration` folder next to the binary.
 
 ## Database settings
 
-The migrations read the `.env` file and the environment variables.
-A real environment variable wins over `.env`, the same as `Env.get()`. The file is read like `Env.get()` reads it (`export`, comments, quotes), but with no `${VAR}` expansion, and `.env.testing` is not read.
-
-When `DATABASE_URL` is set, it wins over all `DB_*` keys. See [`DATABASE_URL`](index.md#database_url).
+The migration commands read the database from the `.env` file and the environment variables. A real environment variable wins over `.env`.
 
 ```bash title=".env"
 DB_CONNECTION=postgres # or mysql (also MariaDB), or sqlite
@@ -171,37 +168,23 @@ DB_USERNAME=admin
 DB_PASSWORD=password
 ```
 
-For SQLite, only two variables are needed:
+For SQLite, you only need two keys:
 
 ```bash title=".env"
 DB_CONNECTION=sqlite
 DB_NAME=db/dox.sqlite # file path, made if missing
 ```
 
-- `DB_DATABASE` works too, in place of `DB_NAME`.
-- Without `DB_CONNECTION`, the migrations use Postgres. So always set it in `.env`.
-- The default port is `5432` for Postgres and `3306` for MySQL.
-- One run opens one driver and closes it at the end. Each migration runs on one connection.
-- A `DB_HOST` that starts with `/` is a [Unix socket](index.md#unix-socket).
-- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`. The url options are on the [Database](index.md#database_url) page.
-
-You can also give the database yourself:
-
-- `Migrator(migrations: migrations, config: databaseConfig.getConnectionConfig())` opens this config, and closes it at the end.
-- `Migrator(migrations: migrations, connection: SqlQueryBuilder().dbDriver)` runs on a driver that is already open. The migrator does not close it.
-- `Migrator(migrations: migrations, flags: databaseConfig.flags)` gives the [ORM flags](index.md#orm-flags) to the `Schema` of each migration. Without it, the migrator uses `SqlQueryBuilder().flags`.
+Without `DB_CONNECTION`, the migrations use `sqlite`. When `DATABASE_URL` is set, it wins over all `DB_*` keys. See [`DATABASE_URL`](index.md#database_url).
 
 ## Transactions
 
-Each migration runs in one transaction.
-On Postgres and SQLite, a failed migration undoes all its changes.
+Each migration runs in one transaction. On Postgres and SQLite, a failed migration undoes all its changes.
 
 !!! warning "MySQL"
-    On MySQL and MariaDB, `CREATE`, `ALTER` and `DROP` save right away.
-    So if a migration fails half way, these changes stay. Only data changes are undone.
-    Keep each MySQL migration small: one table change per migration.
+    On MySQL and MariaDB, `CREATE`, `ALTER` and `DROP` save right away. So if a migration fails half way, these changes stay. Only data changes are undone. Keep each MySQL migration small: one table change per migration.
 
-To run a migration without a transaction (for example `CREATE INDEX CONCURRENTLY` on Postgres):
+Some SQL can not run in a transaction, like `CREATE INDEX CONCURRENTLY` on Postgres. For this, set `withinTransaction` to `false`:
 
 ```dart
 class AddSearchIndex extends Migration {
@@ -222,18 +205,15 @@ class AddSearchIndex extends Migration {
 }
 ```
 
-!!! info "SQLite foreign keys"
-    On SQLite, foreign key checks are off while a migration runs.
-    This lets Dox make a table again (see [SQLite notes](schema.md#sqlite-notes)).
-    Before the end, Dox checks all foreign keys. The migration fails if one is broken.
-
 ## SQL migrations
 
-Use a `.sql` migration for SQL that only one database understands.
+Use a `.sql` migration when you need SQL that only one database understands:
 
 ```bash
 dox make:migration create_blog_table --sql
 ```
+
+Put the `up` SQL under a `-- up` line and the `down` SQL under a `-- down` line. Each of these markers must be on its own line:
 
 ```sql
 -- up
@@ -246,20 +226,66 @@ CREATE TABLE IF NOT EXISTS blog (
 DROP TABLE IF EXISTS blog
 ```
 
-- Put the `up` SQL under a line `-- up`, and the `down` SQL under a line `-- down`.
-  Each of these lines must be on its own line. Other `--` lines are normal SQL comments.
-- Statements are split on `;`.
-  A `;` inside quotes, comments or a postgres `$$ ... $$` body does not split.
+Dart and `.sql` migrations can live together in `db/migration`. They run in file name order, so by their timestamp. A Dart and a `.sql` migration with the same name is an error.
 
 !!! warning "SQLite ids"
-    In SQLite, `id serial PRIMARY KEY` does not make an auto increment id. The id stays `NULL`.
-    Use `id INTEGER PRIMARY KEY AUTOINCREMENT` for SQLite. `table.id()` in Dart does this for you.
+    In SQLite, `id serial PRIMARY KEY` does not make an auto increment id. The id stays `NULL`. Use `id INTEGER PRIMARY KEY AUTOINCREMENT` for SQLite. `table.id()` in Dart does this for you.
 
-### Dart and SQL in one folder
+## Details
 
-Both kinds can live in `db/migration`. They run in file name order (the timestamp).
+This section is for special cases. Most apps do not need it.
 
-- With `bin/migrate.dart`: the Migrator runs the Dart migrations from the registry
-  and reads the `.sql` files from the folder, merged by name.
-- Without `bin/migrate.dart` (a project with only `.sql` files): `dox` runs the `.sql` files itself.
-- A Dart and a `.sql` migration with the same name is an error.
+### The migration list
+
+An AOT build can not load a file at run time. So Dox keeps a list of your Dart migrations in `db/migration/migrations.dart`:
+
+```dart
+// Made by `dox make:migration` and the `dox migration:*` commands.
+// Do not edit, it is made again from the files in this folder.
+import 'package:dox_migration/dox_migration.dart';
+
+import '2026_10_21_120000_create_users_table.dart' as m1;
+
+final List<MigrationEntry> migrations = <MigrationEntry>[
+  MigrationEntry(
+    '2026_10_21_120000_create_users_table',
+    m1.CreateUsersTable(),
+  ),
+];
+```
+
+`dox make:migration` and every `dox migration:*` command write this file again, so you do not edit it. It lists each file named `YYYY_MM_DD_HHMMSS_name.dart` and its `class ... extends Migration`.
+
+The first `dox make:migration` also makes `bin/migrate.dart`. The `dox migration:*` commands run `dart run bin/migrate.dart <command>`, so your migrations run as part of your app code:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_migration/dox_migration.dart';
+
+import '../db/migration/migrations.dart';
+
+Future<void> main(List<String> args) async {
+  exitCode = await Migrator(migrations: migrations).run(args);
+}
+```
+
+### Other cases
+
+- `create:migration` is the same as `make:migration`.
+- `migrate:rollback`, `migrate:reset`, `migrate:refresh`, `migrate:fresh` and `migrate:status` are short names.
+- You can run `dart run bin/migrate.dart run` (or `rollback --step=2`, `reset`, `refresh`, `status`) yourself.
+- The name of a migration is its file name without `.dart`. Migrations run in name order and are undone newest first.
+- The migrations that ran are saved in the `dox_db_migration` table.
+- If the file of a migration that ran is gone, rollback prints `Migration not found: <name>`, keeps its row and rolls back the others.
+- A project with only `.sql` files and no `bin/migrate.dart` is run by `dox` itself.
+- In `.sql` files, other `--` lines are normal comments. Statements are split on `;`, but not on a `;` inside quotes, comments or a Postgres `$$ ... $$` body.
+- `.env` is read like `Env.get()` reads it (`export`, comments, quotes), but with no `${VAR}` expansion. `.env.testing` is not read.
+- `DB_DATABASE` works in place of `DB_NAME`. The default port is `5432` for Postgres and `3306` for MySQL.
+- A `DB_HOST` that starts with `/` is a [Unix socket](index.md#unix-socket).
+- Migrations use TLS only with a `DATABASE_URL` that has `sslmode` (Postgres) or `ssl` (MySQL), like `?sslmode=require`.
+- One run opens one driver and closes it at the end. Each migration runs on one connection.
+- On SQLite, foreign key checks are off while a migration runs, so Dox can make a table again (see [SQLite notes](schema.md#sqlite-notes)). Before the end, Dox checks all foreign keys, and the migration fails if one is broken.
+- `Migrator(migrations: migrations, config: databaseConfig.getConnectionConfig())` opens this config and closes it at the end.
+- `Migrator(migrations: migrations, connection: SqlQueryBuilder().dbDriver)` runs on a driver that is already open. The migrator does not close it.
+- `Migrator(migrations: migrations, flags: databaseConfig.flags)` gives the [ORM flags](index.md#orm-flags) to the `Schema` of each migration. Without it, the migrator uses `SqlQueryBuilder().flags`.

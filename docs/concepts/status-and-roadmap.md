@@ -6,16 +6,16 @@ icon: lucide/map
 
 This page shows what works in Dox today, what is missing and what is planned.
 
+Read it before you pick Dox for a project, so you know which parts are well tested and which parts are new.
+
 ## Packages
 
-What the states mean:
+Each package has a state:
 
 - **Stable**: works, has tests and has had real use.
 - **New**: works and has tests, but it is newer and has had less real use.
 
-All packages follow semantic versioning: a breaking change only comes in a new major version.
-
-Each package has its own version number. Some packages live in their own repos. See [Contribute](../community/contribute.md#packages-in-other-repos).
+All packages follow semantic versioning, so a breaking change only comes in a new major version. Each package has its own version number, and some packages live in their own repos. See [Contribute](../community/contribute.md#packages-in-other-repos).
 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
@@ -47,12 +47,12 @@ Each package has its own version number. Some packages live in their own repos. 
 
 `Hash` (bcrypt password hashing) is in `dox_core`.
 
-!!! note "About test coverage"
-    The repos do not measure line coverage. Counts are `test(` calls in each package's `test/` folder.
-    A test inside a loop counts once, so `dart test` can report more tests.
-    The CI setup of the main repo is in `.github/workflows/test.yaml`. The packages in their own repos have their own CI.
+!!! note "About the test counts"
+    The counts are the `test(` calls in each package's `test/` folder. A test inside a loop counts once, so `dart test` can report more tests. The repos do not measure line coverage.
 
 ## What Dox does not have yet
+
+Some features are not built yet. This table says what to do until they are:
 
 | Feature | Status | What to do today |
 | --- | --- | --- |
@@ -62,14 +62,12 @@ Each package has its own version number. Some packages live in their own repos. 
 
 ## Planned
 
-### Later
+Localization is planned for later.
 
-- Localization
-
-The package CHANGELOGs have an `Unreleased` section when changes wait for the next version.
+If you want to see changes that are done but not released, look at the `Unreleased` section of a package CHANGELOG.
 
 ## How to help
 
-- Try Dox and open an issue when something breaks or is missing.
-- Pick an item above and open an issue first, so the design can be discussed.
+- Try Dox, and open an issue when something breaks or is missing.
+- If you want to build an item from this page, open an issue first, so the design can be discussed.
 - See [Contribute](../community/contribute.md) to set up the repo and run the tests.

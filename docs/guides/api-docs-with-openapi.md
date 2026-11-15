@@ -6,6 +6,8 @@ icon: lucide/file-code
 
 Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.
 
+API docs show every route on one page, so a front-end team can see what to send and what comes back. Dox builds the docs from your code, so they never get out of date.
+
 ## What you need
 
 - The blog API from the [tutorial](../tutorial/01-create-project.md), or any Dox app.
@@ -13,9 +15,9 @@ Turn on OpenAPI docs for the blog API, open the docs page, and make the docs bet
 
 ## 1. Write the config
 
-An app made with `dox create` already serves the docs pages, but each route shows only its path and method. These steps add the full docs from your code.
+A new app already serves the docs pages, but each route shows only its path and method. To get the full docs, give Dox what the builder found in your code.
 
-`build_runner` writes `lib/generated/openapi.g.dart`. Its `openApiRegistry` holds what the builder found in your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
+`build_runner` writes `lib/generated/openapi.g.dart`. Its `openApiRegistry` holds your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
 
 ```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
@@ -46,11 +48,11 @@ dart run build_runner build --delete-conflicting-outputs
 dox serve
 ```
 
-`.env` has `APP_ENV=development`, so the docs routes are on.
+The docs routes are on, because `.env` has `APP_ENV=development`.
 
 ## 3. Open the docs page
 
-Open `http://localhost:3000/docs`. It is a [Scalar](https://github.com/scalar/scalar) page with every route and "Try it" buttons. It loads Scalar from the jsDelivr CDN.
+Open `http://localhost:3000/docs`. It is a [Scalar](https://github.com/scalar/scalar) page with every route and "Try it" buttons.
 
 The app now has three new routes:
 
@@ -66,7 +68,7 @@ The app now has three new routes:
 curl http://localhost:3000/openapi.json
 ```
 
-This is the real output for the blog API, shortened. The top level:
+This is the output for the blog API, shortened. The top level:
 
 ```json
 {
@@ -90,7 +92,7 @@ This is the real output for the blog API, shortened. The top level:
 }
 ```
 
-`POST /api/posts`, as the builder found it. You wrote no docs code for it:
+This is `POST /api/posts`. You wrote no docs code for it:
 
 ```json
 {
@@ -130,11 +132,11 @@ Where each part comes from:
 | `200` with no body | `store` returns `DoxResponse`, so the builder can not see the body. Step 6 fixes this |
 | `x-dox-middleware` | the middleware of the route: the global `LogMiddleware` and `AuthMiddleware` |
 
-Other routes get more error answers in the same way. The `Can` middleware or a `req.authorize(...)` call gives `401` and `403`. The `GuestMiddleware` and `ValidateSignature` middleware give `403`. A `req.validateSchema(...)` call gives `422`.
+Other routes get error answers in the same way. The `Can` middleware or a `req.authorize(...)` call gives `401` and `403`. The `GuestMiddleware` and `ValidateSignature` middleware give `403`. A `req.validateSchema(...)` call gives `422`.
 
 ## 5. See how a DTO becomes a schema
 
-This is the `SavePost` DTO of the tutorial:
+Dox turns each [DTO](../the-basic/dto.md) into a schema, so the docs show the rules of every field. This is the `SavePost` DTO of the tutorial:
 
 ```dart title="lib/app/dtos/save_post/save_post.dto.dart"
 @Dto()
@@ -176,15 +178,13 @@ And this is its schema in `/openapi.json`:
 | `@Describe('...')` or `/// A comment` | `"description"`. `@Describe` wins over the comment |
 | `@Trim()`, `@Lowercase()`, `@Unique(...)` | nothing. They change or check the value on the server only |
 
-A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`.
-Keys in `hidden` are left out. That is why `User` has no `password`.
+A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`. Keys in `hidden` are left out, so `User` has no `password`.
 
 When you change a rule, run `build_runner` again, and the docs change with it.
 
 ## 6. Make the docs better
 
-Put annotations on a controller method: `@Summary`, `@Description`, `@Tags` and `@Response` (from `dox_core`).
-A `///` comment on the method also works for the summary and the description.
+The builder can not guess everything. For example, it can not see the body of a `DoxResponse`. Add annotations to a controller method to fill the gaps: `@Summary`, `@Description`, `@Tags` and `@Response` (from `dox_core`). A `///` comment on the method also works for the summary and the description.
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 @Inject()
@@ -210,7 +210,7 @@ class PostController {
 }
 ```
 
-Run `dart run build_runner build` again and restart the app. The real result:
+Run `dart run build_runner build` again and restart the app. The result:
 
 ```json
 "get": {
@@ -251,7 +251,7 @@ See [OpenAPI: describe a route](../packages/openapi.md#describe-a-route) for all
 
 ## 7. Turn it off in production
 
-This is the default. `enabled` is `null`, so the docs routes are on only when `APP_ENV` is `development` or `local`. With `APP_ENV=production` all three routes give `404`:
+You do not need to do anything here. `enabled` is `null` by default, so the docs routes are on only when `APP_ENV` is `development` or `local`. With `APP_ENV=production` all three routes give `404`:
 
 ```bash
 curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/docs           # 404
@@ -262,7 +262,7 @@ To turn the docs on in production, set `enabled: true`. See [OpenAPI: turn the d
 
 To build the document at build time and serve the files in production, see [OpenAPI: production setup](../packages/openapi.md#production-setup).
 
-To show the docs on staging too, but never in production, set `enabled` yourself:
+If you want the docs on staging too, but never in production, set `enabled` yourself:
 
 ```dart title="lib/config/openapi.dart"
 import 'package:blog/config/env.dart';
@@ -277,8 +277,7 @@ OpenApiConfig openApi = OpenApiConfig(
 !!! warning
     `enabled: true` in production shows every route of your API to anyone. Only do it for a public API.
 
-To give the document to a front-end team without a running server, write it to files with `dox openapi:generate`.
-See [OpenAPI: write the files](../packages/openapi.md#write-the-files).
+To give the document to a front-end team without a running server, write it to files with `dox openapi:generate`. See [OpenAPI: write the files](../packages/openapi.md#write-the-files).
 
 ## Check it
 

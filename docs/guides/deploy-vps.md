@@ -6,8 +6,7 @@ icon: lucide/server-cog
 
 Run the blog API on your own Linux server (a VPS), with systemd to keep it running and Caddy in front for HTTPS.
 
-!!! note
-    These steps follow the systemd and Caddy docs as of 2026-10-22. They were not run on a real VPS in CI.
+A VPS gives you full control and a fixed monthly price. systemd starts the app and starts it again after a crash. Caddy gets the TLS certificate and sends the requests to the app:
 
 ```mermaid
 flowchart LR
@@ -24,8 +23,7 @@ flowchart LR
 
 ## 1. Build the bundle for Linux
 
-`dox build` makes a native binary for the system it runs on. A binary built on macOS does not run on Linux.
-So build it inside the `dart:stable` image (it is Debian):
+`dox build` makes a native binary for the system it runs on, so a binary built on macOS does not run on Linux. Build it inside the `dart:stable` image instead, which is Debian:
 
 ```bash
 docker run --rm -v "$PWD":/app -w /app dart:stable sh -c \
@@ -45,18 +43,17 @@ build/bundle/
   .env.example
 ```
 
-The container writes Linux paths into your `.dart_tool/`. So run `dart pub get` on your machine again before you use `dox serve`.
-
-Keep `bin/` and `lib/` together. The binary loads the libraries from `../lib`. See [Deployment](../digging-deeper/deployment.md#build).
+Keep `bin/` and `lib/` together, because the binary loads the libraries from `../lib`. See [Deployment](../digging-deeper/deployment.md#build).
 
 !!! warning "Match the CPU of the server"
-    Docker builds for the CPU of your machine. On a Mac with Apple silicon that is `arm64`.
-    Most VPS plans are `x86_64`. For them, add `--platform linux/amd64` after `docker run`.
-    Check the server with `uname -m`.
+    Docker builds for the CPU of your machine. On a Mac with Apple silicon that is `arm64`, but most VPS plans are `x86_64`.
+    For them, add `--platform linux/amd64` after `docker run`. Check the server with `uname -m`.
+
+The container writes Linux paths into your `.dart_tool/`. So run `dart pub get` on your machine again before you use `dox serve`.
 
 ## 2. Make a user and the folders
 
-Run this on the server. The app runs as the user `dox`. This user can not log in.
+You should not run the app as `root`. Run this on the server to make a user `dox`, which can not log in:
 
 ```bash
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin dox
@@ -95,17 +92,17 @@ sudo chown root:root /etc/blog.env
 sudo chmod 600 /etc/blog.env
 ```
 
-systemd reads this file as `root`, before it starts the app as `dox`. So `dox` does not need to read it.
+systemd reads this file as `root` before it starts the app, so the user `dox` does not need to read it.
 
 For Postgres, set `DB_CONNECTION=postgres` and add `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_NAME`.
 Or set one `DATABASE_URL`, like `postgres://app:secret@localhost:5432/blog`. It wins over the `DB_*` keys. systemd gives it to the app as a real environment variable. See [`DATABASE_URL`](../database/index.md#database_url).
 See [Environments](environments.md) for all keys.
 
-!!! note "Which value wins"
-    systemd passes `EnvironmentFile` as real environment variables, and those win over a `.env` file.
-    So `/etc/blog.env` wins over a `/opt/blog/.env`. Do not put a `.env` in `/opt/blog`, so there is only one place to look.
+Do not put a `.env` file in `/opt/blog`. The values of `/etc/blog.env` are real environment variables, so they win over a `.env` file anyway, and one place is easier to check.
 
 ## 5. Write the systemd unit
+
+The systemd unit starts the app at boot and starts it again after a crash:
 
 ```ini title="/etc/systemd/system/blog.service"
 [Unit]
@@ -141,19 +138,19 @@ sudo systemctl enable --now blog
 systemctl status blog
 ```
 
-- `Restart=always`: when the main isolate dies, the process exits and systemd starts it again. See [Deployment: keep it running](../digging-deeper/deployment.md#keep-it-running).
+- When the main isolate dies, the process exits and `Restart=always` starts it again. See [Deployment: keep it running](../digging-deeper/deployment.md#keep-it-running).
 - The app runs the migrations at start, before it takes requests.
 - Dox starts one isolate per CPU core. Set `APP_TOTAL_ISOLATE` in `/etc/blog.env` to change it.
 
 ## 6. Close the app port
 
-Caddy runs on the same machine. So let Dox listen on `127.0.0.1` only. Add this line to `/etc/blog.env`:
+Only Caddy should talk to the app. Caddy runs on the same machine, so let Dox listen on `127.0.0.1` only. Add this line to `/etc/blog.env`:
 
 ```ini title="/etc/blog.env"
 APP_HOST=127.0.0.1
 ```
 
-Now only programs on this machine can reach port `3000`. Also turn on a firewall, so only SSH, HTTP and HTTPS are open:
+Now only programs on this machine can reach port `3000`. Also turn on a firewall, so that only SSH, HTTP and HTTPS are open:
 
 ```bash
 sudo ufw default deny incoming
@@ -189,8 +186,7 @@ sudo systemctl reload caddy
 
 ## 8. Trust Caddy in the app
 
-Dox ignores `X-Forwarded-For` and `X-Forwarded-Proto` until you list the proxy in `trustedProxies`.
-Caddy talks to the app from the same server:
+Dox ignores `X-Forwarded-For` and `X-Forwarded-Proto` until you list the proxy in `trustedProxies`. Caddy talks to the app from the same server, so list the local addresses:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -238,7 +234,7 @@ Check that the app port is closed. From your machine:
 curl -m 5 http://api.example.com:3000/api/ping   # must time out
 ```
 
-## Update the app
+## Updating the app
 
 1. Build a new bundle (step 1).
 2. Copy it to the server (step 3). Keep the old one first, so you can go back:
@@ -260,8 +256,8 @@ curl -m 5 http://api.example.com:3000/api/ping   # must time out
 To go back: copy `/opt/blog.prev` to `/opt/blog` and restart. A migration that already ran is not undone.
 
 !!! note "A restart is short, but not zero"
-    A restart takes about one second. New requests do not fail: `lb_try_duration` makes Caddy wait for the app to come back.
-    For a real zero-downtime update, run two copies on two ports and list both in Caddy. See [Deployment: many processes](../digging-deeper/deployment.md#many-processes-or-machines).
+    A restart takes about one second. New requests do not fail, because `lb_try_duration` makes Caddy wait for the app.
+    If you need a real zero-downtime update, run two copies on two ports and list both in Caddy. See [Deployment: many processes](../digging-deeper/deployment.md#many-processes-or-machines).
 
 ## See also
 

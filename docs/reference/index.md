@@ -1,6 +1,6 @@
 # Reference
 
-Short lookup pages, with values taken from the Dox source code.
+These are short pages to look things up: config fields, commands, env vars, errors and more.
 
 | Page | What is on it |
 | --- | --- |

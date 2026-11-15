@@ -1,8 +1,8 @@
 # Guides
 
-Each guide solves one job from start to end: copy the files, run the commands, and check the result.
+Each guide solves one job from start to end: you copy the files, run the commands and check the result.
 
-The reference pages explain each part in more detail. The guides link to them.
+The guides are short on theory. If you want to know more about one part, follow the links to the reference pages.
 
 | Guide | What you get |
 | --- | --- |
@@ -22,10 +22,15 @@ The reference pages explain each part in more detail. The guides link to them.
 | [Deploy to Fly.io](deploy-fly.md) | Fly.io from your `Dockerfile`, with SQLite on a volume or with Postgres. |
 | [Deploy to Google Cloud Run](deploy-cloud-run.md) | Cloud Run from your `Dockerfile`, with Cloud SQL and Secret Manager. |
 
-Most guides use the app that `dox create my_app` makes. The package name is `my_app`.
-Change it to your own package name in the imports.
+## The example apps
+
+Most guides use the app that `dox create my_app` makes, so the package name is `my_app`. Change it to your own package name in the imports.
+
 The OpenAPI guide and the deploy guides use the blog API of the [tutorial](../tutorial/01-create-project.md). Its package name is `blog`.
 
-The code of the app guides is in one app on GitHub: [examples/guides](https://github.com/dartondox/dox/tree/main/examples/guides).
-The blog API is in [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api).
-CI builds both and runs their tests on every push, so the code on these pages keeps working.
+All the code is on GitHub:
+
+- the app guides: [examples/guides](https://github.com/dartondox/dox/tree/main/examples/guides)
+- the blog API: [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api)
+
+CI builds both apps and runs their tests on every push, so the code on these pages keeps working.

@@ -6,7 +6,7 @@ icon: lucide/bug
 
 This page lists known problems, with the text you see, the cause and the fix.
 
-The texts come from the source code.
+For short errors, search the [Error index](errors.md).
 
 ## The native HTTP library did not load
 
@@ -27,18 +27,18 @@ dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
 dox_http_native: cargo build failed
 ```
 
-**Cause.** The build hook of `dox_http_native` (`hook/build.dart` in [its repo](https://github.com/dartondox/dox-http-native)) tries, in this order: the `lib_path` user define, a local `native/target/release` build, the GitHub release download, and `cargo build`. None of them worked. Common reasons:
+**Cause.** The package could not find, download or build its native library. Common reasons:
 
-- No internet during `dart pub get`, or the release has no build for your OS and CPU (there are builds for macOS arm64 and x64, Linux x64 and arm64, Windows x64).
-- Rust is not installed, so the fallback `cargo build` can not run.
-- You compiled with `dart compile exe`. It does not run build hooks, so no native library is in the binary.
-- The `<reason>` is `native library ABI <x>, expected <y>`: the library on disk is from another version of the package.
+- There was no internet during `dart pub get`, or there is no ready build for your OS and CPU. Ready builds exist for macOS arm64 and x64, Linux x64 and arm64, and Windows x64.
+- Rust is not installed, so the library can not be built from source.
+- You compiled with `dart compile exe`. It does not run build hooks, so the binary has no native library.
+- The `<reason>` is `native library ABI <x>, expected <y>`. This means the library on disk is from another version of the package.
 
 **Fix.** Pick one:
 
-1. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. The hook builds the library with `cargo`.
-2. When the reason is an ABI mismatch and you set `lib_path`, rebuild that library: `cargo build --release` in the `native` folder of the `dox-http-native` repo.
-3. Download the library from the GitHub release `v<version>` of [dartondox/dox-http-native](https://github.com/dartondox/dox-http-native/releases) yourself and point to it in the root `pubspec.yaml`:
+1. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. Dox then builds the library with `cargo`.
+2. If the reason is an ABI mismatch and you set `lib_path`, rebuild that library: run `cargo build --release` in the `native` folder of the `dox-http-native` repo.
+3. Download the library yourself from the [GitHub releases](https://github.com/dartondox/dox-http-native/releases), and point to it in the root `pubspec.yaml`:
 
     ```yaml
     hooks:
@@ -47,9 +47,9 @@ dox_http_native: cargo build failed
           lib_path: /path/to/libdox_http_native.so
     ```
 
-4. Build with `dox build` (it runs `dart build cli`), not with `dart compile exe`.
+4. Build with `dox build`, not with `dart compile exe`.
 
-The native database drivers find their library the same way. When it does not load, the app stops too, with:
+The native database drivers load their library the same way. When it does not load, the app stops with:
 
 ```
 dox_postgres_native did not load: <reason>.
@@ -68,7 +68,7 @@ See [Native server](../digging-deeper/native-server.md), [Postgres native](../da
 SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = 3000
 ```
 
-`<errno>` is the OS error: `48` on macOS, `98` on Linux. `<code>` is `-1000` minus it: `-1048` on macOS, `-1098` on Linux.
+The `errno` is `48` on macOS and `98` on Linux.
 
 **Cause.** Another process listens on the port. Often it is an old `bin/server.dart` that `dox serve` did not stop, or a second copy of the app.
 
@@ -94,13 +94,13 @@ rm -rf .dart_tool/build
 dart run build_runner build
 ```
 
-If that is not enough, delete the named `.g.dart` files and build again. New build_runner versions have no `--delete-conflicting-outputs` flag, so the Dox CLI does not pass it.
+If that is not enough, delete the `.g.dart` files that the message names, and build again.
 
 ## Ambiguous import: `Uuid`, `Name` or `Schema`
 
 **Symptom.** The analyzer or the build says a name like `Uuid`, `Name`, `Range`, `Image` or `Schema` is an "ambiguous import".
 
-**Cause.** `dox_core` exports the validation names of `dox_validation`: the rule annotations (`Uuid`, `Name`, `Range`, `Image`, ...) and the `Schema` class. Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
+**Cause.** `dox_core` exports the validation rules (`Uuid`, `Name`, `Range`, `Image`, ...) and the `Schema` class. Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
 
 **Fix.** Hide the name you do not use in that file:
 
@@ -129,7 +129,7 @@ When a value must have ` #` in it (a space, then `#`), put the value in quotes. 
 Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.
 ```
 
-**Cause.** `Hash.make()` and `Hash.makeAsync()` use bcrypt. bcrypt takes at most 72 bytes, so Dox throws an `ArgumentError` for a longer password. The text does not hold the password, so it is safe in logs.
+**Cause.** `Hash.make()` and `Hash.makeAsync()` use bcrypt. bcrypt takes at most 72 bytes, so Dox throws an `ArgumentError` for a longer password. The error text does not hold the password.
 
 **Fix.** Refuse long passwords in your DTO, before you hash them:
 
@@ -138,11 +138,7 @@ Invalid argument(s) (password): The password is too long. bcrypt takes at most 7
 final String password;
 ```
 
-`@MaxLength` counts characters, not bytes. A password with non-ASCII characters can still be over 72 bytes.
-
-`Hash.verify(password, hash)` does not throw. It gives `false` when `hash` is not a valid bcrypt hash, for example a plain password or an empty string in the column. Make sure every stored password went through `Hash.make()`.
-
-For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../security/hashing.md).
+`@MaxLength` counts characters, not bytes, so a password with non-ASCII characters can still be over 72 bytes. See [Hashing](../security/hashing.md).
 
 ## MySQL 8 login fails
 
@@ -150,7 +146,7 @@ For normal login use `Auth().attempt()` from `dox_auth`. See [Hashing](../securi
 
 **Cause.** `caching_sha2_password` needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.
 
-**Fix.** The Dox MySQL driver (`dox_mysql_native`) supports `caching_sha2_password` (MySQL 8.4) and MariaDB 11. Check these settings on the connection in `lib/config/database.dart`:
+**Fix.** The Dox MySQL driver supports `caching_sha2_password`. Check these settings on the connection in `lib/config/database.dart`:
 
 | Setting | What to do |
 | --- | --- |
@@ -168,18 +164,14 @@ ALTER USER 'app'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';
 
 **Symptom.** An `SqliteException` with `unable to open database file`, or an empty database after `dox build`.
 
-**Cause.** `database` is a file path. A relative path is relative to the folder you start the app from. `dox build` tells you to run `cd build/bundle && ./bin/server`. So the default `DB_NAME=db/dox.sqlite` is then `build/bundle/db/dox.sqlite`. `dox build` does not copy your SQLite files into the bundle, so that database starts empty. SQLite makes a missing file, but not a missing folder.
+**Cause.** A relative path is relative to the folder you start the app from. After `dox build` you run the app from `build/bundle`, so the default `DB_NAME=db/dox.sqlite` becomes `build/bundle/db/dox.sqlite`. `dox build` does not copy your SQLite files, so that database starts empty. Also, SQLite makes a missing file, but not a missing folder.
 
 **Fix.**
 
 - Use an absolute path, or make the folder first.
 - Set it with `DB_NAME` (a new project reads it): `DB_NAME=/var/lib/my_app/dox.sqlite`.
-- Migrations use `DB_DATABASE` or `DB_NAME` as the path too. Use the same value for both.
-
-!!! warning "`:memory:` and isolates"
-    `:memory:` opens a new empty database in each isolate. With `totalIsolate` above 1, every isolate sees different data. Use a file, or `totalIsolate: 1`.
-
-Dox opens a file database with `journal_mode = WAL`, `synchronous = NORMAL`, `foreign_keys = ON` and `busy_timeout = 5000` (change it with `extra: {'busyTimeout': ...}`).
+- Migrations read `DB_DATABASE` or `DB_NAME` as the path too, so use the same value.
+- Do not use `:memory:` with more than one isolate. Each isolate gets its own empty database.
 
 ## `dox: command not found` after `dart pub global activate`
 
@@ -200,7 +192,3 @@ export PATH="$PATH":"$HOME/.pub-cache/bin"
 ```
 
 On Windows the folder is `%LOCALAPPDATA%\Pub\Cache\bin`.
-
-## Other startup errors
-
-Short errors, like a bad route, a missing DTO or a bad env key, are in the [Error index](errors.md).

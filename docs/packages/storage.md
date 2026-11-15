@@ -4,21 +4,21 @@ icon: lucide/hard-drive
 
 # Storage
 
-This page shows how to save and read files with `dox_storage`.
+`dox_storage` saves and reads files with one API, on the local disk, AWS S3 and S3-compatible services.
 
-`dox_storage` gives one API for files in many places: local disk, AWS S3 and S3-compatible services.
+You write the same code for every place. Only the config decides where the files go. This page shows the full API of a disk. For a shorter guide, see [File Storage](../digging-deeper/file-storage.md).
 
-## In a Dox app
+## Setup
 
-A new app from `dox create` already has steps 1 to 3. Go to step 4.
+A new app from `dox create` already has this setup. You can go to [Using a disk](#using-a-disk).
 
-### 1. Install
+First, install the package:
 
 ```bash
 dart pub add dox_storage
 ```
 
-### 2. The config
+Then add the config. Each disk has a name and a driver:
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -32,9 +32,7 @@ StorageConfig storageConfig = StorageConfig(
 );
 ```
 
-### 3. The provider
-
-The provider sets up the disks in every isolate. Put it in `lib/providers/`, so the generated container finds it:
+Last, add the provider. It sets up the disks in every isolate. Put it in `lib/providers/`, so the generated container finds it:
 
 ```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -45,13 +43,23 @@ class AppStorageProvider extends StorageProvider {
 }
 ```
 
-Run `dart run build_runner build`.
+Then run `dart run build_runner build`.
 
-### 4. Use it
+S3 disks and their env keys are in [File Storage](../digging-deeper/file-storage.md).
+
+### Drivers
+
+| Driver | Use for | Signed download URL | Signed upload URL |
+| --- | --- | --- | --- |
+| `local` | a folder on the server | Yes (HMAC with your app key) | No |
+| `s3` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS (HMAC keys) | Yes (SigV4) | Yes (SigV4) |
+| `memory` | tests | fake URLs | fake URLs |
+
+## Using a disk
+
+`Storage()` has short functions for common work. For example, `putFile` saves an upload with a new random name:
 
 ```dart
-import 'package:dox_storage/dox_storage.dart';
-
 Route.post('/avatar', (DoxRequest req) async {
   RequestFile file = req.input('avatar');
   String path = await Storage().putFile('avatars', file);
@@ -59,17 +67,327 @@ Route.post('/avatar', (DoxRequest req) async {
 });
 ```
 
-- `Storage().use('s3')` gives the full `Disk` of this page.
-- `Storage.route('files')` serves local signed URLs.
-- S3 disks, env keys and all `Storage()` functions are in [File Storage](../digging-deeper/file-storage.md).
+For the full API, get a `Disk` with `use`. With no name, you get the default disk:
 
-## Drivers
+```dart
+Disk disk = Storage().use('s3');
+```
 
-| Driver | Use for | Signed download URL | Signed upload URL |
-| --- | --- | --- | --- |
-| `LocalDriver` | a folder on the server | Yes (HMAC with your app key) | No |
-| `S3Driver` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS (HMAC keys) | Yes (SigV4) | Yes (SigV4) |
-| `MemoryDriver` | tests | fake URLs | fake URLs |
+The rest of this page shows the methods of a `Disk`.
+
+## Storing files
+
+The `put` method stores a `String`, a `List<int>` or a `Stream<List<int>>`:
+
+```dart
+await disk.put('avatars/1.png', bytes);
+```
+
+You can set the content type and the visibility with `WriteOptions`:
+
+```dart
+await disk.put('a.json', '{}', options: WriteOptions(contentType: 'application/json', visibility: Visibility.public));
+```
+
+### Storing big files
+
+`putStream` writes a stream, so the file is not loaded into memory:
+
+```dart
+await disk.putStream('videos/big.mp4', File('big.mp4').openRead());
+```
+
+### Saving an upload
+
+Stream the upload to the disk, so the file is not loaded into memory:
+
+```dart
+Route.post('/avatar', (DoxRequest req) async {
+  RequestFile file = req.input('avatar');
+  String key = 'avatars/${DateTime.now().microsecondsSinceEpoch}.${file.extension}';
+  await disk.putStream(key, file.stream());
+  return <String, String>{'url': await disk.getUrl(key)};
+});
+```
+
+Do not use `file.filename` from the client as the key, because a client can send any name. Make your own name, like above or with a uuid.
+
+### Adding to a file
+
+`append` adds text at the end of a file, and `prepend` adds it at the start. A missing file is made:
+
+```dart
+await disk.append('logs/app.log', 'new line');
+
+await disk.prepend('logs/app.log', 'first line');
+```
+
+They put a `\n` between the old and the new text, if the file is not empty. Change it with `separator`, like `separator: ', '`. They read the file and write it back, so two writers at the same time can lose a write.
+
+## Retrieving files
+
+`get` reads a file as bytes, and `getString` reads it as text:
+
+```dart
+Uint8List data = await disk.get('avatars/1.png');
+
+String text = await disk.getString('notes/a.txt');
+```
+
+For a big file, use `getStream`:
+
+```dart
+Stream<List<int>> stream = await disk.getStream('videos/big.mp4');
+```
+
+### Checking if a file exists
+
+`exists` returns `true` when the file is there. `missing` is the opposite:
+
+```dart
+bool found = await disk.exists('avatars/1.png');
+
+bool gone = await disk.missing('c.png');
+```
+
+### File metadata
+
+`getMetaData` gives the size, content type, last change time and etag in one call. `size` and `lastModified` give one value each:
+
+```dart
+ObjectMetaData meta = await disk.getMetaData('avatars/1.png');
+
+int size = await disk.size('avatars/1.png');
+
+DateTime changed = await disk.lastModified('avatars/1.png');
+```
+
+`size` and `lastModified` throw `FileNotFoundException` when the file is missing.
+
+## Copying and moving files
+
+```dart
+await disk.copy('a.png', 'b.png');
+
+await disk.move('b.png', 'c.png');
+```
+
+On S3, `copy` and `move` copy on the server, so the file does not pass through your app.
+
+## Deleting files
+
+`delete` removes one file. `deleteAll` removes every file under a prefix:
+
+```dart
+await disk.delete('c.png');
+
+await disk.deleteAll('avatars'); // '' or no argument for the whole disk
+```
+
+## Directories
+
+`files` gives the files directly in a folder, and `allFiles` also gives the files in sub folders. `directories` gives the direct sub folders. They return keys, like `avatars/1.png`:
+
+```dart
+List<String> files = await disk.files('avatars');
+
+List<String> all = await disk.allFiles('avatars');
+
+List<String> folders = await disk.directories('avatars');
+```
+
+`deleteDirectory` deletes a folder and its files. It never deletes the root, so `''` or `/` throws `InvalidKeyException`:
+
+```dart
+await disk.deleteDirectory('reports');
+```
+
+`makeDirectory` makes a folder and its parents on a local disk. On other disks it does nothing, because they have no real folders. `directoryExists` checks a folder. On S3 and memory disks, a folder exists when a file is under it:
+
+```dart
+await disk.makeDirectory('reports/2026');
+
+bool folder = await disk.directoryExists('reports');
+```
+
+### Listing page by page
+
+For a big folder, read it one page at a time with `listAll`:
+
+```dart
+ListResult page = await disk.listAll('avatars', ListOptions(recursive: true, limit: 100));
+// next page: ListOptions(paginationToken: page.paginationToken)
+```
+
+## File visibility
+
+A file is `public` or `private`. Set it with `setVisibility`, and read it with `getVisibility`:
+
+```dart
+await disk.setVisibility('avatars/1.png', Visibility.public);
+
+Visibility v = await disk.getVisibility('avatars/1.png');
+```
+
+On a local disk, visibility does nothing by default. To make it set real file modes, turn on [file permissions](#local-file-permissions).
+
+## URLs
+
+`getUrl` gives the address of a file. Set `url` on the disk to serve public files from a CDN:
+
+```dart
+String url = await disk.getUrl('avatars/1.png');
+```
+
+### Signed URLs
+
+A signed URL works only for a short time, so you can share a private file. `expiresIn` is 30 minutes when you do not set it:
+
+```dart
+String signed = await disk.getSignedUrl('avatars/1.png',
+    options: SignedUrlOptions(expiresIn: Duration(minutes: 10)));
+```
+
+`contentDisposition` asks the server to send this header on download, like `attachment; filename="report.pdf"`. On S3, a signed URL can live at most 7 days.
+
+On a local disk, the app serves the file itself. `Storage.route('files')` adds a route that checks the signature and serves the file.
+
+### Signed upload URLs
+
+On S3, the browser can upload a file straight to the bucket with a signed upload URL. So the file does not pass through your app:
+
+```dart
+String upload = await disk.getSignedUploadUrl('avatars/2.png',
+    options: SignedUrlOptions(contentType: 'image/png'));
+```
+
+## Local disk options
+
+### Atomic writes
+
+Sometimes an upload fails or stops in the middle. Turn on `atomic_writes` so this never leaves a half written file. The disk then writes to a temp file and renames it when the write is done, so the old file stays until then:
+
+```dart
+'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'atomic_writes': true},
+```
+
+It is off by default.
+
+### Local file permissions
+
+Turn on `permissions` if you want visibility to set the real file mode. Then `setVisibility` runs `chmod` and `getVisibility` reads the mode:
+
+```dart
+'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'permissions': true},
+```
+
+The modes are `0644` for a public file, `0600` for a private file, `0755` for a public folder and `0700` for a private folder. To use other modes, give a map instead of `true`:
+
+```dart
+'permissions': <String, dynamic>{
+  'file': <String, int>{'public': 0x1a4, 'private': 0x180},
+  'dir': <String, int>{'public': 0x1ed, 'private': 0x1c0},
+},
+```
+
+A mode that is not in the map keeps its default. Each mode must be an int from 0 to 0x1ff (0777). It is off by default, and it does nothing on Windows.
+
+## S3-compatible services
+
+The examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are keys in the disk map. See [File Storage](../digging-deeper/file-storage.md).
+
+### Cloudflare R2
+
+Set `supportsAcl: false`, because R2 does not take ACL headers:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://<account-id>.r2.cloudflarestorage.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+);
+```
+
+### MinIO
+
+MinIO needs path style URLs, so set `forcePathStyle: true`:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'us-east-1',
+  endpoint: 'http://localhost:9000',
+  forcePathStyle: true,
+  accessKeyId: 'minioadmin',
+  secretAccessKey: 'minioadmin',
+);
+```
+
+### DigitalOcean Spaces
+
+Spaces works like S3. Put the region of your space in `region` and in the endpoint:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-space',
+  region: 'nyc3',
+  endpoint: 'https://nyc3.digitaloceanspaces.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+);
+```
+
+### Google Cloud Storage
+
+Set `supportsAcl: false` and `supportsBatchDelete: false`, because GCS does not take ACL headers or the S3 batch delete call:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://storage.googleapis.com',
+  accessKeyId: 'GOOG...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+  supportsBatchDelete: false,
+);
+```
+
+## Testing
+
+`fake()` swaps a disk for a memory disk, so your tests write nothing to the real disk. In a Dox app, the `DriveManager` is `Storage.manager`:
+
+```dart
+Disk fake = drive.fake('s3'); // drive.use('s3') now writes to memory
+await uploadAvatar();         // your code
+expect(await fake.exists('avatars/1.png'), isTrue);
+drive.restore('s3');
+```
+
+A disk also has `assertExists` and `assertMissing`. They throw a `StateError` when the check fails:
+
+```dart
+await fake.assertExists('avatars/1.png');
+
+await fake.assertMissing('avatars/old.png');
+```
+
+## Errors
+
+All errors extend `StorageException` and have the `key`.
+
+| Error | When |
+| --- | --- |
+| `FileNotFoundException` | the file does not exist |
+| `PermissionDeniedException` | file system permission error, or S3 403 |
+| `InvalidKeyException` | unsafe key |
+| `UnsupportedOperationException` | the driver can not do this |
+| `DriverException` | anything else. The first error is in `cause` |
+
+Keys are checked, so a user can not reach files outside the disk. `..`, absolute paths like `/etc/passwd` and null bytes throw `InvalidKeyException`. A local disk also checks that the path stays inside its root folder.
 
 ## Without Dox
 
@@ -109,125 +427,11 @@ DriveManager drive = DriveManager(
 Disk disk = drive.use('s3'); // or drive.use() for the default disk
 ```
 
-`use()` throws `UnsupportedOperationException` when no disk has that name.
+`use()` throws `UnsupportedOperationException` when no disk has that name. For file permissions, pass `LocalDriverConfig(permissions: LocalPermissions())`.
 
-`LocalDriverConfig(atomicWrites: true)` makes a local disk write to a temp file and rename it when the write is done.
-In a Dox app, use `'atomic_writes': true` in the disk map.
-A failed or stopped upload then never leaves a partial file, and the old file stays. Temp file names end with `.dox-upload.tmp`, and `listAll()` hides them.
-It is off by default.
+### Checking a local signed URL
 
-`LocalDriverConfig(permissions: LocalPermissions())` makes visibility the file mode.
-In a Dox app, use `'permissions': true` in the disk map.
-`setVisibility` then runs `chmod` and `getVisibility` reads the mode of the file.
-The modes are public file `0644`, private file `0600`, public folder `0755` and private folder `0700`.
-Without `permissions`, `setVisibility` does nothing, and `getVisibility` gives the disk `visibility`.
-`LocalPermissions` takes other modes. In a Dox app, the map has a `file` and a `dir` key, each with `public` and `private`. A mode that is not in the map keeps its default. A key that is not one of these is ignored.
-Each mode must be an int from 0 to 0x1ff (0777). A string like `'0644'`, a negative number or a bigger number throws `ArgumentError` when the disk is made.
-It is off by default. On Windows it does nothing.
-
-- The mode is set before the content is written. A private file is never readable by others, not even for a moment.
-- A new file gets the visibility of the write, or the disk `visibility`.
-- An overwrite, `append` and `prepend` keep the mode the file has, unless the call gives a visibility.
-- A `copy` gets the visibility of the call, or else the mode of the source. It is written to a temp file first and then renamed. Listings hide that temp file. A copy onto a symlink replaces the link.
-- A `move` keeps the mode, unless the call gives a visibility.
-- Folders that a write creates get the folder mode. Folders that were there before, and the disk root, keep their mode.
-- `getVisibility` reads the real mode. The private mode is private. Any other mode is public.
-- `getVisibility` and `setVisibility` of a symlink throw `UnsupportedOperationException`.
-- When the `chmod` fails, a file that the write created is removed.
-
-On every local disk, with `permissions` on or off, `copy` or `move` of a missing file throws `FileNotFoundException` and makes no folders.
-
-## Use a disk
-
-In a Dox app, get a disk with `Storage().use('s3')`. Without Dox, use `drive.use('s3')`.
-
-```dart
-await disk.put('avatars/1.png', bytes); // String, List<int> or Stream<List<int>>
-await disk.put('a.json', '{}', options: WriteOptions(contentType: 'application/json', visibility: Visibility.public));
-await disk.putStream('videos/big.mp4', File('big.mp4').openRead());
-
-Uint8List data = await disk.get('avatars/1.png');
-String text = await disk.getString('notes/a.txt');
-Stream<List<int>> stream = await disk.getStream('videos/big.mp4');
-ObjectMetaData meta = await disk.getMetaData('avatars/1.png'); // size, contentType, lastModified, etag
-bool found = await disk.exists('avatars/1.png');
-int size = await disk.size('avatars/1.png');
-DateTime changed = await disk.lastModified('avatars/1.png');
-
-await disk.append('logs/app.log', 'new line');  // a missing file is made
-await disk.prepend('logs/app.log', 'first line');
-await disk.makeDirectory('reports/2026');        // local disk only
-bool folder = await disk.directoryExists('reports');
-
-await disk.copy('a.png', 'b.png');
-await disk.move('b.png', 'c.png');
-await disk.delete('c.png');
-bool gone = await disk.missing('c.png');
-await disk.deleteAll('avatars'); // every file under this prefix, '' for all
-await disk.deleteDirectory('reports'); // never the root
-
-List<String> files = await disk.files('avatars');         // direct files
-List<String> all = await disk.allFiles('avatars');        // in sub-folders too
-List<String> folders = await disk.directories('avatars'); // direct sub-folders
-
-ListResult page = await disk.listAll('avatars', ListOptions(recursive: true, limit: 100));
-// next page: ListOptions(paginationToken: page.paginationToken)
-
-await disk.setVisibility('avatars/1.png', Visibility.public);
-Visibility v = await disk.getVisibility('avatars/1.png');
-```
-
-- `size` and `lastModified` throw `FileNotFoundException` when the file is missing.
-- `append` and `prepend` put a `\n` between the old and the new text, but only when the file is not empty. Change it with `separator`, like `separator: ', '`.
-- `append` and `prepend` keep the visibility and content type of the file.
-- `append` and `prepend` read the file and write it back. They are not atomic, so two writers at the same time can lose a write.
-- `makeDirectory` makes the folder and its parent folders on a local disk. On any other disk it does nothing, because those disks have no real folders.
-- `files`, `allFiles` and `directories` give keys, like `avatars/1.png`. They read every page of `listAll`.
-- `deleteDirectory` deletes a folder and its files. The root (`''` or `/`) throws `InvalidKeyException`. `deleteAll()` empties the whole disk.
-- `directoryExists` is true when a folder exists. On a local disk it checks the real folder. On S3 and memory disks, a folder exists when a file is under it. `exists` is true for files only.
-
-### Save an upload
-
-Stream the upload to the disk. The file is not loaded into memory.
-
-```dart
-Route.post('/avatar', (DoxRequest req) async {
-  RequestFile file = req.input('avatar');
-  String key = 'avatars/${DateTime.now().microsecondsSinceEpoch}.${file.extension}';
-  await disk.putStream(key, file.stream());
-  return <String, String>{'url': await disk.getUrl(key)};
-});
-```
-
-!!! warning
-    Do not use `file.filename` from the client as the key. A client can send any name.
-    Make your own name, like above or with a uuid.
-
-## URLs and signed URLs
-
-```dart
-String url = await disk.getUrl('avatars/1.png');
-
-// a download link that works for 10 minutes
-String signed = await disk.getSignedUrl('avatars/1.png',
-    options: SignedUrlOptions(expiresIn: Duration(minutes: 10)));
-
-// the browser can upload straight to S3 with this URL
-String upload = await disk.getSignedUploadUrl('avatars/2.png',
-    options: SignedUrlOptions(contentType: 'image/png'));
-```
-
-- `expiresIn` is 30 minutes when you do not set it.
-- S3 signed URLs can live at most 7 days. This is an S3 rule.
-- `contentDisposition` asks the server to send this header on download, like `attachment; filename="report.pdf"`.
-- Set `urlBase` to serve public files from a CDN.
-
-### Check a local signed URL
-
-In a Dox app, `Storage.route('files')` does this for you.
-
-`LocalDriver.getSignedUrl` returns `<urlBase>/<key>?expires=...&signature=...`.
-Check it in the route that serves the file:
+A local signed URL looks like `<urlBase>/<key>?expires=...&signature=...`. Without Dox, check it in the route that serves the file:
 
 ```dart
 LocalDriver local = LocalDriver(localConfig);
@@ -237,115 +441,9 @@ if (!ok) {
 }
 ```
 
-## S3-compatible services
+### Your own driver
 
-### Cloudflare R2
-
-Set `supportsAcl: false`. R2 does not take ACL headers.
-
-```dart
-S3DriverConfig(
-  bucket: 'my-bucket',
-  region: 'auto',
-  endpoint: 'https://<account-id>.r2.cloudflarestorage.com',
-  accessKeyId: '...',
-  secretAccessKey: '...',
-  supportsAcl: false,
-);
-```
-
-### MinIO
-
-MinIO needs path style URLs, so set `forcePathStyle: true`.
-
-```dart
-S3DriverConfig(
-  bucket: 'my-bucket',
-  region: 'us-east-1',
-  endpoint: 'http://localhost:9000',
-  forcePathStyle: true,
-  accessKeyId: 'minioadmin',
-  secretAccessKey: 'minioadmin',
-);
-```
-
-### DigitalOcean Spaces
-
-Spaces works like S3. Put the region of your space in `region` and in the endpoint.
-
-```dart
-S3DriverConfig(
-  bucket: 'my-space',
-  region: 'nyc3',
-  endpoint: 'https://nyc3.digitaloceanspaces.com',
-  accessKeyId: '...',
-  secretAccessKey: '...',
-);
-```
-
-### Google Cloud Storage
-
-Set `supportsAcl: false` and `supportsBatchDelete: false`. GCS does not take ACL headers or the S3 batch delete call.
-
-```dart
-S3DriverConfig(
-  bucket: 'my-bucket',
-  region: 'auto',
-  endpoint: 'https://storage.googleapis.com',
-  accessKeyId: 'GOOG...',
-  secretAccessKey: '...',
-  supportsAcl: false,
-  supportsBatchDelete: false,
-);
-```
-
-!!! info "Big files"
-    - `put` sends one request. S3 allows at most 5 GiB in one request.
-    - `putStream` uses a multipart upload when the stream is bigger than `multipartPartSize` (8 MiB).
-      Only one part is in memory at a time. The limit is about 78 GiB. Raise `multipartPartSize` for bigger files.
-    - `copy` and `move` copy on the server. S3 allows at most 5 GiB here.
-
-## Keys are checked
-
-- `a//b/./c.txt` becomes `a/b/c.txt`. `\` becomes `/`.
-- `..`, absolute paths (`/etc/passwd`) and null bytes throw `InvalidKeyException`.
-- `LocalDriver` also checks that the path stays inside its root folder.
-
-## Errors
-
-All errors extend `StorageException` and have the `key`.
-
-| Error | When |
-| --- | --- |
-| `FileNotFoundException` | the file does not exist |
-| `PermissionDeniedException` | file system permission error, or S3 403 |
-| `InvalidKeyException` | unsafe key |
-| `UnsupportedOperationException` | the driver can not do this |
-| `DriverException` | anything else. The first error is in `cause` |
-
-## Tests
-
-`fake()` swaps a disk for a memory disk.
-
-```dart
-Disk fake = drive.fake('s3'); // drive.use('s3') now writes to memory
-await uploadAvatar();         // your code
-expect(await fake.exists('avatars/1.png'), isTrue);
-drive.restore('s3');
-```
-
-A disk also has `assertExists` and `assertMissing`. They throw a `StateError` when the check fails:
-
-```dart
-Disk fake = drive.fake('s3');
-await uploadAvatar();
-await fake.assertExists('avatars/1.png');
-await fake.assertMissing('avatars/old.png');
-```
-
-## Your own driver
-
-Implement `DriverContract` and register it.
+Implement `DriverContract` and register it:
 
 ```dart
 class DropboxDriver implements DriverContract { ... }
@@ -353,3 +451,22 @@ class DropboxDriver implements DriverContract { ... }
 drive.register('dropbox', DropboxDriver(...));
 await drive.use('dropbox').put('a.txt', 'hello');
 ```
+
+## Details
+
+This section is for special cases. Most apps do not need it.
+
+- Keys are cleaned: `a//b/./c.txt` becomes `a/b/c.txt`, and `\` becomes `/`.
+- `append` and `prepend` keep the visibility and the content type of the file.
+- On local disks, `copy` or `move` of a missing file throws `FileNotFoundException` and makes no folders.
+- Atomic writes use temp files that end with `.dox-upload.tmp`. `listAll()` hides them.
+- On S3, `put` sends one request, so it allows at most 5 GiB. `putStream` uses a multipart upload when the stream is bigger than `multipartPartSize` (8 MiB). Only one part is in memory at a time, and the limit is about 78 GiB. Raise `multipartPartSize` for bigger files. `copy` and `move` also allow at most 5 GiB.
+- Without `permissions`, `setVisibility` on a local disk does nothing, and `getVisibility` gives the disk `visibility`.
+- With `permissions`:
+    - The mode is set before the content is written, so a private file is never readable by others, not even for a moment.
+    - A new file gets the visibility of the write, or the disk `visibility`. An overwrite, `append`, `prepend` and `move` keep the mode of the file, unless the call gives a visibility. A `copy` gets the visibility of the call, or the mode of the source.
+    - Folders that a write creates get the folder mode. Folders that were there before, and the disk root, keep their mode.
+    - `getVisibility` reads the real mode: the private mode is private, any other mode is public.
+    - `getVisibility` and `setVisibility` of a symlink throw `UnsupportedOperationException`. A copy onto a symlink replaces the link.
+    - When `chmod` fails, a file that the write created is removed.
+    - A mode that is not an int, like `'0644'`, or is out of range throws `ArgumentError` when the disk is made. A key in the map that is not `file`, `dir`, `public` or `private` is ignored.

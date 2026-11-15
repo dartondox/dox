@@ -4,11 +4,11 @@ icon: lucide/flask-conical
 
 # Step 6: Test
 
-This step writes one HTTP test for the list route and runs it.
+In this step you write one HTTP test for the list route and run it.
 
 ## 1. Write the test
 
-The template has `test/http_test.dart`. Replace it with this:
+A test calls your routes like a real client, so you know they still work after a change. The template has `test/http_test.dart`. Replace it with this:
 
 ```dart title="test/http_test.dart"
 import 'package:blog/config/app.dart';
@@ -41,24 +41,26 @@ void main() {
 }
 ```
 
-- `DoxTestClient.start` runs the app inside the test, on a free port. It does not clash with `dox s`.
-- It runs the migrations first, so the test also works on an empty database.
-- `package:test` is already in `dev_dependencies` of the template.
+- `DoxTestClient.start` runs the app inside the test on a free port, so it does not clash with `dox s`.
+- The test runs the migrations first, so it also works on an empty database.
+- `package:test` is already in the `dev_dependencies` of the template.
 
 ## Check it
+
+Run the test:
 
 ```bash
 dart test test/http_test.dart
 ```
+
+You should see:
 
 ```text
 00:01 +1: All tests passed!
 ```
 
 !!! tip "Use another database for tests"
-    The test uses the `.env` file, so it reads and writes `db/dox.sqlite`.
-    To keep test data out of it, make a `.env.testing` file with `DB_NAME=test.sqlite`.
-    `dart test` reads it on top of `.env`.
+    The test reads `.env`, so it uses `db/dox.sqlite`. To keep test data out of it, make a `.env.testing` file with `DB_NAME=test.sqlite`. `dart test` reads it on top of `.env`.
 
 ## Next
 

@@ -4,22 +4,18 @@ icon: lucide/shield-check
 
 # Authorization
 
-This page shows how to say what a user may do, with gates and policies from `dox_auth`.
+`dox_auth` lets you decide what a logged in user may do, with gates and policies.
 
-[Authentication](authentication.md) says who the user is.
-Authorization says what this user may do.
-For example, a user may edit their own post, but not the post of another user.
+[Authentication](authentication.md) tells you who the user is. Authorization tells you what this user may do. For example, a user may edit their own post, but not the post of another user.
 
 There are two ways to write the rules:
 
 - A **gate** is one rule, written as a function.
 - A **policy** is a class with all the rules of one model, like `Post`.
 
-## Register the rules
+## Registering the rules
 
-Gates and policies are kept per isolate.
-Dox runs many isolates, so add them in a provider.
-The `setup()` of a provider runs in every isolate.
+Gates and policies are kept per isolate. Dox runs many isolates, so add them in the `setup()` of a provider, because it runs in every isolate:
 
 ```dart title="lib/providers/gate_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -37,25 +33,23 @@ class GateProvider extends DoxProvider {
 }
 ```
 
-Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
+Dox finds the provider by itself. Run `dart run build_runner build` to add it to `lib/generated/container.g.dart`.
 
-## Gates
+## Writing gates
 
-A gate gets the user and a subject. It gives `true` when the user may do it.
-The user and subject types come from the function.
-A check with another type is denied.
+A gate gets the user and a subject, and gives `true` when the user may do it. The user and subject types come from the function, so a check with another type is denied:
 
 ```dart
 Gate.define('update-post', (User user, Post post) => post.userId == user.id);
 ```
 
-A gate with no subject uses `_` for the second parameter:
+If the gate needs no subject, use `_` for the second parameter:
 
 ```dart
 Gate.define('create-post', (User user, _) => user.verified == true);
 ```
 
-A gate can be async:
+A gate can also be async:
 
 ```dart
 Gate.define('publish-post', (User user, Post post) async {
@@ -63,31 +57,42 @@ Gate.define('publish-post', (User user, Post post) async {
 });
 ```
 
-### Check a gate
+## Checking a gate
+
+Use `Gate.allows` to check if the user may do something:
 
 ```dart
 if (await Gate.allows(user, 'update-post', post)) {
   // the user may update the post
 }
+```
 
+`Gate.denies` is the opposite:
+
+```dart
 if (await Gate.denies(user, 'create-post')) {
   // the user may not create a post
 }
+```
 
-// stop the request with 403 when denied
+If you want to stop the request when the check fails, use `Gate.authorize`. It throws, and the client gets a `403`:
+
+```dart
 await Gate.authorize(user, 'update-post', post);
+```
 
-// true when the user may do at least one, or all of them
+To check many abilities at once, use `Gate.any` (at least one) or `Gate.all` (all of them):
+
+```dart
 await Gate.any(user, <String>['update-post', 'delete-post'], post);
 await Gate.all(user, <String>['update-post', 'delete-post'], post);
 ```
 
-An ability with no gate and no policy is denied.
+An ability with no gate and no policy is always denied.
 
-### Give a reason
+### Giving a reason
 
-A check can give a `GateResponse` instead of a `bool`.
-The reason of `GateResponse.deny` is the message of the 403 answer.
+Sometimes you want to tell the user why they may not do something. Return a `GateResponse` instead of a `bool`. The reason of `GateResponse.deny` becomes the message of the `403` answer:
 
 ```dart
 Gate.define('delete-post', (User user, Post post) {
@@ -96,18 +101,19 @@ Gate.define('delete-post', (User user, Post post) {
   }
   return post.userId == user.id;
 });
+```
 
+`Gate.inspect` gives you the full answer:
+
+```dart
 GateResponse response = await Gate.inspect(user, 'delete-post', post);
 print(response.allowed);
 print(response.message);
 ```
 
-## Policies
+## Writing policies
 
-A policy holds the rules of one model.
-Write one method per ability.
-A method takes the user, and the model when the ability needs one.
-List the methods in `abilities`.
+When a model has many rules, put them in a policy. Write one method per ability. A method takes the user, and the model when the ability needs one. Then list the methods in `abilities`:
 
 ```dart title="lib/app/policies/post_policy.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -130,14 +136,15 @@ class PostPolicy extends Policy<User, Post> {
 }
 ```
 
-Add the policy for its model:
+The `abilities` map is needed because compiled Dart apps can not find a method by its name.
+
+Register the policy for its model:
 
 ```dart
 Gate.policy<Post>(PostPolicy());
 ```
 
-A check with a `Post` as the subject now uses the policy.
-For an ability with no model, like `create`, pass the type `Post`:
+Now a check with a `Post` as the subject uses the policy. For an ability with no model, like `create`, pass the type `Post`:
 
 ```dart
 await Gate.allows(user, 'update', post);
@@ -145,21 +152,11 @@ await Gate.allows(user, 'create', Post);
 await Gate.authorize(user, 'delete', post);
 ```
 
-Each method must take `(User user)` or `(User user, Post post)`.
-A method with another signature fails at `Gate.policy`, so you see the mistake when the app starts.
+Each method must take `(User user)` or `(User user, Post post)`. A method with another signature fails at `Gate.policy`, so you see the mistake when the app starts.
 
-When the policy has no method with the ability name, the gate with that name is used.
+## Authorizing in a controller
 
-!!! note "Why a map of methods"
-    Dart has no runtime reflection in compiled apps.
-    So Dox can not find a method by its name.
-    The `abilities` map links each name to its method.
-    The methods stay normal typed Dart methods, so you can also call them directly in a test.
-
-## In a controller
-
-`req.can`, `req.cannot` and `req.authorize` use the logged-in user of `req.auth`.
-Use them after `AuthMiddleware`.
+In a controller, use `req.authorize`, `req.can` and `req.cannot`. They use the logged in user of `req.auth`, so put the route after `AuthMiddleware`:
 
 ```dart
 Future<Post> update(DoxRequest req, Post post) async {
@@ -168,7 +165,11 @@ Future<Post> update(DoxRequest req, Post post) async {
   await post.save();
   return post;
 }
+```
 
+`req.can` gives a `bool`, for example to tell the front end what the user may do:
+
+```dart
 Future<Map<String, dynamic>> show(DoxRequest req, Post post) async {
   return <String, dynamic>{
     'post': post,
@@ -178,43 +179,46 @@ Future<Map<String, dynamic>> show(DoxRequest req, Post post) async {
 ```
 
 `req.authorize` answers `401` for a guest and `403` for a user who may not do it.
-With the [`forbidGuest` flag](#auth-flags), a guest gets `403` too.
 
-## On a route
+## Authorizing on a route
 
-The `Can` middleware checks an ability before the controller runs.
-Put it after `AuthMiddleware`.
+The `Can` middleware checks an ability before the controller runs. Put it after `AuthMiddleware`:
 
 ```dart
 // a gate with no subject
 Route.get('/admin', <dynamic>[AuthMiddleware(), Can('view-admin'), adminController.index]);
+```
 
+For a policy method with no model, pass the type with `subject`:
+
+```dart
 // a policy method with no model
 Route.post('/posts', <dynamic>[AuthMiddleware(), Can('create', subject: Post), postController.store]);
+```
 
+For a policy method with a model, use `param`. The subject is then the value that `Route.bind` gives for that route param. When `Route.bind` finds nothing, the answer is `404`:
+
+```dart
 // a policy method with the model of the route param
 Route.bind<Post>('post', (String id) => Post().find(id));
 Route.put('/posts/{post}', <dynamic>[AuthMiddleware(), Can('update', param: 'post'), postController.update]);
 ```
 
-With `param`, the subject is the value of `Route.bind` for that route param.
-When `Route.bind` finds nothing, the answer is `404`.
+A guest who may not do it gets `401`, and a logged in user who may not do it gets `403`.
 
-The answers:
+## Guest users
 
-- A guest who may not do it gets `401`. With the [`forbidGuest` flag](#auth-flags), it is `403`.
-- A logged-in user who may not do it gets `403`.
-
-## Guests
-
-A guest has no user. The user is `null`.
-A gate or a policy is denied for a guest, unless its user type is nullable:
+A guest has no user, so a gate or policy is denied for a guest. If you want a rule that also works for guests, make the user type nullable:
 
 ```dart
 Gate.define('view-post', (User? user, Post post) {
   return post.published == true || post.userId == user?.id;
 });
+```
 
+The same works in a policy:
+
+```dart
 class CommentPolicy extends Policy<User?, Comment> {
   bool view(User? user, Comment comment) => comment.visible == true;
 
@@ -223,30 +227,23 @@ class CommentPolicy extends Policy<User?, Comment> {
 }
 ```
 
-`Can('view-post', param: 'post')` without `AuthMiddleware` then works for guests too.
-But then a logged-in user is a guest too, because nothing loads the user.
-Use `AuthMiddleware(optional: true)` on a public route. It loads the user when the login is good, and lets guests through:
+On a public route, use `AuthMiddleware(optional: true)`. It loads the user when the login is good, and lets guests through. Without it, nothing loads the user, so a logged in user is a guest too:
 
 ```dart
 Route.get('/posts/{post}', <dynamic>[AuthMiddleware(optional: true), Can('view-post', param: 'post'), postController.show]);
 ```
 
-`req.can()` then also sees the user on a public route.
-
 ## Before and after hooks
 
-`Gate.before` runs before every check.
-It gives `true` or `false` to decide at once, or `null` to go on with the normal check.
-For example, an admin may do anything:
+Sometimes one user may do everything, like an admin. `Gate.before` runs before every check. Return `true` or `false` to decide at once, or `null` to go on with the normal check:
 
 ```dart
 Gate.before((User user, String ability) => user.isAdmin == true ? true : null);
 ```
 
-A hook runs only for users of its type. A `User` hook does not run for guests.
+A hook runs only for users of its type, so a `User` hook does not run for guests.
 
-`Gate.after` sees the answer of every check, for example to log it.
-It can not change the answer.
+`Gate.after` sees the answer of every check, for example to log it. It can not change the answer:
 
 ```dart
 Gate.after((User user, String ability, GateResponse response) {
@@ -267,9 +264,7 @@ class PostPolicy extends Policy<User, Post> {
 
 ## Auth flags
 
-Some answers are opt-in.
-Turn them on with `flags:` in `AuthConfig`.
-All flags are off by default.
+Some behaviors are opt-in. Turn them on with `flags:` in `AuthConfig`. All flags are off by default:
 
 ```dart
 AuthConfig authConfig = AuthConfig(
@@ -279,11 +274,9 @@ AuthConfig authConfig = AuthConfig(
 );
 ```
 
-The flags:
-
-- `forbidGuest`: `req.authorize` and `Can` give a guest `403`, not `401`. The `403` has the message of the gate. `AuthMiddleware` runs first on most routes, and it still gives a guest `401`.
-- `jsonNoRedirect`: `AuthMiddleware(redirectTo: '/login')` gives a JSON or XHR client a `401`, not a redirect. A JSON client sends an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request still gets the redirect.
-- `endSessionsOnPasswordChange`: a session login ends when the password of the user changes. It also turns on `logoutOtherDevices`. See [End other sessions when the password changes](authentication.md#end-other-sessions-when-the-password-changes).
+- `forbidGuest`: `req.authorize` and `Can` give a guest `403` with the gate message, not `401`. `AuthMiddleware` still gives a guest `401`.
+- `jsonNoRedirect`: `AuthMiddleware(redirectTo: '/login')` gives a JSON or XHR client a `401`, not a redirect. An Inertia request still gets the redirect.
+- `endSessionsOnPasswordChange`: a session login ends when the user's password changes. It also turns on `logoutOtherDevices`. See [Ending sessions when the password changes](authentication.md#end-other-sessions-when-the-password-changes).
 
 `AuthFlags.all()` turns on every flag:
 
@@ -291,10 +284,13 @@ The flags:
 AuthConfig(defaultGuard: 'web', guards: guards, flags: const AuthFlags.all());
 ```
 
-The flags are part of `AuthConfig`.
-`Auth.initialize(authConfig)` runs in the `setup()` of your auth provider, so every isolate gets the same flags.
+## Testing
 
-## In tests
+`Gate.flush()` removes all gates, policies and hooks. Call it in `setUp` when each test adds its own rules.
 
-`Gate.flush()` removes all gates, policies and hooks.
-Call it in `setUp` when each test adds its own rules.
+## Details
+
+- A JSON client is a request with a json `Accept` header, a JSON body, or `X-Requested-With: XMLHttpRequest`.
+- When a policy has no method for an ability, the gate with that name is used.
+- Policy methods are normal typed Dart methods, so you can also call them directly in a test.
+- The flags are part of `AuthConfig`, and `Auth.initialize` runs in every isolate, so every isolate gets the same flags.

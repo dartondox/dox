@@ -6,9 +6,7 @@ icon: lucide/share-2
 
 Use a polymorphic relation when one model can belong to more than one other model.
 
-For example, a comment can belong to a photo or to a video.
-The `comment` table does not have a `photo_id` and a `video_id`.
-It has two columns:
+For example, a comment can belong to a photo or to a video. The `comment` table does not have a `photo_id` and a `video_id`. Instead it has two columns:
 
 - `commentable_id`: the id of the photo or the video.
 - `commentable_type`: the type, like `photo` or `video`.
@@ -36,13 +34,9 @@ await schema.create('comment', (Table table) {
 
 ## The morph map
 
-The morph map gives each model a type name.
-The type name is the value in the `commentable_type` column.
+The morph map gives each model a type name. The type name is the value in the `commentable_type` column.
 
-Set it in the `setup()` of a [provider](../../../digging-deeper/providers.md).
-Dox runs providers in every isolate, before the first request.
-The map is kept per isolate, so setting it only in `main()` is not enough.
-Then the other isolates store the class name, and `@MorphTo` throws there.
+Set it in the `setup()` of a [provider](../../../digging-deeper/providers.md). Dox runs providers in every isolate, before the first request. The map is kept per isolate, so setting it only in `main()` is not enough:
 
 ```dart
 class MorphMapProvider extends DoxProvider {
@@ -58,25 +52,13 @@ class MorphMapProvider extends DoxProvider {
 
 A queue worker or a CLI command that reads these relations must call it too.
 
-- `@MorphTo` needs it. It reads the type and makes the model from the map.
-- Without a map, `@MorphMany` and `@MorphOne` store the class name, like `Photo`.
-- Use a morph map in production. The class name changes when you rename the class, or when you build with `--obfuscate`. Then the old rows do not match.
-- Do not change a type name later. The rows in the table keep the old name.
-- `Model.morphMap(map, merge: false)` removes the names you set before.
+You should always use a morph map, because without it the class name is stored, like `Photo`. The class name changes when you rename the class or build with `--obfuscate`, and then the old rows do not match. For the same reason, do not change a type name later. `@MorphTo` needs the map and throws without it.
 
-Two helpers read the map:
+## Defining the relation
 
-```dart
-String type = Model.morphTypeOf(Photo()); // 'photo'
-Model<dynamic> model = Model.morphModel('video'); // a new Video()
-```
+### Has many
 
-## Define it
-
-### `@MorphMany`
-
-A photo has many comments.
-The second argument is the morph name.
+A photo has many comments. Use `@MorphMany`. The second argument is the morph name:
 
 ```dart title="lib/app/models/photo/photo.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -95,25 +77,22 @@ class Photo extends PhotoGenerator {
 }
 ```
 
-### `@MorphOne`
+### Has one
 
-A photo has one cover image.
-It works like `@MorphMany`, but the field is one model.
+A photo has one cover image. Use `@MorphOne`. It works like `@MorphMany`, but the field is one model:
 
 ```dart
 @MorphOne(Image, 'imageable')
 Image? cover;
 ```
 
-When there are many rows, it keeps the last row the query returns.
-Add an `orderBy` in `onQuery` to pick the row, like with [HasOne](has-one.md).
+When there are many rows, it keeps the last row the query returns. Add an `orderBy` in `onQuery` to pick the row, like with [HasOne](has-one.md).
 
-### `@MorphTo`
+### The other side
 
-A comment belongs to a photo or a video.
-The field type is `Model<dynamic>?`.
-The morph name is the field name in snake_case: `commentable`.
-The `commentable_id` and `commentable_type` columns must be `@Column` fields, or the relation is always `null`.
+A comment belongs to a photo or a video. Use `@MorphTo`. The field type is `Model<dynamic>?`, and the morph name is the field name in snake_case: `commentable`.
+
+The `commentable_id` and `commentable_type` columns must be `@Column` fields, or the relation is always `null`:
 
 ```dart title="lib/app/models/comment/comment.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -138,10 +117,9 @@ class Comment extends CommentGenerator {
 
 Run `dart run build_runner build` after you add a relationship.
 
-## Save a row
+## Saving a row
 
-There is no `associate()`. Set the two columns yourself.
-Use `Model.morphTypeOf()` for the type, so it is the same as the morph map.
+There is no `associate()`, so set the two columns yourself. Use `Model.morphTypeOf()` for the type, so it is the same as the morph map:
 
 ```dart
 Comment comment = Comment()
@@ -151,9 +129,9 @@ Comment comment = Comment()
 await comment.save();
 ```
 
-## Load it
+## Loading the relation
 
-Load it like the other relations: `preload`, `$getRelation`, `related` or `eager`.
+Load it like the other relations: with `preload`, `$getRelation`, `related` or `eager`. On a `@MorphTo` field, check the type of the loaded model:
 
 ```dart
 Photo? photo = await Photo().preload('comments').find(1);
@@ -167,18 +145,11 @@ for (Comment c in comments) {
 }
 ```
 
-- `@MorphMany` and `@MorphOne` run one query for all models.
-  It has `where commentable_type = 'photo'`.
-- `@MorphTo` runs one query for each type in the list.
-  A comment with a type that is not in the morph map throws a `StateError`.
-  A comment with no type, or an empty type `''`, gets `null`.
-- `related<Photo>('commentable')` on one comment gives the query of its photo.
+A comment with a type that is not in the morph map throws a `StateError`. A comment with no type, or an empty type `''`, gets `null`.
 
-`reload()` and a preload set the relation fields again, also when there is no related row. See [Relationships](../index.md#relationships).
+## Filtering by the relation
 
-## Filter by it
-
-`whereHas()`, `whereDoesntHave()` and `withCount()` work with `@MorphMany` and `@MorphOne`.
+`whereHas()`, `whereDoesntHave()` and `withCount()` work with `@MorphMany` and `@MorphOne`:
 
 ```dart
 List<Photo> photos = await Photo().whereHas('comments').get();
@@ -187,9 +158,20 @@ List<Video> videos = await Video().withCount('comments').get();
 
 They do not work with `@MorphTo`. It throws an `UnsupportedError`.
 
-## Options
+## Details
 
-### `@MorphMany` and `@MorphOne`
+### Morph map helpers
+
+Two helpers read the map:
+
+```dart
+String type = Model.morphTypeOf(Photo()); // 'photo'
+Model<dynamic> model = Model.morphModel('video'); // a new Video()
+```
+
+`Model.morphMap(map, merge: false)` removes the names you set before.
+
+### Options of `@MorphMany` and `@MorphOne`
 
 The examples are for `@MorphMany(Comment, 'commentable')` in the `Photo` model.
 
@@ -202,7 +184,7 @@ The examples are for `@MorphMany(Comment, 'commentable')` in the `Photo` model.
 | `onQuery` | none | | A static function that changes the query. |
 | `eager` | `false` | | Load the relation on every query. |
 
-### `@MorphTo`
+### Options of `@MorphTo`
 
 | Option | Default | Example value | What it is |
 |---|---|---|---|
@@ -213,8 +195,9 @@ The examples are for `@MorphMany(Comment, 'commentable')` in the `Photo` model.
 | `onQuery` | none | | A static function that changes the query of each type. It runs for every type, so it takes and returns `Model<dynamic>`. |
 | `eager` | `false` | | Load the relation on every query. |
 
-## In JSON
+### Other cases
 
-- A relation with `eager: true` is always in `toJson()`.
-- A relation loaded with `preload` is in `toJson()` of that query.
-- The JSON key is the field name in snake_case: `comments`, `commentable`.
+- `@MorphMany` and `@MorphOne` run one query for all models, with `where commentable_type = 'photo'`. `@MorphTo` runs one query for each type in the list.
+- `related<Photo>('commentable')` on one comment gives the query of its photo.
+- A relation with `eager: true` is always in `toJson()`. A relation loaded with `preload` is in `toJson()` of that query. The JSON key is the field name in snake_case: `comments`, `commentable`.
+- `reload()` and a preload set the relation fields again, also when there is no related row. See [Relationships](../index.md#relationships).

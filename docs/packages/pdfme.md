@@ -16,7 +16,7 @@ The package is standalone. It does not need Dox, and Dox does not need it. It is
 dart pub add dox_pdf_me
 ```
 
-## Fill a template in a controller
+## Filling a template
 
 Design the template in the pdfme designer and save its JSON. Read it with `Template.fromJson`. The inputs are one map of strings for each copy of the template.
 
@@ -62,7 +62,7 @@ Route.get('/invoice.pdf', (InvoiceController c) => c.show);
 
 `dox_pdf_me` supports text, image, svg, shapes, barcodes and QR codes, date and time, checkbox, radio group, select, table, multi variable text, signature and circle mark. Pass `builtInPlugins` to use all of them.
 
-## Fonts
+## Using other fonts
 
 Text uses Roboto by default. For other languages, pass your fonts in `GenerateOptions`:
 
@@ -87,7 +87,7 @@ Thai, Myanmar, Khmer, Lao, Arabic, Hebrew and Hindi text is laid out correctly. 
 
 `dox_pdf_me` uses `dox_pdf_lib`, which has a small native library. It runs in Dart programs on macOS, Linux and Windows.
 
-They do not run on the web, iOS or Android.
+It does not run on the web, iOS or Android.
 
 A ready-built native library is downloaded for you, so you do not need Rust.
 

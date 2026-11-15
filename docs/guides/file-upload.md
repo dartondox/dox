@@ -6,14 +6,15 @@ icon: lucide/upload
 
 Accept an image from a form, check its size and type, save it to a disk, and return its URL.
 
+You should never trust an uploaded file: it can be too big, or it can be a different type than its name says. So this guide checks the file in a [DTO](../the-basic/dto.md) first, and only then saves it.
+
 ## What you need
 
 - A Dox app (`dox create my_app`). A new app has the `dox_storage` package, `lib/config/storage.dart` and `lib/providers/storage_provider.dart`.
 
 ## 1. Set up the disk
 
-The `local` disk of a new app saves files in the `storage` folder.
-Give it a `url`. `Storage().url()` uses it to build the public URL of a file.
+The `local` disk of a new app saves files in the `storage` folder. Give the disk a `url`, because `Storage().url()` uses it to build the public URL of a file:
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -33,17 +34,16 @@ StorageConfig storageConfig = StorageConfig(
 );
 ```
 
-`APP_URL` is a new key. Add a getter for it to the `AppEnv` class:
+`APP_URL` is a new key, so add a getter for it to the `AppEnv` class:
 
 ```dart title="lib/config/env.dart"
   /// the public URL of this app, used in file links
   String get appUrl => 'http://localhost:3000';
 ```
 
-Run `dart run build_runner build` to update `env.g.dart`.
-Then add `APP_URL=http://localhost:3000` to your `.env`.
+Run `dart run build_runner build` to update `env.g.dart`. Then add `APP_URL=http://localhost:3000` to your `.env`.
 
-The provider of a new app sets the disks in every isolate. You do not change it:
+The provider of a new app sets up the disks. You do not need to change it:
 
 ```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -56,7 +56,7 @@ class AppStorageProvider extends StorageProvider {
 
 ## 2. Write the DTO
 
-The DTO checks the file before your controller runs.
+The DTO checks the file before your controller runs. If the check fails, Dox answers `422` and the controller never sees the file.
 
 ```dart title="lib/app/dtos/upload_image/upload_image.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -77,11 +77,11 @@ class UploadImage {
 }
 ```
 
-For other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image()`.
+If you want other file types, use `@Mimes(<String>['pdf', 'docx'])` in place of `@Image()`.
 
 ## 3. Write the controller
 
-`putFile` with a `RequestFile`, on the local disk, moves the upload temp file to a new UUID name (with `permissions` on, it streams it). It does not read it into memory.
+The controller saves the file with `putFile` and returns its path and URL. `putFile` gives the file a new UUID name, and on the local disk it does not read the whole file into memory.
 
 ```dart title="lib/app/http/controllers/upload.controller.dart"
 import 'package:dox_core/dox_core.dart';
@@ -101,13 +101,12 @@ class UploadController {
 ```
 
 !!! warning "Save the file before you return"
-    A file bigger than 1 MB is written to a temp file while it arrives.
-    Dox deletes that temp file when the response is sent.
+    Dox deletes the uploaded temp file when the response is sent.
     So call `putFile`, `store` or `moveTo` inside the controller, not later.
 
 ## 4. Add the routes
 
-One route takes the upload. `Storage.route` serves the saved files at `GET /files/{key*}`.
+You need two routes. One route takes the upload, and `Storage.route` serves the saved files at `GET /files/{key*}`:
 
 ```dart title="lib/routes/api.dart"
 import 'package:dox_core/dox_core.dart';
@@ -143,12 +142,11 @@ class WebRouter extends Router {
 }
 ```
 
-`signed: false` makes every file public. Leave it out to serve only signed URLs. Then use `Storage().signedUrl(path)` in place of `Storage().url(path)`.
+`signed: false` makes every file public. If the files are private, leave it out, so the route serves only signed URLs. Then use `Storage().signedUrl(path)` in place of `Storage().url(path)`.
 
 ## 5. Register the DTOs
 
-Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
-Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`. You add it only once, so skip this step if your `app.dart` already has `dtos: dtos`.
 
 ```dart title="lib/config/app.dart"
 import 'package:my_app/generated/dtos.g.dart';
@@ -180,7 +178,7 @@ curl -F image=@photo.png http://localhost:3000/api/upload
 
 Open the `url` in the browser. The image shows.
 
-Upload a text file. You get `422`:
+Now upload a text file. You get `422`:
 
 ```bash
 curl -F image=@notes.txt http://localhost:3000/api/upload
@@ -190,15 +188,20 @@ curl -F image=@notes.txt http://localhost:3000/api/upload
 {"image":"The image must be an image"}
 ```
 
-Send no file at all. You get `422` with `{"image":"The image is required"}`.
+If you send no file at all, you also get `422`, with `{"image":"The image is required"}`.
 
 ## Bigger files
 
-The default limit for a `multipart/form-data` body is 100 MB. Change it in `AppConfig(maxMultipartSize: ...)`.
-Set the same limit in your proxy (`client_max_body_size` in nginx).
+A `multipart/form-data` body can be 100 MB by default. If you need more, change it in `AppConfig(maxMultipartSize: ...)`. Set the same limit in your proxy too (`client_max_body_size` in nginx).
+
+## Details
+
+- `@Image()` reads the first bytes of the file to find the real type. It does not trust the file name.
+- A file bigger than 1 MB is written to a temp file while it arrives. That is the file Dox deletes after the response.
+- On the local disk, `putFile` moves the temp file. With `permissions` on, it streams the file in place of a move.
 
 ## See also
 
 - [Request: form data](../the-basic/request.md#form-data-file) for `RequestFile`
-- [Validation: files](../the-basic/validation.md#files) for `@Image`, `@Mimes`, `@MimeTypes`, `@MaxSize`, `@MinSize`, `@Dimensions`
+- [Validation rules: files](../the-basic/validation-rules.md#files) for `@Image`, `@Mimes`, `@MimeTypes`, `@MaxSize`, `@MinSize`, `@Dimensions`
 - [File storage](../digging-deeper/file-storage.md) for S3 and signed URLs

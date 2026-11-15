@@ -6,30 +6,31 @@ icon: lucide/file-image
 
 Serve a folder of files, or a single page app (React, Vue, Flutter web), from the Dox app, with the right cache headers.
 
+If your front-end is small, you can serve it from the same Dox app as your API. Then you have one server to run and no CORS setup.
+
 ## What you need
 
 - A Dox app.
 - A `public` folder with the built front-end (`index.html`, `assets/...`).
-- For the storage way and the controller below: the `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#config).
+- For the storage way and the controller below: the `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#configuration).
 
 ## Serve a folder: one line
 
-`Route.staticFiles` serves the files of a folder.
-Add it in `register()` of `WebRouter`.
+If you only need to serve the files of a folder, `Route.staticFiles` does it in one line. Add it in `register()` of `WebRouter`:
 
 ```dart title="lib/routes/web.dart"
 Route.staticFiles('/', 'public');
 ```
 
-`GET /app.js` sends `public/app.js` with the right `Content-Type`. A route always wins over a file. A missing file goes to `Route.fallback` if you added one, else to `404`.
-It sends `ETag` and `Last-Modified`, and the browser gets `304` when it already has the file. Add `maxAge:` to send a `Cache-Control` header.
-See [Routing: serve static files](../the-basic/routing.md#serve-static-files) for all the rules.
+Now `GET /app.js` sends `public/app.js` with the right `Content-Type`. If a route and a file have the same path, the route wins. A missing file answers `404`.
 
-For a single page app, add `Route.fallback` to send `index.html` for every URL that has no route and no file. See [Routing: fallback route](../the-basic/routing.md#fallback-route).
+The browser gets `304` when it already has the file, because Dox sends `ETag` and `Last-Modified`. If you want a `Cache-Control` header too, add `maxAge:`. See [Routing: serve static files](../the-basic/routing.md#serve-static-files) for all the rules.
+
+For a single page app, add `Route.fallback`, so every URL with no route and no file gets `index.html`. See [Routing: fallback route](../the-basic/routing.md#fallback-route).
 
 ### Or serve a storage disk
 
-`Storage.route` serves every file of a storage disk. Add a `public` disk for the folder in `lib/config/storage.dart`:
+You can also serve the folder as a storage disk. `Storage.route` serves every file of a disk. First add a `public` disk for the folder in `lib/config/storage.dart`:
 
 ```dart title="lib/config/storage.dart"
 StorageConfig storageConfig = StorageConfig(
@@ -49,19 +50,20 @@ Then add the route in `register()` of `WebRouter`. `Storage` comes from `package
 Storage.route('static', disk: 'public', signed: false); // GET /static/{key*}
 ```
 
-`GET /static/app.js` sends `public/app.js`, streamed, with the right `Content-Type`. A missing file answers `404`.
-The disk rejects `..` in the path, so a client can not read files outside `public`.
+Now `GET /static/app.js` sends `public/app.js` with the right `Content-Type`. A missing file answers `404`. The disk rejects `..` in the path, so a client can not read files outside `public`.
 
-This is enough for a few files. It sends no `Cache-Control` header. For an SPA, go on.
+This is enough for a few files, but it sends no `Cache-Control` header. For an SPA, read on.
 
 ## Serve an SPA
 
-An SPA needs two things:
+An SPA needs two things, and a small controller gives you both:
 
 - `index.html` for every URL the SPA router handles, with no cache.
 - The built assets with a long cache. Build tools put a hash in the file name (`app.3f9c2b.js`), so a new build has new names.
 
 ### 1. Write the controller
+
+The controller has one method for the assets and one for `index.html`:
 
 ```dart title="lib/app/http/controllers/static.controller.dart"
 import 'dart:io';
@@ -96,7 +98,7 @@ class StaticController {
 
 ### 2. Add the routes
 
-The catch-all route must come **last**. Put the API router before the web router in `AppConfig`.
+The catch-all route must come **last**, because it matches every URL. So put the API router before the web router in `AppConfig`:
 
 ```dart title="lib/routes/web.dart"
 import 'package:dox_core/dox_core.dart';
@@ -125,9 +127,11 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-Keep the route for `/` as well, so the start page is always served.
+Keep the route for `/` too, because `/{path*}` does not match the start page.
 
 ### 3. Put the build in `public`
+
+Build the front-end and copy the files to `public`:
 
 ```bash
 # React (Vite)
@@ -141,6 +145,8 @@ Vite puts the files in `assets/`. Flutter web puts them next to `index.html`. Fo
 
 ## Check it
 
+The start page comes with no cache:
+
 ```bash
 curl -i http://localhost:3000/
 ```
@@ -150,6 +156,8 @@ HTTP/1.1 200 OK
 cache-control: max-age=0
 content-type: text/html
 ```
+
+Any other page also gets `index.html`, and an asset gets a cache of one year:
 
 ```bash
 curl -i http://localhost:3000/settings/profile   # same answer: index.html
@@ -167,7 +175,8 @@ content-type: text/javascript
 
 ## In production
 
-Put the proxy in front of Dox, and let it do gzip. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
+Put a proxy in front of Dox, and let it do gzip. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
+
 For a big site, serve `public` from the proxy or a CDN, and keep Dox for the API only.
 
 ## See also

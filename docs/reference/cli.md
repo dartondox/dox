@@ -4,21 +4,16 @@ icon: lucide/terminal
 
 # CLI
 
-Every `dox` command, with its options and the files it writes.
+This page lists every `dox` command, with its options and the files it writes.
 
-The CLI lives in the [dox-cli](https://github.com/dartondox/dox-cli) repo. The paths below are in that repo. The commands come from `lib/src/command_registry.dart`. The file templates are Dart strings inside `lib/src/tools/`. The path of each template is given below.
+To install the CLI, see the [Dox CLI](../digging-deeper/dox-cli.md) page. Run `dox help` to list the commands, and `dox help <command>` to see one.
 
-How to install the CLI is on the [Dox CLI](../digging-deeper/dox-cli.md) page.
+A few rules hold for every command:
 
-Rules that apply to every command:
-
-- `dox` with no command prints ``Could not find a command. Run `dox help` for more information.`` and exits with code 1.
-- An unknown command prints ``Could not find a command named "<name>". Run `dox help` for more information.``, and a hint about the `dox: commands:` key. It exits with code 1.
-- A command that is not built in can come from a package or from the app. See [Package commands](../digging-deeper/package-commands.md).
-- Too few or too many arguments prints `Invalid number of arguments for command "<name>".` with the expected count.
-- A name you pass is turned into `snake_case` for the file and `PascalCase` for the class. `BlogPost` and `blog_post` give the same result.
-- Many `make:*` commands also answer to a `create:*` name, like `create:model`. `dox help <command>` shows the aliases.
-- A `make:*` command does not overwrite. When the file exists it prints `<name> already exists` and stops.
+- A name you pass becomes `snake_case` for the file and `PascalCase` for the class. So `BlogPost` and `blog_post` give the same result.
+- A `make:*` command never overwrites a file. When the file exists, it prints `<name> already exists` and stops.
+- Many `make:*` commands also answer to a `create:*` name, like `create:model`.
+- Packages and your app can add their own commands. See [Package commands](../digging-deeper/package-commands.md).
 
 ## Project
 
@@ -34,21 +29,9 @@ Makes a new project from the [dox-sample](https://github.com/dartondox/dox-sampl
 | --- | --- |
 | `--version <v>` (or `--v`) | A release tag of `dox-sample` to clone. Without it, the newest `dox-sample` release with the same major version as the CLI is used. |
 
-What it does:
+It clones the template into a new `snake_case` folder, puts your project name in the files, and makes a `.env` with a new random `APP_KEY`. Then it prints the next steps: `cd <name>`, `dart pub get` and `dox serve`. It needs `curl` and `git` on the `PATH`.
 
-1. Turns the name into `snake_case`. Stops with `Folder name "<name>" already exist` when the folder is there.
-2. Picks the release (see `--version` above) from the release list of `dartondox/dox-sample`.
-3. Runs `git clone --depth 1 --branch v<version> https://github.com/dartondox/dox-sample.git <name>`.
-4. Deletes the `.git` folder.
-5. Replaces `dox_sample` with your project name in every text file, except files under `bin/dox`.
-6. Copies `.env.example` to `.env` and writes a new random `APP_KEY` to it, like `dox key:generate`. It skips this step when `.env` is already there.
-7. Prints the next steps: `cd <name>`, `dart pub get` and `dox serve`.
-
-Needs `curl` and `git` on the `PATH`. When it can not find a release (no network), it prints `Could not find a template release for Dox <version>. Check your network, or pass --version.`
-
-The new project already has `bin/server.dart`, `bin/migrate.dart`, `bin/seed.dart`, `bin/queue.dart` and `bin/schedule.dart`. So the migration, seed, queue and schedule commands below work in it right away.
-
-Source: `lib/src/tools/create_project.dart`.
+The new project already has `bin/server.dart`, `bin/migrate.dart`, `bin/seed.dart`, `bin/queue.dart` and `bin/schedule.dart`, so the migration, seed, queue and schedule commands work in it right away.
 
 ### `dox add`
 
@@ -56,12 +39,10 @@ Source: `lib/src/tools/create_project.dart`.
 dox add <package> [--dev] [options]
 ```
 
-Adds a Dox package and sets it up. `orm` is short for `dox_orm`.
-It runs `dart pub add`, then `dart pub get`, then the `<package>:install` command of the package with the options, like `dox add orm --driver=postgres`.
-A package with no `<package>:install` command is only added.
-See [Add a package](../getting-started/add-a-package.md).
+Adds a Dox package and sets it up, like `dox add orm --driver=postgres`. `orm` is short for `dox_orm`.
 
-Source: `lib/src/tools/add_package.dart`.
+It runs `dart pub add` and `dart pub get`. Then it runs the `<package>:install` command of the package, with your options, if the package has one.
+See [Add a package](../getting-started/add-a-package.md).
 
 ### `dox serve`
 
@@ -71,25 +52,16 @@ dox s
 dox server
 ```
 
-Starts the dev server.
+Starts the dev server with hot reload. It also runs `dart run build_runner watch`, so generated files stay up to date.
 
-`dox serve --port=...` does not set the port. Dox ignores it and prints a warning. Set `APP_PORT` in `.env`, or run `APP_PORT=9000 dox serve`.
+To change the port, set `APP_PORT` in `.env`, or run `APP_PORT=9000 dox serve`. A `--port` option is ignored.
 
 | Option | Meaning |
 | --- | --- |
 | `--no-reload` | Turn hot reload off. Every change restarts the server. |
 | `--ignore-build-runner` | Do not start `dart run build_runner watch`. |
 
-You can use both options together.
-
-What it does:
-
-1. Starts `dart run --resident bin/server.dart` and prints its output. The `--resident` flag keeps a background compiler that only recompiles changed files. So restarts are fast. `dox serve` stops that compiler when it exits.
-2. Runs the server with the Dart VM service on a free port on `localhost`. Hot reload needs it. The server prints the VM service link at start. Open it in a browser to get DevTools: the debugger, the CPU profiler and memory snapshots. VS Code can also attach to the VM service address ("Dart: Attach to Dart Process").
-3. When the server is up, starts `dart run build_runner watch` (unless the option is set).
-4. Watches the project folder. It ignores `build/` and hidden folders like `.dart_tool/`. It waits until no file changed for 200 ms. With build_runner, a restart also waits for the generated files. A hot reload does not wait for build_runner.
-
-What happens on a change:
+When you save a file, `dox serve` does one of these:
 
 | Changed | Result |
 | --- | --- |
@@ -97,10 +69,9 @@ What happens on a change:
 | Routes, providers, config, `lib/generated/`, `bin/`, `db/` or a generated `.g.dart` file | The server restarts, because this code or data is built only at start. |
 | A hot reload that fails, for example a compile error | The server restarts. |
 
-Hot reload does not run code again that already ran once. For example, a changed static or global value keeps its old value until a restart. Use `--no-reload` if you do not want this.
-With build_runner, one save gives one restart, after the generated files are written.
+Hot reload does not run code again that already ran. So a changed static or global value keeps its old value until a restart.
 
-Source: `lib/src/tools/server_serve.dart`.
+The server prints a VM service link at start. Open it in a browser to get DevTools (debugger, CPU profiler, memory). VS Code can also attach to it with "Dart: Attach to Dart Process".
 
 ### `dox build`
 
@@ -108,18 +79,11 @@ Source: `lib/src/tools/server_serve.dart`.
 dox build
 ```
 
-AOT compiles the app for production into `build/bundle`. Use this in production, not `dart run`.
+Compiles the app to a native binary for production, in `build/bundle`. Use this in production, not `dart run`.
 
-What it does:
+It runs `build_runner` first (when the app uses it), then `dart build cli`. It also builds `bin/queue.dart` and `bin/schedule.dart` when they exist. Then run the app with `cd build/bundle && ./bin/server`.
 
-1. When `pubspec.yaml` contains `build_runner`: runs `dart run build_runner build`. Stops with exit code 1 when it fails.
-2. Runs `dart build cli --target bin/server.dart --output build`.
-3. When `bin/queue.dart` or `bin/schedule.dart` exists: builds it the same way, to `build/bundle/bin/queue` and `build/bundle/bin/schedule`.
-4. Deletes the old `build/bundle/db`, then copies `db/` to `build/bundle/db`. It leaves out SQLite files (`*.sqlite`, `*.sqlite3`, `*.db`, and their `-wal`, `-shm`, `-journal` and `.lock` files), so your local data does not go to production.
-5. Copies `.env.example` to `build/bundle/.env.example`.
-6. Prints `[Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server`.
-
-Output:
+It writes:
 
 | Path | What |
 | --- | --- |
@@ -130,9 +94,7 @@ Output:
 | `build/bundle/db/` | your migrations and seeders. SQLite files are not copied. |
 | `build/bundle/.env.example` | copy it to `.env` or set real env vars |
 
-`dart compile exe` can not build packages with build hooks, so the CLI uses `dart build cli`.
-
-Source: `lib/src/tools/server_serve.dart` (`buildServer`).
+Do not use `dart compile exe`. It can not build the native libraries.
 
 ### `dox build_runner:build` and `dox build_runner:watch`
 
@@ -141,9 +103,7 @@ dox build_runner:build
 dox build_runner:watch
 ```
 
-Run `dart run build_runner build` once, or `dart run build_runner watch`. No options.
-`build_runner:build` prints only the first line of each output block of build_runner. Run `dart run build_runner build` yourself to see all of it.
-The CLI does not pass `--delete-conflicting-outputs` (build_runner removed that flag).
+Run `dart run build_runner build` once, or `dart run build_runner watch`. `build_runner:build` prints a short output. Run `dart run build_runner build` yourself to see all of it.
 
 ### `dox key:generate`
 
@@ -151,23 +111,14 @@ The CLI does not pass `--delete-conflicting-outputs` (build_runner removed that 
 dox key:generate [--show] [--force]
 ```
 
-Makes a 32 character key (A-Z, a-z, 0-9, from `Random.secure()`) and writes it to `APP_KEY` in `.env`.
-Prints `<key> : Key have been updated successfully in .env!`.
+Makes a random 32 character key and writes it to `APP_KEY` in `.env`. Every other line of `.env` stays as it is. When there is no `APP_KEY` line, it adds one at the top.
 
 | Option | Meaning |
 | --- | --- |
 | `--show` | Print a new key and write nothing. |
 | `--force` | Skip the question below. |
 
-When `APP_ENV=production`, a new key logs every user out. In a terminal the command asks first. Without a terminal it prints a warning and runs. If you answer no, it prints `Stopped. APP_KEY was not changed.` and exits with code 1.
-
-What it does with `.env`:
-
-- Reads `.env` in the current folder. The file must exist, else the command fails with a file error.
-- Replaces the value of `APP_KEY`. Every other line stays as it is, in the same order. This keeps comments, blank lines, quotes and values with more than one `=` (like `DATABASE_URL=postgres://u:p@h/db?a=b`).
-- Adds `APP_KEY=<key>` as the first line when there is no `APP_KEY`.
-
-Source: `lib/src/tools/generate_key.dart`.
+When `APP_ENV=production`, a new key logs every user out, so the command asks first. Without a terminal it prints a warning and runs. The `.env` file must exist.
 
 ### `dox env:generate`
 
@@ -175,15 +126,18 @@ Source: `lib/src/tools/generate_key.dart`.
 dox env:generate
 ```
 
-Writes `lib/config/env.dart`, the typed env class, from `.env.example`.
+Writes `lib/config/env.dart`, the typed env class, from `.env.example`. It does not overwrite an existing file. Run `dart run build_runner build` after it.
 
-- Stops with `.env.example is missing.` (exit code 1) when there is no example file.
-- Stops with `lib/config/env.dart is already there. Delete it to make it again.` (exit code 1) when the file exists.
-- Prints ``Run `dart run build_runner build` to make env.g.dart.`` when done.
+The type of each getter comes from the example value:
 
-Rules for each key: a whole number (like `3000` or `-1`) gives `int get x => <value>;`, `true`/`false` give `bool get x => <value>;`, an empty value gives `String? get x;`, any other value gives `String get x;` (required, no default). `#` comment lines above a key become its doc comment. A key that does not map back from `camelCase` gets `@EnvKey('KEY')`.
+| Value in `.env.example` | Getter |
+| --- | --- |
+| a whole number, like `3000` | `int get x => 3000;` |
+| `true` or `false` | `bool get x => true;` |
+| empty | `String? get x;` |
+| any other text | `String get x;` (required) |
 
-Source: `lib/src/tools/env_tools.dart` (`EnvScaffold`).
+A `#` comment line above a key becomes its doc comment.
 
 ### `dox env:check`
 
@@ -191,12 +145,9 @@ Source: `lib/src/tools/env_tools.dart` (`EnvScaffold`).
 dox env:check
 ```
 
-Loads `AppEnv` from `lib/config/env.dart` with the real environment and `.env`. Prints `The env is valid.` or an `EnvException` with every missing or bad key (exit code 1).
+Checks the env with your `AppEnv` class, from the real environment and `.env`. It prints `The env is valid.`, or every missing or bad key and exits with code 1. Run it in CI or before a deploy.
 
-It writes a small script to `.dart_tool/dox/env_check.dart` and runs it with `dart run`. It needs `lib/config/env.dart` and a `name:` in `pubspec.yaml`.
-Without `lib/config/env.dart` it prints ``lib/config/env.dart is missing. Run `dox env:generate` first.`` (exit code 1).
-
-Source: `lib/src/tools/env_tools.dart` (`envCheck`).
+It needs `lib/config/env.dart` (see `dox env:generate`) and a `name:` in `pubspec.yaml`.
 
 ### `dox openapi:generate`
 
@@ -204,11 +155,7 @@ Source: `lib/src/tools/env_tools.dart` (`envCheck`).
 dox openapi:generate [dir]
 ```
 
-Runs `dart run bin/openapi.dart [dir]`. That file writes `openapi.json` and `openapi.yaml` into `dir` (default `storage/openapi`).
-A new project has no `bin/openapi.dart`. You add it yourself, see [OpenAPI](../packages/openapi.md).
-When the file is not there, the command prints `bin/openapi.dart is missing.` and the code to put in it (exit code 1).
-
-Source: `lib/src/tools/openapi_generate.dart`.
+Writes `openapi.json` and `openapi.yaml` into `dir` (default `storage/openapi`). It runs `bin/openapi.dart`, which a new project does not have. When it is missing, the command prints the code to put in it. See [OpenAPI](../packages/openapi.md).
 
 ### `dox update`
 
@@ -216,11 +163,7 @@ Source: `lib/src/tools/openapi_generate.dart`.
 dox update
 ```
 
-Installs the newest CLI with the same major version as the one you have.
-It reads the version list from pub.dev (retracted versions are skipped), then runs `dart pub global activate dox <version>`.
-Needs `curl` on the `PATH`.
-
-Source: `lib/src/tools/update_dox.dart`.
+Installs the newest CLI with the same major version as the one you have. It needs `curl` on the `PATH`.
 
 ### `dox version`
 
@@ -231,7 +174,7 @@ dox -v
 dox --version
 ```
 
-Prints `Dox version: <version>`. Aliases: `--version`, `-version`, `v`, `-v`, `--v`.
+Prints the CLI version.
 
 ### `dox help`
 
@@ -241,7 +184,7 @@ dox --help
 dox -h
 ```
 
-Aliases: `--help`, `-h`. Without a command: lists every command by category. With a command: prints its usage, description, category, aliases and argument count.
+Without a command, it lists every command. With a command, it prints its usage, options and aliases.
 
 ## Create files
 
@@ -251,7 +194,7 @@ Aliases: `--help`, `-h`. Without a command: lists every command by category. Wit
 dox make:controller <name> [-r|--resource] [--api] [--model=<model>]
 ```
 
-Alias: `create:controller`. Some other `make:*` commands have a `create:*` alias too. The Command list table at the end shows which.
+Writes `lib/app/http/controllers/<name>.controller.dart`. A trailing `Controller` in the name is removed, so `UserController` and `User` give the same file.
 
 | Option | Meaning |
 | --- | --- |
@@ -259,19 +202,9 @@ Alias: `create:controller`. Some other `make:*` commands have a `create:*` alias
 | `--api` | A resource controller without `create` and `edit`, the two form pages. `Route.resource` makes no route for them. |
 | `--model=<model>` or `--model <model>` | A resource controller that uses the model. It imports `package:<app>/app/models/<model>/<model>.model.dart`. `index` returns all rows, and `store` creates a row from `req.body`. `show`, `edit`, `update` and `destroy` take the model as a parameter, so [route model binding](../the-basic/dependency-injection.md#route-model-binding) loads it by the `{id}`. |
 
-`--api` and `--model` work together. Each one makes a resource controller, also without `-r`.
-With `--model`, the CLI prints a warning when the model file does not exist yet.
-Any other option prints `Unknown option <x> for make:controller.` (exit code 1), and no file is made.
+`--api` and `--model` work together, and each one makes a resource controller, also without `-r`.
 
-A trailing `Controller` in the name is removed: `UserController` and `User` give the same file.
-
-| Form | Writes | Template |
-| --- | --- | --- |
-| plain | `lib/app/http/controllers/<name>.controller.dart` | `_getSample` in `lib/src/tools/create_controller.dart` |
-| `-r`, `--api`, `--model` | `lib/app/http/controllers/<name>.controller.dart` | `_getResourceSample` in the same file |
-
-The class has `@Inject()`, so the container makes it. A comment shows the route to add, like `Route.get('path', (BlogController c) => c.index);`. A resource controller gets `Route.resource('path', BlogController);`.
-After the file is made, the CLI tells you to run `dart run build_runner build`. That adds the controller to `lib/generated/container.g.dart`.
+The class has `@Inject()`, so the container makes it. A comment in the file shows the route to add. Run `dart run build_runner build` after it, so the controller is added to the container.
 
 ### `dox make:middleware`
 
@@ -282,8 +215,6 @@ dox make:middleware <name>
 Writes `lib/app/http/middleware/<name>.middleware.dart`: a class `<Name>Middleware implements IDoxMiddleware` with a `handle(IDoxRequest req)` that returns `req`.
 A trailing `Middleware` in the name is removed.
 
-Template: `_getSample` in `lib/src/tools/create_middleware.dart`.
-
 ### `dox make:dto`
 
 ```
@@ -291,10 +222,7 @@ dox make:dto <name>
 ```
 
 Writes `lib/app/dtos/<name>/<name>.dto.dart`: a `@Dto()` class with one `name` field and `part '<name>.dto.g.dart';`.
-The class name has no `Dto` at the end: `dox make:dto CreateBlog` gives the class `CreateBlog` in `lib/app/dtos/create_blog/create_blog.dto.dart`.
-A trailing `Dto` in the name is removed. Prints ``Run `dox build_runner:build` to make <name>/<name>.dto.g.dart.``
-
-Template: `_getSample` in `lib/src/tools/create_dto.dart`.
+A trailing `Dto` in the name is removed: `dox make:dto CreateBlog` gives the class `CreateBlog` in `lib/app/dtos/create_blog/create_blog.dto.dart`. Run `dox build_runner:build` after it. See [DTOs](../the-basic/dto.md).
 
 ### `dox make:serializer`
 
@@ -305,8 +233,6 @@ dox make:serializer <name>
 Writes `lib/app/serializers/<name>.serializer.dart`: a class `<Name>Serializer extends Serializer<<Name>>`. It imports the model with `package:<app>/app/models/<name>/<name>.model.dart`.
 A trailing `Serializer` in the name is removed.
 
-Template: `_getSample` in `lib/src/tools/create_serializer.dart`.
-
 ### `dox make:provider`
 
 ```
@@ -314,10 +240,7 @@ dox make:provider <name>
 ```
 
 Writes `lib/providers/<name>_provider.dart`: a class `<Name>Provider extends DoxProvider` with an empty `setup()` and an optional `shutdown()`.
-A trailing `Provider` in the name is removed: `dox make:provider Cache` gives `CacheProvider` in `lib/providers/cache_provider.dart`.
-Prints ``Run `dox build_runner:build` to add it to the container.`` Dox finds the provider after that. See [Providers](../digging-deeper/providers.md).
-
-Template: `createProvider` in `lib/src/tools/make_files.dart`.
+A trailing `Provider` in the name is removed: `dox make:provider Cache` gives `CacheProvider` in `lib/providers/cache_provider.dart`. Run `dox build_runner:build` after it, so Dox finds the provider. See [Providers](../digging-deeper/providers.md).
 
 ### `dox make:command`
 
@@ -328,18 +251,11 @@ dox make:command <name>
 Writes `lib/app/commands/<name>_command.dart`: a class `<Name>Command extends Command`. Its name is `app:<name>`, and `_` in the name becomes `-`. So `dox make:command send_report` makes the command `app:send-report`.
 A trailing `Command` in the name is removed.
 
-It also does two more things:
+It also adds the class to `lib/app/commands/commands.dart`, and adds `dox: commands:` to `pubspec.yaml` when it is not set. Then run `dart pub get` and `dox app:send-report`.
 
-- It adds the class to the `commands` list in `lib/app/commands/commands.dart`. It makes that file when it is missing.
-- It adds `commands: package:<app>/app/commands/commands.dart` under `dox:` in `pubspec.yaml`, when that key is not set.
-
-Then it prints ``Run `dart pub get`, then `dox app:send-report`.``
-
-It makes all the changes or none. When `pubspec.yaml` or `commands.dart` is not in the shape it expects, it prints what to add by hand, exits with code 1 and writes nothing. When `dox: commands:` already points to another library, it does the same.
+It makes all the changes or none. If a file is not in the shape it expects, it prints what to add by hand.
 
 See [Package commands](../digging-deeper/package-commands.md#add-a-command-to-your-app).
-
-Template: `createCommand` in `lib/src/tools/make_files.dart`.
 
 ### `dox make:mail`
 
@@ -352,16 +268,11 @@ dox make:mail <name> [--no-view]
 | plain | `lib/app/mail/<name>_mail.dart` and the view `resources/views/emails/<name>.dox.html` |
 | `--no-view` | `lib/app/mail/<name>_mail.dart` only, with a plain text body |
 
-The class is `<Name>Mail extends Mailable`. It takes the recipient `Address` in its constructor. A comment shows how to send it and how to queue it. A trailing `Mail` in the name is removed.
-With the view, the mail has `view` set to `emails/<name>` and a `data` map with `name`. With `--no-view`, it has a `text` getter.
-It makes both files or none.
+The class is `<Name>Mail extends Mailable`, and takes the recipient `Address` in its constructor. A trailing `Mail` in the name is removed. With the view, the mail uses the view `emails/<name>`. With `--no-view`, it has a `text` getter.
 
-After it writes the files, it prints a hint for each package that `pubspec.yaml` does not have yet: `dox_mailer`, and `dox_view` when there is a view.
-With a view, it also prints that the default view settings work (`resources/views`), and that you only add a `ViewProvider` with a `ViewConfig` to change them.
+It tells you when `pubspec.yaml` still needs `dox_mailer`, or `dox_view` for the view.
 
 See [Mail](../digging-deeper/mail.md#mailables).
-
-Template: `createMail` in `lib/src/tools/make_files.dart`.
 
 ### `dox make:view`
 
@@ -369,13 +280,9 @@ Template: `createMail` in `lib/src/tools/make_files.dart`.
 dox make:view <name>
 ```
 
-Writes `resources/views/<name>.dox.html` with a small sample: `<h1>Hello, {{ name }}</h1>`.
-A name with `/` makes a folder: `dox make:view emails/welcome` writes `resources/views/emails/welcome.dox.html`.
-Each part of the name becomes `snake_case`: `Pages/About` gives `resources/views/pages/about.dox.html`.
+Writes `resources/views/<name>.dox.html` with a small sample. A `/` in the name makes a folder, and each part becomes `snake_case`: `Pages/About` gives `resources/views/pages/about.dox.html`.
 
 See [Views](../the-basic/views.md).
-
-Template: `createView` in `lib/src/tools/make_files.dart`.
 
 ### `dox make:test`
 
@@ -385,14 +292,12 @@ dox make:test <name> [--unit]
 
 | Form | Writes |
 | --- | --- |
-| plain | `test/<name>_test.dart` that starts the app with `DoxTestClient` and checks `GET /ping` for status 200. Change the path to match your route. |
+| plain | `test/<name>_test.dart` that starts the app with `DoxTestClient` and checks `GET /ping`. Change the path to match your route. |
 | `--unit` | `test/<name>_test.dart` with a plain `package:test` test. It does not start the app. |
 
 A trailing `Test` in the name is removed.
 
 See [Testing](../digging-deeper/testing.md).
-
-Template: `createTest` in `lib/src/tools/make_files.dart`.
 
 ### `dox make:model`
 
@@ -401,7 +306,7 @@ dox make:model <name> [-m] [-c] [-r] [-f] [-s] [-a] [--api]
 dox create:model <name> [-m] [-c] [-r] [-f] [-s] [-a] [--api]
 ```
 
-Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel(table: '<plural snake name>')` class with `part '<name>.model.g.dart';`. `BlogPost` gives `blog_posts`. The class has an empty `fillable` list. Add your columns to it.
+Writes `lib/app/models/<name>/<name>.model.dart`, a `@DoxModel` class. The table name is the plural `snake_case` name, so `BlogPost` gives `blog_posts`. Add your columns to its empty `fillable` list.
 
 | Option | Meaning |
 | --- | --- |
@@ -415,7 +320,7 @@ Writes `lib/app/models/<name>/<name>.model.dart`: a `@DoxModel(table: '<plural s
 
 You can join short options: `-mcr` is the same as `-m -c -r`. With `-c` and `-r` together, the controller is a resource controller.
 
-Each extra file is the same as the one from the single command:
+Each extra file is the same as the one from its own command:
 
 | Command | Same file as |
 | --- | --- |
@@ -426,11 +331,7 @@ Each extra file is the same as the one from the single command:
 | `dox make:model Post -f` | `dox make:factory Post` |
 | `dox make:model Post -s` | `dox make:seeder Post` |
 
-When the model file exists, the command prints `<Name> model already exists` and makes no other file.
-When one of the other files exists, that file is skipped, the same as with its own command.
-Any other option prints `Unknown option <x> for make:model.` (exit code 1), and no file is made.
-
-Template: `_getSample` in `lib/src/tools/create_model.dart`.
+When the model file exists, the command makes no file at all. When one of the extra files exists, only that file is skipped.
 
 ### `dox make:migration`
 
@@ -443,24 +344,17 @@ dox create:migration <name> [--sql]
 | --- | --- |
 | `--sql` | Make a `.sql` file with `-- up` and `-- down` sections instead of a Dart class. |
 
-Writes `db/migration/<yyyy>_<mm>_<dd>_<hhmmss>_<name>.dart` (or `.sql`). Characters that are not letters, digits or `_` are removed from the name. A second argument other than `--sql` is ignored.
+Writes `db/migration/<yyyy>_<mm>_<dd>_<hhmmss>_<name>.dart` (or `.sql`). Migrations run in file name order, and a new file always sorts last.
 
-Migrations run sorted by file name. So the new file always sorts after every file already in `db/migration`. When the current time is not later than the newest file (for example, two migrations in the same second), it uses the newest time plus 1 second.
+For a Dart migration, it also updates `db/migration/migrations.dart` (the list of all migrations), and makes `bin/migrate.dart` when it is missing.
 
-For a Dart migration it also:
-
-- writes `db/migration/migrations.dart`, the registry of every Dart migration in the folder, sorted by name. A file with no class that `extends Migration` is skipped with a warning;
-- writes `bin/migrate.dart` when it is missing, and prints `bin/migrate.dart created.`
-
-The Dart template depends on the name:
+The code in the new file depends on the name:
 
 | Name | `up()` | `down()` |
 | --- | --- | --- |
 | `create_<table>_table` | `schema.create('<table>', ...)` with `id()` and `timestamps()` | `schema.dropIfExists('<table>')` |
 | `<x>_to_<table>_table` (also `from`, `in`, `on`) | `schema.table('<table>', ...)` | `schema.table('<table>', ...)` |
 | anything else | a comment | a comment |
-
-Templates: `dartMigrationSource`, `migrateEntrySource` and `_sampleSql` in `lib/src/tools/create_migration.dart`.
 
 ## Routes
 
@@ -495,70 +389,44 @@ dox route:list --json
 [{"method":"GET","path":"/api/ping","name":null,"handler":"ApiController.pong","middleware":["LogMiddleware"]}]
 ```
 
-Each item has `method`, `path`, `name`, `handler` and `middleware`. The example shows the first route only.
+It does not start the server, and providers do not run. So a route that a provider adds, like the Socket.IO mount, is not in the list.
 
-How to read the table:
-
-- A controller route shows `Controller.method`. A function shows its name, or `Closure` when it has none.
-- Fallback routes have the method `FALLBACK`. Handlers added with `Route.mount` have the method `MOUNT`.
-- A `Route.websocket` route shows `WebSocket` as its handler.
-- A route with a domain shows the domain in front of the path.
-
-It does not start the server. It writes a small script to `.dart_tool/dox/route_list.dart` and runs it. The script loads the routes of your routers with `Dox().loadRoutes()`.
-
-Providers do not run. A route that a provider adds in `setup()` is not in the list. The Socket.IO mount is one example.
-
-Your `dox_core` must have `Dox().loadRoutes()`.
-
-Errors go to stderr, so `--json` output stays clean for scripts. Without a Dox app in the folder, or with an unknown option, the command exits with code 1.
-
-Source: `lib/src/tools/route_list.dart`.
+In the table, a function with no name shows as `Closure`. Fallback routes have the method `FALLBACK`, and `Route.mount` handlers have the method `MOUNT`.
 
 ## Migrations
 
-All `migration:*` commands work the same way:
+These commands run `bin/migrate.dart` of your app. If it is missing and you have Dart migrations, they make it first. With only `.sql` migrations, the CLI runs them itself.
 
-1. When `bin/migrate.dart` exists: write the registry again, then run `dart run bin/migrate.dart <command> [args]`. Your app code runs, so Dart migrations work.
-2. When there is no `bin/migrate.dart` but `db/migration` has Dart files: write `bin/migrate.dart` (the same text as `make:migration` writes, and print `bin/migrate.dart created.`), then go on like step 1. This happens after a package command like `dox queue:table` wrote the first Dart migration.
-3. Else: run the `.sql` migrations with `Migrator()` from `dox_migration` in the CLI process.
-
-The database comes from `DATABASE_URL` when it is set. Else it comes from `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_USERNAME`, `DB_PASSWORD` and `DB_DATABASE` (or `DB_NAME`). See [Environment variables](env.md).
-A failed run prints the error and sets exit code 1.
+The database comes from `DATABASE_URL`, or else from the `DB_*` keys. See [Environment variables](env.md).
 
 | Command | Aliases | What it does |
 | --- | --- | --- |
 | `dox migration:run` | `dox migrate` | Run the migrations that did not run yet. |
-| `dox migration:rollback [--step=<count>] [--batch=<number>] [--force]` | `dox migrate:rollback` | Undo the last batch, the last `<count>` migrations, or only batch `<number>`. `--step 2` and `--batch 3` work too. Give `--step` or `--batch`, not both. Any other option prints `Invalid option <x>, use --step=<count>, --batch=<number> or --force` (exit code 1). |
+| `dox migration:rollback [--step=<count>] [--batch=<number>] [--force]` | `dox migrate:rollback` | Undo the last batch, the last `<count>` migrations, or only batch `<number>`. Give `--step` or `--batch`, not both. |
 | `dox migration:reset` | `dox migrate:reset` | Undo every migration. |
 | `dox migration:refresh` | `dox migrate:refresh` | Undo every migration, then run them all again. |
 | `dox migration:fresh` | `dox migrate:fresh` | Drop every table, then run all migrations. |
 | `dox migration:status` | `dox migrate:status` | Print which migrations ran, and their batch. |
 
-`--seed` after `migration:run`, `migration:refresh` or `migration:fresh` runs `dox db:seed` when the migrations end well.
+Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh` to run `dox db:seed` after the migrations.
 
-`--force` after `migration:rollback`, `migration:reset`, `migration:refresh` or `migration:fresh` skips the question they ask when `APP_ENV=production` and stdin is a terminal. Without a terminal they print a warning and run.
-
-`bin/migrate.dart` takes the same commands: `dart run bin/migrate.dart <run|rollback [--step=n|--batch=n]|reset|refresh|fresh|status>`. With no command it runs `run`.
+When `APP_ENV=production`, the commands that undo or drop ask first. Add `--force` to skip the question.
 
 ## Factories and seeders
 
 | Command | Aliases | What it does |
 | --- | --- | --- |
 | `dox make:factory <model>` | `dox create:factory` | Make `db/factories/<model>.factory.dart`. It imports the model with the package name of `pubspec.yaml`. |
-| `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It writes `db/seeders/seeders.dart` again, and makes `bin/seed.dart` when it is missing. |
-| `dox db:seed [--class=<name>]` | | Write `db/seeders/seeders.dart` again, then run `dart run bin/seed.dart [--class=<name>]`. Default seeder: `DatabaseSeeder`. `--class <name>` (with a space) works too. When `bin/seed.dart` is missing, it prints `bin/seed.dart is missing.` (exit code 1). |
-
-Templates: `createFactory` in `lib/src/tools/create_factory.dart`, and `createSeeder` and `seedEntrySource` in `lib/src/tools/create_seeder.dart`.
+| `dox make:seeder <name>` | `dox create:seeder` | Make `db/seeders/<name>.seeder.dart`. It updates `db/seeders/seeders.dart`, and makes `bin/seed.dart` when it is missing. |
+| `dox db:seed [--class=<name>]` | | Run the seeders with `bin/seed.dart`. The default seeder is `DatabaseSeeder`. |
 
 ## Queue
 
-These commands run the app script `bin/queue.dart` with `dart run`. A new project already has it. It uses the `dox_queue` package.
-Input, output and errors go straight to your terminal. `Ctrl+C` (SIGINT) and SIGTERM are sent on to the script, so a worker can finish its job and stop. The exit code of the script is the exit code of `dox`.
-When `bin/queue.dart` is missing, the command prints how to set it up and exits with code 1.
+These commands run `bin/queue.dart` of your app, which a new project already has. `Ctrl+C` and `SIGTERM` are passed on, so a worker can finish its job before it stops.
 
 | Command | Runs | What it does |
 | --- | --- | --- |
-| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. A trailing `Job` in the name is removed. Make `bin/queue.dart` when it is missing. Print a hint to add `dox_queue` to `pubspec.yaml` when it is not there, and to run `dox build_runner:build` (it makes `lib/generated/jobs.g.dart`). |
+| `dox make:job <name>` | | Make `lib/app/jobs/<name>.job.dart` with a `@Job()` class that extends `DoxJob`. It makes `bin/queue.dart` when it is missing. Run `dox build_runner:build` after it. |
 | `dox queue:work [flags]` | `bin/queue.dart work [flags]` | Run the worker. |
 | `dox queue:failed` | `bin/queue.dart failed` | List the failed jobs. |
 | `dox queue:retry <id\|all>` | `bin/queue.dart retry <id\|all>` | Put one failed job, or all of them, back on the queue. |
@@ -567,10 +435,10 @@ When `bin/queue.dart` is missing, the command prints how to set it up and exits 
 | `dox queue:clear [queue]` | `bin/queue.dart clear [queue]` | Delete the jobs of a queue. The default queue is `default`. |
 | `dox queue:restart` | `bin/queue.dart restart` | Make the running workers stop after their current jobs. The workers must share the cache store. |
 | `dox queue:prune-failed [--hours=N]` | `bin/queue.dart prune-failed [--hours=N]` | Delete failed jobs older than N hours. The default is 24. |
-| `dox queue:table` | | A [package command](../digging-deeper/package-commands.md) of `dox_queue_database`. Make `db/migration/<time>_create_queue_tables.dart`, which calls `QueueTables.up`, `QueueTables.upBatches` and the matching `down` methods. When a `create_queue_tables` migration is already there, it prints so and exits with code 1. |
-| `dox auth:tokens-table` | | A [package command](../digging-deeper/package-commands.md) of `dox_auth`. Make a migration for the `auth_access_tokens` table. When a `create_access_tokens_table` migration is already there, it prints so and exits with code 1. |
+| `dox queue:table` | | From `dox_queue_database`. Make a migration for the queue tables. |
+| `dox auth:tokens-table` | | From `dox_auth`. Make a migration for the `auth_access_tokens` table. |
 
-Flags of `queue:work`, passed on as they are:
+Flags of `queue:work`:
 
 | Flag | Default | Meaning |
 | --- | --- | --- |
@@ -583,9 +451,7 @@ Flags of `queue:work`, passed on as they are:
 | `--stop-when-empty` | off | Stop when the queues are empty. |
 | `--timeout-grace=S` | none | After a timeout, wait up to `S` seconds for the old run to end before the next try. |
 
-An unknown flag or command prints the usage and exits with code 64.
-
-Flags of `auth:tokens-table`. They set the same options of `AccessTokenTables.up`:
+Flags of `auth:tokens-table`:
 
 | Flag | Meaning |
 | --- | --- |
@@ -594,7 +460,7 @@ Flags of `auth:tokens-table`. They set the same options of `AccessTokenTables.up
 | `--users-table=<table>` | Add a foreign key from `tokenable_id` to this table, with cascade delete. |
 | `--users-key=<column>` | The column of `--users-table` for the foreign key. Default: `id`. It does nothing without `--users-table`. |
 
-The `bin/queue.dart` of a new project (`<app>` is the `name` in `pubspec.yaml`). The jobs come from `queueConfig` in `lib/config/queue.dart`:
+This is the `bin/queue.dart` of a new project. The jobs come from `queueConfig` in `lib/config/queue.dart`:
 
 ```dart
 import 'dart:io';
@@ -607,12 +473,9 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-Templates: `createJob` and `queueEntrySource` in `lib/src/tools/create_job.dart`.
-
 ## Schedule
 
-These commands run the app script `bin/schedule.dart` with `dart run`. A new project already has it. They pass the signals, the terminal and the exit code the same way as the queue commands.
-When `bin/schedule.dart` is missing, the command prints how to set it up and exits with code 1.
+These commands run `bin/schedule.dart` of your app, which a new project already has.
 
 | Command | Runs | What it does |
 | --- | --- | --- |
@@ -620,7 +483,7 @@ When `bin/schedule.dart` is missing, the command prints how to set it up and exi
 | `dox schedule:run` | `bin/schedule.dart run` | Run the tasks that are due now, once. |
 | `dox schedule:list` | `bin/schedule.dart list` | List the scheduled tasks. |
 | `dox schedule:test <name>` | `bin/schedule.dart test <name>` | Run one task now. |
-| `dox schedule:clear-cache` | `bin/schedule.dart clear-cache` | Remove the `withoutOverlapping()` locks that a crash left behind. Do not run it while a task really runs. |
+| `dox schedule:clear-cache` | `bin/schedule.dart clear-cache` | Remove the `withoutOverlapping()` locks that a crash left behind. Do not run it while a task runs. |
 
 You add tasks in `lib/config/schedule.dart`. These are the two files of a new project:
 
@@ -650,7 +513,7 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-See [Scheduler](../digging-deeper/scheduler.md) for the task methods. See [Queue](../digging-deeper/queue.md) for jobs.
+See [Scheduler](../digging-deeper/scheduler.md) for the task methods, and [Queue](../digging-deeper/queue.md) for jobs.
 
 ## Command list
 

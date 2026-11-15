@@ -6,10 +6,7 @@ icon: lucide/filter
 
 `whereHas()`, `whereDoesntHave()` and `has()` keep the rows of a query by their related rows.
 
-For example: get the users that have a post.
-These methods do not load the related rows.
-They add a subquery to the `where` part, so it is still one query.
-To load the related rows, use `preload()`. See [HasMany](relationship/has-many.md).
+For example, you may want only the users that have a post. These methods do not load the related rows. They add a subquery to the `where` part, so it is still one query. If you also want to load the related rows, use `preload()`. See [HasMany](relationship/has-many.md).
 
 The examples on this page use these models:
 
@@ -33,17 +30,18 @@ class Post extends PostGenerator {
 }
 ```
 
-## `whereHas`
+Use the relation name (the field name), like `'posts'`. Start the query with a model, like `User()`. A query from `QueryBuilder.table()` throws a `StateError`.
 
-Keeps the rows that have at least one related row.
-Use the relation name (the field name).
+## Rows that have a relation
+
+`whereHas` keeps the rows that have at least one related row:
 
 ```dart
 List<User> users = await User().whereHas('posts').get();
 // WHERE EXISTS (SELECT 1 FROM "post" WHERE ...)
 ```
 
-Give a function to add conditions to the related rows.
+If only some related rows should count, give a function with conditions. This keeps the users that have at least one published post:
 
 ```dart
 List<User> users = await User().whereHas('posts', (QueryBuilder<dynamic> q) {
@@ -51,11 +49,9 @@ List<User> users = await User().whereHas('posts', (QueryBuilder<dynamic> q) {
 }).get();
 ```
 
-This keeps the users that have at least one published post.
+## Rows that do not have a relation
 
-## `whereDoesntHave`
-
-Keeps the rows that have no related row.
+`whereDoesntHave` keeps the rows that have no related row. It also takes a function:
 
 ```dart
 List<User> users = await User().whereDoesntHave('posts').get();
@@ -66,9 +62,9 @@ List<User> noDrafts = await User().whereDoesntHave('posts', (QueryBuilder<dynami
 }).get();
 ```
 
-## `orWhereHas` and `orWhereDoesntHave`
+## Joining with or
 
-They are the same, but they join the condition with `OR`.
+`orWhereHas` and `orWhereDoesntHave` do the same, but they join the condition with `OR`:
 
 ```dart
 List<User> users = await User()
@@ -80,10 +76,9 @@ List<User> users = await User()
 await User().where('name', 'Ann').orWhereDoesntHave('posts').get();
 ```
 
-## `has`
+## Counting related rows
 
-`has()` counts the related rows.
-Give an operator and a number.
+Sometimes you need a number of related rows, like "three posts or more". `has` takes an operator and a number. The default is `'>='` and `1`, so at least one related row:
 
 ```dart
 // at least one post
@@ -101,13 +96,11 @@ await User().has('posts', '>', 1, (QueryBuilder<dynamic> q) {
 }).get();
 ```
 
-- The default is `'>='` and `1`: at least one related row.
-- The operator must be one of `=`, `!=`, `<>`, `<`, `>`, `<=` or `>=`.
-  Any other operator throws an `ArgumentError`.
+The operator must be one of `=`, `!=`, `<>`, `<`, `>`, `<=` or `>=`. Any other operator throws an `ArgumentError`.
 
 ## Relations of relations
 
-Use a dot to check a relation of a relation.
+If you want to check a relation of a relation, use a dot. The function is for the last relation (`comments`):
 
 ```dart
 // users that have a post with a comment
@@ -122,27 +115,11 @@ await User().whereHas('posts.comments', (QueryBuilder<dynamic> q) {
 await User().whereDoesntHave('posts.comments').get();
 ```
 
-The function is for the last relation (`comments`).
-
-With `has()`, the count is for the last relation of one row.
-`has('posts.comments', '>=', 2)` keeps the users that have a post with two comments or more.
-
-## Rules
-
-- It works with `hasOne`, `hasMany`, `hasOneThrough`, `hasManyThrough`, `belongsTo`, `manyToMany`, `morphOne` and `morphMany` relations.
-  A `morphTo` relation throws an `UnsupportedError`.
-- Soft deleted related rows do not count.
-  To count them, set `q.withTrashed = true` in the function.
-- The global scopes and the `onQuery` function of the relation are used.
-- It works with `where()`, `count()`, `paginate()`, `withCount()` and the other query methods.
-- Start the query with a model, like `User()`.
-  On `QueryBuilder.table()` it throws a `StateError`.
-- A name that is not a relation of the model throws an `ArgumentError`.
-- It works for a relation to the same table, like a `Category` with a parent `Category`.
+With `has()`, the count is for the last relation of one row. So `has('posts.comments', '>=', 2)` keeps the users that have a post with two comments or more.
 
 ## A relation to the same table
 
-The subquery gives the table its own name, so each row is not compared with itself.
+It also works for a relation to the same table, like a `Category` with a parent `Category`:
 
 ```dart
 // categories that have at least one child category
@@ -156,6 +133,13 @@ List<Category> books = await Category()
     .get();
 ```
 
-!!! warning
-    In the function, write the column without the table name: `name`, not `categories.name`.
-    With the table name, the column points to the parent row, not to the related row.
+In the function, write the column without the table name: `name`, not `categories.name`. With the table name, the column points to the parent row, not to the related row.
+
+## Details
+
+- It works with `hasOne`, `hasMany`, `hasOneThrough`, `hasManyThrough`, `belongsTo`, `manyToMany`, `morphOne` and `morphMany` relations. A `morphTo` relation throws an `UnsupportedError`.
+- Soft deleted related rows do not count. To count them, set `q.withTrashed = true` in the function.
+- The global scopes and the `onQuery` function of the relation are used.
+- It works with `where()`, `count()`, `paginate()`, `withCount()` and the other query methods.
+- A name that is not a relation of the model throws an `ArgumentError`.
+- For a relation to the same table, the subquery gives the table its own name, so each row is not compared with itself.

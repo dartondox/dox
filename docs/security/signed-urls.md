@@ -4,12 +4,11 @@ icon: lucide/link
 
 # Signed URLs
 
-A signed url has a `signature` in its query.
+A signed URL has a `signature` in its query, so nobody can change the URL without your `APP_KEY`.
 
-Nobody can change the url without the `APP_KEY`.
-Use it for links in emails, like "unsubscribe" or "download your file", where the user is not logged in.
+You need it for links in emails, like "unsubscribe" or "download your file", where the user is not logged in.
 
-## Make a signed url
+## Creating signed URLs
 
 Give the route a name and add the `ValidateSignature` middleware:
 
@@ -20,7 +19,7 @@ Route.get('/unsubscribe/{user}', <dynamic>[
 ]).name('unsubscribe');
 ```
 
-Then make the url with `Route.signedUrl`:
+Then make the URL with `Route.signedUrl`:
 
 ```dart
 String url = Route.signedUrl(
@@ -30,12 +29,11 @@ String url = Route.signedUrl(
 // https://example.com/unsubscribe/5?signature=3f9a...
 ```
 
-A url with no `signature`, a wrong one, or a changed path or query gets `403 Forbidden`.
+A URL with no `signature`, a wrong one, or a changed path or query gets `403 Forbidden`.
 
-## A url that expires
+### URLs that expire
 
-Give `expires`. The url gets an `expires` query param (unix seconds), and it is signed too.
-After that time the url gets `403`.
+Sometimes a link should work only for a while. Give `expires`. The URL then gets a signed `expires` query param, and after that time it gets a `403`:
 
 ```dart
 String url = Route.signedUrl(
@@ -45,15 +43,11 @@ String url = Route.signedUrl(
 );
 ```
 
-## Absolute and relative urls
+## Relative URLs
 
-By default the url is absolute. Dox puts `APP_URL` from the env in front, like `https://example.com`. The scheme and host are signed too.
-Give `baseUrl:` to use another one.
+By default the URL is absolute. Dox puts `APP_URL` in front, and the scheme and host are signed too. Give `baseUrl:` to use another one. The `Host` and the scheme of the request must match the URL it was made with: `APP_URL`, or the `baseUrl`.
 
-- The `Host` of the request must be the host of `APP_URL`, with the same port.
-- The scheme must match too. Behind a proxy that ends TLS, add the proxy to `AppConfig.trustedProxies`, so Dox reads `X-Forwarded-Proto: https`.
-
-With `absolute: false`, only the path and the query are signed. Check it with `ValidateSignature(absolute: false)`:
+If you want to sign only the path and the query, use `absolute: false`, and check it with `ValidateSignature(absolute: false)`:
 
 ```dart
 Route.get('/files/{id}', <dynamic>[
@@ -69,9 +63,11 @@ String url = Route.signedUrl(
 // /files/3?signature=...
 ```
 
-## Check in a controller
+Behind a proxy that ends TLS, add the proxy to `AppConfig.trustedProxies`, so Dox sees that the scheme is https.
 
-`ValidateSignature.hasValidSignature(req)` gives `true` or `false`, so you can answer in your own way:
+## Checking in a controller
+
+If you want to answer a bad link in your own way, use `ValidateSignature.hasValidSignature(req)`. It gives `true` or `false`:
 
 ```dart
 if (!ValidateSignature.hasValidSignature(req)) {
@@ -79,9 +75,9 @@ if (!ValidateSignature.hasValidSignature(req)) {
 }
 ```
 
-## How it works
+## Details
 
-- The signature is HMAC-SHA256 of the url, with a key made from `APP_KEY` (`KeyDerivation.signedUrl`).
-- Dox compares it in constant time.
-- After you change `APP_KEY`, urls made with an old key still work when the old key is in `AppConfig.previousKeys`.
-- `signature` is a reserved query param. Any other param added to a signed url makes it invalid.
+- The signature is HMAC-SHA256 of the URL, with a key made from `APP_KEY`. Dox compares it in constant time.
+- URLs made with an old key still work when the old key is in `AppConfig.previousKeys`.
+- `signature` is a reserved query param. Any other param added to a signed URL makes it invalid.
+- The `Host` must match the host of `APP_URL`, with the same port.

@@ -2,14 +2,13 @@
 
 This tutorial takes you from an empty folder to a small blog API that runs as one native binary.
 
-Every step has the full code and a `curl` command to check it.
+Every step has the full code and a `curl` command, so you can check your work after each step.
 
-The finished project is on GitHub: [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api).
-CI builds it and runs its tests on every push, so the code on these pages keeps working.
+The finished project is on GitHub: [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api). CI builds it and runs its tests on every push, so the code on these pages always works.
 
 ## What you will build
 
-A JSON API for blog posts.
+You will build a JSON API for blog posts. Anyone can read posts, but only a logged in user can write them:
 
 | Method | Path | Who | What it does |
 | --- | --- | --- | --- |
@@ -23,11 +22,11 @@ A JSON API for blog posts.
 
 ## What you need
 
-- Dart **3.13** or newer: `dart --version`.
+- Dart 3.13 or newer. Check it with `dart --version`.
 - `curl`, to call the API.
 - About 15 minutes.
 
-You do not need Docker or a database server. The app uses SQLite, which is one file in your project.
+You do not need Docker or a database server, because the app uses SQLite. SQLite keeps the whole database in one file in your project.
 
 ## The steps
 
@@ -41,8 +40,7 @@ You do not need Docker or a database server. The app uses SQLite, which is one f
 
 ## The finished project
 
-Files that you make or change in this tutorial are marked with `*`.
-The template has more files (queue, scheduler, storage). This tree shows the ones that matter here.
+This is the project at the end. Files that you make or change are marked with `*`. The template has more files, like queue, scheduler and storage, but this tree only shows the ones you need here.
 
 ```text
 blog/

@@ -17,7 +17,7 @@ hide:
 
 <p class="dox-hero__lead">
 Dox is a web backend framework for Dart.
-Routing, an ORM, migrations, validation, auth and a CLI come in one place.
+It has routing, an ORM, migrations, validation, auth and a CLI in one place.
 It runs one isolate per CPU core and builds to a small native binary.
 </p>
 
@@ -55,9 +55,9 @@ class BlogController {
 }
 ```
 
-1.  A route points at a static method. No reflection, no controller registry.
-2.  `@Dto()` marks an input class. `build_runner` generates the checks from the fields and their types.
-3.  The generated schema. The same schema feeds the OpenAPI docs.
+1.  A route points to a static method. Dox needs no reflection and no list of controllers.
+2.  `@Dto()` marks an input class. `build_runner` makes the checks from the fields and their types.
+3.  The generated schema. The OpenAPI docs use the same schema.
 4.  Ask for the DTO as a parameter. Dox reads the query (or the body), checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
 5.  The ORM. The same code runs on Postgres, MySQL and SQLite. Postgres and MySQL use native drivers.
 
@@ -126,15 +126,15 @@ class BlogController {
 
 </div>
 
-Your code is plain Dart. The speed comes from the native server: it runs
+Your code is plain Dart. The speed comes from the native server. It runs
 on the isolate's own thread, so a request never waits for another thread.
 See [Performance](digging-deeper/performance.md) for every route and how
 it was run.
 
 ## Run it in two minutes
 
-You need [Dart](https://dart.dev/get-dart) 3.13 or newer. Nothing else: the
-starter project uses SQLite, so there is no database to install.
+You need [Dart](https://dart.dev/get-dart) 3.13 or newer, and nothing else.
+The starter project uses SQLite, so there is no database to install.
 
 ```bash
 dart pub global activate dox             # install the CLI
@@ -154,7 +154,7 @@ curl localhost:3000/ping
 pong
 ```
 
-That is a Dox app. Keep going with the [tutorial](tutorial/index.md): it adds a
+That is a Dox app. Next, follow the [tutorial](tutorial/index.md). It adds a
 model, a database table, validation, login and a Docker image, one short step
 at a time.
 

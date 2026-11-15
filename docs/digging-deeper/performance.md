@@ -6,16 +6,42 @@ icon: lucide/gauge
 
 This page shows how fast Dox is, and how to keep your app fast in production.
 
-The short version:
+Dox is fast by default, so most apps only need to follow a few rules in production:
 
-1. Build with `dox build` and run the AOT binary. Never `dart run` in production.
-2. Put Caddy or nginx in front for HTTPS and gzip.
-3. Keep the default isolates (one per CPU core).
+1. Build with `dox build` and run the AOT binary. Never use `dart run` in production. See [Deployment](deployment.md#build).
+2. Put Caddy or nginx in front, for HTTPS and gzip.
+3. Keep the default isolates, one per CPU core.
 4. Keep the body limits on. Uploads stream to disk.
+
+## Bodies, uploads and big responses
+
+Big requests and responses can fill the memory of your server. Dox protects you from this by default, so you only need to keep these settings:
+
+- A body over `maxBodySize` or `maxMultipartSize` gets `413` from the native server, before Dart reads it. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
+- An upload over 1 MB streams to a temp file. See [Request](../the-basic/request.md#requestfile).
+- A `File` or `Stream` response is streamed, not loaded into memory. See [Files and big responses](../the-basic/response.md#files-and-big-responses).
+
+## gzip
+
+gzip saves bandwidth, but it costs CPU on every response. A proxy like Caddy or nginx does it better. So gzip in Dart is off by default. If there is no proxy, turn it on:
+
+```dart
+AppConfig(compress: true);
+```
+
+Only a body over 256 bytes is gzipped, and only when the client accepts gzip. Streamed responses are not compressed.
+
+## Logging
+
+`LogMiddleware` logs one line per request. If a proxy already writes access logs, turn `LogMiddleware` off, because writing logs costs time. A new project does this for you: `enabled` is `false` when `APP_ENV` is `production` or not set.
+
+## Response handler
+
+Leave `responseHandler` unset if you do not need it. With no handler, a plain value (text, map, list) is sent without building a `DoxResponse`.
 
 ## Benchmark
 
-The rules of [the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks):
+This benchmark uses the rules of [the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks):
 each server answers `GET /` (empty body), `GET /user/:id` (the id) and
 `POST /user` (empty body). Dox is a full Dox app with these three routes.
 "Dox server only" is `dox_http_native` with no framework, to show what the
@@ -235,14 +261,6 @@ The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4.
 Each server has 4 database connections per core, 8 in total. One run of 15
 seconds per route. `dox_postgres_native` and `dox_mysql_native` as released when these numbers were measured.
 
-### Dart VM flags
-
-We tried a bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64`
-and `128`) for a better p99. Over 5 runs the change was inside the noise,
-and memory did not move. So there is no flag to set. Dox never sets VM
-flags for you. `DART_VM_OPTIONS` is read by the AOT binary from
-`dox build`, so you can try your own.
-
 ## Database drivers
 
 One find-by-id query, AOT build (`dart build cli`), database on the same machine (Apple M-series), one isolate:
@@ -257,50 +275,21 @@ One find-by-id query, AOT build (`dart build cli`), database on the same machine
 - Dart sends many queries to Rust in one call. Rust sends many results back in one message.
 - One query alone spends most of its time on the trip to the database. Many requests at the same time, like in a web server, get the most out of the driver.
 
-## Bodies, uploads and big responses
+## Details
 
-These are on by default. You only need to keep them:
+### Dart VM flags
 
-- A body over `maxBodySize` or `maxMultipartSize` gets `413` from the native server, before Dart reads it. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
-- An upload over 1 MB streams to a temp file, so it does not fill the memory. See [Request](../the-basic/request.md#requestfile).
-- A `File` or `Stream` response is streamed, not loaded into memory. See [Files and big responses](../the-basic/response.md#files-and-big-responses).
+A bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64` or `128`) did not give a better p99. Over 5 runs the change was inside the noise, and memory did not move. So there is no flag to set, and Dox never sets VM flags for you. `DART_VM_OPTIONS` is read by the AOT binary from `dox build`, so you can try your own.
 
-## gzip
+### How logs are written
 
-gzip in Dart is off by default.
+- `Logger` collects log lines and writes them every 20 ms (or every 64 KB) in one write, because writing to stdout blocks the isolate.
+- A `warn`, `warning`, `danger` or `error` line is written right away, with the waiting lines before it, so the order stays.
+- The buffer is also written when the app stops. If the process is killed hard, the last 20 ms of logs can be lost.
 
-```dart
-AppConfig(compress: true);
-```
+### What Dox does for you
 
-- It saves bandwidth, but costs CPU on every response. The native server
-  gzips on a Rust thread. Streamed responses are not compressed.
-- A proxy (Caddy, nginx) does it better. Turn it on in Dart only when there
-  is no proxy.
-- Only a body over 256 bytes is gzipped, and only when the client accepts
-  gzip. The gzipped body still gets a `Content-Length`.
-
-## Logging
-
-`LogMiddleware` logs one line per request through `Logger`. Writing to stdout
-blocks the isolate. So `Logger` collects log lines and writes them every 20 ms
-(or every 64 KB) in one write. A `warn`, `warning`, `danger` or `error` line is written right away,
-with the waiting lines before it, so the order stays. The buffer is also
-written when the app stops. If the process is killed hard, the last 20 ms of
-logs can be lost.
-
-Turn `LogMiddleware` off when a proxy already writes access logs. The new
-project does this for you: `enabled` is `false` when `APP_ENV` is
-`production` or not set.
-
-Leave `responseHandler` unset when you do not need it. With no handler, a
-plain value (text, map, list) is sent without building a `DoxResponse`.
-
-## What Dox does for you
-
-- Routes are grouped by method. The regex of each route is built once, not
-  on every request.
-- The argument types of each controller are read once at start, not on
-  every request.
-- JSON and text responses are encoded once, straight to bytes, with
-  `Content-Length` set.
+- Routes are grouped by method. The regex of each route is built once, not on every request.
+- The argument types of each controller are read once at start, not on every request.
+- JSON and text responses are encoded once, straight to bytes, with `Content-Length` set.
+- The native server gzips on a Rust thread, and the gzipped body still gets a `Content-Length`.

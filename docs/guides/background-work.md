@@ -6,11 +6,15 @@ icon: lucide/loader
 
 Answer the request now and do the slow work later: after the response, on another thread, in a queue, or on a timer.
 
+Some work is too slow to do while the user waits, like sending an email or building a report. You should answer the request first and do that work in the background.
+
 ## What you need
 
 - A Dox app (`dox create my_app`). A new app has the queue (`dox_queue`) and the scheduler (`dox_scheduler`) set up.
 
 ## Pick the right tool
+
+Dox gives you four ways to run work in the background. Pick one by how slow the work is and if it may get lost:
 
 | You want | Use | Runs where | Lost when the process stops |
 | --- | --- | --- | --- |
@@ -21,8 +25,7 @@ Answer the request now and do the slow work later: after the response, on anothe
 
 ## 1. Work after the response
 
-Start the future and return. `unawaited` tells the linter you did this on purpose.
-An error in the future goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
+For small I/O work, start the future and return without waiting for it. `unawaited` tells the linter you did this on purpose. If the future throws, the error goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
 
 This file has the code of steps 1, 2 and 3:
 
@@ -86,15 +89,13 @@ int countPrimes(int limit) {
 ```
 
 !!! warning "Do not block the event loop"
-    `_build` shares the thread with the requests of this isolate. A long loop makes them all wait.
-    Put a long loop in `Isolate.run`.
+    `_build` shares the thread with the requests of this isolate, so a long loop makes them all wait. Put a long loop in `Isolate.run`.
 
 ## 2. CPU work on another thread
 
-`Isolate.run` runs the function on a new isolate and sends the result back.
-Pass plain data in (an `int`, a `String`, bytes) and get plain data out. Save the result in the request isolate.
+Heavy CPU work blocks the requests, so run it on another thread. `Isolate.run` runs the function on a new isolate and sends the result back. Pass plain data in (an `int`, a `String`, bytes) and get plain data out. Save the result in the request isolate.
 
-`primes` above waits for the result. To not wait, combine both patterns:
+`primes` above waits for the result. If you do not want to wait, combine both patterns:
 
 ```dart
 unawaited(Isolate.run(() => countPrimes(limit)).then(saveResult));
@@ -102,9 +103,7 @@ unawaited(Isolate.run(() => countPrimes(limit)).then(saveResult));
 
 ## 3. A job that must not get lost
 
-A future you do not await is gone when the server stops, and it does not retry.
-For work that must happen, use a queue job. `dispatch()` saves the job in the database.
-A worker process takes it and runs `handle()`. A failed job is tried again.
+A future you do not await is gone when the server stops, and it does not retry. So for work that must happen, use a queue job. `dispatch()` saves the job in the database. A worker process takes it and runs `handle()`, and tries again if it fails.
 
 Make the job:
 
@@ -138,14 +137,13 @@ class BuildReport extends DoxJob {
 }
 ```
 
-The fields of the job (`reportId`) are saved with it. Use plain values like `String`, `int`, `bool`, `DateTime`, lists and maps.
-Save an id, not a model: load the model in `handle()`.
+The fields of the job (`reportId`) are saved with it, so use plain values like `String`, `int`, `bool`, `DateTime`, lists and maps. Save an id, not a model, and load the model in `handle()`.
+
 Run `dart run build_runner build` after you add or change a job. It updates `lib/generated/jobs.g.dart`.
 
 The `queue` method of the controller above dispatches it. `dispatch()` returns the id of the job.
 
-A new app uses the `database` driver (`lib/config/queue.dart`). It comes from the `dox_queue_database` package, which the queue provider registers.
-Its jobs tables come from the migration `db/migration/..._create_queue_tables.dart`. The server runs it at start.
+A new app keeps the jobs in the database (the `database` driver in `lib/config/queue.dart`). The jobs tables come from a migration in `db/migration/`, which the server runs at start.
 
 Start the worker next to the server, in a second terminal:
 
@@ -158,7 +156,7 @@ See [Queue](../digging-deeper/queue.md) for Redis, delays and all worker flags.
 
 ## 4. Work on a timer
 
-Put the task in `lib/config/schedule.dart`. A new app has this file with an empty `schedule` function.
+Some work must run again and again, like a cleanup every hour. Put the task in `lib/config/schedule.dart`. A new app has this file with an empty `schedule` function.
 
 ```dart title="lib/config/schedule.dart"
 import 'package:dox_scheduler/dox_scheduler.dart';
@@ -195,9 +193,7 @@ dox schedule:work
 
 `dox schedule:list` shows each task and its next run. `dox schedule:test cleanup` runs the task now.
 
-The scheduler runs each task once per tick, also when many processes run the schedule.
-With many servers, use a Redis cache store for the lock (`ScheduleConfig(store: 'redis')`).
-For a small app, you can run the schedule inside the server. See [Scheduler: run inside the server](../digging-deeper/scheduler.md#run-inside-the-server).
+The scheduler runs each task once per tick, even when many processes run the schedule. If you have many servers, use a Redis cache store for the lock (`ScheduleConfig(store: 'redis')`). For a small app, you can run the schedule inside the server. See [Scheduler: run inside the server](../digging-deeper/scheduler.md#run-inside-the-server).
 
 ## 5. Add the routes
 
@@ -231,8 +227,7 @@ curl -X POST http://localhost:3000/api/reports/queued
 {"id":"1792677670112345","job":"9f2c4e1a7b3d5f60a1c2e3f4a5b6c7d8","status":"queued"}
 ```
 
-The terminal of `dox queue:work` shows a log line with `report 1792677670112345 is ready`.
-Stop the worker first, and the job waits in the `jobs` table until the worker runs again.
+The terminal of `dox queue:work` shows a log line with `report 1792677670112345 is ready`. If you stop the worker first, the job waits in the `jobs` table until the worker runs again.
 
 ```bash
 curl http://localhost:3000/api/primes/100000

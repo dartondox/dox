@@ -4,44 +4,42 @@ icon: lucide/settings
 
 # App config
 
-Every field of `AppConfig`, with its type, its default and what it does.
+This page lists every field of `AppConfig`, with its type, its default and what it does.
 
-`AppConfig` is the one object you give to `Dox().initialize()`. It lives in `lib/config/app.dart`.
-
-Source: `packages/dox-core/lib/interfaces/app_config.dart`.
+`AppConfig` is the one object you give to `Dox().initialize()`. It lives in `lib/config/app.dart`. Every field has a default except `appKey`, so you only set what you want to change. A full example is at the [end of the page](#full-example).
 
 ## Server
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `appKey` | `String` | required | Encrypts cookies (`req.cookie()`, `DoxCookie`) and signs local storage URLs. It must be exactly 32 characters. The app stops at start when it is empty, has another length, or is a public sample key. When `APP_ENV` is `development`, `local`, `test` or `testing`, this is only a warning. Make one with `dox key:generate`. |
-| `serverPort` | `int` | `3000` | The port the HTTP server listens on. When the env has no `APP_PORT` but has `PORT`, Dox listens on `PORT` instead (Cloud Run, Fly, Render and Heroku set it). |
-| `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads the env var `APP_HOST`. With neither, Dox listens on all interfaces, IPv6 and IPv4 (`::`). |
-| `totalIsolate` | `int?` | `Platform.numberOfProcessors` | Isolates (threads) that serve HTTP, all on the same port. On Windows the native server runs on one isolate. |
-| `compress` | `bool` | `false` | gzip responses (`HttpServer.autoCompress`). Rust gzips on its own thread, not on the isolate. It still costs CPU on every response. Let a proxy do it when you have one. |
+| `appKey` | `String` | required | Encrypts cookies and signs local storage URLs. It must be exactly 32 characters. Make one with `dox key:generate`. In production a bad key stops the app at start, see [`APP_ENV`](env.md#read-by-the-framework). |
+| `serverPort` | `int` | `3000` | The port to listen on. When the env has no `APP_PORT` but has `PORT`, Dox uses `PORT` (Cloud Run, Fly, Render and Heroku set it). |
+| `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads `APP_HOST`. With neither, Dox listens on all interfaces (`::`). |
+| `totalIsolate` | `int?` | `Platform.numberOfProcessors` | How many isolates (threads) serve HTTP, all on the same port. Windows always uses one. |
+| `compress` | `bool` | `false` | gzip the responses. It costs CPU on every response, so let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
-| `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. Native server only. |
-| `idleTimeout` | `Duration` | `Duration(seconds: 30)` | A keep-alive connection with no new request for this long is closed. A request head must also arrive in this time. Behind a load balancer, set it longer than the balancer's idle timeout. See [Behind a load balancer](../digging-deeper/deployment.md#behind-a-load-balancer). |
-| `maxConnections` | `int?` | `null` (no limit) | The most connections one isolate holds open at once. Must be 1 or more. 0 or less throws an `ArgumentError` when the server starts. When it is full, new clients wait in the OS listen queue until a connection closes. WebSocket connections and connections that are still closing count too. The queue holds up to 1024 clients, and the OS can make it smaller (`somaxconn`; 128 by default on macOS). When the queue is full, new clients wait and then time out. On Linux each new client goes to one isolate (`SO_REUSEPORT`), so it can wait for a full isolate even when others have room. The whole app holds up to `maxConnections * totalIsolate`, so keep that below `ulimit -n`. Native server only. |
+| `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. |
+| `idleTimeout` | `Duration` | `Duration(seconds: 30)` | A keep-alive connection with no new request for this long is closed. Behind a load balancer, set it longer than the balancer's idle timeout. See [Behind a load balancer](../digging-deeper/deployment.md#behind-a-load-balancer). |
+| `maxConnections` | `int?` | `null` (no limit) | The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue until a connection closes. The whole app holds up to `maxConnections * totalIsolate`, so keep that below `ulimit -n`. |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
-| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of reverse proxies. Only when the direct client is in this list does Dox read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for `req.scheme()`. `['*']` trusts any direct client, and takes the right-most `X-Forwarded-For` hop (the one the proxy added) as the client. |
+| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of your reverse proxies. Dox reads `X-Forwarded-For` (for `req.ip()`) and `X-Forwarded-Proto` (for `req.scheme()`) only from these. `['*']` trusts any direct client. |
 
 ## Routing and request handling
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `container` | `void Function(IocContainer)?` | `null` | Fills the container: `registerContainer` from `lib/generated/container.g.dart`. Every isolate runs it. It also gives the routers, providers and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
+| `container` | `void Function(IocContainer)?` | `null` | Pass `registerContainer` from `lib/generated/container.g.dart`. It fills the container, and also gives the routers, providers and model binders. See [Dependency injection](../the-basic/dependency-injection.md). |
 | `routers` | `List<Router>` | `[]` | Routers to register first, in this order. Every other `Router` class comes from `container`. |
 | `globalMiddleware` | `List<dynamic>` | `[]` | Middleware that runs on every route. A function or an `IDoxMiddleware`. |
-| `dtos` | `List<DtoSchema<Object>>` | `[]` | Every DTO of the app: `dtos` from `lib/generated/dtos.g.dart`. Dox finds the DTO of a controller parameter and of `req.validate<T>()` with it. |
+| `dtos` | `List<DtoSchema<Object>>` | `[]` | Pass `dtos` from `lib/generated/dtos.g.dart`. Dox finds the DTOs of controllers and `req.validate<T>()` in it. |
 | `validationMessages` | `MessageResolver?` | `null` (English messages) | Messages for validation errors, for example in other languages. |
 | `responseHandler` | `ResponseHandlerInterface?` | `null` | A class with `DoxResponse handle(DoxResponse res)`. It sees every response before it is sent. |
-| `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error with `Logger.warn` and the stack with `Logger.danger`. See [Error handling](../the-basic/errors.md). |
-| `htmlErrors` | `bool` | `false` | Sends an HTML error page to a request that does not want JSON (see `DoxRequest.expectsJson()`). In `development` or `local` the page also shows the error text and the stack. JSON clients, validation errors and `ExceptionHandler.render` answers do not change. See [An HTML error page](../the-basic/errors.md#an-html-error-page). |
+| `exceptionHandler` | `ExceptionHandler` | `ExceptionHandler()` | Reports every unhandled error and turns it into a response. The default logs the error and the stack. See [Error handling](../the-basic/errors.md). |
+| `htmlErrors` | `bool` | `false` | Sends an HTML error page to a request that does not want JSON. In `development` or `local` the page also shows the error and the stack. JSON clients do not change. See [An HTML error page](../the-basic/errors.md#an-html-error-page). |
 | `errorPage` | `String Function(int status, Object error, StackTrace stack, bool debug)` | `defaultErrorPage` | Makes the HTML of the page. `debug` is `true` in `development` or `local`. Escape every value you put in the page. Used only with `htmlErrors`. |
 | `providers` | `List<DoxProvider>` | `[]` | Providers to run first, in this order. Every other `DoxProvider` class comes from `container`. Dox runs them in every isolate at start. |
-| `webSocketAllowedOrigins` | `List<String>?` | `null` (no check) | Turns on the `Origin` check for every `Route.websocket` route. Only pages of the same host and the listed sites, like `https://app.example.com`, can open a socket. Other origins get `403`. `[]` means the same host only. `allowedOrigins` on a route wins over this. With `null`, any website can open a socket with the cookies of the user, and Dox prints one warning to stderr at start. |
+| `webSocketAllowedOrigins` | `List<String>?` | `null` (no check) | Checks the `Origin` of every `Route.websocket` route. Only the same host and the listed sites, like `https://app.example.com`, can open a socket. Others get `403`. `[]` means the same host only. With `null`, any website can open a socket with the user's cookies, and Dox prints a warning at start. |
 
 ## Sub configs
 
@@ -50,14 +48,13 @@ Source: `packages/dox-core/lib/interfaces/app_config.dart`.
 | `cors` | `CORSConfig` | `CORSConfig()` | CORS headers. See [CORSConfig](#corsconfig). |
 | `logger` | `LoggerConfig` | `LoggerConfig()` | The `Logger` output. See [LoggerConfig](#loggerconfig). |
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
-| `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#config). |
+| `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#configuration). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
 | `flags` | `CoreFlags` | `CoreFlags()` (all off) | Opt-in core behaviors. See [Core flags](#core-flags). |
 
 ## Core flags
 
-`CoreFlags` turns on opt-in behaviors. Every flag is off by default.
-Turn on the ones you want:
+`CoreFlags` turns on extra behaviors. Every flag is off by default, so you turn on only the ones you want:
 
 ```dart
 AppConfig(
@@ -74,26 +71,21 @@ AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
 
 | Flag | When it is on |
 | --- | --- |
-| `laravelErrors` | A `422` body is `{"message": "...", "errors": {"field": ["..."]}}`, with all messages of each field. The `message` is the first error, plus `(and N more errors)`. The OpenAPI `ValidationError` schema has this shape too. Off: `{"field": "first message"}`. |
+| `laravelErrors` | A `422` body is `{"message": "...", "errors": {"field": ["..."]}}`, with all messages of each field. The OpenAPI docs use this shape too. Off: `{"field": "first message"}`. |
 | `onlyPresent` | `req.only([...])` leaves out keys that are not in the input. So `model.update(req.only([...]))` does not write `null` for a field the client did not send. Off: a missing key is in the map with `null`. |
-| `cookieDefaults` | A `DoxCookie` with no `path` gets `Path=/`, and one with no `sameSite` gets `SameSite=Lax`. A value you set wins. `SameSite.none` needs `secure: true`, or browsers drop the cookie. A cookie set before with no `Path` on a sub-path (like `/auth`) is not removed by an `expire()` that sends `Path=/`. Expire it with its old `path`. Off: no `Path` and no `SameSite`. |
+| `cookieDefaults` | A `DoxCookie` with no `path` gets `Path=/`, and one with no `sameSite` gets `SameSite=Lax`. A value you set wins. Off: no `Path` and no `SameSite`. |
 | `hasKeyOnly` | `req.has('x')` is `true` when the key is there, with any value (also `''` or null), like `req.exists('x')`. Dot keys work. Off: `''` and null give `false`. |
-| `htmlStrings` | A string from a controller is sent as `text/html`. A content type you set wins, also one a middleware set on the response. Only the preset `text/plain; charset=utf-8` is changed, so a string with that type set by hand is sent as HTML too. To keep plain text, return `response(text).contentType(ContentType.text)`. Escape user input in the string. Off: `text/plain`. |
-| `replaceHeaders` | `res.header(k, v)` replaces a value of the header that a middleware put on the response before. `Vary` and `Set-Cookie` are lists, so they still get one more value. Off: it adds a second value. `res.header(k, v, replace: true)` or `replace: false` picks for one call. |
-| `decryptServerError` | A `DecryptException` gives `500` with `{"code": "server_error", "message": "Server Error"}`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. `req.cookie()` still gives `null` for a bad cookie. |
+| `htmlStrings` | A string from a controller is sent as `text/html`. A content type you set wins. Escape user input in the string. Off: `text/plain`. |
+| `replaceHeaders` | `res.header(k, v)` replaces a value that a middleware set before. `Vary` and `Set-Cookie` still get one more value. Off: it adds a second value. Pass `replace:` to pick for one call. |
+| `decryptServerError` | A `DecryptException` gives a `500` `server_error`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. |
 | `envExpand` | `.env` values can use `${OTHER}`, and a `"..."` value reads `\n`, `\t`, `\"`, `\\` and `\$`. Also set `Env.flags = flags;` at the top of `main()` in `bin/server.dart` and in your tests, because `.env` is read before `AppConfig` exists. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another). Off: values are read as written. |
 | `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
 
-Each isolate builds its own `AppConfig`, so every isolate has the same flags.
-Dox reads a flag when the code runs, with `Dox().flags`.
-
-The lock flag of the cache is in [`CacheConfig`](#cacheconfig): `CacheFlags`.
+The cache has its own flag class, `CacheFlags`, in [`CacheConfig`](#cacheconfig).
 
 ## CORSConfig
 
-Source: `packages/dox-core/lib/interfaces/app_config.dart`. Headers are set in `packages/dox-core/lib/http/http_cors_handler.dart`.
-
-A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` value sends no header.
+A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` value sends no header. Because every value is `null` by default, you must set at least `origin`.
 
 | Field | Type | Default | Header |
 | --- | --- | --- | --- |
@@ -105,21 +97,16 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | `credentials` | `bool?` | `null` | `Access-Control-Allow-Credentials` |
 | `maxAge` | `num?` | `null` | `Access-Control-Max-Age` in seconds |
 
-!!! note
-    With the default `CORSConfig()` every value is `null`. So `enabled: true` alone sends no header. Set `origin` at least.
-
 ## LoggerConfig
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `name` | `String` | `''` | Written as `logger.name` in each JSON log line. Left out when empty. |
-| `enabled` | `bool` | `false` | Turn the `Logger` on. When it is `false`, `LogMiddleware(enabled: true)` does not turn request logs on. |
-| `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line (for log services). The line has `timestamp`, `status`, `message` and `logger.name`. Keys of a `Map` you log are added at the top level. Other data goes under `payload`. `LogMiddleware` follows this setting too. |
-| `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. `Logger.success` counts as `info`. `Logger.danger` counts as `error`. An unknown value prints every line. |
+| `enabled` | `bool` | `false` | Turn the `Logger` on. When it is off, `LogMiddleware` logs nothing too. |
+| `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line, for log services. |
+| `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. |
 
 ## CacheConfig
-
-Source: `packages/dox-cache/lib/src/cache_config.dart`. Option keys: `packages/dox-cache/lib/src/constants/cache_constants.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -160,7 +147,6 @@ Options of each driver:
 ## StorageConfig
 
 `StorageProvider` of the `dox_storage` package takes it. See [File storage](../digging-deeper/file-storage.md).
-Source: `lib/src/dox/storage_config.dart` in [dartondox/dox-storage](https://github.com/dartondox/dox-storage).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -177,7 +163,7 @@ Options of each driver:
 | `local` | `app_key` | `String` | `AppConfig.appKey` | Key that signs the URLs. |
 | `local` | `visibility` | `String` | `public` | `public` or `private`. |
 | `local` | `atomic_writes` | `bool` | `false` | Write to a temp file, then rename it. |
-| `local` | `permissions` | `bool` or `Map` | off | Visibility is the file mode. See [File storage](../digging-deeper/file-storage.md#config). |
+| `local` | `permissions` | `bool` or `Map` | off | Visibility is the file mode. See [File storage](../digging-deeper/file-storage.md#visibility-on-a-local-disk). |
 | `s3` | `bucket` | `String` | required | Bucket name. |
 | `s3` | `region` | `String` | `us-east-1` | Region. |
 | `s3` | `key` | `String` | required | Access key id. |
@@ -190,19 +176,15 @@ Options of each driver:
 | `s3` | `acl` | `bool` | `true` | The service supports ACLs. |
 | `s3` | `batch_delete` | `bool` | `true` | The service supports batch delete. |
 
-An unknown driver throws `ArgumentError('Storage disk "<name>" has unknown driver "<type>"')`.
-
 ## OpenApiConfig
-
-Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means: on only when `APP_ENV` is `development` or `local`. An empty `APP_ENV` counts as production. |
+| `enabled` | `bool?` | `null` | Serve the docs routes. `null` means on only in `development` or `local`. |
 | `info` | `Info` | `Info(title: 'Dox API', version: '1.0.0')` | Title and version of the API. |
 | `servers` | `List<Server>` | `[]` | Base URLs of the API. |
 | `securitySchemes` | `Map<String, SecurityScheme>` | `{}` | Ways to log in, like `{'bearerAuth': SecurityScheme.bearer()}`. |
-| `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. It wins over `@Security` on the class. A class name that ends with `AuthMiddleware` gets `bearerAuth` when it has neither. |
+| `securityByMiddleware` | `Map<String, List<Map<String, List<String>>>>` | `{}` | Security for routes that use a middleware class with this name. It wins over `@Security` on the class. A middleware whose class name ends with `AuthMiddleware` gets `bearerAuth` when it has no `@Security` and no entry here. |
 | `registry` | `OpenApiRegistry` | `OpenApiRegistry()` (empty) | What `dox_builder` found in the code. Pass `openApiRegistry` from `lib/generated/openapi.g.dart`. |
 | `ui` | `DocsUi` | `DocsUi.scalar` | `scalar` or `swagger`. |
 | `scalar` | `ScalarOptions` | `ScalarOptions()` | Options of the Scalar page. See below. |
@@ -210,7 +192,7 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 | `include` | `List<String>` | `[]` (all routes) | Only routes with these paths are in the docs, like `['/api/*']`. A `*` at the end matches the rest of the path. |
 | `exclude` | `List<String>` | `[]` | Routes with these paths are left out. Checked after `include`. |
 
-`ScalarOptions` (`lib/src/docs_ui.dart` in [dartondox/dox-openapi](https://github.com/dartondox/dox-openapi)):
+`ScalarOptions`:
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -222,7 +204,6 @@ Source: `packages/dox-core/lib/openapi/openapi_config.dart`.
 ## SocketIoConfig
 
 `SocketIoProvider` of the `dox_socketio` package takes it. See [Socket.IO](../packages/socketio.md).
-Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://github.com/dartondox/dox-socketio).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -231,7 +212,7 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 | `namespaces` | `List<NamespaceHandler>` | `[]` | Namespaces to register, like `ChatNamespace()`. |
 | `adapter` | `SocketAdapterFactory?` | `null` (in memory with one isolate, `IsolateAdapter` with many) | Makes the adapter in each isolate. Use a Redis adapter with many servers. |
 
-`ServerOptions` (`lib/src/engine/server_options.dart` in dox-socketio). The defaults match the Node.js server.
+`ServerOptions`:
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
@@ -259,11 +240,10 @@ Source: `lib/src/dox/socket_io_config.dart` in [dartondox/dox-socketio](https://
 ## DatabaseConfig
 
 The database is not a field of `AppConfig`. A provider calls `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)` in its `setup()`.
-Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_config.dart` in [dartondox/dox-orm](https://github.com/dartondox/dox-orm).
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `connection` | `String` | required | Name of the connection to use. A missing name throws `Exception('<name> not found')`. |
+| `connection` | `String` | required | Name of the connection to use. |
 | `connections` | `Map<String, ConnectionConfig>` | required | Connection name to config. |
 
 `ConnectionConfig`:
@@ -278,9 +258,9 @@ Source: `packages/dox-orm/lib/src/types/database_config.dart` and `connection_co
 | `database` | `String` | required | Database name. For sqlite: the file path, or `:memory:`. |
 | `useSSL` | `bool` | `false` | Use TLS. Postgres: mode `require` (no certificate check), set `extra['sslMode']` to change it. MySQL: the certificate is checked. |
 | `debug` | `bool` | required | Print every query with `printer`. |
-| `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter(file: File('queries.log'))` or your own. `FileQueryPrinter(file: ..., buffered: true)` writes in the background, so a query does not wait for the disk. Then call `await printer.flush()` before `exit()`, or the last lines are lost. |
-| `logRedact` | `List<String>` | `[]` | Names of values to hide in the query log. A value shows as `***` when its key ends with one of these names, in any case. `['password', 'token']` hides `password`, `users.password` and `remember_token`. Only the log changes. The query gets the real values. The list of the default connection counts for every query. The list of a named connection counts too, for the queries on that connection. |
-| `slowQueryMs` | `int?` | `null` | Log each query that takes longer than this many milliseconds, with `printer`. `0` logs every query. `null` turns it off. It works with `debug` off. Values named in `logRedact` show as `***`. A failed query is not logged. |
+| `printer` | `QueryPrinter?` | `null` | `ConsoleQueryPrinter()`, `PrettyQueryPrinter()`, `FileQueryPrinter(file: File('queries.log'))` or your own. With `buffered: true`, call `await printer.flush()` before `exit()`, or the last lines are lost. |
+| `logRedact` | `List<String>` | `[]` | Names of values to hide in the query log. A value shows as `***` when its key ends with one of these names. `['password', 'token']` hides `password`, `users.password` and `remember_token`. Only the log changes. |
+| `slowQueryMs` | `int?` | `null` | Log each query that takes longer than this many milliseconds. `0` logs every query. `null` turns it off. It works with `debug` off. |
 | `read` | `List<Map<String, dynamic>>?` | `null` | Read replica hosts. Each map can change `host`, `port`, `user`, `password`, `database` and `extra`. See [Read replicas](../database/replicas.md). |
 | `write` | `Map<String, dynamic>?` | `null` | Settings of the write host, in the same form as one `read` map. Only used with `read`. |
 | `sticky` | `bool` | `false` | With `read`: after a write, the reads of the same request go to the write host. |
@@ -300,19 +280,18 @@ Keys of `extra`:
 | mysql, sqlite | `preparedStatementCacheSize` | `int` | `100` | Prepared statements kept per connection. |
 | postgres | `sslMode` | `String` | `require` with `useSSL`, else `disable` | TLS mode: `disable`, `prefer`, `require` or `verify-full`. |
 | postgres | `sslRootCert` | `String` | none | Path of a PEM file with the CA certificates to trust for `verify-full`. `sslrootcert` in `DATABASE_URL`. |
-| postgres | `sslWarning` | `bool` | `true` | `false` hides the warning that Dox prints (once per isolate) when TLS mode is `require`. `sslWarning=false` in `DATABASE_URL` works too. |
+| postgres | `sslWarning` | `bool` | `true` | `false` hides the warning Dox prints when TLS mode is `require`. `sslWarning=false` in `DATABASE_URL` works too. |
 | postgres | `timeZone` | `String` | `UTC` | Session time zone. |
 | postgres | `applicationName` | `String` | none | Name of the app in `pg_stat_activity`. |
 | mysql | `verifyCertificate` | `bool` | `true` | `false` skips the TLS certificate check. Only for a self-signed certificate in development. |
 | sqlite | `busyTimeout` | `int` | `5000` | `PRAGMA busy_timeout` in milliseconds. |
-| sqlite | `background` | `bool` | `false` | `true` (or `1`, `'true'`, `'1'`, so `?background=true` in `DATABASE_URL` works) runs the queries in a helper isolate, so a slow query does not block the request isolate. Each query costs one message hop. See [SQLite](../database/index.md#run-queries-in-a-helper-isolate). |
+| sqlite | `background` | `bool` | `false` | `true` runs the queries in a helper isolate, so a slow query does not block the request isolate. `?background=true` in `DATABASE_URL` works too. See [SQLite](../database/index.md#run-queries-in-a-helper-isolate). |
 
 A time key takes a `Duration`, or a number of seconds. See [Pool settings](../database/index.md#pool-settings).
 
 ## AuthConfig
 
 Auth is not a field of `AppConfig`. A provider calls `Auth.initialize(AuthConfig(...))` in its `setup()`.
-Source: `lib/src/interfaces.dart` in [dartondox/dox-auth](https://github.com/dartondox/dox-auth).
 
 | Class | Field | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
@@ -326,7 +305,7 @@ Source: `lib/src/interfaces.dart` in [dartondox/dox-auth](https://github.com/dar
 
 ## Full example
 
-The config files of a new project. They read their values from `env`, the typed env class in `lib/config/env.dart` (see [Env reference](env.md)).
+These are the config files of a new project. They read their values from `env`, the typed env class in `lib/config/env.dart` (see [Env reference](env.md)).
 
 ```dart title="lib/config/app.dart"
 import 'dart:io';
@@ -463,10 +442,7 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-Do not use `origin: '*'` together with `credentials: true`.
-With credentials the browser sends cookies, so it does not accept `*`, and the call fails.
-Dox does not send back any origin in place of `*`, because that would let every site call the app with the user's cookies.
-`'*'` is fine for a public API with `credentials: false` (or not set).
+Do not use `origin: '*'` together with `credentials: true`, because the browser refuses that pair and the call fails. `'*'` is fine for a public API without credentials.
 
 ```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';

@@ -6,7 +6,7 @@ icon: lucide/git-pull-request-arrow
 
 This page shows how to work on Dox: set up the repo, run the tests, release packages and update the docs.
 
-To send a change, fork the repo and open a pull request.
+To send a change, fork the repo and open a pull request. The first part of this page is all you need for that. The release parts are for maintainers.
 
 ## Setting up local development
 
@@ -18,8 +18,7 @@ git clone git@github.com:dartondox/dox.git
 
 ### 2. Install melos
 
-The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces).
-The melos config is in the root `pubspec.yaml` (under `melos:`). Use Dart 3.13 or newer.
+The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces), and melos runs the commands for all packages. Its config is in the root `pubspec.yaml`, under `melos:`. You need Dart 3.13 or newer.
 
 ```bash
 dart pub global activate melos
@@ -27,14 +26,15 @@ dart pub global activate melos
 
 ### 3. Run melos bootstrap
 
-It runs one `dart pub get` at the root. All local packages are linked.
-There is one `pubspec.lock` for the whole repo.
+This runs one `dart pub get` at the root and links all local packages, so there is one `pubspec.lock` for the whole repo.
 
 ```bash
 melos bs
 ```
 
-### 4. Useful commands
+### 4. Run the tests and checks
+
+Run these before you open a pull request. They are the same checks CI runs:
 
 ```bash
 # Run all tests.
@@ -48,49 +48,38 @@ melos run format_check
 
 ### If the project does not run
 
+If `melos bs` fails or the packages do not resolve, start clean:
+
 1. Remove `pubspec.lock` and `.dart_tool` at the root.
-2. Remove any old `pubspec_overrides.yaml` and `pubspec.lock` in `packages/*` (left from melos 3).
+2. Remove any old `pubspec_overrides.yaml` and `pubspec.lock` in `packages/*`.
 3. Run `melos bs` again.
 
 ## Release (maintainers)
 
-The `Release` GitHub workflow (`.github/workflows/publish.yaml`) publishes one package to pub.dev.
-Each package has its own version and its own tag, like `dox_builder-v3.1.4` (`<package>-v<version>`).
-It uses pub.dev automated publishing, so it needs no token or secret.
+The `Release` GitHub workflow (`.github/workflows/publish.yaml`) publishes one package to pub.dev. Each package has its own version and its own tag, in the form `<package>-v<version>`. The workflow uses pub.dev automated publishing, so it needs no token or secret.
 
 ### Steps
 
 The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELEASING.md) in the repo. In short, for each package that changed:
 
-1. Run `bin/bump.sh <package> <version>`. It sets the version of that package only.
-   If the package needs a newer sibling, raise that constraint by hand.
-   Close the `## Unreleased` section of its `CHANGELOG.md`.
-2. Merge the release PR, then push the tag `<package>-v<version>`. This publishes that package to pub.dev.
-   Release in dependency order: `dox_annotation`, `dox_cache`, `dox_builder`, `dox_core`.
+1. Run `bin/bump.sh <package> <version>`. It sets the version of that package only. If the package needs a newer sibling, raise that constraint by hand. Then close the `## Unreleased` section of its `CHANGELOG.md`.
+2. Merge the release PR, then push the tag `<package>-v<version>`. This publishes that package to pub.dev. Release in dependency order: `dox_annotation`, `dox_cache`, `dox_builder`, `dox_core`.
 3. Release the matching `dox-sample` template.
 
 A builder-only fix needs a `dox_builder` release only. It does not need a `dox_core` release.
 
-The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo.
-See [Native packages](#native-packages) below.
-`dox_orm`, `dox_migration`, `dox_socketio`, `dox_storage`, `dox_queue`, `dox_queue_database`, `dox_scheduler`, `dox_inertia`, `dox_view` and `dox_mailer` are not in this repo either.
-See [Packages in other repos](#packages-in-other-repos).
+The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo. See [Native packages](#native-packages) below. `dox_orm`, `dox_migration`, `dox_socketio`, `dox_storage`, `dox_queue`, `dox_queue_database`, `dox_scheduler`, `dox_inertia`, `dox_view` and `dox_mailer` are not in this repo either. See [Packages in other repos](#packages-in-other-repos).
 
-**New package only:** turn on pub.dev automated publishing for it first. See [One-time setup](#one-time-setup).
-A new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`.
+**New package only:** a new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`. Then turn on pub.dev automated publishing for it. See [One-time setup](#one-time-setup).
 
 ### What the workflow does
 
-1. It reads the package name and the version from the tag.
-   It stops with an error for an unknown package or a bad version.
-2. It checks that the version in `packages/<folder>/pubspec.yaml` is the tag version.
-   If not, it stops. Run `bin/bump.sh <package> <version>` and try again.
-3. It runs the tests. They must pass.
-   Then it checks that the sibling packages it needs are on pub.dev. If not, it stops: "release <dep> first".
+1. It reads the package name and the version from the tag. It stops with an error for an unknown package or a bad version.
+2. It checks that the version in `packages/<folder>/pubspec.yaml` is the tag version. If not, it stops, so run `bin/bump.sh <package> <version>` and try again.
+3. It runs the tests, and they must pass. Then it checks that the sibling packages it needs are on pub.dev. If not, it stops with "release <dep> first".
 4. It checks that one package with a dry run, then publishes it.
 
-A tag for a version that is already on pub.dev is skipped.
-So if a run fails, fix the problem and click "Re-run jobs".
+A tag for a version that is already on pub.dev is skipped. So if a run fails, fix the problem and click "Re-run jobs".
 
 To see the packages in publish order on your machine:
 
@@ -100,14 +89,11 @@ python3 bin/publish_order.py
 
 ### Dry run
 
-Open Actions > Release > "Run workflow".
-Pick one package, or `all`. It runs `dart pub publish --dry-run` and publishes nothing.
-Warnings (for example a missing CHANGELOG entry) show as yellow warnings. They do not fail the run.
+If you want to check a release without publishing, open Actions > Release > "Run workflow" and pick one package, or `all`. It runs `dart pub publish --dry-run` and publishes nothing. Warnings, like a missing CHANGELOG entry, show in yellow and do not fail the run.
 
 ### One-time setup
 
-Do this once for each published package, and for every new package before its first tag.
-The list of packages is the output of `python3 bin/publish_order.py`.
+Do this once for each published package, and for every new package before its first tag. `python3 bin/publish_order.py` lists the packages.
 
 On pub.dev:
 
@@ -118,9 +104,7 @@ On pub.dev:
 5. Tick "Require GitHub Actions environment" and set the environment to `pub.dev`.
 6. Save.
 
-On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`.
-The publish job runs in it.
-Optional: add yourself as a required reviewer, and allow only the tags `dox_annotation-v*`, `dox_builder-v*`, `dox_cache-v*` and `dox_core-v*`.
+On GitHub, in `dartondox/dox` > Settings > Environments, there must be an environment named `pub.dev`, because the publish job runs in it. Optional: add yourself as a required reviewer, and allow only the tags `dox_annotation-v*`, `dox_builder-v*`, `dox_cache-v*` and `dox_core-v*`.
 
 ## Packages in other repos
 
@@ -139,17 +123,13 @@ Optional: add yourself as a required reviewer, and allow only the tags `dox_anno
 | `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |
 | `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 
-The packages here use them from pub.dev. The database tests (Postgres, MySQL, MariaDB, SQLite) run in `dox-orm`.
-`dox_core` uses `dox_openapi` and `dox_validation`.
-CI in this repo uses their newest code: `ci/clone-siblings.sh`, then `ci/use-siblings.sh`.
+The packages in this repo use them from pub.dev. `dox_core` uses `dox_openapi` and `dox_validation`. The database tests (Postgres, MySQL, MariaDB, SQLite) run in `dox-orm`. CI in this repo tests against their newest code: it runs `ci/clone-siblings.sh`, then `ci/use-siblings.sh`.
 
 To work on one of them and Dox together:
 
-1. Clone the repos next to the Dox repo, like `../dox-orm`.
-   `ci/clone-siblings.sh` clones `dox-orm`, `dox-auth`, `dox-openapi`, `dox-validation`, `dox-socketio`, `dox-storage`, `dox-queue`, `dox-scheduler` and `dox-cli`.
+1. Clone the repos next to the Dox repo, like `../dox-orm`. `ci/clone-siblings.sh` clones `dox-orm`, `dox-auth`, `dox-openapi`, `dox-validation`, `dox-socketio`, `dox-storage`, `dox-queue`, `dox-scheduler` and `dox-cli`.
    Clone `dox-mailer`, `dox-view` and `dox-inertia` by hand when you need them.
-2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file.
-   For `dox_openapi` and `dox_validation`, `ci/use-siblings.sh` writes this file for you.
+2. Add them to the root `pubspec_overrides.yaml` of the Dox repo. Git ignores this file. For `dox_openapi` and `dox_validation`, `ci/use-siblings.sh` writes it for you.
 
     ```yaml
     dependency_overrides:
@@ -164,7 +144,7 @@ To work on one of them and Dox together:
 The apps in `examples/` already use these clones (their `pubspec_overrides.yaml`), so clone them before you run an example.
 In the other repo, a `pubspec_overrides.yaml` that points to `../dox/packages/...` uses your local Dox packages.
 
-Each repo has its own version. Push a `v<version>` tag in that repo to release it.
+Each of these repos has its own version. To release one, push a `v<version>` tag in that repo.
 
 ## Native packages
 
@@ -176,7 +156,7 @@ The three native packages live in their own repos:
 | `dox_postgres_native` | [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native) |
 | `dox_mysql_native` | [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native) |
 
-Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox.
+Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox. You only need these steps if you change a native package.
 
 To work on a native package and Dox together:
 
@@ -191,15 +171,11 @@ To work on a native package and Dox together:
 
 3. Run `dart pub get`.
 
-Each native package is released from its own repo, with its own version.
-Push a `v<version>` tag in that repo.
-Its CI builds the libraries, uploads them, fills the hashes and publishes the package to pub.dev.
-Then raise the version constraint in the Dox packages that use it.
+Each native package is released from its own repo, with its own version. Push a `v<version>` tag in that repo. Its CI builds the libraries, uploads them, fills the hashes and publishes the package to pub.dev. Then raise the version constraint in the Dox packages that use it.
 
 ## Docs
 
-The docs site is https://dartondox.dev. It is built with MkDocs Material and
-[mike](https://github.com/jimporter/mike). mike keeps one folder per version on the `gh-pages` branch.
+The docs site is https://dartondox.dev. It is built with MkDocs Material and [mike](https://github.com/jimporter/mike), which keeps one folder per version on the `gh-pages` branch.
 
 | URL | What it is |
 | --- | --- |
@@ -219,7 +195,7 @@ python3 -m venv .venv
 
 `hooks/docs_hooks.py` runs during the build. It makes the changelog page from `packages/*/CHANGELOG.md`, and writes `llms.txt` and `llms-full.txt`.
 
-The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pull request that changes the docs. It runs three checks:
+Every pull request that changes the docs runs the `Docs check` workflow (`.github/workflows/docs-check.yaml`). It has three checks:
 
 - `mkdocs build --strict`
 - a spell check: `codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore`
@@ -227,17 +203,11 @@ The `Docs check` workflow (`.github/workflows/docs-check.yaml`) runs on every pu
 
 ### Deploy
 
-- 3.x deploys with each release. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on a
-  `dox_core-v<version>` tag, the same tag that publishes `dox_core`. So docs for a feature that is not released yet stay off the site.
-  It runs `mike deploy --update-aliases 3.x latest`.
-- To deploy the docs only (a typo fix, or the docs of a package from another repo that was just released),
-  push a `docs-v<version>` tag on `main`, like `git tag docs-v3.0.1-1 && git push origin docs-v3.0.1-1`.
-  It publishes no package and runs no tests.
-- After each deploy, the workflow writes small redirect pages for the old root links,
-  the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
+- 3.x deploys with each release. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on a `dox_core-v<version>` tag, the same tag that publishes `dox_core`, and runs `mike deploy --update-aliases 3.x latest`. So docs for a feature that is not released yet stay off the site.
+- If you want to deploy the docs only (a typo fix, or the docs of a package from another repo that was just released), push a `docs-v<version>` tag on `main`, like `git tag docs-v3.0.1-1 && git push origin docs-v3.0.1-1`. It publishes no package and runs no tests.
+- After each deploy, the workflow writes small redirect pages for the old root links, the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
 - The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
 
 ### New major version
 
-When 4.x starts, deploy 4.x with `mike deploy --update-aliases 4.x latest`. Keep a `v3.x`
-branch, and add `3.x` to the workflow input, so 3.x can still be fixed.
+When 4.x starts, deploy it with `mike deploy --update-aliases 4.x latest`. Keep a `v3.x` branch and add `3.x` to the workflow input, so 3.x can still be fixed.

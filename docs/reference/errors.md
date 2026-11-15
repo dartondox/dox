@@ -6,18 +6,16 @@ icon: lucide/circle-alert
 
 This page lists the messages Dox prints or throws, so you can search for the text you see.
 
-- `<...>` is a part that changes, like a name or a number.
-- Dart adds a prefix to some errors: `Bad state:` (`StateError`), `Invalid argument(s):` (`ArgumentError`), `Unsupported operation:` (`UnsupportedError`), `Exception:` (`Exception`).
-- For problems that need a longer story, see [Troubleshooting](troubleshooting.md).
+A `<...>` part changes, like a name or a number. Dart puts a prefix in front of some errors, like `Bad state:` or `Invalid argument(s):`. For problems that need a longer fix, see [Troubleshooting](troubleshooting.md).
 
 ## dox_core: start of the app
 
 | Text | When | What to do |
 | --- | --- | --- |
-| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. A `StateError` stops the app, unless `APP_ENV` is `development`, `local`, `test` or `testing`. Then it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
+| `APP_KEY is not set. Run `dox key:generate` and put the key in .env` | `appKey` is empty. The app stops. In `development`, `local`, `test` or `testing` it is only a warning. | Run `dox key:generate`, or set `APP_KEY` in the env. |
 | `APP_KEY must be exactly 32 characters. Run `dox key:generate`` | The key is shorter or longer. Same rule as above. | Run `dox key:generate`. |
 | `APP_KEY is a public sample key. Run `dox key:generate` for a new one` | The key is a known sample key. Same rule as above. | Run `dox key:generate`. |
-| `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version (`native library ABI <x>, expected <y>`). The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
+| `Unsupported operation: dox_http_native did not load: <reason>. Fix: ...` | The native HTTP library is missing or from another version. The app stops at start. | Do what the `Fix:` part says. See [Troubleshooting](troubleshooting.md#the-native-http-library-did-not-load). |
 | `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use `transports: ['websocket']` in the client. |
@@ -72,9 +70,9 @@ The table shows the `message` text.
 | `419` | `CSRF token mismatch` | `CsrfMiddleware` finds no CSRF token, or a wrong one, on a `POST`, `PUT`, `PATCH` or `DELETE`. | Send the token. See [CSRF](../security/csrf.md). |
 | `429` | `Too Many Requests` | A `RateLimit` middleware sees too many requests. The `Retry-After` header says how many seconds to wait. | Wait, then try again. See [Rate limiting](../security/rate-limiting.md). |
 | `422` | `{"_root":"The input has too many items (max 1000) or levels (max 10)"}` | Form or query keys with more than 1000 list items or 10 levels. | Send less nested data. |
-| `422` | `{"<field>":"<message>"}` | A DTO check failed. With the flag `laravelErrors` the body is `{"message":"...","errors":{"<field>":["..."]}}`. See [Core flags](app-config.md#core-flags). | See [Validation rules](../the-basic/validation-rules.md). |
+| `422` | `{"<field>":"<message>"}` | A DTO check failed. The [core flag](app-config.md#core-flags) `laravelErrors` changes the shape. | See [Validation rules](../the-basic/validation-rules.md). |
 | `431` | (no text) | Native server: request line plus headers over 16 KB. | Send smaller headers or cookies. |
-| `500` | `Server Error`, code `server_error`. When `APP_ENV` is `development` or `local`, the body is `<error>.toString()` as plain text. | Any error that is not an `IHttpException`. It also goes to the `report` method of the `ExceptionHandler`. | Look at the server log. |
+| `500` | `Server Error`, code `server_error`. In `development` or `local`, the body is the error text. | Any error that is not an HTTP exception. It also goes to `ExceptionHandler.report`. | Look at the server log. |
 
 ## dox_core: DTOs, storage and config
 
@@ -89,7 +87,7 @@ The table shows the `message` text.
 | `404` `file not found` | `Storage().stream()`, `download()`, `copy()`, `move()`, `getVisibility()`, `setVisibility()`, `size()` or `lastModified()` of a missing file. | Check the path. |
 | `Invalid argument (trustedProxies): not an ip or cidr: "<value>"` | A bad entry in `AppConfig.trustedProxies`. | Use an IP, a CIDR like `10.0.0.0/8`, or `*`. |
 | `Invalid argument (type): must be asc or desc: "<value>"` | `orderBy(column, type)` with another direction. | Use `asc` or `desc`. |
-| `400` `decrypt_failed`, `The encrypted value is not valid` | `AESEncryptor.decode` got changed text or a wrong key. It throws `DecryptException`. `req.cookie()` catches it and returns `null`. With the flag `decryptServerError` it is a `500` `server_error` and is reported. See [Core flags](app-config.md#core-flags). | Check the key. For a cookie, ask the user to log in again. |
+| `400` `decrypt_failed`, `The encrypted value is not valid` | `AESEncryptor.decode` got changed text or a wrong key. `req.cookie()` gives `null` instead. The [core flag](app-config.md#core-flags) `decryptServerError` makes it a reported `500`. | Check the key. For a cookie, ask the user to log in again. |
 
 ## dox_auth
 
@@ -111,8 +109,8 @@ The table shows the `message` text.
 | --- | --- | --- |
 | `Unsupported operation: dox_postgres_native did not load: <reason>. Dox needs it to talk to Postgres. Fix: ...` | The native Postgres library did not load. The app stops. | Follow the fix in the message. See [Postgres native](../database/postgres-native.md#when-the-library-does-not-load). |
 | `Unsupported operation: dox_mysql_native did not load: <reason>. Dox needs it to talk to MySQL. Fix: ...` | The native MySQL library did not load. The app stops. | Follow the fix in the message. See [MySQL native](../database/mysql-native.md#when-the-library-does-not-load). |
-| `PgServerException(<code>): <message>` | The Postgres server said no, eg. code `23505` for a unique violation. | Read `code`, `detail` and `constraint` on the exception. |
-| `MysqlException(<code>, <sqlState>): <message>` | An error from MySQL, eg. code `1062` for a duplicate key. | Read `code` and `sqlState` on the exception. |
+| `PgServerException(<code>): <message>` | The Postgres server refused the query, for example code `23505` for a unique violation. | Read `code`, `detail` and `constraint` on the exception. |
+| `MysqlException(<code>, <sqlState>): <message>` | An error from MySQL, for example code `1062` for a duplicate key. | Read `code` and `sqlState` on the exception. |
 | `Exception: <name> not found` | `DatabaseConfig.connection` (or `withConnection()`) names a connection that is not in `connections`. | Fix `DB_CONNECTION` or the map. |
 | `Exception: Invalid driver or not supported` | A `ConnectionConfig.driver` Dox can not open. | Use `Driver.postgres`, `Driver.mysql` or `Driver.sqlite`. |
 | `Invalid argument(s): dox_postgres_native: bad connection config` | The native driver can not read the connection values. | Check `host`, `port`, `user`, `database`. |
@@ -225,7 +223,7 @@ These stop `dart run build_runner build`.
 
 Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`.
 
-There is no fallback. When a library is missing, the app stops with the reason and the fix. `dox_http_native` stops at start. The database drivers stop when the ORM opens the database.
+When a library is missing, the app stops with the reason and the fix. `dox_http_native` stops at start. The database drivers stop when the ORM opens the database.
 
 | Text | When | What to do |
 | --- | --- | --- |
@@ -241,7 +239,7 @@ See [Native server](../digging-deeper/native-server.md).
 
 ## dox_socketio
 
-Printed to stderr. The connection or the request fails, the app keeps running.
+These are printed to stderr. The connection or the request fails, but the app keeps running.
 
 | Text | When | What to do |
 | --- | --- | --- |
@@ -255,7 +253,7 @@ Printed to stderr. The connection or the request fails, the app keeps running.
 | Text | When | What to do |
 | --- | --- | --- |
 | `Could not find a command. Run `dox help` for more information.` | `dox` with no command. | Run `dox help`. |
-| `Could not find a command named "<name>". Run `dox help` for more information.` | Unknown command. A second line tells you about the `dox: commands:` key. | Check the spelling. For a [package command](../digging-deeper/package-commands.md), run `dart pub get` after you add the package. |
+| `Could not find a command named "<name>". Run `dox help` for more information.` | Unknown command. | Check the spelling. For a [package command](../digging-deeper/package-commands.md), run `dart pub get` after you add the package. |
 | `More than one command is named "<name>", in: <packages>. ...` | Two commands (in two packages, or twice in one) have the same name. Exit code 1. | Remove one of these packages, or ask its author to rename the command. |
 | `Skip <package>: `dox: commands: <value>` must be a library of the package itself, like package:<package>/commands.dart.` | The `dox: commands:` value is not `package:<package>/<path>.dart`, or has `..`, quotes or other characters. The other packages still work. | Fix the value in that package's `pubspec.yaml`. |
 | `Skip <package>: `dox: commands:` must be a library, like package:<package>/commands.dart.` | The value is not a string (like a list). | Use one library. |

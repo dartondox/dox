@@ -4,13 +4,13 @@ icon: lucide/database
 
 # Step 2: Model and migration
 
-This step makes the `posts` table with a Dart migration and a `Post` model for it.
+In this step you make the `posts` table with a migration, and a `Post` model to read and write it.
 
 ## 1. Make the model and the migration
 
-Stop `dox s` first with `Ctrl+C`.
-`dox s` restarts the server when a new file appears, and the server runs new migrations at start.
-So it would run the new migration before you add the columns.
+Stop `dox s` first with `Ctrl+C`. You need to do this because `dox s` restarts the server when a new file appears, and the server runs new migrations at start. So it would run the new migration before you add the columns.
+
+Now make the model and its migration:
 
 ```bash
 dox make:model Post -m
@@ -24,11 +24,11 @@ This makes two files and updates one:
 | `db/migration/<date>_create_posts_table.dart` | the migration (new) |
 | `db/migration/migrations.dart` | the list of all Dart migrations. Dox writes it. Do not edit it. |
 
-The template already has `bin/migrate.dart`. The `dox migration:*` commands run it.
+The `dox migration:*` commands run `bin/migrate.dart`, which the template already has.
 
 ## 2. Add the columns to the migration
 
-Open the new file in `db/migration`. Add `title` and `body`:
+A new migration has no columns yet. Open the new file in `db/migration` and add `title` and `body`:
 
 ```dart title="db/migration/2026_10_22_205345_create_posts_table.dart"
 // ignore_for_file: file_names
@@ -52,10 +52,12 @@ class CreatePostsTable extends Migration {
 }
 ```
 
-- `table.id()` makes an auto increment primary key on every database.
-- `table.timestamps()` makes `created_at` and `updated_at`. The model fills them.
+- `table.id()` makes an auto increment primary key.
+- `table.timestamps()` makes `created_at` and `updated_at`. The model fills them for you.
 
 ## 3. Add the fields to the model
+
+The model needs one field for each column you added:
 
 ```dart title="lib/app/models/post/post.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -75,12 +77,11 @@ class Post extends PostGenerator {
 }
 ```
 
-Every column field is nullable. A new `Post()` has no values yet.
-`id`, `createdAt` and `updatedAt` come from `PostGenerator`. You do not declare them.
+Every column field is nullable, because a new `Post()` has no values yet. You do not declare `id`, `createdAt` and `updatedAt`, because they come from `PostGenerator`.
 
-## 4. Run the migrations on server start
+## 4. See how migrations run
 
-Nothing to change here. The template's `bin/server.dart` already runs the migrations before the server starts:
+You do not need to change anything here. The template's `bin/server.dart` already runs the migrations before the server starts:
 
 ```dart title="bin/server.dart"
 import '../db/migration/migrations.dart';
@@ -101,6 +102,8 @@ This also works in the native binary of [step 7](07-build-and-deploy.md).
 
 ## 5. Run the migration and the generator
 
+Run the new migration now:
+
 ```bash
 dox migration:run
 ```
@@ -111,11 +114,9 @@ Migrated: 2026_10_22_205345_create_posts_table
 ```
 
 !!! tip "The migration ran too early?"
-    If `dox s` was still running, the `posts` table may already exist without `title` and `body`.
-    Run `dox migration:rollback`, then `dox migration:run` again.
+    If `dox s` was still running, the `posts` table may already exist without `title` and `body`. Run `dox migration:rollback`, then `dox migration:run` again.
 
-The model needs its generated file `post.model.g.dart`.
-`dox s` makes it while it runs. If `dox s` is not running, run the generator once:
+The model also needs its generated file `post.model.g.dart`. `dox s` makes it while it runs. If `dox s` is not running, run the generator once:
 
 ```bash
 dart run build_runner build
@@ -123,9 +124,13 @@ dart run build_runner build
 
 ## Check it
 
+See which migrations ran:
+
 ```bash
 dox migration:status
 ```
+
+You should see:
 
 ```text
 Migration                                 Batch  Status

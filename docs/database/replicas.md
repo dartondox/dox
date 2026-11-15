@@ -4,16 +4,13 @@ icon: lucide/server
 
 # Read replicas
 
-A read replica is a copy of your database that only answers reads.
-Dox can send reads to replicas and writes to the main database.
-This spreads the load over more servers.
+A read replica is a copy of your database that only answers reads, and Dox can send reads to replicas and writes to the main database.
 
-Postgres and MySQL support it. SQLite does not.
+This spreads the load over more servers, which helps when your app reads much more than it writes. Postgres and MySQL support it. SQLite does not.
 
-## Set it up
+## Configuring replicas
 
-Add `read` to the `ConnectionConfig`.
-The `host` of the config is the write host.
+Add `read` to the `ConnectionConfig`. The `host` of the config is the write host:
 
 ```dart title="lib/config/database.dart"
 'postgres': ConnectionConfig(
@@ -31,53 +28,41 @@ The `host` of the config is the write host.
 ),
 ```
 
-Each map in `read` can change `host`, `port`, `user`, `password`, `database` and `extra`.
-The other settings are shared with the config.
+Each map in `read` can change `host`, `port`, `user`, `password`, `database` and `extra`. The other settings come from the config. Without `read`, nothing changes.
 
-To change the write host, add `write`. It has the same keys as one `read` map.
-Without `write`, the config itself is the write host.
+If the write host is not the host of the config, add `write`. It has the same keys as one `read` map:
 
 ```dart
 write: <String, dynamic>{'host': 'primary.db', 'port': 6432},
 ```
 
-Without `read`, nothing changes.
+## Where queries go
 
-## What goes where
+A plain `SELECT` goes to a read host. The read hosts take turns, in the order of the list. Everything else goes to the write host:
 
-The read hosts take turns, in the order of the list (round robin).
+- `INSERT`, `UPDATE` and `DELETE`
+- a raw query that is not a `SELECT`
+- schema changes and migrations
+- a `SELECT` with a lock (`lockForUpdate()`, `sharedLock()`) or with `INTO`
+- every query in a transaction
 
-| Goes to a read host | Goes to the write host |
-|---|---|
-| A plain `SELECT` | `INSERT`, `UPDATE` and `DELETE` |
-| | A raw query that is not a `SELECT` |
-| | Schema changes and migrations |
-| | A `SELECT` with a lock (`lockForUpdate()`, `sharedLock()`) or with `INTO` |
-| | Every query in a transaction |
+### Reading from the write host
 
-Use `onWriteConnection()` to read from the write host.
-Use it when a replica may be behind, or when a `SELECT` changes data.
+A replica may be a little behind, or a `SELECT` may change data. In these cases, use `onWriteConnection()` to read from the write host:
 
 ```dart
 User? user = await User().onWriteConnection().find(id);
 ```
 
-It also sends the queries of `preload()` to the write host.
-`insert()`, `create()` and `updateOrCreate()` read the new row back from the write host, so you always get it.
+It also sends the queries of `preload()` to the write host. You do not need it after `insert()`, `create()` and `updateOrCreate()`, because they always read the new row back from the write host.
 
 ## Sticky reads
 
-A replica can be a little behind the main database.
-A user saves a post, then the page loads, and the post is not there yet.
+A replica can be a little behind the main database. So a user saves a post, the next page loads, and the post is not there yet.
 
-`sticky: true` fixes this.
-After a write, the reads of the same request go to the write host.
-So a request reads what it just wrote.
-Other requests still read from the replicas.
+`sticky: true` fixes this. After a write, the reads of the same request go to the write host, so a request always reads what it just wrote. Other requests still read from the replicas.
 
-In a Dox app this works by itself.
-`dox_orm` adds the `stickyReads` middleware as a [global middleware](../the-basic/middleware.md) when a connection uses `sticky`.
-You change nothing.
+In a Dox app this works on its own. When a connection uses `sticky`, `dox_orm` adds the `stickyReads` middleware as a [global middleware](../the-basic/middleware.md).
 
 Outside a request, like in a job or a script, wrap the work in `stickyScope()`:
 
@@ -88,11 +73,8 @@ await ReplicaDriver.stickyScope(() async {
 });
 ```
 
-dox_orm prints a warning on stderr, once, when sticky cannot work: a read from a replica that follows a write, outside `stickyScope()`.
-In a Dox app every request runs inside a scope, so the warning only shows for scripts, jobs or startup code.
+If you forget it, `dox_orm` prints a warning on stderr, once, when a read from a replica follows a write outside `stickyScope()`.
 
-## With `DATABASE_URL`
+## Details
 
-When [`DATABASE_URL`](index.md#database_url) is set, the url is the write host.
-The `read` hosts and `sticky` stay.
-`write` is not used then.
+- When [`DATABASE_URL`](index.md#database_url) is set, the url is the write host. The `read` hosts and `sticky` stay, and `write` is not used.

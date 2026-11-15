@@ -6,13 +6,15 @@ icon: lucide/octagon-alert
 
 Give your app its own exception classes, send every error in one JSON shape, and log the unexpected ones.
 
+A client is easier to write when every error has the same shape. You also want to know when something breaks on the server, without showing the details to the client.
+
 ## What you need
 
 - A Dox app.
 
 ## How Dox handles an error
 
-When a controller or a middleware throws:
+First, see what Dox does when a controller or a middleware throws:
 
 | Error | Status | What Dox does |
 | --- | --- | --- |
@@ -20,14 +22,13 @@ When a controller or a middleware throws:
 | a validation error (bad DTO input) | `422` | sends the field errors: `{"field": "message"}`. Does not call `report` |
 | any other `Exception` or `Error` | `500` | sends `{"code":"server_error","message":"Server Error"}`. When `APP_ENV` is `development` or `local`, it sends the error text. Calls `report` |
 
-`report` is a method of the [exception handler](../the-basic/errors.md). The response goes through the `responseHandler` of `AppConfig` last. This guide sets the shape there.
+`report` is a method of the [exception handler](../the-basic/errors.md). Every response goes through the `responseHandler` of `AppConfig` last, so this guide sets the error shape there.
 
 ## 1. Write your own exceptions
 
 For a quick error, use `abort(403)` or `abort(409, 'The email is taken')`. See [HTTP exceptions](../reference/http-exceptions.md#any-status-abort-and-httpstatusexception).
-For errors you throw in many places, write a class.
 
-Extend `IHttpException`. Set `code` (the HTTP status), `errorCode` (a short text for the client) and `message`.
+If you throw the same error in many places, write a class for it. Extend `IHttpException`, and set `code` (the HTTP status), `errorCode` (a short text for the client) and `message`:
 
 ```dart title="lib/app/exceptions/app_exception.dart"
 import 'dart:io';
@@ -80,8 +81,7 @@ class UserController {
 
 ## 2. One JSON shape for every error
 
-The response handler sees every response before it is sent. For an error, the content is the exception object.
-Turn it into your shape here.
+The response handler sees every response before it is sent. For an error, the content is the exception object, so you can turn it into your shape here:
 
 ```dart title="lib/app/http/response_handler.dart"
 import 'dart:io';
@@ -132,12 +132,11 @@ class ResponseHandler extends ResponseHandlerInterface {
 }
 ```
 
-The last `if` gives a `500` your shape too, in every environment.
-Without it, the client gets the default body. When `APP_ENV` is `development` or `local`, that is the error text. It can show a SQL query or a file path.
+The last `if` gives a `500` your shape too, in every environment. Without it, the client gets the default body, which in `development` or `local` is the error text. That text can show a SQL query or a file path.
 
 ## 3. Log unexpected errors
 
-The `report` method of the exception handler runs for every `500`, and for errors outside a request (a future nobody awaited, a timer).
+You want to know about unexpected errors, so log them. The `report` method of the exception handler runs for every `500`, and for errors outside a request, like a future nobody awaited or a timer:
 
 ```dart title="lib/app/error_handler.dart"
 import 'dart:convert';
@@ -166,6 +165,8 @@ class AppExceptionHandler extends ExceptionHandler {
 ```
 
 ## 4. Register both
+
+Add both handlers to `AppConfig`:
 
 ```dart title="lib/config/app.dart"
 import 'package:my_app/app/error_handler.dart';
@@ -203,8 +204,7 @@ After `GET /api/boom`, the server prints one line:
 Remove the `/boom` route when you are done.
 
 !!! note "A URL with no route"
-    A URL that matches no route is a `NotFoundHttpException` with the message `GET /nothing not found`.
-    It goes through the response handler too, so it gets the same JSON shape:
+    A URL that matches no route is a `NotFoundHttpException`. It goes through the response handler too, so it gets the same JSON shape:
     `{"error":{"code":"not_found","message":"GET /nothing not found"}}`.
 
 ## See also

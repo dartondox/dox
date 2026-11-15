@@ -10,6 +10,8 @@ Dox needs **Dart 3.13** or newer.
 
 ## Install the CLI
 
+The `dox` CLI makes projects, runs the server and makes files for you. Install it with pub:
+
 ```bash
 dart pub global activate dox
 ```
@@ -21,7 +23,7 @@ dox version
 ```
 
 !!! warning "`dox: command not found`"
-    The shell can not find the CLI when the pub `bin` folder is not in your `PATH`.
+    The shell can not find the CLI, because the pub `bin` folder is not in your `PATH`.
     Add this line to `~/.bashrc` or `~/.zshrc`, then open a new terminal:
 
     ```bash
@@ -30,29 +32,25 @@ dox version
 
 ## Create a new project
 
+Use `dox create` with the name of your app:
+
 ```bash
 dox create new_blog
 ```
 
-`dox create` downloads the newest release of
-[dox-sample](https://github.com/dartondox/dox-sample), the starter project.
-To get one exact release, add `--version` with a release tag of dox-sample.
+It downloads the newest release of [dox-sample](https://github.com/dartondox/dox-sample), the starter project. To get one exact release, add `--version` with a release tag of dox-sample.
 
-It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`.
-Then get the packages:
+It also makes your `.env` file from `.env.example`, with a new random `APP_KEY`. Then get the packages:
 
 ```bash
 cd new_blog
 dart pub get
 ```
 
-The starter project uses SQLite, so there is no database to install.
-The file `db/dox.sqlite` is created at the first start.
-To use Postgres or MySQL instead, change `DB_CONNECTION` and the `DB_*`
-values in `.env`. See [Database](../database/index.md).
+The starter project uses SQLite, so there is no database to install. The file `db/dox.sqlite` is created at the first start. To use Postgres or MySQL instead, change `DB_CONNECTION` and the `DB_*` values in `.env`. See [Database](../database/index.md).
 
 !!! info "Add Dox to an existing Dart project"
-    Add the packages you need with `dart pub add`:
+    If you already have a Dart project, add the packages you need with `dart pub add`:
 
     ```bash
     dart pub add dox_core dox_orm dox_migration
@@ -61,22 +59,18 @@ values in `.env`. See [Database](../database/index.md).
 
 ## Start the server
 
+Start the server in dev mode:
+
 ```bash
 dox s
 ```
 
 `dox s` does two things:
 
-- It runs `dart run bin/server.dart`. When you change a file in `lib/app/`, it hot reloads the new code. No restart is needed. For routes, providers, config and other start-up code, it restarts the server.
+- It runs `dart run bin/server.dart`. When you change a file in `lib/app/`, it hot reloads the new code, so no restart is needed. For routes, providers, config and other start-up code, it restarts the server.
 - It runs `dart run build_runner watch`, so generated files stay up to date.
 
-To skip the builder, use `dox s --ignore-build-runner`.
-To turn hot reload off, use `dox s --no-reload`.
-To start the server without the CLI, run `dart run bin/server.dart`.
-
-At each start it also runs the new migrations in `db/migration`.
-The server uses the port in `APP_PORT` in the `.env` file (`3000` by default).
-Check it:
+At each start it also runs the new migrations in `db/migration`. The server uses the port in `APP_PORT` in the `.env` file (`3000` by default). Check that it works:
 
 ```bash
 curl localhost:3000/ping
@@ -86,17 +80,24 @@ curl localhost:3000/ping
 pong
 ```
 
+These options change `dox s`:
+
+- `dox s --ignore-build-runner` skips the builder.
+- `dox s --no-reload` turns hot reload off.
+
+To start the server without the CLI, run `dart run bin/server.dart`.
+
 ## Start the server with Docker
+
+The starter project has a Docker setup. This starts the app, a queue worker and a Postgres database:
 
 ```bash
 docker compose up -d --build
 ```
 
-This starts the app, a queue worker and a Postgres database.
-The app and the worker always use the Postgres service. They set `DB_CONNECTION` and `DB_NAME` themselves.
-The database port is open on this machine only (`127.0.0.1`), not on the network.
-To start only the database and run the app with `dox s`, use `docker compose up -d postgres`.
-Then set `DB_CONNECTION=postgres` and `DB_NAME=dox` in `.env`.
+The app and the worker always use the Postgres service. They set `DB_CONNECTION` and `DB_NAME` themselves. The database port is open on this machine only (`127.0.0.1`), not on the network.
+
+If you want only the database in Docker, and the app with `dox s`, run `docker compose up -d postgres`. Then set `DB_CONNECTION=postgres` and `DB_NAME=dox` in `.env`.
 
 !!! tip "Production"
     Do not use `dox s` or `dart run` in production.
@@ -104,8 +105,7 @@ Then set `DB_CONNECTION=postgres` and `DB_NAME=dox` in `.env`.
 
 ## Run the code generator
 
-Dox makes code for models and DTOs with `build_runner`.
-`dox s` already runs it. To run it alone:
+Dox makes code for models and DTOs with `build_runner`. `dox s` already runs it. To run it alone:
 
 ```bash
 dox build_runner:watch   # runs again on every file change
@@ -114,23 +114,21 @@ dox build_runner:build   # runs once
 
 ## AI agents
 
-The Dox packages ship skills for AI coding agents.
-A skill tells the agent how to use the real API of a package.
-Install them in your app, after `dart pub get`:
+If you use an AI coding agent, it should know the real API of each package. The Dox packages ship skills for this. Install them in your app, after `dart pub get`:
 
 ```bash
 dart run skills@ get
 ```
 
-It finds the skills of your dependencies and installs them for your agent.
-It works with Claude Code, Codex, Cursor, GitHub Copilot and others.
-Run it again after you add a package or update one.
-It only reads the packages listed in your own `pubspec.yaml`. To get the skill of a package that comes in through another one (like `ioredis`), add it to `pubspec.yaml`.
-See [skills](https://pub.dev/packages/skills) for the options.
+It finds the skills of your dependencies and installs them for your agent. It works with Claude Code, Codex, Cursor, GitHub Copilot and others. Run it again after you add a package or update one.
+
+It only reads the packages listed in your own `pubspec.yaml`. To get the skill of a package that comes in through another one (like `ioredis`), add it to `pubspec.yaml`. See [skills](https://pub.dev/packages/skills) for the options.
 
 The starter project also has an `AGENTS.md` file with the rules of the project.
 
 ## Packages
+
+Dox is split into packages, so you add only what you need:
 
 | Package | What it does |
 | --- | --- |
