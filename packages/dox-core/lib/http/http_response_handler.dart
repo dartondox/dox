@@ -87,7 +87,7 @@ void _guardActiveFile(HttpResponse res, ContentType type) {
 Uint8List utf8Bytes(String text) {
   int length = text.length;
   for (int i = 0; i < length; i++) {
-    if (text.codeUnitAt(i) > 0x7F) return utf8.encode(text) as Uint8List;
+    if (text.codeUnitAt(i) > 0x7F) return utf8.encode(text);
   }
   Uint8List out = Uint8List(length);
   for (int i = 0; i < length; i++) {
