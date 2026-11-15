@@ -1,6 +1,7 @@
 import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/isolate/compute_pool.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
 import 'package:dox_core/middleware/rate_limit_counter.dart';
 import 'package:dox_core/server/dox_server.dart';
@@ -22,6 +23,7 @@ void isolateHandler(IsolateSpawnParameter param) async {
   /// RateLimit counts live in the main isolate
   RateLimitCounter.instance.connect(param.rateLimitPort);
   IsolateBus.instance.connect(param.busPort, param.isolateId);
+  ComputePool.instance.connect(param.computePort);
   Dox().initialize(appConfig);
   Dox().addProviders(providers);
 

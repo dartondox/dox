@@ -4,10 +4,12 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_static_handler.dart';
+import 'package:dox_core/isolate/compute_pool.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/log_buffer.dart';
+import 'package:dox_core/utils/strict_mode.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 IocContainer _ioc = IocContainer();
@@ -95,6 +97,8 @@ class Dox {
   void initialize(AppConfig appConfig) async {
     config = appConfig;
     _initialized = true;
+    ComputePool.instance.size = appConfig.computeWorkers;
+    StrictMode.configure(appConfig.strict);
     if (appConfig.flags.envExpand && !Env().expanded) {
       Logger.warn(
         'CoreFlags.envExpand is on, but .env was read without it. Set '
@@ -107,6 +111,32 @@ class Dox {
     _dtos = null;
     ioc.clear();
     appConfig.container?.call(ioc);
+  }
+
+  /// Run [task] on a worker isolate and give its result, so the server
+  /// can answer other requests while it runs. Use it for heavy CPU work:
+  /// a PDF, an image, a big JSON file. Tasks run on a small pool of
+  /// workers (`AppConfig.computeWorkers`). More tasks wait in line, first
+  /// come first served. An error of the task is thrown here, with its
+  /// stack trace.
+  ///
+  /// [task] runs in another isolate. It can only use values that can be
+  /// sent between isolates: numbers, strings, lists, maps, plain objects.
+  /// It can not use the state of the app: the IoC container, a database
+  /// pool, a cache store or an open socket are not there. Read what it
+  /// needs first, and pass it in. A closure also holds the other
+  /// variables of the function it is made in. When one of them can not
+  /// be sent (like a database connection), the task fails with an
+  /// [ArgumentError]. Make the task in a small top-level or static
+  /// function to be safe.
+  ///
+  /// It works without a server too (a command, a test, a queue job).
+  /// Inside a worker, a nested `compute` runs the task in that same worker.
+  /// ```
+  /// List<int> pdf = await Dox().compute(() => buildPdf(order.toJson()));
+  /// ```
+  Future<R> compute<R>(FutureOr<R> Function() task) {
+    return ComputePool.instance.run(task);
   }
 
   /// override total isolate from config
@@ -218,6 +248,8 @@ class Dox {
       // close the bus again: `killAll` closes it while the providers of the
       // main isolate still shut down, and one of them may join it again.
       IsolateBus.instance.close();
+      // last: the other isolates may use it until they are done
+      ComputePool.instance.close();
     } finally {
       LogBuffer.flush();
     }
@@ -250,6 +282,11 @@ class Dox {
     }
     // after the providers too: they may still publish
     if (isolateId != 1) IsolateBus.instance.close();
+    // the main isolate owns the pool. it closes it in [stop], once the
+    // other isolates are done, or here when there are none.
+    if (isolateId != 1 || DoxIsolate().isolates.isEmpty) {
+      ComputePool.instance.close();
+    }
   }
 
   /// the real address of [server], like `http://127.0.0.1:3000` or

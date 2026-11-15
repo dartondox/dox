@@ -160,6 +160,28 @@ class AppConfig {
   /// See [CoreFlags].
   final CoreFlags flags;
 
+  /// The number of worker isolates of `Dox().compute` (and
+  /// `Hash.makeAsync` / `Hash.verifyAsync`). One pool for the whole
+  /// process, shared by every server isolate. The workers start on the
+  /// first task. More tasks than workers wait in line. Default
+  /// [defaultComputeWorkers]. Must be 1 or more.
+  /// ```
+  /// computeWorkers: 8,
+  /// ```
+  final int computeWorkers;
+
+  /// The default of [computeWorkers]: 4. Enough for a few password
+  /// hashes at the same time, small enough for a small server. More
+  /// workers than CPU cores do not make CPU work faster.
+  static const int defaultComputeWorkers = 4;
+
+  /// Warnings for code that blocks the server, for development. Off by
+  /// default. See [StrictConfig].
+  /// ```
+  /// strict: StrictConfig(enabled: Env.appEnv == 'development'),
+  /// ```
+  final StrictConfig strict;
+
   AppConfig({
     required this.appKey,
     this.previousKeys = const <String>[],
@@ -197,6 +219,8 @@ class AppConfig {
     this.shutdownTimeout = const Duration(seconds: 8),
     this.webSocketAllowedOrigins,
     this.flags = const CoreFlags(),
+    this.computeWorkers = defaultComputeWorkers,
+    this.strict = const StrictConfig(),
     this.htmlErrors = false,
     this.errorPage = defaultErrorPage,
   }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
@@ -224,6 +248,41 @@ class CORSConfig {
     this.credentials,
     this.maxAge,
   });
+}
+
+/// Strict mode: warnings for code that blocks the server. Use it in
+/// development. Dart runs one thing at a time in an isolate, so a slow
+/// sync call (bcrypt, a PDF, an image) makes every other request on that
+/// isolate wait. When on, Dox writes a `[strict]` warning to stderr when:
+///
+/// - the sync part of the middleware and controller of a route takes
+///   longer than [blockLimit] (once per route),
+/// - the event loop was blocked longer than that, also after an `await`
+///   (at most once in 10 seconds),
+/// - `Hash.make`, `Hash.verify` or `Hash.check` runs in the web server
+///   (once per place in the code). Use `Hash.makeAsync` or
+///   `Hash.verifyAsync` there.
+///
+/// Off, it costs one bool check per request.
+/// ```
+/// AppConfig(appKey: key, strict: const StrictConfig(enabled: true));
+/// ```
+class StrictConfig {
+  const StrictConfig({
+    this.enabled = false,
+    this.blockLimit = defaultBlockLimit,
+  });
+
+  /// Turn the warnings on. Off by default.
+  final bool enabled;
+
+  /// Warn when code blocks the isolate longer than this. Default
+  /// [defaultBlockLimit] (50 ms). The event loop check does not run more
+  /// often than every 10 ms, so a smaller limit does not make it faster.
+  final Duration blockLimit;
+
+  /// The default of [blockLimit]: 50 ms.
+  static const Duration defaultBlockLimit = Duration(milliseconds: 50);
 }
 
 class LoggerConfig {

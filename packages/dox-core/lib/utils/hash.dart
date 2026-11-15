@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:isolate';
 
 import 'package:bcrypt/bcrypt.dart';
 import 'package:crypto/crypto.dart' as crypto;
+import 'package:dox_core/isolate/compute_pool.dart';
+import 'package:dox_core/utils/strict_mode.dart';
 
 class Hash {
   /// bcrypt cost (log rounds) for new hashes. Default: 10.
@@ -25,6 +26,9 @@ class Hash {
   /// Hash.make('secret', rounds: 12);
   /// ```
   static String make(String password, {int? rounds}) {
+    if (StrictMode.enabled) {
+      StrictMode.checkSyncHash('Hash.make', 'Hash.makeAsync');
+    }
     _checkLength(password);
     int cost = rounds ?? Hash.rounds;
     return BCrypt.hashpw(password, BCrypt.gensalt(logRounds: cost));
@@ -36,6 +40,13 @@ class Hash {
   /// Hash.verify('secret', '<hashedString>');
   /// ```
   static bool verify(String password, String hashedPassword) {
+    if (StrictMode.enabled) {
+      StrictMode.checkSyncHash('Hash.verify', 'Hash.verifyAsync');
+    }
+    return _verify(password, hashedPassword);
+  }
+
+  static bool _verify(String password, String hashedPassword) {
     try {
       return BCrypt.checkpw(password, hashedPassword);
     } catch (_) {
@@ -48,29 +59,34 @@ class Hash {
   /// Hash.check('secret', '<hashedString>');
   /// ```
   static bool check(String password, String hashedPassword) {
-    return verify(password, hashedPassword);
+    if (StrictMode.enabled) {
+      StrictMode.checkSyncHash('Hash.check', 'Hash.verifyAsync');
+    }
+    return _verify(password, hashedPassword);
   }
 
-  /// same as [make], but runs bcrypt in a new isolate,
-  /// so the server can answer other requests in the meantime.
+  /// same as [make], but runs bcrypt on a worker isolate of
+  /// `Dox().compute`, so the server can answer other requests in the
+  /// meantime. Use it in the web server. It works without a server too.
   /// ```
   /// String hash = await Hash.makeAsync('secret');
   /// ```
   static Future<String> makeAsync(String password, {int? rounds}) async {
     _checkLength(password);
     int cost = rounds ?? Hash.rounds;
-    return Isolate.run(() {
+    return ComputePool.instance.run(() {
       return BCrypt.hashpw(password, BCrypt.gensalt(logRounds: cost));
     });
   }
 
-  /// same as [verify], but runs bcrypt in a new isolate,
-  /// so the server can answer other requests in the meantime.
+  /// same as [verify], but runs bcrypt on a worker isolate of
+  /// `Dox().compute`, so the server can answer other requests in the
+  /// meantime. Use it in the web server. It works without a server too.
   /// ```
   /// bool ok = await Hash.verifyAsync('secret', '<hashedString>');
   /// ```
   static Future<bool> verifyAsync(String password, String hashedPassword) {
-    return Isolate.run(() => verify(password, hashedPassword));
+    return ComputePool.instance.run(() => _verify(password, hashedPassword));
   }
 
   /// true when [a] and [b] are the same. It takes the same time for

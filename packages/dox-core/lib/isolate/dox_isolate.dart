@@ -3,6 +3,7 @@ import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_static_handler.dart';
+import 'package:dox_core/isolate/compute_pool.dart';
 import 'package:dox_core/isolate/isolate_handler.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
 import 'package:dox_core/middleware/rate_limit_counter.dart';
@@ -142,6 +143,7 @@ class DoxIsolate {
         control: controlPort.sendPort,
         rateLimitPort: RateLimitCounter.instance.port,
         busPort: IsolateBus.instance.port,
+        computePort: ComputePool.instance.port,
         isolateCount: Dox().isolateCount,
         envExpand: Env().expanded,
       ),
