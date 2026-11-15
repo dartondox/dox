@@ -27,6 +27,10 @@ class IsolateSpawnParameter {
   /// see `RateLimitCounter`
   final SendPort? rateLimitPort;
 
+  /// the port of the main isolate that keeps the sessions of a `memory`
+  /// cache store, see `SessionMemoryStore`
+  final SendPort? sessionPort;
+
   /// the hub of the main isolate, see `IsolateBus`
   final SendPort? busPort;
 
@@ -51,6 +55,7 @@ class IsolateSpawnParameter {
     this.bindings = const <String, RouteBinding>{},
     this.control,
     this.rateLimitPort,
+    this.sessionPort,
     this.busPort,
     this.computePort,
     this.isolateCount = 1,

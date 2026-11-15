@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import 'package:dox_core/isolate/port_calls.dart';
+
 /// Rate limit counts shared by all isolates of the app.
 ///
 /// The main isolate owns the counts. The other isolates send each
@@ -21,16 +23,29 @@ class RateLimitCounter {
   /// made in this isolate, so a request never hangs (eg. during shutdown).
   static const Duration timeout = Duration(seconds: 5);
 
-  /// key => count, only used in the isolate that owns the counts
+  /// The most keys the counter keeps. One key is about 150 bytes, so
+  /// this is about 15 MB. Without a cap, a client that sends from many
+  /// ips (an IPv6 /64 has 2^64) could grow the map with no end.
+  static const int defaultMaxKeys = 100000;
+
+  /// see [defaultMaxKeys]; null is no cap. Only changed in tests.
+  int? maxKeys = defaultMaxKeys;
+
+  /// key => count, only used in the isolate that owns the counts.
+  /// A Dart map keeps insert order, so the first key is the oldest.
   final Map<String, _Count> _counts = <String, _Count>{};
   int _nextSweep = 0;
   ReceivePort? _server;
 
   /// the owner of the counts, null in the owner itself
   SendPort? _owner;
-  ReceivePort? _replies;
-  int _nextId = 0;
-  final Map<int, Completer<List<int>>> _waiting = <int, Completer<List<int>>>{};
+  final PortCalls _calls = PortCalls(timeout);
+
+  /// number of keys kept now, for tests
+  int get length => _counts.length;
+
+  /// the calls to the owner, for tests
+  PortCalls get calls => _calls;
 
   /// The port other isolates send their increments to. Opened on the
   /// first call, in the isolate that owns the counts (the main isolate).
@@ -64,46 +79,35 @@ class RateLimitCounter {
     return (counts[0], counts[1]);
   }
 
-  Future<List<int>> _send(String key, int ttlMs, String? other) {
+  Future<List<int>> _send(String key, int ttlMs, String? other) async {
     SendPort? owner = _owner;
-    if (owner == null) return Future<List<int>>.value(_run(key, ttlMs, other));
-
-    ReceivePort replies = _replies ??= ReceivePort()..listen(_onReply);
-    int id = _nextId++;
-    Completer<List<int>> done = Completer<List<int>>();
-    _waiting[id] = done;
-    owner.send(<Object?>[replies.sendPort, id, key, ttlMs, other]);
-    return done.future.timeout(
-      timeout,
-      onTimeout: () {
-        _waiting.remove(id);
-        return _run(key, ttlMs, other);
-      },
-    );
+    if (owner == null) return _run(key, ttlMs, other);
+    try {
+      return await _calls.send(owner, <Object?>[key, ttlMs, other])
+          as List<int>;
+    } on Object {
+      // no answer in time (eg. during shutdown): count here, so a
+      // request never hangs
+      return _run(key, ttlMs, other);
+    }
   }
 
   /// close the ports and forget all counts
   void close() {
     _server?.close();
     _server = null;
-    _replies?.close();
-    _replies = null;
+    _calls.close();
     _owner = null;
-    _waiting.clear();
     _counts.clear();
     _nextSweep = 0;
   }
 
   void _serve(dynamic message) {
-    List<Object?> m = message as List<Object?>;
-    SendPort reply = m[0] as SendPort;
-    List<int> counts = _run(m[2] as String, m[3] as int, m[4] as String?);
-    reply.send(<Object>[m[1] as int, counts]);
+    PortCalls.answer(message, _runMessage);
   }
 
-  void _onReply(dynamic message) {
-    List<Object> m = message as List<Object>;
-    _waiting.remove(m[0] as int)?.complete(m[1] as List<int>);
+  List<int> _runMessage(List<Object?> m) {
+    return _run(m[0] as String, m[1] as int, m[2] as String?);
   }
 
   /// the new count of [key], then the count of [other] when given
@@ -118,17 +122,44 @@ class RateLimitCounter {
 
   int _increment(String key, int ttlMs) {
     int now = DateTime.now().millisecondsSinceEpoch;
-    // drop old keys at most once a second, so the map does not grow
-    if (now >= _nextSweep) {
-      _counts.removeWhere((String _, _Count c) => c.expiresAt <= now);
-      _nextSweep = now + 1000;
-    }
+    // drop old keys at most once a second, so the map does not grow.
+    // ponytail: a full scan, at most [maxKeys] keys (about 1 ms) once a
+    // second. Keep keys per ttl in order if this ever shows up.
+    if (now >= _nextSweep) _sweep(now);
     _Count? count = _counts[key];
     if (count == null || count.expiresAt <= now) {
+      int? limit = maxKeys;
+      if (count == null && limit != null && _counts.length >= limit) {
+        _makeRoom(now, limit);
+      }
       count = _Count(now + ttlMs);
+      // remove first, so a key of a new window moves to the end (newest)
+      _counts.remove(key);
       _counts[key] = count;
     }
     return ++count.hits;
+  }
+
+  void _sweep(int now) {
+    _counts.removeWhere((String _, _Count c) => c.expiresAt <= now);
+    _nextSweep = now + 1000;
+  }
+
+  /// The map is full. Drop the expired keys. When that frees less than
+  /// a tenth of the map, drop the oldest keys until a tenth is free. So
+  /// this full scan runs at most once per [limit] / 10 new keys.
+  ///
+  /// Dropping the oldest keys gives those clients a fresh count. That
+  /// is safer than turning new clients away: a client with many ips
+  /// can fill the map, and then it would lock out every new user.
+  void _makeRoom(int now, int limit) {
+    _sweep(now);
+    int drop = _counts.length - (limit - limit ~/ 10 - 1);
+    if (drop <= 0) return;
+    List<String> oldest = _counts.keys.take(drop).toList();
+    for (String key in oldest) {
+      _counts.remove(key);
+    }
   }
 }
 

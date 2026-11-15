@@ -73,6 +73,10 @@ class FlagsRouter extends Router {
       (DoxRequest req) => throw const FormatException('<b>x</b>'),
     );
     Route.get('session-all', (DoxRequest req) => req.session.all());
+    Route.get('limited-v6', <dynamic>[
+      RateLimit(max: 1, name: 'flags-v6'),
+      (DoxRequest req) => 'ok',
+    ]);
     Route.get('regenerate', (DoxRequest req) {
       String before = req.session.token;
       req.session.regenerate();
@@ -129,6 +133,7 @@ void coreFlagTests(CoreFlags flags) {
         routers: <Router>[FlagsRouter(), HeaderRouter()],
         exceptionHandler: handler,
         flags: flags,
+        trustedProxies: <String>['127.0.0.1', '::1'],
         cache: const CacheConfig(
           defaultStore: 'a',
           stores: <String, Map<String, dynamic>>{
@@ -354,5 +359,27 @@ void coreFlagTests(CoreFlags flags) {
 
   test('a HealthCheck cache check uses its store in both modes', () async {
     expect(await HealthCheck.cache('b')(), isTrue);
+  });
+
+  test('rateLimitIpv6Prefix: two ips of one /64', () async {
+    Future<int> from(String ip) async {
+      TestResponse res = await client.get(
+        '/limited-v6',
+        headers: <String, String>{'x-forwarded-for': ip},
+      );
+      return res.status;
+    }
+
+    expect(await from('2001:db8:1:2::1'), 200);
+    expect(
+      await from('2001:db8:1:2::2'),
+      flags.rateLimitIpv6Prefix ? 429 : 200,
+    );
+    // another /64 has its own count
+    expect(await from('2001:db8:1:3::1'), 200);
+    // a mapped address and its IPv4 share one count in both modes
+    // (`req.ip()` gives the IPv4 form)
+    expect(await from('9.9.9.9'), 200);
+    expect(await from('::ffff:9.9.9.9'), 429);
   });
 }

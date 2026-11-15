@@ -8,6 +8,7 @@ import 'package:dox_core/isolate/isolate_handler.dart';
 import 'package:dox_core/isolate/isolate_interfaces.dart';
 import 'package:dox_core/middleware/rate_limit_counter.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_core/session/session_memory_store.dart';
 
 class DoxIsolate {
   /// singleton
@@ -93,6 +94,7 @@ class DoxIsolate {
     _receivePorts.clear();
     _sendPorts.clear();
     RateLimitCounter.instance.close();
+    SessionMemoryStore.instance.close();
     IsolateBus.instance.close();
   }
 
@@ -142,6 +144,7 @@ class DoxIsolate {
         bindings: Route().bindings,
         control: controlPort.sendPort,
         rateLimitPort: RateLimitCounter.instance.port,
+        sessionPort: SessionMemoryStore.instance.port,
         busPort: IsolateBus.instance.port,
         computePort: ComputePool.instance.port,
         isolateCount: Dox().isolateCount,

@@ -38,6 +38,8 @@ A store uses one driver. The driver decides where the data is kept:
 
 Dox runs one isolate per CPU core, and each isolate has its own `memory` store. So a value you put in one isolate is missing in the others. If all isolates and servers must see the same data, use `redis` or `database`.
 
+Sessions on a `memory` store are the exception. They live in the main isolate, so every isolate sees them. See [Session](../the-basic/session.md).
+
 ### Adding a Redis store
 
 To add a store, edit `lib/config/cache.dart`. This example adds a `redis` store:
