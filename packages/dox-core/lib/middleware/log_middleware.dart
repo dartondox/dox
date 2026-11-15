@@ -80,7 +80,7 @@ class LogMiddleware implements IDoxMiddleware {
     // the logger config decides if the line is written, and how
     String status = '${text.remove('status') ?? 'info'}';
     String message = '${text.remove('message') ?? ''}';
-    Logger.log(status, message, text);
+    Logger.log(status, message, text, 'request');
     return req;
   }
 

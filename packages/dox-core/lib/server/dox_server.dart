@@ -68,7 +68,8 @@ class DoxServer {
       () {
         server.listen(
           httpRequestHandler,
-          onError: onError ?? (dynamic error) => stderr.writeln(error),
+          onError:
+              onError ?? (dynamic error) => stderr.writeln('[server] $error'),
         );
       },
       (Object error, StackTrace stackTrace) {

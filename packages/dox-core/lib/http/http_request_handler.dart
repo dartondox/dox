@@ -337,7 +337,7 @@ Future<void> _terminate(
       try {
         handler.report(error, stackTrace);
       } catch (_) {
-        Logger.danger('terminate failed: $error\n$stackTrace');
+        Logger.danger('terminate failed: $error\n$stackTrace', null, 'error');
       }
     }
   }

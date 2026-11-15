@@ -70,7 +70,11 @@ class AfterResponse {
       try {
         Dox().config.exceptionHandler.report(error, stackTrace);
       } catch (_) {
-        Logger.danger('after response work failed: $error\n$stackTrace');
+        Logger.danger(
+          'after response work failed: $error\n$stackTrace',
+          null,
+          'error',
+        );
       }
     }
   }

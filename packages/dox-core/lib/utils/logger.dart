@@ -26,19 +26,26 @@ class Logger {
     return (_ranks[level.toLowerCase()] ?? 3) >= min;
   }
 
-  static void log(String level, dynamic message, [dynamic data]) {
+  /// [tag] names where the line comes from, like `request` or `server`.
+  /// No tag gives `app`. It is the third positional argument, because
+  /// Dart does not allow a named argument next to the optional [data].
+  /// ```
+  /// Logger.info('done', null, 'billing');
+  /// ```
+  static void log(String level, dynamic message, [dynamic data, String? tag]) {
+    tag ??= 'app';
     // `INFO` from a filter ranks as `info`
     level = level.toLowerCase();
     LoggerConfig config = Dox().config.logger;
     if (!config.enabled || !shouldLog(level, config.level)) return;
     String line;
     try {
-      line = _build(config, level, message, data);
+      line = _build(config, level, message, data, tag);
     } catch (_) {
       // data that can not become JSON must not break the caller (eg. a
       // request). Log its text instead.
       try {
-        line = _build(config, level, message, data?.toString());
+        line = _build(config, level, message, data?.toString(), tag);
       } catch (_) {
         return;
       }
@@ -51,32 +58,32 @@ class Logger {
   /// ```
   /// Logger.info('using dox is fun');
   /// ```
-  static void info(dynamic message, [dynamic data]) {
-    log('info', message, data);
+  static void info(dynamic message, [dynamic data, String? tag]) {
+    log('info', message, data, tag);
   }
 
   /// log the text using warn color (yellow)
   /// ```
   /// Logger.warn('careful!');
   ///
-  static void warn(dynamic message, [dynamic data]) {
-    log('warn', message, data);
+  static void warn(dynamic message, [dynamic data, String? tag]) {
+    log('warn', message, data, tag);
   }
 
   /// log the text using success color (green)
   /// ```
   /// Logger.success('success');
   ///
-  static void success(dynamic message, [dynamic data]) {
-    log('success', message, data);
+  static void success(dynamic message, [dynamic data, String? tag]) {
+    log('success', message, data, tag);
   }
 
   /// log the text using danger color (red)
   /// ```
   /// Logger.danger('failed');
   ///
-  static void danger(dynamic message, [dynamic data]) {
-    log('danger', message, data);
+  static void danger(dynamic message, [dynamic data, String? tag]) {
+    log('danger', message, data, tag);
   }
 
   static String _build(
@@ -84,14 +91,20 @@ class Logger {
     String level,
     dynamic message,
     dynamic data,
+    String tag,
   ) {
     return config.prettyPrint
-        ? _prettyLog(level, message, data)
-        : _log(config, level, message, data);
+        ? _prettyLog(level, message, data, tag)
+        : _log(config, level, message, data, tag);
   }
 
-  /// the colored text line
-  static String _prettyLog(String level, dynamic message, dynamic data) {
+  /// the colored text line, after a dim `[tag]`
+  static String _prettyLog(
+    String level,
+    dynamic message,
+    dynamic data,
+    String tag,
+  ) {
     String? payload = '';
     if (data == null || data is String) {
       payload = data;
@@ -111,10 +124,11 @@ class Logger {
     };
     // an unknown level gets the default color
     String color = colors[level] ?? '0';
+    String prefix = '\x1B[2m[$tag]\x1B[0m ';
     if (payload == null || payload.isEmpty) {
-      return '\x1B[${color}m$message\x1B[0m';
+      return '$prefix\x1B[${color}m$message\x1B[0m';
     }
-    return '\x1B[${color}m$message => $payload\x1B[0m';
+    return '$prefix\x1B[${color}m$message => $payload\x1B[0m';
   }
 
   /// one JSON line, with the standard attributes of log services
@@ -125,10 +139,12 @@ class Logger {
     String level,
     dynamic message,
     dynamic data,
+    String tag,
   ) {
     Map<String, dynamic> text = <String, dynamic>{
       'timestamp': DateTime.now().toIso8601String(),
       'status': level,
+      'source': tag,
       'message': message.toString(),
       if (config.name.isNotEmpty)
         'logger': <String, dynamic>{'name': config.name},

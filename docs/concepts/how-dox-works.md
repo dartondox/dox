@@ -134,7 +134,7 @@ Dox tries hard to keep isolates alive:
 
 - An error in a request is caught. Dox answers `500` and keeps going.
 - An async error outside a request is caught and passed to the `ExceptionHandler`, and the isolate keeps running.
-- If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` and starts a new one after 1 second.
+- If a worker isolate still dies, Dox prints `[server] isolate N exited, restarting` and starts a new one after 1 second.
 - If the first (main) isolate dies, the process exits with a non-zero code. So in production, use a supervisor (Docker `restart:`, systemd `Restart=always`) to start it again.
 
 ### How many isolates

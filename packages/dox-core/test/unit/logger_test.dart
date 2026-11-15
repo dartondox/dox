@@ -111,7 +111,28 @@ void main() {
       config(pretty: true);
       Logger.info('hello', <String, dynamic>{'a': 1});
       LogBuffer.flush();
-      expect(lines.single, '\x1B[36mhello => {"a":1}\x1B[0m');
+      expect(
+        lines.single,
+        '\x1B[2m[app]\x1B[0m \x1B[36mhello => {"a":1}\x1B[0m',
+      );
+    });
+
+    test('pretty mode starts with the tag', () {
+      config(pretty: true);
+      Logger.warn('careful', null, 'server');
+      Logger.info('plain');
+      LogBuffer.flush();
+      expect(lines[0], '\x1B[2m[server]\x1B[0m \x1B[33mcareful\x1B[0m');
+      expect(lines[1], '\x1B[2m[app]\x1B[0m \x1B[36mplain\x1B[0m');
+    });
+
+    test('json mode puts the tag in source', () {
+      config();
+      Logger.info('a', <String, dynamic>{'source': 'fake'}, 'queue');
+      Logger.info('b');
+      LogBuffer.flush();
+      expect(jsonDecode(lines[0])['source'], 'queue');
+      expect(jsonDecode(lines[1])['source'], 'app');
     });
 
     test('info waits in the buffer until flush', () {
@@ -149,8 +170,8 @@ void main() {
       }
       LogBuffer.flush();
       expect(lines.join(), isNot(contains('nullm')));
-      expect(lines[1], startsWith('\x1B[33m'));
-      expect(lines[2], startsWith('\x1B[31m'));
+      expect(lines[1], startsWith('\x1B[2m[app]\x1B[0m \x1B[33m'));
+      expect(lines[2], startsWith('\x1B[2m[app]\x1B[0m \x1B[31m'));
     });
 
     test('data keys do not replace the standard fields', () {
