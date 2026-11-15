@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Use HasManyThrough to read rows that are two steps away. A model in the middle links the two ends. HasOneThrough is the same, but it gives one row.">
+        <meta name="description" content="Use HasManyThrough to read rows that are two steps away, through a model in the middle. HasOneThrough is the same, but it gives one row.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="HasManyThrough | Dox">
-  <meta property="og:description" content="Use HasManyThrough to read rows that are two steps away. A model in the middle links the two ends. HasOneThrough is the same, but it gives one row.">
+  <meta property="og:description" content="Use HasManyThrough to read rows that are two steps away, through a model in the middle. HasOneThrough is the same, but it gives one row.">
   <meta property="og:url" content="https://dartondox.dev/latest/database/model/relationship/through/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="HasManyThrough | Dox">
-  <meta name="twitter:description" content="Use HasManyThrough to read rows that are two steps away. A model in the middle links the two ends. HasOneThrough is the same, but it gives one row.">
+  <meta name="twitter:description" content="Use HasManyThrough to read rows that are two steps away, through a model in the middle. HasOneThrough is the same, but it gives one row.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1600,6 +1600,8 @@
       
         
       
+        
+      
     
     
     
@@ -1699,6 +1701,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../../the-basic/request/" class="md-nav__link">
         
   
@@ -1744,12 +1842,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../the-basic/response/" class="md-nav__link">
+      <a href="../../../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1760,15 +1858,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1924,6 +2212,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../../../the-basic/errors/" class="md-nav__link">
         
   
@@ -1949,291 +2282,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -4323,10 +4371,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#define-it" class="md-nav__link">
+  <a href="#defining-the-relation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Define it
+        Defining the relation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Defining the relation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-the-relation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading the relation
       
     </span>
   </a>
@@ -4334,10 +4410,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#load-it" class="md-nav__link">
+  <a href="#writing-column-names" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Load it
+        Writing column names
       
     </span>
   </a>
@@ -4345,24 +4421,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Options
+        Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#all-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All options
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#write-the-table-in-a-column-name" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write the table in a column name
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -6875,10 +6957,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#define-it" class="md-nav__link">
+  <a href="#defining-the-relation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Define it
+        Defining the relation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Defining the relation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#custom-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loading-the-relation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading the relation
       
     </span>
   </a>
@@ -6886,10 +6996,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#load-it" class="md-nav__link">
+  <a href="#writing-column-names" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Load it
+        Writing column names
       
     </span>
   </a>
@@ -6897,24 +7007,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Options
+        Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#all-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All options
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#write-the-table-in-a-column-name" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Write the table in a column name
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -6944,11 +7060,8 @@
 
 
 <h1 id="hasmanythrough">HasManyThrough</h1>
-<p>Use <code>HasManyThrough</code> to read rows that are two steps away.
-A model in the middle links the two ends.
-<code>HasOneThrough</code> is the same, but it gives one row.</p>
-<p>For example, a country has many users, and a user has many posts.
-A country has many posts through its users.</p>
+<p>Use <code>HasManyThrough</code> to read rows that are two steps away, through a model in the middle. <code>HasOneThrough</code> is the same, but it gives one row.</p>
+<p>For example, a country has many users, and a user has many posts. So a country has many posts through its users.</p>
 <h2 id="tables">Tables</h2>
 <table>
 <thead>
@@ -6972,9 +7085,8 @@ A country has many posts through its users.</p>
 </tr>
 </tbody>
 </table>
-<h2 id="define-it">Define it</h2>
-<p>Add the field to the first model.
-The <code>through</code> option is the model in the middle.</p>
+<h2 id="defining-the-relation">Defining the relation</h2>
+<p>Add the field to the first model. The <code>through</code> option is the model in the middle:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/models/country/country.model.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../post/post.model.dart'</span><span class="p">;</span>
@@ -6999,22 +7111,38 @@ The <code>through</code> option is the model in the middle.</p>
 </span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>With <code>HasOneThrough</code>, when several rows match, the last row of the query wins.
-So <code>newest</code> orders by <code>post.id</code> from low to high, and the highest id is the last row.</p>
+<p>With <code>HasOneThrough</code>, when several rows match, the last row of the query wins. So <code>newest</code> orders by <code>post.id</code> from low to high, and the highest id is the last row.</p>
 <p>Run <code>dart run build_runner build</code> after you add a relationship.</p>
-<h2 id="load-it">Load it</h2>
-<p>It loads like the other relations.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Country</span><span class="o">?</span><span class="w"> </span><span class="n">country</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">print</span><span class="p">(</span><span class="n">country</span><span class="o">?</span><span class="p">.</span><span class="n">posts</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Country</span><span class="o">&gt;</span><span class="w"> </span><span class="n">countries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Country</span><span class="o">&gt;</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+<h3 id="custom-keys">Custom keys</h3>
+<p>If your columns have other names, set the four keys:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@HasManyThrough</span><span class="p">(</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="n">Post</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">through:</span><span class="w"> </span><span class="n">User</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nl">foreignKey:</span><span class="w"> </span><span class="s1">'home_country_id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on user, points to the country</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nl">localKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on country</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nl">throughForeignKey:</span><span class="w"> </span><span class="s1">'author_id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on post, points to the user</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nl">throughLocalKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on user</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">)</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="n">posts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">[];</span>
 </span></code></pre></div>
-<p><code>preload</code> runs one query for all countries.
-<code>withCount</code>, <code>whereHas</code>, <code>whereDoesntHave</code> and <code>has</code> work too.
-See <a href="../../counting-relations/">Counting relations</a> and <a href="../../relation-queries/">Query by relations</a>.</p>
-<p>Rows that are soft deleted are left out, in the middle table and in the far table.</p>
-<h2 id="options">Options</h2>
+<h2 id="loading-the-relation">Loading the relation</h2>
+<p>It loads like the other relations. <code>preload</code> runs one query for all countries. <code>withCount</code>, <code>whereHas</code>, <code>whereDoesntHave</code> and <code>has</code> work too:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Country</span><span class="o">?</span><span class="w"> </span><span class="n">country</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">print</span><span class="p">(</span><span class="n">country</span><span class="o">?</span><span class="p">.</span><span class="n">posts</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Country</span><span class="o">&gt;</span><span class="w"> </span><span class="n">countries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Country</span><span class="o">&gt;</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<p>See <a href="../../counting-relations/">Counting relations</a> and <a href="../../relation-queries/">Query by relations</a>.</p>
+<p>Soft deleted rows are left out, in the middle table and in the far table.</p>
+<h2 id="writing-column-names">Writing column names</h2>
+<p>The query joins the two tables, and a column like <code>title</code> can be in both. So in <code>onQuery</code> and in a <code>whereHas</code> function, write the table in front of the column:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Country</span><span class="o">&gt;</span><span class="w"> </span><span class="n">countries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'post.title'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">);</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="details">Details</h2>
+<h3 id="all-options">All options</h3>
 <table>
 <thead>
 <tr>
@@ -7056,24 +7184,6 @@ See <a href="../../counting-relations/">Counting relations</a> and <a href="../.
 </tr>
 </tbody>
 </table>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@HasManyThrough</span><span class="p">(</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="n">Post</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nl">through:</span><span class="w"> </span><span class="n">User</span><span class="p">,</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">foreignKey:</span><span class="w"> </span><span class="s1">'home_country_id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on user, points to the country</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">localKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on country</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nl">throughForeignKey:</span><span class="w"> </span><span class="s1">'author_id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on post, points to the user</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nl">throughLocalKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="c1">// on user</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">)</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="n">posts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">[];</span>
-</span></code></pre></div>
-<h2 id="write-the-table-in-a-column-name">Write the table in a column name</h2>
-<p>The query joins the two tables.
-So in <code>onQuery</code> and in a <code>whereHas</code> callback, write the table in front of the column.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Country</span><span class="o">&gt;</span><span class="w"> </span><span class="n">countries</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Country</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'post.title'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">);</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<p>A column without the table, like <code>title</code>, can be in both tables.</p>
 
 
 

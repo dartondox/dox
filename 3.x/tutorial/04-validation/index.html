@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This step checks the input of create and update with a @Dto class.">
+        <meta name="description" content="In this step you check the input of create and update with a @Dto class, so bad input gets a 422 answer and the controller does not run.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Step 4: Validation | Dox">
-  <meta property="og:description" content="This step checks the input of create and update with a @Dto class.">
+  <meta property="og:description" content="In this step you check the input of create and update with a @Dto class, so bad input gets a 422 answer and the controller does not run.">
   <meta property="og:url" content="https://dartondox.dev/latest/tutorial/04-validation/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Step 4: Validation | Dox">
-  <meta name="twitter:description" content="This step checks the input of create and update with a @Dto class.">
+  <meta name="twitter:description" content="In this step you check the input of create and update with a @Dto class, so bad input gets a 422 answer and the controller does not run.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1740,6 +1740,8 @@
       
         
       
+        
+      
     
     
     
@@ -1839,6 +1841,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1884,12 +1982,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1900,15 +1998,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -2064,6 +2352,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -2089,291 +2422,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -6970,13 +7018,12 @@
 
 
 <h1 id="step-4-validation">Step 4: Validation</h1>
-<p>This step checks the input of create and update with a <code>@Dto</code> class.</p>
-<p>Bad input gets a <code>422</code> answer, and the controller does not run.</p>
+<p>In this step you check the input of create and update with a <code>@Dto</code> class, so bad input gets a <code>422</code> answer and the controller does not run.</p>
 <h2 id="1-make-the-dto">1. Make the DTO</h2>
+<p>A <a href="../../the-basic/dto/">DTO</a> is a class that describes the input you expect, with a rule on each field. Make one:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:dto<span class="w"> </span>SavePost
 </span></code></pre></div>
-<p>One class is enough for create and update, because both need the same fields.
-Replace the file with this:</p>
+<p>Create and update need the same fields, so one class is enough for both. Replace the file with this:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/dtos/save_post/save_post.dto.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'save_post.dto.g.dart'</span><span class="p">;</span>
@@ -6999,13 +7046,11 @@ Replace the file with this:</p>
 </span></code></pre></div>
 <ul>
 <li>A field that is not nullable and has no default is required.</li>
-<li>The rules run from top to bottom. <code>@Trim()</code> removes spaces first. An empty string then counts as missing.</li>
+<li>The rules run from top to bottom. <code>@Trim()</code> removes spaces first, so an empty string then counts as missing.</li>
 <li>See <a href="../../the-basic/validation/">Validation</a> for all rules.</li>
 </ul>
 <h2 id="2-give-the-dto-list-to-the-app">2. Give the DTO list to the app</h2>
-<p>The generator writes a list of all DTOs to <code>lib/generated/dtos.g.dart</code>.
-Dox needs this list, because it does not use reflection.
-Add two lines to <code>lib/config/app.dart</code>:</p>
+<p>The code generator writes a list of all DTOs to <code>lib/generated/dtos.g.dart</code>. Dox needs this list, because it does not use reflection. Add two lines to <code>lib/config/app.dart</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/generated/dtos.g.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
@@ -7016,8 +7061,7 @@ Add two lines to <code>lib/config/app.dart</code>:</p>
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="3-use-the-dto-in-the-controller">3. Use the DTO in the controller</h2>
-<p>Ask for <code>SavePost</code> as a parameter. Dox checks the body and gives you a typed object.
-This also adds <code>update</code>, so <code>PUT /api/posts/{id}</code> works:</p>
+<p>Now ask for <code>SavePost</code> as a parameter of the controller method. Dox checks the body and gives you a typed object. This version also adds <code>update</code>, so you can change a post:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/post.controller.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/dtos/save_post/save_post.dto.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/models/post/post.model.dart'</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7062,25 +7106,26 @@ This also adds <code>update</code>, so <code>PUT /api/posts/{id}</code> works:</
 </span><span id="__span-3-42"><a id="__codelineno-3-42" name="__codelineno-3-42" href="#__codelineno-3-42"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-3-43"><a id="__codelineno-3-43" name="__codelineno-3-43" href="#__codelineno-3-43"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>Route.resource</code> in <code>lib/routes/api.dart</code> sees the new <code>update</code> method and adds <code>PUT</code> and <code>PATCH /api/posts/{id}</code>. You change nothing there.</p>
+<p>You do not need to change the routes. <code>Route.resource</code> sees the new <code>update</code> method and adds <code>PUT</code> and <code>PATCH /api/posts/{id}</code>.</p>
 <h2 id="4-run-the-generator">4. Run the generator</h2>
-<p><code>dox s</code> runs it for you. Without <code>dox s</code>:</p>
+<p><code>dox s</code> runs the generator for you. If it is not running, run it once:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
 <p>It writes <code>lib/app/dtos/save_post/save_post.dto.g.dart</code> and <code>lib/generated/dtos.g.dart</code>.</p>
 <h2 id="check-it">Check it</h2>
-<p>A title that is too short, and a body that is too short:</p>
+<p>Send a title and a body that are too short:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:3000/api/posts<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"title":"Hi","body":"Short"}'</span>
 </span></code></pre></div>
+<p>You should get <code>422</code> with one message for each field:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>HTTP/1.1 422 Unprocessable Entity
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>content-type: application/json; charset=utf-8
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>...
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>{"title":"The title must be between 3 and 100 characters","body":"The body must be at least 10 characters"}
 </span></code></pre></div>
-<p>An empty body:</p>
+<p>Send an empty body:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:3000/api/posts<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span>-d<span class="w"> </span><span class="s1">'{}'</span>
 </span></code></pre></div>

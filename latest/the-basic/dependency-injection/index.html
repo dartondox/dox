@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Dox has a container.">
+        <meta name="description" content="The Dox container makes your classes and gives each constructor what it needs, so you never wire classes by hand.">
       
       
       
@@ -16,7 +16,7 @@
         <link rel="prev" href="../controller/">
       
       
-        <link rel="next" href="../middleware/">
+        <link rel="next" href="../views/">
       
       
         
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Dependency injection | Dox">
-  <meta property="og:description" content="Dox has a container.">
+  <meta property="og:description" content="The Dox container makes your classes and gives each constructor what it needs, so you never wire classes by hand.">
   <meta property="og:url" content="https://dartondox.dev/latest/the-basic/dependency-injection/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Dependency injection | Dox">
-  <meta name="twitter:description" content="Dox has a container.">
+  <meta name="twitter:description" content="The Dox container makes your classes and gives each constructor what it needs, so you never wire classes by hand.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1600,6 +1600,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,6 +1702,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../request/" class="md-nav__link">
         
   
@@ -1745,12 +1843,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../response/" class="md-nav__link">
+      <a href="../dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1761,15 +1859,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
   
 
     
@@ -1790,12 +1889,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../views/" class="md-nav__link">
+      <a href="../validation/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-layout-template"
+  class="lucide lucide-list-checks"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1806,15 +1905,17 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <rect width="18" height="7" x="3" y="3" rx="1" />
-  <rect width="9" height="7" x="3" y="14" rx="1" />
-  <rect width="5" height="7" x="16" y="14" rx="1" />
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Views
+    Validation
   
 
     
@@ -1835,12 +1936,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../inertia/" class="md-nav__link">
+      <a href="../validation-rules/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-app-window"
+  class="lucide lucide-ruler"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1851,105 +1952,17 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <rect x="2" y="4" width="20" height="16" rx="2" />
-  <path d="M10 4v4" />
-  <path d="M2 8h20" />
-  <path d="M6 4v4" />
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Inertia
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../serializer/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-braces"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
-  <path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../errors/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-triangle-alert"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
-  <path d="M12 9v4" />
-  <path d="M12 17h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Error handling
+    Validation rules
   
 
     
@@ -2117,10 +2130,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-full-example" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A full example
+        Setup
       
     </span>
   </a>
@@ -2128,10 +2141,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-generated-file" class="md-nav__link">
+  <a href="#a-full-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The generated file
+        A full example
       
     </span>
   </a>
@@ -2157,6 +2170,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Constructor parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#abstract-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abstract types
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2205,10 +2235,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-the-container-in-code" class="md-nav__link">
+  <a href="#using-the-container-in-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use the container in code
+        Using the container in code
       
     </span>
   </a>
@@ -2216,10 +2246,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tests" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tests
+        Testing
       
     </span>
   </a>
@@ -2238,13 +2268,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limits
+        Details
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-generated-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The generated file
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2264,12 +2311,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../middleware/" class="md-nav__link">
+      <a href="../views/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-layers"
+  class="lucide lucide-layout-template"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -2280,15 +2327,15 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+  <rect width="18" height="7" x="3" y="3" rx="1" />
+  <rect width="9" height="7" x="3" y="14" rx="1" />
+  <rect width="5" height="7" x="16" y="14" rx="1" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Middleware
+    Views
   
 
     
@@ -2309,12 +2356,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../session/" class="md-nav__link">
+      <a href="../inertia/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-fingerprint"
+  class="lucide lucide-app-window"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -2325,21 +2372,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+  <rect x="2" y="4" width="20" height="16" rx="2" />
+  <path d="M10 4v4" />
+  <path d="M2 8h20" />
+  <path d="M6 4v4" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Session
+    Inertia
   
 
     
@@ -2360,12 +2402,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../validation/" class="md-nav__link">
+      <a href="../serializer/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-list-checks"
+  class="lucide lucide-braces"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -2376,17 +2418,14 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
+  <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
+  <path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Validation
+    Serializer
   
 
     
@@ -2407,12 +2446,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../validation-rules/" class="md-nav__link">
+      <a href="../response/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-ruler"
+  class="lucide lucide-arrow-up-from-line"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -2423,17 +2462,60 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Validation rules
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../errors/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
   
 
     
@@ -6939,10 +7021,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-full-example" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A full example
+        Setup
       
     </span>
   </a>
@@ -6950,10 +7032,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-generated-file" class="md-nav__link">
+  <a href="#a-full-example" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The generated file
+        A full example
       
     </span>
   </a>
@@ -6979,6 +7061,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Constructor parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#abstract-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Abstract types
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7027,10 +7126,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-the-container-in-code" class="md-nav__link">
+  <a href="#using-the-container-in-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use the container in code
+        Using the container in code
       
     </span>
   </a>
@@ -7038,10 +7137,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tests" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tests
+        Testing
       
     </span>
   </a>
@@ -7060,13 +7159,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limits
+        Details
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-generated-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The generated file
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7096,241 +7212,170 @@
 
 
 <h1 id="dependency-injection">Dependency injection</h1>
-<p>Dox has a container.</p>
-<p>It makes your classes and gives each constructor what it needs.
-You do not register classes by hand.
-Put <code>@Inject()</code> above a class, and <code>dox_builder</code> adds it to the container.
-Dox does not use <code>dart:mirrors</code>.
-All the wiring is generated code.</p>
+<p>The Dox container makes your classes and gives each constructor what it needs, so you never wire classes by hand.</p>
+<p>Put <code>@Inject()</code> above a class, and <code>dox_builder</code> adds it to the container. Then any class can ask for it in its constructor. Dox does not use <code>dart:mirrors</code>: all the wiring is generated code.</p>
+<h2 id="setup">Setup</h2>
+<p>The builder writes <code>lib/generated/container.g.dart</code>. Give it to the app once:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/container.g.dart'</span><span class="p">;</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>Run the builder again after you add a class:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
+</span></code></pre></div>
 <h2 id="a-full-example">A full example</h2>
-<p>A repository reads the database. A service holds the business logic. A controller answers the route.</p>
-<div class="language-dart highlight"><span class="filename">lib/app/repositories/user.repository.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserRepository</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">find</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">}</span>
-</span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/app/services/user.service.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/repositories/user.repository.dart'</span><span class="p">;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">UserService</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">users</span><span class="p">);</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">UserRepository</span><span class="w"> </span><span class="n">users</span><span class="p">;</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">    </span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">();</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">user</span><span class="p">;</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="p">}</span>
-</span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/app/http/controllers/user.controller.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+<p>A common setup has three layers. A repository reads the database. A service holds the business logic. A controller answers the route. Each one asks for the one below it in its constructor.</p>
+<p>The repository needs nothing:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/repositories/user.repository.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/services/user.service.dart'</span><span class="p">;</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="n">UserController</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">service</span><span class="p">);</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">UserService</span><span class="w"> </span><span class="n">service</span><span class="p">;</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">service</span><span class="p">.</span><span class="n">show</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">}</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nd">@Inject</span><span class="p">()</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserRepository</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">find</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">prefix</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'api'</span><span class="p">;</span>
+<p>The service asks for the repository:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/services/user.service.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/repositories/user.repository.dart'</span><span class="p">;</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/users/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">UserController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">);</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">}</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="nd">@Inject</span><span class="p">()</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="n">UserService</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">users</span><span class="p">);</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">UserRepository</span><span class="w"> </span><span class="n">users</span><span class="p">;</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">    </span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">();</span>
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">user</span><span class="p">;</span>
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Run the builder:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
+<p>The controller asks for the service:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/controllers/user.controller.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/services/user.service.dart'</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nd">@Inject</span><span class="p">()</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserController</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="n">UserController</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">service</span><span class="p">);</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">UserService</span><span class="w"> </span><span class="n">service</span><span class="p">;</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">service</span><span class="p">.</span><span class="n">show</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>It writes <code>lib/generated/container.g.dart</code>. Give it to the app once:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/container.g.dart'</span><span class="p">;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">);</span>
+<p>And the route points to the controller:</p>
+<div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">prefix</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'api'</span><span class="p">;</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/users/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">UserController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">);</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>That is all. <code>GET /api/users/5</code> makes the repository, the service and the controller, and calls <code>show(5)</code>.</p>
-<h2 id="the-generated-file">The generated file</h2>
-<p><code>lib/generated/container.g.dart</code> has one function. Each class gets a factory that calls its constructor.</p>
-<div class="language-dart highlight"><span class="filename">lib/generated/container.g.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// GENERATED CODE - DO NOT MODIFY BY HAND</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1">// Made by dox_builder. Run `dart run build_runner build`.</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1">// ignore_for_file: type=lint</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/http/controllers/user.controller.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i1</span><span class="p">;</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/repositories/user.repository.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i2</span><span class="p">;</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/services/user.service.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i3</span><span class="p">;</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/providers/orm_provider.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i4</span><span class="p">;</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/routes/api.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i5</span><span class="p">;</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i6</span><span class="p">;</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="c1">/// Puts every class of the app into the container: the</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="c1">/// `@Inject()` classes, routers, providers and model binders.</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="c1">/// Use it in `AppConfig(container: registerContainer)`.</span>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="kt">void</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">i1</span><span class="p">.</span><span class="n">UserController</span><span class="o">&gt;</span><span class="p">(</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">    </span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i1</span><span class="p">.</span><span class="n">UserController</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">()),</span>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="w">  </span><span class="p">);</span>
-</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">i2</span><span class="p">.</span><span class="n">UserRepository</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i2</span><span class="p">.</span><span class="n">UserRepository</span><span class="p">());</span>
-</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">(</span>
-</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="w">    </span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">i2</span><span class="p">.</span><span class="n">UserRepository</span><span class="o">&gt;</span><span class="p">()),</span>
-</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="w">  </span><span class="p">);</span>
-</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">provider</span><span class="o">&lt;</span><span class="n">i4</span><span class="p">.</span><span class="n">ORMProvider</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i4</span><span class="p">.</span><span class="n">ORMProvider</span><span class="p">());</span>
-</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">router</span><span class="o">&lt;</span><span class="n">i5</span><span class="p">.</span><span class="n">ApiRouter</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i5</span><span class="p">.</span><span class="n">ApiRouter</span><span class="p">());</span>
-</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">bindModel</span><span class="o">&lt;</span><span class="n">i6</span><span class="p">.</span><span class="n">User</span><span class="o">&gt;</span><span class="p">((</span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">    </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="n">tryParse</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-</span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">i6</span><span class="p">.</span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
-</span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>Do not edit it. Run the builder again after you add a class.</p>
+<p>That is all. After <code>dart run build_runner build</code>, <code>GET /api/users/5</code> makes the repository, the service and the controller, and calls <code>show(5)</code>.</p>
 <h2 id="lifetime">Lifetime</h2>
-<ul>
-<li><code>@Inject()</code>: one instance per isolate. It is made on first use.</li>
-<li><code>@Inject(singleton: false)</code>: a new instance each time it is asked for.</li>
-</ul>
-<p>Dox runs one server per isolate. Isolates do not share objects.
-So each isolate runs <code>registerContainer</code> and has its own instances.
-Do not keep state in a singleton that all isolates must see. Use the cache or the database for that.</p>
+<p>By default, <code>@Inject()</code> makes one instance per isolate. It is made on first use, and every class that asks for it gets the same one.</p>
+<p>If you want a new instance each time it is asked for, use <code>singleton: false</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Inject</span><span class="p">(</span><span class="nl">singleton:</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ReportBuilder</span><span class="w"> </span><span class="p">{}</span>
+</span></code></pre></div>
+<p>Dox runs one server per isolate, and isolates do not share objects. So each isolate has its own instances. Do not keep state in a singleton that all isolates must see. Use the cache or the database for that.</p>
 <h2 id="constructor-parameters">Constructor parameters</h2>
-<p>Each constructor parameter is found by its type.</p>
-<ul>
-<li>Positional and named parameters both work.</li>
-<li>An optional parameter whose type is not in the container keeps its default value.</li>
-<li>A nullable parameter whose type is not in the container gets <code>null</code>.</li>
-<li>Any other parameter whose type is not in the container stops the build.</li>
-</ul>
+<p>Each constructor parameter is found by its type. Positional and named parameters both work.</p>
+<p>If the type is not in the container, an optional parameter keeps its default value, and a nullable parameter gets <code>null</code>. Any other parameter stops the build.</p>
+<h3 id="abstract-types">Abstract types</h3>
+<p>A constructor parameter of an abstract type gets the one container class that implements it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">Mailer</span><span class="w"> </span><span class="p">{}</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nd">@Inject</span><span class="p">()</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SmtpMailer</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Mailer</span><span class="w"> </span><span class="p">{}</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="nd">@Inject</span><span class="p">()</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SignupService</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="n">SignupService</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">mailer</span><span class="p">);</span><span class="w"> </span><span class="c1">// gets the SmtpMailer</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">Mailer</span><span class="w"> </span><span class="n">mailer</span><span class="p">;</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>This works for constructor parameters only. <code>c.get&lt;Mailer&gt;()</code> and handler parameters still need the class itself.</p>
 <h2 id="routes-to-controller-methods">Routes to controller methods</h2>
 <p>Pass a function that picks the method. Dox finds the controller by the parameter type:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">store</span><span class="p">);</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">Route</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'/posts/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">update</span><span class="p">);</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">Route</span><span class="p">.</span><span class="n">delete</span><span class="p">(</span><span class="s1">'/posts/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">destroy</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">store</span><span class="p">);</span>
 </span></code></pre></div>
-<p>The controller comes from the container. Dox gets it once per isolate, at start. A request does no extra work.
-<code>.name()</code>, groups and middleware lists work the same:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">).</span><span class="n">name</span><span class="p">(</span><span class="s1">'posts.show'</span><span class="p">);</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/me'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="p">(</span><span class="n">AuthController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">me</span><span class="p">]);</span>
+<p>The controller comes from the container. Dox gets it once per isolate, at start, so a request does no extra work. <code>.name()</code>, groups and middleware lists work the same:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">).</span><span class="n">name</span><span class="p">(</span><span class="s1">'posts.show'</span><span class="p">);</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/me'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="p">(</span><span class="n">AuthController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">me</span><span class="p">]);</span>
 </span></code></pre></div>
 <p>For resource routes, pass the class:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="n">PostController</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="n">PostController</span><span class="p">);</span>
 </span></code></pre></div>
-<p>The method still gets its parameters as usual: <code>DoxRequest</code>, a <code>@Dto</code>, path params and bound models.
-See <a href="../controller/#parameters">Controller: parameters</a>.</p>
+<p>The method still gets its parameters as usual: <code>DoxRequest</code>, a <code>@Dto</code>, path params and bound models. See <a href="../controller/#parameters">Controller: parameters</a>.</p>
 <h2 id="handler-parameters">Handler parameters</h2>
 <p>A controller method (or a plain route function) can ask for any class of the container:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/stats'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">StatsService</span><span class="w"> </span><span class="n">stats</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">today</span><span class="p">());</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/stats'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">StatsService</span><span class="w"> </span><span class="n">stats</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">stats</span><span class="p">.</span><span class="n">today</span><span class="p">());</span>
 </span></code></pre></div>
 <p>A singleton is read once, at start. A <code>singleton: false</code> class is made on each request.</p>
 <h2 id="route-model-binding">Route model binding</h2>
-<p>Every <code>@DoxModel</code> class gets a binder in <code>lib/generated/container.g.dart</code>.
-When a handler has a parameter of a model type, Dox loads the model by its primary key.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts/{post}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">);</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">PostController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="n">Post</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">;</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">}</span>
+<p>Often a route gets the id of a model, and the controller loads the model first. Dox can do this for you. Every <code>@DoxModel</code> class gets a binder, so when a handler has a parameter of a model type, Dox loads the model by its primary key:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts/{post}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="nd">@Inject</span><span class="p">()</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">PostController</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="n">Post</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">;</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<ul>
-<li>The route param with the name of the model is used: <code>{post}</code> for <code>Post</code>, <code>{blogPost}</code> for <code>BlogPost</code>.</li>
-<li>When there is no such param, the next route param in order is used, like <code>{id}</code>.</li>
-<li>A missing row answers <code>404</code>.</li>
-<li>An <code>int</code> key that is not a number answers <code>404</code>, with no database call.</li>
-<li>A route without a parameter of the model type does not load the model.</li>
-<li>A binder from <code>Route.bind</code> wins over this one. See <a href="../routing/#route-model-binding">Routing: route model binding</a>.</li>
-</ul>
+<p>Dox uses the route param with the name of the model: <code>{post}</code> for <code>Post</code>, <code>{blogPost}</code> for <code>BlogPost</code>. When there is no such param, it uses the next route param in order, like <code>{id}</code>.</p>
+<p>A missing row answers <code>404</code>. An <code>int</code> key that is not a number also answers <code>404</code>, with no database call.</p>
+<p>A binder from <code>Route.bind</code> wins over this one. See <a href="../routing/#route-model-binding">Routing: route model binding</a>.</p>
 <h2 id="routers-and-providers">Routers and providers</h2>
-<p>You do not need <code>@Inject()</code> on them.</p>
-<ul>
-<li>Every class that extends <code>Router</code> is found. Its routes are registered at start.</li>
-<li>Every class that extends <code>DoxProvider</code> is found. Its <code>setup()</code> runs at start, in every isolate.</li>
-</ul>
-<p>Their constructors get parameters from the container too.</p>
-<p>They run in the order of their file path, then the order in the file.
-To pick the order, list them in <code>AppConfig</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">providers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxProvider</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMProvider</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs first</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nl">routers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Router</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ApiRouter</span><span class="p">()],</span><span class="w">       </span><span class="c1">// registered first</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">);</span>
+<p>Routers and providers do not need <code>@Inject()</code>. Dox finds every class that extends <code>Router</code> and registers its routes at start. It finds every class that extends <code>DoxProvider</code> and runs its <code>setup()</code> at start, in every isolate. Their constructors get parameters from the container too.</p>
+<p>They run in the order of their file path, then the order in the file. If you want to pick the order, list them in <code>AppConfig</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nl">providers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxProvider</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMProvider</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs first</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nl">routers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Router</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ApiRouter</span><span class="p">()],</span><span class="w">       </span><span class="c1">// registered first</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>A listed class comes first. The others follow. No class runs twice.
-A listed provider is also the instance that the container gives.</p>
-<p>A provider can add global middleware with <code>Dox().addGlobalMiddleware(...)</code> in <code>setup()</code>. They run before the app's <code>globalMiddleware</code>. See <a href="../middleware/">Middleware</a>.</p>
-<h2 id="use-the-container-in-code">Use the container in code</h2>
-<p><code>Dox().ioc</code> is the container of the current isolate.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">UserService</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">();</span>
+<p>A listed class comes first, and the others follow. No class runs twice. A listed provider is also the instance that the container gives.</p>
+<p>A provider can add global middleware with <code>Dox().addGlobalMiddleware(...)</code> in <code>setup()</code>. See <a href="../middleware/#global-middleware">Middleware</a>.</p>
+<h2 id="using-the-container-in-code">Using the container in code</h2>
+<p>Sometimes you need a class in code that the container does not build, like a script. <code>Dox().ioc</code> is the container of the current isolate. Use <code>get</code> to read a class:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">UserService</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">();</span>
 </span></code></pre></div>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>get&lt;T&gt;()</code></td>
-<td>the instance of <code>T</code>. Throws when <code>T</code> is not registered.</td>
-</tr>
-<tr>
-<td><code>has&lt;T&gt;()</code></td>
-<td><code>true</code> when <code>T</code> is registered</td>
-</tr>
-<tr>
-<td><code>singleton&lt;T&gt;(factory)</code></td>
-<td>one instance per isolate, made on first use</td>
-</tr>
-<tr>
-<td><code>factory&lt;T&gt;(factory)</code></td>
-<td>a new instance on each <code>get</code></td>
-</tr>
-<tr>
-<td><code>instance&lt;T&gt;(value)</code></td>
-<td><code>value</code> is the instance, eg. a config object</td>
-</tr>
-<tr>
-<td><code>override&lt;T&gt;(value)</code></td>
-<td>replace <code>T</code>, eg. with a fake in a test</td>
-</tr>
-<tr>
-<td><code>clearOverrides()</code></td>
-<td>remove every override</td>
-</tr>
-</tbody>
-</table>
-<h2 id="tests">Tests</h2>
-<p>Replace a class with a fake before the app starts:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">setUpAll</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">override</span><span class="o">&lt;</span><span class="n">UserRepository</span><span class="o">&gt;</span><span class="p">(</span><span class="n">FakeUserRepository</span><span class="p">());</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="p">});</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">tearDownAll</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
-</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">clearOverrides</span><span class="p">();</span>
-</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="p">});</span>
+<p><code>get</code> throws when the class is not registered. Use <code>has</code> to check first:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">has</span><span class="o">&lt;</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>An override stays when the app registers its classes again.
-Call it before <code>DoxTestClient.start</code>. Controllers get their objects once, at start.</p>
+<p>You can also add classes by hand. <code>singleton</code> makes one instance per isolate, on first use. <code>factory</code> makes a new instance on each <code>get</code>. <code>instance</code> uses the value you give, for example a config object:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">Clock</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Clock</span><span class="p">());</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="kd">factory</span><span class="o">&lt;</span><span class="n">Report</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Report</span><span class="p">());</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">instance</span><span class="o">&lt;</span><span class="n">MailConfig</span><span class="o">&gt;</span><span class="p">(</span><span class="n">mailConfig</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="testing">Testing</h2>
+<p>In a test you often want a fake in place of a real class. Use <code>override</code> before the app starts, and <code>clearOverrides</code> at the end:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">setUpAll</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">override</span><span class="o">&lt;</span><span class="n">UserRepository</span><span class="o">&gt;</span><span class="p">(</span><span class="n">FakeUserRepository</span><span class="p">());</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">});</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">tearDownAll</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">ioc</span><span class="p">.</span><span class="n">clearOverrides</span><span class="p">();</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>Call <code>override</code> before <code>DoxTestClient.start</code>, because controllers get their objects once, at start. An override stays when the app registers its classes again.</p>
 <h2 id="build-errors">Build errors</h2>
-<p>The build stops with a clear message when:</p>
+<p>The build stops with a clear message, with the file and line, when:</p>
 <ul>
 <li>a required parameter has a type that is not in the container,</li>
 <li>a parameter has an abstract type, and two or more classes in the container implement it,</li>
@@ -7338,29 +7383,47 @@ Call it before <code>DoxTestClient.start</code>. Controllers get their objects o
 <li><code>@Inject()</code> is on an abstract class or a generic class,</li>
 <li>a class has no unnamed constructor.</li>
 </ul>
-<p>The message shows the file and line of the problem.</p>
 <p>A private class (like <code>_AdminRouter</code>) is not put in the container. The build shows a warning for it. Remove the <code>_</code> to add it.</p>
-<h2 id="limits">Limits</h2>
+<h2 id="details">Details</h2>
 <ul>
 <li>Dox finds classes in <code>lib/</code> only.</li>
-<li>
-<p>The container is keyed by the class. A constructor parameter of an abstract type gets the one container class that implements it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">Mailer</span><span class="w"> </span><span class="p">{}</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SmtpMailer</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">Mailer</span><span class="w"> </span><span class="p">{}</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SignupService</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span><span class="n">SignupService</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">mailer</span><span class="p">);</span><span class="w"> </span><span class="c1">// gets the SmtpMailer</span>
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a>
-</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">Mailer</span><span class="w"> </span><span class="n">mailer</span><span class="p">;</span>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>This works for constructor parameters only. <code>c.get&lt;Mailer&gt;()</code> and handler parameters still need the class itself.
-- Two classes with the same name in two files both work. But use the typed route style (<code>Route.get&lt;C&gt;(...)</code>) for them. They can not be handler parameters, because Dox can not tell them apart by name.</p>
-</li>
+<li>Two classes with the same name in two files both work. But use the typed route style (<code>Route.get&lt;C&gt;(...)</code>) for them. They can not be handler parameters, because Dox can not tell them apart by name.</li>
+<li>A route without a parameter of the model type does not load the model.</li>
 </ul>
+<h3 id="the-generated-file">The generated file</h3>
+<p><code>lib/generated/container.g.dart</code> has one function. Each class gets a factory that calls its constructor. Do not edit it.</p>
+<div class="language-dart highlight"><span class="filename">lib/generated/container.g.dart</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1">// GENERATED CODE - DO NOT MODIFY BY HAND</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="c1">// Made by dox_builder. Run `dart run build_runner build`.</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1">// ignore_for_file: type=lint</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/http/controllers/user.controller.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i1</span><span class="p">;</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/repositories/user.repository.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i2</span><span class="p">;</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/services/user.service.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i3</span><span class="p">;</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/providers/orm_provider.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i4</span><span class="p">;</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/routes/api.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i5</span><span class="p">;</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i6</span><span class="p">;</span>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="c1">/// Puts every class of the app into the container: the</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="c1">/// `@Inject()` classes, routers, providers and model binders.</span>
+</span><span id="__span-18-15"><a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="c1">/// Use it in `AppConfig(container: registerContainer)`.</span>
+</span><span id="__span-18-16"><a id="__codelineno-18-16" name="__codelineno-18-16" href="#__codelineno-18-16"></a><span class="kt">void</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-17"><a id="__codelineno-18-17" name="__codelineno-18-17" href="#__codelineno-18-17"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">i1</span><span class="p">.</span><span class="n">UserController</span><span class="o">&gt;</span><span class="p">(</span>
+</span><span id="__span-18-18"><a id="__codelineno-18-18" name="__codelineno-18-18" href="#__codelineno-18-18"></a><span class="w">    </span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i1</span><span class="p">.</span><span class="n">UserController</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">()),</span>
+</span><span id="__span-18-19"><a id="__codelineno-18-19" name="__codelineno-18-19" href="#__codelineno-18-19"></a><span class="w">  </span><span class="p">);</span>
+</span><span id="__span-18-20"><a id="__codelineno-18-20" name="__codelineno-18-20" href="#__codelineno-18-20"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">i2</span><span class="p">.</span><span class="n">UserRepository</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i2</span><span class="p">.</span><span class="n">UserRepository</span><span class="p">());</span>
+</span><span id="__span-18-21"><a id="__codelineno-18-21" name="__codelineno-18-21" href="#__codelineno-18-21"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">singleton</span><span class="o">&lt;</span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="o">&gt;</span><span class="p">(</span>
+</span><span id="__span-18-22"><a id="__codelineno-18-22" name="__codelineno-18-22" href="#__codelineno-18-22"></a><span class="w">    </span><span class="p">(</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i3</span><span class="p">.</span><span class="n">UserService</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">i2</span><span class="p">.</span><span class="n">UserRepository</span><span class="o">&gt;</span><span class="p">()),</span>
+</span><span id="__span-18-23"><a id="__codelineno-18-23" name="__codelineno-18-23" href="#__codelineno-18-23"></a><span class="w">  </span><span class="p">);</span>
+</span><span id="__span-18-24"><a id="__codelineno-18-24" name="__codelineno-18-24" href="#__codelineno-18-24"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">provider</span><span class="o">&lt;</span><span class="n">i4</span><span class="p">.</span><span class="n">ORMProvider</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i4</span><span class="p">.</span><span class="n">ORMProvider</span><span class="p">());</span>
+</span><span id="__span-18-25"><a id="__codelineno-18-25" name="__codelineno-18-25" href="#__codelineno-18-25"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">router</span><span class="o">&lt;</span><span class="n">i5</span><span class="p">.</span><span class="n">ApiRouter</span><span class="o">&gt;</span><span class="p">((</span><span class="n">IocContainer</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">i5</span><span class="p">.</span><span class="n">ApiRouter</span><span class="p">());</span>
+</span><span id="__span-18-26"><a id="__codelineno-18-26" name="__codelineno-18-26" href="#__codelineno-18-26"></a><span class="w">  </span><span class="n">c</span><span class="p">.</span><span class="n">bindModel</span><span class="o">&lt;</span><span class="n">i6</span><span class="p">.</span><span class="n">User</span><span class="o">&gt;</span><span class="p">((</span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-27"><a id="__codelineno-18-27" name="__codelineno-18-27" href="#__codelineno-18-27"></a><span class="w">    </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="n">key</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">int</span><span class="p">.</span><span class="n">tryParse</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-18-28"><a id="__codelineno-18-28" name="__codelineno-18-28" href="#__codelineno-18-28"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">key</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-18-29"><a id="__codelineno-18-29" name="__codelineno-18-29" href="#__codelineno-18-29"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">i6</span><span class="p">.</span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">key</span><span class="p">);</span>
+</span><span id="__span-18-30"><a id="__codelineno-18-30" name="__codelineno-18-30" href="#__codelineno-18-30"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-18-31"><a id="__codelineno-18-31" name="__codelineno-18-31" href="#__codelineno-18-31"></a><span class="p">}</span>
+</span></code></pre></div>
 
 
 
@@ -7420,13 +7483,13 @@ Call it before <code>DoxTestClient.start</code>. Controllers get their objects o
         
         
           
-          <a href="../middleware/" class="md-footer__link md-footer__link--next" aria-label="Next: Middleware">
+          <a href="../views/" class="md-footer__link md-footer__link--next" aria-label="Next: Views">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Middleware
+                Views
               </div>
             </div>
             <div class="md-footer__button md-icon">

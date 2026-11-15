@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This step adds a resource controller and the routes to list, create and show posts.">
+        <meta name="description" content="In this step you add a controller and the routes to list, create and show posts.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Step 3: Routes and controller | Dox">
-  <meta property="og:description" content="This step adds a resource controller and the routes to list, create and show posts.">
+  <meta property="og:description" content="In this step you add a controller and the routes to list, create and show posts.">
   <meta property="og:url" content="https://dartondox.dev/latest/tutorial/03-routes-and-controller/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Step 3: Routes and controller | Dox">
-  <meta name="twitter:description" content="This step adds a resource controller and the routes to list, create and show posts.">
+  <meta name="twitter:description" content="In this step you add a controller and the routes to list, create and show posts.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1730,6 +1730,8 @@
       
         
       
+        
+      
     
     
     
@@ -1829,6 +1831,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1874,12 +1972,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1890,15 +1988,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -2054,6 +2342,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -2079,291 +2412,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -6949,12 +6997,12 @@
 
 
 <h1 id="step-3-routes-and-controller">Step 3: Routes and controller</h1>
-<p>This step adds a resource controller and the routes to list, create and show posts.</p>
+<p>In this step you add a controller and the routes to list, create and show posts.</p>
 <h2 id="1-make-the-controller">1. Make the controller</h2>
+<p>A controller holds the code that answers a request. Make one for posts:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Post<span class="w"> </span>-r
 </span></code></pre></div>
-<p><code>-r</code> makes a resource controller with the seven CRUD methods.
-Replace the file with this. It keeps only <code>index</code>, <code>store</code> and <code>show</code>:</p>
+<p><code>-r</code> makes a resource controller with the seven CRUD methods. You only need three of them now, so replace the file with this:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/post.controller.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/models/post/post.model.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -6984,16 +7032,16 @@ Replace the file with this. It keeps only <code>index</code>, <code>store</code>
 </span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>How it works:</p>
+<p>What the code does:</p>
 <ul>
-<li><code>@Inject()</code> puts the controller in the container. Dox makes it for you. <code>dox s</code> runs <code>build_runner</code>, which adds it to <code>lib/generated/container.g.dart</code>.
-  A new project already has <code>container: registerContainer</code> in <code>lib/config/app.dart</code>, so you change nothing there.</li>
-<li>A controller returns a model or a list of models. Dox sends it as JSON.</li>
+<li><code>@Inject()</code> puts the controller in the container, so Dox can make it for you. The code generator adds it to <code>lib/generated/container.g.dart</code>, and a new project already uses that file. So you change nothing else.</li>
+<li>When a method returns a model or a list of models, Dox sends it as JSON.</li>
 <li><code>response(post).statusCode(201)</code> sets the status code.</li>
 <li><code>show(int id)</code> gets the <code>{id}</code> from the URL. <code>/api/posts/abc</code> answers <code>404</code>, because <code>abc</code> is not an <code>int</code>.</li>
-<li><code>req.input('title')</code> reads the body as it is. It is not checked yet. <a href="../04-validation/">Step 4</a> fixes that.</li>
+<li><code>req.input('title')</code> reads the input without any check. You add checks in <a href="../04-validation/">step 4</a>.</li>
 </ul>
 <h2 id="2-add-the-routes">2. Add the routes</h2>
+<p>Routes connect a URL to a controller method. Open <code>lib/routes/api.dart</code> and add <code>Route.resource</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/http/controllers/api.controller.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/http/controllers/post.controller.dart'</span><span class="p">;</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7013,8 +7061,6 @@ Replace the file with this. It keeps only <code>index</code>, <code>store</code>
 </span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>PostController</code> is the class. Dox gets the controller from the container.
-You do not add the router to a list. Dox finds every <code>Router</code> class by itself.</p>
 <p><code>Route.resource</code> makes one route for each method the controller has:</p>
 <table>
 <thead>
@@ -7042,8 +7088,9 @@ You do not add the router to a list. Dox finds every <code>Router</code> class b
 </tr>
 </tbody>
 </table>
-<p>The controller has no <code>update</code> or <code>destroy</code>, so those routes are not made.</p>
+<p>The controller has no <code>update</code> or <code>destroy</code> yet, so those routes are not made. You do not need to register the router anywhere, because Dox finds every <code>Router</code> class by itself.</p>
 <h2 id="3-start-the-server">3. Start the server</h2>
+<p>If the server is not running, start it:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>s
 </span></code></pre></div>
 <p>If it is already running, it restarts by itself when you save a file.</p>
@@ -7053,6 +7100,7 @@ You do not add the router to a list. Dox finds every <code>Router</code> class b
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"title":"Hello Dox","body":"My first post."}'</span>
 </span></code></pre></div>
+<p>You should get <code>201</code> and the new post:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>HTTP/1.1 201 Created
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>content-type: application/json; charset=utf-8
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>...
@@ -7069,7 +7117,7 @@ You do not add the router to a list. Dox finds every <code>Router</code> class b
 </span></code></pre></div>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span><span class="nt">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">"title"</span><span class="p">:</span><span class="s2">"Hello Dox"</span><span class="p">,</span><span class="nt">"body"</span><span class="p">:</span><span class="s2">"My first post."</span><span class="p">,</span><span class="nt">"created_at"</span><span class="p">:</span><span class="s2">"2026-10-22T13:58:14.062215Z"</span><span class="p">,</span><span class="nt">"updated_at"</span><span class="p">:</span><span class="s2">"2026-10-22T13:58:14.062215Z"</span><span class="p">}</span>
 </span></code></pre></div>
-<p>A post that does not exist:</p>
+<p>Ask for a post that does not exist. You should get <code>404</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/posts/99
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>HTTP/1.1 404 Not Found

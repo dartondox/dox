@@ -6,14 +6,14 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A controller holds the code that answers a route.">
+        <meta name="description" content="A controller holds the code that answers a route, so your route files stay short.">
       
       
       
         <link rel="canonical" href="https://dartondox.dev/latest/the-basic/controller/">
       
       
-        <link rel="prev" href="../errors/">
+        <link rel="prev" href="../validation-rules/">
       
       
         <link rel="next" href="../dependency-injection/">
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Controller | Dox">
-  <meta property="og:description" content="A controller holds the code that answers a route.">
+  <meta property="og:description" content="A controller holds the code that answers a route, so your route files stay short.">
   <meta property="og:url" content="https://dartondox.dev/latest/the-basic/controller/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Controller | Dox">
-  <meta name="twitter:description" content="A controller holds the code that answers a route.">
+  <meta name="twitter:description" content="A controller holds the code that answers a route, so your route files stay short.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1600,6 +1600,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,6 +1702,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../request/" class="md-nav__link">
         
   
@@ -1745,12 +1843,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../response/" class="md-nav__link">
+      <a href="../dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1761,15 +1859,410 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#writing-controllers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writing controllers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writing controllers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-controllers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Basic controllers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plain-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plain functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resource-controllers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource controllers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resource controllers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#api-resource-controllers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API resource controllers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#resource-controllers-for-a-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Resource controllers for a model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parameters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-param-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path param types
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returning-a-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Returning a response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1925,6 +2418,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../errors/" class="md-nav__link">
         
   
@@ -1950,457 +2488,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#class-based-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Class based controller
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Class based controller">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#static-method" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Static method
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#function-based-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Function based controller
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#resource-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resource controller
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Resource controller">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#api-resource-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        API resource controller
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#resource-controller-for-a-model" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resource controller for a model
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#parameters" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Parameters
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-to-return" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What to return
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -6906,22 +6993,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#class-based-controller" class="md-nav__link">
+  <a href="#writing-controllers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Class based controller
+        Writing controllers
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Class based controller">
+    <nav class="md-nav" aria-label="Writing controllers">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#static-method" class="md-nav__link">
+  <a href="#basic-controllers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Static method
+        Basic controllers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static methods
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#plain-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plain functions
       
     </span>
   </a>
@@ -6934,33 +7043,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#function-based-controller" class="md-nav__link">
+  <a href="#resource-controllers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Function based controller
+        Resource controllers
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#resource-controller" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resource controller
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Resource controller">
+    <nav class="md-nav" aria-label="Resource controllers">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#api-resource-controller" class="md-nav__link">
+  <a href="#api-resource-controllers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API resource controller
+        API resource controllers
       
     </span>
   </a>
@@ -6968,10 +7066,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#resource-controller-for-a-model" class="md-nav__link">
+  <a href="#resource-controllers-for-a-model" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resource controller for a model
+        Resource controllers for a model
       
     </span>
   </a>
@@ -6992,13 +7090,41 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Parameters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-param-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Path param types
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-to-return" class="md-nav__link">
+  <a href="#returning-a-response" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What to return
+        Returning a response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
       
     </span>
   </a>
@@ -7031,10 +7157,11 @@
 
 
 <h1 id="controller">Controller</h1>
-<p>A controller holds the code that answers a route.</p>
-<p>It can be a class method, a static method or a plain function.</p>
-<h2 id="class-based-controller">Class based controller</h2>
-<p>Make one with the CLI:</p>
+<p>A controller holds the code that answers a route, so your route files stay short.</p>
+<p>You could write all your code in route closures. But when an app grows, it is easier to group the code for one topic, like blogs, in one class. A controller can be a class method, a static method or a plain function.</p>
+<h2 id="writing-controllers">Writing controllers</h2>
+<h3 id="basic-controllers">Basic controllers</h3>
+<p>Make a controller with the CLI:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog
 </span></code></pre></div>
 <p>It writes <code>lib/app/http/controllers/blog.controller.dart</code> with an empty <code>index</code> method. Fill it in:</p>
@@ -7047,11 +7174,12 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>Then point a route to the method:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/blogs'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">BlogController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>@Inject()</code> puts the controller in the container. Run <code>dart run build_runner build</code> after you add one.
-The constructor can ask for services and repositories. See <a href="../dependency-injection/">Dependency injection</a>.</p>
-<h3 id="static-method">Static method</h3>
+<p><code>@Inject()</code> puts the controller in the container. Run <code>dart run build_runner build</code> after you add one. The constructor can ask for services and repositories. See <a href="../dependency-injection/">Dependency injection</a>.</p>
+<h3 id="static-methods">Static methods</h3>
+<p>If a controller needs nothing from the container, a static method also works:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppController</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">ping</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'pong'</span><span class="p">;</span>
@@ -7060,16 +7188,17 @@ The constructor can ask for services and repositories. See <a href="../dependenc
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/ping'</span><span class="p">,</span><span class="w"> </span><span class="n">AppController</span><span class="p">.</span><span class="n">ping</span><span class="p">);</span>
 </span></code></pre></div>
-<h2 id="function-based-controller">Function based controller</h2>
+<h3 id="plain-functions">Plain functions</h3>
+<p>A plain function works too:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">listBlog</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="s1">'all blogs'</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
 </span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/blogs'</span><span class="p">,</span><span class="w"> </span><span class="n">listBlog</span><span class="p">);</span>
 </span></code></pre></div>
-<h2 id="resource-controller">Resource controller</h2>
-<p>A resource controller has the 7 methods that <code>Route.resource</code> uses.</p>
-<p>Make one with the CLI:</p>
+<h2 id="resource-controllers">Resource controllers</h2>
+<p>Most models need the same routes: list, show, create, update and delete. A resource controller has the 7 methods that <code>Route.resource</code> uses, so one line of routes covers all of them.</p>
+<p>Make one with <code>-r</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w"> </span>-r
 </span></code></pre></div>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/blog.controller.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7101,16 +7230,16 @@ The constructor can ask for services and repositories. See <a href="../dependenc
 </span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">destroy</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{}</span>
 </span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>Register it with one route:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">resource</span><span class="p">(</span><span class="s1">'blogs'</span><span class="p">,</span><span class="w"> </span><span class="n">BlogController</span><span class="p">);</span>
 </span></code></pre></div>
-<p>You can delete methods you do not need. <code>Route.resource</code> skips them.
-See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
-<h3 id="api-resource-controller">API resource controller</h3>
-<p>An API has no form pages. <code>--api</code> makes the resource controller without <code>create</code> and <code>edit</code>:</p>
+<p>You can delete the methods you do not need, because <code>Route.resource</code> skips them. See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
+<h3 id="api-resource-controllers">API resource controllers</h3>
+<p>An API has no form pages. So <code>--api</code> makes the resource controller without <code>create</code> and <code>edit</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w"> </span>--api
 </span></code></pre></div>
-<h3 id="resource-controller-for-a-model">Resource controller for a model</h3>
-<p><code>--model</code> makes a resource controller that uses a model:</p>
+<h3 id="resource-controllers-for-a-model">Resource controllers for a model</h3>
+<p>If the controller works with one model, use <code>--model</code>. It fills the methods with model code:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Blog<span class="w"> </span>--model<span class="o">=</span>Blog
 </span></code></pre></div>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/blog.controller.dart</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7159,14 +7288,11 @@ See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
 </span><span id="__span-10-44"><a id="__codelineno-10-44" name="__codelineno-10-44" href="#__codelineno-10-44"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-10-45"><a id="__codelineno-10-45" name="__codelineno-10-45" href="#__codelineno-10-45"></a><span class="p">}</span>
 </span></code></pre></div>
-<ul>
-<li><code>show</code>, <code>edit</code>, <code>update</code> and <code>destroy</code> take the model. <a href="../dependency-injection/#route-model-binding">Route model binding</a> loads it by the <code>{id}</code>.</li>
-<li><code>create()</code> and <code>update()</code> take only the columns in the model's <code>fillable</code> list. Add your columns there.</li>
-<li>Use <code>--api</code> and <code>--model</code> together for an API controller with a model.</li>
-<li><code>dox make:model Blog -r</code> makes the model and this controller in one step.</li>
-</ul>
+<p><code>show</code>, <code>edit</code>, <code>update</code> and <code>destroy</code> take the model. <a href="../dependency-injection/#route-model-binding">Route model binding</a> loads it by the <code>{id}</code>.</p>
+<p><code>create()</code> and <code>update()</code> take only the columns in the model's <code>fillable</code> list, so add your columns there first.</p>
+<p>You can use <code>--api</code> and <code>--model</code> together. And <code>dox make:model Blog -r</code> makes the model and this controller in one step.</p>
 <h2 id="parameters">Parameters</h2>
-<p>A controller asks for what it needs by <strong>type</strong>. Dox fills each parameter.</p>
+<p>A controller method asks for what it needs by <strong>type</strong>, and Dox fills each parameter:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'/teams/{teamId}/users/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">UserController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">update</span><span class="p">);</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nd">@Inject</span><span class="p">()</span>
@@ -7174,6 +7300,7 @@ See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
 </span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">teamId</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">UpdateUser</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>These types work:</p>
 <table>
 <thead>
 <tr>
@@ -7208,31 +7335,29 @@ See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
 </tr>
 </tbody>
 </table>
-<p>Rules:</p>
+<p>You can put the parameters in any order. Path params are matched by position: the first path-param parameter gets the first <code>{...}</code> in the route. <code>DoxRequest</code> is not needed, so add it only when you use it.</p>
+<p>There are a few rules:</p>
 <ul>
-<li>The order of parameters is free. Path params are matched by position: the first path-param parameter gets the first <code>{...}</code> in the route.</li>
-<li><code>DoxRequest</code> is not needed. Add it only when you use it.</li>
 <li>At most one <code>@Dto</code> parameter.</li>
 <li>Only positional parameters. Named and <code>[optional]</code> parameters are not supported.</li>
 <li>A catch-all <code>{path*}</code> param is a <code>String</code>.</li>
 <li>The same rules work for static methods and plain functions.</li>
-<li>Dox reads the parameter types once, at start. It does not use <code>dart:mirrors</code>.</li>
 </ul>
-<p><strong>Path param types.</strong> Dox converts the text from the URL:</p>
+<h3 id="path-param-types">Path param types</h3>
+<p>Dox converts the text from the URL to the type you ask for. If the text does not fit the type, the client gets <code>404 Not Found</code>:</p>
 <ul>
-<li><code>int</code>: <code>"42"</code> is <code>42</code>. <code>"abc"</code> or <code>"4.5"</code> answers <code>404 Not Found</code>.</li>
+<li><code>int</code>: <code>"42"</code> is <code>42</code>. <code>"abc"</code> or <code>"4.5"</code> answers <code>404</code>.</li>
 <li><code>double</code>, <code>num</code>: <code>"4.5"</code> is <code>4.5</code>.</li>
-<li><code>bool</code>: <code>true</code> or <code>1</code> is <code>true</code>. <code>false</code> or <code>0</code> is <code>false</code>.</li>
-<li>Any other text answers <code>404</code> too.</li>
-<li>Path params are checked first. When one is wrong, the DTO is not checked.</li>
+<li><code>bool</code>: <code>true</code> or <code>1</code> is <code>true</code>. <code>false</code> or <code>0</code> is <code>false</code>. Any other text answers <code>404</code>.</li>
 </ul>
-<p><strong>Checked at start.</strong> The server does not start when:</p>
-<ul>
-<li>a parameter type is not in the list above (did you run <code>dart run build_runner build</code>?),</li>
-<li>the method has more path-param parameters than the route has <code>{...}</code> params.</li>
-</ul>
-<h2 id="what-to-return">What to return</h2>
+<p>Path params are checked first. When one is wrong, the DTO is not checked.</p>
+<h2 id="returning-a-response">Returning a response</h2>
 <p>Return a <code>String</code>, a <code>Map</code>, a model, a <code>File</code> and more. See <a href="../response/">Response</a>.</p>
+<h2 id="details">Details</h2>
+<ul>
+<li>Dox reads the parameter types once, at start. It does not use <code>dart:mirrors</code>.</li>
+<li>The server does not start when a parameter type is not in the list above (did you run <code>dart run build_runner build</code>?), or when the method has more path-param parameters than the route has <code>{...}</code> params.</li>
+</ul>
 
 
 
@@ -7275,7 +7400,7 @@ See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../errors/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Error handling">
+          <a href="../validation-rules/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Validation rules">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -7285,7 +7410,7 @@ See <a href="../routing/#resource-routes">Routing: resource routes</a>.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Error handling
+                Validation rules
               </div>
             </div>
           </a>

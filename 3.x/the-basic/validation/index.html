@@ -6,14 +6,14 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how to check request input with typed DTO classes.">
+        <meta name="description" content="Validation checks the request input with a typed DTO class, so your controller only gets good data.">
       
       
       
         <link rel="canonical" href="https://dartondox.dev/latest/the-basic/validation/">
       
       
-        <link rel="prev" href="../session/">
+        <link rel="prev" href="../dto/">
       
       
         <link rel="next" href="../validation-rules/">
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Validation | Dox">
-  <meta property="og:description" content="This page shows how to check request input with typed DTO classes.">
+  <meta property="og:description" content="Validation checks the request input with a typed DTO class, so your controller only gets good data.">
   <meta property="og:url" content="https://dartondox.dev/latest/the-basic/validation/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Validation | Dox">
-  <meta name="twitter:description" content="This page shows how to check request input with typed DTO classes.">
+  <meta name="twitter:description" content="Validation checks the request input with a typed DTO class, so your controller only gets good data.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1600,6 +1600,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,6 +1702,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../request/" class="md-nav__link">
         
   
@@ -1745,12 +1843,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../response/" class="md-nav__link">
+      <a href="../dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1761,15 +1859,487 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#required-and-optional-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required and optional fields
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Required and optional fields">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empty-strings-and-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty strings and spaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-default-for-bad-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using the default for bad values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#missing-or-null-for-patch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Missing or null? (for PATCH)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checks-across-fields-validate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checks across fields: validate()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#database-rules-unique-and-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database rules: @Unique and @Exists
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-error-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The error response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Messages">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#names-for-field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Names for {field}
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#short-rule-names-in-message-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Short rule names in message keys
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dynamic-input" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dynamic input
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empty-values-and-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty values and defaults
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1925,6 +2495,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../errors/" class="md-nav__link">
         
   
@@ -1950,578 +2565,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Setup
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-a-dto" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use a DTO
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#required-and-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Required and optional
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Required and optional">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#missing-or-null-for-patch" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Missing or null? (for PATCH)
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-the-data-comes-from" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where the data comes from
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#keys" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Keys
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rules
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nested-objects-and-lists" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Nested objects and lists
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Files
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#checks-across-fields-validate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Checks across fields: validate()
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#database-rules-unique-and-exists" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Database rules: @Unique and @Exists
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-error-response" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The error response
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#messages" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Messages
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Messages">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#names-for-field" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Names for {field}
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#laravel-rule-names-in-message-keys" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Laravel rule names in message keys
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#custom-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom rules
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#dynamic-input" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dynamic input
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Testing
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -7027,38 +7070,38 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#setup" class="md-nav__link">
+  <a href="#required-and-optional-fields" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setup
+        Required and optional fields
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-a-dto" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use a DTO
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#required-and-optional" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Required and optional
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Required and optional">
+    <nav class="md-nav" aria-label="Required and optional fields">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#empty-strings-and-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty strings and spaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#using-the-default-for-bad-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using the default for bad values
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#missing-or-null-for-patch" class="md-nav__link">
@@ -7077,65 +7120,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-the-data-comes-from" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where the data comes from
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#keys" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Keys
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#rules" class="md-nav__link">
     <span class="md-ellipsis">
       
         Rules
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#nested-objects-and-lists" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Nested objects and lists
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#files" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Files
       
     </span>
   </a>
@@ -7199,10 +7187,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#laravel-rule-names-in-message-keys" class="md-nav__link">
+  <a href="#short-rule-names-in-message-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Laravel rule names in message keys
+        Short rule names in message keys
       
     </span>
   </a>
@@ -7247,6 +7235,56 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#flags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#empty-values-and-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty values and defaults
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#messages_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Messages
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7273,10 +7311,8 @@
 
 
 <h1 id="validation">Validation</h1>
-<p>This page shows how to check request input with typed DTO classes.</p>
-<p>Write a class with <code>@Dto()</code>. Ask for it in your controller.
-Dox reads the request, checks it, and gives you a typed object.
-When the input is wrong, Dox answers <code>422</code> with the errors. Your controller does not run.</p>
+<p>Validation checks the request input with a typed <a href="../dto/">DTO</a> class, so your controller only gets good data.</p>
+<p>You write a class with <code>@Dto()</code> and put rules on its fields. Then you ask for it in your controller. Dox reads the request, checks it, and gives you a typed object. When the input is wrong, Dox answers <code>422</code> with the errors, and your controller does not run.</p>
 <div class="language-dart highlight"><span class="filename">lib/app/dtos/create_user/create_user.dto.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'create_user.dto.g.dart'</span><span class="p">;</span>
@@ -7318,35 +7354,9 @@ When the input is wrong, Dox answers <code>422</code> with the errors. Your cont
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="setup">Setup</h2>
-<p>You do this once per app.</p>
-<ol>
-<li>Make a DTO with <code>dox make:dto CreateUser</code>. It writes <code>lib/app/dtos/create_user/create_user.dto.dart</code>.</li>
-<li>Run the generator: <code>dox build_runner:build</code> (or <code>dox build_runner:watch</code>).
-   It writes a <code>.dto.g.dart</code> file next to each DTO, and one list of all DTOs in <code>lib/generated/dtos.g.dart</code>.</li>
-<li>Give that list to the app:</li>
-</ol>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/dtos.g.dart'</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">dtos:</span><span class="w"> </span><span class="n">dtos</span><span class="p">,</span><span class="w"> </span><span class="c1">// from lib/generated/dtos.g.dart</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>Dox uses no reflection, so it needs this list to find your DTOs. Without it, the server stops at start with a clear error.</p>
-<h2 id="use-a-dto">Use a DTO</h2>
-<p>Add a parameter with the DTO type. Dox checks the request before your method runs.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">CreateUser</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">// with the request and a path param</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">UpdateUser</span><span class="w"> </span><span class="n">body</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</span></code></pre></div>
-<p>Or check inside the method. <code>req.validate&lt;T&gt;()</code> returns the object, or throws the <code>422</code> error.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">CreateUser</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validate</span><span class="o">&lt;</span><span class="n">CreateUser</span><span class="o">&gt;</span><span class="p">();</span>
-</span></code></pre></div>
-<p>See <a href="../controller/#parameters">Controller: parameters</a> for the full rules.</p>
-<h2 id="required-and-optional">Required and optional</h2>
-<p>The Dart type decides. You do not write <code>required</code> or <code>nullable</code>.</p>
+<p>To create a DTO, register it with the app, and use it for the body, the query string or files, see <a href="../dto/">DTOs</a>. This page is about the rules and the error messages.</p>
+<h2 id="required-and-optional-fields">Required and optional fields</h2>
+<p>The Dart type decides if a field is required, so you do not write <code>required</code> or <code>nullable</code>:</p>
 <table>
 <thead>
 <tr>
@@ -7373,135 +7383,38 @@ When the input is wrong, Dox answers <code>422</code> with the errors. Your cont
 </tr>
 </tbody>
 </table>
-<ul>
-<li>Rules on an optional field run only when it has a value.</li>
-<li>A default value is used only when the key is missing. The rules do not check it.</li>
-<li><strong>An empty string counts as missing.</strong> So a required <code>String</code> rejects <code>""</code>. Add <code>@AllowEmpty()</code> to keep <code>""</code>.</li>
-<li><strong>Spaces are kept.</strong> So <code>"   "</code> passes <code>required</code>, unless the field has <code>@Trim()</code>. To trim every text field of a DTO, use <code>@Dto(trim: true)</code>. Then <code>"   "</code> counts as missing. It works like <code>@Trim()</code> on each <code>String</code> field and on the text items of its lists and maps. A nested DTO uses its own <code>@Dto(trim:)</code>.</li>
-<li>To read <code>""</code> as <code>null</code> instead, use <code>@Dto(emptyStringsToNull: true)</code>. With <code>@Dto(trim: true)</code> too, blank text like <code>"  "</code> is <code>null</code> as well. Then <code>{"bio": ""}</code> clears a <code>Maybe&lt;String?&gt;</code> field. A required field still gets <code>required</code>. A field that is not nullable but has a default gets <code>required</code> too, because <code>null</code> is not a missing key.</li>
-<li><code>@OrDefault()</code> turns a bad value into the default, with no error.<ul>
-<li>It works on any field, in a body or a query.</li>
-<li>Example: <code>@OrDefault() @NotIn(&lt;int&gt;[0]) final int page;</code> with <code>this.page = 1</code> reads <code>page=abc</code> and <code>page=0</code> as <code>1</code>.</li>
-<li>The field needs a default, a nullable type or a <code>Maybe</code> type. A <code>Maybe</code> field gets <code>Maybe.missing()</code>.</li>
-<li>Errors from async rules (<code>@Unique</code>, <code>@Exists</code>, your <code>AsyncRule</code>) and from <code>validate()</code> are not dropped. They run later, on the built object, and still give <code>422</code>.</li>
-</ul>
-</li>
-<li>Three <a href="../../packages/validation/#opt-in-flags">opt-in flags</a> change how DTOs are checked: get all errors at once, reject <code>[]</code> in a required list, and reject <code>""</code> in a <code>Maybe</code> field.</li>
-</ul>
+<p>Rules on an optional field run only when it has a value. A default value is used only when the key is missing, and the rules do not check it.</p>
+<h3 id="empty-strings-and-spaces">Empty strings and spaces</h3>
+<p><strong>An empty string counts as missing.</strong> So a required <code>String</code> rejects <code>""</code>. Add <code>@AllowEmpty()</code> to keep <code>""</code>.</p>
+<p><strong>Spaces are kept.</strong> So <code>"   "</code> passes <code>required</code>, unless the field has <code>@Trim()</code>. To trim every text field of a DTO, use <code>@Dto(trim: true)</code>. Then <code>"   "</code> counts as missing.</p>
+<p>If you want <code>""</code> to be <code>null</code> instead, use <code>@Dto(emptyStringsToNull: true)</code>.</p>
+<h3 id="using-the-default-for-bad-values">Using the default for bad values</h3>
+<p>Sometimes a bad value should not be an error. For example, <code>page=abc</code> in a list page should just give page 1. <code>@OrDefault()</code> turns a bad value into the default, with no error:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@OrDefault</span><span class="p">()</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nd">@NotIn</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">0</span><span class="p">])</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">page</span><span class="p">;</span><span class="w"> </span><span class="c1">// with this.page = 1, page=abc and page=0 give 1</span>
+</span></code></pre></div>
+<p>The field needs a default, a nullable type or a <code>Maybe</code> type.</p>
 <h3 id="missing-or-null-for-patch">Missing or <code>null</code>? (for PATCH)</h3>
-<p>A <code>T?</code> field gives <code>null</code> for both. To know the difference, use <code>Maybe&lt;T&gt;</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@Length</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">500</span><span class="p">)</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">final</span><span class="w"> </span><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">bio</span><span class="p">;</span><span class="w"> </span><span class="c1">// default: const Maybe.missing()</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1">// in the controller</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">bio</span><span class="p">.</span><span class="n">isPresent</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="n">user</span><span class="p">.</span><span class="n">bio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">bio</span><span class="p">.</span><span class="n">value</span><span class="p">;</span><span class="w"> </span><span class="c1">// can be null: the client cleared it</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
+<p>In a PATCH request, a missing key means "do not change it", and <code>null</code> means "clear it". A <code>T?</code> field gives <code>null</code> for both. To know the difference, use <code>Maybe&lt;T&gt;</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@Length</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">500</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">final</span><span class="w"> </span><span class="n">Maybe</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">bio</span><span class="p">;</span><span class="w"> </span><span class="c1">// default: const Maybe.missing()</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1">// in the controller</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">bio</span><span class="p">.</span><span class="n">isPresent</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="n">user</span><span class="p">.</span><span class="n">bio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">body</span><span class="p">.</span><span class="n">bio</span><span class="p">.</span><span class="n">value</span><span class="p">;</span><span class="w"> </span><span class="c1">// can be null: the client cleared it</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="types">Types</h2>
-<table>
-<thead>
-<tr>
-<th>Dart type</th>
-<th>JSON</th>
-<th>Query and form data</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>String</code>, <code>int</code>, <code>double</code>, <code>num</code>, <code>bool</code></td>
-<td>the same JSON type</td>
-<td>text, converted</td>
-</tr>
-<tr>
-<td><code>DateTime</code></td>
-<td>an ISO 8601 string</td>
-<td>the same</td>
-</tr>
-<tr>
-<td>an <code>enum</code></td>
-<td>the name, like <code>"admin"</code></td>
-<td>the same</td>
-</tr>
-<tr>
-<td><code>RequestFile</code></td>
-<td>not allowed</td>
-<td>a file part</td>
-</tr>
-<tr>
-<td>a <code>@Dto</code> class</td>
-<td>an object</td>
-<td>bracket keys: <code>address[city]</code></td>
-</tr>
-<tr>
-<td><code>List&lt;T&gt;</code></td>
-<td>an array</td>
-<td><code>tags=a&amp;tags=b</code> or <code>tags[]=a</code></td>
-</tr>
-<tr>
-<td><code>Map&lt;String, T&gt;</code></td>
-<td>an object</td>
-<td>bracket keys: <code>meta[color]</code></td>
-</tr>
-</tbody>
-</table>
-<p>JSON is strict: <code>"18"</code> is not an <code>int</code>. Query and form data are text, so Dox converts them.
-To accept text in a JSON body too, use <code>@Dto(coerce: true)</code>. Then <code>"18"</code> is read as <code>18</code>, <code>"4.5"</code> as <code>4.5</code>, and <code>"true"</code>, <code>"1"</code>, <code>"yes"</code>, <code>"on"</code> (and the opposites) as a bool. A <code>bool</code> also takes the numbers <code>1</code> and <code>0</code>. A nested DTO uses its own <code>@Dto(coerce:)</code>.</p>
-<p><div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Dto</span><span class="p">(</span><span class="nl">coerce:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UpdateStock</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="p">;</span><span class="w"> </span><span class="c1">// {"count": "18"} gives 18</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">active</span><span class="p">;</span><span class="w"> </span><span class="c1">// {"active": 1} gives true</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">UpdateStock</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">count</span><span class="p">,</span><span class="w"> </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">active</span><span class="p">});</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="p">}</span>
-</span></code></pre></div>
-Every detail is in <a href="../validation-rules/#types-in-detail">Types in detail</a>.</p>
-<h2 id="where-the-data-comes-from">Where the data comes from</h2>
-<table>
-<thead>
-<tr>
-<th>Request</th>
-<th>Dox reads</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>GET</code>, <code>HEAD</code>, <code>DELETE</code></td>
-<td>the query string</td>
-</tr>
-<tr>
-<td><code>POST</code>, <code>PUT</code>, <code>PATCH</code></td>
-<td>the body (JSON, form or multipart)</td>
-</tr>
-</tbody>
-</table>
-<p>Dox reads <strong>one</strong> source. It never mixes the query and the body.
-To choose the source yourself:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@Dto</span><span class="p">(</span><span class="k">source</span><span class="o">:</span><span class="w"> </span><span class="n">Source</span><span class="p">.</span><span class="n">query</span><span class="p">)</span><span class="w"> </span><span class="c1">// on the DTO</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SearchUsers</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validate</span><span class="o">&lt;</span><span class="n">SearchUsers</span><span class="o">&gt;</span><span class="p">(</span><span class="k">source</span><span class="o">:</span><span class="w"> </span><span class="n">Source</span><span class="p">.</span><span class="n">query</span><span class="p">);</span><span class="w"> </span><span class="c1">// for one call</span>
-</span></code></pre></div>
-<p>Path params are not part of a DTO. Ask for them as controller parameters, like <code>int id</code>.</p>
-<h2 id="keys">Keys</h2>
-<p>The input key is the field name in snake_case: <code>firstName</code> reads <code>first_name</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">firstName</span><span class="p">;</span><span class="w"> </span><span class="c1">// key: first_name</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nd">@Name</span><span class="p">(</span><span class="s1">'emailAddress'</span><span class="p">)</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span><span class="w"> </span><span class="c1">// key: emailAddress</span>
-</span></code></pre></div>
-<ul>
-<li><code>@Dto(keyCase: KeyCase.field)</code> uses the field names as they are.</li>
-<li>Unknown keys are dropped. With <code>@Dto(strict: true)</code>, an unknown key is an error.</li>
-</ul>
 <h2 id="rules">Rules</h2>
-<p>Put rules on a field as annotations. They run from top to bottom. The first rule that fails gives the error.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@Trim</span><span class="p">()</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nd">@Lowercase</span><span class="p">()</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nd">@Email</span><span class="p">()</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nd">@MaxLength</span><span class="p">(</span><span class="m">255</span><span class="p">)</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
+<p>Put rules on a field as annotations. They run from top to bottom, and the first rule that fails gives the error:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Trim</span><span class="p">()</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nd">@Lowercase</span><span class="p">()</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nd">@Email</span><span class="p">()</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nd">@MaxLength</span><span class="p">(</span><span class="m">255</span><span class="p">)</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
 </span></code></pre></div>
+<p>A rule on a list checks each item, like <code>@Email()</code> on a <code>List&lt;String&gt;</code>. Only the list rules check the list itself. For a few allowed values, use a Dart <code>enum</code>, or <code>@In(&lt;String&gt;['draft', 'published'])</code>.</p>
+<p>These are the rules. Every rule, with its error code and message, is in <a href="../validation-rules/">Validation rules</a>:</p>
 <table>
 <thead>
 <tr>
@@ -7552,150 +7465,100 @@ To choose the source yourself:</p>
 </tr>
 </tbody>
 </table>
-<p>Every rule, with its error code and message, is in <a href="../validation-rules/">Validation rules</a>.</p>
-<ul>
-<li>A rule on a list checks each item: <code>@Email()</code> on a <code>List&lt;String&gt;</code>. Only the list rules check the list itself.</li>
-<li>For a few allowed values, use a Dart <code>enum</code>, or <code>@In(&lt;String&gt;['draft', 'published'])</code>.</li>
-</ul>
-<h2 id="nested-objects-and-lists">Nested objects and lists</h2>
-<p>A field can be another <code>@Dto</code> class, or a list of them.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@Dto</span><span class="p">()</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateOrder</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">Address</span><span class="w"> </span><span class="n">address</span><span class="p">;</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nd">@MinItems</span><span class="p">(</span><span class="m">1</span><span class="p">)</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">OrderItem</span><span class="o">&gt;</span><span class="w"> </span><span class="n">items</span><span class="p">;</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">CreateOrder</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">address</span><span class="p">,</span><span class="w"> </span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">items</span><span class="p">});</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">CreateOrder</span><span class="o">&gt;</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$CreateOrderDto</span><span class="p">;</span>
-</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="p">}</span>
-</span></code></pre></div>
-<p><code>Address</code> and <code>OrderItem</code> are <code>@Dto</code> classes too. An error in a nested value has a path key, like <code>items.1.quantity</code>.</p>
-<h2 id="files">Files</h2>
-<p>A <code>RequestFile</code> field reads a file from <code>multipart/form-data</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nd">@Image</span><span class="p">()</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="nd">@MaxSize</span><span class="p">(</span><span class="s1">'2MB'</span><span class="p">)</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="nd">@Dimensions</span><span class="p">(</span><span class="nl">minWidth:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="nl">maxWidth:</span><span class="w"> </span><span class="m">2000</span><span class="p">)</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="kd">final</span><span class="w"> </span><span class="n">RequestFile</span><span class="w"> </span><span class="n">avatar</span><span class="p">;</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="nd">@Mimes</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'pdf'</span><span class="p">,</span><span class="w"> </span><span class="s1">'docx'</span><span class="p">])</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="kd">final</span><span class="w"> </span><span class="n">List</span><span class="o">&lt;</span><span class="n">RequestFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">documents</span><span class="p">;</span>
-</span></code></pre></div>
-<p>Dox checks the real file type from its first bytes. It does not trust the file name or the client.
-To save the file, see <a href="../../guides/file-upload/">File upload</a>.</p>
 <h2 id="checks-across-fields-validate">Checks across fields: <code>validate()</code></h2>
-<p>Add a <code>validate(DtoErrors errors)</code> method to the DTO. Dox calls it after all field rules passed.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">validate</span><span class="p">(</span><span class="n">DtoErrors</span><span class="w"> </span><span class="n">errors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">passwordConfirmation</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="n">errors</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'password_confirmation'</span><span class="p">,</span><span class="w"> </span><span class="s1">'The passwords do not match'</span><span class="p">);</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">}</span>
+<p>Some checks need more than one field. Add a <code>validate(DtoErrors errors)</code> method to the DTO. Dox calls it after all field rules passed:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">validate</span><span class="p">(</span><span class="n">DtoErrors</span><span class="w"> </span><span class="n">errors</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">password</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">passwordConfirmation</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="n">errors</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'password_confirmation'</span><span class="p">,</span><span class="w"> </span><span class="s1">'The passwords do not match'</span><span class="p">);</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<ul>
-<li>The key is the input key (snake_case). Use <code>_root</code> for an error about the whole body.</li>
-<li><code>errors.has(key)</code> tells you if a key already has an error.</li>
-<li>The method can be <code>async</code>. Do not throw for bad input. Add an error.</li>
-</ul>
+<p>The key is the input key (snake_case). Use <code>_root</code> for an error about the whole body. <code>errors.has(key)</code> tells you if a key already has an error.</p>
+<p>The method can be <code>async</code>. Do not throw for bad input. Add an error.</p>
 <h2 id="database-rules-unique-and-exists">Database rules: <code>@Unique</code> and <code>@Exists</code></h2>
-<p>These read the database, so they run last.
-They come from <code>dox_orm</code>. Add <code>import 'package:dox_orm/dox_orm.dart';</code> to the DTO file.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nd">@Unique</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="nl">column:</span><span class="w"> </span><span class="s1">'email'</span><span class="p">)</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="nd">@Exists</span><span class="p">(</span><span class="s1">'teams'</span><span class="p">)</span><span class="w"> </span><span class="c1">// column defaults to id</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">teamId</span><span class="p">;</span>
+<p>Sometimes you need to check the database, for example that an email is not taken yet. <code>@Unique</code> and <code>@Exists</code> do this. They come from <code>dox_orm</code>, so add <code>import 'package:dox_orm/dox_orm.dart';</code> to the DTO file:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Unique</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="nl">column:</span><span class="w"> </span><span class="s1">'email'</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nd">@Exists</span><span class="p">(</span><span class="s1">'teams'</span><span class="p">)</span><span class="w"> </span><span class="c1">// column defaults to id</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">teamId</span><span class="p">;</span>
 </span></code></pre></div>
 <p>For an update, skip the row you are updating with <code>ignoreParam</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="c1">// PUT /users/{id}</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nd">@Unique</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="nl">column:</span><span class="w"> </span><span class="s1">'email'</span><span class="p">,</span><span class="w"> </span><span class="nl">ignoreParam:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">)</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// PUT /users/{id}</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nd">@Unique</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="nl">column:</span><span class="w"> </span><span class="s1">'email'</span><span class="p">,</span><span class="w"> </span><span class="nl">ignoreParam:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">)</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
 </span></code></pre></div>
-<p>All options are in <a href="../validation-rules/#database">Validation rules: database</a>.
-The full order of checks is in <a href="../validation-rules/#the-order-of-checks">The order of checks</a>.</p>
+<p>These rules read the database, so they run last. All options are in <a href="../validation-rules/#database">Validation rules: database</a>. The full order of checks is in <a href="../validation-rules/#the-order-of-checks">The order of checks</a>.</p>
 <h2 id="the-error-response">The error response</h2>
 <p>When a check fails, Dox answers <code>422</code> with one message per field:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="p">{</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The email is not a valid email"</span><span class="p">,</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nt">"tags.0"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The tags may not be greater than 20 characters"</span><span class="p">,</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nt">"items.1.quantity"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The quantity must be greater than 0"</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nt">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The email is not a valid email"</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">"tags.0"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The tags may not be greater than 20 characters"</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">"items.1.quantity"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The quantity must be greater than 0"</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>The key is the path to the value, with the input keys. List items use the index.</p>
-<p>The flag <code>laravelErrors</code> sends <code>{"message": "...", "errors": {"field": ["..."]}}</code> instead. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</p>
-<p>For another error shape, read <code>error.issues</code> of the <code>ValidationException</code> in your <code>ExceptionHandler</code>. Each issue has its <code>dottedPath</code>, its rule <code>code</code> (like <code>min_length</code>), its <code>message</code> and its <code>params</code>.</p>
+<p>On a form post with a <a href="../session/#validation-errors-and-old-input">session</a>, Dox redirects back with the errors instead.</p>
+<p>If you need another error shape, read <code>error.issues</code> of the <code>ValidationException</code> in your <code>ExceptionHandler</code>. Each issue has its <code>dottedPath</code>, its rule <code>code</code> (like <code>min_length</code>), its <code>message</code> and its <code>params</code>.</p>
 <h2 id="messages">Messages</h2>
-<p>Change a message in one of these places. The first one wins.</p>
-<ol>
-<li>On the rule: <code>@Email(message: 'Please check your email')</code>.</li>
-<li>On the DTO, by code or by <code>key.code</code>. A full dotted path works too, like <code>'address.city.required'</code> (it also reaches a nested DTO). A message in the nested DTO itself, like <code>'city.required'</code>, wins over it. Use <code>*</code> for list items, like <code>'tags.*.required'</code>:</li>
-</ol>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nd">@Dto</span><span class="p">(</span><span class="nl">messages:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="s1">'email.required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'We need your email'</span><span class="p">,</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="s1">'integer'</span><span class="o">:</span><span class="w"> </span><span class="s1">'The {field} must be a number'</span><span class="p">,</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">})</span>
+<p>Sometimes you want your own error text. You can change a message in three places. The first one wins.</p>
+<p>On the rule:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@Email</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Please check your email'</span><span class="p">)</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">email</span><span class="p">;</span>
 </span></code></pre></div>
-<ol>
-<li>For the whole app, with a <code>MessageResolver</code>. Use it for other languages:</li>
-</ol>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppMessages</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">MessageResolver</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">_texts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="s1">'th'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'กรุณากรอก {field}'</span><span class="p">},</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="p">};</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">resolve</span><span class="p">(</span><span class="n">MessageRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">    </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_texts</span><span class="p">[</span><span class="n">request</span><span class="p">.</span><span class="n">locale</span><span class="p">]</span><span class="o">?</span><span class="p">[</span><span class="n">request</span><span class="p">.</span><span class="n">code</span><span class="p">];</span><span class="w"> </span><span class="c1">// locale from Accept-Language</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">template</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
-</span><span id="__span-17-11"><a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-17-12"><a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">format</span><span class="p">(</span><span class="n">template</span><span class="p">,</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="n">params</span><span class="p">);</span>
-</span><span id="__span-17-13"><a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-17-14"><a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="p">}</span>
-</span><span id="__span-17-15"><a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a>
-</span><span id="__span-17-16"><a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-17-17"><a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="w">  </span><span class="nl">validationMessages:</span><span class="w"> </span><span class="n">AppMessages</span><span class="p">(),</span>
-</span><span id="__span-17-18"><a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-17-19"><a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="p">);</span>
+<p>On the DTO, by code or by <code>key.code</code>. Use <code>*</code> for list items, like <code>'tags.*.required'</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@Dto</span><span class="p">(</span><span class="nl">messages:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="s1">'email.required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'We need your email'</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="s1">'integer'</span><span class="o">:</span><span class="w"> </span><span class="s1">'The {field} must be a number'</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">})</span>
 </span></code></pre></div>
-<p>Placeholders: <code>{field}</code> (the last key), <code>{value}</code>, and rule values like <code>{min}</code> and <code>{max}</code>.</p>
+<p>For the whole app, with a <code>MessageResolver</code>. Use it for other languages:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppMessages</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">MessageResolver</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">_texts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="p">{</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="s1">'th'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'required'</span><span class="o">:</span><span class="w"> </span><span class="s1">'กรุณากรอก {field}'</span><span class="p">},</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="p">};</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">resolve</span><span class="p">(</span><span class="n">MessageRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">_texts</span><span class="p">[</span><span class="n">request</span><span class="p">.</span><span class="n">locale</span><span class="p">]</span><span class="o">?</span><span class="p">[</span><span class="n">request</span><span class="p">.</span><span class="n">code</span><span class="p">];</span><span class="w"> </span><span class="c1">// locale from Accept-Language</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">template</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">      </span><span class="k">return</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
+</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">format</span><span class="p">(</span><span class="n">template</span><span class="p">,</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="n">params</span><span class="p">);</span>
+</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="p">}</span>
+</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
+</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="w">  </span><span class="nl">validationMessages:</span><span class="w"> </span><span class="n">AppMessages</span><span class="p">(),</span>
+</span><span id="__span-11-18"><a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>A message can use placeholders: <code>{field}</code> (the last key), <code>{value}</code>, and rule values like <code>{min}</code> and <code>{max}</code>.</p>
 <h3 id="names-for-field">Names for <code>{field}</code></h3>
-<p>By default <code>{field}</code> is the key, like <code>The first_name is required</code>.
-To show another name, give attribute names.
-A key with no name still shows the key.</p>
-<p>On the DTO:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@Dto</span><span class="p">(</span><span class="nl">attributes:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'first_name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'first name'</span><span class="p">})</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="c1">// The first name is required</span>
+<p>By default <code>{field}</code> is the key, like <code>The first_name is required</code>. To show a nicer name, give attribute names on the DTO:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@Dto</span><span class="p">(</span><span class="nl">attributes:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'first_name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'first name'</span><span class="p">})</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateUser</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="c1">// The first name is required</span>
 </span></code></pre></div>
-<p>For the whole app (and for fluent schemas), in the <code>MessageResolver</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nl">validationMessages:</span><span class="w"> </span><span class="n">MessageResolver</span><span class="p">(</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="nl">attributes:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'first_name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'first name'</span><span class="p">},</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">);</span>
+<p>Or for the whole app (and for fluent schemas), in the <code>MessageResolver</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nl">validationMessages:</span><span class="w"> </span><span class="n">MessageResolver</span><span class="p">(</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nl">attributes:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'first_name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'first name'</span><span class="p">},</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<ul>
-<li>A name is looked up by the dotted path (<code>address.city</code>), then with <code>*</code> for list items (<code>items.*.qty</code>), then by the field name (<code>city</code>).</li>
-<li>The names of the DTO win over the names of the <code>MessageResolver</code>. A nested DTO uses its own names first, then the names of the outer DTO.</li>
-<li><code>MessageResolver.setAttributes(...)</code> adds names to a resolver. A custom resolver can override <code>attributeName(path)</code>.</li>
-<li><code>{other}</code> and <code>{others}</code> (the other keys of rules like <code>@RequiredIf</code> and <code>@Same</code>) show their names too.</li>
-<li>The error path and the key in the error response do not change. Only the text does.</li>
-<li><code>@Dto(attributes:)</code> needs one <code>build_runner</code> run.</li>
-</ul>
-<h3 id="laravel-rule-names-in-message-keys">Laravel rule names in message keys</h3>
-<p>Some Dox codes have another name in Laravel. With the opt-in flag <code>laravelMessageKeys</code>, a message key can use the Laravel name too. So <code>'name.min'</code> gives the message for the <code>min_length</code> error of <code>name</code>. Without the flag, only the Dox codes match.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">Validator</span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ValidationFlags</span><span class="p">(</span><span class="nl">laravelMessageKeys:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<p>A key with no name still shows the key. Only the text changes. The key in the error response stays the same.</p>
+<h3 id="short-rule-names-in-message-keys">Short rule names in message keys</h3>
+<p>Some error codes are long, like <code>min_length</code>. With the opt-in flag <code>laravelMessageKeys</code>, a message key can also use a short name. So <code>'name.min'</code> gives the message for the <code>min_length</code> error of <code>name</code>. Without the flag, only the full codes match. Set the flag in a provider's <code>setup()</code>, like the <a href="../../packages/validation/#opt-in-flags">other flags</a>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Validator</span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ValidationFlags</span><span class="p">(</span><span class="nl">laravelMessageKeys:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Set it in a provider's <code>setup()</code>, like the <a href="../../packages/validation/#opt-in-flags">other flags</a>.
-The error code in the response does not change: it is still <code>min_length</code>.</p>
-<p>At each step of the lookup, the Dox code is tried first, then the Laravel name. So <code>'name.min_length'</code> wins over <code>'name.min'</code>. A key with a path still wins over a key with only a code: <code>'name.min'</code> wins over <code>'min_length'</code>.</p>
+<p>The error code in the response does not change: it is still <code>min_length</code>. These are the short names:</p>
 <table>
 <thead>
 <tr>
 <th>Dox code</th>
-<th>Laravel name</th>
+<th>Short name</th>
 </tr>
 </thead>
 <tbody>
@@ -7765,68 +7628,69 @@ The error code in the response does not change: it is still <code>min_length</co
 </tr>
 </tbody>
 </table>
-<p>This works in <code>@Dto(messages:)</code> and in a <code>MessageResolver</code>. A code with the same name in both (like <code>email</code> or <code>required</code>) needs nothing.
-With the flag on, a message key <code>min</code> or <code>max</code> with no path fits text, list and file errors too, not only numbers.</p>
 <h2 id="custom-rules">Custom rules</h2>
-<p>Extend <code>Rule&lt;T&gt;</code>. <code>T</code> is the field type (or the item type, for a list).</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Slug</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Rule</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">Slug</span><span class="p">({</span><span class="k">super</span><span class="p">.</span><span class="n">message</span><span class="p">});</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'slug'</span><span class="p">;</span><span class="w"> </span><span class="c1">// the error code</span>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>
-</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">defaultMessage</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'The {field} must be a slug'</span><span class="p">;</span>
-</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-21-13"><a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>
-</span><span id="__span-21-14"><a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-21-15"><a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">check</span><span class="p">(</span><span class="kt">String</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">RuleContext</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-21-16"><a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">_pattern</span><span class="p">.</span><span class="n">hasMatch</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
-</span><span id="__span-21-17"><a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-21-18"><a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>
-</span><span id="__span-21-19"><a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">RegExp</span><span class="w"> </span><span class="n">_pattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RegExp</span><span class="p">(</span><span class="s1">r'^[a-z0-9]+(-[a-z0-9]+)*$'</span><span class="p">);</span>
-</span><span id="__span-21-20"><a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a><span class="p">}</span>
-</span><span id="__span-21-21"><a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>
-</span><span id="__span-21-22"><a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a><span class="c1">// use it</span>
-</span><span id="__span-21-23"><a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a><span class="nd">@Slug</span><span class="p">()</span>
-</span><span id="__span-21-24"><a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">slug</span><span class="p">;</span>
+<p>If no built-in rule fits, write your own. Extend <code>Rule&lt;T&gt;</code>. <code>T</code> is the field type (or the item type, for a list):</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Slug</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Rule</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">Slug</span><span class="p">({</span><span class="k">super</span><span class="p">.</span><span class="n">message</span><span class="p">});</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'slug'</span><span class="p">;</span><span class="w"> </span><span class="c1">// the error code</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">defaultMessage</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'The {field} must be a slug'</span><span class="p">;</span>
+</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>
+</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">check</span><span class="p">(</span><span class="kt">String</span><span class="w"> </span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">RuleContext</span><span class="w"> </span><span class="n">context</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-16"><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">_pattern</span><span class="p">.</span><span class="n">hasMatch</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span id="__span-15-17"><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-15-18"><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a>
+</span><span id="__span-15-19"><a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">RegExp</span><span class="w"> </span><span class="n">_pattern</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">RegExp</span><span class="p">(</span><span class="s1">r'^[a-z0-9]+(-[a-z0-9]+)*$'</span><span class="p">);</span>
+</span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Then use it like any rule:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nd">@Slug</span><span class="p">()</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">slug</span><span class="p">;</span>
 </span></code></pre></div>
 <ul>
-<li>A rule with values: add <code>final</code> fields and override <code>params</code>. They become placeholders.</li>
+<li>If the rule has values, add <code>final</code> fields and override <code>params</code>. They become placeholders.</li>
 <li><code>context.lookup('other.key')</code> reads another input value.</li>
 <li><code>context.sibling('key')</code> reads the raw input of a field next to this one, in the same object. For example, <code>context.sibling('password_confirmation')</code> in a rule on <code>password</code>. It gives <code>undefined</code> when the field is missing.</li>
-<li>A rule that needs the database: extend <code>AsyncRule&lt;T&gt;</code> and write <code>checkAsync</code>.</li>
+<li>If the rule needs the database, extend <code>AsyncRule&lt;T&gt;</code> and write <code>checkAsync</code>.</li>
 </ul>
 <h2 id="dynamic-input">Dynamic input</h2>
-<p>When the shape is known only at runtime (like form fields from the database), use a fluent schema:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateSchema</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="n">fields</span><span class="p">));</span>
+<p>Sometimes the shape of the input is known only at runtime, like form fields from the database. Use a fluent schema for this:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateSchema</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span><span class="n">fields</span><span class="p">));</span>
 </span></code></pre></div>
 <p>See <a href="../../packages/validation/#fluent-schemas-for-dynamic-input">Fluent schemas</a>. Use a DTO for everything else.</p>
 <h2 id="testing">Testing</h2>
-<p>A DTO is a normal Dart class. Make one directly to skip the checks:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">CreateUser</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">CreateUser</span><span class="p">(</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">,</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="nl">email:</span><span class="w"> </span><span class="s1">'ann@dox.dev'</span><span class="p">,</span>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'secret123'</span><span class="p">,</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>To test the checks, use <code>safeValidateMap</code>. It never throws:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">ParseResult</span><span class="o">&lt;</span><span class="n">CreateUser</span><span class="o">&gt;</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">CreateUser</span><span class="p">.</span><span class="n">schema</span><span class="p">.</span><span class="n">safeValidateMap</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'A'</span><span class="p">,</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'not-an-email'</span><span class="p">,</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="s1">'password'</span><span class="o">:</span><span class="w"> </span><span class="s1">'secret123'</span><span class="p">,</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">});</span>
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>
-</span><span id="__span-24-7"><a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a><span class="n">expect</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">success</span><span class="p">,</span><span class="w"> </span><span class="n">isFalse</span><span class="p">);</span>
-</span><span id="__span-24-8"><a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a><span class="n">expect</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">errors</span><span class="p">[</span><span class="s1">'email'</span><span class="p">],</span><span class="w"> </span><span class="s1">'The email is not a valid email'</span><span class="p">);</span>
-</span></code></pre></div>
+<p>To test the checks of a DTO, use <code>safeValidateMap</code> on its schema. See <a href="../dto/#testing">DTOs: testing</a>.</p>
+<h2 id="details">Details</h2>
+<p>This section is for special cases. Most apps do not need it.</p>
+<h3 id="flags">Flags</h3>
 <ul>
-<li><code>validateMap</code> does the same, but returns the object or throws.</li>
-<li><code>source: Source.query</code> reads the map like a query string. <code>params: {'id': '5'}</code> gives path params.</li>
-<li><code>@Unique</code> and <code>@Exists</code> need a test database.</li>
+<li>The flag <code>laravelErrors</code> sends <code>{"message": "...", "errors": {"field": ["..."]}}</code> as the error response. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</li>
+<li>Three <a href="../../packages/validation/#opt-in-flags">opt-in flags</a> change how DTOs are checked: get all errors at once, reject <code>[]</code> in a required list, and reject <code>""</code> in a <code>Maybe</code> field.</li>
+</ul>
+<h3 id="empty-values-and-defaults">Empty values and defaults</h3>
+<ul>
+<li><code>@Dto(trim: true)</code> works like <code>@Trim()</code> on each <code>String</code> field and on the text items of its lists and maps. A nested DTO uses its own <code>@Dto(trim:)</code>. The same is true for <code>@Dto(coerce:)</code>.</li>
+<li>With <code>@Dto(emptyStringsToNull: true)</code> and <code>@Dto(trim: true)</code>, blank text like <code>"  "</code> is <code>null</code> as well. Then <code>{"bio": ""}</code> clears a <code>Maybe&lt;String?&gt;</code> field. A required field still gets <code>required</code>. A field that is not nullable but has a default gets <code>required</code> too, because <code>null</code> is not a missing key.</li>
+<li><code>@OrDefault()</code> works on any field, in a body or a query. A <code>Maybe</code> field gets <code>Maybe.missing()</code>. Errors from async rules (<code>@Unique</code>, <code>@Exists</code>, your <code>AsyncRule</code>) and from <code>validate()</code> are not dropped. They run later, on the built object, and still give <code>422</code>.</li>
+</ul>
+<h3 id="messages_1">Messages</h3>
+<ul>
+<li>In <code>@Dto(messages:)</code>, a full dotted path works too, like <code>'address.city.required'</code>. It also reaches a nested DTO. A message in the nested DTO itself, like <code>'city.required'</code>, wins over it.</li>
+<li>A name for <code>{field}</code> is looked up by the dotted path (<code>address.city</code>), then with <code>*</code> for list items (<code>items.*.qty</code>), then by the field name (<code>city</code>).</li>
+<li>The names of the DTO win over the names of the <code>MessageResolver</code>. A nested DTO uses its own names first, then the names of the outer DTO.</li>
+<li><code>MessageResolver.setAttributes(...)</code> adds names to a resolver. A custom resolver can override <code>attributeName(path)</code>.</li>
+<li><code>{other}</code> and <code>{others}</code> (the other keys of rules like <code>@RequiredIf</code> and <code>@Same</code>) show their names too.</li>
+<li><code>@Dto(attributes:)</code> needs one <code>build_runner</code> run.</li>
+<li>With <code>laravelMessageKeys</code>, the full code is tried first at each step of the lookup, then the short name. So <code>'name.min_length'</code> wins over <code>'name.min'</code>. A key with a path still wins over a key with only a code: <code>'name.min'</code> wins over <code>'min_length'</code>.</li>
+<li>Short names work in <code>@Dto(messages:)</code> and in a <code>MessageResolver</code>. A code that is already short (like <code>email</code> or <code>required</code>) needs nothing. With the flag on, a key <code>min</code> or <code>max</code> with no path fits text, list and file errors too, not only numbers.</li>
 </ul>
 
 
@@ -7870,7 +7734,7 @@ With the flag on, a message key <code>min</code> or <code>max</code> with no pat
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../session/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Session">
+          <a href="../dto/" class="md-footer__link md-footer__link--prev" aria-label="Previous: DTOs">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -7880,7 +7744,7 @@ With the flag on, a message key <code>min</code> or <code>max</code> with no pat
                 Previous
               </span>
               <div class="md-ellipsis">
-                Session
+                DTOs
               </div>
             </div>
           </a>

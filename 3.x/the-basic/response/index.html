@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows what a controller can return, and how to set the status, headers and cookies.">
+        <meta name="description" content="A controller returns a value, and Dox turns it into the response for the client.">
       
       
       
         <link rel="canonical" href="https://dartondox.dev/latest/the-basic/response/">
       
       
-        <link rel="prev" href="../request/">
+        <link rel="prev" href="../serializer/">
       
       
-        <link rel="next" href="../views/">
+        <link rel="next" href="../errors/">
       
       
         
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Response | Dox">
-  <meta property="og:description" content="This page shows what a controller can return, and how to set the status, headers and cookies.">
+  <meta property="og:description" content="A controller returns a value, and Dox turns it into the response for the client.">
   <meta property="og:url" content="https://dartondox.dev/latest/the-basic/response/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Response | Dox">
-  <meta name="twitter:description" content="This page shows what a controller can return, and how to set the status, headers and cookies.">
+  <meta name="twitter:description" content="A controller returns a value, and Dox turns it into the response for the client.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1600,6 +1600,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,6 +1702,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../request/" class="md-nav__link">
         
   
@@ -1742,24 +1840,15 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
+    <li class="md-nav__item">
+      <a href="../dto/" class="md-nav__link">
         
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1770,50 +1859,16 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-    <svg
-  class="lucide lucide-arrow-up-from-line"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Response
+    DTOs
   
 
     
@@ -1822,103 +1877,195 @@
   
 
       </a>
-      
-        
+    </li>
+  
 
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+              
+            
+              
+                
   
   
   
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
     
   
+    Validation
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#return-a-value" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Return a value
-      
-    </span>
-  </a>
+
+    
+  </span>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Errors
-      
-    </span>
-  </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#files-and-big-responses" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Files and big responses
-      
-    </span>
-  </a>
+
+      </a>
+    </li>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#the-response-helper" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The response() helper
-      
-    </span>
-  </a>
+
+              
+            
+              
+                
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#redirect" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Redirect
-      
-    </span>
-  </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cookie" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cookie
-      
-    </span>
-  </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#change-every-response" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Change every response
-      
-    </span>
-  </a>
   
-</li>
-      
-    </ul>
+    <li class="md-nav__item">
+      <a href="../validation-rules/" class="md-nav__link">
+        
   
-</nav>
-      
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2063,6 +2210,270 @@
                 
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#return-a-value" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return a value
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#files-and-big-responses" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files and big responses
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Files and big responses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#files-from-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files from storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-response-helper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The response() helper
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The response() helper">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-the-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting the status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-headers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting headers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changing-the-body" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changing the body
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#redirect" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Redirect
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cookie" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cookie
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#change-every-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Change every response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
   
   
     <li class="md-nav__item">
@@ -2091,291 +2502,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -6911,6 +7037,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Files and big responses">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#files-from-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Files from storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -6921,6 +7064,56 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="The response() helper">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setting-the-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting the status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#setting-headers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting headers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caching
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#changing-the-body" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Changing the body
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -6957,6 +7150,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -6983,9 +7187,21 @@
 
 
 <h1 id="response">Response</h1>
-<p>This page shows what a controller can return, and how to set the status, headers and cookies.</p>
+<p>A controller returns a value, and Dox turns it into the response for the client.</p>
+<p>Most of the time you just return a string, a map or a model. When you need to set the status, headers or cookies, use the <code>response()</code> helper.</p>
 <h2 id="return-a-value">Return a value</h2>
-<p>Return the value from your controller. Dox turns it into the response.</p>
+<p>Return the value from your controller. Dox sends a <code>String</code> as text, and a <code>Map</code> or a model as JSON:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// JSON</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello world!'</span><span class="p">};</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">}</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1">// a model</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>This is what the client gets for each type:</p>
 <table>
 <thead>
 <tr>
@@ -7032,18 +7248,12 @@
 </tr>
 </tbody>
 </table>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1">// JSON</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hello</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello world!'</span><span class="p">};</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">}</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1">// a model</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="p">}</span>
-</span></code></pre></div>
 <h2 id="errors">Errors</h2>
-<p>Throw or return an exception to answer with an error.</p>
+<p>To answer with an error, throw or return an exception:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Blog not found'</span><span class="p">);</span>
+</span></code></pre></div>
+<p>The client gets <code>404</code> with <code>{"code":"not_found","message":"Blog not found"}</code>. Each exception takes <code>message:</code>, <code>errorCode:</code> and <code>code:</code>. <code>code</code> in the JSON is the <code>errorCode</code>. A <code>Map</code> message is sent as it is.</p>
+<p>Dox has these exceptions:</p>
 <table>
 <thead>
 <tr>
@@ -7086,12 +7296,7 @@
 </tr>
 </tbody>
 </table>
-<p>Each one takes <code>message:</code>, <code>errorCode:</code> and <code>code:</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Blog not found'</span><span class="p">);</span>
-</span></code></pre></div>
-<p>The client gets <code>404</code> with <code>{"code":"not_found","message":"Blog not found"}</code>.
-<code>code</code> is the <code>errorCode</code>. A <code>Map</code> message is sent as it is.</p>
-<p>For another status, extend <code>IHttpException</code>:</p>
+<p>If you need another status, extend <code>IHttpException</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7106,143 +7311,123 @@
 </span></code></pre></div>
 <p>Any other error gets <code>500</code>. It is also passed to the <a href="../errors/">exception handler</a>.</p>
 <h2 id="files-and-big-responses">Files and big responses</h2>
-<p>Return a <code>File</code> or a <code>Stream&lt;List&lt;int&gt;&gt;</code>. Dox sends it in chunks. It does not load it all into memory.</p>
-<ul>
-<li>A <code>File</code> sets <code>Content-Type</code> (from the file name), <code>Content-Length</code> and <code>Accept-Ranges</code>.</li>
-<li>It answers <code>Range: bytes=...</code> with <code>206 Partial Content</code>. Video players can seek, and downloads can resume.</li>
-<li><code>Storage().stream()</code> and <code>Storage().download()</code> on the local disk also stream the file.</li>
-</ul>
+<p>Return a <code>File</code> or a <code>Stream&lt;List&lt;int&gt;&gt;</code> to send a file. Dox sends it in chunks, so it does not load it all into memory:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1">// a file from disk</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/video'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'storage/video.mp4'</span><span class="p">));</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="c1">// a download from Storage</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">DownloadableFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">download</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="c1">// sends Content-Disposition, so the browser saves the file</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'report.pdf'</span><span class="p">);</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">}</span>
-</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
-</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1">// a stream from Storage</span>
-</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">StreamFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">stream</span><span class="p">(</span><span class="s1">'photo.jpg'</span><span class="p">);</span>
-</span><span id="__span-3-17"><a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a><span class="p">}</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="c1">// a file from disk</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/video'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'storage/video.mp4'</span><span class="p">));</span>
 </span></code></pre></div>
-<p>See <a href="../../digging-deeper/file-storage/">File Storage</a>.</p>
-<h2 id="the-response-helper">The <code>response()</code> helper</h2>
-<p>Use <code>response(content)</code> when you need to set the status, headers or cookies.
-All methods return the response, so you can chain them.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+<p>A <code>File</code> gets the right <code>Content-Type</code>, <code>Content-Length</code> and <code>Accept-Ranges</code>. It also answers <code>Range</code> requests with <code>206 Partial Content</code>, so video players can seek and downloads can resume.</p>
+<h3 id="files-from-storage">Files from storage</h3>
+<p>If you use <a href="../../digging-deeper/file-storage/">File Storage</a>, return <code>Storage().download()</code> to make the browser save the file. It sends <code>Content-Disposition</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">DoxResponse</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'status'</span><span class="o">:</span><span class="w"> </span><span class="s1">'created'</span><span class="p">})</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">      </span><span class="p">.</span><span class="n">statusCode</span><span class="p">(</span><span class="m">201</span><span class="p">)</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">      </span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Request-Id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'abc'</span><span class="p">)</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="p">.</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">json</span><span class="p">);</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="p">}</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="c1">// a download from Storage</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">DownloadableFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">download</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="c1">// sends Content-Disposition, so the browser saves the file</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'report.pdf'</span><span class="p">);</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<table>
-<thead>
-<tr>
-<th>Method</th>
-<th>Does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>statusCode(201)</code></td>
-<td>sets the status code. Default <code>200</code>.</td>
-</tr>
-<tr>
-<td><code>header('X-Key', 'value')</code></td>
-<td>sets one header. A value a middleware put on the response stays, and this one is added. <code>header('X-Key', 'value', replace: true)</code> replaces it.</td>
-</tr>
-<tr>
-<td><code>withHeaders({...})</code></td>
-<td>adds these headers. A key replaces the header with the same name, in any case. Other headers stay.</td>
-</tr>
-<tr>
-<td><code>contentType(ContentType.html)</code></td>
-<td>sets <code>Content-Type</code> (<code>ContentType</code> is from <code>dart:io</code>)</td>
-</tr>
-<tr>
-<td><code>cache(Duration(minutes: 5))</code></td>
-<td>sets <code>Cache-Control: max-age=300</code></td>
-</tr>
-<tr>
-<td><code>cookie(DoxCookie(...))</code></td>
-<td>sets a cookie</td>
-</tr>
-<tr>
-<td><code>content(value)</code></td>
-<td>changes the body</td>
-</tr>
-<tr>
-<td><code>stream(byteStream)</code></td>
-<td>sends a <code>Stream&lt;List&lt;int&gt;&gt;</code> as the body</td>
-</tr>
-</tbody>
-</table>
-<h2 id="redirect">Redirect</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// 302 to a path</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/login'</span><span class="p">);</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1">// another status</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="nl">status:</span><span class="w"> </span><span class="m">301</span><span class="p">);</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1">// back to the page the request came from (Referer), or '/'</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="k">return</span><span class="w"> </span><span class="n">back</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+<p>To show the file in the browser instead, return <code>Storage().stream()</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1">// a stream from Storage</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">StreamFile</span><span class="o">&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">stream</span><span class="p">(</span><span class="s1">'photo.jpg'</span><span class="p">);</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>See <a href="../session/#redirect-back-with-errors">Session</a> for flash messages and errors with a redirect.</p>
-<p>The flags <code>htmlStrings</code> (a string is sent as <code>text/html</code>) and <code>replaceHeaders</code> (<code>header()</code> replaces) change this page. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</p>
-<h2 id="cookie">Cookie</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// set a cookie</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">cookie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">);</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+<h2 id="the-response-helper">The <code>response()</code> helper</h2>
+<p>Use <code>response(content)</code> when you need to set the status, headers or cookies. All methods return the response, so you can chain them:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="c1">// set a cookie with options</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="s1">'token'</span><span class="p">,</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="s1">'value'</span><span class="p">,</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">days:</span><span class="w"> </span><span class="m">7</span><span class="p">),</span><span class="w"> </span><span class="c1">// sent as Max-Age in seconds. default 1 hour</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nl">httpOnly:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// default true: page scripts can not read it</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="nl">secure:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">   </span><span class="c1">// default: Secure only when the request came over https</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/'</span><span class="p">,</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">  </span><span class="nl">sameSite:</span><span class="w"> </span><span class="n">SameSite</span><span class="p">.</span><span class="n">lax</span><span class="p">,</span><span class="w"> </span><span class="c1">// from dart:io. default: none sent</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="p">);</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="c1">// delete a cookie</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">),</span><span class="w"> </span><span class="nl">setExpire:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">DoxResponse</span><span class="w"> </span><span class="n">store</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'status'</span><span class="o">:</span><span class="w"> </span><span class="s1">'created'</span><span class="p">})</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">      </span><span class="p">.</span><span class="n">statusCode</span><span class="p">(</span><span class="m">201</span><span class="p">)</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">      </span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Request-Id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'abc'</span><span class="p">)</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">      </span><span class="p">.</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">json</span><span class="p">);</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">}</span>
 </span></code></pre></div>
+<h3 id="setting-the-status">Setting the status</h3>
+<p><code>statusCode</code> sets the status code. The default is <code>200</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">response</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">statusCode</span><span class="p">(</span><span class="m">201</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="setting-headers">Setting headers</h3>
+<p><code>header</code> sets one header. If a middleware already put the same header on the response, the old value stays and this one is added. Pass <code>replace: true</code> to replace it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">response</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Key'</span><span class="p">,</span><span class="w"> </span><span class="s1">'value'</span><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">response</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Key'</span><span class="p">,</span><span class="w"> </span><span class="s1">'value'</span><span class="p">,</span><span class="w"> </span><span class="nl">replace:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+</span></code></pre></div>
+<p><code>withHeaders</code> adds many headers. A key replaces the header with the same name, in any case. Other headers stay:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">response</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">withHeaders</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'X-One'</span><span class="o">:</span><span class="w"> </span><span class="s1">'1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'X-Two'</span><span class="o">:</span><span class="w"> </span><span class="s1">'2'</span><span class="p">});</span>
+</span></code></pre></div>
+<p><code>contentType</code> sets <code>Content-Type</code>. <code>ContentType</code> is from <code>dart:io</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">response</span><span class="p">(</span><span class="n">html</span><span class="p">).</span><span class="n">contentType</span><span class="p">(</span><span class="n">ContentType</span><span class="p">.</span><span class="n">html</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="caching">Caching</h3>
+<p><code>cache</code> sets <code>Cache-Control</code>. For example, <code>Duration(minutes: 5)</code> sends <code>Cache-Control: max-age=300</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">response</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">cache</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">));</span>
+</span></code></pre></div>
+<h3 id="changing-the-body">Changing the body</h3>
+<p><code>content</code> changes the body, and <code>stream</code> sends a <code>Stream&lt;List&lt;int&gt;&gt;</code> as the body:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">response</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="n">content</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">response</span><span class="p">(</span><span class="s1">''</span><span class="p">).</span><span class="n">stream</span><span class="p">(</span><span class="n">byteStream</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="redirect">Redirect</h2>
+<p>Use <code>redirect</code> to send the browser to another page. The status is <code>302</code>, unless you pass another one:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1">// 302 to a path</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/login'</span><span class="p">);</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1">// another status</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="nl">status:</span><span class="w"> </span><span class="m">301</span><span class="p">);</span>
+</span></code></pre></div>
+<p><code>back</code> sends the browser back to the page the request came from (the <code>Referer</code> header). When there is no <code>Referer</code>, or it points to another host, it goes to <code>/</code>. This is useful after a form post:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">return</span><span class="w"> </span><span class="n">back</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+</span></code></pre></div>
+<p>See <a href="../session/#flash-data">Session</a> for flash messages and errors with a redirect.</p>
+<h2 id="cookie">Cookie</h2>
+<p>To set a cookie, make a <code>DoxCookie</code> and add it with <code>cookie</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">cookie</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">);</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">cookie</span><span class="p">);</span>
+</span></code></pre></div>
+<p>You can set the cookie options too:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">DoxCookie</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DoxCookie</span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="s1">'token'</span><span class="p">,</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="s1">'value'</span><span class="p">,</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">days:</span><span class="w"> </span><span class="m">7</span><span class="p">),</span><span class="w"> </span><span class="c1">// sent as Max-Age in seconds. default 1 hour</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="nl">httpOnly:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// default true: page scripts can not read it</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="nl">secure:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">   </span><span class="c1">// default: Secure only when the request came over https</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">  </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/'</span><span class="p">,</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">  </span><span class="nl">sameSite:</span><span class="w"> </span><span class="n">SameSite</span><span class="p">.</span><span class="n">lax</span><span class="p">,</span><span class="w"> </span><span class="c1">// from dart:io. default: none sent</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="p">);</span>
+</span><span id="__span-16-10"><a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+</span></code></pre></div>
+<p>To delete a cookie, pass <code>setExpire: true</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'ok'</span><span class="p">).</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">),</span><span class="w"> </span><span class="nl">setExpire:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+</span></code></pre></div>
+<p>Dox encrypts the cookie value with <code>APP_KEY</code>, and decrypts it when you read it. If the browser or another app must read the value, turn this off with <code>DoxCookie(key, value, encrypt: false)</code>. Then read it with <code>req.cookie(key, decrypt: false)</code>.</p>
 <p>To read a cookie, see <a href="../request/#cookies">Request: cookies</a>.</p>
-<p>The flag <code>cookieDefaults</code> sends <code>Path=/</code> and <code>SameSite=Lax</code> when you set no <code>path</code> or <code>sameSite</code>. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</p>
-<div class="admonition info">
-<p class="admonition-title">Encrypt and decrypt</p>
-<p>By default, Dox encrypts the cookie value with <code>APP_KEY</code>, and decrypts it when you read it.
-To turn this off, use <code>DoxCookie(key, value, encrypt: false)</code> to set it,
-and <code>req.cookie(key, decrypt: false)</code> to read it.</p>
-</div>
 <h2 id="change-every-response">Change every response</h2>
-<p>To change every response in one place (for example, to add a header), set a <code>responseHandler</code> in <code>AppConfig</code>.</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/handler.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ResponseHandler</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ResponseHandlerInterface</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Powered-By'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Dox'</span><span class="p">);</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
+<p>Sometimes you want to change every response in one place, for example to add a header. Set a <code>responseHandler</code> in <code>AppConfig</code> for this:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/handler.dart</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ResponseHandler</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ResponseHandlerInterface</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Powered-By'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Dox'</span><span class="p">);</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">responseHandler:</span><span class="w"> </span><span class="n">ResponseHandler</span><span class="p">(),</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nl">responseHandler:</span><span class="w"> </span><span class="n">ResponseHandler</span><span class="p">(),</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="p">);</span>
 </span></code></pre></div>
+<h2 id="details">Details</h2>
+<ul>
+<li>Some flags change this page: <code>htmlStrings</code> sends a string as <code>text/html</code>, <code>replaceHeaders</code> makes <code>header()</code> replace, and <code>cookieDefaults</code> sends <code>Path=/</code> and <code>SameSite=Lax</code> when you set no <code>path</code> or <code>sameSite</code>. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</li>
+<li><code>Storage().stream()</code> and <code>Storage().download()</code> on the local disk also stream the file.</li>
+</ul>
 
 
 
@@ -7285,7 +7470,7 @@ and <code>req.cookie(key, decrypt: false)</code> to read it.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../request/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Request">
+          <a href="../serializer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Serializer">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -7295,20 +7480,20 @@ and <code>req.cookie(key, decrypt: false)</code> to read it.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Request
+                Serializer
               </div>
             </div>
           </a>
         
         
           
-          <a href="../views/" class="md-footer__link md-footer__link--next" aria-label="Next: Views">
+          <a href="../errors/" class="md-footer__link md-footer__link--next" aria-label="Next: Error handling">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Views
+                Error handling
               </div>
             </div>
             <div class="md-footer__button md-icon">

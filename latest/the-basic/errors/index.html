@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Every error that a route throws goes to one place: the exception handler. It does two things:">
+        <meta name="description" content="Every error that a route throws goes to one exception handler, which logs it and sends an answer to the client.">
       
       
       
         <link rel="canonical" href="https://dartondox.dev/latest/the-basic/errors/">
       
       
-        <link rel="prev" href="../serializer/">
+        <link rel="prev" href="../response/">
       
       
-        <link rel="next" href="../controller/">
+        <link rel="next" href="../../digging-deeper/cache/">
       
       
         
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Error handling | Dox">
-  <meta property="og:description" content="Every error that a route throws goes to one place: the exception handler. It does two things:">
+  <meta property="og:description" content="Every error that a route throws goes to one exception handler, which logs it and sends an answer to the client.">
   <meta property="og:url" content="https://dartondox.dev/latest/the-basic/errors/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Error handling | Dox">
-  <meta name="twitter:description" content="Every error that a route throws goes to one place: the exception handler. It does two things:">
+  <meta name="twitter:description" content="Every error that a route throws goes to one exception handler, which logs it and sends an answer to the client.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1600,6 +1600,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,6 +1702,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../request/" class="md-nav__link">
         
   
@@ -1745,12 +1843,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../response/" class="md-nav__link">
+      <a href="../dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1761,15 +1859,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1922,6 +2210,51 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -2027,6 +2360,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="The default answer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#which-errors-are-logged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which errors are logged
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2037,6 +2387,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="An HTML error page">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#your-own-error-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your own error page
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2049,9 +2416,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Your own handler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#what-render-can-return" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2061,23 +2429,17 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#errors-outside-a-request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Errors outside a request
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-response-handler" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The response handler
+        Details
       
     </span>
   </a>
@@ -2088,291 +2450,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -6878,6 +6955,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="The default answer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#which-errors-are-logged" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which errors are logged
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -6888,6 +6982,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="An HTML error page">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#your-own-error-page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your own error page
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -6900,9 +7011,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Your own handler">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#what-render-can-return" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -6912,23 +7024,17 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#errors-outside-a-request" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Errors outside a request
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#the-response-handler" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The response handler
+        Details
       
     </span>
   </a>
@@ -6961,14 +7067,15 @@
 
 
 <h1 id="error-handling">Error handling</h1>
-<p>Every error that a route throws goes to one place: the exception handler.
-It does two things:</p>
+<p>Every error that a route throws goes to one exception handler, which logs it and sends an answer to the client.</p>
+<p>The handler has two methods:</p>
 <ul>
 <li><code>report(error, stackTrace)</code> logs the error.</li>
 <li><code>render(error, req)</code> decides what the client gets.</li>
 </ul>
+<p>You do not need to set anything up. The default handler already gives good answers. You only write your own handler when you want to change them.</p>
 <h2 id="the-default-answer">The default answer</h2>
-<p>You do not need to set anything. With the default handler:</p>
+<p>This is what the client gets with the default handler:</p>
 <table>
 <thead>
 <tr>
@@ -6989,7 +7096,7 @@ It does two things:</p>
 <td>the field errors, like <code>{"name": "The name is required"}</code></td>
 </tr>
 <tr>
-<td>a <code>ValidationException</code> on a request with a <a href="../session/#redirect-back-with-errors">session</a> that does not want JSON, like a form post</td>
+<td>a <code>ValidationException</code> on a request with a <a href="../session/#validation-errors-and-old-input">session</a> that does not want JSON, like a form post</td>
 <td><code>302</code></td>
 <td>a redirect back. The errors and the old input are in the session.</td>
 </tr>
@@ -7005,33 +7112,22 @@ It does two things:</p>
 </tr>
 </tbody>
 </table>
-<p>For a <code>500</code>, the error text is sent only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.
-In production the client never sees it, because it can hold SQL, file paths or hosts.</p>
-<p><code>report</code> is called for every error, except an <code>IHttpException</code> with a <code>4xx</code> code.
-A <code>4xx</code> exception is a normal answer (like <code>404</code>), so it is not logged.
-A <code>5xx</code> exception, like <code>InternalErrorException</code>, is reported.
-The default <code>report</code> prints the error and the stack with the logger.</p>
+<p>For a <code>500</code>, the error text is sent only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. In production the client never sees it, because it can hold SQL, file paths or hosts.</p>
 <p>See <a href="../../reference/http-exceptions/">HTTP exceptions</a> for the built-in exception classes.</p>
+<h3 id="which-errors-are-logged">Which errors are logged</h3>
+<p><code>report</code> is called for every error, except an <code>IHttpException</code> with a <code>4xx</code> code. A <code>4xx</code> exception (like <code>404</code>) is a normal answer, so it is not logged. A <code>5xx</code> exception, like <code>InternalErrorException</code>, is logged. The default <code>report</code> prints the error and the stack with the logger.</p>
 <h2 id="an-html-error-page">An HTML error page</h2>
-<p>By default an error is sent as JSON. In <code>development</code> or <code>local</code>, a <code>500</code> is plain text with the error text. A browser that opens a bad URL sees JSON or text, not a page.
-To send an HTML page to browsers, turn on <code>htmlErrors</code>:</p>
+<p>By default an error is sent as JSON, so a browser that opens a bad URL sees JSON, not a page. In <code>development</code> or <code>local</code>, a <code>500</code> is plain text with the error text.</p>
+<p>If you want browsers to get an HTML page, turn on <code>htmlErrors</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nl">htmlErrors:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>The page has the status and its title, like <code>404 Not Found</code>.
-It loads no files from outside.</p>
-<ul>
-<li>Only a request that does not want JSON gets the page. A request wants JSON (<code>DoxRequest.expectsJson()</code>) when it has an <code>Accept</code> header with json, a JSON body, or <code>X-Requested-With: XMLHttpRequest</code>. An Inertia request does not want JSON, so it gets the page.</li>
-<li>Only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>, the page also shows the error text and the stack trace.</li>
-<li>A JSON client gets the same answer as without <code>htmlErrors</code>.</li>
-<li>A validation error does not change. It keeps its <code>422</code> JSON or its redirect.</li>
-<li>An answer from your own <code>ExceptionHandler.render</code> does not change.</li>
-</ul>
-<p>To make your own page, set <code>errorPage</code>. It gets the status, the error, the stack trace and a <code>debug</code> flag.
-<code>debug</code> is <code>true</code> when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.
-Escape every value you put in the page.</p>
+<p>The page shows the status and its title, like <code>404 Not Found</code>. It loads no files from outside. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, the page also shows the error text and the stack trace.</p>
+<p>Only a request that does not want JSON gets the page. A JSON client, a validation error and an answer from your own <code>render</code> stay the same.</p>
+<h3 id="your-own-error-page">Your own error page</h3>
+<p>To make your own page, set <code>errorPage</code>. It gets the status, the error, the stack trace and a <code>debug</code> flag. <code>debug</code> is <code>true</code> when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. Escape every value you put in the page.</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">htmlErrors:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">errorPage:</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">status</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="w"> </span><span class="n">error</span><span class="p">,</span><span class="w"> </span><span class="n">StackTrace</span><span class="w"> </span><span class="n">stack</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">debug</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span>
@@ -7039,9 +7135,9 @@ Escape every value you put in the page.</p>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p><code>defaultErrorPage</code> is the default. You can call it from your own function, for example for the statuses you do not handle.</p>
+<p>The default page is <code>defaultErrorPage</code>. You can call it from your own function, for example for the statuses you do not handle.</p>
 <h2 id="your-own-handler">Your own handler</h2>
-<p>Extend <code>ExceptionHandler</code>. Override one method or both.</p>
+<p>Sometimes you want to send errors to an error tracker, or give your own exception a special answer. For this, extend <code>ExceptionHandler</code> and override one method or both:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/exception_handler.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7068,28 +7164,23 @@ Escape every value you put in the page.</p>
 </span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Set it in <code>AppConfig</code>:</p>
+<p>Then set it in <code>AppConfig</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">exceptionHandler:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AppExceptionHandler</span><span class="p">(),</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<h2 id="what-render-can-return">What render can return</h2>
-<p><code>render</code> returns anything a controller can return: a <code>DoxResponse</code>, a map, a string.
-Return the error itself (this is what <code>super.render</code> does) to get the default answer.</p>
-<p><code>req</code> is the raw <code>HttpRequest</code>. It is there even when the error came before Dox read the body.
-Use it to read headers, like <code>req.headers.value('accept')</code>.</p>
-<p>If <code>render</code> itself throws, Dox logs that error and sends the default answer.
-The client always gets a response.</p>
-<h2 id="errors-outside-a-request">Errors outside a request</h2>
-<p>Some errors do not belong to a request.
-For example a future that nobody awaits, or an error in the <code>shutdown()</code> of a provider.
-Dox passes them to <code>report</code> too. The server keeps running.</p>
-<h2 id="the-response-handler">The response handler</h2>
-<p>The <code>responseHandler</code> of <code>AppConfig</code> still runs after <code>render</code>.
-It sees every response, also error responses.
-Use <code>render</code> to change errors, and <code>responseHandler</code> to change all responses (for example, to add a header).</p>
+<h3 id="what-render-can-return">What render can return</h3>
+<p><code>render</code> can return anything a controller can return: a <code>DoxResponse</code>, a map or a string. If you return the error itself, the client gets the default answer. This is what <code>super.render</code> does.</p>
+<p><code>req</code> is the raw <code>HttpRequest</code>. It is there even when the error came before Dox read the body. Use it to read headers, like <code>req.headers.value('accept')</code>.</p>
 <p>See <a href="../../guides/custom-errors/">Custom errors</a> for a full example with your own exception classes.</p>
+<h2 id="details">Details</h2>
+<ul>
+<li>A request wants JSON (<code>DoxRequest.expectsJson()</code>) when it has an <code>Accept</code> header with json, a JSON body, or <code>X-Requested-With: XMLHttpRequest</code>. An Inertia request does not want JSON, so it gets the HTML page.</li>
+<li>If <code>render</code> itself throws, Dox logs that error and sends the default answer. The client always gets a response.</li>
+<li>Errors outside a request, like a future that nobody awaits or an error in the <code>shutdown()</code> of a provider, also go to <code>report</code>. The server keeps running.</li>
+<li>The <code>responseHandler</code> of <code>AppConfig</code> still runs after <code>render</code>, so it sees error responses too. Use <code>render</code> to change errors, and <code>responseHandler</code> to change all responses.</li>
+</ul>
 
 
 
@@ -7132,7 +7223,7 @@ Use <code>render</code> to change errors, and <code>responseHandler</code> to ch
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../serializer/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Serializer">
+          <a href="../response/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Response">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -7142,20 +7233,20 @@ Use <code>render</code> to change errors, and <code>responseHandler</code> to ch
                 Previous
               </span>
               <div class="md-ellipsis">
-                Serializer
+                Response
               </div>
             </div>
           </a>
         
         
           
-          <a href="../controller/" class="md-footer__link md-footer__link--next" aria-label="Next: Controller">
+          <a href="../../digging-deeper/cache/" class="md-footer__link md-footer__link--next" aria-label="Next: Cache">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Controller
+                Cache
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how to hash passwords with Hash and check them later.">
+        <meta name="description" content="Hash turns a password into a bcrypt hash that you can store, and checks a password against it later.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Hashing | Dox">
-  <meta property="og:description" content="This page shows how to hash passwords with Hash and check them later.">
+  <meta property="og:description" content="Hash turns a password into a bcrypt hash that you can store, and checks a password against it later.">
   <meta property="og:url" content="https://dartondox.dev/latest/security/hashing/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Hashing | Dox">
-  <meta name="twitter:description" content="This page shows how to hash passwords with Hash and check them later.">
+  <meta name="twitter:description" content="Hash turns a password into a bcrypt hash that you can store, and checks a password against it later.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1598,6 +1598,8 @@
       
         
       
+        
+      
     
     
     
@@ -1697,6 +1699,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1742,12 +1840,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1758,15 +1856,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1922,6 +2210,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -1947,291 +2280,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -4734,10 +4782,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hash-a-password" class="md-nav__link">
+  <a href="#hashing-passwords" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Hash a password
+        Hashing passwords
       
     </span>
   </a>
@@ -4745,10 +4793,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#check-a-password" class="md-nav__link">
+  <a href="#verifying-passwords" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Check a password
+        Verifying passwords
       
     </span>
   </a>
@@ -4756,21 +4804,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#without-blocking-the-server" class="md-nav__link">
+  <a href="#changing-the-cost" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Without blocking the server
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cost" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cost
+        Changing the cost
       
     </span>
   </a>
@@ -4789,10 +4826,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#compare-secrets" class="md-nav__link">
+  <a href="#comparing-secrets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Compare secrets
+        Comparing secrets
       
     </span>
   </a>
@@ -4800,10 +4837,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#store-tokens" class="md-nav__link">
+  <a href="#storing-tokens" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Store tokens
+        Storing tokens
       
     </span>
   </a>
@@ -4811,21 +4848,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#with-login" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        With login
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#things-to-know" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Things to know
+        Details
       
     </span>
   </a>
@@ -6909,10 +6935,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#hash-a-password" class="md-nav__link">
+  <a href="#hashing-passwords" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Hash a password
+        Hashing passwords
       
     </span>
   </a>
@@ -6920,10 +6946,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#check-a-password" class="md-nav__link">
+  <a href="#verifying-passwords" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Check a password
+        Verifying passwords
       
     </span>
   </a>
@@ -6931,21 +6957,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#without-blocking-the-server" class="md-nav__link">
+  <a href="#changing-the-cost" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Without blocking the server
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cost" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cost
+        Changing the cost
       
     </span>
   </a>
@@ -6964,10 +6979,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#compare-secrets" class="md-nav__link">
+  <a href="#comparing-secrets" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Compare secrets
+        Comparing secrets
       
     </span>
   </a>
@@ -6975,10 +6990,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#store-tokens" class="md-nav__link">
+  <a href="#storing-tokens" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Store tokens
+        Storing tokens
       
     </span>
   </a>
@@ -6986,21 +7001,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#with-login" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        With login
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#things-to-know" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Things to know
+        Details
       
     </span>
   </a>
@@ -7033,67 +7037,46 @@
 
 
 <h1 id="hashing">Hashing</h1>
-<p>This page shows how to hash passwords with <code>Hash</code> and check them later.</p>
-<p>A hash is one-way. You can not turn it back into the password.
-<code>Hash</code> uses bcrypt with a new random salt each time. It is in <code>package:dox_core/dox_core.dart</code>.</p>
-<h2 id="hash-a-password">Hash a password</h2>
-<p>Hash the password before you save it.</p>
+<p><code>Hash</code> turns a password into a bcrypt hash that you can store, and checks a password against it later.</p>
+<p>A hash is one-way: you can not turn it back into the password. <code>Hash</code> uses bcrypt with a new random salt each time. It is in <code>package:dox_core/dox_core.dart</code>.</p>
+<p>You do not need <code>Hash</code> for a normal login, because <code>Auth().attempt()</code> from <code>dox_auth</code> checks the password for you. See <a href="../authentication/">Authentication</a>.</p>
+<h2 id="hashing-passwords">Hashing passwords</h2>
+<p>Hash the password before you save it:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">makeAsync</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">);</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
 </span></code></pre></div>
-<p><code>makeAsync</code> runs bcrypt in another isolate. See <a href="#without-blocking-the-server">Without blocking the server</a>.</p>
-<p>The result looks like <code>$2a$10$...</code>. It holds the salt, so you only store this one string.
-The same password gives a different hash each time.</p>
-<h2 id="check-a-password">Check a password</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verify</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="o">!</span><span class="p">);</span>
+<p><code>makeAsync</code> runs bcrypt in another isolate, so it does not block the server. The result looks like <code>$2a$10$...</code>. It holds the salt, so you only store this one string.</p>
+<p>Never send the hash to the client. Put the column in the <code>hidden</code> list of the model.</p>
+<h2 id="verifying-passwords">Verifying passwords</h2>
+<p>Use <code>verifyAsync</code> to check a password against a hash. It gives <code>true</code> when they match:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verifyAsync</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="o">!</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>Hash.verify(password, hashedPassword)</code> returns <code>true</code> when the password matches. <code>Hash.check</code> does the same.
-It returns <code>false</code> when the password does not match, or when <code>hashedPassword</code> is not a valid bcrypt hash (for example an empty string).</p>
-<h2 id="without-blocking-the-server">Without blocking the server</h2>
-<p><code>Hash.make</code> and <code>Hash.verify</code> block the request isolate while bcrypt runs.
-In a request handler, use the async versions. They run bcrypt in another isolate.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">makeAsync</span><span class="p">(</span><span class="n">body</span><span class="p">.</span><span class="n">password</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verifyAsync</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="o">!</span><span class="p">);</span>
+<p>It gives <code>false</code> when the password does not match, or when the hash is not a valid bcrypt hash, like an empty string.</p>
+<p><code>Hash.make</code> and <code>Hash.verify</code> do the same, but they block the request isolate while bcrypt runs. Use them only outside request handlers. <code>Hash.check</code> is the same as <code>Hash.verify</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">verify</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">password</span><span class="o">!</span><span class="p">);</span>
 </span></code></pre></div>
-<h2 id="cost">Cost</h2>
-<p><code>Hash.rounds</code> is the bcrypt cost for new hashes. The default is <code>10</code>. Each step up doubles the time.
-The cost must be from 4 to 31. Do not go below 10.</p>
+<h2 id="changing-the-cost">Changing the cost</h2>
+<p><code>Hash.rounds</code> is the bcrypt cost for new hashes. The default is <code>10</code>, and each step up doubles the time. The cost must be from 4 to 31. Do not go below 10:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Hash</span><span class="p">.</span><span class="n">rounds</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">12</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">hash</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">make</span><span class="p">(</span><span class="s1">'secret'</span><span class="p">,</span><span class="w"> </span><span class="nl">rounds:</span><span class="w"> </span><span class="m">12</span><span class="p">);</span><span class="w"> </span><span class="c1">// or per call</span>
 </span></code></pre></div>
-<p>Old hashes keep their own cost, so they still verify.
-If you change it, also set <code>hashRounds</code> on <code>JwtAuthDriver</code> or <code>SessionAuthDriver</code> to the same value.
-Then a login with an unknown email takes as long as a wrong password. See <a href="../authentication/">Authentication</a>.</p>
+<p>Old hashes keep their own cost, so they still verify. If you change the cost, also set <code>hashRounds</code> on your auth driver to the same value. See <a href="../authentication/#password-hash-cost">Authentication</a>.</p>
 <h2 id="long-passwords">Long passwords</h2>
-<p>bcrypt reads at most 72 bytes.
-<code>Hash.make</code> and <code>Hash.makeAsync</code> throw an <code>ArgumentError</code> when the password is longer than 72 bytes (UTF-8).
-The error text does not hold the password, so it is safe in logs.
-<code>Hash.verify</code> returns <code>false</code> for such a password.</p>
-<p>So limit the length in your DTO, like <code>@Length(min: 8, max: 72)</code>.
-<code>@Length</code> counts characters, and a letter outside ASCII can use up to 4 bytes.
-So a password with such letters can still be too long. Catch the error and answer <code>422</code>, or use a smaller <code>max</code>.</p>
-<h2 id="compare-secrets">Compare secrets</h2>
-<p>To check an API key or a token, use <code>Hash.equals(given, expected)</code>, not <code>==</code>.
-<code>==</code> stops at the first wrong character, so the time can tell how much of the key was right.
-<code>Hash.equals</code> takes the same time for every value of the same length.</p>
+<p>bcrypt reads at most 72 bytes. So <code>Hash.make</code> and <code>Hash.makeAsync</code> throw an <code>ArgumentError</code> for a longer password, and <code>Hash.verify</code> gives <code>false</code>. Limit the length in your DTO, like <code>@Length(min: 8, max: 72)</code>.</p>
+<p><code>@Length</code> counts characters, but a letter outside ASCII can use up to 4 bytes. So such a password can still be too long. Catch the error and answer <code>422</code>, or use a smaller <code>max</code>.</p>
+<h2 id="comparing-secrets">Comparing secrets</h2>
+<p>To check an API key or a token, use <code>Hash.equals(given, expected)</code>, not <code>==</code>. <code>==</code> stops at the first wrong character, so the time can tell how much of the key was right. <code>Hash.equals</code> takes the same time for every value of the same length:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Api-Key'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'API_KEY'</span><span class="p">));</span>
 </span></code></pre></div>
-<h2 id="store-tokens">Store tokens</h2>
-<p>For a long random secret that you keep in the database (an API key, an access token), store only <code>Hash.sha256(token)</code>.
-Find the row by the hash of what the client sends.
-SHA-256 is fast and gives the same hash for the same input, so a unique index works on it.</p>
+<h2 id="storing-tokens">Storing tokens</h2>
+<p>For a long random secret that you keep in the database, like an API key, store only <code>Hash.sha256(token)</code>. Then find the row by the hash of what the client sends. SHA-256 gives the same hash for the same input, so a unique index works on it:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">stored</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">token</span><span class="p">);</span><span class="w">          </span><span class="c1">// save this, never the token</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">Token</span><span class="o">?</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Token</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'hash'</span><span class="p">,</span><span class="w"> </span><span class="n">Hash</span><span class="p">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">given</span><span class="p">)).</span><span class="n">getFirst</span><span class="p">();</span>
 </span></code></pre></div>
-<p>Never use <code>Hash.sha256</code> for passwords. A password is short and can be guessed, so use <code>Hash.make</code> (bcrypt).</p>
-<h2 id="with-login">With login</h2>
-<p>You do not need <code>Hash.verify</code> for normal login.
-<code>Auth().attempt()</code> from <code>dox_auth</code> finds the user and checks the password with bcrypt.
-See <a href="../authentication/">Authentication</a>.</p>
-<h2 id="things-to-know">Things to know</h2>
+<p>Never use <code>Hash.sha256</code> for passwords. A password is short and can be guessed, so use bcrypt.</p>
+<h2 id="details">Details</h2>
 <ul>
-<li>Never store or encrypt a plain password. Hash it.</li>
-<li>Never send the hash to the client. Put the column in the model <code>hidden</code> list.</li>
+<li>The error text of a too long password does not hold the password, so it is safe in logs.</li>
 <li>bcrypt is slow on purpose, so guessing is slow too. Do not hash in a loop on hot paths.</li>
 </ul>
 

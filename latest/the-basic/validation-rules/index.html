@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page lists every annotation you can put on a @Dto field.">
+        <meta name="description" content="This page lists every annotation you can put on a @Dto field, with its error code and default message.">
       
       
       
@@ -16,7 +16,7 @@
         <link rel="prev" href="../validation/">
       
       
-        <link rel="next" href="../../digging-deeper/cache/">
+        <link rel="next" href="../controller/">
       
       
         
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Validation rules | Dox">
-  <meta property="og:description" content="This page lists every annotation you can put on a @Dto field.">
+  <meta property="og:description" content="This page lists every annotation you can put on a @Dto field, with its error code and default message.">
   <meta property="og:url" content="https://dartondox.dev/latest/the-basic/validation-rules/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Validation rules | Dox">
-  <meta name="twitter:description" content="This page lists every annotation you can put on a @Dto field.">
+  <meta name="twitter:description" content="This page lists every annotation you can put on a @Dto field, with its error code and default message.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1600,6 +1600,8 @@
       
         
       
+        
+      
     
     
     
@@ -1700,371 +1702,6 @@
   
   
     <li class="md-nav__item">
-      <a href="../request/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-arrow-down-to-line"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 17V3" />
-  <path d="m6 11 6 6 6-6" />
-  <path d="M19 21H5" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Request
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../response/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-arrow-up-from-line"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Response
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../views/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layout-template"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <rect width="18" height="7" x="3" y="3" rx="1" />
-  <rect width="9" height="7" x="3" y="14" rx="1" />
-  <rect width="5" height="7" x="16" y="14" rx="1" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Views
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../inertia/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-app-window"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <rect x="2" y="4" width="20" height="16" rx="2" />
-  <path d="M10 4v4" />
-  <path d="M2 8h20" />
-  <path d="M6 4v4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Inertia
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../serializer/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-braces"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
-  <path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Serializer
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../errors/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-triangle-alert"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
-  <path d="M12 9v4" />
-  <path d="M12 17h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
       <a href="../middleware/" class="md-nav__link">
         
   
@@ -2141,6 +1778,97 @@
     
   
     Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../request/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-down-to-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 17V3" />
+  <path d="m6 11 6 6 6-6" />
+  <path d="M19 21H5" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Request
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dto/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-package"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    DTOs
   
 
     
@@ -2507,6 +2235,326 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../views/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layout-template"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect width="18" height="7" x="3" y="3" rx="1" />
+  <rect width="9" height="7" x="3" y="14" rx="1" />
+  <rect width="5" height="7" x="16" y="14" rx="1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Views
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../inertia/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-app-window"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect x="2" y="4" width="20" height="16" rx="2" />
+  <path d="M10 4v4" />
+  <path d="M2 8h20" />
+  <path d="M6 4v4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Inertia
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serializer/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-braces"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1" />
+  <path d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Serializer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../errors/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Error handling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -7227,8 +7275,8 @@
 
 
 <h1 id="validation-rules">Validation rules</h1>
-<p>This page lists every annotation you can put on a <code>@Dto</code> field.</p>
-<p>See <a href="../validation/">Validation</a> for how DTOs work.</p>
+<p>This page lists every annotation you can put on a <code>@Dto</code> field, with its error code and default message.</p>
+<p>Use it to look up a rule. To learn how DTOs work, read <a href="../validation/">Validation</a> first.</p>
 <p>How to read the tables:</p>
 <ul>
 <li><strong>Code</strong> is the error code. Use it in <code>@Dto(messages: ...)</code> and in a <code>MessageResolver</code>.</li>
@@ -7238,7 +7286,7 @@
 <li>On a <code>List&lt;T&gt;</code> field, a value rule checks each item. Only the list rules check the list itself.</li>
 </ul>
 <h2 id="type-errors">Type errors</h2>
-<p>These have no annotation. They come from the field type.</p>
+<p>You get these errors when a value does not fit the field type. They have no annotation.</p>
 <table>
 <thead>
 <tr>
@@ -7306,7 +7354,7 @@
 </tbody>
 </table>
 <h2 id="text">Text</h2>
-<p>For <code>String</code> fields (and <code>List&lt;String&gt;</code> items).</p>
+<p>Use these rules on <code>String</code> fields (and <code>List&lt;String&gt;</code> items):</p>
 <table>
 <thead>
 <tr>
@@ -7421,7 +7469,6 @@
 </tr>
 </tbody>
 </table>
-<p>Details:</p>
 <ul>
 <li><code>@Length</code> has <code>min:</code> and <code>max:</code>. Both are optional, but you must give one.
   With only <code>min:</code> it acts like <code>@MinLength</code>, with only <code>max:</code> like <code>@MaxLength</code>.</li>
@@ -7435,7 +7482,7 @@
 <li><code>@In</code> and <code>@NotIn</code> compare exactly (case matters).</li>
 </ul>
 <h2 id="more-text-rules">More text rules</h2>
-<p>For <code>String</code> fields.</p>
+<p>These are also for <code>String</code> fields:</p>
 <table>
 <thead>
 <tr>
@@ -7487,7 +7534,7 @@
 <ul>
 <li><code>@HexColor()</code> takes <code>#</code> and 6 hex digits, in any case. <code>@HexColor(short: true)</code> also takes 3 digits, like <code>#abc</code>.</li>
 <li><code>@Digits</code> and <code>@DigitsBetween</code> take only <code>0-9</code>. No sign, no dot. Use a <code>String</code> field, so leading zeros stay.</li>
-<li><code>@DateFormatted</code> uses the PHP <code>date()</code> letters:
+<li><code>@DateFormatted</code> uses these letters:
   day <code>d</code>, <code>j</code>, <code>D</code> (<code>Mon</code>), <code>l</code> (<code>Monday</code>), <code>N</code>, <code>w</code>, <code>S</code> (<code>st</code>), <code>z</code>;
   month <code>m</code>, <code>n</code>, <code>M</code> (<code>Jan</code>), <code>F</code> (<code>January</code>), <code>t</code>;
   year <code>Y</code>, <code>y</code>, <code>L</code>;
@@ -7503,7 +7550,8 @@
   It does not check leaked passwords.</li>
 </ul>
 <h2 id="other-fields">Other fields</h2>
-<p>These read another key of the same object. The other key is the input key, like <code>account_type</code>, not the Dart name <code>accountType</code>. If you give the Dart name of a field with another key, the build stops. <code>@Confirmed</code> and <code>@Same</code> compare the raw input of both keys. So <code>@Trim</code> does not change the compare.</p>
+<p>Sometimes a field depends on another field. For example, a password must match its confirmation, or a VAT number is required only for a company. These rules read another key of the same object.</p>
+<p>The other key is the input key, like <code>account_type</code>, not the Dart name <code>accountType</code>. If you give the Dart name of a field with another key, the build stops.</p>
 <table>
 <thead>
 <tr>
@@ -7581,6 +7629,7 @@
 </tbody>
 </table>
 <ul>
+<li><code>@Confirmed</code> and <code>@Same</code> compare the raw input of both keys, so <code>@Trim</code> does not change the compare.</li>
 <li><code>@Confirmed()</code> on <code>password</code> needs the key <code>password_confirmation</code> with the same value. The error is on <code>password</code>. Use <code>@Confirmed(other: 'password_again')</code> for another key.
   The DTO does not need a field for the confirmation key.</li>
 <li>Text and numbers match by text, both ways: <code>1234</code> matches <code>"1234"</code>, and <code>"1234"</code> matches <code>1234</code>.</li>
@@ -7599,7 +7648,7 @@
 <li>They run in step 1, with the other "required" checks. <code>@Confirmed</code> and <code>@Same</code> run in step 2.</li>
 </ul>
 <h2 id="present-or-missing">Present or missing</h2>
-<p>These check if a key is sent and has a value.</p>
+<p>Use these rules to check if a key is sent and has a value:</p>
 <table>
 <thead>
 <tr>
@@ -7651,6 +7700,7 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">note</span><span class="p">;</span><span class="w"> </span><span class="c1">// the key must be there, null is fine</span>
 </span></code></pre></div>
 <h2 id="skip-a-field">Skip a field</h2>
+<p>Sometimes a field only matters for some input. For example, a VAT number is only for a company. These rules skip the field for the other cases:</p>
 <table>
 <thead>
 <tr>
@@ -7683,8 +7733,8 @@
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">vatNumber</span><span class="p">;</span><span class="w"> </span><span class="c1">// not checked for a person</span>
 </span></code></pre></div>
 <h2 id="change-text">Change text</h2>
-<p>These change the value before the rules run. They always run in this order, wherever you put them:
-<code>@Trim</code>, then <code>@Lowercase</code> or <code>@Uppercase</code>, then the "empty string is missing" check.</p>
+<p>These change the value before the rules run. For example, <code>@Trim</code> removes the spaces a user typed by mistake.</p>
+<p>They always run in this order, wherever you put them: <code>@Trim</code>, then <code>@Lowercase</code> or <code>@Uppercase</code>, then the "empty string is missing" check.</p>
 <table>
 <thead>
 <tr>
@@ -7713,6 +7763,7 @@
 </table>
 <p>They have no error and no JSON Schema output. <code>@Lowercase()</code> and <code>@Uppercase()</code> together stop the build.</p>
 <h2 id="bad-value-to-default">Bad value to default</h2>
+<p>Sometimes a bad value should just give the default, like <code>page=abc</code> in a list page:</p>
 <table>
 <thead>
 <tr>
@@ -7733,7 +7784,7 @@
 <li>The field needs a default, a nullable type or a <code>Maybe</code> type. Else the build stops.</li>
 </ul>
 <h2 id="numbers">Numbers</h2>
-<p>For <code>int</code>, <code>double</code> and <code>num</code> fields (and list items).</p>
+<p>Use these rules on <code>int</code>, <code>double</code> and <code>num</code> fields (and list items):</p>
 <table>
 <thead>
 <tr>
@@ -7796,7 +7847,7 @@
 </table>
 <p>The values are <code>num</code>. <code>@Min(1.5)</code> on an <code>int</code> field stops the build. <code>@Range</code> checks that a number is between two values.</p>
 <h2 id="lists">Lists</h2>
-<p>For <code>List&lt;T&gt;</code> fields. These check the list, not the items.</p>
+<p>Use these rules on <code>List&lt;T&gt;</code> fields. They check the list, not the items:</p>
 <table>
 <thead>
 <tr>
@@ -7829,7 +7880,7 @@
 </table>
 <p><code>@UniqueItems()</code> works for <code>String</code>, numbers, <code>bool</code>, enums and <code>DateTime</code>. On a list of DTOs it stops the build.</p>
 <h2 id="dates">Dates</h2>
-<p>For <code>DateTime</code> fields.</p>
+<p>Use these rules on <code>DateTime</code> fields:</p>
 <table>
 <thead>
 <tr>
@@ -7885,7 +7936,7 @@
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kd">final</span><span class="w"> </span><span class="n">DateTime</span><span class="w"> </span><span class="n">endDate</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="files">Files</h2>
-<p>For <code>RequestFile</code> and <code>List&lt;RequestFile&gt;</code> fields.</p>
+<p>Use these rules on <code>RequestFile</code> and <code>List&lt;RequestFile&gt;</code> fields:</p>
 <table>
 <thead>
 <tr>
@@ -7965,7 +8016,7 @@
 </span></code></pre></div>
 <p>The fluent methods are <code>maxSize(bytes)</code>, <code>minSize(bytes)</code>, <code>mimes(types)</code>, <code>mimeTypes(types)</code>, <code>dimensions(...)</code>, <code>image()</code> and <code>extensions(types)</code>.</p>
 <h2 id="database">Database</h2>
-<p>From <code>dox_orm</code>. Async: they run after all other checks passed.</p>
+<p>These rules come from <code>dox_orm</code>. They read the database, so they run after all other checks passed:</p>
 <table>
 <thead>
 <tr>
@@ -7996,6 +8047,7 @@
 <p>See <a href="../validation/#database-rules-unique-and-exists">Database rules</a>.</p>
 <p>In a fluent schema, use <code>v.string().unique('users', column: 'email')</code> and <code>v.int().exists('teams')</code>. See <a href="../../packages/validation/#more-rules">Fluent schemas</a>.</p>
 <h2 id="keys-and-dto-options">Keys and DTO options</h2>
+<p>These options change how the whole DTO reads its input:</p>
 <table>
 <thead>
 <tr>
@@ -8038,7 +8090,7 @@
 </tr>
 <tr>
 <td><code>@Dto(messages: {...})</code></td>
-<td>messages by <code>code</code> or <code>key.code</code>. A dotted path like <code>address.city.required</code> or <code>tags.*.required</code> works too. A Laravel rule name works too, like <code>name.min</code>. See <a href="../validation/#laravel-rule-names-in-message-keys">Messages</a>.</td>
+<td>messages by <code>code</code> or <code>key.code</code>. A dotted path like <code>address.city.required</code> or <code>tags.*.required</code> works too. A short rule name works too, like <code>name.min</code>. See <a href="../validation/#short-rule-names-in-message-keys">Short rule names</a>.</td>
 </tr>
 <tr>
 <td><code>@Dto(attributes: {...})</code></td>
@@ -8056,7 +8108,7 @@ The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Describe</span><span class="p">(</span><span class="s1">'Category ID (see list_categories).'</span><span class="p">)</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">categoryId</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="types-in-detail">Types in detail</h2>
-<p>How each field type reads input. The short table is in <a href="../validation/#types">Types</a>.</p>
+<p>This is how each field type reads input. The short table is in <a href="../dto/#field-types">Types</a>.</p>
 <ul>
 <li><strong>JSON is strict.</strong> In a JSON body, <code>"18"</code> is not an <code>int</code>. You get the error <code>integer</code>. With <code>@Dto(coerce: true)</code>, JSON is read like form text for <code>int</code>, <code>double</code>, <code>num</code> and <code>bool</code>, and a <code>bool</code> also takes <code>1</code> and <code>0</code>.</li>
 <li><strong>Query and form data are text.</strong> Dox turns the text into the field type first. If it can not, you get the type error.</li>
@@ -8072,6 +8124,7 @@ The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
 <li>In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives <code>422</code> with the key <code>_root</code>.</li>
 </ul>
 <h2 id="body-types">Body types</h2>
+<p>The content type of the body decides how Dox reads it:</p>
 <table>
 <thead>
 <tr>
@@ -8103,6 +8156,7 @@ The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
 </tbody>
 </table>
 <h2 id="the-order-of-checks">The order of checks</h2>
+<p>Dox checks the input in four steps:</p>
 <ol>
 <li>Read the input and convert types. Change text (<code>@Trim</code>, <code>@Lowercase</code>, <code>@Uppercase</code>). Find missing required fields.</li>
 <li>The field rules, top to bottom. The first rule that fails stops the other rules of that field. So there is no <code>@Bail</code>. A fluent schema runs all rules, unless you add <code>.bail()</code>. See <a href="../../packages/validation/#stop-at-the-first-error">Stop at the first error</a>.</li>
@@ -8119,7 +8173,7 @@ The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
 <p>The build stops with a clear error when:</p>
 <ul>
 <li>a field is not <code>final</code>, or is not a parameter of the unnamed constructor,</li>
-<li>a field type is not supported (see <a href="../validation/#types">Types</a>),</li>
+<li>a field type is not supported (see <a href="../dto/#field-types">Types</a>),</li>
 <li>a rule does not fit the field type (like <code>@Email()</code> on an <code>int</code>),</li>
 <li>a <code>Maybe&lt;T&gt;</code> field has no <code>const Maybe.missing()</code> default,</li>
 <li><code>@RequiredIf</code>, <code>@RequiredWith</code>, <code>@RequiredUnless</code>, <code>@RequiredWithout</code>, <code>@RequiredWithoutAll</code>, <code>@Filled</code>, <code>@Present</code>, <code>@Prohibited</code>, <code>@ProhibitedIf</code>, <code>@ExcludeIf</code> or <code>@ExcludeUnless</code> is on a field that is always required,</li>
@@ -8189,13 +8243,13 @@ The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
         
         
           
-          <a href="../../digging-deeper/cache/" class="md-footer__link md-footer__link--next" aria-label="Next: Cache">
+          <a href="../controller/" class="md-footer__link md-footer__link--next" aria-label="Next: Controller">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Cache
+                Controller
               </div>
             </div>
             <div class="md-footer__button md-icon">

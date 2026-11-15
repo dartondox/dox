@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Declare your env keys once, in a typed class.">
+        <meta name="description" content="Declare your env keys once, in a typed class, and read them as normal Dart values.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Environment Variables | Dox">
-  <meta property="og:description" content="Declare your env keys once, in a typed class.">
+  <meta property="og:description" content="Declare your env keys once, in a typed class, and read them as normal Dart values.">
   <meta property="og:url" content="https://dartondox.dev/latest/digging-deeper/env/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Environment Variables | Dox">
-  <meta name="twitter:description" content="Declare your env keys once, in a typed class.">
+  <meta name="twitter:description" content="Declare your env keys once, in a typed class, and read them as normal Dart values.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1598,6 +1598,8 @@
       
         
       
+        
+      
     
     
     
@@ -1697,6 +1699,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1742,12 +1840,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1758,15 +1856,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1922,6 +2210,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -1947,291 +2280,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -2791,22 +2839,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-typed-env-class" class="md-nav__link">
+  <a href="#defining-env-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The typed env class
+        Defining env keys
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The typed env class">
+    <nav class="md-nav" aria-label="Defining env keys">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#the-rules" class="md-nav__link">
+  <a href="#key-names" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The rules
+        Key names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-and-optional-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required and optional keys
       
     </span>
   </a>
@@ -2825,10 +2895,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fail-fast" class="md-nav__link">
+  <a href="#missing-or-bad-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fail fast
+        Missing or bad keys
       
     </span>
   </a>
@@ -2837,6 +2907,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-env-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading env values
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2863,11 +2944,28 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#use-one-value-in-another" class="md-nav__link">
     <span class="md-ellipsis">
       
         Use one value in another
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Use one value in another">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#turning-on-envexpand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Turning on envExpand
       
     </span>
   </a>
@@ -2880,10 +2978,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
+  <a href="#generating-the-env-class" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Commands
+        Generating the env class
       
     </span>
   </a>
@@ -2891,10 +2989,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tests" class="md-nav__link">
+  <a href="#checking-the-env" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tests
+        Checking the env
       
     </span>
   </a>
@@ -2902,10 +3000,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#envget-the-low-level-way" class="md-nav__link">
+  <a href="#the-app-key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Env.get: the low-level way
+        The app key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-a-key-by-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading a key by name
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
       
     </span>
   </a>
@@ -6935,22 +7066,44 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#the-typed-env-class" class="md-nav__link">
+  <a href="#defining-env-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The typed env class
+        Defining env keys
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="The typed env class">
+    <nav class="md-nav" aria-label="Defining env keys">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#the-rules" class="md-nav__link">
+  <a href="#key-names" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The rules
+        Key names
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#default-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Default values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#required-and-optional-keys" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Required and optional keys
       
     </span>
   </a>
@@ -6969,10 +7122,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#fail-fast" class="md-nav__link">
+  <a href="#missing-or-bad-keys" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Fail fast
+        Missing or bad keys
       
     </span>
   </a>
@@ -6981,6 +7134,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-env-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading env values
+      
+    </span>
+  </a>
   
 </li>
       
@@ -7007,11 +7171,28 @@
   
 </li>
         
-          <li class="md-nav__item">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#use-one-value-in-another" class="md-nav__link">
     <span class="md-ellipsis">
       
         Use one value in another
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Use one value in another">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#turning-on-envexpand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Turning on envExpand
       
     </span>
   </a>
@@ -7024,10 +7205,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#commands" class="md-nav__link">
+  <a href="#generating-the-env-class" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Commands
+        Generating the env class
       
     </span>
   </a>
@@ -7035,10 +7216,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#tests" class="md-nav__link">
+  <a href="#checking-the-env" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Tests
+        Checking the env
       
     </span>
   </a>
@@ -7046,10 +7227,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#envget-the-low-level-way" class="md-nav__link">
+  <a href="#the-app-key" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Env.get: the low-level way
+        The app key
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reading-a-key-by-name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading a key by name
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
       
     </span>
   </a>
@@ -7082,10 +7296,11 @@
 
 
 <h1 id="environment-variables">Environment Variables</h1>
-<p>Declare your env keys once, in a typed class.</p>
-<p>Then <code>env.appPort</code> is an <code>int</code>, your IDE suggests every key, and a missing key stops the app at startup.</p>
-<h2 id="the-typed-env-class">The typed env class</h2>
-<p>A new project already has <code>lib/config/env.dart</code>. Its keys are listed in the <a href="../../reference/env/#read-by-a-new-project">Env reference</a>. This example shows the kinds of getters you can write:</p>
+<p>Declare your env keys once, in a typed class, and read them as normal Dart values.</p>
+<p>Your app needs different settings on each machine. For example, the database password on your laptop is not the one in production. You keep these values in environment variables or in a <code>.env</code> file, not in your code.</p>
+<p>Dox reads them through a typed class. So <code>env.appPort</code> is an <code>int</code>, your IDE suggests every key, and a missing key stops the app at startup, not in the middle of a request.</p>
+<h2 id="defining-env-keys">Defining env keys</h2>
+<p>A new project already has <code>lib/config/env.dart</code>. Its keys are listed in the <a href="../../reference/env/#read-by-a-new-project">Env reference</a>. Each getter in the class is one env key. This example shows the kinds of getters you can write:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'env.g.dart'</span><span class="p">;</span>
@@ -7113,27 +7328,20 @@
 </span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="c1">/// The env of the app. Read and checked once, on first use.</span>
 </span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="kd">final</span><span class="w"> </span><span class="n">AppEnv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppEnv</span><span class="p">.</span><span class="n">load</span><span class="p">();</span>
 </span></code></pre></div>
-<p>Run <code>dart run build_runner build</code> after each change to the class. It writes <code>env.g.dart</code>. Then use <code>env</code> anywhere:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="cm">/* int */</span><span class="p">,</span><span class="w"> </span><span class="p">...),</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">);</span>
+<p>Run <code>dart run build_runner build</code> after each change to the class. It writes <code>env.g.dart</code>.</p>
+<h3 id="key-names">Key names</h3>
+<p>The key is the getter name in UPPER_SNAKE case. <code>appName</code> reads <code>APP_NAME</code>. A run of capitals is one word, so <code>dbURL</code> reads <code>DB_URL</code>. If you want another name, use <code>@EnvKey('X')</code>.</p>
+<h3 id="default-values">Default values</h3>
+<p>The getter body is the default. It runs only when the key is missing. It can be any expression, like <code>Platform.numberOfProcessors</code>.</p>
+<p>A default can use another env getter, and it gets the loaded value. Write the getter directly (<code>appPort</code>), not <code>env.appPort</code>, because the global <code>env</code> is not ready while it loads:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appUrl</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'http://localhost:</span><span class="si">$</span><span class="n">appPort</span><span class="s1">'</span><span class="p">;</span>
 </span></code></pre></div>
-<h3 id="the-rules">The rules</h3>
+<p>This getter is still a key: it reads <code>APP_URL</code>, and when <code>APP_URL</code> is set, it wins over the body.</p>
+<h3 id="required-and-optional-keys">Required and optional keys</h3>
 <ul>
-<li><strong>Key</strong>: the getter name in UPPER_SNAKE case. <code>appName</code> reads <code>APP_NAME</code>, <code>s3Bucket</code> reads <code>S3_BUCKET</code>. A run of capitals is one word: <code>dbURL</code> reads <code>DB_URL</code>. Use <code>@EnvKey('X')</code> for another name.</li>
-<li><strong>Default</strong>: the getter body. It can be any expression, like <code>Platform.numberOfProcessors</code>. It runs only when the key is missing. A default can read another env getter and sees its loaded value: <code>String get appUrl =&gt; 'http://localhost:$appPort';</code> uses the real <code>APP_PORT</code>.</li>
-<li><strong>Every getter is a key</strong>: an env getter is always one env key and nothing more. Also a getter whose body uses other getters: <code>appUrl</code> above reads <code>APP_URL</code>, and when <code>APP_URL</code> is set, it wins over the body.</li>
-<li><strong>No computed values</strong>: a value like "is development" is not an env key, so it does not go in the env class. Use <code>appConfig.isDevelopment</code> from the app config. It is <code>true</code> when <code>APP_ENV</code> is <code>development</code>.</li>
-<li><strong>Use the getter, not <code>env</code></strong>: in a default, write <code>appEnv</code>, never <code>env.appEnv</code>. The global <code>env</code> is not ready while it loads. The app stops at startup with a <code>StateError</code>: "A default of AppEnv reads the global <code>env</code>. Use the getter directly".</li>
-<li><strong>Only this class</strong>: the builder reads the getters of the <code>@DoxEnv()</code> class itself. Getters from a superclass or a mixin are not read from the env. A field (<code>final String x = ...;</code>) is a build error: use a getter.</li>
-<li><strong>Optional</strong>: a nullable getter with no body (<code>String? get s3Bucket;</code>). It is <code>null</code> when the key is missing.</li>
-<li><strong>Required</strong>: any other getter with no body. A missing key stops the app.</li>
-<li><strong>Empty</strong>: an empty value (or the text <code>null</code>) counts as missing.</li>
+<li>A getter with no body is required. A missing key stops the app.</li>
+<li>A nullable getter with no body, like <code>String? get s3Bucket;</code>, is optional. It is <code>null</code> when the key is missing.</li>
+<li>An empty value (or the text <code>null</code>) counts as missing.</li>
 </ul>
 <h3 id="types">Types</h3>
 <table>
@@ -7175,137 +7383,144 @@
 </tbody>
 </table>
 <p>Any other type is a build error.</p>
-<h3 id="fail-fast">Fail fast</h3>
-<p><code>AppEnv.load()</code> reads every key one time. Then it checks them all, and throws one <code>EnvException</code> that lists every missing or bad key:</p>
+<h3 id="missing-or-bad-keys">Missing or bad keys</h3>
+<p>When the app starts, <code>AppEnv.load()</code> reads and checks every key. If something is wrong, it throws one <code>EnvException</code> that lists every missing or bad key:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>EnvException: the env is not valid
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  - APP_KEY is missing
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  - DB_PORT must be an int
 </span></code></pre></div>
-<p>The error names the key, never the value. A value may be a secret, and this text goes to the log and to CI output.</p>
-<p>This happens once, when the app starts. After that, <code>env.dbPort</code> is a plain field read.</p>
+<p>The error names the key, never the value, because a value may be a secret and this text goes to logs and CI output.</p>
+<h2 id="reading-env-values">Reading env values</h2>
+<p>Import the config file and use <code>env</code> anywhere:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="cm">/* int */</span><span class="p">,</span><span class="w"> </span><span class="p">...),</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>Keep only plain keys in the env class. A computed value, like "is this development", does not go there. Use <code>appConfig.isDevelopment</code> from the app config instead. It is <code>true</code> when <code>APP_ENV</code> is <code>development</code>.</p>
 <h2 id="where-values-come-from">Where values come from</h2>
-<p>Dox reads values from these places:</p>
+<p>Dox reads values from these places. The first one that has the key wins:</p>
 <ol>
 <li>Real environment variables (set in the shell, Docker or systemd).</li>
 <li>In tests only: the <code>.env.testing</code> file. See <a href="../testing/#use-a-test-database-with-envtesting">Testing: a test database</a>.</li>
 <li>The <code>.env</code> file in the folder where you start the app. It is optional.</li>
 </ol>
-<div class="admonition info">
-<p class="admonition-title">The environment wins</p>
-<p>A real environment variable wins over the <code>.env</code> file.
-So you can keep <code>.env</code> for development and use real variables in production.</p>
-</div>
+<p>So you can keep a <code>.env</code> file for development and use real environment variables in production.</p>
 <h3 id="the-env-file">The <code>.env</code> file</h3>
-<div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="na">APP_NAME</span><span class="o">=</span><span class="s">dox</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">&lt;output of dox key:generate&gt;</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="na">DB_PORT</span><span class="o">=</span><span class="s">5432</span>
+<p>The <code>.env</code> file has one <code>KEY=value</code> per line:</p>
+<div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="na">APP_NAME</span><span class="o">=</span><span class="s">dox</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">&lt;output of dox key:generate&gt;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="na">DB_PORT</span><span class="o">=</span><span class="s">5432</span>
 </span></code></pre></div>
 <ul>
-<li>One <code>KEY=value</code> per line.</li>
-<li>Quotes around a value are removed. So <code>APP_NAME="My app"</code> gives <code>My app</code>. Use <code>"</code>, <code>'</code> or <code>`</code>.</li>
-<li>A <code>=</code> inside the value is kept: <code>TOKEN=a=b</code> gives <code>a=b</code>.</li>
-<li>A line that starts with <code>#</code> is a comment.</li>
-<li>A <code>#</code> after a space starts a comment: <code>APP_PORT=3000 # dev</code> gives <code>3000</code>.</li>
-<li>A <code>#</code> with no space before it is kept: <code>DB_PASSWORD=abc#123</code> gives <code>abc#123</code>, and <code>COLOR=#fff</code> gives <code>#fff</code>.</li>
-<li>A <code>#</code> inside quotes is kept: <code>DB_PASSWORD="abc # 123"</code> gives <code>abc # 123</code>.</li>
-<li><code>export KEY=value</code> is read like <code>KEY=value</code>.</li>
-<li><code>KEY=</code> (empty, or only spaces) gives the default value, like a key that is not there.</li>
-<li>One line is one value. A quoted value can not go over more lines, so a multi-line PEM key does not work. Turn on <code>envExpand</code> (below) and write it on one line with <code>\n</code>: <code>JWT_KEY="-----BEGIN KEY-----\nabc\n-----END KEY-----"</code>. Or keep the key in a file and put the file path in the env.</li>
+<li>Quotes around a value are removed, so <code>APP_NAME="My app"</code> gives <code>My app</code>. Use <code>"</code>, <code>'</code> or <code>`</code>.</li>
+<li>A line that starts with <code>#</code> is a comment. A <code>#</code> after a space also starts a comment: <code>APP_PORT=3000 # dev</code> gives <code>3000</code>.</li>
+<li>A <code>#</code> with no space before it, or inside quotes, is kept: <code>COLOR=#fff</code> gives <code>#fff</code>.</li>
+<li><code>KEY=</code> (empty) gives the default value, the same as a missing key.</li>
+<li><code>export KEY=value</code> works too.</li>
+<li>A value can not go over more lines. For a multi-line PEM key, keep the key in a file and put the file path in the env. Or turn on <code>envExpand</code> (below) and write it on one line with <code>\n</code>.</li>
 </ul>
-<h3 id="use-one-value-in-another">Use one value in another</h3>
-<p><code>CoreFlags.envExpand</code> is off by default. Turn it on to use <code>${OTHER}</code> in a value:</p>
-<div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="na">HOST</span><span class="o">=</span><span class="s">localhost</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="na">PORT</span><span class="o">=</span><span class="s">3000</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="na">APP_URL</span><span class="o">=</span><span class="s">http://${HOST}:${PORT}</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="na">GREETING</span><span class="o">=</span><span class="s">"Hello\nWorld"</span>
+<h2 id="use-one-value-in-another">Use one value in another</h2>
+<p>Sometimes you want to build a value from other values, like <code>APP_URL</code> from <code>HOST</code> and <code>PORT</code>. Turn on <code>CoreFlags.envExpand</code> for this. It is off by default.</p>
+<div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="na">HOST</span><span class="o">=</span><span class="s">localhost</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="na">PORT</span><span class="o">=</span><span class="s">3000</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="na">APP_URL</span><span class="o">=</span><span class="s">http://${HOST}:${PORT}</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="na">GREETING</span><span class="o">=</span><span class="s">"Hello\nWorld"</span>
 </span></code></pre></div>
 <ul>
 <li><code>${OTHER}</code> works in an unquoted value and in a <code>"..."</code> value. It does not work in <code>'...'</code>.</li>
-<li>Dox looks for a real environment variable first, then for a key above this line. In tests, <code>.env.testing</code> also sees the keys of <code>.env</code>.</li>
-<li>A name that Dox does not find stays as it is: <code>${OTHER}</code>.</li>
-<li>In a <code>"..."</code> value, <code>\n</code>, <code>\t</code>, <code>\"</code>, <code>\\</code> and <code>\$</code> become a new line, a tab, <code>"</code>, <code>\</code> and <code>$</code>. Use <code>\$</code> to write a <code>$</code> that is not a variable.</li>
+<li>Dox looks for a real environment variable first, then for a key above this line. A name it does not find stays as <code>${OTHER}</code>.</li>
+<li>In a <code>"..."</code> value, <code>\n</code>, <code>\t</code>, <code>\"</code>, <code>\\</code> and <code>\$</code> become a new line, a tab, <code>"</code>, <code>\</code> and <code>$</code>.</li>
 </ul>
-<p>The <code>.env</code> file is read before <code>AppConfig</code> exists. So you must set the flag in two places:</p>
-<ol>
-<li><code>Env.flags = flags;</code> at the top of <code>main()</code>, before any env value is read.</li>
-<li>The same flags in <code>AppConfig(flags: flags)</code>.</li>
-</ol>
-<p>Set <code>Env.flags</code> at the very top of <code>main()</code>, before any env read. The first env read (like <code>Env.get()</code> or <code>env.appName</code>) loads <code>.env</code> with the flags of that moment, and the file is not read again. If the flags were not set yet, <code>Dox().initialize</code> prints a warning.</p>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">const</span><span class="w"> </span><span class="n">CoreFlags</span><span class="w"> </span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CoreFlags</span><span class="p">(</span><span class="nl">envExpand:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'APP_KEY'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">),</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="n">flags</span><span class="p">,</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">);</span>
+<h3 id="turning-on-envexpand">Turning on envExpand</h3>
+<p>The <code>.env</code> file is read before <code>AppConfig</code> exists. So you set the flags in two places: in <code>AppConfig</code>, and in <code>Env.flags</code> at the very top of <code>main()</code>, before any env value is read:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">const</span><span class="w"> </span><span class="n">CoreFlags</span><span class="w"> </span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CoreFlags</span><span class="p">(</span><span class="nl">envExpand:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'APP_KEY'</span><span class="p">,</span><span class="w"> </span><span class="s1">''</span><span class="p">),</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="n">flags</span><span class="p">,</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">bin/server.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="n">Env</span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">startServer</span><span class="p">();</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="p">}</span>
+<div class="language-dart highlight"><span class="filename">bin/server.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">Env</span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">startServer</span><span class="p">();</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">}</span>
 </span></code></pre></div>
 <p><code>my_app</code> is the <code>name</code> in your <code>pubspec.yaml</code>.</p>
-<p>A test does not run <code>bin/server.dart</code>. So set <code>Env.flags = flags;</code> at the top of the <code>main()</code> of each test file too, before the app or the client starts:</p>
-<div class="language-dart highlight"><span class="filename">test/http_test.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/testing.dart'</span><span class="p">;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="n">Env</span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="w"> </span><span class="n">client</span><span class="p">;</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="n">setUpAll</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">    </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
-</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="p">}</span>
+<p>A test does not run <code>bin/server.dart</code>. So set <code>Env.flags = flags;</code> at the top of <code>main()</code> in each test file too:</p>
+<div class="language-dart highlight"><span class="filename">test/http_test.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/testing.dart'</span><span class="p">;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="n">Env</span><span class="p">.</span><span class="n">flags</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">flags</span><span class="p">;</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="w"> </span><span class="n">client</span><span class="p">;</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="n">setUpAll</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="n">client</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">DoxTestClient</span><span class="p">.</span><span class="n">start</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Without it, <code>${OTHER}</code> stays as written in the test, and Dox prints the warning.</p>
-<p>The server isolates follow the main isolate. You set nothing for them.
-When the flag is on in <code>AppConfig</code> but <code>.env</code> was read without it, Dox prints a warning at start, once in each isolate.</p>
-<h2 id="commands">Commands</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dox<span class="w"> </span>env:generate<span class="w">   </span><span class="c1"># make lib/config/env.dart from .env.example</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>dox<span class="w"> </span>env:check<span class="w">      </span><span class="c1"># load the env and print every missing or bad key</span>
+<p>If you forget it, <code>${OTHER}</code> stays as written, and Dox prints a warning.</p>
+<h2 id="generating-the-env-class">Generating the env class</h2>
+<p>If you have a <code>.env.example</code>, <code>dox env:generate</code> makes <code>lib/config/env.dart</code> from it:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>dox<span class="w"> </span>env:generate<span class="w">   </span><span class="c1"># make lib/config/env.dart from .env.example</span>
 </span></code></pre></div>
-<p><code>dox env:generate</code> reads <code>.env.example</code>:</p>
 <ul>
-<li>digits become an <code>int</code> with that default: <code>APP_PORT=3000</code> gives <code>int get appPort =&gt; 3000;</code></li>
-<li><code>true</code>/<code>false</code> become a <code>bool</code> with that default</li>
-<li>an empty value becomes an optional <code>String?</code></li>
-<li>any other value becomes a required <code>String</code>. The example value is never a default, so a secret in the example can not leak into the code.</li>
-<li><code>#</code> comment lines above a key become its doc comment</li>
+<li>Digits become an <code>int</code> with that default: <code>APP_PORT=3000</code> gives <code>int get appPort =&gt; 3000;</code>.</li>
+<li><code>true</code>/<code>false</code> become a <code>bool</code> with that default.</li>
+<li>An empty value becomes an optional <code>String?</code>.</li>
+<li>Any other value becomes a required <code>String</code>. The example value is never a default, so a secret in the example can not leak into the code.</li>
+<li><code>#</code> comment lines above a key become its doc comment.</li>
 </ul>
 <p>It does not overwrite an existing <code>lib/config/env.dart</code>. Run <code>dox build_runner:build</code> after it.</p>
-<p><code>dox env:check</code> exits with code 1 when a key is missing or bad. Use it in CI or before a deploy.</p>
-<h2 id="tests">Tests</h2>
-<p>To pass your own values in a test, see <a href="../testing/#test-the-env">Testing</a>.</p>
-<h2 id="envget-the-low-level-way">Env.get: the low-level way</h2>
-<p><code>Env.get()</code> reads one key by name. Use it for a key you only know at run time. For normal config, use the typed class.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_KEY'</span><span class="p">);</span><span class="w">             </span><span class="c1">// '' when missing</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'APP_KEY'</span><span class="p">,</span><span class="w"> </span><span class="s1">'default_value'</span><span class="p">);</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_PORT'</span><span class="p">,</span><span class="w"> </span><span class="m">3000</span><span class="p">);</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'SOCKETIO_ENABLED'</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// true, 1, yes, on</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="p">(</span><span class="s1">'AWS_BUCKET'</span><span class="p">);</span><span class="w">          </span><span class="c1">// null when it is not set</span>
+<h2 id="checking-the-env">Checking the env</h2>
+<p><code>dox env:check</code> loads the env and prints every missing or bad key. It exits with code 1 when a key is wrong, so you can use it in CI or before a deploy:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>dox<span class="w"> </span>env:check<span class="w">      </span><span class="c1"># load the env and print every missing or bad key</span>
+</span></code></pre></div>
+<h2 id="the-app-key">The app key</h2>
+<p>Dox needs <code>APP_KEY</code> to encrypt and sign data. Make one with <code>dox key:generate</code>.</p>
+<p>When <code>APP_KEY</code> is missing, not 32 characters, or a public sample key, <code>Dox().startServer()</code> stops with an error. When <code>APP_ENV</code> is <code>development</code>, <code>local</code>, <code>test</code> or <code>testing</code>, it only logs a warning.</p>
+<h2 id="reading-a-key-by-name">Reading a key by name</h2>
+<p>Sometimes you only know the key name at run time. Use <code>Env.get()</code> for this. For normal config, use the typed class.</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_KEY'</span><span class="p">);</span><span class="w">             </span><span class="c1">// '' when missing</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'APP_KEY'</span><span class="p">,</span><span class="w"> </span><span class="s1">'default_value'</span><span class="p">);</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_PORT'</span><span class="p">,</span><span class="w"> </span><span class="m">3000</span><span class="p">);</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'SOCKETIO_ENABLED'</span><span class="p">,</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// true, 1, yes, on</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">?&gt;</span><span class="p">(</span><span class="s1">'AWS_BUCKET'</span><span class="p">);</span><span class="w">          </span><span class="c1">// null when it is not set</span>
 </span></code></pre></div>
 <p>A missing or empty key gives the default. With no default:</p>
 <ul>
-<li><code>String</code> gives an empty string <code>''</code>. It is never the text <code>"null"</code>.</li>
-<li><code>String?</code> and <code>dynamic</code> give <code>null</code>. With no type, like <code>Env.get('KEY')</code>, the type is <code>dynamic</code>, so you get <code>null</code>.</li>
+<li><code>String</code> gives <code>''</code>.</li>
+<li><code>String?</code> and <code>dynamic</code> give <code>null</code>. <code>Env.get('KEY')</code> with no type is <code>dynamic</code>.</li>
 <li><code>int</code>, <code>num</code>, <code>double</code> and <code>bool</code> throw an <code>ArgumentError</code> with the key name. A value that is not a number throws too.</li>
 </ul>
-<p><code>Env.get()</code> looks up and converts the value on every call. Do not call it on a hot path.</p>
-<div class="admonition warning">
-<p class="admonition-title">APP_KEY</p>
-<p>When <code>APP_KEY</code> is missing, not 32 characters, or a public sample key, <code>Dox().startServer()</code> stops with an error.
-When <code>APP_ENV</code> is <code>development</code>, <code>local</code>, <code>test</code> or <code>testing</code>, it only logs a warning. Make a key with <code>dox key:generate</code>.</p>
-</div>
+<p><code>Env.get()</code> looks up and converts the value on every call, so do not call it on a hot path.</p>
+<h2 id="testing">Testing</h2>
+<p>To pass your own values in a test, see <a href="../testing/#test-the-env">Testing</a>.</p>
+<h2 id="details">Details</h2>
+<ul>
+<li>The builder only reads getters of the <code>@DoxEnv()</code> class itself. Getters from a superclass or a mixin are not read from the env. A field (<code>final String x = ...;</code>) is a build error.</li>
+<li>If a default reads the global <code>env</code>, the app stops at startup with a <code>StateError</code>: "A default of AppEnv reads the global <code>env</code>. Use the getter directly".</li>
+<li>After startup, <code>env.dbPort</code> is a plain field read.</li>
+<li>A <code>=</code> inside a value is kept: <code>TOKEN=a=b</code> gives <code>a=b</code>.</li>
+<li>With <code>envExpand</code>, <code>.env.testing</code> also sees the keys of <code>.env</code>.</li>
+<li>The first env read (like <code>Env.get()</code> or <code>env.appName</code>) loads <code>.env</code> with the flags of that moment. The file is not read again. If <code>Env.flags</code> was not set yet, <code>Dox().initialize</code> prints a warning.</li>
+<li>The server isolates follow the main isolate, so you set nothing for them. When the flag is on in <code>AppConfig</code> but <code>.env</code> was read without it, Dox prints a warning at start, once in each isolate.</li>
+</ul>
 
 
 

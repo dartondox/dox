@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A read replica is a copy of your database that only answers reads. Dox can send reads to replicas and writes to the main database. This spreads the load...">
+        <meta name="description" content="A read replica is a copy of your database that only answers reads, and Dox can send reads to replicas and writes to the main database.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Read replicas | Dox">
-  <meta property="og:description" content="A read replica is a copy of your database that only answers reads. Dox can send reads to replicas and writes to the main database. This spreads the load...">
+  <meta property="og:description" content="A read replica is a copy of your database that only answers reads, and Dox can send reads to replicas and writes to the main database.">
   <meta property="og:url" content="https://dartondox.dev/latest/database/replicas/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Read replicas | Dox">
-  <meta name="twitter:description" content="A read replica is a copy of your database that only answers reads. Dox can send reads to replicas and writes to the main database. This spreads the load...">
+  <meta name="twitter:description" content="A read replica is a copy of your database that only answers reads, and Dox can send reads to replicas and writes to the main database.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1598,6 +1598,8 @@
       
         
       
+        
+      
     
     
     
@@ -1697,6 +1699,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1742,12 +1840,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1758,15 +1856,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1922,6 +2210,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -1947,291 +2280,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -3615,10 +3663,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#set-it-up" class="md-nav__link">
+  <a href="#configuring-replicas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set it up
+        Configuring replicas
       
     </span>
   </a>
@@ -3626,13 +3674,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-goes-where" class="md-nav__link">
+  <a href="#where-queries-go" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What goes where
+        Where queries go
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Where queries go">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reading-from-the-write-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading from the write host
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3648,10 +3713,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#with-database_url" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        With DATABASE_URL
+        Details
       
     </span>
   </a>
@@ -6852,10 +6917,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#set-it-up" class="md-nav__link">
+  <a href="#configuring-replicas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set it up
+        Configuring replicas
       
     </span>
   </a>
@@ -6863,13 +6928,30 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-goes-where" class="md-nav__link">
+  <a href="#where-queries-go" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What goes where
+        Where queries go
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Where queries go">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reading-from-the-write-host" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading from the write host
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -6885,10 +6967,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#with-database_url" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        With DATABASE_URL
+        Details
       
     </span>
   </a>
@@ -6921,13 +7003,10 @@
 
 
 <h1 id="read-replicas">Read replicas</h1>
-<p>A read replica is a copy of your database that only answers reads.
-Dox can send reads to replicas and writes to the main database.
-This spreads the load over more servers.</p>
-<p>Postgres and MySQL support it. SQLite does not.</p>
-<h2 id="set-it-up">Set it up</h2>
-<p>Add <code>read</code> to the <code>ConnectionConfig</code>.
-The <code>host</code> of the config is the write host.</p>
+<p>A read replica is a copy of your database that only answers reads, and Dox can send reads to replicas and writes to the main database.</p>
+<p>This spreads the load over more servers, which helps when your app reads much more than it writes. Postgres and MySQL support it. SQLite does not.</p>
+<h2 id="configuring-replicas">Configuring replicas</h2>
+<p>Add <code>read</code> to the <code>ConnectionConfig</code>. The <code>host</code> of the config is the write host:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span><span class="w"> </span><span class="c1">// the write host</span>
@@ -6942,73 +7021,39 @@ The <code>host</code> of the config is the write host.</p>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="nl">sticky:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">),</span>
 </span></code></pre></div>
-<p>Each map in <code>read</code> can change <code>host</code>, <code>port</code>, <code>user</code>, <code>password</code>, <code>database</code> and <code>extra</code>.
-The other settings are shared with the config.</p>
-<p>To change the write host, add <code>write</code>. It has the same keys as one <code>read</code> map.
-Without <code>write</code>, the config itself is the write host.</p>
+<p>Each map in <code>read</code> can change <code>host</code>, <code>port</code>, <code>user</code>, <code>password</code>, <code>database</code> and <code>extra</code>. The other settings come from the config. Without <code>read</code>, nothing changes.</p>
+<p>If the write host is not the host of the config, add <code>write</code>. It has the same keys as one <code>read</code> map:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nl">write:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'host'</span><span class="o">:</span><span class="w"> </span><span class="s1">'primary.db'</span><span class="p">,</span><span class="w"> </span><span class="s1">'port'</span><span class="o">:</span><span class="w"> </span><span class="m">6432</span><span class="p">},</span>
 </span></code></pre></div>
-<p>Without <code>read</code>, nothing changes.</p>
-<h2 id="what-goes-where">What goes where</h2>
-<p>The read hosts take turns, in the order of the list (round robin).</p>
-<table>
-<thead>
-<tr>
-<th>Goes to a read host</th>
-<th>Goes to the write host</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>A plain <code>SELECT</code></td>
-<td><code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code></td>
-</tr>
-<tr>
-<td></td>
-<td>A raw query that is not a <code>SELECT</code></td>
-</tr>
-<tr>
-<td></td>
-<td>Schema changes and migrations</td>
-</tr>
-<tr>
-<td></td>
-<td>A <code>SELECT</code> with a lock (<code>lockForUpdate()</code>, <code>sharedLock()</code>) or with <code>INTO</code></td>
-</tr>
-<tr>
-<td></td>
-<td>Every query in a transaction</td>
-</tr>
-</tbody>
-</table>
-<p>Use <code>onWriteConnection()</code> to read from the write host.
-Use it when a replica may be behind, or when a <code>SELECT</code> changes data.</p>
+<h2 id="where-queries-go">Where queries go</h2>
+<p>A plain <code>SELECT</code> goes to a read host. The read hosts take turns, in the order of the list. Everything else goes to the write host:</p>
+<ul>
+<li><code>INSERT</code>, <code>UPDATE</code> and <code>DELETE</code></li>
+<li>a raw query that is not a <code>SELECT</code></li>
+<li>schema changes and migrations</li>
+<li>a <code>SELECT</code> with a lock (<code>lockForUpdate()</code>, <code>sharedLock()</code>) or with <code>INTO</code></li>
+<li>every query in a transaction</li>
+</ul>
+<h3 id="reading-from-the-write-host">Reading from the write host</h3>
+<p>A replica may be a little behind, or a <code>SELECT</code> may change data. In these cases, use <code>onWriteConnection()</code> to read from the write host:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">onWriteConnection</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
 </span></code></pre></div>
-<p>It also sends the queries of <code>preload()</code> to the write host.
-<code>insert()</code>, <code>create()</code> and <code>updateOrCreate()</code> read the new row back from the write host, so you always get it.</p>
+<p>It also sends the queries of <code>preload()</code> to the write host. You do not need it after <code>insert()</code>, <code>create()</code> and <code>updateOrCreate()</code>, because they always read the new row back from the write host.</p>
 <h2 id="sticky-reads">Sticky reads</h2>
-<p>A replica can be a little behind the main database.
-A user saves a post, then the page loads, and the post is not there yet.</p>
-<p><code>sticky: true</code> fixes this.
-After a write, the reads of the same request go to the write host.
-So a request reads what it just wrote.
-Other requests still read from the replicas.</p>
-<p>In a Dox app this works by itself.
-<code>dox_orm</code> adds the <code>stickyReads</code> middleware as a <a href="../../the-basic/middleware/">global middleware</a> when a connection uses <code>sticky</code>.
-You change nothing.</p>
+<p>A replica can be a little behind the main database. So a user saves a post, the next page loads, and the post is not there yet.</p>
+<p><code>sticky: true</code> fixes this. After a write, the reads of the same request go to the write host, so a request always reads what it just wrote. Other requests still read from the replicas.</p>
+<p>In a Dox app this works on its own. When a connection uses <code>sticky</code>, <code>dox_orm</code> adds the <code>stickyReads</code> middleware as a <a href="../../the-basic/middleware/">global middleware</a>.</p>
 <p>Outside a request, like in a job or a script, wrap the work in <code>stickyScope()</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">ReplicaDriver</span><span class="p">.</span><span class="n">stickyScope</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">});</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="n">posts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="kd">get</span><span class="p">();</span><span class="w"> </span><span class="c1">// read from the write host</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">});</span>
 </span></code></pre></div>
-<p>dox_orm prints a warning on stderr, once, when sticky cannot work: a read from a replica that follows a write, outside <code>stickyScope()</code>.
-In a Dox app every request runs inside a scope, so the warning only shows for scripts, jobs or startup code.</p>
-<h2 id="with-database_url">With <code>DATABASE_URL</code></h2>
-<p>When <a href="../#database_url"><code>DATABASE_URL</code></a> is set, the url is the write host.
-The <code>read</code> hosts and <code>sticky</code> stay.
-<code>write</code> is not used then.</p>
+<p>If you forget it, <code>dox_orm</code> prints a warning on stderr, once, when a read from a replica follows a write outside <code>stickyScope()</code>.</p>
+<h2 id="details">Details</h2>
+<ul>
+<li>When <a href="../#database_url"><code>DATABASE_URL</code></a> is set, the url is the write host. The <code>read</code> hosts and <code>sticky</code> stay, and <code>write</code> is not used.</li>
+</ul>
 
 
 

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how to encrypt and decrypt text with Crypt and AESEncryptor.">
+        <meta name="description" content="Crypt and AESEncryptor encrypt and decrypt text with AES-256-GCM, so you can store or send data that nobody else can read or change.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Encryption | Dox">
-  <meta property="og:description" content="This page shows how to encrypt and decrypt text with Crypt and AESEncryptor.">
+  <meta property="og:description" content="Crypt and AESEncryptor encrypt and decrypt text with AES-256-GCM, so you can store or send data that nobody else can read or change.">
   <meta property="og:url" content="https://dartondox.dev/latest/security/encryption/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Encryption | Dox">
-  <meta name="twitter:description" content="This page shows how to encrypt and decrypt text with Crypt and AESEncryptor.">
+  <meta name="twitter:description" content="Crypt and AESEncryptor encrypt and decrypt text with AES-256-GCM, so you can store or send data that nobody else can read or change.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1598,6 +1598,8 @@
       
         
       
+        
+      
     
     
     
@@ -1697,6 +1699,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1742,12 +1840,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1758,15 +1856,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1922,6 +2210,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -1947,291 +2280,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -4677,10 +4725,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#encrypt-with-the-app-key" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Encrypt with the app key
+        Configuration
       
     </span>
   </a>
@@ -4688,10 +4736,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#encrypt-and-decrypt-with-your-own-key" class="md-nav__link">
+  <a href="#encrypting-values" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Encrypt and decrypt with your own key
+        Encrypting values
       
     </span>
   </a>
@@ -4699,10 +4747,49 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#decrypting-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decrypting values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-your-own-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using your own key
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using your own key">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#one-key-per-purpose" class="md-nav__link">
     <span class="md-ellipsis">
       
         One key per purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#encrypted-cookies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted cookies
       
     </span>
   </a>
@@ -4713,35 +4800,13 @@
   <a href="#change-the-key-key-rotation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Change the key (key rotation)
+        Rotating the key
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Change the key (key rotation)">
+    <nav class="md-nav" aria-label="Rotating the key">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Steps
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#what-reads-the-old-keys" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What reads the old keys
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#when-the-key-leaked" class="md-nav__link">
@@ -4760,21 +4825,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cookies" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cookies
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
+        Details
       
     </span>
   </a>
@@ -6909,10 +6963,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#encrypt-with-the-app-key" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Encrypt with the app key
+        Configuration
       
     </span>
   </a>
@@ -6920,10 +6974,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#encrypt-and-decrypt-with-your-own-key" class="md-nav__link">
+  <a href="#encrypting-values" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Encrypt and decrypt with your own key
+        Encrypting values
       
     </span>
   </a>
@@ -6931,10 +6985,49 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#decrypting-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decrypting values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-your-own-key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using your own key
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Using your own key">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#one-key-per-purpose" class="md-nav__link">
     <span class="md-ellipsis">
       
         One key per purpose
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#encrypted-cookies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypted cookies
       
     </span>
   </a>
@@ -6945,35 +7038,13 @@
   <a href="#change-the-key-key-rotation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Change the key (key rotation)
+        Rotating the key
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Change the key (key rotation)">
+    <nav class="md-nav" aria-label="Rotating the key">
       <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Steps
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#what-reads-the-old-keys" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What reads the old keys
-      
-    </span>
-  </a>
-  
-</li>
         
           <li class="md-nav__item">
   <a href="#when-the-key-leaked" class="md-nav__link">
@@ -6992,21 +7063,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cookies" class="md-nav__link">
+  <a href="#details" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Cookies
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
+        Details
       
     </span>
   </a>
@@ -7039,42 +7099,44 @@
 
 
 <h1 id="encryption">Encryption</h1>
-<p>This page shows how to encrypt and decrypt text with <code>Crypt</code> and <code>AESEncryptor</code>.</p>
-<p>Dox uses <code>AESEncryptor</code> to encrypt cookies with your <code>APP_KEY</code>.
-You can also call it yourself.</p>
-<h2 id="encrypt-with-the-app-key">Encrypt with the app key</h2>
-<p><code>Crypt</code> uses the <code>APP_KEY</code> of the app. You do not pass the key.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">encryptString</span><span class="p">(</span><span class="s1">'card-1234'</span><span class="p">);</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">card</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">decryptString</span><span class="p">(</span><span class="n">secret</span><span class="p">);</span><span class="w"> </span><span class="c1">// 'card-1234'</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">5</span><span class="p">});</span><span class="w"> </span><span class="c1">// any JSON value</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+<p><code>Crypt</code> and <code>AESEncryptor</code> encrypt and decrypt text with AES-256-GCM, so you can store or send data that nobody else can read or change.</p>
+<p>Dox uses the same encryption for cookies and the <code>cookie</code> session driver, with your <code>APP_KEY</code>.</p>
+<h2 id="configuration">Configuration</h2>
+<p>The key is the <code>APP_KEY</code> in <code>.env</code>. Make a new one with the CLI. It writes a random key of 32 letters and digits:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>key:generate
 </span></code></pre></div>
-<ul>
-<li><code>decryptString</code> and <code>decrypt</code> also try the old keys in <code>AppConfig.previousKeys</code>.</li>
-<li>They throw <code>DecryptException</code> when the text was changed or made with another key.</li>
-<li><code>Crypt.encryptString(v)</code> gives the same as <code>AESEncryptor.encode(v, appKey)</code>.</li>
-</ul>
-<h2 id="encrypt-and-decrypt-with-your-own-key">Encrypt and decrypt with your own key</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kt">String</span><span class="w"> </span><span class="n">encoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AESEncryptor</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'Hello world'</span><span class="p">,</span><span class="w"> </span><span class="n">secret</span><span class="p">);</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="kt">String</span><span class="w"> </span><span class="n">decoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AESEncryptor</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span><span class="w"> </span><span class="n">secret</span><span class="p">);</span><span class="w"> </span><span class="c1">// 'Hello world'</span>
+<p>Keep <code>APP_KEY</code> in <code>.env</code> or in the secrets of your host. Never put it in code or in git.</p>
+<p>At startup Dox checks <code>APP_KEY</code>. When it is empty, not exactly 32 bytes, or a public sample key, the app stops. In <code>development</code>, <code>local</code>, <code>test</code> and <code>testing</code> it only prints a warning.</p>
+<h2 id="encrypting-values">Encrypting values</h2>
+<p><code>Crypt</code> uses the <code>APP_KEY</code> of the app, so you do not pass a key. Use <code>encryptString</code> for text:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">encryptString</span><span class="p">(</span><span class="s1">'card-1234'</span><span class="p">);</span>
 </span></code></pre></div>
-<ul>
-<li><code>encode</code> returns base64 text.</li>
-<li>The same text gives a different output each time.</li>
-<li><code>decode</code> throws <code>DecryptException</code> when the text was changed, or the key is wrong. It is a <code>400 Bad Request</code> error. The flag <code>decryptServerError</code> makes it a reported <code>500</code>. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</li>
-<li>The AES key is not the secret itself. Dox makes a 32-byte key (AES-256) from the secret with HKDF-SHA256 (RFC 5869) and a label. The default label is <code>dox:encrypt</code>. Pick another one with <code>purpose:</code>, like <code>AESEncryptor.encode(text, secret, purpose: 'app:invoice')</code>. <code>decode</code> needs the same <code>purpose</code>.</li>
-</ul>
-<p>Make a new 32-character <code>APP_KEY</code> with the CLI:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox<span class="w"> </span>key:generate
+<p>Use <code>encrypt</code> for any JSON value:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">encrypt</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">5</span><span class="p">});</span><span class="w"> </span><span class="c1">// any JSON value</span>
 </span></code></pre></div>
-<p>It writes a random key of letters and digits to <code>APP_KEY</code> in <code>.env</code>.</p>
-<h2 id="one-key-per-purpose">One key per purpose</h2>
-<p>Dox does not use <code>APP_KEY</code> as it is. It makes one key per purpose from it, with HKDF-SHA256 and a label:</p>
+<p>The result is base64 text. The same value gives a different result each time.</p>
+<h2 id="decrypting-values">Decrypting values</h2>
+<p>Use <code>decryptString</code> or <code>decrypt</code> to get the value back:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">card</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">decryptString</span><span class="p">(</span><span class="n">secret</span><span class="p">);</span><span class="w"> </span><span class="c1">// 'card-1234'</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Crypt</span><span class="p">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">data</span><span class="p">);</span>
+</span></code></pre></div>
+<p>They throw a <code>DecryptException</code> when the text was changed or made with another key. The client then gets a <code>400</code>. They also try the old keys in <code>AppConfig.previousKeys</code>, so values still work after you <a href="#change-the-key-key-rotation">rotate the key</a>.</p>
+<h2 id="using-your-own-key">Using your own key</h2>
+<p>Sometimes you want a key that is not the <code>APP_KEY</code>. Use <code>AESEncryptor</code> and pass the key yourself:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">secret</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kt">String</span><span class="w"> </span><span class="n">encoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AESEncryptor</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'Hello world'</span><span class="p">,</span><span class="w"> </span><span class="n">secret</span><span class="p">);</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="kt">String</span><span class="w"> </span><span class="n">decoded</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AESEncryptor</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoded</span><span class="p">,</span><span class="w"> </span><span class="n">secret</span><span class="p">);</span><span class="w"> </span><span class="c1">// 'Hello world'</span>
+</span></code></pre></div>
+<p><code>decode</code> throws a <code>DecryptException</code> when the text was changed or the key is wrong.</p>
+<h3 id="one-key-per-purpose">One key per purpose</h3>
+<p>Dox does not use your key as it is. It makes a 32-byte key from it with HKDF-SHA256 and a label. The default label is <code>dox:encrypt</code>. You should pick your own label with <code>purpose:</code>, so a value made for one purpose can not be used for another. <code>decode</code> needs the same <code>purpose</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AESEncryptor</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="n">secret</span><span class="p">,</span><span class="w"> </span><span class="nl">purpose:</span><span class="w"> </span><span class="s1">'app:invoice'</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Dox uses these labels for its own keys:</p>
 <table>
 <thead>
 <tr>
@@ -7101,34 +7163,36 @@ You can also call it yourself.</p>
 </tr>
 </tbody>
 </table>
-<p>So a value made for one purpose can not be used for another one.
-<code>KeyDerivation.forAppKey(label)</code> gives the 32-byte key of a label. Each isolate makes it once.</p>
-<p>At startup Dox checks <code>APP_KEY</code>. When it is empty, not exactly 32 bytes, or an old public sample key, the app stops.
-In <code>development</code>, <code>local</code>, <code>test</code> and <code>testing</code> it only prints a warning.</p>
-<ul>
-<li>Keep <code>APP_KEY</code> in <code>.env</code> or in the secrets of your host. Never put it in code or in git.</li>
-<li>If you change <code>APP_KEY</code> with no <code>previousKeys</code>, old encrypted cookies and sessions can not be read any more, so every user is logged out. JWT tokens signed with it stop working too. See <a href="#change-the-key-key-rotation">Change the key</a>.</li>
-</ul>
-<h2 id="change-the-key-key-rotation">Change the key (key rotation)</h2>
-<p>Change <code>APP_KEY</code> from time to time, or when someone who knew it leaves the team.
-With <code>previousKeys</code>, users stay logged in while you change it.</p>
-<h3 id="steps">Steps</h3>
+<h2 id="encrypted-cookies">Encrypted cookies</h2>
+<p><code>DoxCookie</code> encrypts its value with <code>APP_KEY</code> by default, and <code>req.cookie(key)</code> decrypts it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">().</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">));</span><span class="w">  </span><span class="c1">// encrypted</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// decrypted</span>
+</span></code></pre></div>
+<p>If you need a plain text cookie, turn encryption off. Read the raw value with <code>decrypt: false</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">,</span><span class="w"> </span><span class="nl">encrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">             </span><span class="c1">// plain text</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// as sent</span>
+</span></code></pre></div>
+<p><code>req.cookie(key)</code> returns <code>null</code> when the cookie was changed, made with another <code>APP_KEY</code>, or made for another cookie name. The cookie name is bound to the value, so a value can not be copied from one cookie to another. To decrypt a raw cookie value yourself, use <code>DoxCookie.decrypt(name, value)</code>.</p>
+<h2 id="change-the-key-key-rotation">Rotating the key</h2>
+<p>You should change <code>APP_KEY</code> from time to time, or when someone who knew it leaves the team. If you just change it, old cookies and sessions can not be read, so every user is logged out, and JWT tokens signed with it stop working. With <code>previousKeys</code>, users stay logged in while you change it:</p>
 <ol>
 <li>Copy the current <code>APP_KEY</code> to <code>APP_PREVIOUS_KEYS</code>.</li>
 <li>
 <p>Run <code>dox key:generate</code>. It writes a new <code>APP_KEY</code>. Now <code>.env</code> has both:</p>
-<div class="language-bash highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nv">APP_KEY</span><span class="o">=</span>&lt;the<span class="w"> </span>new<span class="w"> </span>key<span class="w"> </span>from<span class="w"> </span>dox<span class="w"> </span>key:generate&gt;
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="nv">APP_PREVIOUS_KEYS</span><span class="o">=</span>&lt;the<span class="w"> </span>old<span class="w"> </span>APP_KEY&gt;
+<div class="language-bash highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">APP_KEY</span><span class="o">=</span>&lt;the<span class="w"> </span>new<span class="w"> </span>key<span class="w"> </span>from<span class="w"> </span>dox<span class="w"> </span>key:generate&gt;
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nv">APP_PREVIOUS_KEYS</span><span class="o">=</span>&lt;the<span class="w"> </span>old<span class="w"> </span>APP_KEY&gt;
 </span></code></pre></div>
 </li>
 <li>
 <p>Read it in the env class, and give it to <code>AppConfig</code>:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appPreviousKeys</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[];</span><span class="w"> </span><span class="c1">// APP_PREVIOUS_KEYS=a,b</span>
+<div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appPreviousKeys</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[];</span><span class="w"> </span><span class="c1">// APP_PREVIOUS_KEYS=a,b</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">previousKeys:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appPreviousKeys</span><span class="p">,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">)</span>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nl">previousKeys:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appPreviousKeys</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">)</span>
 </span></code></pre></div>
 </li>
 <li>
@@ -7137,73 +7201,20 @@ With <code>previousKeys</code>, users stay logged in while you change it.</p>
 <li>Wait until the old cookies have expired: the session <code>lifetime</code>, and the <code>maxAge</code> of your own cookies.</li>
 <li>Remove the old key from <code>APP_PREVIOUS_KEYS</code> and deploy again.</li>
 </ol>
-<p><code>APP_PREVIOUS_KEYS</code> can hold more than one key, comma separated. Dox tries them in order.</p>
-<h3 id="what-reads-the-old-keys">What reads the old keys</h3>
-<table>
-<thead>
-<tr>
-<th>Value</th>
-<th>With an old key</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>encrypted cookies (<code>req.cookie</code>)</td>
-<td>read</td>
-</tr>
-<tr>
-<td><code>cookie</code> session driver</td>
-<td>read</td>
-</tr>
-<tr>
-<td>CSRF token</td>
-<td>read (it is in the session)</td>
-</tr>
-<tr>
-<td>JWT tokens of <code>JwtAuthDriver(secret: SecretKey(env.appKey))</code></td>
-<td>checked. A JWT secret that is not <code>APP_KEY</code> needs its own <code>previousSecrets</code> option, see <a href="../authentication/#change-the-jwt-secret">Authentication</a>.</td>
-</tr>
-<tr>
-<td><code>Crypt.decryptString</code> and <code>Crypt.decrypt</code></td>
-<td>read</td>
-</tr>
-<tr>
-<td><code>AESEncryptor.decode</code> in your code</td>
-<td>read only when you pass <code>previousSecrets: Dox().config.previousKeys</code></td>
-</tr>
-<tr>
-<td>anything new</td>
-<td>made with <code>APP_KEY</code> only</td>
-</tr>
-</tbody>
-</table>
-<p>Dox writes a cookie with the new key the next time it sends that cookie.
-So a user who comes back during step 5 moves to the new key without noticing.</p>
+<p><code>APP_PREVIOUS_KEYS</code> can hold more than one key, comma separated. Dox writes a cookie with the new key the next time it sends it, so a user who comes back during step 5 moves to the new key without noticing.</p>
+<p>The old keys are used to read encrypted cookies, the <code>cookie</code> session driver, the CSRF token, <code>Crypt.decrypt</code>, and JWT tokens signed with <code>APP_KEY</code>. A JWT secret that is not <code>APP_KEY</code> needs its own <code>previousSecrets</code>, see <a href="../authentication/#change-the-jwt-secret">Authentication</a>. Your own <code>AESEncryptor.decode</code> calls read old keys only when you pass <code>previousSecrets: Dox().config.previousKeys</code>.</p>
 <h3 id="when-the-key-leaked">When the key leaked</h3>
-<p>Do <strong>not</strong> put a leaked key in <code>previousKeys</code>.
-Anyone who has it can still make cookies and JWT tokens that Dox accepts.
-Change <code>APP_KEY</code> with no <code>previousKeys</code>. Every user is logged out, and that is what you want.</p>
-<h2 id="cookies">Cookies</h2>
-<p><code>DoxCookie</code> encrypts its value with <code>APP_KEY</code> by default.
-<code>req.cookie(key)</code> decrypts it.
-To decrypt a raw cookie value yourself, call <code>DoxCookie.decrypt(name, value)</code>. It returns <code>null</code> when the value was changed, was made with another key, or was made for another cookie name.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">().</span><span class="n">cookie</span><span class="p">(</span><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">));</span><span class="w">  </span><span class="c1">// encrypted</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">DoxCookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="s1">'dark'</span><span class="p">,</span><span class="w"> </span><span class="nl">encrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">             </span><span class="c1">// plain text</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">theme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// decrypted</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// as sent</span>
-</span></code></pre></div>
-<p><code>req.cookie(key)</code> returns <code>null</code> when the cookie was changed, was made with another <code>APP_KEY</code>, or was made for another cookie name.
-The cookie name is bound to the encrypted value, so a value can not be copied from one cookie to another.</p>
-<h2 id="how-it-works">How it works</h2>
-<p><code>AESEncryptor</code> uses AES-256-GCM. The work runs in Rust (in <code>dox_http_native</code>), with the AES instructions of the CPU. One cookie takes about 1–2 µs.</p>
+<p>Do <strong>not</strong> put a leaked key in <code>previousKeys</code>, because anyone who has it can still make cookies and JWT tokens that Dox accepts. Change <code>APP_KEY</code> with no <code>previousKeys</code>. Every user is logged out, and that is what you want.</p>
+<h2 id="details">Details</h2>
 <ul>
-<li>Each message gets a new random 12-byte nonce.</li>
-<li>The output is base64 of <code>nonce + encrypted text + tag</code>.</li>
-<li>The 16-byte tag checks the message. If someone changes one byte, <code>decode</code> throws.</li>
-<li><code>encode</code> and <code>decode</code> also take <code>associatedData</code>, a text like a cookie name. It is not in the output, but <code>decode</code> needs the same value. Cookies use the cookie name here.</li>
+<li>To store passwords, do not encrypt them. Hash them. See <a href="../hashing/">Hashing</a>.</li>
+<li><code>Crypt.encryptString(v)</code> gives the same as <code>AESEncryptor.encode(v, appKey)</code>.</li>
+<li>The flag <code>decryptServerError</code> makes a <code>DecryptException</code> a reported <code>500</code> instead of a <code>400</code>. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</li>
+<li><code>KeyDerivation.forAppKey(label)</code> gives the 32-byte key of a label.</li>
+<li>The work runs in Rust with the AES instructions of the CPU. One cookie takes about 1–2 µs.</li>
+<li>Each message gets a new random 12-byte nonce. The output is base64 of <code>nonce + encrypted text + tag</code>. The 16-byte tag makes <code>decode</code> throw if one byte is changed.</li>
+<li><code>encode</code> and <code>decode</code> also take <code>associatedData</code>, like a cookie name. It is not in the output, but <code>decode</code> needs the same value.</li>
 </ul>
-<p>To store passwords, do not encrypt them. Hash them. See <a href="../hashing/">Hashing</a>.</p>
 
 
 

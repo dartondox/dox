@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Cross site request forgery (CSRF) is an attack.">
+        <meta name="description" content="CsrfMiddleware stops other sites from sending forms to your app in the name of your logged in users.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="CSRF protection | Dox">
-  <meta property="og:description" content="Cross site request forgery (CSRF) is an attack.">
+  <meta property="og:description" content="CsrfMiddleware stops other sites from sending forms to your app in the name of your logged in users.">
   <meta property="og:url" content="https://dartondox.dev/latest/security/csrf/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="CSRF protection | Dox">
-  <meta name="twitter:description" content="Cross site request forgery (CSRF) is an attack.">
+  <meta name="twitter:description" content="CsrfMiddleware stops other sites from sending forms to your app in the name of your logged in users.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1598,6 +1598,8 @@
       
         
       
+        
+      
     
     
     
@@ -1697,6 +1699,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1742,12 +1840,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1758,15 +1856,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1922,6 +2210,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -1947,291 +2280,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -4632,10 +4680,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#turn-it-on" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Turn it on
+        Setup
       
     </span>
   </a>
@@ -4643,15 +4691,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#send-the-token" class="md-nav__link">
+  <a href="#sending-the-token" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Send the token
+        Sending the token
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Send the token">
+    <nav class="md-nav" aria-label="Sending the token">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -4682,10 +4730,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#skip-some-paths" class="md-nav__link">
+  <a href="#excluding-paths" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Skip some paths
+        Excluding paths
       
     </span>
   </a>
@@ -4697,6 +4745,17 @@
     <span class="md-ellipsis">
       
         After login
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
       
     </span>
   </a>
@@ -6876,10 +6935,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#turn-it-on" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Turn it on
+        Setup
       
     </span>
   </a>
@@ -6887,15 +6946,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#send-the-token" class="md-nav__link">
+  <a href="#sending-the-token" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Send the token
+        Sending the token
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Send the token">
+    <nav class="md-nav" aria-label="Sending the token">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -6926,10 +6985,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#skip-some-paths" class="md-nav__link">
+  <a href="#excluding-paths" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Skip some paths
+        Excluding paths
       
     </span>
   </a>
@@ -6941,6 +7000,17 @@
     <span class="md-ellipsis">
       
         After login
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
       
     </span>
   </a>
@@ -6973,12 +7043,11 @@
 
 
 <h1 id="csrf-protection">CSRF protection</h1>
-<p>Cross site request forgery (CSRF) is an attack.</p>
-<p>Another site makes the browser of your user send a form to your app.
-The browser sends your session cookie with it, so the request looks real.</p>
-<p><code>CsrfMiddleware</code> stops it. Each session has a secret token. A request that changes data must send it back. Another site can not read the token, so it can not send it.</p>
-<h2 id="turn-it-on">Turn it on</h2>
-<p>It needs a session, so put it after <code>SessionMiddleware</code>:</p>
+<p><code>CsrfMiddleware</code> stops other sites from sending forms to your app in the name of your logged in users.</p>
+<p>This attack is called cross site request forgery (CSRF). Another site makes the browser of your user send a form to your app. The browser sends your session cookie with it, so the request looks real.</p>
+<p>To stop it, each session has a secret token. A request that changes data must send the token back. Another site can not read the token, so it can not send it.</p>
+<h2 id="setup">Setup</h2>
+<p>The middleware needs a session, so put it right after <code>SessionMiddleware</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">SessionMiddleware</span><span class="p">(),</span>
@@ -6987,30 +7056,21 @@ The browser sends your session cookie with it, so the request looks real.</p>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Now every <code>POST</code>, <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code> request must send the token. A request with no token, or a wrong one, gets <code>419</code> with <code>{"code": "csrf_token_mismatch", "message": "CSRF token mismatch"}</code>.</p>
-<p><code>GET</code>, <code>HEAD</code> and <code>OPTIONS</code> requests are not checked. Do not change data in a <code>GET</code> route.</p>
-<h2 id="send-the-token">Send the token</h2>
-<p>Dox reads the token from one of these places:</p>
-<ul>
-<li>the <code>_token</code> field of the body (not the query string: a url ends up in logs and in the <code>Referer</code> header)</li>
-<li>the <code>X-CSRF-TOKEN</code> header</li>
-<li>the <code>X-XSRF-TOKEN</code> header</li>
-</ul>
-<p>The token is <code>req.session.token</code>.
-Do not put it in a URL. URLs are kept in logs and in the browser history.</p>
+<p>Now every <code>POST</code>, <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code> request must send the token. A request with no token, or a wrong one, gets a <code>419</code> with <code>{"code": "csrf_token_mismatch", "message": "CSRF token mismatch"}</code>.</p>
+<p><code>GET</code>, <code>HEAD</code> and <code>OPTIONS</code> requests are not checked, so never change data in a <code>GET</code> route.</p>
+<h2 id="sending-the-token">Sending the token</h2>
+<p>Dox reads the token from the <code>_token</code> field of the body, or from the <code>X-CSRF-TOKEN</code> or <code>X-XSRF-TOKEN</code> header. In your code the token is <code>req.session.token</code>.</p>
+<p>Do not put the token in a URL, because URLs end up in logs and in the browser history. For the same reason, Dox does not read <code>_token</code> from the query string.</p>
 <h3 id="html-forms">HTML forms</h3>
-<p>Put the token in a hidden field.
-With <a href="../../the-basic/views/#forms">views</a>, <code>@csrf</code> writes this field for you:</p>
+<p>Put the token in a hidden field. With <a href="../../the-basic/views/#forms">views</a>, <code>@csrf</code> writes this field for you:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">"POST"</span> <span class="na">action</span><span class="o">=</span><span class="s">"/posts"</span><span class="p">&gt;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  @csrf
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  ...
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p><code>@csrf</code> must be alone on its line. In the middle of a line, use <code>{{ csrfField() }}</code>. It prints the same field.</p>
-<p><code>csrfToken()</code> gives only the token, for example for a <code>&lt;meta&gt;</code> tag.</p>
+<p><code>@csrf</code> must be alone on its line. In the middle of a line, use <code>{{ csrfField() }}</code>, which prints the same field. If you only need the token, for example for a <code>&lt;meta&gt;</code> tag, use <code>csrfToken()</code>.</p>
 <h3 id="axios-and-inertia">axios and Inertia</h3>
-<p>Dox also sets an <code>XSRF-TOKEN</code> cookie with the token. It is not <code>HttpOnly</code>, so page scripts can read it.
-axios reads this cookie and sends it in the <code>X-XSRF-TOKEN</code> header by itself. Inertia uses axios, so it works with no code.</p>
+<p>Dox also sets an <code>XSRF-TOKEN</code> cookie with the token. It is not <code>HttpOnly</code>, so page scripts can read it. axios reads this cookie and sends it in the <code>X-XSRF-TOKEN</code> header by itself. Inertia uses axios, so it works with no code.</p>
 <p>With <code>fetch</code>, read the cookie and send the header yourself:</p>
 <div class="language-js highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">cookie</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s1">'; '</span><span class="p">)</span>
@@ -7023,20 +7083,19 @@ axios reads this cookie and sends it in the <code>X-XSRF-TOKEN</code> header by 
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nx">body</span><span class="o">:</span><span class="w"> </span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">({</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'Hi'</span><span class="w"> </span><span class="p">}),</span>
 </span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">});</span>
 </span></code></pre></div>
-<h2 id="skip-some-paths">Skip some paths</h2>
-<p>Routes that other servers call (webhooks) or token based APIs can not send the token. List them in <code>except</code>:</p>
+<h2 id="excluding-paths">Excluding paths</h2>
+<p>Some routes can not send the token, like webhooks that other servers call, or APIs that use tokens. List them in <code>except</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">const</span><span class="w"> </span><span class="n">CsrfMiddleware</span><span class="p">(</span><span class="nl">except:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'/api/*'</span><span class="p">,</span><span class="w"> </span><span class="s1">'/webhooks/stripe'</span><span class="p">]);</span>
 </span></code></pre></div>
-<ul>
-<li>A path that ends with <code>*</code> matches everything that starts with it: <code>/api/*</code> matches <code>/api/posts</code> and <code>/api/users/5</code>.</li>
-<li>Any other path must match exactly.</li>
-</ul>
-<p>An excluded path is not checked and gets no <code>XSRF-TOKEN</code> cookie.
-Only skip paths that do not use the session login. A webhook should check its own signature instead.</p>
+<p>A path that ends with <code>*</code> matches everything that starts with it, so <code>/api/*</code> matches <code>/api/posts</code> and <code>/api/users/5</code>. Any other path must match exactly.</p>
+<p>Only skip paths that do not use the session login. A webhook should check its own signature instead.</p>
 <h2 id="after-login">After login</h2>
-<p><code>req.session.regenerate()</code> also makes a new token. Dox sends the new <code>XSRF-TOKEN</code> cookie with the same response.
-<code>regenerate(keepToken: true)</code> keeps the token, so forms open in other tabs keep working.
-Do not use it at login. A token from before the login would stay valid after the login.</p>
+<p><code>req.session.regenerate()</code> also makes a new token, and Dox sends the new <code>XSRF-TOKEN</code> cookie with the same response. So after login, the client must use the new token.</p>
+<h2 id="details">Details</h2>
+<ul>
+<li>An excluded path is not checked and gets no <code>XSRF-TOKEN</code> cookie.</li>
+<li><code>regenerate(keepToken: true)</code> keeps the token, so forms open in other tabs keep working. Do not use it at login, because a token from before the login would stay valid.</li>
+</ul>
 
 
 

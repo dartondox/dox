@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page shows how to say what a user may do, with gates and policies from dox_auth.">
+        <meta name="description" content="dox_auth lets you decide what a logged in user may do, with gates and policies.">
       
       
       
@@ -81,7 +81,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Authorization | Dox">
-  <meta property="og:description" content="This page shows how to say what a user may do, with gates and policies from dox_auth.">
+  <meta property="og:description" content="dox_auth lets you decide what a logged in user may do, with gates and policies.">
   <meta property="og:url" content="https://dartondox.dev/latest/security/authorization/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +90,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Authorization | Dox">
-  <meta name="twitter:description" content="This page shows how to say what a user may do, with gates and policies from dox_auth.">
+  <meta name="twitter:description" content="dox_auth lets you decide what a logged in user may do, with gates and policies.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1598,6 +1598,8 @@
       
         
       
+        
+      
     
     
     
@@ -1697,6 +1699,102 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/middleware/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-layers"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
+  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
+  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Middleware
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/session/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-fingerprint"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
+  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
+  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
+  <path d="M2 12a10 10 0 0 1 18-6" />
+  <path d="M2 16h.01" />
+  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
+  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
+  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
+  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Session
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/request/" class="md-nav__link">
         
   
@@ -1742,12 +1840,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../../the-basic/response/" class="md-nav__link">
+      <a href="../../the-basic/dto/" class="md-nav__link">
         
   
   
     <svg
-  class="lucide lucide-arrow-up-from-line"
+  class="lucide lucide-package"
   xmlns="http://www.w3.org/2000/svg"
   width="24"
   height="24"
@@ -1758,15 +1856,205 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <path d="m18 9-6-6-6 6" />
-  <path d="M12 3v14" />
-  <path d="M5 21h14" />
+  <path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" />
+  <path d="M12 22V12" />
+  <polyline points="3.29 7 12 12 20.71 7" />
+  <path d="m7.5 4.27 9 5.15" />
 </svg>
   
   <span class="md-ellipsis">
     
   
-    Response
+    DTOs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-list-checks"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M13 5h8" />
+  <path d="M13 12h8" />
+  <path d="M13 19h8" />
+  <path d="m3 17 2 2 4-4" />
+  <path d="m3 7 2 2 4-4" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/validation-rules/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-ruler"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
+  <path d="m14.5 12.5 2-2" />
+  <path d="m11.5 9.5 2-2" />
+  <path d="m8.5 6.5 2-2" />
+  <path d="m17.5 15.5 2-2" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Validation rules
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/controller/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-gamepad-2"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <line x1="6" x2="10" y1="11" y2="11" />
+  <line x1="8" x2="8" y1="9" y2="13" />
+  <line x1="15" x2="15.01" y1="12" y2="12" />
+  <line x1="18" x2="18.01" y1="10" y2="10" />
+  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Controller
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-syringe"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 2 4 4" />
+  <path d="m17 7 3-3" />
+  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
+  <path d="m9 11 4 4" />
+  <path d="m5 19-3 3" />
+  <path d="m14 4 6 6" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Dependency injection
   
 
     
@@ -1922,6 +2210,51 @@
   
   
     <li class="md-nav__item">
+      <a href="../../the-basic/response/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-arrow-up-from-line"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m18 9-6-6-6 6" />
+  <path d="M12 3v14" />
+  <path d="M5 21h14" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Response
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../the-basic/errors/" class="md-nav__link">
         
   
@@ -1947,291 +2280,6 @@
     
   
     Error handling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/controller/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-gamepad-2"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <line x1="6" x2="10" y1="11" y2="11" />
-  <line x1="8" x2="8" y1="9" y2="13" />
-  <line x1="15" x2="15.01" y1="12" y2="12" />
-  <line x1="18" x2="18.01" y1="10" y2="10" />
-  <path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Controller
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/dependency-injection/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-syringe"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="m18 2 4 4" />
-  <path d="m17 7 3-3" />
-  <path d="M19 9 8.7 19.3c-1 1-2.5 1-3.4 0l-.6-.6c-1-1-1-2.5 0-3.4L15 5" />
-  <path d="m9 11 4 4" />
-  <path d="m5 19-3 3" />
-  <path d="m14 4 6 6" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Dependency injection
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/middleware/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-layers"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z" />
-  <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12" />
-  <path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Middleware
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/session/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-fingerprint"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M12 10a2 2 0 0 0-2 2c0 1.02-.1 2.51-.26 4" />
-  <path d="M14 13.12c0 2.38 0 6.38-1 8.88" />
-  <path d="M17.29 21.02c.12-.6.43-2.3.5-3.02" />
-  <path d="M2 12a10 10 0 0 1 18-6" />
-  <path d="M2 16h.01" />
-  <path d="M21.8 16c.2-2 .131-5.354 0-6" />
-  <path d="M5 19.5C5.5 18 6 15 6 12a6 6 0 0 1 .34-2" />
-  <path d="M8.65 22c.21-.66.45-1.32.57-2" />
-  <path d="M9 6.8a6 6 0 0 1 9 5.2v2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Session
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-list-checks"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M13 5h8" />
-  <path d="M13 12h8" />
-  <path d="M13 19h8" />
-  <path d="m3 17 2 2 4-4" />
-  <path d="m3 7 2 2 4-4" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../the-basic/validation-rules/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-ruler"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z" />
-  <path d="m14.5 12.5 2-2" />
-  <path d="m11.5 9.5 2-2" />
-  <path d="m8.5 6.5 2-2" />
-  <path d="m17.5 15.5 2-2" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Validation rules
   
 
     
@@ -4540,10 +4588,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#register-the-rules" class="md-nav__link">
+  <a href="#registering-the-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Register the rules
+        Registering the rules
       
     </span>
   </a>
@@ -4551,33 +4599,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gates" class="md-nav__link">
+  <a href="#writing-gates" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gates
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Gates">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#check-a-gate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Check a gate
+        Writing gates
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#give-a-reason" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#checking-a-gate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Give a reason
+        Checking a gate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Checking a gate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#giving-a-reason" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Giving a reason
       
     </span>
   </a>
@@ -4590,10 +4638,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#policies" class="md-nav__link">
+  <a href="#writing-policies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Policies
+        Writing policies
       
     </span>
   </a>
@@ -4601,10 +4649,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-a-controller" class="md-nav__link">
+  <a href="#authorizing-in-a-controller" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In a controller
+        Authorizing in a controller
       
     </span>
   </a>
@@ -4612,10 +4660,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#on-a-route" class="md-nav__link">
+  <a href="#authorizing-on-a-route" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On a route
+        Authorizing on a route
       
     </span>
   </a>
@@ -4623,10 +4671,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#guests" class="md-nav__link">
+  <a href="#guest-users" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Guests
+        Guest users
       
     </span>
   </a>
@@ -4656,10 +4704,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-tests" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In tests
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
       
     </span>
   </a>
@@ -6930,10 +6989,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#register-the-rules" class="md-nav__link">
+  <a href="#registering-the-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Register the rules
+        Registering the rules
       
     </span>
   </a>
@@ -6941,33 +7000,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gates" class="md-nav__link">
+  <a href="#writing-gates" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Gates
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Gates">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#check-a-gate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Check a gate
+        Writing gates
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#give-a-reason" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#checking-a-gate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Give a reason
+        Checking a gate
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Checking a gate">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#giving-a-reason" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Giving a reason
       
     </span>
   </a>
@@ -6980,10 +7039,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#policies" class="md-nav__link">
+  <a href="#writing-policies" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Policies
+        Writing policies
       
     </span>
   </a>
@@ -6991,10 +7050,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-a-controller" class="md-nav__link">
+  <a href="#authorizing-in-a-controller" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In a controller
+        Authorizing in a controller
       
     </span>
   </a>
@@ -7002,10 +7061,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#on-a-route" class="md-nav__link">
+  <a href="#authorizing-on-a-route" class="md-nav__link">
     <span class="md-ellipsis">
       
-        On a route
+        Authorizing on a route
       
     </span>
   </a>
@@ -7013,10 +7072,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#guests" class="md-nav__link">
+  <a href="#guest-users" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Guests
+        Guest users
       
     </span>
   </a>
@@ -7046,10 +7105,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#in-tests" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In tests
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Details
       
     </span>
   </a>
@@ -7082,19 +7152,15 @@
 
 
 <h1 id="authorization">Authorization</h1>
-<p>This page shows how to say what a user may do, with gates and policies from <code>dox_auth</code>.</p>
-<p><a href="../authentication/">Authentication</a> says who the user is.
-Authorization says what this user may do.
-For example, a user may edit their own post, but not the post of another user.</p>
+<p><code>dox_auth</code> lets you decide what a logged in user may do, with gates and policies.</p>
+<p><a href="../authentication/">Authentication</a> tells you who the user is. Authorization tells you what this user may do. For example, a user may edit their own post, but not the post of another user.</p>
 <p>There are two ways to write the rules:</p>
 <ul>
 <li>A <strong>gate</strong> is one rule, written as a function.</li>
 <li>A <strong>policy</strong> is a class with all the rules of one model, like <code>Post</code>.</li>
 </ul>
-<h2 id="register-the-rules">Register the rules</h2>
-<p>Gates and policies are kept per isolate.
-Dox runs many isolates, so add them in a provider.
-The <code>setup()</code> of a provider runs in every isolate.</p>
+<h2 id="registering-the-rules">Registering the rules</h2>
+<p>Gates and policies are kept per isolate. Dox runs many isolates, so add them in the <code>setup()</code> of a provider, because it runs in every isolate:</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/gate_provider.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/post/post.model.dart'</span><span class="p">;</span>
@@ -7109,199 +7175,176 @@ The <code>setup()</code> of a provider runs in every isolate.</p>
 </span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Dox finds the provider by itself. Run <code>dart run build_runner build</code> and it is in <code>lib/generated/container.g.dart</code>.</p>
-<h2 id="gates">Gates</h2>
-<p>A gate gets the user and a subject. It gives <code>true</code> when the user may do it.
-The user and subject types come from the function.
-A check with another type is denied.</p>
+<p>Dox finds the provider by itself. Run <code>dart run build_runner build</code> to add it to <code>lib/generated/container.g.dart</code>.</p>
+<h2 id="writing-gates">Writing gates</h2>
+<p>A gate gets the user and a subject, and gives <code>true</code> when the user may do it. The user and subject types come from the function, so a check with another type is denied:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">define</span><span class="p">(</span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="p">);</span>
 </span></code></pre></div>
-<p>A gate with no subject uses <code>_</code> for the second parameter:</p>
+<p>If the gate needs no subject, use <code>_</code> for the second parameter:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">define</span><span class="p">(</span><span class="s1">'create-post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">verified</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
-<p>A gate can be async:</p>
+<p>A gate can also be async:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">define</span><span class="p">(</span><span class="s1">'publish-post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">canPublishIn</span><span class="p">(</span><span class="n">post</span><span class="p">.</span><span class="n">categoryId</span><span class="p">);</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="p">});</span>
 </span></code></pre></div>
-<h3 id="check-a-gate">Check a gate</h3>
+<h2 id="checking-a-gate">Checking a gate</h2>
+<p>Use <code>Gate.allows</code> to check if the user may do something:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">allows</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="c1">// the user may update the post</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">denies</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'create-post'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="c1">// the user may not create a post</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="p">}</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="c1">// stop the request with 403 when denied</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="c1">// true when the user may do at least one, or all of them</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">any</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete-post'</span><span class="p">],</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">all</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete-post'</span><span class="p">],</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
 </span></code></pre></div>
-<p>An ability with no gate and no policy is denied.</p>
-<h3 id="give-a-reason">Give a reason</h3>
-<p>A check can give a <code>GateResponse</code> instead of a <code>bool</code>.
-The reason of <code>GateResponse.deny</code> is the message of the 403 answer.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">define</span><span class="p">(</span><span class="s1">'delete-post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">post</span><span class="p">.</span><span class="n">published</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">GateResponse</span><span class="p">.</span><span class="n">deny</span><span class="p">(</span><span class="s1">'You can not delete a published post.'</span><span class="p">);</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">});</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">GateResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">inspect</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete-post'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">print</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">allowed</span><span class="p">);</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">print</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">message</span><span class="p">);</span>
+<p><code>Gate.denies</code> is the opposite:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">denies</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'create-post'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="c1">// the user may not create a post</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="policies">Policies</h2>
-<p>A policy holds the rules of one model.
-Write one method per ability.
-A method takes the user, and the model when the ability needs one.
-List the methods in <code>abilities</code>.</p>
-<div class="language-dart highlight"><span class="filename">lib/app/policies/post_policy.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/post/post.model.dart'</span><span class="p">;</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">PostPolicy</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Policy</span><span class="o">&lt;</span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">create</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">verified</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">delete</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">abilities</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="s1">'create'</span><span class="o">:</span><span class="w"> </span><span class="n">create</span><span class="p">,</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">    </span><span class="s1">'update'</span><span class="o">:</span><span class="w"> </span><span class="n">update</span><span class="p">,</span>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">    </span><span class="s1">'delete'</span><span class="o">:</span><span class="w"> </span><span class="n">delete</span><span class="p">,</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">  </span><span class="p">};</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="p">}</span>
+<p>If you want to stop the request when the check fails, use <code>Gate.authorize</code>. It throws, and the client gets a <code>403</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Add the policy for its model:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">policy</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">(</span><span class="n">PostPolicy</span><span class="p">());</span>
+<p>To check many abilities at once, use <code>Gate.any</code> (at least one) or <code>Gate.all</code> (all of them):</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">any</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete-post'</span><span class="p">],</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">all</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'update-post'</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete-post'</span><span class="p">],</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
 </span></code></pre></div>
-<p>A check with a <code>Post</code> as the subject now uses the policy.
-For an ability with no model, like <code>create</code>, pass the type <code>Post</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">allows</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">allows</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'create'</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="p">);</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
+<p>An ability with no gate and no policy is always denied.</p>
+<h3 id="giving-a-reason">Giving a reason</h3>
+<p>Sometimes you want to tell the user why they may not do something. Return a <code>GateResponse</code> instead of a <code>bool</code>. The reason of <code>GateResponse.deny</code> becomes the message of the <code>403</code> answer:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">define</span><span class="p">(</span><span class="s1">'delete-post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">post</span><span class="p">.</span><span class="n">published</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">GateResponse</span><span class="p">.</span><span class="n">deny</span><span class="p">(</span><span class="s1">'You can not delete a published post.'</span><span class="p">);</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">});</span>
 </span></code></pre></div>
-<p>Each method must take <code>(User user)</code> or <code>(User user, Post post)</code>.
-A method with another signature fails at <code>Gate.policy</code>, so you see the mistake when the app starts.</p>
-<p>When the policy has no method with the ability name, the gate with that name is used.</p>
-<div class="admonition note">
-<p class="admonition-title">Why a map of methods</p>
-<p>Dart has no runtime reflection in compiled apps.
-So Dox can not find a method by its name.
-The <code>abilities</code> map links each name to its method.
-The methods stay normal typed Dart methods, so you can also call them directly in a test.</p>
-</div>
-<h2 id="in-a-controller">In a controller</h2>
-<p><code>req.can</code>, <code>req.cannot</code> and <code>req.authorize</code> use the logged-in user of <code>req.auth</code>.
-Use them after <code>AuthMiddleware</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">authorize</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="n">post</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">post</span><span class="p">;</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">}</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="s1">'post'</span><span class="o">:</span><span class="w"> </span><span class="n">post</span><span class="p">,</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="s1">'can_edit'</span><span class="o">:</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">can</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">),</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="p">};</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="p">}</span>
+<p><code>Gate.inspect</code> gives you the full answer:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">GateResponse</span><span class="w"> </span><span class="n">response</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">inspect</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete-post'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">print</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">allowed</span><span class="p">);</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">print</span><span class="p">(</span><span class="n">response</span><span class="p">.</span><span class="n">message</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>req.authorize</code> answers <code>401</code> for a guest and <code>403</code> for a user who may not do it.
-With the <a href="#auth-flags"><code>forbidGuest</code> flag</a>, a guest gets <code>403</code> too.</p>
-<h2 id="on-a-route">On a route</h2>
-<p>The <code>Can</code> middleware checks an ability before the controller runs.
-Put it after <code>AuthMiddleware</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1">// a gate with no subject</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/admin'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'view-admin'</span><span class="p">),</span><span class="w"> </span><span class="n">adminController</span><span class="p">.</span><span class="n">index</span><span class="p">]);</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1">// a policy method with no model</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'create'</span><span class="p">,</span><span class="w"> </span><span class="nl">subject:</span><span class="w"> </span><span class="n">Post</span><span class="p">),</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">store</span><span class="p">]);</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1">// a policy method with the model of the route param</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">Route</span><span class="p">.</span><span class="n">bind</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">));</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="n">Route</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'/posts/{post}'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="nl">param:</span><span class="w"> </span><span class="s1">'post'</span><span class="p">),</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">update</span><span class="p">]);</span>
+<h2 id="writing-policies">Writing policies</h2>
+<p>When a model has many rules, put them in a policy. Write one method per ability. A method takes the user, and the model when the ability needs one. Then list the methods in <code>abilities</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/policies/post_policy.dart</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/post/post.model.dart'</span><span class="p">;</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">PostPolicy</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Policy</span><span class="o">&lt;</span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">create</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">verified</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">delete</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>
+</span><span id="__span-10-12"><a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-10-13"><a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">abilities</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-10-14"><a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="w">    </span><span class="s1">'create'</span><span class="o">:</span><span class="w"> </span><span class="n">create</span><span class="p">,</span>
+</span><span id="__span-10-15"><a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="w">    </span><span class="s1">'update'</span><span class="o">:</span><span class="w"> </span><span class="n">update</span><span class="p">,</span>
+</span><span id="__span-10-16"><a id="__codelineno-10-16" name="__codelineno-10-16" href="#__codelineno-10-16"></a><span class="w">    </span><span class="s1">'delete'</span><span class="o">:</span><span class="w"> </span><span class="n">delete</span><span class="p">,</span>
+</span><span id="__span-10-17"><a id="__codelineno-10-17" name="__codelineno-10-17" href="#__codelineno-10-17"></a><span class="w">  </span><span class="p">};</span>
+</span><span id="__span-10-18"><a id="__codelineno-10-18" name="__codelineno-10-18" href="#__codelineno-10-18"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>With <code>param</code>, the subject is the value of <code>Route.bind</code> for that route param.
-When <code>Route.bind</code> finds nothing, the answer is <code>404</code>.</p>
-<p>The answers:</p>
-<ul>
-<li>A guest who may not do it gets <code>401</code>. With the <a href="#auth-flags"><code>forbidGuest</code> flag</a>, it is <code>403</code>.</li>
-<li>A logged-in user who may not do it gets <code>403</code>.</li>
-</ul>
-<h2 id="guests">Guests</h2>
-<p>A guest has no user. The user is <code>null</code>.
-A gate or a policy is denied for a guest, unless its user type is nullable:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">define</span><span class="p">(</span><span class="s1">'view-post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">published</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="p">});</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CommentPolicy</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Policy</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?</span><span class="p">,</span><span class="w"> </span><span class="n">Comment</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">view</span><span class="p">(</span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Comment</span><span class="w"> </span><span class="n">comment</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">comment</span><span class="p">.</span><span class="n">visible</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">abilities</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'view'</span><span class="o">:</span><span class="w"> </span><span class="n">view</span><span class="p">};</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">}</span>
+<p>The <code>abilities</code> map is needed because compiled Dart apps can not find a method by its name.</p>
+<p>Register the policy for its model:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">policy</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">(</span><span class="n">PostPolicy</span><span class="p">());</span>
 </span></code></pre></div>
-<p><code>Can('view-post', param: 'post')</code> without <code>AuthMiddleware</code> then works for guests too.
-But then a logged-in user is a guest too, because nothing loads the user.
-Use <code>AuthMiddleware(optional: true)</code> on a public route. It loads the user when the login is good, and lets guests through:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts/{post}'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(</span><span class="nl">optional:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'view-post'</span><span class="p">,</span><span class="w"> </span><span class="nl">param:</span><span class="w"> </span><span class="s1">'post'</span><span class="p">),</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">show</span><span class="p">]);</span>
+<p>Now a check with a <code>Post</code> as the subject uses the policy. For an ability with no model, like <code>create</code>, pass the type <code>Post</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">allows</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">allows</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'create'</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="p">);</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Gate</span><span class="p">.</span><span class="n">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="s1">'delete'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>req.can()</code> then also sees the user on a public route.</p>
+<p>Each method must take <code>(User user)</code> or <code>(User user, Post post)</code>. A method with another signature fails at <code>Gate.policy</code>, so you see the mistake when the app starts.</p>
+<h2 id="authorizing-in-a-controller">Authorizing in a controller</h2>
+<p>In a controller, use <code>req.authorize</code>, <code>req.can</code> and <code>req.cannot</code>. They use the logged in user of <code>req.auth</code>, so put the route after <code>AuthMiddleware</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">authorize</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">);</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="n">post</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">post</span><span class="p">;</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>req.can</code> gives a <code>bool</code>, for example to tell the front end what the user may do:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="s1">'post'</span><span class="o">:</span><span class="w"> </span><span class="n">post</span><span class="p">,</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="s1">'can_edit'</span><span class="o">:</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">can</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="n">post</span><span class="p">),</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="p">};</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>req.authorize</code> answers <code>401</code> for a guest and <code>403</code> for a user who may not do it.</p>
+<h2 id="authorizing-on-a-route">Authorizing on a route</h2>
+<p>The <code>Can</code> middleware checks an ability before the controller runs. Put it after <code>AuthMiddleware</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="c1">// a gate with no subject</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/admin'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'view-admin'</span><span class="p">),</span><span class="w"> </span><span class="n">adminController</span><span class="p">.</span><span class="n">index</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>For a policy method with no model, pass the type with <code>subject</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// a policy method with no model</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'create'</span><span class="p">,</span><span class="w"> </span><span class="nl">subject:</span><span class="w"> </span><span class="n">Post</span><span class="p">),</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">store</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>For a policy method with a model, use <code>param</code>. The subject is then the value that <code>Route.bind</code> gives for that route param. When <code>Route.bind</code> finds nothing, the answer is <code>404</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// a policy method with the model of the route param</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">bind</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">String</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">Post</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">));</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">Route</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'/posts/{post}'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'update'</span><span class="p">,</span><span class="w"> </span><span class="nl">param:</span><span class="w"> </span><span class="s1">'post'</span><span class="p">),</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">update</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>A guest who may not do it gets <code>401</code>, and a logged in user who may not do it gets <code>403</code>.</p>
+<h2 id="guest-users">Guest users</h2>
+<p>A guest has no user, so a gate or policy is denied for a guest. If you want a rule that also works for guests, make the user type nullable:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">define</span><span class="p">(</span><span class="s1">'view-post'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="w"> </span><span class="n">post</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">published</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>The same works in a policy:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CommentPolicy</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Policy</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?</span><span class="p">,</span><span class="w"> </span><span class="n">Comment</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="kt">bool</span><span class="w"> </span><span class="n">view</span><span class="p">(</span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="n">Comment</span><span class="w"> </span><span class="n">comment</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">comment</span><span class="p">.</span><span class="n">visible</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">abilities</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Function</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'view'</span><span class="o">:</span><span class="w"> </span><span class="n">view</span><span class="p">};</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>On a public route, use <code>AuthMiddleware(optional: true)</code>. It loads the user when the login is good, and lets guests through. Without it, nothing loads the user, so a logged in user is a guest too:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts/{post}'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">(</span><span class="nl">optional:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span><span class="w"> </span><span class="n">Can</span><span class="p">(</span><span class="s1">'view-post'</span><span class="p">,</span><span class="w"> </span><span class="nl">param:</span><span class="w"> </span><span class="s1">'post'</span><span class="p">),</span><span class="w"> </span><span class="n">postController</span><span class="p">.</span><span class="n">show</span><span class="p">]);</span>
+</span></code></pre></div>
 <h2 id="before-and-after-hooks">Before and after hooks</h2>
-<p><code>Gate.before</code> runs before every check.
-It gives <code>true</code> or <code>false</code> to decide at once, or <code>null</code> to go on with the normal check.
-For example, an admin may do anything:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">before</span><span class="p">((</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">ability</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">isAdmin</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<p>Sometimes one user may do everything, like an admin. <code>Gate.before</code> runs before every check. Return <code>true</code> or <code>false</code> to decide at once, or <code>null</code> to go on with the normal check:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">before</span><span class="p">((</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">ability</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">isAdmin</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
 </span></code></pre></div>
-<p>A hook runs only for users of its type. A <code>User</code> hook does not run for guests.</p>
-<p><code>Gate.after</code> sees the answer of every check, for example to log it.
-It can not change the answer.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">after</span><span class="p">((</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">ability</span><span class="p">,</span><span class="w"> </span><span class="n">GateResponse</span><span class="w"> </span><span class="n">response</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="si">}</span><span class="s1"> </span><span class="si">$</span><span class="n">ability</span><span class="s1"> </span><span class="si">${</span><span class="n">response</span><span class="p">.</span><span class="n">allowed</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">});</span>
+<p>A hook runs only for users of its type, so a <code>User</code> hook does not run for guests.</p>
+<p><code>Gate.after</code> sees the answer of every check, for example to log it. It can not change the answer:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">Gate</span><span class="p">.</span><span class="n">after</span><span class="p">((</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">ability</span><span class="p">,</span><span class="w"> </span><span class="n">GateResponse</span><span class="w"> </span><span class="n">response</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="si">}</span><span class="s1"> </span><span class="si">$</span><span class="n">ability</span><span class="s1"> </span><span class="si">${</span><span class="n">response</span><span class="p">.</span><span class="n">allowed</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="p">});</span>
 </span></code></pre></div>
 <p>A policy can have its own <code>before</code>. It runs before the methods of that policy:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">PostPolicy</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Policy</span><span class="o">&lt;</span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="kt">bool</span><span class="o">?</span><span class="w"> </span><span class="n">before</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">ability</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">isAdmin</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">PostPolicy</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Policy</span><span class="o">&lt;</span><span class="n">User</span><span class="p">,</span><span class="w"> </span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="kt">bool</span><span class="o">?</span><span class="w"> </span><span class="n">before</span><span class="p">(</span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">ability</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">isAdmin</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="kc">true</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="auth-flags">Auth flags</h2>
-<p>Some answers are opt-in.
-Turn them on with <code>flags:</code> in <code>AuthConfig</code>.
-All flags are off by default.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">AuthConfig</span><span class="w"> </span><span class="n">authConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthConfig</span><span class="p">(</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="nl">guards:</span><span class="w"> </span><span class="n">guards</span><span class="p">,</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AuthFlags</span><span class="p">(</span><span class="nl">forbidGuest:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">jsonNoRedirect:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">);</span>
+<p>Some behaviors are opt-in. Turn them on with <code>flags:</code> in <code>AuthConfig</code>. All flags are off by default:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">AuthConfig</span><span class="w"> </span><span class="n">authConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AuthConfig</span><span class="p">(</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nl">guards:</span><span class="w"> </span><span class="n">guards</span><span class="p">,</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AuthFlags</span><span class="p">(</span><span class="nl">forbidGuest:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">jsonNoRedirect:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>The flags:</p>
 <ul>
-<li><code>forbidGuest</code>: <code>req.authorize</code> and <code>Can</code> give a guest <code>403</code>, not <code>401</code>. The <code>403</code> has the message of the gate. <code>AuthMiddleware</code> runs first on most routes, and it still gives a guest <code>401</code>.</li>
-<li><code>jsonNoRedirect</code>: <code>AuthMiddleware(redirectTo: '/login')</code> gives a JSON or XHR client a <code>401</code>, not a redirect. A JSON client sends an <code>Accept</code> header with json, a JSON body, or <code>X-Requested-With: XMLHttpRequest</code>. An Inertia request still gets the redirect.</li>
-<li><code>endSessionsOnPasswordChange</code>: a session login ends when the password of the user changes. It also turns on <code>logoutOtherDevices</code>. See <a href="../authentication/#end-other-sessions-when-the-password-changes">End other sessions when the password changes</a>.</li>
+<li><code>forbidGuest</code>: <code>req.authorize</code> and <code>Can</code> give a guest <code>403</code> with the gate message, not <code>401</code>. <code>AuthMiddleware</code> still gives a guest <code>401</code>.</li>
+<li><code>jsonNoRedirect</code>: <code>AuthMiddleware(redirectTo: '/login')</code> gives a JSON or XHR client a <code>401</code>, not a redirect. An Inertia request still gets the redirect.</li>
+<li><code>endSessionsOnPasswordChange</code>: a session login ends when the user's password changes. It also turns on <code>logoutOtherDevices</code>. See <a href="../authentication/#end-other-sessions-when-the-password-changes">Ending sessions when the password changes</a>.</li>
 </ul>
 <p><code>AuthFlags.all()</code> turns on every flag:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">AuthConfig</span><span class="p">(</span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span><span class="w"> </span><span class="nl">guards:</span><span class="w"> </span><span class="n">guards</span><span class="p">,</span><span class="w"> </span><span class="nl">flags:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AuthFlags</span><span class="p">.</span><span class="n">all</span><span class="p">());</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">AuthConfig</span><span class="p">(</span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span><span class="w"> </span><span class="nl">guards:</span><span class="w"> </span><span class="n">guards</span><span class="p">,</span><span class="w"> </span><span class="nl">flags:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">AuthFlags</span><span class="p">.</span><span class="n">all</span><span class="p">());</span>
 </span></code></pre></div>
-<p>The flags are part of <code>AuthConfig</code>.
-<code>Auth.initialize(authConfig)</code> runs in the <code>setup()</code> of your auth provider, so every isolate gets the same flags.</p>
-<h2 id="in-tests">In tests</h2>
-<p><code>Gate.flush()</code> removes all gates, policies and hooks.
-Call it in <code>setUp</code> when each test adds its own rules.</p>
+<h2 id="testing">Testing</h2>
+<p><code>Gate.flush()</code> removes all gates, policies and hooks. Call it in <code>setUp</code> when each test adds its own rules.</p>
+<h2 id="details">Details</h2>
+<ul>
+<li>A JSON client is a request with a json <code>Accept</code> header, a JSON body, or <code>X-Requested-With: XMLHttpRequest</code>.</li>
+<li>When a policy has no method for an ability, the gate with that name is used.</li>
+<li>Policy methods are normal typed Dart methods, so you can also call them directly in a test.</li>
+<li>The flags are part of <code>AuthConfig</code>, and <code>Auth.initialize</code> runs in every isolate, so every isolate gets the same flags.</li>
+</ul>
 
 
 
