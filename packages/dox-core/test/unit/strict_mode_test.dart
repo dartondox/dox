@@ -169,6 +169,43 @@ void main() {
       expect(err.lines.single, contains('The event loop of isolate'));
     });
 
+    test('configure restarts a running watchdog with the new config', () async {
+      StrictMode.configure(
+        const StrictConfig(
+          enabled: true,
+          blockLimit: Duration(milliseconds: 20),
+        ),
+      );
+      _Capture err = _Capture();
+      await IOOverrides.runZoned(() async {
+        StrictMode.startWatchdog();
+        // off: the old timer must stop
+        StrictMode.configure(const StrictConfig());
+        busy(const Duration(milliseconds: 120));
+        await Future<void>.delayed(const Duration(milliseconds: 60));
+        expect(err.lines, isEmpty);
+        // a new limit: the timer follows it
+        StrictMode.configure(
+          const StrictConfig(
+            enabled: true,
+            blockLimit: Duration(milliseconds: 20),
+          ),
+        );
+        StrictMode.startWatchdog();
+        StrictMode.configure(
+          const StrictConfig(
+            enabled: true,
+            blockLimit: Duration(milliseconds: 500),
+          ),
+        );
+        await Future<void>.delayed(const Duration(milliseconds: 30));
+        busy(const Duration(milliseconds: 120));
+        await Future<void>.delayed(const Duration(milliseconds: 60));
+        StrictMode.stopWatchdog();
+      }, stderr: () => err);
+      expect(err.lines, isEmpty);
+    });
+
     test('off: no timer and no warning', () async {
       StrictMode.configure(
         const StrictConfig(blockLimit: Duration(milliseconds: 20)),

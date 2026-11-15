@@ -28,6 +28,10 @@ class StrictMode {
   /// the watchdog warns at most once in this time
   static const Duration watchdogQuiet = Duration(seconds: 10);
 
+  /// The watchdog timer never ticks faster than this, so a tiny limit
+  /// does not spin the event loop.
+  static const Duration minWatchdogInterval = Duration(milliseconds: 10);
+
   static Timer? _watchdog;
 
   /// set the checks from [config] and forget the old warnings
@@ -36,6 +40,11 @@ class StrictMode {
     _limit = config.blockLimit;
     _routes.clear();
     _hashSites.clear();
+    // a running watchdog must follow the new config
+    if (_watchdog != null) {
+      stopWatchdog();
+      startWatchdog();
+    }
   }
 
   /// warn when the sync part of the middleware and controller of [route]
@@ -79,7 +88,9 @@ class StrictMode {
   /// tell which code did it. The server calls it when it listens.
   static void startWatchdog() {
     if (!enabled || _watchdog != null) return;
-    Duration interval = _limit;
+    Duration interval = _limit < minWatchdogInterval
+        ? minWatchdogInterval
+        : _limit;
     int limit = _limit.inMilliseconds;
     Stopwatch clock = Stopwatch()..start();
     int last = 0;

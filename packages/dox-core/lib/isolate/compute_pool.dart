@@ -46,7 +46,11 @@ class ComputePool {
 
   /// run [task] on a worker and give its result. An error of the task is
   /// thrown here, with the stack trace of the worker.
+  ///
+  /// Inside a worker, [task] runs in that same isolate. A worker is
+  /// already off the request isolate, and a nested pool would never close.
   Future<R> run<R>(FutureOr<R> Function() task) {
+    if (_ComputeWorker.inWorker) return Future<R>.sync(task);
     _Call<R> call = _Call<R>();
     _Job job = _Job(task, call.port.sendPort);
     SendPort? owner = _owner;
@@ -69,6 +73,9 @@ class ComputePool {
   /// [StateError]. A connected isolate only stops sending to the owner.
   /// A later [run] starts a new pool.
   void close() {
+    // ponytail: after this, a compute call in the same dying server
+    // isolate starts a local pool that nothing closes. Add a closed flag
+    // if shutdown code is seen to call compute.
     _owner = null;
     StateError closed = StateError(
       'The compute pool was closed before the task was done. '
@@ -109,16 +116,15 @@ class ComputePool {
   }
 
   void _add(_Job job) {
-    if (_workers.isEmpty) {
-      if (size < 1) {
-        job.fail(
-          ArgumentError.value(size, 'computeWorkers', 'must be 1 or more'),
-        );
-        return;
-      }
-      for (int i = 0; i < size; i++) {
-        unawaited(_spawn());
-      }
+    if (size < 1) {
+      job.fail(
+        ArgumentError.value(size, 'computeWorkers', 'must be 1 or more'),
+      );
+      return;
+    }
+    // fills the pool at the first task, and again after a failed spawn
+    while (_workers.length < size) {
+      unawaited(_spawn());
     }
     _queue.add(job);
     _dispatch();
@@ -147,11 +153,23 @@ class ComputePool {
     return null;
   }
 
+  /// workers alive or starting
+  int get workerCount => _workers.length;
+
+  /// Tests only: the next this many spawns fail.
+  int failSpawns = 0;
+
   Future<void> _spawn() async {
     _Worker worker = _Worker(_nextWorkerId++);
     _workers.add(worker);
     SendPort inbox = port;
     try {
+      if (failSpawns > 0) {
+        failSpawns--;
+        // a real spawn fails after an await too
+        await Future<void>.delayed(Duration.zero);
+        throw StateError('spawn failed (test)');
+      }
       // paused, so the exit listener is there before the task can run
       Isolate isolate = await Isolate.spawn(
         _ComputeWorker.main,
@@ -169,17 +187,16 @@ class ComputePool {
       worker.isolate = isolate;
       isolate.resume(isolate.pauseCapability!);
     } catch (error, stackTrace) {
-      // the isolate could not start: fail the tasks, a later run tries again
+      // The isolate could not start. A later task tries again. Tasks fail
+      // only when no other worker is alive or starting.
       _workers.remove(worker);
-      if (_workers.every(_notStarted)) {
+      if (_workers.isEmpty) {
         while (_queue.isNotEmpty) {
           _queue.removeFirst().fail(error, stackTrace);
         }
       }
     }
   }
-
-  static bool _notStarted(_Worker worker) => worker.isolate == null;
 
   void _onExit(int id) {
     _Worker? worker = _find(id);
@@ -299,7 +316,11 @@ class _ComputeWorker {
   final int id;
   final SendPort pool;
 
+  /// true in a worker isolate: [ComputePool.run] runs the task inline
+  static bool inWorker = false;
+
   static void main(_Start start) {
+    inWorker = true;
     _ComputeWorker worker = _ComputeWorker(start.id, start.pool);
     RawReceivePort jobs = RawReceivePort(worker.run, 'dox compute jobs');
     start.pool.send(_Ready(start.id, jobs.sendPort));

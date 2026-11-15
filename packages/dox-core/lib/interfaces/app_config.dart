@@ -277,7 +277,8 @@ class StrictConfig {
   final bool enabled;
 
   /// Warn when code blocks the isolate longer than this. Default
-  /// [defaultBlockLimit] (50 ms).
+  /// [defaultBlockLimit] (50 ms). The event loop check does not run more
+  /// often than every 10 ms, so a smaller limit does not make it faster.
   final Duration blockLimit;
 
   /// The default of [blockLimit]: 50 ms.

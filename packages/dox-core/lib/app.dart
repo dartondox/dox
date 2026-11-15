@@ -131,6 +131,7 @@ class Dox {
   /// function to be safe.
   ///
   /// It works without a server too (a command, a test, a queue job).
+  /// Inside a worker, a nested `compute` runs the task in that same worker.
   /// ```
   /// List<int> pdf = await Dox().compute(() => buildPdf(order.toJson()));
   /// ```

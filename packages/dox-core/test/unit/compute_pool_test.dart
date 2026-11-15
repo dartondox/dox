@@ -19,6 +19,16 @@ Future<int> slow(int value) async {
   return value;
 }
 
+Future<String> nestedCompute() => Dox().compute(workerName);
+
+Future<String> nestedHash() async {
+  String hash = await Hash.makeAsync('secret', rounds: 4);
+  bool ok = await Hash.verifyAsync('secret', hash);
+  return '$ok ${Isolate.current.debugName}';
+}
+
+Never nestedFail() => throw StateError('nested boom');
+
 Future<int> forever() => Completer<int>().future;
 
 /// made at the top level: a closure made in `main` would also hold the
@@ -157,5 +167,33 @@ Future<void> main() async {
     ).timeout(const Duration(seconds: 60));
     expect(result.exitCode, 0, reason: '${result.stderr}');
     expect((result.stdout as String).trim(), 'true');
+  });
+
+  test('compute inside a worker runs in that worker, no nested pool', () async {
+    pool.size = 1;
+    String outer = await Dox().compute(workerName);
+    expect(await Dox().compute(nestedCompute), outer);
+    expect(await Dox().compute(nestedHash), startsWith('true dox compute'));
+    expect(
+      Dox().compute(() => Dox().compute(nestedFail)),
+      throwsA(isA<StateError>()),
+    );
+  });
+
+  test('a failed spawn is retried by the next task', () async {
+    pool.size = 2;
+    pool.failSpawns = 1;
+    // one worker fails, the other comes up and runs the task
+    expect(await Dox().compute(answer), 42);
+    // the next task fills the pool again, never above the size
+    expect(await Dox().compute(answer), 42);
+    expect(pool.workerCount, 2);
+  });
+
+  test('tasks fail when no worker can start', () async {
+    pool.size = 2;
+    pool.failSpawns = 2;
+    await expectLater(Dox().compute(answer), throwsA(isA<StateError>()));
+    expect(await Dox().compute(answer), 42);
   });
 }
