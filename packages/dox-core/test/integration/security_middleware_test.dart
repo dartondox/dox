@@ -96,9 +96,21 @@ class QuietHandler extends ExceptionHandler {
 /// A Redis store where `add` runs after the increment, or fails. It
 /// forces the bad cases of the rate limit count.
 class BadOrderStore extends CacheStore {
-  BadOrderStore(super.driver, {this.fail = false});
+  BadOrderStore(super.driver, {this.fail = false, this.failTouchOnce = false});
 
   final bool fail;
+
+  /// the first `touch` throws, like a short network error
+  bool failTouchOnce;
+
+  @override
+  Future<bool> touch(String key, Duration? ttl) async {
+    if (failTouchOnce) {
+      failTouchOnce = false;
+      throw StateError('touch failed');
+    }
+    return super.touch(key, ttl);
+  }
 
   @override
   Future<bool> add(String key, Object? value, [Duration? ttl]) async {
@@ -288,6 +300,17 @@ void main() {
         ),
         (DoxRequest req) => 'ok',
       ]);
+      Route.get('/redis-touch', <dynamic>[
+        RateLimit(
+          max: 2,
+          name: '$name-touch',
+          cacheStore: BadOrderStore(driver, failTouchOnce: true),
+          now: now,
+        ),
+        (DoxRequest req) => 'ok',
+      ]);
+      // the ttl repair tries again when the first touch fails
+      (await client.get('/redis-touch')).expectStatus(200);
       (await client.get('/redis-late'))
           .expectStatus(200)
           .expectHeader('x-ratelimit-remaining', '1');
@@ -296,7 +319,7 @@ void main() {
       // the error of the add still reaches the client
       (await client.get('/redis-fail')).expectStatus(500);
 
-      for (String part in <String>['late', 'fail']) {
+      for (String part in <String>['late', 'fail', 'touch']) {
         List<dynamic> keys = await driver.redis.sendCommand(<String>[
           'KEYS',
           '${driver.prefix}rate_limit:$name-$part*',

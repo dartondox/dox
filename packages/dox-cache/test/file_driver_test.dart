@@ -319,16 +319,81 @@ void main() {
       expect(await Future.wait(releases), everyElement(isTrue));
     });
 
-    test('a moved file is never pruned, even when it looks old', () async {
-      File moved = File(
-        '${driver.fileFor('a').path}.${CacheLock.randomOwner()}'
-        '${CacheConstants.fileMovedSuffix}',
-      );
+    test('prune deletes a moved file by the time in its name', () async {
       await driver.storeDirectory.create(recursive: true);
-      await moved.writeAsString('{"value":1,"expires_at":null}');
-      await moved.setLastModified(_hoursAgo(2));
+      String hash = _nameOf(driver.fileFor('a'));
+      int now = DateTime.now().millisecondsSinceEpoch;
+      int old = _hoursAgo(2).millisecondsSinceEpoch;
+      String owner = CacheLock.randomOwner();
+      File recent = _inStore(driver, '$hash.$now.$owner.mv');
+      File oldValue = _inStore(driver, '$hash.$old.$owner.mv');
+      File oldLock = _inStore(driver, '$hash.lock.$old.$owner.mv');
+      for (File file in <File>[recent, oldValue, oldLock]) {
+        await file.writeAsString('{"value":1,"expires_at":null}');
+        // a rename keeps the old modified time
+        await file.setLastModified(_hoursAgo(2));
+      }
       await driver.prune();
-      expect(moved.existsSync(), isTrue);
+      expect(recent.existsSync(), isTrue);
+      expect(oldValue.existsSync(), isFalse);
+      expect(oldLock.existsSync(), isFalse);
+    });
+
+    test('flush deletes values that pull moved away', () async {
+      await driver.put('keep-lock-check', 1, null);
+      String hash = _nameOf(driver.fileFor('a'));
+      int now = DateTime.now().millisecondsSinceEpoch;
+      String owner = CacheLock.randomOwner();
+      File movedValue = _inStore(driver, '$hash.$now.$owner.mv');
+      File movedLock = _inStore(driver, '$hash.klock.$now.$owner.mv');
+      await movedValue.writeAsString('{"value":1,"expires_at":null}');
+      await movedLock.writeAsString('{}');
+      await driver.flush();
+      expect(movedValue.existsSync(), isFalse);
+      // a lock that is being taken away right now is kept
+      expect(movedLock.existsSync(), isTrue);
+    });
+
+    test('prune deletes old moved lock files of older versions', () async {
+      await driver.storeDirectory.create(recursive: true);
+      String hash = _nameOf(driver.fileFor('a'));
+      String owner = CacheLock.randomOwner();
+      File oldLock = _inStore(driver, '$hash.lock.$owner.tmp');
+      File oldKeyLock = _inStore(driver, '$hash.klock.$owner.tmp');
+      for (File file in <File>[oldLock, oldKeyLock]) {
+        await file.writeAsString('{}');
+        await file.setLastModified(_hoursAgo(2));
+      }
+      // not a name the cache makes: kept
+      File foreign = _inStore(driver, '${hash}x.klock.$owner.tmp');
+      await foreign.writeAsString('{}');
+      await foreign.setLastModified(_hoursAgo(2));
+      await driver.prune();
+      expect(oldLock.existsSync(), isFalse);
+      expect(oldKeyLock.existsSync(), isFalse);
+      expect(foreign.existsSync(), isTrue);
+    });
+
+    test('a recent moved lock file of an older version is kept', () async {
+      await driver.storeDirectory.create(recursive: true);
+      String hash = _nameOf(driver.fileFor('a'));
+      File recent = _inStore(
+        driver,
+        '$hash.klock.${CacheLock.randomOwner()}.tmp',
+      );
+      await recent.writeAsString('{}');
+      await driver.prune();
+      expect(recent.existsSync(), isTrue);
+    });
+
+    test('an expiry time that is not an int is a broken file', () async {
+      await driver.storeDirectory.create(recursive: true);
+      await driver
+          .fileFor('odd')
+          .writeAsString('{"value":1,"expires_at":"soon"}');
+      expect(await driver.get('odd'), isNull);
+      expect(await driver.has('odd'), isFalse);
+      expect(await driver.prune(), 1);
     });
 
     test('a light prune runs by itself, once per hour for all', () async {
@@ -342,13 +407,14 @@ void main() {
       await driver.fileFor('broken').writeAsString('{not json');
       clock.advance(const Duration(seconds: 30));
       await driver.put('a', 2, null);
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      expect(driver.fileFor('old').existsSync(), isTrue);
+      // too soon: no prune starts
+      expect(driver.backgroundPrune, isNull);
 
-      // a minute after the first write
+      // the first write a minute or more after the first write
       clock.advance(const Duration(seconds: 31));
       await driver.put('b', 3, null);
-      await _gone(driver.fileFor('old'));
+      expect(await driver.backgroundPrune, 1);
+      expect(driver.fileFor('old').existsSync(), isFalse);
       // a file it can not read may be of another app: it stays
       expect(driver.fileFor('broken').existsSync(), isTrue);
       expect(await driver.get('a'), 2);
@@ -358,7 +424,8 @@ void main() {
       await driver.put('late', 1, const Duration(seconds: 1));
       clock.advance(const Duration(seconds: 2));
       await other.put('d', 1, null);
-      await Future<void>.delayed(const Duration(milliseconds: 50));
+      // it starts, but the lock on disk stops it: nothing deleted
+      expect(await other.backgroundPrune, 0);
       expect(other.fileFor('late').existsSync(), isTrue);
 
       // after the hour, a new process (an app restart) prunes again
@@ -371,7 +438,8 @@ void main() {
       await restarted.put('e', 1, null);
       clock.advance(const Duration(seconds: 61));
       await restarted.put('f', 1, null);
-      await _gone(restarted.fileFor('late'));
+      expect(await restarted.backgroundPrune, 1);
+      expect(restarted.fileFor('late').existsSync(), isFalse);
     });
 
     test('prune skips a key that add or increment holds', () async {
@@ -474,16 +542,18 @@ void main() {
   });
 }
 
-DateTime _hoursAgo(int hours) {
-  return DateTime.now().subtract(Duration(hours: hours));
+/// the file name of [file], with no folder
+String _nameOf(File file) {
+  return file.uri.pathSegments.last;
 }
 
-/// waits up to one second for [file] to be deleted
-Future<void> _gone(File file) async {
-  for (int i = 0; i < 100 && file.existsSync(); i++) {
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-  }
-  expect(file.existsSync(), isFalse);
+/// [name] in the folder of [driver]
+File _inStore(FileDriver driver, String name) {
+  return File('${driver.storeDirectory.path}${Platform.pathSeparator}$name');
+}
+
+DateTime _hoursAgo(int hours) {
+  return DateTime.now().subtract(Duration(hours: hours));
 }
 
 bool _isLock(String name) {

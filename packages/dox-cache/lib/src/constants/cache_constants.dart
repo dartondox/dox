@@ -70,8 +70,8 @@ class CacheConstants {
   /// One run covers all isolates and processes that share the folder.
   static const Duration fileAutoPruneInterval = Duration(hours: 1);
 
-  /// The first auto prune of a process is tried this long after its
-  /// first write. The interval lock on disk decides if it really runs, so
+  /// The first auto prune of a process can start on the first write
+  /// that comes at least this long after its first write. The interval lock on disk decides if it really runs, so
   /// an app that restarts often still prunes once per interval.
   static const Duration fileAutoPruneFirstDelay = Duration(minutes: 1);
 
@@ -87,8 +87,10 @@ class CacheConstants {
   static const String fileKeyLockSuffix = '.klock';
   static const String fileTempSuffix = '.tmp';
 
-  /// End of a file that `pull` or a lock moved away for a moment. A
-  /// rename keeps the old modified time, so prune never deletes these.
+  /// End of a file that `pull` or a lock moved away for a moment:
+  /// `<name>.<ms>.<owner>.mv`. A rename keeps the old modified time, so
+  /// the time of the move is in the name. Prune deletes one only when
+  /// that time is older than [fileStaleTempAge].
   static const String fileMovedSuffix = '.mv';
 
   /// JSON field of a file lock.

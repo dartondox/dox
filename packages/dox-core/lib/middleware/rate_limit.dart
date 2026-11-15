@@ -263,9 +263,27 @@ class RateLimit implements IDoxMiddleware {
       if (addError != null) Error.throwWithStackTrace(addError, addTrace!);
       rethrow;
     }
-    if (hits == 1 && !added) await counts.touch(key, ttl);
+    if (hits == 1 && !added) await _setTtl(counts, key, ttl);
     if (addError != null) Error.throwWithStackTrace(addError, addTrace!);
     return hits;
+  }
+
+  /// Sets the ttl of a count that has none. Tries twice.
+  ///
+  /// ponytail: only the request that made the key (count 1) can see that
+  /// it has no ttl. When both tries fail, the key stays with no ttl and
+  /// later requests (count above 1) do not repair it: that would cost a
+  /// TTL read on every request. Delete the key by hand if it happens.
+  static Future<void> _setTtl(
+    CacheStore counts,
+    String key,
+    Duration ttl,
+  ) async {
+    try {
+      await counts.touch(key, ttl);
+    } catch (_) {
+      await counts.touch(key, ttl);
+    }
   }
 
   /// the cache store that keeps the counts, or null for the counts of
