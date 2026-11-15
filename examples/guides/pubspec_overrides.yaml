@@ -2,7 +2,7 @@
 # The packages of other repos come from clones next to this repo
 # (../dox-orm, ../dox-auth, ../dox-openapi, ../dox-validation,
 # ../dox-socketio, ../dox-storage, ../dox-queue, ../dox-mailer,
-# ../dox-view, ../dox-scheduler, ../ioredis and the two native drivers). CI clones them with ci/clone-siblings.sh.
+# ../dox-view, ../dox-scheduler, ../ioredis, ../dox-http-native and the two native drivers). CI clones them with ci/clone-siblings.sh.
 dependency_overrides:
   dox_annotation:
     path: ../../packages/dox-annotation
@@ -14,6 +14,8 @@ dependency_overrides:
     path: ../../packages/dox-cache
   dox_core:
     path: ../../packages/dox-core
+  dox_http_native:
+    path: ../../../dox-http-native
   dox_mailer:
     path: ../../../dox-mailer
   dox_migration:

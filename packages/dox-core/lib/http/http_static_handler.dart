@@ -141,7 +141,7 @@ void _send(HttpRequest req, File file, FileStat stat, Duration? maxAge) {
   );
   if (_notModified(req, etag, modified)) {
     res.statusCode = HttpStatus.notModified;
-    res.close();
+    endResponse(res);
     return;
   }
   responseDataHandler(file, req);

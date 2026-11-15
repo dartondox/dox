@@ -37,7 +37,7 @@ void _plainError(HttpResponse res) {
     /// the head is already sent
   }
   try {
-    res.close();
+    endResponse(res);
   } catch (_) {
     /// client already gone
   }

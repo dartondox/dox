@@ -163,6 +163,17 @@ jobs:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
+      # dox_http_native comes from its clone too, so a dox_core change that
+      # needs new native code is tested before that code is on pub.dev.
+      # Caches its Rust dependencies, then builds the library for this
+      # machine only. On a tag the build is skipped and its hook downloads
+      # the released library.
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        if: github.ref_type != 'tag'
+        with:
+          workspaces: |
+            ../dox-http-native/native -> target
+      - run: ci/use-siblings.sh build
       - run: ci/run-examples.sh ${{ needs.changes.outputs.examples }}
 
   # A new app made with `dox create` from the template branch v3.x, on the
@@ -192,6 +203,17 @@ jobs:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
+      # dox_http_native comes from its clone too, so a dox_core change that
+      # needs new native code is tested before that code is on pub.dev.
+      # Caches its Rust dependencies, then builds the library for this
+      # machine only. On a tag the build is skipped and its hook downloads
+      # the released library.
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        if: github.ref_type != 'tag'
+        with:
+          workspaces: |
+            ../dox-http-native/native -> target
+      - run: ci/use-siblings.sh build
       - run: ci/smoke-template.sh
         env:
           TEMPLATE_VERSION: v3.x
