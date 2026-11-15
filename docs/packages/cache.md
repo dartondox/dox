@@ -304,7 +304,7 @@ int deleted = await (store.driver as DatabaseCacheDriver).prune();
 
 ## Pruning the file store
 
-A read never deletes a file, so an expired file stays until it is written again. The store cleans up by itself: at most once an hour, a write starts a light prune in the background. It deletes expired files, temp files left by a crash, and lock files that are free. It keeps files it can not read or decrypt, because they can belong to another app in the same folder. The first one runs an hour after the first write. Only one runs per hour, also with many isolates or servers on one folder.
+A read never deletes a file, so an expired file stays until it is written again. The store cleans up by itself: at most once an hour, a write starts a light prune in the background. It deletes expired files, temp files left by a crash, and lock files that are free. It keeps files it can not read or decrypt, because they can belong to another app in the same folder. It never touches files the cache did not make. Only one runs per hour, also with many isolates or servers on one folder, and also when the app restarts often.
 
 To clean up more often, or to also delete broken files, call `prune()` yourself, for example in a schedule:
 

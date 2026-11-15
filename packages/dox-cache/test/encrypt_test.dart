@@ -11,10 +11,7 @@ const CacheEncrypter rightKey = TestEncrypter('right');
 const CacheEncrypter wrongKey = TestEncrypter('wrong');
 
 Future<void> main() async {
-  bool reachable = await RedisEnv.isReachable();
-  Object? skipRedis = reachable
-      ? null
-      : 'Redis not reachable at ${RedisEnv.host}:${RedisEnv.port}';
+  Object? skipRedis = await RedisEnv.skipReason();
 
   group('encrypt option', () {
     test('a store with encrypt: true and no encrypter throws', () {

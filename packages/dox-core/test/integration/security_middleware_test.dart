@@ -93,6 +93,21 @@ class QuietHandler extends ExceptionHandler {
   void report(Object error, StackTrace stackTrace) {}
 }
 
+/// A Redis store where `add` runs after the increment, or fails. It
+/// forces the bad cases of the rate limit count.
+class BadOrderStore extends CacheStore {
+  BadOrderStore(super.driver, {this.fail = false});
+
+  final bool fail;
+
+  @override
+  Future<bool> add(String key, Object? value, [Duration? ttl]) async {
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    if (fail) throw StateError('add failed');
+    return super.add(key, value, ttl);
+  }
+}
+
 void main() {
   late DoxTestClient client;
 
@@ -169,7 +184,7 @@ void main() {
           'redis': <String, dynamic>{
             'driver': 'redis',
             'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
-            'port': int.parse(redisPort ?? '6379'),
+            'port': int.parse(redisPort!),
           },
         },
       );
@@ -195,7 +210,7 @@ void main() {
             'redis': <String, dynamic>{
               'driver': 'redis',
               'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
-              'port': int.parse(redisPort ?? '6379'),
+              'port': int.parse(redisPort!),
             },
           },
         ),
@@ -236,6 +251,62 @@ void main() {
         int ttl =
             await driver.redis.sendCommand(<String>['PTTL', '$key']) as int;
         expect(ttl, greaterThan(0));
+      }
+      await manager.close();
+    }, skip: redisPort == null ? 'set REDIS_PORT to run it' : false);
+
+    test('Redis: the key gets its ttl when add runs late or fails', () async {
+      CacheManager manager = CacheManager(
+        CacheConfig(
+          defaultStore: 'redis',
+          stores: <String, Map<String, dynamic>>{
+            'redis': <String, dynamic>{
+              'driver': 'redis',
+              'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
+              'port': int.parse(redisPort!),
+            },
+          },
+        ),
+      );
+      RedisDriver driver = manager.store().driver as RedisDriver;
+      String name = 'order-${DateTime.now().microsecondsSinceEpoch}';
+      Route.get('/redis-late', <dynamic>[
+        RateLimit(
+          max: 2,
+          name: '$name-late',
+          cacheStore: BadOrderStore(driver),
+          now: now,
+        ),
+        (DoxRequest req) => 'ok',
+      ]);
+      Route.get('/redis-fail', <dynamic>[
+        RateLimit(
+          max: 2,
+          name: '$name-fail',
+          cacheStore: BadOrderStore(driver, fail: true),
+          now: now,
+        ),
+        (DoxRequest req) => 'ok',
+      ]);
+      (await client.get('/redis-late'))
+          .expectStatus(200)
+          .expectHeader('x-ratelimit-remaining', '1');
+      (await client.get('/redis-late')).expectStatus(200);
+      (await client.get('/redis-late')).expectStatus(429);
+      // the error of the add still reaches the client
+      (await client.get('/redis-fail')).expectStatus(500);
+
+      for (String part in <String>['late', 'fail']) {
+        List<dynamic> keys = await driver.redis.sendCommand(<String>[
+          'KEYS',
+          '${driver.prefix}rate_limit:$name-$part*',
+        ]) as List<dynamic>;
+        expect(keys, hasLength(1));
+        int ttl = await driver.redis.sendCommand(<String>[
+          'PTTL',
+          '${keys.first}',
+        ]) as int;
+        expect(ttl, greaterThan(0), reason: part);
       }
       await manager.close();
     }, skip: redisPort == null ? 'set REDIS_PORT to run it' : false);

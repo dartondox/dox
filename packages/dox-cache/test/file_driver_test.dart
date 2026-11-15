@@ -227,12 +227,11 @@ void main() {
 
     test('prune deletes old temp files and free lock files', () async {
       await driver.put('keep', 1, null);
-      File oldTemp = File('${driver.fileFor('a').path}.abc.tmp');
+      String owner = CacheLock.randomOwner();
+      File oldTemp = File('${driver.fileFor('a').path}.$owner.tmp');
       await oldTemp.writeAsString('x');
-      await oldTemp.setLastModified(
-        DateTime.now().subtract(const Duration(hours: 2)),
-      );
-      File newTemp = File('${driver.fileFor('b').path}.abc.tmp');
+      await oldTemp.setLastModified(_hoursAgo(2));
+      File newTemp = File('${driver.fileFor('b').path}.$owner.tmp');
       await newTemp.writeAsString('x');
       CacheLock expired = driver.lock('old', const Duration(seconds: 1));
       expect(await expired.get(), isTrue);
@@ -252,41 +251,128 @@ void main() {
       expect(await driver.get('keep'), 1);
     });
 
-    test(
-      'a light prune runs by itself an hour after the first write',
-      () async {
-        FileDriver other = FileDriver(
-          directory: directory,
-          prefix: 'p:',
-          clock: clock,
-        );
-        await other.put('c', 1, null);
-        await driver.put('old', 1, const Duration(seconds: 1));
-        await driver.fileFor('broken').writeAsString('{not json');
-        clock.advance(const Duration(minutes: 59));
-        await driver.put('a', 2, null);
-        await Future<void>.delayed(const Duration(milliseconds: 50));
-        expect(driver.fileFor('old').existsSync(), isTrue);
+    test('prune never touches files the cache did not make', () async {
+      await driver.put('keep', 1, null);
+      Directory folder = driver.storeDirectory;
+      Map<String, String> foreign = <String, String>{
+        'notes.lock': '[1, 2]',
+        'readme.lock': 'not json',
+        'data.json': '{}',
+        'README': 'x',
+        'old.tmp': 'x',
+        '${driver.fileFor('x').path.split('/').last}.mv': '{}',
+      };
+      for (MapEntry<String, String> file in foreign.entries) {
+        File made = File('${folder.path}/${file.key}');
+        await made.writeAsString(file.value);
+        await made.setLastModified(_hoursAgo(2));
+      }
+      // a lock file of the cache with JSON that is not a map: no error
+      File odd = File(
+        '${driver.fileFor('odd').path}${CacheConstants.fileLockSuffix}',
+      );
+      await odd.writeAsString('[1]');
+      await odd.setLastModified(_hoursAgo(2));
 
-        clock.advance(const Duration(minutes: 2));
-        await driver.put('b', 3, null);
-        for (int i = 0; i < 100 && driver.fileFor('old').existsSync(); i++) {
-          await Future<void>.delayed(const Duration(milliseconds: 10));
-        }
-        expect(driver.fileFor('old').existsSync(), isFalse);
-        // a file it can not read may be of another app: it stays
-        expect(driver.fileFor('broken').existsSync(), isTrue);
-        expect(await driver.get('a'), 2);
+      expect(await driver.prune(), 0);
+      for (String name in foreign.keys) {
+        expect(File('${folder.path}/$name').existsSync(), isTrue);
+      }
+      // an old lock file with no owner in it is free, so it goes
+      expect(odd.existsSync(), isFalse);
+      expect(await driver.get('keep'), 1);
+    });
 
-        // the lock of that run stops a second driver on the same folder
-        // in the same hour
-        await driver.put('late', 1, const Duration(seconds: 1));
-        clock.advance(const Duration(seconds: 2));
-        await other.put('d', 1, null);
-        await Future<void>.delayed(const Duration(milliseconds: 50));
-        expect(other.fileFor('late').existsSync(), isTrue);
-      },
-    );
+    test('a value file with JSON that is not a map is a miss', () async {
+      await driver.storeDirectory.create(recursive: true);
+      await driver.fileFor('list').writeAsString('[1, 2]');
+      expect(await driver.get('list'), isNull);
+    });
+
+    test('prune does not break a pull of an old file', () async {
+      for (int i = 0; i < 20; i++) {
+        await driver.put('k$i', i, null);
+        // a rename keeps this time, so the moved file looks old
+        await driver.fileFor('k$i').setLastModified(_hoursAgo(2));
+      }
+      List<Future<Object?>> pulls = <Future<Object?>>[
+        for (int i = 0; i < 20; i++) driver.pull('k$i'),
+      ];
+      await driver.prune();
+      expect(await Future.wait(pulls), <int>[for (int i = 0; i < 20; i++) i]);
+    });
+
+    test('prune does not break the release of an old lock', () async {
+      List<CacheLock> locks = <CacheLock>[];
+      for (int i = 0; i < 20; i++) {
+        CacheLock lock = driver.lock('l$i', const Duration(minutes: 1));
+        expect(await lock.get(), isTrue);
+        locks.add(lock);
+      }
+      for (File file in driver.storeDirectory.listSync().whereType<File>()) {
+        await file.setLastModified(_hoursAgo(2));
+      }
+      List<Future<bool>> releases = <Future<bool>>[
+        for (CacheLock lock in locks) lock.release(),
+      ];
+      await driver.prune();
+      expect(await Future.wait(releases), everyElement(isTrue));
+    });
+
+    test('a moved file is never pruned, even when it looks old', () async {
+      File moved = File(
+        '${driver.fileFor('a').path}.${CacheLock.randomOwner()}'
+        '${CacheConstants.fileMovedSuffix}',
+      );
+      await driver.storeDirectory.create(recursive: true);
+      await moved.writeAsString('{"value":1,"expires_at":null}');
+      await moved.setLastModified(_hoursAgo(2));
+      await driver.prune();
+      expect(moved.existsSync(), isTrue);
+    });
+
+    test('a light prune runs by itself, once per hour for all', () async {
+      FileDriver other = FileDriver(
+        directory: directory,
+        prefix: 'p:',
+        clock: clock,
+      );
+      await other.put('c', 1, null);
+      await driver.put('old', 1, const Duration(seconds: 1));
+      await driver.fileFor('broken').writeAsString('{not json');
+      clock.advance(const Duration(seconds: 30));
+      await driver.put('a', 2, null);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(driver.fileFor('old').existsSync(), isTrue);
+
+      // a minute after the first write
+      clock.advance(const Duration(seconds: 31));
+      await driver.put('b', 3, null);
+      await _gone(driver.fileFor('old'));
+      // a file it can not read may be of another app: it stays
+      expect(driver.fileFor('broken').existsSync(), isTrue);
+      expect(await driver.get('a'), 2);
+
+      // the lock of that run stops a second driver on the same folder
+      // in the same hour
+      await driver.put('late', 1, const Duration(seconds: 1));
+      clock.advance(const Duration(seconds: 2));
+      await other.put('d', 1, null);
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(other.fileFor('late').existsSync(), isTrue);
+
+      // after the hour, a new process (an app restart) prunes again
+      clock.advance(const Duration(minutes: 61));
+      FileDriver restarted = FileDriver(
+        directory: directory,
+        prefix: 'p:',
+        clock: clock,
+      );
+      await restarted.put('e', 1, null);
+      clock.advance(const Duration(seconds: 61));
+      await restarted.put('f', 1, null);
+      await _gone(restarted.fileFor('late'));
+    });
 
     test('prune skips a key that add or increment holds', () async {
       await driver.put('old', 1, const Duration(seconds: 1));
@@ -386,6 +472,18 @@ void main() {
       expect(added.where(_isTrue), hasLength(1));
     });
   });
+}
+
+DateTime _hoursAgo(int hours) {
+  return DateTime.now().subtract(Duration(hours: hours));
+}
+
+/// waits up to one second for [file] to be deleted
+Future<void> _gone(File file) async {
+  for (int i = 0; i < 100 && file.existsSync(); i++) {
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
+  expect(file.existsSync(), isFalse);
 }
 
 bool _isLock(String name) {

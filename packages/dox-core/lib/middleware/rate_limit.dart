@@ -151,13 +151,7 @@ class RateLimit implements IDoxMiddleware {
     if (counts == null) {
       hits = await RateLimitCounter.instance.increment(cacheKey, per);
     } else if (counts.driver is RedisDriver) {
-      // both in the same tick: ioredis sends them in one write, in this
-      // order, so it is one round trip
-      List<Object?> replies = await _inOrder(<Future<Object?>>[
-        counts.add(cacheKey, 0, per),
-        counts.increment(cacheKey),
-      ]);
-      hits = replies[1] as int;
+      hits = await _countOnRedis(counts, cacheKey, per);
     } else {
       await counts.add(cacheKey, 0, per);
       hits = await counts.increment(cacheKey);
@@ -197,14 +191,11 @@ class RateLimit implements IDoxMiddleware {
         ttl,
       );
     } else if (counts.driver is RedisDriver) {
-      // all in the same tick: one round trip, see [handle]
-      List<Object?> replies = await _inOrder(<Future<Object?>>[
-        counts.add(cacheKey, 0, ttl),
-        counts.increment(cacheKey),
-        counts.get(beforeKey),
-      ]);
-      hits = replies[1] as int;
-      before = (replies[2] as num?)?.toInt() ?? 0;
+      // started in the same tick as the count: one round trip
+      Future<int> counted = _countOnRedis(counts, cacheKey, ttl);
+      Future<Object?> read = counts.get(beforeKey)..ignore();
+      hits = await counted;
+      before = ((await read) as num?)?.toInt() ?? 0;
     } else {
       // other stores (eg. file) may run the steps out of order when they
       // run at the same time, so one after the other
@@ -240,22 +231,41 @@ class RateLimit implements IDoxMiddleware {
     throw TooManyRequestsException();
   }
 
-  /// The results of [futures], awaited in order. The first error is
-  /// thrown, the same one as when they ran one after the other. The
-  /// errors of the later ones are dropped, so they are not unhandled.
-  static Future<List<Object?>> _inOrder(List<Future<Object?>> futures) async {
-    List<Object?> results = <Object?>[];
-    for (int i = 0; i < futures.length; i++) {
-      try {
-        results.add(await futures[i]);
-      } catch (_) {
-        for (int j = i + 1; j < futures.length; j++) {
-          futures[j].ignore();
-        }
-        rethrow;
-      }
+  /// Adds one to [key] on Redis and gives the new count. The add (with
+  /// the ttl) and the increment start in the same tick, so ioredis sends
+  /// them in one write: one round trip.
+  ///
+  /// It does not trust the order. When the increment made the key (the
+  /// add ran late or failed), the key has no ttl, so it is set here. Else
+  /// the count would never end and the client would stay blocked. This
+  /// costs one more round trip, only in that case. An error of the add is
+  /// thrown, the same as when the steps ran one after the other.
+  static Future<int> _countOnRedis(
+    CacheStore counts,
+    String key,
+    Duration ttl,
+  ) async {
+    Future<bool> adding = counts.add(key, 0, ttl)..ignore();
+    Future<int> counting = counts.increment(key)..ignore();
+    bool added = false;
+    Object? addError;
+    StackTrace? addTrace;
+    try {
+      added = await adding;
+    } catch (error, trace) {
+      addError = error;
+      addTrace = trace;
     }
-    return results;
+    int hits;
+    try {
+      hits = await counting;
+    } catch (_) {
+      if (addError != null) Error.throwWithStackTrace(addError, addTrace!);
+      rethrow;
+    }
+    if (hits == 1 && !added) await counts.touch(key, ttl);
+    if (addError != null) Error.throwWithStackTrace(addError, addTrace!);
+    return hits;
   }
 
   /// the cache store that keeps the counts, or null for the counts of

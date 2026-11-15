@@ -34,7 +34,9 @@ import '../constants/cache_constants.dart';
 /// With [pruneEvery] 0 (the default), a light prune runs in the
 /// background at most once an hour: it deletes expired files, temp files
 /// left by a crash and free lock files. It keeps files it cannot read or
-/// decrypt. The first one runs an hour after the first write.
+/// decrypt, and files the cache did not make. A process first tries one
+/// a minute after its first write. A lock file on disk makes sure only
+/// one runs per hour for all processes on the folder.
 ///
 /// [fsync] true (the default) syncs each value file to the disk before
 /// the rename. Without it a write is faster, and after a power cut the
@@ -160,7 +162,7 @@ class FileDriver extends CacheDriver {
   /// gets the value.
   @override
   Future<dynamic> pull(String key) async {
-    File moved = _tempFor(fileFor(key));
+    File moved = _movedFor(fileFor(key));
     try {
       await fileFor(key).rename(moved.path);
     } on FileSystemException {
@@ -209,7 +211,11 @@ class FileDriver extends CacheDriver {
     if (!await storeDirectory.exists()) return 0;
     await for (FileSystemEntity entity in storeDirectory.list()) {
       if (entity is! File) continue;
-      (_isDataFile(entity) ? values : others).add(entity);
+      if (_isDataFile(entity)) {
+        values.add(entity);
+      } else if (_isPrunable(entity)) {
+        others.add(entity);
+      }
     }
     for (File file in values) {
       if (!await _isGone(file, deleteBroken)) continue;
@@ -217,7 +223,8 @@ class FileDriver extends CacheDriver {
       if (!await lock.get()) continue;
       try {
         // ponytail: `put` takes no lock. A `put` between this read and
-        // the delete is lost, which is only a cache miss.
+        // the delete is lost, which is only a cache miss. A check of the
+        // modified time would only make the gap smaller, not close it.
         if (await _isGone(file, deleteBroken)) {
           await _delete(file);
           removed++;
@@ -289,8 +296,22 @@ class FileDriver extends CacheDriver {
     return files;
   }
 
+  /// A value file: the sha256 of the key, with no dot.
+  static final RegExp _dataName = RegExp(r'^[0-9a-f]{64}$');
+
+  /// Files that prune may delete: temp files of [_write] and lock files.
+  /// Moved files (`.mv`) and files the cache did not make are never
+  /// touched.
+  static final RegExp _prunableName = RegExp(
+    r'^[0-9a-f]{64}(\.[0-9a-f]{32}\.tmp|\.lock|\.klock)$',
+  );
+
   static bool _isDataFile(File file) {
-    return !file.uri.pathSegments.last.contains('.');
+    return _dataName.hasMatch(file.uri.pathSegments.last);
+  }
+
+  static bool _isPrunable(File file) {
+    return _prunableName.hasMatch(file.uri.pathSegments.last);
   }
 
   /// The stored entry, or null when missing, expired or broken.
@@ -319,6 +340,9 @@ class FileDriver extends CacheDriver {
       try {
         entry = jsonDecode(text) as Map<String, dynamic>;
       } on FormatException {
+        return null;
+      } on TypeError {
+        // JSON that is not a map
         return null;
       }
     } else {
@@ -372,10 +396,16 @@ class FileDriver extends CacheDriver {
     int now = _clock.nowMs();
     int? next = _nextAutoPrune;
     if (next != null && now < next) return;
+    if (next == null) {
+      // the first write only sets the time, so a short run (eg. a
+      // command) never starts a prune
+      _nextAutoPrune =
+          now + CacheConstants.fileAutoPruneFirstDelay.inMilliseconds;
+      return;
+    }
     _nextAutoPrune = now + CacheConstants.fileAutoPruneInterval.inMilliseconds;
-    // the first write only sets the time, so a short run (eg. a command)
-    // never starts a prune
-    if (next == null) return;
+    // the lock on disk decides if it runs: once per interval for all
+    // processes, also when they restart often
     _startPrune(_autoPrune());
   }
 
@@ -422,6 +452,14 @@ class FileDriver extends CacheDriver {
 
   String _pathFor(String name) {
     return '${storeDirectory.path}${Platform.pathSeparator}${_hash(name)}';
+  }
+
+  /// A name to move [file] to for a moment. See
+  /// [CacheConstants.fileMovedSuffix].
+  static File _movedFor(File file) {
+    return File(
+      '${file.path}.${CacheLock.randomOwner()}${CacheConstants.fileMovedSuffix}',
+    );
   }
 
   static File _tempFor(File file) {
@@ -514,9 +552,7 @@ class FileLock extends CacheLock {
   /// The rename is atomic, so only one caller moves the file. When the
   /// moved file does not match, it is put back.
   Future<bool> _takeAway(String? ownerToMatch) async {
-    File moved = File(
-      '${file.path}.${CacheLock.randomOwner()}${CacheConstants.fileTempSuffix}',
-    );
+    File moved = FileDriver._movedFor(file);
     try {
       await file.rename(moved.path);
     } on FileSystemException {
@@ -558,6 +594,9 @@ class FileLock extends CacheLock {
     } on FileSystemException {
       return null;
     } on FormatException {
+      return null;
+    } on TypeError {
+      // JSON that is not a map
       return null;
     }
   }
