@@ -52,4 +52,18 @@ void main() {
     calls.close();
     silent.close();
   });
+
+  test('a send that throws leaves nothing waiting and no timer', () {
+    ReceivePort server = ReceivePort();
+    PortCalls calls = PortCalls(const Duration(seconds: 5));
+    // a ReceivePort can not be sent through a port
+    expect(
+      () => calls.send(server.sendPort, <Object?>[ReceivePort()]),
+      throwsA(anything),
+    );
+    expect(calls.waiting, 0);
+    expect(calls.timerRuns, isFalse);
+    calls.close();
+    server.close();
+  });
 }

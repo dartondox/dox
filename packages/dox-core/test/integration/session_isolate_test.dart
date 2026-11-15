@@ -76,7 +76,7 @@ void main() {
     ]);
     Route.get('/get', <dynamic>[
       const SessionMiddleware(),
-      (DoxRequest req) => '${req.session.get('name')}',
+      (DoxRequest req) => '${Dox().isolateId}:${req.session.get('name')}',
     ]);
     await Dox().startServer();
   });
@@ -91,9 +91,16 @@ void main() {
     (int, String, Cookie?) put = await _get(port, '/put', null);
     expect(put.$1, 200, reason: put.$2);
     Cookie cookie = put.$3!;
-    for (int i = 0; i < 24; i++) {
+    Set<String> served = <String>{};
+    for (int i = 0; i < 40; i++) {
       (int, String, Cookie?) got = await _get(port, '/get', cookie);
-      expect(got.$2, 'ann', reason: 'request $i');
+      expect(got.$2.split(':').last, 'ann', reason: 'request $i');
+      served.add(got.$2.split(':').first);
+    }
+    // Linux spreads new connections over the isolates (SO_REUSEPORT).
+    // macOS sends them all to one isolate, so the check is for Linux only.
+    if (Platform.isLinux) {
+      expect(served.length, greaterThan(1), reason: 'served by $served');
     }
   });
 

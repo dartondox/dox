@@ -42,6 +42,8 @@ Then set `CACHE_STORE=redis` in `.env`. With no config at all, Dox has a `file` 
 
 Dox runs many isolates, and each isolate has its own `memory` cache. So use `redis` or `database` when all isolates and servers must see the same data.
 
+Sessions on a `memory` store are the exception. They live in the main isolate, so every isolate sees them. See [Session](../the-basic/session.md).
+
 ### Store options
 
 | Driver | Options |

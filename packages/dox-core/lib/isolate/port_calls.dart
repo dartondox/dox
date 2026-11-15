@@ -34,7 +34,13 @@ class PortCalls {
     // ponytail: a request can fail up to timeout / 5 late, fine for a
     // safety net that is not on the normal path
     _timer ??= Timer.periodic(timeout ~/ 5, _check);
-    to.send(<Object?>[replies.sendPort, id, ...message]);
+    try {
+      to.send(<Object?>[replies.sendPort, id, ...message]);
+    } catch (_) {
+      _waiting.remove(id);
+      if (_waiting.isEmpty) _stopTimer();
+      rethrow;
+    }
     return call.done.future;
   }
 
