@@ -2,10 +2,14 @@ name: Release
 
 # Push a tag like v<version> to publish all packages to pub.dev.
 # Run it by hand (workflow_dispatch) to do a dry run only. Nothing is published then.
-# On a tag, the Test workflow runs first and must pass, or nothing is
-# published. On a tag, lint and the unit tests use pub.dev only (see
-# ci/use-siblings.sh). The examples and template jobs still use the
-# sibling clones on main (see test.yaml).
+# On a tag, the Test workflow must pass, or nothing is published. If it
+# already passed on main for the tagged commit (ci-passed), the tag skips
+# it. Else it runs on the tag: lint and the unit tests then use pub.dev
+# only (see ci/use-siblings.sh). The examples and template jobs still use
+# the sibling clones on main (see test.yaml).
+# pub-check always runs on a tag: main CI used the sibling clones, so it
+# resolves and analyzes the package in a copy outside the workspace, with
+# every dependency from pub.dev.
 
 on:
   push:
@@ -72,17 +76,95 @@ jobs:
       - name: Dry run publish
         run: ci/publish-dry-run.sh
 
-  # Read access only. The tests run a lot of other code, so they must not
-  # get the pub.dev token.
-  test:
+  # passed=true when the Test workflow passed on main for this same
+  # commit AND its unit and lint jobs really ran and succeeded. Main CI
+  # runs only the jobs for the changed packages, so a green run alone does
+  # not prove this package was tested. Any API error, skipped job or
+  # unclear answer gives false, so the tests run.
+  # Also, the last commit must touch the tagged package. Main CI diffs
+  # against the push `before` commit, which is HEAD~1 or older. So it
+  # tested at least everything that HEAD~1..HEAD changed. Without this
+  # check, a green push for package B could let a tag for a red package A
+  # skip the tests. A version bump always changes packages/<folder>/pubspec.yaml, so we
+  # require that file. A docs-only change (*.md) does not run the tests.
+  # No parent commit or anything unclear gives false.
+  ci-passed:
     if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      passed: ${{ steps.check.outputs.passed }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          passed=false
+          # The folder of the tagged package (same script as the other jobs).
+          folder=$(ci/publish-order.sh | head -n1 | cut -d: -f1) || folder=""
+          touched=false
+          if [ -n "$folder" ] && git rev-parse -q --verify HEAD~1 >/dev/null \
+            && git diff --name-only HEAD~1 HEAD | grep -qx "packages/$folder/pubspec.yaml"; then
+            touched=true
+          fi
+          ids=""
+          [ "$touched" = true ] && ids=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/test.yaml/runs?event=push&branch=main&status=success&head_sha=$GITHUB_SHA" \
+            --jq '.workflow_runs[] | select(.conclusion == "success" and .head_sha == env.GITHUB_SHA) | .id') || ids=""
+          for id in $ids; do
+            # The jobs of the latest attempt. Both `lint` and `unit` must exist and be green.
+            ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id/jobs?filter=latest" --paginate \
+              --jq '.jobs[] | select(.name == "lint" or .name == "unit") | "\(.name) \(.conclusion)"' \
+              | sort -u | tr '\n' ',') || ok=""
+            if [ "$ok" = "lint success,unit success," ]; then passed=true; break; fi
+          done
+          echo "passed=$passed" | tee -a "$GITHUB_OUTPUT"
+
+  # Read access only. The tests run a lot of other code, so they must not
+  # get the pub.dev token. Runs only when the tests did not pass on main.
+  # `!cancelled()`: run even if ci-passed itself failed.
+  test:
+    needs: ci-passed
+    if: >-
+      ${{ !cancelled() && github.event_name == 'push' && github.ref_type == 'tag'
+      && needs.ci-passed.outputs.passed != 'true' }}
     uses: ./.github/workflows/test.yaml
     permissions:
       contents: read
 
-  publish:
+  # Short check against pub.dev, on every tag. Read access only, like the
+  # tests. The package is checked in a copy outside the workspace, so its
+  # siblings come from pub.dev, not from local folders (ci/pub-check.sh).
+  pub-check:
     if: github.event_name == 'push' && github.ref_type == 'tag'
-    needs: [check-version, test]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The tagged package only. Sets PACKAGES for the next steps.
+      - name: Package to release
+        run: ci/publish-order.sh
+      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+        with:
+          sdk: stable
+      - name: Resolve and analyze against pub.dev
+        run: ci/pub-check.sh
+
+  # A skipped test job is fine only when the tests passed on main. A failed
+  # or cancelled test job stops the release.
+  publish:
+    needs: [check-version, ci-passed, test, pub-check]
+    if: >-
+      ${{ !cancelled() && github.event_name == 'push' && github.ref_type == 'tag'
+      && needs.check-version.result == 'success'
+      && needs.pub-check.result == 'success'
+      && (needs.test.result == 'success'
+      || (needs.test.result == 'skipped' && needs.ci-passed.outputs.passed == 'true')) }}
     runs-on: ubuntu-latest
     environment: pub.dev
     permissions:
@@ -101,7 +183,7 @@ jobs:
       # the local siblings, so this needs no wait for pub.dev. The uploads
       # then skip this check (--skip-validation), see ci/publish.sh.
       - name: Resolve the workspace
-        run: dart pub get
+        run: ci/pub-get-retry.sh
       - name: Check the package (dry run)
         run: ci/publish-dry-run.sh
       # Stops when a sibling this package needs is not on pub.dev yet.
