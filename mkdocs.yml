@@ -169,6 +169,7 @@ nav:
     - digging-deeper/deployment.md
     - digging-deeper/native-server.md
     - digging-deeper/performance.md
+    - digging-deeper/performance-mistakes.md
     - digging-deeper/testing.md
     - digging-deeper/health-check.md
   - Database:

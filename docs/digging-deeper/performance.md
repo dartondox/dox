@@ -13,6 +13,8 @@ Dox is fast by default, so most apps only need to follow a few rules in producti
 3. Keep the default isolates, one per CPU core.
 4. Keep the body limits on. Uploads stream to disk.
 
+For the code mistakes that slow an app down, see [Performance mistakes](performance-mistakes.md).
+
 ## Bodies, uploads and big responses
 
 Big requests and responses can fill the memory of your server. Dox protects you from this by default, so you only need to keep these settings:
