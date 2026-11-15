@@ -64,18 +64,20 @@ class SecurityHeaders implements IDoxMiddleware {
   /// header.
   final Map<String, String?> extra;
 
+  /// the names are lower case: the server makes them lower case anyway,
+  /// and a name that is already lower case needs no new string.
   @override
   IDoxRequest handle(IDoxRequest req) {
     HttpHeaders headers = req.httpRequest.response.headers;
-    _set(headers, 'X-Content-Type-Options', contentTypeOptions);
-    _set(headers, 'X-Frame-Options', frameOptions);
-    _set(headers, 'Referrer-Policy', referrerPolicy);
-    _set(headers, 'Permissions-Policy', permissionsPolicy);
-    _set(headers, 'Cross-Origin-Opener-Policy', crossOriginOpenerPolicy);
-    _set(headers, 'Content-Security-Policy', contentSecurityPolicy);
-    _set(headers, 'X-XSS-Protection', xssProtection);
+    _set(headers, 'x-content-type-options', contentTypeOptions);
+    _set(headers, 'x-frame-options', frameOptions);
+    _set(headers, 'referrer-policy', referrerPolicy);
+    _set(headers, 'permissions-policy', permissionsPolicy);
+    _set(headers, 'cross-origin-opener-policy', crossOriginOpenerPolicy);
+    _set(headers, 'content-security-policy', contentSecurityPolicy);
+    _set(headers, 'x-xss-protection', xssProtection);
     if (req is DoxRequest && req.isSecure()) {
-      _set(headers, 'Strict-Transport-Security', strictTransportSecurity);
+      _set(headers, 'strict-transport-security', strictTransportSecurity);
     }
     for (MapEntry<String, String?> header in extra.entries) {
       _set(headers, header.key, header.value);

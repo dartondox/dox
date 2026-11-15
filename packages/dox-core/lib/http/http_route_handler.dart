@@ -299,7 +299,10 @@ RouteMatch? _getMatchRoute(String inputRoute, String method, String? domain) {
     }
 
     /// when route have params
-    /// eg. /api/admin/{adminId}
+    /// eg. /api/admin/{adminId}. a url without the plain text before the
+    /// first param can not match, so the regex is skipped.
+    String? prefix = route.matchPrefix;
+    if (prefix != null && !inputRoute.startsWith(prefix)) continue;
     RegExpMatch? match = pattern.firstMatch(inputRoute);
     if (match != null) {
       Map<String, dynamic>? params = _decodeParams(route, match);

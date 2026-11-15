@@ -58,13 +58,40 @@ class RequestBody {
 }
 
 class HttpBody {
+  /// header text => its parsed type. Most apps get a few types again and
+  /// again, so each one is parsed once.
+  static final Map<String, ContentType> _types = <String, ContentType>{};
+
+  /// the most texts kept. When full, the map starts again.
+  static const int _maxTypes = 64;
+
+  /// The `Content-Type` of a request on the native server. A header text
+  /// seen before gives the same parsed object (a [ContentType] can not
+  /// change), so it is not parsed again. Other headers use their own
+  /// `contentType`.
+  static ContentType? contentTypeOf(HttpHeaders headers) {
+    if (headers is! NativeHeaders) return headers.contentType;
+    String? text = headers.value(HttpHeaders.contentTypeHeader);
+    if (text == null) return null;
+    ContentType? type = _types[text];
+    if (type != null) return type;
+    type = ContentType.parse(text);
+
+    /// a multipart boundary is new on each request. Not worth keeping.
+    if (!text.contains('boundary')) {
+      if (_types.length >= _maxTypes) _types.clear();
+      _types[text] = type;
+    }
+    return type;
+  }
+
   /// [contentType] is the `Content-Type` of [request] when the caller
   /// already read it. Else it is read here.
   static Future<RequestBody> read(
     HttpRequest request, [
     ContentType? contentType,
   ]) async {
-    contentType ??= request.headers.contentType;
+    contentType ??= contentTypeOf(request.headers);
     if (contentType == null) return RequestBody.empty();
 
     RequestBody? now = readNow(request, contentType);

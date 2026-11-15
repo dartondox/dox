@@ -54,7 +54,7 @@ void runRoute(HttpRequest req, RouteMatch match) {
     /// no Content-Type means no body to read. a body the native server
     /// already holds is read at once too. then the request is made with
     /// no Future in between. read the header once and pass it on.
-    ContentType? contentType = req.headers.contentType;
+    ContentType? contentType = HttpBody.contentTypeOf(req.headers);
     RequestBody? now = contentType == null
         ? RequestBody.empty()
         : HttpBody.readNow(req, contentType);
@@ -85,7 +85,7 @@ void runRoute(HttpRequest req, RouteMatch match) {
 /// `_method` field (see `MethodOverride`). the route is found before
 /// middleware runs, so the middleware can not do it.
 void _withMethodOverride(HttpRequest req) {
-  ContentType? contentType = req.headers.contentType;
+  ContentType? contentType = HttpBody.contentTypeOf(req.headers);
   RequestBody? now = contentType == null
       ? RequestBody.empty()
       : HttpBody.readNow(req, contentType);
@@ -211,7 +211,7 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
     route,
     null,
     RequestBody.empty(),
-    req.headers.contentType,
+    HttpBody.contentTypeOf(req.headers),
   );
   List<IDoxTerminableMiddleware> ends = route.terminable;
   Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
