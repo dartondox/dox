@@ -8,7 +8,8 @@ name: Release
 # only (see ci/use-siblings.sh). The examples and template jobs still use
 # the sibling clones on main (see test.yaml).
 # pub-check always runs on a tag: main CI used the sibling clones, so it
-# checks the package against what is really on pub.dev.
+# resolves and analyzes the package in a copy outside the workspace, with
+# every dependency from pub.dev.
 
 on:
   push:
@@ -76,7 +77,10 @@ jobs:
         run: ci/publish-dry-run.sh
 
   # passed=true when the Test workflow passed on main for this same
-  # commit. Any API error or unclear answer gives false, so the tests run.
+  # commit AND its unit and lint jobs really ran and succeeded. Main CI
+  # runs only the jobs for the changed packages, so a green run alone does
+  # not prove this package was tested. Any API error, skipped job or
+  # unclear answer gives false, so the tests run.
   ci-passed:
     if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
@@ -89,9 +93,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          n=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/test.yaml/runs?event=push&branch=main&status=success&head_sha=$GITHUB_SHA" \
-            --jq '[.workflow_runs[] | select(.conclusion == "success" and .head_sha == env.GITHUB_SHA)] | length') || n=0
-          if [ "$n" -gt 0 ] 2>/dev/null; then passed=true; else passed=false; fi
+          passed=false
+          ids=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/test.yaml/runs?event=push&branch=main&status=success&head_sha=$GITHUB_SHA" \
+            --jq '.workflow_runs[] | select(.conclusion == "success" and .head_sha == env.GITHUB_SHA) | .id') || ids=""
+          for id in $ids; do
+            # The jobs of the latest attempt. Both `lint` and `unit` must exist and be green.
+            ok=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$id/jobs?filter=latest" --paginate \
+              --jq '.jobs[] | select(.name == "lint" or .name == "unit") | "\(.name) \(.conclusion)"' \
+              | sort -u | tr '\n' ',') || ok=""
+            if [ "$ok" = "lint success,unit success," ]; then passed=true; break; fi
+          done
           echo "passed=$passed" | tee -a "$GITHUB_OUTPUT"
 
   # Read access only. The tests run a lot of other code, so they must not
@@ -106,8 +117,9 @@ jobs:
     permissions:
       contents: read
 
-  # Short check against pub.dev only, on every tag. Read access only, like
-  # the tests. The root `dart pub get` takes no sibling clones on a tag.
+  # Short check against pub.dev, on every tag. Read access only, like the
+  # tests. The package is checked in a copy outside the workspace, so its
+  # siblings come from pub.dev, not from local folders (ci/pub-check.sh).
   pub-check:
     if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
@@ -121,9 +133,8 @@ jobs:
       - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
-      - run: ci/pub-get-retry.sh
-      - name: Analyze the package
-        run: for entry in $PACKAGES; do dart analyze --no-fatal-warnings "packages/${entry%%:*}"; done
+      - name: Resolve and analyze against pub.dev
+        run: ci/pub-check.sh
 
   # A skipped test job is fine only when the tests passed on main. A failed
   # or cancelled test job stops the release.

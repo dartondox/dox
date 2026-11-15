@@ -95,9 +95,9 @@ git push origin dox_builder-vx.y.z
 
 The tag starts `.github/workflows/publish.yaml` (the "Release" workflow).
 It checks that the tag matches the version in `packages/<folder>/pubspec.yaml`.
-Then it runs the tests, unless they already passed on `main` for the same commit.
-It always runs a short check against pub.dev only (`dart pub get` and `dart analyze`), because `main` CI tests against the sibling clones.
-When pub.dev does not show a just-published version yet, `dart pub get` tries again every 20 seconds, for up to 5 minutes (`ci/pub-get-retry.sh`).
+Then it runs the tests, unless the `unit` and `lint` jobs of the Test workflow both ran and passed on `main` for the same commit (a docs-only push after a red code push does not count).
+It always runs a short check (`ci/pub-check.sh`): it copies the tagged package to a temp folder outside the workspace and runs `dart pub get` and `dart analyze` there. Every dependency comes from pub.dev, because `main` CI tests against the sibling clones.
+On a tag, when pub.dev does not show a just-published version yet, `dart pub get` tries again every 20 seconds, for up to 5 minutes (`ci/pub-get-retry.sh`).
 Then it checks that every sibling it needs is on pub.dev (`ci/check-siblings.sh`; if not: "release <dep> first"). Then it checks the package with `dart pub publish --dry-run`
 (in the workspace, so it needs no wait for pub.dev).
 Then it uploads that one package, with `--skip-validation`.
