@@ -41,8 +41,8 @@ class ExceptionHandler {
   /// [requestId] when there is one.
   void report(Object error, StackTrace stackTrace) {
     String? id = _requestId;
-    Logger.warn(id == null ? error : '[request $id] $error');
-    Logger.danger(stackTrace.toString());
+    Logger.warn(id == null ? error : '[request $id] $error', null, 'error');
+    Logger.danger(stackTrace.toString(), null, 'error');
   }
 
   /// [report] for an error of [req], with [requestId] set while it runs.

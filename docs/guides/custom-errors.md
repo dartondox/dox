@@ -198,7 +198,7 @@ Route.get('/boom', (DoxRequest req) => throw StateError('boom'));
 After `GET /api/boom`, the server prints one line:
 
 ```json
-{"timestamp":"2026-10-22T14:01:12.000Z","status":"error","message":"Bad state: boom","error":{"stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ..."}}
+{"timestamp":"2026-10-22T14:01:12.000Z","status":"error","message":"Bad state: boom","error":{"stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ..."},"source":"error"}
 ```
 
 Remove the `/boom` route when you are done.

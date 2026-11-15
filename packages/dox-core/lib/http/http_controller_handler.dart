@@ -93,7 +93,7 @@ void warnNullMiddleware(Object middleware, RouteData route) {
       : '${middleware.runtimeType}';
   // stderr, not Logger: the logger is off by default
   stderr.writeln(
-    'dox: warning: $name on ${route.method} ${route.path} returned null, '
+    '[request] $name on ${route.method} ${route.path} returned null, '
     'so the request ended with an empty 200 and the controller did not '
     'run. Return the request (return req) to go on, or return a response.',
   );

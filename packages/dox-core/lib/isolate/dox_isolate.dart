@@ -112,7 +112,7 @@ class DoxIsolate {
 
     errorPort.listen((dynamic message) {
       List<dynamic> error = message as List<dynamic>;
-      stderr.writeln('[dox] isolate $isolateId error: ${error.first}');
+      stderr.writeln('[server] isolate $isolateId error: ${error.first}');
       stderr.writeln(error.last);
     });
 
@@ -124,7 +124,7 @@ class DoxIsolate {
       _sendPorts.remove(isolateId);
       IsolateBus.instance.drop(isolateId);
       if (_stopped) return;
-      stderr.writeln('[dox] isolate $isolateId exited, restarting');
+      stderr.writeln('[server] isolate $isolateId exited, restarting');
       await Future<void>.delayed(restartDelay);
       if (!_stopped) await _spawn(isolateId);
     });

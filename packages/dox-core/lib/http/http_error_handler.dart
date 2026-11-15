@@ -15,7 +15,11 @@ void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
     try {
       Dox().config.exceptionHandler.report(sendError, sendStack);
     } catch (_) {
-      Logger.danger('Sending the error failed: $sendError\n$sendStack');
+      Logger.danger(
+        'Sending the error failed: $sendError\n$sendStack',
+        null,
+        'error',
+      );
     }
     _plainError(req.response);
   }
@@ -59,7 +63,11 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
   } catch (handlerError, handlerStack) {
     /// a broken handler must not leave the client waiting.
     /// send the default answer for the first error.
-    Logger.danger('ExceptionHandler failed: $handlerError\n$handlerStack');
+    Logger.danger(
+      'ExceptionHandler failed: $handlerError\n$handlerStack',
+      null,
+      'error',
+    );
   }
   if (identical(payload, error)) payload = _htmlPage(req, error, stackTrace);
   return payload;
@@ -83,7 +91,11 @@ Object _htmlPage(HttpRequest req, Object error, StackTrace stackTrace) {
     return page;
   } catch (pageError, pageStack) {
     /// a repeated header or a broken renderer: send the JSON answer
-    Logger.danger('The error page failed: $pageError\n$pageStack');
+    Logger.danger(
+      'The error page failed: $pageError\n$pageStack',
+      null,
+      'error',
+    );
     return error;
   }
 }

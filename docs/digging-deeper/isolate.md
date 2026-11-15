@@ -90,7 +90,7 @@ Dox keeps your app running when code fails:
 
 - An error in a request is caught. Dox sends a `500` and keeps going.
 - An async error outside a request (for example a future that nobody awaits) is passed to the `report` method of the [exception handler](../the-basic/errors.md). The isolate keeps running.
-- If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` to stderr and starts a new isolate after 1 second.
+- If a worker isolate still dies, Dox prints `[server] isolate N exited, restarting` to stderr and starts a new isolate after 1 second.
 
 If the first (main) isolate dies, the process exits with a non-zero code. So let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
 

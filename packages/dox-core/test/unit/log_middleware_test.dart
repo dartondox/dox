@@ -89,7 +89,7 @@ void main() {
       LogMiddleware().handle(FakeRequest());
       LogBuffer.flush();
       String line = lines.single;
-      expect(line, startsWith('\x1B[36mGET /a/b => {'));
+      expect(line, startsWith('\x1B[2m[request]\x1B[0m \x1B[36mGET /a/b => {'));
       expect(line, contains('[REDACTED]'));
       expect(line, isNot(contains('hunter2')));
       expect(line, isNot(contains('"status"')));
