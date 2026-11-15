@@ -33,7 +33,8 @@ class Logger {
   /// Logger.info('done', null, 'billing');
   /// ```
   static void log(String level, dynamic message, [dynamic data, String? tag]) {
-    tag ??= 'app';
+    // an empty tag would print `[]`
+    if (tag == null || tag.isEmpty) tag = 'app';
     // `INFO` from a filter ranks as `info`
     level = level.toLowerCase();
     LoggerConfig config = Dox().config.logger;
@@ -144,7 +145,6 @@ class Logger {
     Map<String, dynamic> text = <String, dynamic>{
       'timestamp': DateTime.now().toIso8601String(),
       'status': level,
-      'source': tag,
       'message': message.toString(),
       if (config.name.isNotEmpty)
         'logger': <String, dynamic>{'name': config.name},
@@ -160,6 +160,8 @@ class Logger {
     } else if (data != null) {
       text['payload'] = data;
     }
+    // added last: a `source` from the data wins, and no old field moves
+    text.putIfAbsent('source', () => tag);
     return JSON.stringify(text);
   }
 }

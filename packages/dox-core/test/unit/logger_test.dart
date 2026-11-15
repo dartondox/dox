@@ -128,11 +128,25 @@ void main() {
 
     test('json mode puts the tag in source', () {
       config();
-      Logger.info('a', <String, dynamic>{'source': 'fake'}, 'queue');
+      Logger.info('a', null, 'queue');
       Logger.info('b');
       LogBuffer.flush();
       expect(jsonDecode(lines[0])['source'], 'queue');
       expect(jsonDecode(lines[1])['source'], 'app');
+    });
+
+    test('a source key in the data wins over the tag', () {
+      config();
+      Logger.info('a', <String, dynamic>{'source': 'mine'}, 'queue');
+      LogBuffer.flush();
+      expect(jsonDecode(lines.single)['source'], 'mine');
+    });
+
+    test('an empty tag acts like no tag', () {
+      config(pretty: true);
+      Logger.info('a', null, '');
+      LogBuffer.flush();
+      expect(lines.single, startsWith('\x1B[2m[app]\x1B[0m '));
     });
 
     test('info waits in the buffer until flush', () {

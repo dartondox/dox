@@ -147,7 +147,7 @@ Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"timestamp":"...","status":"info","source":"server","message":"Server started at http://[::]:3000 with 1 isolate (native)","logger":{"name":"dox"}}
+{"timestamp":"...","status":"info","message":"Server started at http://[::]:3000 with 1 isolate (native)","logger":{"name":"dox"},"source":"server"}
 ```
 
 ## HTTPS and the client IP
