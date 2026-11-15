@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 /// encodes json straight to utf8 bytes, without building a String first.
-/// 8 KB chunks: most bodies fit in one, so there is no join.
+/// Each call makes a new buffer of this size, even for a small body.
+/// An 8 KB buffer made a 30 byte body 2x slower to encode than 1 KB.
+/// A big body (17 KB) is only about 1% slower with 1 KB chunks.
 final JsonUtf8Encoder _jsonUtf8Encoder = JsonUtf8Encoder(
   null,
   advanceEncode,
-  8192,
+  1024,
 );
 
 /// decodes utf8 bytes straight into json, without a middle String.

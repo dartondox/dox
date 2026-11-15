@@ -1,3 +1,7 @@
+## Unreleased
+
+- Perf: a JSON response made a new 8 KB buffer, even for a small body. This made small JSON bodies about 2x slower to encode. The buffer is 1 KB now. Big bodies are about the same speed.
+
 ## 3.2.1
 
 - Fix: `Env.get` read as the first env read of the app saw only the shell, because nothing had loaded `.env` yet. Now every env read (`Env.get`, `Env.appEnv`, `Env().env`) loads `.env` once when it is not loaded. After that it is a plain map read, also when there is no `.env` file. Setting `Env().env` in a test counts as loaded, so the file is not put on top. When the `.env` file can not be read (like bad UTF-8), every read throws again; it never looks like an empty file.
