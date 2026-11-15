@@ -326,6 +326,9 @@ AppConfig appConfig = AppConfig(
     LogMiddleware(enabled: env.appEnv != 'production'),
   ],
   container: registerContainer,
+
+  /// Only in development. Warns when a handler blocks the isolate.
+  strict: StrictConfig(enabled: env.appEnv == 'development'),
   cache: cache,
   cors: cors,
   logger: logger,
@@ -372,6 +375,9 @@ bool _debug = appConfig.isDevelopment;
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   connection: env.dbConnection,
+
+  /// Only in development. Warns about N+1 relation loads and big results.
+  strict: OrmStrict(enabled: appConfig.isDevelopment),
   connections: <String, ConnectionConfig>{
     'postgres': ConnectionConfig(
       driver: Driver.postgres,

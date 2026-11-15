@@ -36,6 +36,9 @@ AppConfig appConfig = AppConfig(
   /// log unexpected errors (custom errors guide)
   exceptionHandler: const AppExceptionHandler(),
 
+  /// development only: warns about blocked isolates and sync hashing
+  strict: StrictConfig(enabled: env.appEnv == 'development'),
+
   cache: cache,
   cors: cors,
 

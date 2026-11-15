@@ -49,6 +49,13 @@ AppConfig appConfig = AppConfig(
   /// DTOs (generated list in lib/generated/dtos.g.dart)
   dtos: dtos,
 
+  /// Strict mode
+  /// -------------------------------
+  /// Only in development. It warns in the log when a handler blocks the
+  /// isolate, or when sync `Hash.make` / `Hash.verify` runs in the web server.
+  /// Fix the warning. Do not turn strict mode off.
+  strict: StrictConfig(enabled: env.appEnv == 'development'),
+
   /// Cache stores (config/cache.dart)
   cache: cache,
 
