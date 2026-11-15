@@ -296,11 +296,27 @@ Then add a store to `lib/config/cache.dart`:
 
 Cache calls inside an app transaction on the same connection join that transaction, so their writes roll back with it. If you do not want this, give the store its own `connection`: a second connection with the same database settings.
 
-An expired row reads as a miss, but it stays in the table. So call `prune()` from time to time, for example in a schedule:
+An expired row reads as a miss, but it stays in the table, so the table keeps growing. To delete expired rows, set `prune_interval` on the store. It is in seconds. A write then starts a delete of expired rows in the background, at most once per that time. A read never starts it, and no call waits for it. Each server counts its own time. It is off by default:
+
+```dart
+'database': <String, dynamic>{'driver': 'database', 'prune_interval': 3600},
+```
+
+On a very big table the first delete can be slow. On MySQL and MariaDB it can make writes wait for a short time.
+
+You can also call `prune()` yourself from time to time, for example in a schedule:
 
 ```dart
 int deleted = await (store.driver as DatabaseCacheDriver).prune();
 ```
+
+A new `cache` table has an index on `expires_at`, so a prune reads only the expired rows. A table you made earlier does not have it. Add it with a migration:
+
+```dart
+await schema.table('cache', (Table t) => t.index('expires_at'));
+```
+
+An `increment` that goes past the 64-bit integer limit throws an error. The stored value does not change.
 
 ## Pruning the file store
 
