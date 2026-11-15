@@ -128,7 +128,7 @@ Map<String, dynamic> settings = await Cache().remember(
 );
 ```
 
-With the `redis` or `file` store, all isolates share the same values.
+With the `redis` or `database` store, all isolates and servers share the same values.
 
 ## Forgetting await
 
