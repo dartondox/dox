@@ -4,12 +4,13 @@ icon: lucide/replace
 
 # Attribute casts
 
-A cast changes a column value between the database and Dart.
+A cast changes a column value between the database and Dart, for example to read JSON text as a map or to save an enum by its name.
 
-For example, it reads JSON text as a map, or saves an enum by its name.
-Casts work the same on Postgres, MySQL, MariaDB and SQLite.
+Casts work the same on Postgres, MySQL, MariaDB and SQLite. A cast runs when a row is read (`get()`, `find()` and others), when the model is saved, and in `toJson()`.
 
-Set a cast with `cast` on `@Column()`. Then run `dart run build_runner build`.
+## Defining casts
+
+Set a cast with `cast` on `@Column()`, then run `dart run build_runner build`:
 
 ```dart
 enum Status { draft, live }
@@ -35,8 +36,13 @@ class Item extends ItemGenerator {
 }
 ```
 
-The cast runs when a row is read (`get()`, `find()` and others),
-when the model is saved, and in `toJson()`.
+A `bool` field gets `BoolCast()` and an enum field gets `EnumCast(values)` by itself, so you do not need `cast` for them. `DateTime` fields need no cast either.
+
+A cast does not change a `where()` value, so use the database value there:
+
+```dart
+where('status', Status.live.name)
+```
 
 ## Built-in casts
 
@@ -48,22 +54,9 @@ when the model is saved, and in `toJson()`.
 | `EnumCast<E>(E.values)` | an enum | text with the enum name |
 | `EnumCast<E>(E.values, byIndex: true)` | an enum | a number, the enum index |
 
-You do not need `cast` for two field types:
+## Custom casts
 
-- A `bool` field gets `BoolCast()`.
-- An enum field gets `EnumCast(values)`, so it is saved by its name.
-
-`DateTime` fields need no cast either. Dox reads them on every database.
-
-!!! info
-    A cast changes the values of a model. It does not change a `where()` value.
-    Use the database value there, like `where('status', Status.live.name)`.
-
-## Your own cast
-
-Extend `Cast<T>`. `get()` gets the database value and returns the Dart value.
-`set()` gets the Dart value and returns the value to save.
-The class needs a const constructor.
+If no built-in cast fits, write your own. Extend `Cast<T>`: `get()` gets the database value and returns the Dart value, and `set()` gets the Dart value and returns the value to save. The class needs a const constructor:
 
 ```dart
 class Money {
@@ -88,8 +81,8 @@ class Product extends ProductGenerator {
 }
 ```
 
-A cast can take const arguments, like `EnumCast` does.
-The generator copies the `cast` code into the generated file,
-so the names in it must be imported in the model file.
+A cast can take const arguments, like `EnumCast` does. The generator copies the `cast` code into the generated file, so the names in it must be imported in the model file.
 
-A column with `beforeGet` does not use its cast.
+## Details
+
+- A column with `beforeGet` does not use its cast.

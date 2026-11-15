@@ -6,14 +6,15 @@ icon: lucide/book-open-text
 
 Make a list route that takes `page` and `per_page` from the query string and returns one page of rows.
 
+A table can have many thousands of rows. You do not want to send them all in one response, because it is slow for the server and for the client. So the client asks for one page at a time.
+
 ## What you need
 
 - A Dox app (`dox create my_app`). A new app has a database (SQLite), a `User` model and a `users` table.
 
 ## 1. Write the query DTO
 
-A DTO with `source: Source.query` reads the query string, also for `POST`.
-The query key of `perPage` is `per_page`, because keys are snake_case by default.
+The [DTO](../the-basic/dto.md) reads `page` and `per_page` and checks them. Because it has `source: Source.query`, it reads the query string, not the body. The field `perPage` reads the key `per_page`, because keys are snake_case by default.
 
 ```dart title="lib/app/dtos/list_users/list_users.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -35,12 +36,11 @@ class ListUsers {
 }
 ```
 
-Both fields have a default, so both are optional. `@Range(1, 100)` stops a client from asking for 10000 rows.
+Both fields have a default, so the client can leave them out. `@Range(1, 100)` stops a client from asking for 10000 rows at once.
 
 ## 2. Write the controller
 
-`paginate()` runs one `count` query and one `select` query. It returns a `Pagination`.
-A controller can return it as it is. Dox sends `toJson()`.
+`paginate()` runs one `count` query and one `select` query, and returns a `Pagination`. The controller can return it as it is, because Dox sends its `toJson()`.
 
 ```dart title="lib/app/http/controllers/user.controller.dart"
 import 'package:dox_core/dox_core.dart';
@@ -59,9 +59,9 @@ class UserController {
 }
 ```
 
-Always add an `orderBy`. Without it, the database may return the rows in a different order on each page.
+You should always add an `orderBy`. Without it, the database may return the rows in a different order on each page, so a row can show up twice or not at all.
 
-Add a `where` before `paginate` to filter: `User().where('role', 'admin').orderBy('id').paginate(...)`.
+If you want to filter the rows, add a `where` before `paginate`: `User().where('role', 'admin').orderBy('id').paginate(...)`.
 
 ## 3. Add the route
 
@@ -71,8 +71,7 @@ Route.get('/users', (UserController c) => c.index);
 
 ## 4. Register the DTOs
 
-Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`.
-Add it once. Skip this step when your `app.dart` already has `dtos: dtos`.
+Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`. You add it only once, so skip this step if your `app.dart` already has `dtos: dtos`.
 
 ```dart title="lib/config/app.dart"
 import 'package:my_app/generated/dtos.g.dart';
@@ -92,7 +91,7 @@ dox serve
 
 ## Check it
 
-With 3 users in the table:
+Ask for page 2, with 2 rows per page. With 3 users in the table, you get the last user:
 
 ```bash
 curl 'http://localhost:3000/api/users?page=2&per_page=2'
@@ -110,6 +109,8 @@ curl 'http://localhost:3000/api/users?page=2&per_page=2'
 }
 ```
 
+The keys of the answer are:
+
 | Key | Meaning |
 | --- | --- |
 | `total` | rows that match the query, on all pages |
@@ -118,7 +119,7 @@ curl 'http://localhost:3000/api/users?page=2&per_page=2'
 | `current_page` | the page you asked for |
 | `data` | the rows of this page, from `toJson()` of the model |
 
-A page after the last one gives an empty `data` list.
+If you ask for a page after the last one, `data` is an empty list.
 
 Bad input gets `422` before the controller runs:
 
@@ -132,9 +133,7 @@ curl 'http://localhost:3000/api/users?page=0&per_page=500'
 
 ## Change the shape of a row
 
-Return a serializer for each row, when the model has fields you do not want to send.
-`dox make:serializer User` makes `lib/app/serializers/user.serializer.dart`.
-`page.data` gives the typed rows (`List<User>`):
+Sometimes the model has fields you do not want to send. Then use a serializer for the rows. `dox make:serializer User` makes `lib/app/serializers/user.serializer.dart`. `page.data` gives the typed rows (`List<User>`), so you can pass them to the serializer:
 
 ```dart
 Future<Map<String, dynamic>> index(ListUsers query) async {
@@ -150,6 +149,6 @@ Future<Map<String, dynamic>> index(ListUsers query) async {
 
 ## See also
 
-- [Query builder: paginate](../database/query-builder.md#paginate)
-- [Validation: where the data comes from](../the-basic/validation.md#where-the-data-comes-from)
+- [Query builder: paginate](../database/query-builder.md#paginating-results)
+- [DTOs: body and query string](../the-basic/dto.md#body-and-query-string)
 - [Serializer](../the-basic/serializer.md)

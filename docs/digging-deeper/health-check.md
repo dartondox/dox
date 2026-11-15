@@ -6,9 +6,11 @@ icon: lucide/heart-pulse
 
 A health route tells a load balancer, Docker or Kubernetes if the app can serve requests.
 
-## Add the route
+The load balancer calls the route every few seconds. If the answer is not `200`, it stops sending traffic to this server, or it restarts it.
 
-Add it in `register()` of a router:
+## Adding the route
+
+Add `Route.health` in `register()` of a router:
 
 ```dart title="lib/routes/web.dart"
 @override
@@ -24,9 +26,11 @@ void register() {
 {"status": "ok"}
 ```
 
-## Check the database and the cache
+The route gets the middleware of its router and the global middleware. So put `Route.health` in a router with no auth middleware, or the health check gets `401`.
 
-Give named checks. Each check is a function. Put the `Route.health` call in `register()`, as above:
+## Checking the database and the cache
+
+The app may run, but its database may be down. To check this, give named checks. Each check is a function:
 
 ```dart title="lib/routes/web.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -52,25 +56,13 @@ When one check fails, the answer is `503 Service Unavailable`:
 {"status": "fail", "checks": {"database": "fail", "cache": "ok"}}
 ```
 
-A check fails when it:
+A check fails when it throws an error, returns `false`, or takes longer than the timeout. The checks run at the same time.
 
-- throws an error,
-- returns `false`,
-- or takes longer than `timeout` (default 5 seconds).
+`HealthCheck.cache()` writes a key to the default cache store and reads it back. `HealthCheck.cache('redis')` checks the store with that name. Any other check is your own function, like a call to another API.
 
-The checks run at the same time.
+## Changing the timeout
 
-- `HealthCheck.cache()` writes a key to the default cache store and reads it back. `HealthCheck.cache('redis')` checks the store with that name.
-- Any other check is your own function, like a call to another API.
-
-## Error details
-
-The error of a failed check is passed to `exceptionHandler.report()`, so you see it in your logs.
-
-The answer has the error text (in `errors`) only when `APP_ENV` is `development` or `local`.
-In other envs the text is left out, because it can show hosts or user names.
-
-## Change the timeout
+A check fails after 5 seconds by default. Use `timeout` to change it:
 
 ```dart
 Route.health(
@@ -82,9 +74,11 @@ Route.health(
 );
 ```
 
-!!! tip
-    A route in a router gets the middleware of that router and the global middleware.
-    Put `Route.health` in a router with no auth middleware, or the health check gets `401`.
+## Seeing why a check failed
+
+The error of a failed check goes to `exceptionHandler.report()`, so you see it in your logs.
+
+The answer has the error text (in `errors`) only when `APP_ENV` is `development` or `local`. In other envs the text is left out, because it can show hosts or user names.
 
 ## See also
 

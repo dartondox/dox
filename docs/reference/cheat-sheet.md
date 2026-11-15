@@ -4,7 +4,7 @@ icon: lucide/notebook-pen
 
 # Cheat sheet
 
-One page to keep open while you work.
+This page shows the code you use every day, on one page you can keep open while you work.
 
 Each section links to its full page.
 
@@ -136,9 +136,7 @@ Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
 Routers and `DoxProvider` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
 See [Dependency injection](../the-basic/dependency-injection.md).
 
-Middleware order: `globalMiddleware`, router `middleware`, group, route.
-
-See [Routing](../the-basic/routing.md), [Controller](../the-basic/controller.md), [Middleware](../the-basic/middleware.md).
+See [Routing](../the-basic/routing.md) and [Controller](../the-basic/controller.md).
 
 ## Middleware
 
@@ -164,6 +162,8 @@ class ApiKeyMiddleware implements IDoxMiddleware {
 | `const ServerTiming()` | `Server-Timing` header; `ServerTiming.add('db', d)` adds a time. Development or trusted clients only |
 | `const ValidateSignature()` | `403` unless the url is from `Route.signedUrl(...)` |
 | `implements IDoxTerminableMiddleware` | `terminate(req, res)` runs after the answer is sent |
+
+Middleware runs in this order: `globalMiddleware`, router `middleware`, group, route.
 
 See [Middleware](../the-basic/middleware.md) and [Signed URLs](../security/signed-urls.md).
 
@@ -279,7 +279,7 @@ Then `dox build_runner:build`, and `dtos: dtos` in `AppConfig`.
 
 Cross field check: add `void validate(DtoErrors errors)` to the DTO. PATCH "missing or null": `Maybe<T>` with `const Maybe.missing()`.
 
-See [Validation](../the-basic/validation.md) and [Validation rules](../the-basic/validation-rules.md).
+See [DTOs](../the-basic/dto.md), [Validation](../the-basic/validation.md) and [Validation rules](../the-basic/validation-rules.md).
 
 ## Model
 
@@ -497,9 +497,7 @@ dynamic a = JSON.parse(text);          // from a String
 dynamic b = JSON.parse(res.bodyBytes); // from bytes, from an HTTP client
 ```
 
-`stringify` gives a String and `bytes` gives UTF-8 bytes. Use bytes for sockets, files, queues and HTTP client bodies, and never return `JSON.bytes` from a controller.
-
-`parse` takes a String or bytes. Prefer `res.bodyBytes` over `res.body`.
+Use `bytes` for sockets, files, queues and HTTP client bodies. Do not return `JSON.bytes` from a controller. `parse` takes a String or bytes, so you can pass `res.bodyBytes` straight in.
 
 ## Env
 
@@ -518,7 +516,7 @@ final AppEnv env = AppEnv.load();
 
 A new project has this class in `lib/config/env.dart`. Use `env.appPort` in code. After you add a getter, run `dart run build_runner build`.
 
-`Env.get<int>('APP_PORT', 3000)` is the low-level way. It reads a key by name. A real env var wins over `.env`. In `.env`, a `#` after a space starts a comment.
+`Env.get<int>('APP_PORT', 3000)` reads one key by name, without the class. A real env var wins over `.env`.
 
 See [Environment variables](../digging-deeper/env.md) and [Env reference](env.md).
 
@@ -581,7 +579,7 @@ class ChatNamespace extends NamespaceHandler {
 
 Log users in at connect time with `SocketAuth(findUser).handle` in `middleware`. The user is in `socket.user`.
 
-Turn it on with a `SocketIoProvider` (extend it in `lib/`). With many isolates, clients use `transports: ['websocket']`. Broadcasts reach every isolate with no Redis; many servers need the Redis adapter.
+Turn it on with a `SocketIoProvider` (extend it in `lib/`). With many isolates, clients must use `transports: ['websocket']`. Broadcasts reach every isolate without Redis, but many servers need the Redis adapter.
 
 See [Socket.IO](../packages/socketio.md).
 
@@ -594,7 +592,7 @@ OpenApiConfig openApi = OpenApiConfig(
 );
 ```
 
-Docs at `/docs`, `/openapi.json`, `/openapi.yaml`. On only when `APP_ENV` is `development` or `local`, unless `enabled` is set. Not set means production. `@Security.bearer(format: 'API key')` above a middleware class shows its login scheme. Change one route with `@Summary`, `@Tags`, `@Request(T)`, `@Response(200, T)`, `@ApiIgnore()`.
+The docs are at `/docs`, `/openapi.json` and `/openapi.yaml`. They are on only in `development` or `local`, unless you set `enabled`. `@Security.bearer(format: 'API key')` above a middleware class shows its login scheme. Change one route with `@Summary`, `@Tags`, `@Request(T)`, `@Response(200, T)` or `@ApiIgnore()`.
 
 See [OpenAPI](../packages/openapi.md).
 

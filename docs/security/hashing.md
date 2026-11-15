@@ -4,100 +4,78 @@ icon: lucide/fingerprint
 
 # Hashing
 
-This page shows how to hash passwords with `Hash` and check them later.
+`Hash` turns a password into a bcrypt hash that you can store, and checks a password against it later.
 
-A hash is one-way. You can not turn it back into the password.
-`Hash` uses bcrypt with a new random salt each time. It is in `package:dox_core/dox_core.dart`.
+A hash is one-way: you can not turn it back into the password. `Hash` uses bcrypt with a new random salt each time. It is in `package:dox_core/dox_core.dart`.
 
-## Hash a password
+You do not need `Hash` for a normal login, because `Auth().attempt()` from `dox_auth` checks the password for you. See [Authentication](authentication.md).
 
-Hash the password before you save it.
+## Hashing passwords
+
+Hash the password before you save it:
 
 ```dart
 user.password = await Hash.makeAsync(body.password);
 await user.save();
 ```
 
-`makeAsync` runs bcrypt in another isolate. See [Without blocking the server](#without-blocking-the-server).
+`makeAsync` runs bcrypt in another isolate, so it does not block the server. The result looks like `$2a$10$...`. It holds the salt, so you only store this one string.
 
-The result looks like `$2a$10$...`. It holds the salt, so you only store this one string.
-The same password gives a different hash each time.
+Never send the hash to the client. Put the column in the `hidden` list of the model.
 
-## Check a password
+## Verifying passwords
+
+Use `verifyAsync` to check a password against a hash. It gives `true` when they match:
+
+```dart
+bool ok = await Hash.verifyAsync('secret', user.password!);
+```
+
+It gives `false` when the password does not match, or when the hash is not a valid bcrypt hash, like an empty string.
+
+`Hash.make` and `Hash.verify` do the same, but they block the request isolate while bcrypt runs. Use them only outside request handlers. `Hash.check` is the same as `Hash.verify`:
 
 ```dart
 bool ok = Hash.verify('secret', user.password!);
 ```
 
-`Hash.verify(password, hashedPassword)` returns `true` when the password matches. `Hash.check` does the same.
-It returns `false` when the password does not match, or when `hashedPassword` is not a valid bcrypt hash (for example an empty string).
+## Changing the cost
 
-## Without blocking the server
-
-`Hash.make` and `Hash.verify` block the request isolate while bcrypt runs.
-In a request handler, use the async versions. They run bcrypt in another isolate.
-
-```dart
-user.password = await Hash.makeAsync(body.password);
-bool ok = await Hash.verifyAsync('secret', user.password!);
-```
-
-## Cost
-
-`Hash.rounds` is the bcrypt cost for new hashes. The default is `10`. Each step up doubles the time.
-The cost must be from 4 to 31. Do not go below 10.
+`Hash.rounds` is the bcrypt cost for new hashes. The default is `10`, and each step up doubles the time. The cost must be from 4 to 31. Do not go below 10:
 
 ```dart
 Hash.rounds = 12;
 String hash = Hash.make('secret', rounds: 12); // or per call
 ```
 
-Old hashes keep their own cost, so they still verify.
-If you change it, also set `hashRounds` on `JwtAuthDriver` or `SessionAuthDriver` to the same value.
-Then a login with an unknown email takes as long as a wrong password. See [Authentication](authentication.md).
+Old hashes keep their own cost, so they still verify. If you change the cost, also set `hashRounds` on your auth driver to the same value. See [Authentication](authentication.md#password-hash-cost).
 
 ## Long passwords
 
-bcrypt reads at most 72 bytes.
-`Hash.make` and `Hash.makeAsync` throw an `ArgumentError` when the password is longer than 72 bytes (UTF-8).
-The error text does not hold the password, so it is safe in logs.
-`Hash.verify` returns `false` for such a password.
+bcrypt reads at most 72 bytes. So `Hash.make` and `Hash.makeAsync` throw an `ArgumentError` for a longer password, and `Hash.verify` gives `false`. Limit the length in your DTO, like `@Length(min: 8, max: 72)`.
 
-So limit the length in your DTO, like `@Length(min: 8, max: 72)`.
-`@Length` counts characters, and a letter outside ASCII can use up to 4 bytes.
-So a password with such letters can still be too long. Catch the error and answer `422`, or use a smaller `max`.
+`@Length` counts characters, but a letter outside ASCII can use up to 4 bytes. So such a password can still be too long. Catch the error and answer `422`, or use a smaller `max`.
 
-## Compare secrets
+## Comparing secrets
 
-To check an API key or a token, use `Hash.equals(given, expected)`, not `==`.
-`==` stops at the first wrong character, so the time can tell how much of the key was right.
-`Hash.equals` takes the same time for every value of the same length.
+To check an API key or a token, use `Hash.equals(given, expected)`, not `==`. `==` stops at the first wrong character, so the time can tell how much of the key was right. `Hash.equals` takes the same time for every value of the same length:
 
 ```dart
 bool ok = Hash.equals(req.header('X-Api-Key') ?? '', Env.get<String>('API_KEY'));
 ```
 
-## Store tokens
+## Storing tokens
 
-For a long random secret that you keep in the database (an API key, an access token), store only `Hash.sha256(token)`.
-Find the row by the hash of what the client sends.
-SHA-256 is fast and gives the same hash for the same input, so a unique index works on it.
+For a long random secret that you keep in the database, like an API key, store only `Hash.sha256(token)`. Then find the row by the hash of what the client sends. SHA-256 gives the same hash for the same input, so a unique index works on it:
 
 ```dart
 String stored = Hash.sha256(token);          // save this, never the token
 Token? row = await Token().where('hash', Hash.sha256(given)).getFirst();
 ```
 
-Never use `Hash.sha256` for passwords. A password is short and can be guessed, so use `Hash.make` (bcrypt).
+Never use `Hash.sha256` for passwords. A password is short and can be guessed, so use bcrypt.
 
-## With login
+## Details
 
-You do not need `Hash.verify` for normal login.
-`Auth().attempt()` from `dox_auth` finds the user and checks the password with bcrypt.
-See [Authentication](authentication.md).
-
-## Things to know
-
-- Never store or encrypt a plain password. Hash it.
-- Never send the hash to the client. Put the column in the model `hidden` list.
+- The error text of a too long password does not hold the password, so it is safe in logs.
 - bcrypt is slow on purpose, so guessing is slow too. Do not hash in a loop on hot paths.

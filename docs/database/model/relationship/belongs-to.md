@@ -6,14 +6,11 @@ icon: lucide/corner-left-up
 
 Use `BelongsTo` when this table keeps the foreign key to another table.
 
-For example, a comment belongs to a user.
-The comment table has the column `user_id`.
+For example, a comment belongs to a user, so the comment table has the column `user_id`. `BelongsTo` is the other side of [HasOne](has-one.md) and [HasMany](has-many.md).
 
-`BelongsTo` is the other side of [HasOne](has-one.md) and [HasMany](has-many.md).
+## Defining the relation
 
-## Define it
-
-Add a field with `@BelongsTo(...)` to the model. The field type is the related model, nullable.
+Add a field with `@BelongsTo(...)` to the model. The field type is the related model, and it is nullable:
 
 ```dart title="lib/app/models/comment/comment.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -35,6 +32,8 @@ class Comment extends CommentGenerator {
 }
 ```
 
+The related model needs nothing special:
+
 ```dart title="lib/app/models/user/user.model.dart"
 import 'package:dox_orm/dox_orm.dart';
 
@@ -52,14 +51,22 @@ class User extends UserGenerator {
 
 Run `dart run build_runner build` after you add a relationship.
 
-## Load it
+### Custom keys
 
-The relation is not loaded by default. Load it in one of these ways.
-Use the field name (`'user'`) as the relation name.
+By default the foreign key is the class name of the related model in snake_case and `_id`, so `User` gives `user_id`. This is also true when the table is `users`. It is not taken from the field name, so a field named `author` still uses `user_id`. In that case, set `foreignKey`:
 
-### `preload`
+```dart
+@BelongsTo(User, foreignKey: 'author_id', localKey: 'id')
+User? author;
+```
 
-Use it when you load the models with a query.
+## Loading the relation
+
+The relation is not loaded by default. Use the field name (`'user'`) as the relation name.
+
+### Preloading
+
+Use `preload` when you load the models with a query. It runs one query for all comments, not one query per comment:
 
 ```dart
 List<Comment> comments = await Comment().preload('user').all();
@@ -68,12 +75,11 @@ for (Comment comment in comments) {
 }
 ```
 
-`preload` works with `find`, `get`, `all` and `getFirst`.
-It runs one query for all comments, not one query per comment.
+`preload` works with `find`, `get`, `all` and `getFirst`. Each user is read once, also when it has many comments. Comments of the same user get the same `User` object.
 
-### `$getRelation`
+### Loading on a model you have
 
-Use it when you already have the model.
+If you already have the model, use `$getRelation`. Do not call it in a loop over many models, because it runs one query each time. Use `preload` for a list:
 
 ```dart
 Comment? comment = await Comment().find(1);
@@ -81,11 +87,9 @@ await comment?.$getRelation('user');
 print(comment?.user?.name);
 ```
 
-Do not call it in a loop over many models. Use `preload` for a list.
+### Querying the relation
 
-### `related`
-
-Use it when you need more conditions on the related row.
+Sometimes you need more conditions on the related row. `related` gives you a query for it. It does not set `comment.user`:
 
 ```dart
 Comment? comment = await Comment().find(1);
@@ -95,35 +99,18 @@ User? activeUser = await comment
     .getFirst();
 ```
 
-It does not set `comment.user`.
+### Always loading the relation
 
-### `eager`
-
-Use it when every query of `Comment` should load the relation.
+If every query of `Comment` should load the relation, set `eager: true`. Then you do not call `preload`:
 
 ```dart
 @BelongsTo(User, eager: true)
 User? user;
 ```
 
-You do not call `preload`.
+## Filtering by the relation
 
-The load runs this SQL:
-
-```sql
-SELECT * FROM "user"
-  WHERE "user"."id" IN (@userid_p0, ...)
-```
-
-Each user is read once, also when it has many comments.
-Comments of the same user get the same `User` object.
-
-`reload()` and a preload set the relation fields again, also when there is no related row. See [Relationships](../index.md#relationships).
-
-## Filter by it
-
-`whereHas()` keeps the comments by a user that matches.
-It does not load the users.
+`whereHas()` keeps the comments by a user that matches. It does not load the users:
 
 ```dart
 List<Comment> comments = await Comment().whereHas('user', (QueryBuilder<dynamic> q) {
@@ -133,30 +120,9 @@ List<Comment> comments = await Comment().whereHas('user', (QueryBuilder<dynamic>
 
 See [Query by relations](../relation-queries.md).
 
-## Options
+## Changing the relation query
 
-| Option | Default | What it is |
-|---|---|---|
-| `foreignKey` | `{related model}_id`, like `user_id` | The column in this table that points to the related model. |
-| `localKey` | the primary key of the related model | The column in the related table that `foreignKey` points to. |
-| `onQuery` | none | A static function that changes the query. |
-| `eager` | `false` | Load the relation on every query. |
-
-The default `foreignKey` uses the class name of the related model in snake_case.
-`User` gives `user_id`, also when the table is `users`.
-The [`belongsToKeyFromRelation` flag](../../index.md#orm-flags) takes it from the relation name (`author_id`). The model generator does not pass the relation name yet, so set `foreignKey` when it is not the class name.
-
-### `foreignKey` and `localKey`
-
-```dart
-@BelongsTo(User, foreignKey: 'author_id', localKey: 'id')
-User? author;
-```
-
-### `onQuery`
-
-`onQuery` is a static function in the same model class.
-It gets the query of the related model and returns it.
+Sometimes the relation should only load some rows. Give `onQuery` a static function in the same model class. It gets the query of the related model and returns it:
 
 ```dart
 @DoxModel()
@@ -173,8 +139,25 @@ class Comment extends CommentGenerator {
 }
 ```
 
-## In JSON
+## Details
 
-- A relation with `eager: true` is always in `toJson()`.
-- A relation loaded with `preload` is in `toJson()` of that query.
-- The JSON key is the field name in snake_case: `user`.
+### All options
+
+| Option | Default | What it is |
+|---|---|---|
+| `foreignKey` | `{related model}_id`, like `user_id` | The column in this table that points to the related model. |
+| `localKey` | the primary key of the related model | The column in the related table that `foreignKey` points to. |
+| `onQuery` | none | A static function that changes the query. |
+| `eager` | `false` | Load the relation on every query. |
+
+### Other cases
+
+- The [`belongsToKeyFromRelation` flag](../../index.md#orm-flags) takes the default foreign key from the relation name (`author_id`). The model generator does not pass the relation name yet, so set `foreignKey` when it is not the class name.
+- A relation with `eager: true` is always in `toJson()`. A relation loaded with `preload` is in `toJson()` of that query. The JSON key is the field name in snake_case: `user`.
+- `reload()` and a preload set the relation fields again, also when there is no related row. See [Relationships](../index.md#relationships).
+- The load runs one query like this:
+
+```sql
+SELECT * FROM "user"
+  WHERE "user"."id" IN (@userid_p0, ...)
+```

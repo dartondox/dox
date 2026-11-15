@@ -6,40 +6,41 @@ icon: lucide/zap
 
 `Cache()` keeps data that is slow to make, so the next request can read it fast.
 
-It runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
+Some work takes a long time, like a big database query or a call to another service. If the result does not change often, you can keep it in the cache and read it from there. The cache runs on [`dox_cache`](../packages/cache.md), which is built into `dox_core`.
 
-## Drivers
+## Configuration
 
-| Driver | Where the data is | Shared between isolates | Locks |
-| --- | --- | --- | --- |
-| `file` | files in a folder (default `storage/cache`) | yes, on the same machine | yes, on the same machine |
-| `memory` | a map inside the isolate | no | yes |
-| `redis` | a Redis server | yes, also between machines | yes |
-| `null` | nowhere. It stores nothing | - | no |
-| `database` | a table in your database, from [`dox_cache_database`](../packages/cache.md#database-store) | yes, also between machines | yes |
+A new project already has `lib/config/cache.dart`, with a `file` store and a `memory` store. `CACHE_STORE` in `.env` picks the default store. It is `file` when it is not set.
 
-!!! warning "Many isolates"
-    Dox runs one isolate per CPU core. Each isolate has its own `memory` store.
-    So a value you put in one isolate is missing in the others.
-    Use `redis` or `database` when all isolates and servers must see the same data.
+### Install
 
-## Install
+A new app already has the cache. In an older app, run `dox add cache`:
 
 ```bash
 dox add cache
 ```
 
-Add `--store=redis` (or `memory`, `database`) to pick the default store. `file` is the default.
-It writes `lib/config/cache.dart`, adds it to `lib/config/app.dart` and adds the `CACHE_STORE` key. `redis` also adds the `REDIS_*` keys.
-`database` also adds `dox_cache_database`, its provider and the cache table migration. It needs `dox add orm` first.
-It never overwrites a file, so it is safe to run twice.
-A new app already has it. To set it up by hand, follow [Config](#config).
+It writes `lib/config/cache.dart`, adds it to `lib/config/app.dart` and adds the `CACHE_STORE` key. It never overwrites a file, so it is safe to run twice.
 
-## Config
+To pick another default store, add `--store=redis` (or `memory`, `database`). `redis` also adds the `REDIS_*` keys. `database` also adds `dox_cache_database`, its provider and the cache table migration, and it needs `dox add orm` first.
 
-A new project already has `lib/config/cache.dart`, with a `file` store and a `memory` store.
-`CACHE_STORE` in `.env` picks the default store (`file` when it is not set).
-To add a store, edit the file. This example adds a `redis` store:
+### Drivers
+
+A store uses one driver. The driver decides where the data is kept:
+
+| Driver | Where the data is | Shared between isolates |
+| --- | --- | --- |
+| `file` | files in a folder (default `storage/cache`) | yes, on the same machine |
+| `memory` | a map inside the isolate | no |
+| `redis` | a Redis server | yes, also between machines |
+| `database` | a table in your database, from [`dox_cache_database`](../packages/cache.md#database-store) | yes, also between machines |
+| `null` | nowhere. It stores nothing | - |
+
+Dox runs one isolate per CPU core, and each isolate has its own `memory` store. So a value you put in one isolate is missing in the others. If all isolates and servers must see the same data, use `redis` or `database`.
+
+### Adding a Redis store
+
+To add a store, edit `lib/config/cache.dart`. This example adds a `redis` store:
 
 ```dart title="lib/config/cache.dart"
 import 'package:dox_core/dox_core.dart';
@@ -60,8 +61,7 @@ CacheConfig cache = CacheConfig(
 );
 ```
 
-Redis needs two keys that a new project does not have yet. Add them to
-`lib/config/env.dart` and run `dart run build_runner build`:
+Redis needs two env keys that a new project does not have yet. Add them to `lib/config/env.dart`, then run `dart run build_runner build`:
 
 ```dart title="lib/config/env.dart"
   String get redisHost => '127.0.0.1';
@@ -69,68 +69,38 @@ Redis needs two keys that a new project does not have yet. Add them to
   int get redisPort => 6379;
 ```
 
-`lib/config/app.dart` already passes it to `AppConfig(cache: cache)`.
-Each store is made once per isolate, the first time you use it.
+`lib/config/app.dart` already passes the config to `AppConfig(cache: cache)`. All options of each driver are in [Store options](#store-options).
 
-### Store options
+## Retrieving items
 
-| Driver | Options |
-| --- | --- |
-| `file` | `path` (default `storage/cache`), `prefix` |
-| `memory` | `max_size`: the most items. When it is full, the item that was used least recently is removed. No limit by default. Expired items are removed when read, and by a sweep after many writes (at least 1000). Also `prefix`. |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `max_value_bytes` (no limit by default), `prefix` |
-
-A `redis` store with no `prefix` gets `<app name>_cache:` from `APP_NAME`, like `my_shop_cache:`. So two apps on one Redis do not share keys. The other drivers use `dox_cache:`.
-You rarely need `pool_size`: the cache sends no blocking commands, so each isolate uses about one Redis connection.
-
-## Encrypt the cache
-
-By default the cache keeps plain JSON. Anyone who can read the cache file or the Redis database can read the values.
-To hide them, add `'encrypt': true` to a `file` or `redis` store:
+Use `get` to read a value. It gives `null` when the key is missing. The second argument is the default, which you get instead of `null`:
 
 ```dart
-'file': {'driver': 'file', 'path': 'storage/cache', 'encrypt': true},
+await Cache().get('foo');            // 'bar', or null when missing
+await Cache().get('foo', 'default'); // 'default' when missing
 ```
 
-- It is off by default. A store without the option is not changed.
-- The normal `Dox().cache` has the encrypter set for you, and values are encrypted with your `APP_KEY`. A `CacheManager` you build yourself needs `encrypter:` (for example `const CryptCacheEncrypter()`). Old keys in `previousKeys` can still read old entries.
-- When the key changes, the old entries cannot be read. They count as a miss. The cache then fills again.
-- On a `file` store, the whole file is encrypted, also the expiry time. Lock files are not encrypted. They hold no values.
-- On a `redis` store, a plain `int` stays plain text, so `increment` and `decrement` still work. Every other value is encrypted. Tag counters are `int` values, so they stay plain too. To keep a secret number encrypted, store it as a `String`.
-- A `memory` or `null` store does not encrypt. Its values never leave the process. The option still needs an encrypter, or building the store throws.
-- The option must be `true` or `false`. Any other type, like `'true'`, throws an `ArgumentError`.
-- Old plain values read as a miss after you turn the option on. The one exception is an `int` on Redis, which is plain by design and still reads as a value.
-- On a `file` store, `prune` deletes files that cannot be decrypted. After a key change with no previous keys, or in a folder that apps with different keys share, `prune` removes those files.
-- Cache keys and tag names are not encrypted. A value is not tied to its key, so someone who can write to Redis or the cache folder can copy an encrypted value to another key. Encryption protects against reading only.
-- `maxValueBytes` is checked on the plain JSON size. The stored encrypted text is about a third bigger.
+### Checking if an item exists
 
-## Values are JSON
-
-A value must be a JSON type: `Map`, `List`, `String`, `num`, `bool` or `null`.
-A `Map` comes back as `Map<String, dynamic>`. A `List` comes back as `List<dynamic>`.
-
-## Usage
+The `has` method returns `true` when the key is in the cache:
 
 ```dart
-// no duration: the value stays forever
-await Cache().put('foo', 'bar');
-await Cache().put('foo', 'bar', duration: Duration(minutes: 10));
+if (await Cache().has('foo')) {
+  // ...
+}
+```
 
-await Cache().get('foo');             // 'bar', or null when missing
-await Cache().get('foo', 'default');  // 'default' when missing
-await Cache().has('foo');             // true
-await Cache().forget('foo');          // remove one key
-await Cache().forever('settings', <String, dynamic>{'theme': 'dark'});
-await Cache().flush();                // remove all items of the store
+### Retrieving many items
 
-await Cache().putMany(<String, Object?>{'a': 1, 'b': 2}); // many at once
+The `many` method reads many keys at once. A missing key gives `null`:
+
+```dart
 await Cache().many(<String>['a', 'b', 'c']); // {a: 1, b: 2, c: null}
 ```
 
-### `remember`
+### Retrieve and store
 
-`remember` reads the value from the cache. When it is missing, the function runs and its result is stored.
-The value is stored as JSON. Return maps, lists, strings and numbers, not models.
+Often you want to read a value, and make it when it is missing. The `remember` method does this. If the key is missing, the function runs and its result is stored for the given time:
 
 ```dart
 List<dynamic> posts = await Cache().remember(
@@ -140,12 +110,16 @@ List<dynamic> posts = await Cache().remember(
 );
 ```
 
-`rememberForever(key, fn)` does the same with no expiry.
+The value is stored as JSON, so return maps, lists, strings and numbers, not models. To keep the value with no expiry, use `rememberForever(key, fn)`.
+
+`remember` has two options:
 
 - `decode:` turns the stored JSON back into your type on a hit, like `decode: (j) => (j as List).cast<String>()`. Without it, use JSON types like `List<dynamic>`.
-- `lock: true` lets only one caller on all isolates and servers run the function. The others wait for its value.
+- `lock: true` lets only one caller on all isolates and servers run the function. The others wait for its value. Use it when the function is slow and many requests could run it at once.
 
-`flexible(key, fresh, stale, fn)` serves the value as it is for `fresh`. Then, until `stale` more has passed, it still serves the old value at once and runs `fn` once in the background:
+### Serving stale values
+
+Sometimes an old value is fine for a while, but you do not want a user to wait while it is made again. The `flexible` method serves the value as it is for `fresh`. Then, until `stale` more has passed, it still serves the old value at once and runs the function once in the background:
 
 ```dart
 Map<String, dynamic> stats = await Cache().flexible(
@@ -153,9 +127,9 @@ Map<String, dynamic> stats = await Cache().flexible(
 );
 ```
 
-After `fresh` + `stale`, the value is gone and the next call waits for `fn`.
+After `fresh` + `stale`, the value is gone and the next call waits for the function.
 
-Pass `null` as `stale` to keep the value until a refresh replaces it. Use it when an old value is better than no value, like rates from a service that can be down. When `fn` fails, callers still get the last good value:
+If an old value is always better than no value, pass `null` as `stale`. Then the value stays until a refresh replaces it. This is good for data from a service that can be down: when the function fails, callers still get the last good value:
 
 ```dart
 Map<String, dynamic> rates = await Cache().flexible(
@@ -163,9 +137,17 @@ Map<String, dynamic> rates = await Cache().flexible(
 );
 ```
 
-### `getRaw`
+### Retrieve and delete
 
-`getRaw` gives the stored JSON text as it is. Send it as a response with no decode and no encode:
+The `pull` method reads a value and removes it in one step:
+
+```dart
+dynamic code = await Cache().pull('login_code');
+```
+
+### Retrieving raw JSON
+
+If you only send the cached value back as a response, you do not need to decode it and encode it again. `getRaw` gives the stored JSON text as it is:
 
 ```dart
 String? json = await Cache().getRaw('posts');
@@ -175,34 +157,94 @@ if (json != null) {
 ```
 
 A missing key gives `null`. A stored `String` comes back as JSON, with its quotes: `"bar"`.
-The `memory` driver also keeps JSON text, so `get` decodes on every hit there too.
 
-### Another store
+## Storing items
 
-`store(name)` uses a store from the config instead of the default store:
+Use `put` to store a value. Pass a `duration` to make it expire. With no duration, the value stays forever:
+
+```dart
+await Cache().put('foo', 'bar', duration: Duration(minutes: 10));
+
+await Cache().put('foo', 'bar');
+```
+
+A value must be a JSON type: `Map`, `List`, `String`, `num`, `bool` or `null`. A `Map` comes back as `Map<String, dynamic>`, and a `List` comes back as `List<dynamic>`.
+
+### Storing an item forever
+
+The `forever` method stores a value with no expiry:
+
+```dart
+await Cache().forever('settings', <String, dynamic>{'theme': 'dark'});
+```
+
+### Storing if not present
+
+The `add` method stores a value only when the key is missing. It returns `true` when the value was stored:
+
+```dart
+bool stored = await Cache().add('foo', 'bar', duration: Duration(minutes: 10));
+```
+
+### Storing many items
+
+The `putMany` method stores many values at once:
+
+```dart
+await Cache().putMany(<String, Object?>{'a': 1, 'b': 2});
+```
+
+### Incrementing and decrementing
+
+The `increment` and `decrement` methods change an integer. A missing key starts at 0:
+
+```dart
+await Cache().increment('visits');
+await Cache().decrement('stock', 5);
+```
+
+### Changing the expiry
+
+The `touch` method gives a key a new expiry. It returns `false` when the key is missing:
+
+```dart
+await Cache().touch('foo', duration: Duration(hours: 1));
+```
+
+## Removing items
+
+The `forget` method removes one key. The `flush` method removes all items of the store:
+
+```dart
+await Cache().forget('foo');
+
+await Cache().flush();
+```
+
+## Using another store
+
+By default, `Cache()` uses the default store. If you want another store from the config, use `store`:
 
 ```dart
 await Cache().store('redis').put('foo', 'bar');
-await Cache().store('memory').get('foo');
 ```
 
-`store()` changes the `Cache` it is called on. The flag `cacheCopies` makes `store()` and `tags()` give a new `Cache`. See [Core flags](../reference/app-config.md#core-flags).
+`store()` changes the `Cache` it is called on. The flag `cacheCopies` makes `store()` and `tags()` give a new `Cache` instead. See [Core flags](../reference/app-config.md#core-flags).
 
-### Tags
+## Cache tags
 
-Put items under a tag. Then you can remove only the items of that tag:
+Tags let you group items, so you can remove only the items of one group. Put items under a tag with `tag`, then call `flush` on the tag:
 
 ```dart
 await Cache().tag('users').put('u1', 'Ann');
 await Cache().tag('users').flush(); // removes only the items of this tag
 ```
 
-`tags(['a', 'b'])` uses many tags.
+To use many tags, call `tags(['a', 'b'])`.
 
-### Locks
+## Atomic locks
 
-A lock makes sure only one request (or one server) runs some code at a time.
-The `memory`, `file` and `redis` stores support locks. The `memory` lock works inside one isolate only. The `file` lock works for all isolates on one machine. Use `redis` when many servers must share the lock.
+Sometimes only one request (or one server) may run some code at a time, like building a report. A lock does this. The `memory`, `file`, `redis` and `database` stores support locks:
 
 ```dart
 CacheLock lock = Cache().store('redis').lock('report', Duration(seconds: 30));
@@ -215,25 +257,69 @@ if (await lock.get()) {
 }
 ```
 
-- `get()` tries once. It is `true` when you got the lock.
-- `block(Duration(seconds: 5))` tries again and again until the time is over.
-  It gives `false` when the time is over. With the flag `CacheFlags(lockThrows: true)` it throws `LockTimeoutException`. See [CacheConfig](../reference/app-config.md#cacheconfig).
-- The lock is freed after its `ttl`, even if you never call `release()`.
-- `block(timeout, callback)` runs the callback while it holds the lock, then frees it.
-- `forceRelease()` frees the lock, whoever holds it.
+`get()` tries once. It is `true` when you got the lock. The lock is freed after its time (`30` seconds here), even if you never call `release()`.
 
-### More methods
+The `memory` lock works inside one isolate only, and the `file` lock works for all isolates on one machine. If many servers must share the lock, use `redis` or `database`.
 
-| Method | What it does |
-| --- | --- |
-| `add(key, value, duration:)` | store only when the key is missing. `true` when it was stored |
-| `pull(key)` | get the value and remove it, in one step |
-| `increment(key, [by])` / `decrement(key, [by])` | change an integer. A missing key starts at 0 |
-| `touch(key, duration:)` | give a key a new expiry. `false` when it is missing |
-| `repository` | the `dox_cache` `CacheStore`, for everything else |
+### Waiting for a lock
 
-See [dox_cache](../packages/cache.md) for custom drivers.
+`block` tries again and again until the time is over. It gives `false` when the time is over:
 
-## Tests
+```dart
+if (await lock.block(Duration(seconds: 5))) {
+  // ...
+}
+```
+
+If you pass a callback, `block` runs it while it holds the lock, then frees the lock. It returns the result of the callback, and throws a `LockTimeoutException` when it could not get the lock in time:
+
+```dart
+await lock.block(Duration(seconds: 5), buildReport);
+```
+
+With the flag `CacheFlags(lockThrows: true)`, `block` with no callback throws a `LockTimeoutException` instead of giving `false`. See [CacheConfig](../reference/app-config.md#cacheconfig).
+
+To free a lock, whoever holds it, use `forceRelease()`.
+
+## Encrypting the cache
+
+By default the cache keeps plain JSON. So anyone who can read the cache files or the Redis database can read the values. To hide them, add `'encrypt': true` to a `file` or `redis` store:
+
+```dart
+'file': {'driver': 'file', 'path': 'storage/cache', 'encrypt': true},
+```
+
+The values are encrypted with your `APP_KEY`. When the key changes, old entries count as a miss and the cache fills again. Old keys in `previousKeys` can still read old entries.
+
+Encryption only stops people from reading values. Cache keys and tag names are not encrypted. On Redis, a plain `int` stays plain text, so `increment` still works. To keep a secret number encrypted, store it as a `String`.
+
+## Testing
 
 To use a memory store in tests, see [Testing](testing.md#test-the-cache).
+
+## Details
+
+### Store options
+
+| Driver | Options |
+| --- | --- |
+| `file` | `path` (default `storage/cache`), `prefix`, `encrypt` |
+| `memory` | `max_size`: the most items. When it is full, the item used least recently is removed. No limit by default. Also `prefix`. |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `max_value_bytes` (no limit by default), `prefix`, `encrypt` |
+
+- A `redis` store with no `prefix` gets `<app name>_cache:` from `APP_NAME`, like `my_shop_cache:`. So two apps on one Redis do not share keys. The other drivers use `dox_cache:`.
+- You rarely need `pool_size`. The cache sends no blocking commands, so each isolate uses about one Redis connection.
+- Each store is made once per isolate, the first time you use it.
+- The `memory` driver removes expired items when they are read, and in a sweep after many writes (at least 1000). It also keeps JSON text, so `get` decodes on every hit.
+- `repository` gives the `dox_cache` `CacheStore`. See [dox_cache](../packages/cache.md) for custom drivers.
+
+### Encryption
+
+- `encrypt` must be `true` or `false`. Any other type, like `'true'`, throws an `ArgumentError`.
+- A `CacheManager` you build yourself needs `encrypter:`, for example `const CryptCacheEncrypter()`. The normal `Dox().cache` has it set for you.
+- A `memory` or `null` store does not encrypt, because its values never leave the process. The option still needs an encrypter, or building the store throws.
+- On a `file` store, the whole file is encrypted, also the expiry time. Lock files are not encrypted, because they hold no values. `prune` deletes files that can not be decrypted.
+- Tag counters are `int` values, so on Redis they stay plain too.
+- Old plain values read as a miss after you turn the option on. Only an `int` on Redis still reads as a value.
+- A value is not tied to its key. So someone who can write to Redis or the cache folder can copy an encrypted value to another key.
+- `max_value_bytes` is checked on the plain JSON size. The encrypted text is about a third bigger.

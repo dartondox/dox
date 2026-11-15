@@ -4,13 +4,14 @@ icon: lucide/package
 
 # Step 7: Build and deploy
 
-This step compiles the app to one native binary, runs it, and shows the `Dockerfile` of the project.
+In this step you compile the app to one native binary, run it, and run it in Docker.
 
 !!! warning "Never run production with `dox s` or `dart run`"
-    They use the JIT compiler. It needs about 25 times more memory and starts slower.
-    Build a native (AOT) binary for production.
+    They use the JIT compiler, which needs about 25 times more memory and starts slower. Build a native (AOT) binary for production.
 
 ## 1. Build the binary
+
+Build the app:
 
 ```bash
 dox build
@@ -23,7 +24,7 @@ Generated: /.../blog/build/bundle/bin/server
 [Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server
 ```
 
-`dox build` runs the code generator, then `dart build cli`. The result is in `build/bundle`:
+`dox build` runs the code generator, then `dart build cli`. You get a `build/bundle` folder with everything the app needs:
 
 | Path | What it is |
 | --- | --- |
@@ -36,8 +37,7 @@ Generated: /.../blog/build/bundle/bin/server
 
 ## 2. Run the binary
 
-The binary reads `.env` from the folder you start it in. Copy yours there.
-The `db` folder for the SQLite file is already in `build/bundle`.
+The binary reads `.env` from the folder you start it in, so copy yours there first. The `db` folder for the SQLite file is already in `build/bundle`.
 
 ```bash
 cd build/bundle
@@ -55,13 +55,13 @@ Migrated: 2026_10_22_205345_create_posts_table
 ... "message":"Server started at http://[::]:3000 with 8 isolate (native)" ...
 ```
 
-The migrations run again, because `db/dox.sqlite` is a new file in `build/bundle`.
-The migration list is compiled into the binary, so no source code is needed.
-On a server you can skip `.env` and set real environment variables. They win over `.env`.
+The migrations run again, because `db/dox.sqlite` is a new file in `build/bundle`. The migration list is compiled into the binary, so you do not need the source code.
+
+On a server you can skip `.env` and set real environment variables instead. They win over `.env`.
 
 ## Check it
 
-In a second terminal:
+Call the binary from a second terminal:
 
 ```bash
 curl http://localhost:3000/api/ping
@@ -77,7 +77,7 @@ The list is empty, because this is a new database file. Stop the server with `Ct
 
 ## 3. Docker
 
-The project has a `Dockerfile`. It builds the same bundle and copies it to an empty (`scratch`) image:
+If you deploy with Docker, the project already has a `Dockerfile`. It builds the same bundle and copies it into an empty (`scratch`) image:
 
 ```dockerfile title="Dockerfile"
 FROM dart:stable AS build
@@ -124,8 +124,7 @@ EXPOSE 3000
 CMD ["/app/bin/server"]
 ```
 
-Build and run it. The image has no `.env` file, so pass the config as environment variables.
-`APP_KEY` must be exactly 32 characters. The app does not start with a shorter or longer key.
+Build and run the image. The image has no `.env` file, so pass the config as environment variables. `APP_KEY` must be exactly 32 characters, or the app does not start.
 
 ```bash
 docker build -t blog .
@@ -137,9 +136,7 @@ docker run -p 3000:3000 \
 ```
 
 !!! note "SQLite in Docker"
-    The database file lives inside the container. It is lost when the container is removed.
-    Mount a volume for it: `-v blog-data:/app/storage`.
-    For a busy app, use Postgres or MySQL. See [Database](../database/index.md).
+    The database file lives inside the container, so it is lost when the container is removed. Mount a volume for it: `-v blog-data:/app/storage`. For a busy app, use Postgres or MySQL. See [Database](../database/index.md).
 
 ## Where to go next
 

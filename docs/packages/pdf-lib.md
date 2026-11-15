@@ -16,7 +16,7 @@ The package is standalone. It does not need Dox, and Dox does not need it. To fi
 dart pub add dox_pdf_lib
 ```
 
-## Send a PDF from a controller
+## Sending a PDF from a controller
 
 A controller can return a `DownloadableFile`. Dox streams the bytes and sets `Content-Type` and `Content-Disposition`. The browser saves the file. See [Response](../the-basic/response.md).
 
@@ -52,7 +52,7 @@ class ReportController {
 Route.get('/report.pdf', (ReportController c) => c.show);
 ```
 
-## Fonts
+## Using other fonts
 
 The 14 standard PDF fonts, like Helvetica, are built in. They only have Latin letters. For other languages, embed your own TrueType or OpenType font. Use `subset: true` to put only the letters you use into the file.
 
@@ -99,7 +99,7 @@ for (ConformanceIssue issue in doc.checkConformance(PDFStandard.pdfA2b)) {
 
 `dox_pdf_lib` uses `dart:ffi` and a small native library. It runs in Dart programs on macOS, Linux and Windows.
 
-They do not run on the web, iOS or Android.
+It does not run on the web, iOS or Android.
 
 A ready-built native library is downloaded for you, so you do not need Rust.
 

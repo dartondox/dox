@@ -6,28 +6,22 @@ icon: lucide/scale
 
 This page compares Dox with four other ways to build a backend in Dart: Dart Frog, Serverpod, Shelf (with `shelf_router`) and Alfred.
 
-It lists facts only.
-Each project is good at different things.
+Each project is good at different things, so this page lists facts only and helps you pick the one that fits your app.
 
 !!! note "Facts can change"
-    The facts about the other projects come from their own docs, READMEs and pub.dev pages, read on 2026-10-22.
-    Projects change. Check their docs before you decide.
-    Where this page is not sure, the table says "see their docs".
+    The facts about the other projects come from their own docs, READMEs and pub.dev pages. Projects change, so check their docs before you decide. Where a fact is not clear, the table says "see their docs".
 
 ## What each one is for
 
 - **Dox** is a full backend framework, in the style of Laravel. It has routes, controllers, typed DTOs, an ORM, migrations, auth, cache, storage and a CLI.
-- **Dart Frog** is a small backend framework. It is built on Shelf. Routes come from the files in the `routes/` folder.
-  It describes itself as "a fast, minimalistic backend framework for Dart".
-- **Serverpod** is a full-stack framework for Flutter. You write endpoint methods on the server. Serverpod generates a typed Dart client for the Flutter app.
-  It has an ORM, auth, streaming and a hosted service (Serverpod Cloud).
-- **Shelf** is the request and middleware model from the Dart team. It is a library, not a framework.
-  `shelf_router` adds a router. You pick every other part yourself.
+- **Dart Frog** is a small backend framework built on Shelf. Routes come from the files in the `routes/` folder. It describes itself as "a fast, minimalistic backend framework for Dart".
+- **Serverpod** is a full-stack framework for Flutter. You write endpoint methods on the server, and Serverpod generates a typed Dart client for the Flutter app. It has an ORM, auth, streaming and a hosted service (Serverpod Cloud).
+- **Shelf** is the request and middleware model from the Dart team. It is a library, not a framework. `shelf_router` adds a router, and you pick every other part yourself.
 - **Alfred** is a small server in the style of Express.js. Routes, middleware, WebSocket and static files are built in.
 
 ## Feature table
 
-"Not built in" means the project does not ship it. You can still add a package for it.
+"Not built in" means the project does not ship it, but you can still add a package for it.
 
 | Feature | Dox | Dart Frog | Serverpod | Shelf + shelf_router | Alfred |
 | --- | --- | --- | --- | --- | --- |
@@ -48,7 +42,7 @@ Each project is good at different things.
 | First release and maturity | New (2026) | First on pub.dev in 2022, 1.0 about three years ago | First on pub.dev in 2021, now 4.x | First on pub.dev in 2014, 1.0 in 2021 | First on pub.dev in 2021, 1.x |
 | Maintenance (on 2026-10-22) | Active | Active. Moved to the `dart-frog-dev` group in 2025. Last `dart_frog` release: 1.2.6 (November 2025). | Active. Release 4.0.4 in October 2026. | Active. Published by `tools.dart.dev` (the Dart team). | Last release 1.1.3, about 17 months ago. Unverified uploader. |
 
-Sources (checked on 2026-10-22):
+Sources:
 
 - Dart Frog: [dart-frog.dev](https://dart-frog.dev), [github.com/dart-frog-dev/dart_frog](https://github.com/dart-frog-dev/dart_frog) (docs in `docs/src/content/docs`, the roadmap and "The Future of Dart Frog"), [pub.dev/packages/dart_frog](https://pub.dev/packages/dart_frog)
 - Serverpod: [docs.serverpod.dev](https://docs.serverpod.dev), [github.com/serverpod/serverpod](https://github.com/serverpod/serverpod), [github.com/serverpod/serverpod_docs](https://github.com/serverpod/serverpod_docs) (scalability, streaming, shared packages, database connection), [pub.dev/packages/serverpod](https://pub.dev/packages/serverpod)
@@ -57,8 +51,7 @@ Sources (checked on 2026-10-22):
 
 ## Speed
 
-This page does not compare speed. Dox's own numbers (hello world and a `/db` read) are on [Performance](../digging-deeper/performance.md).
-To compare, run the same test on your own machine, with each server on the same number of cores.
+This page does not compare speed. Dox's own numbers (hello world and a `/db` read) are on [Performance](../digging-deeper/performance.md). If you want to compare, run the same test on your own machine, with each server on the same number of cores.
 
 ## When to pick Dox
 
@@ -70,9 +63,9 @@ To compare, run the same test on your own machine, with each server on the same 
 
 ## When to pick something else
 
-- **You want a framework with many years of use.** Dart Frog, Serverpod and Shelf have been out for years. Dox is new.
-- **You want a hosted service.** Serverpod has Serverpod Cloud. Dox has no hosted service. You deploy it yourself (a binary or Docker).
+- **You want a framework with many years of use.** Dart Frog, Serverpod and Shelf have been out for years, and Dox is new.
+- **You want a hosted service.** Serverpod has Serverpod Cloud. Dox has no hosted service, so you deploy it yourself (a binary or Docker).
 - **Your app is Flutter only, and you want the client made for you.** Serverpod generates a typed client for every endpoint. Dox does not generate a Dart client. It generates an OpenAPI document.
-- **You want a small tool with few parts.** Dart Frog is simpler. You add only what you need.
+- **You want a small tool with few parts.** Dart Frog is simpler, and you add only what you need.
 - **You want to build your own stack.** Shelf gives you the base parts, and the Dart team publishes it.
 - **You need features Dox does not have yet**, like events and listeners. See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet).

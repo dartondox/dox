@@ -4,13 +4,15 @@ icon: lucide/gamepad-2
 
 # Controller
 
-A controller holds the code that answers a route.
+A controller holds the code that answers a route, so your route files stay short.
 
-It can be a class method, a static method or a plain function.
+You could write all your code in route closures. But when an app grows, it is easier to group the code for one topic, like blogs, in one class. A controller can be a class method, a static method or a plain function.
 
-## Class based controller
+## Writing controllers
 
-Make one with the CLI:
+### Basic controllers
+
+Make a controller with the CLI:
 
 ```bash
 dox make:controller Blog
@@ -29,14 +31,17 @@ class BlogController {
 }
 ```
 
+Then point a route to the method:
+
 ```dart title="lib/routes/api.dart"
 Route.get('/blogs', (BlogController c) => c.index);
 ```
 
-`@Inject()` puts the controller in the container. Run `dart run build_runner build` after you add one.
-The constructor can ask for services and repositories. See [Dependency injection](dependency-injection.md).
+`@Inject()` puts the controller in the container. Run `dart run build_runner build` after you add one. The constructor can ask for services and repositories. See [Dependency injection](dependency-injection.md).
 
-### Static method
+### Static methods
+
+If a controller needs nothing from the container, a static method also works:
 
 ```dart
 class AppController {
@@ -48,7 +53,9 @@ class AppController {
 Route.get('/ping', AppController.ping);
 ```
 
-## Function based controller
+### Plain functions
+
+A plain function works too:
 
 ```dart
 String listBlog(DoxRequest req) {
@@ -58,11 +65,11 @@ String listBlog(DoxRequest req) {
 Route.get('/blogs', listBlog);
 ```
 
-## Resource controller
+## Resource controllers
 
-A resource controller has the 7 methods that `Route.resource` uses.
+Most models need the same routes: list, show, create, update and delete. A resource controller has the 7 methods that `Route.resource` uses, so one line of routes covers all of them.
 
-Make one with the CLI:
+Make one with `-r`:
 
 ```bash
 dox make:controller Blog -r
@@ -99,24 +106,25 @@ class BlogController {
 }
 ```
 
+Register it with one route:
+
 ```dart title="lib/routes/api.dart"
 Route.resource('blogs', BlogController);
 ```
 
-You can delete methods you do not need. `Route.resource` skips them.
-See [Routing: resource routes](routing.md#resource-routes).
+You can delete the methods you do not need, because `Route.resource` skips them. See [Routing: resource routes](routing.md#resource-routes).
 
-### API resource controller
+### API resource controllers
 
-An API has no form pages. `--api` makes the resource controller without `create` and `edit`:
+An API has no form pages. So `--api` makes the resource controller without `create` and `edit`:
 
 ```bash
 dox make:controller Blog --api
 ```
 
-### Resource controller for a model
+### Resource controllers for a model
 
-`--model` makes a resource controller that uses a model:
+If the controller works with one model, use `--model`. It fills the methods with model code:
 
 ```bash
 dox make:controller Blog --model=Blog
@@ -170,14 +178,15 @@ class BlogController {
 }
 ```
 
-- `show`, `edit`, `update` and `destroy` take the model. [Route model binding](dependency-injection.md#route-model-binding) loads it by the `{id}`.
-- `create()` and `update()` take only the columns in the model's `fillable` list. Add your columns there.
-- Use `--api` and `--model` together for an API controller with a model.
-- `dox make:model Blog -r` makes the model and this controller in one step.
+`show`, `edit`, `update` and `destroy` take the model. [Route model binding](dependency-injection.md#route-model-binding) loads it by the `{id}`.
+
+`create()` and `update()` take only the columns in the model's `fillable` list, so add your columns there first.
+
+You can use `--api` and `--model` together. And `dox make:model Blog -r` makes the model and this controller in one step.
 
 ## Parameters
 
-A controller asks for what it needs by **type**. Dox fills each parameter.
+A controller method asks for what it needs by **type**, and Dox fills each parameter:
 
 ```dart
 Route.put('/teams/{teamId}/users/{id}', (UserController c) => c.update);
@@ -188,6 +197,8 @@ class UserController {
 }
 ```
 
+These types work:
+
 | Parameter type | Dox gives |
 | --- | --- |
 | `DoxRequest` | the request |
@@ -197,29 +208,30 @@ class UserController {
 | a `@DoxModel` class | the model, loaded by the route param. See [route model binding](dependency-injection.md#route-model-binding). |
 | an `@Inject()` class | the instance from the [container](dependency-injection.md#handler-parameters) |
 
-Rules:
+You can put the parameters in any order. Path params are matched by position: the first path-param parameter gets the first `{...}` in the route. `DoxRequest` is not needed, so add it only when you use it.
 
-- The order of parameters is free. Path params are matched by position: the first path-param parameter gets the first `{...}` in the route.
-- `DoxRequest` is not needed. Add it only when you use it.
+There are a few rules:
+
 - At most one `@Dto` parameter.
 - Only positional parameters. Named and `[optional]` parameters are not supported.
 - A catch-all `{path*}` param is a `String`.
 - The same rules work for static methods and plain functions.
-- Dox reads the parameter types once, at start. It does not use `dart:mirrors`.
 
-**Path param types.** Dox converts the text from the URL:
+### Path param types
 
-- `int`: `"42"` is `42`. `"abc"` or `"4.5"` answers `404 Not Found`.
+Dox converts the text from the URL to the type you ask for. If the text does not fit the type, the client gets `404 Not Found`:
+
+- `int`: `"42"` is `42`. `"abc"` or `"4.5"` answers `404`.
 - `double`, `num`: `"4.5"` is `4.5`.
-- `bool`: `true` or `1` is `true`. `false` or `0` is `false`.
-- Any other text answers `404` too.
-- Path params are checked first. When one is wrong, the DTO is not checked.
+- `bool`: `true` or `1` is `true`. `false` or `0` is `false`. Any other text answers `404`.
 
-**Checked at start.** The server does not start when:
+Path params are checked first. When one is wrong, the DTO is not checked.
 
-- a parameter type is not in the list above (did you run `dart run build_runner build`?),
-- the method has more path-param parameters than the route has `{...}` params.
-
-## What to return
+## Returning a response
 
 Return a `String`, a `Map`, a model, a `File` and more. See [Response](response.md).
+
+## Details
+
+- Dox reads the parameter types once, at start. It does not use `dart:mirrors`.
+- The server does not start when a parameter type is not in the list above (did you run `dart run build_runner build`?), or when the method has more path-param parameters than the route has `{...}` params.

@@ -6,24 +6,27 @@ icon: material/package-variant-plus
 
 `dox add` adds a Dox package to your app and sets it up.
 
+Many packages need config files and `.env` keys. `dox add` writes them for you, so you do not set up each package by hand:
+
 ```bash
 dox add orm
 ```
 
 ## What it does
 
+`dox add orm` does three steps:
+
 1. Runs `dart pub add dox_orm`. `orm` is short for `dox_orm`. The full name works too.
 2. Runs `dart pub get`.
 3. Runs the setup command of the package, `dox orm:install`.
 
-The setup command writes the config files, adds the keys to `.env` and `.env.example`, and runs `build_runner` when the package needs it.
-At the end it prints what it did and the next steps.
+The setup command writes the config files, adds the keys to `.env` and `.env.example`, and runs `build_runner` when the package needs it. At the end it prints what it did and the next steps.
 
-A package with no setup command is only added. `dox add` then says so.
+A package with no setup command is only added, and `dox add` says so.
 
 ## Options
 
-Words after the name go to the setup command:
+Words after the name go to the setup command, for example to pick a driver:
 
 ```bash
 dox add orm --driver=postgres
@@ -33,10 +36,11 @@ dox add orm --driver=postgres
 
 ## Safe to run twice
 
-The setup command never overwrites a file and never changes a `.env` key that is already there.
-So you can run `dox add` again. It only adds what is missing.
+The setup command never overwrites a file and never changes a `.env` key that is already there. So you can run `dox add` again, and it only adds what is missing.
 
 ## Packages with a setup command
+
+These packages have a setup command:
 
 | Command | What it sets up |
 | --- | --- |
@@ -52,6 +56,6 @@ So you can run `dox add` again. It only adds what is missing.
 | `dox add inertia` | The server side of Inertia. It prints the Vite steps. See [Inertia](../the-basic/inertia.md). |
 | `dox add mcp` | An MCP server with a sample tool. See [MCP](../packages/mcp.md). |
 
-The first `dox add orm` can download (or build) the Postgres and MySQL drivers once, also the one you do not use. After it, `pubspec.yaml` skips the unused drivers, so later builds do not get them.
+The first `dox add orm` can download (or build) the Postgres and MySQL drivers once, also the one you do not use. After that, `pubspec.yaml` skips the unused drivers, so later builds do not get them.
 
 To add a setup command to your own package, see [Package commands](../digging-deeper/package-commands.md#ship-an-install-command).

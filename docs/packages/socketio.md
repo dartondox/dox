@@ -4,32 +4,27 @@ icon: lucide/radio-tower
 
 # Socket.IO
 
-This page shows how to set up Socket.IO in a Dox app with `dox_socketio`.
+`dox_socketio` is a Socket.IO v4 server for Dart, and it is the way to do realtime in Dox.
 
-It can also run on its own, see [Without Dox](#without-dox).
+The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package. It has acks, rooms, namespaces, binary data and long-polling.
 
-`dox_socketio` is a Socket.IO v4 server for Dart.
-The official clients connect to it with no changes: `socket.io-client` (JavaScript v4) and the Dart `socket_io_client` package.
-It has acks, rooms, namespaces, binary data and long-polling.
-Socket.IO is the way to do realtime in Dox.
+In a Dox app, Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. It can also run on its own, see [Without Dox](#without-dox).
 
 ## In a Dox app
 
-Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. You add a provider, a config, a namespace and one env key.
-
 ### Install
+
+The quick way is the CLI:
 
 ```bash
 dox add socketio
 ```
 
-Add `--broadcasting` to turn on [broadcasting](../digging-deeper/broadcasting.md).
-It adds the package, the provider, the config and the env key (steps 1 to 3 and 5 below). It never overwrites a file, so it is safe to run twice.
-Then do steps 4 and 6 yourself.
+It adds the package, the provider, the config and the env key (steps 1, 2, 3 and 5 below). It never overwrites a file, so it is safe to run twice. Then write a namespace (step 4) and connect a client (step 6). Add `--broadcasting` to also turn on [broadcasting](../digging-deeper/broadcasting.md).
 
 ### Set it up by hand
 
-Do all the steps below when you do not use `dox add socketio`.
+If you do not use `dox add socketio`, do all the steps below.
 
 ### 1. Install
 
@@ -70,7 +65,7 @@ SocketIoConfig socketIoConfig = SocketIoConfig(
 | `enabled` | `true` | serve Socket.IO at `options.path` |
 | `options` | `ServerOptions()` | see [Options](#options) |
 | `namespaces` | `[]` | `NamespaceHandler` classes to register |
-| `adapter` | `null` (in memory with one isolate, `IsolateAdapter` with many) | makes one adapter in each isolate, see [Many isolates](#many-isolates) |
+| `adapter` | `null` | makes one adapter in each isolate, see [Many isolates](#many-isolates) |
 
 ### 4. A namespace
 
@@ -97,8 +92,6 @@ class ChatNamespace extends NamespaceHandler {
 }
 ```
 
-See [Namespaces](#namespaces) for middleware and dependencies.
-
 ### 5. Turn it on
 
 Add a getter for the `SOCKETIO_ENABLED` key to `lib/config/env.dart`:
@@ -124,72 +117,13 @@ socket.on('welcome', (data) => console.log(data.id));
 socket.emit('message', 'hi', (answer) => console.log(answer)); // 'sent'
 ```
 
-Use `transports: ['websocket']`. See [Many isolates](#many-isolates) for why.
+Use `transports: ['websocket']`, because long-polling does not work with many isolates. See [Many isolates](#many-isolates).
 
-### Send from a controller or a service
-
-`SocketIoProvider.server` is the Socket.IO server of this isolate:
-
-```dart
-await SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
-```
-
-From a queue job or another program, use the [emitter](#emit-from-other-programs).
-
-- Requests to `/socket.io/` go to Socket.IO before the router. Middleware and body reading are skipped. To log users in, see [Log in a socket](#log-in-a-socket).
-- With no provider, or with `enabled: false`, there is no extra work per request.
-- Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
-
-### Many isolates
-
-Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server.
-A client is connected to one of them.
-
-With many isolates and no `adapter`, the provider uses the `IsolateAdapter`. It sends each broadcast to the other isolates of the process (through `IsolateBus` of `dox_core`), so it reaches the clients of every isolate. `socketsJoin`, `fetchSockets`, `serverSideEmit` and broadcast acks work across isolates too. You need no Redis.
-
-| Adapter | Reaches |
-|---|---|
-| `InMemoryAdapter` (one isolate) | the clients of this isolate |
-| `IsolateAdapter` (many isolates, the default) | the clients of every isolate of this process |
-| `RedisAdapter` | the clients of every isolate of every server |
-
-!!! warning "Add each namespace in every isolate"
-    The `IsolateAdapter` counts the isolates on the bus, not the isolates that have a namespace.
-    `fetchSockets` and `serverSideEmitWithAck` wait for an answer from each of them.
-    A `NamespaceHandler` in the config is added in every isolate, so it is fine.
-    A namespace that only one isolate adds with `io.of('/x')` gets no answer from the others.
-    Then these calls wait 5 seconds and throw.
-
-
-!!! warning "Clients should connect with websocket only"
-    One websocket stays on one isolate. HTTP long-polling sends many requests, and they can reach different isolates.
-    Long-polling only works with `totalIsolate: 1`, or with sticky sessions in front of many single-isolate servers.
-    Dox logs this hint at startup when it runs many isolates and polling is allowed.
-
-With more than one server process, or next to Node.js servers, use the [Redis adapter](#many-servers-redis-adapter).
-
-## Without Dox
-
-`dox_socketio` also runs on its own, with no Dox app:
-
-```dart
-import 'package:dox_socketio/dox_socketio.dart';
-
-Future<void> main() async {
-  SocketIoServer io = SocketIoServer();
-  io.register(ChatNamespace());
-  await io.listen(3001);
-}
-```
-
-- `io.listen(port)` starts a native server (`dox_http_native`) on its own port. Run it in its own small program, for example `bin/socket.dart`, and put it behind the same proxy as the HTTP server.
-- `io.attach(httpServer)` uses a server you already have: a `NativeHttpServer` or a `dart:io` one.
-- In your own server, call `io.handle(request)` when `io.matches(request)` is true.
-- `io.on('connection', (Socket socket) {...})` handles the default namespace `/` with no class.
+Requests to `/socket.io/` go to Socket.IO before the router, so route middleware does not run for them. To log users in, see [Log in a socket](#log-in-a-socket).
 
 ## Namespaces
 
-A namespace is a class. Its dependencies come in through the constructor.
+A namespace is a class, so its dependencies come in through the constructor:
 
 ```dart
 class ChatNamespace extends NamespaceHandler {
@@ -199,15 +133,6 @@ class ChatNamespace extends NamespaceHandler {
 
   @override
   String get path => '/chat';
-
-  @override
-  List<Middleware> get middleware => <Middleware>[checkToken];
-
-  void checkToken(Socket socket) {
-    if (socket.handshake.auth['token'] != 'secret') {
-      throw SocketIoException('unauthorized', data: <String, dynamic>{'reason': 'bad token'});
-    }
-  }
 
   @override
   void onConnection(Socket socket) {
@@ -223,15 +148,61 @@ class ChatNamespace extends NamespaceHandler {
 namespaces: <NamespaceHandler>[ChatNamespace(MessageService())],
 ```
 
-When a middleware throws a `SocketIoException`, the client gets `connect_error` with the message and the data.
-Any other error is written to stderr. The client only gets `{"message": "Internal error"}`, so it can not see private text like SQL.
+### Namespace middleware
 
-A client that is refused is still closed after `connectTimeout`, unless it joins another namespace.
+Sometimes you want to check a client before it joins. Add a middleware to the namespace. When it throws a `SocketIoException`, the client gets `connect_error` with the message and the data:
+
+```dart
+@override
+List<Middleware> get middleware => <Middleware>[checkToken];
+
+void checkToken(Socket socket) {
+  if (socket.handshake.auth['token'] != 'secret') {
+    throw SocketIoException('unauthorized', data: <String, dynamic>{'reason': 'bad token'});
+  }
+}
+```
+
+Any other error is written to stderr, and the client only gets `{"message": "Internal error"}`. So private text, like SQL, never reaches the client.
+
+## Sending events
+
+### Sending from a controller or a service
+
+`SocketIoProvider.server` is the Socket.IO server of this isolate:
+
+```dart
+await SocketIoProvider.server?.of('/chat').to('lobby').emit('news', data);
+```
+
+From a queue job or another program, use the [emitter](#emit-from-other-programs).
+
+### Common methods
+
+The API follows the Node.js server. This table shows the few places where Dart is different:
+
+| Node.js | Dart |
+| --- | --- |
+| `socket.on('e', (a, cb) => ...)` | `socket.on('e', (SocketEvent e) => ...)`, then `e.data`, `e.args`, `e.ack(x)` |
+| `socket.emit('e', a, b)` | `socket.emit('e', a)` or `socket.emitArgs('e', [a, b])` |
+| `await socket.timeout(5000).emitWithAck('e', a)` | `await socket.emitWithAck('e', a, timeout: Duration(seconds: 5))` |
+| `socket.join(r)` / `socket.leave(r)` | the same |
+| `socket.to(r).emit(...)` | the same |
+| `socket.broadcast.emit(...)` | the same |
+| `io.to(r).except(x).emit(...)` | the same |
+| `io.of('/chat')`, `io.use(fn)` | the same |
+| `socket.handshake` | `.headers`, `.query`, `.auth`, `.address`, `.token`, `.cookie(name)`, `.session()` |
+| `socket.data` | `socket.data` (a `Map`) |
+| `await io.in(r).fetchSockets()` | `await io.to(r).fetchSockets()` (all servers) |
+| `await io.timeout(5000).emitWithAck('e', a)` | `await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)` |
+| `io.serverSideEmit('e', a)` | `await io.serverSideEmit('e', [a])` |
+| `io.on('e', (a, cb) => ...)` (from other servers) | `io.onServerSideEmit('e', (ServerSideEvent e) => ...)`, then `e.data`, `e.ack(x)` |
+
+To send binary data, send a `Uint8List`. It can be anywhere in lists and maps. The `disconnecting` and `disconnect` events give the reason in `event.data`, like `transport close`.
 
 ## Log in a socket
 
-Socket.IO gets its requests before the router, so route middleware (session, auth) does not run for it.
-Use `SocketAuth` as a namespace middleware. Your function gets the handshake and gives the user, or null.
+Socket.IO gets its requests before the router, so route middleware like session and auth does not run. Use `SocketAuth` as a namespace middleware instead. Your function gets the handshake and returns the user, or `null`:
 
 ```dart title="lib/app/socket/chat.namespace.dart"
 class ChatNamespace extends NamespaceHandler {
@@ -255,7 +226,7 @@ class ChatNamespace extends NamespaceHandler {
 }
 ```
 
-The client sends the token in `auth`:
+The client sends the token in `auth`. Browsers can not set headers on a websocket, so use `auth` and not a header:
 
 ```js
 const socket = io('http://localhost:3000/chat', {
@@ -265,12 +236,13 @@ const socket = io('http://localhost:3000/chat', {
 socket.on('connect_error', (err) => console.log(err.message)); // 'Unauthorized'
 ```
 
-- With a user, it is kept in `socket.user`. It stays on this server. `fetchSockets()` on other servers does not get it.
-- With null, the client gets a `connect_error` with the message `Unauthorized`, and `onConnection` does not run. Change the message with `SocketAuth(findUser, message: '...')`.
-- `handshake.token` is `auth.token` from the client, else the `Authorization: Bearer` header. Browsers can not set headers on a websocket, so use `auth`.
-- `handshake.cookie('name')` reads a cookie and decrypts it with the APP_KEY, like `req.cookie('name')`. Use `decrypt: false` for a plain cookie.
-- `await handshake.session()` gives the Dox session of the client, from its session cookie. See below.
-- `io.use(SocketAuth(findUser).handle)` does the same for the default namespace.
+When the function returns a user, it is kept in `socket.user`. When it returns `null`, the client gets a `connect_error` with the message `Unauthorized`, and `onConnection` does not run.
+
+The handshake gives you these helpers:
+
+- `handshake.token` is `auth.token` from the client, else the `Authorization: Bearer` header.
+- `handshake.cookie('name')` reads a cookie and decrypts it with the `APP_KEY`. Use `decrypt: false` for a plain cookie.
+- `await handshake.session()` gives the Dox session of the client, from its session cookie.
 
 ### With dox_auth
 
@@ -288,121 +260,32 @@ static Future<User?> findUser(Handshake handshake) async {
 }
 ```
 
-- `userFromToken` runs the same checks as `AuthMiddleware`: signature, guard, `exp` and revocation. A bad, expired, revoked or changed token gives `null`, so the client is refused. With `userCacheTtl` on, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
-- `handshake.session()` runs the same cookie checks as `SessionMiddleware`. A changed cookie, a cookie made with another `APP_KEY` or an expired session gives an empty session, so `userFromSession` gives `null`.
-- `handshake.session()` uses `AppConfig.session`. Pass another `SessionConfig` like `handshake.session(config)`.
-- The session is read once, when the socket connects. A logout later does not close the socket. Call `socket.disconnect()` yourself if you need that.
-- The session is read only. Changes to it are not saved.
-- With no `allowedOrigins`, or with `'*'` in it, `handshake.session()` prints a warning once.
-- With the `cookie` session driver, an old copy of the session cookie still works after logout, until the session `lifetime` ends. If a logout must stop old cookies, use the `cache` session driver, like `SessionConfig(driver: 'cache', store: 'redis')`.
+`userFromToken` runs the same checks as `AuthMiddleware`, so a bad, expired or revoked token gives `null`. `handshake.session()` runs the same checks as `SessionMiddleware`.
+
+The session is read once, when the socket connects. A logout later does not close the socket, so call `socket.disconnect()` yourself if you need that.
 
 !!! warning "Cookie login needs `allowedOrigins`"
-    A browser sends its cookies on a websocket from any website. So if you log users in with a cookie, set `allowedOrigins` to your own sites.
-    Without it, another website can open a socket as your user. See [Allowed origins](#allowed-origins).
+    A browser sends its cookies on a websocket from any website. So if you log users in with a cookie, set [`allowedOrigins`](#allowed-origins) to your own sites. Without it, another website can open a socket as your user.
 
-## Node.js to Dart
+## Many isolates
 
-| Node.js | Dart |
-| --- | --- |
-| `socket.on('e', (a, cb) => ...)` | `socket.on('e', (SocketEvent e) => ...)`, then `e.data`, `e.args`, `e.ack(x)` |
-| `socket.emit('e', a, b)` | `socket.emit('e', a)` or `socket.emitArgs('e', [a, b])` |
-| `await socket.timeout(5000).emitWithAck('e', a)` | `await socket.emitWithAck('e', a, timeout: Duration(seconds: 5))` |
-| `socket.join(r)` / `socket.leave(r)` | the same |
-| `socket.to(r).emit(...)` | the same |
-| `socket.broadcast.emit(...)` | the same |
-| `io.to(r).except(x).emit(...)` | the same |
-| `io.of('/chat')`, `io.use(fn)` | the same |
-| `socket.handshake` | `.headers`, `.query`, `.auth`, `.address`, `.token`, `.cookie(name)`, `.session()` |
-| `socket.data` | `socket.data` (a `Map`) |
-| `await io.in(r).fetchSockets()` | `await io.to(r).fetchSockets()` (all servers) |
-| `await io.timeout(5000).emitWithAck('e', a)` | `await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)` |
-| `io.serverSideEmit('e', a)` | `await io.serverSideEmit('e', [a])` |
-| `io.on('e', (a, cb) => ...)` (from other servers) | `io.onServerSideEmit('e', (ServerSideEvent e) => ...)`, then `e.data`, `e.ack(x)` |
+Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server. A client is connected to one of them.
 
-- `disconnecting` and `disconnect` give the reason in `event.data`, like `transport close` or `ping timeout`.
-- Binary data: send a `Uint8List`. It can be anywhere in lists and maps.
+With many isolates, the provider uses the `IsolateAdapter` by default. It sends each broadcast to the other isolates of the process, so it reaches every client. `socketsJoin`, `fetchSockets`, `serverSideEmit` and broadcast acks work across isolates too. You need no Redis for this.
 
-## Options
+| Adapter | Reaches |
+|---|---|
+| `InMemoryAdapter` (one isolate) | the clients of this isolate |
+| `IsolateAdapter` (many isolates, the default) | the clients of every isolate of this process |
+| `RedisAdapter` | the clients of every isolate of every server |
 
-```dart
-SocketIoServer(
-  options: ServerOptions(
-    path: '/socket.io/',
-    pingInterval: Duration(seconds: 25),
-    pingTimeout: Duration(seconds: 20),
-    maxHttpBufferSize: 1000000,
-    transports: <String>['polling', 'websocket'],
-    cors: CorsOptions(origins: <String>['https://my.app'], credentials: true),
-  ),
-);
-```
+Clients should connect with websocket only. One websocket stays on one isolate, but long-polling sends many requests that can reach different isolates. Long-polling only works with `totalIsolate: 1`, or with sticky sessions in front of many single-isolate servers.
 
-| Option | Default | What it does |
-| --- | --- | --- |
-| `path` | `/socket.io/` | the URL path |
-| `pingInterval` | 25 s | how often the server sends a ping |
-| `pingTimeout` | 20 s | how long to wait for the pong before the client is gone |
-| `upgradeTimeout` | 10 s | how long an upgrade from polling to websocket may take |
-| `connectTimeout` | 45 s | how long the client has to join a namespace |
-| `maxHttpBufferSize` | 1,000,000 bytes | the biggest message. A bigger websocket message closes the connection |
-| `maxAttachments` | `10` | the most binary parts in one packet. A packet with more closes that client |
-| `transports` | `['polling', 'websocket']` | allowed transports |
-| `allowUpgrades` | `true` | let polling clients move to websocket |
-| `cors` | `null` | CORS headers for polling requests. It also checks the origin of websockets |
-| `allowedOrigins` | `null` | the sites that may connect, see [Allowed origins](#allowed-origins) |
-| `allowRequest` | `null` | a function that accepts or refuses each request, see [Allow requests and limit sessions](#allow-requests-and-limit-sessions) |
-| `maxSessions` | `null` | the most open sessions, see [Allow requests and limit sessions](#allow-requests-and-limit-sessions) |
-
-- `cors` with a list of origins: a websocket from another origin gets 403. A request with no `Origin` header (not a browser) is allowed.
-- `cors: null`, or `*` in `origins`: websockets from any origin are allowed. If you log users in with cookies, list your origins.
-- `*` together with `credentials: true` throws an `ArgumentError`. List your origins instead.
-- Websocket compression is off. A message bigger than `maxHttpBufferSize` closes with code 1009.
-- On a plain `dart:io` server (`io.attach`), the whole message is read before the size check. Also set a size limit in your proxy.
-
-### Allowed origins
-
-`allowedOrigins` says which websites may open a socket. Set it when you log users in with cookies.
-
-```dart
-ServerOptions(allowedOrigins: <String>['https://app.example.com']);
-```
-
-- `null` (the default): no extra check. Websockets are checked against `cors` when it is set. Dox logs a warning at start.
-- `[]`: only pages of the same host can connect.
-- A list of sites: the same host and those sites can connect.
-- `['*']`: every site can connect.
-- Other sites get 403. A client with no `Origin` header (not a browser) is always allowed.
-
-### Allow requests and limit sessions
-
-`allowRequest` is a function that runs for every handshake and every websocket upgrade.
-It does not run again for the polling requests of an open session.
-It gets an `EngineRequest` (headers, query and address).
-It gives `true` or `false`, sync or async.
-`maxSessions` is the most open sessions.
-Set both in the `options` of `SocketIoConfig`:
-
-```dart title="lib/config/socketio.dart"
-SocketIoConfig socketIoConfig = SocketIoConfig(
-  options: ServerOptions(
-    allowRequest: (EngineRequest req) => req.query['key'] == 'secret',
-    maxSessions: 10000,
-  ),
-);
-```
-
-- When the function gives `false` or throws, the client gets `403` with `{"code":4,"message":"Forbidden"}`.
-- At the limit, a new handshake gets `503` with `{"code":3,"message":"Too many sessions"}`. Open sessions keep working.
-- The count is per isolate. With 4 isolates, the app allows 4 times `maxSessions`.
-- Keep the function fast. When the client leaves while the function runs, the session is still made. It holds a `maxSessions` slot until the ping timeout.
-- A browser client only sees a connect error. It does not see the `403` or `503` body.
-
-Both are `null` by default: all requests are allowed and there is no limit.
+Add each namespace in the config, so it is added in every isolate. A namespace that only one isolate adds with `io.of('/x')` gets no answer from the others, so `fetchSockets` and `serverSideEmitWithAck` wait 5 seconds and throw.
 
 ## Many servers: Redis adapter
 
-With more than one server process, or next to Node.js servers, use the Redis adapter.
-Then a broadcast on one server reaches the clients of all servers, and of all their isolates.
+If you run more than one server process, or Dox next to Node.js servers, use the Redis adapter. Then a broadcast on one server reaches the clients of all servers.
 
 Add the `ioredis` package:
 
@@ -410,7 +293,7 @@ Add the `ioredis` package:
 dart pub add ioredis
 ```
 
-In a Dox app, make the adapter in each isolate with a factory:
+Then make the adapter in each isolate with a factory, because a Redis connection can not be sent to another isolate:
 
 ```dart title="lib/config/socketio.dart"
 import 'package:dox_socketio/dox_socketio.dart';
@@ -437,26 +320,13 @@ class RedisSocketAdapterFactory extends SocketAdapterFactory {
 }
 ```
 
-Without Dox, pass the adapter to the server:
+The subscriber needs its own connection, because a Redis connection in subscribe mode can not run other commands.
 
-```dart
-Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
-SocketIoServer io = SocketIoServer(
-  adapter: RedisAdapter(subscriber: redis.duplicate(), publisher: redis),
-);
-```
+The adapter uses the format of `@socket.io/redis-adapter`, so Node.js servers with that adapter can share one Redis with Dox servers. If your Node.js servers use a JSON parser, set `format: RedisFormat.json`.
 
-- The subscriber needs its own connection. A Redis connection in subscribe mode can not run other commands.
-- It uses the format of `@socket.io/redis-adapter`. Node.js servers with that adapter can share one Redis with Dox servers.
-- It reads messages in msgpack and in JSON. It writes msgpack, like the Node.js adapter.
-  If your Node.js servers use a JSON parser, set `format: RedisFormat.json`.
-- `fetchSockets`, `socketsJoin`, `socketsLeave` and `disconnectSockets` act on the sockets of all servers.
-- Broadcasts with an ack get the acks of clients on all servers.
-- Servers can send events to each other with `serverSideEmit`. Clients do not get them.
-- A request waits at most `requestsTimeout` for the other servers (5 seconds by default, like Node.js).
-- Long-polling needs sticky sessions, the same as with [many isolates](#many-isolates). Or use `transports: ['websocket']` on the client.
+### Acting on all servers
 
-### Act on all servers
+With the Redis adapter, these methods work on the sockets of all servers:
 
 ```dart
 // sockets of every server. Sockets of this server are `Socket`s.
@@ -467,18 +337,21 @@ for (RemoteSocket socket in sockets) {
 
 await io.to('room1').socketsJoin('room2');
 await io.to('banned').disconnectSockets();
+```
 
-// one ack per client, from all servers. A timeout is needed.
+To get one ack from each client on all servers, set a timeout:
+
+```dart
 List<Object?> answers = await io
     .timeout(const Duration(seconds: 5))
     .emitWithAck('ping', 'are you there?');
 ```
 
-`fetchSockets` throws a `TimeoutException` when a server does not answer in time.
+`fetchSockets` throws a `TimeoutException` when a server does not answer within `requestsTimeout` (5 seconds by default).
 
 ### Events between servers
 
-`serverSideEmit` sends an event to the other servers. Clients do not get it.
+Sometimes the servers need to tell each other something, like "reload the config". `serverSideEmit` sends an event to the other servers. Clients do not get it:
 
 ```dart
 // on every server
@@ -489,25 +362,17 @@ io.onServerSideEmit('reload-config', (ServerSideEvent event) {
 
 // on one server
 await io.serverSideEmit('reload-config', <Object?>['v2']);
+```
 
-// wait for one answer from each other server
+To wait for one answer from each other server, use `serverSideEmitWithAck`. When a server does not answer in time, it throws an `AckTimeoutException`, and its `responses` holds the answers that came back:
+
+```dart
 List<Object?> answers = await io.serverSideEmitWithAck('reload-config', <Object?>['v2']);
 ```
 
-When a server does not answer in time, `serverSideEmitWithAck` throws an `AckTimeoutException`. Its `responses` holds the answers that came back.
-`onServerSideEmit` is also on namespaces: `io.of('/chat').onServerSideEmit(...)`.
-
-## Broadcasting
-
-To send events to public, private and presence channels, see [Broadcasting](../digging-deeper/broadcasting.md).
-
 ## Emit from other programs
 
-An emitter sends events to your clients without a Socket.IO server.
-Use it in a queue worker, a cron job or a service in another language.
-It writes to Redis, and every server with the Redis adapter sends the event to its clients.
-
-Dart (for example in a Dox queue job or a CLI command):
+Sometimes you want to send an event from a queue worker, a cron job or a service in another language. An emitter does this without a Socket.IO server. It writes to Redis, and every server with the Redis adapter sends the event to its clients:
 
 ```dart
 import 'package:dox_socketio/dox_socketio.dart';
@@ -529,7 +394,9 @@ Future<void> main() async {
 }
 ```
 
-Node.js, with [`@socket.io/redis-emitter`](https://www.npmjs.com/package/@socket.io/redis-emitter):
+The emitter does not wait for an answer, so it can not know if a client got the event.
+
+The emitters of other languages use the same format, so they work too. For example, Node.js with [`@socket.io/redis-emitter`](https://www.npmjs.com/package/@socket.io/redis-emitter):
 
 ```js
 import { Emitter } from '@socket.io/redis-emitter';
@@ -543,7 +410,116 @@ emitter.to('room1').emit('news', { title: 'hello' });
 emitter.of('/chat').emit('notice', 'for everyone in /chat');
 ```
 
-- The emitters of other languages (PHP, Python, Go) use the same format, so they work too.
-- Binary data (`Uint8List` in Dart, `Buffer` in Node.js) arrives as binary.
-- The emitter does not wait for an answer. It can not know if a client got the event.
-- `key` must be the same as the `key` of the adapter. Both default to `socket.io`.
+## Broadcasting
+
+To send events to public, private and presence channels, see [Broadcasting](../digging-deeper/broadcasting.md).
+
+## Options
+
+Pass `ServerOptions` as `options` to `SocketIoConfig` in a Dox app, or to `SocketIoServer` without Dox:
+
+```dart
+SocketIoServer(
+  options: ServerOptions(
+    path: '/socket.io/',
+    pingInterval: Duration(seconds: 25),
+    pingTimeout: Duration(seconds: 20),
+    maxHttpBufferSize: 1000000,
+    transports: <String>['polling', 'websocket'],
+    cors: CorsOptions(origins: <String>['https://my.app'], credentials: true),
+  ),
+);
+```
+
+| Option | Default | What it does |
+| --- | --- | --- |
+| `path` | `/socket.io/` | the URL path |
+| `pingInterval` | 25 s | how often the server sends a ping |
+| `pingTimeout` | 20 s | how long to wait for the pong before the client is gone |
+| `upgradeTimeout` | 10 s | how long an upgrade from polling to websocket may take |
+| `connectTimeout` | 45 s | how long the client has to join a namespace |
+| `maxHttpBufferSize` | 1,000,000 bytes | the biggest message. A bigger websocket message closes the connection |
+| `maxAttachments` | `10` | the most binary parts in one packet |
+| `transports` | `['polling', 'websocket']` | allowed transports |
+| `allowUpgrades` | `true` | let polling clients move to websocket |
+| `cors` | `null` | CORS headers for polling requests. With a list of origins, it also checks the origin of websockets |
+| `allowedOrigins` | `null` | the sites that may connect, see [Allowed origins](#allowed-origins) |
+| `allowRequest` | `null` | accepts or refuses each request, see [Allow requests and limit sessions](#allow-requests-and-limit-sessions) |
+| `maxSessions` | `null` | the most open sessions per isolate |
+
+### Allowed origins
+
+`allowedOrigins` says which websites may open a socket. You should set it when you log users in with cookies:
+
+```dart
+ServerOptions(allowedOrigins: <String>['https://app.example.com']);
+```
+
+- `null` (the default): no extra check. Dox logs a warning at start.
+- `[]`: only pages of the same host can connect.
+- A list of sites: the same host and those sites can connect.
+- `['*']`: every site can connect.
+
+Other sites get 403. A client with no `Origin` header (not a browser) is always allowed.
+
+### Allow requests and limit sessions
+
+`allowRequest` runs for every handshake and every websocket upgrade. It gets an `EngineRequest` with the headers, query and address, and returns `true` or `false`. `maxSessions` is the most open sessions:
+
+```dart title="lib/config/socketio.dart"
+SocketIoConfig socketIoConfig = SocketIoConfig(
+  options: ServerOptions(
+    allowRequest: (EngineRequest req) => req.query['key'] == 'secret',
+    maxSessions: 10000,
+  ),
+);
+```
+
+When `allowRequest` gives `false` or throws, the client gets `403`. At the limit, a new handshake gets `503` and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times `maxSessions`.
+
+## Without Dox
+
+`dox_socketio` also runs on its own, with no Dox app:
+
+```dart
+import 'package:dox_socketio/dox_socketio.dart';
+
+Future<void> main() async {
+  SocketIoServer io = SocketIoServer();
+  io.register(ChatNamespace());
+  await io.listen(3001);
+}
+```
+
+- `io.listen(port)` starts a native server on its own port. Run it in its own small program, like `bin/socket.dart`, behind the same proxy as the HTTP server.
+- `io.attach(httpServer)` uses a server you already have: a `NativeHttpServer` or a `dart:io` one.
+- In your own server, call `io.handle(request)` when `io.matches(request)` is true.
+- `io.on('connection', (Socket socket) {...})` handles the default namespace `/` with no class.
+- `io.use(SocketAuth(findUser).handle)` logs users in on the default namespace.
+
+To use the Redis adapter, pass it to the server:
+
+```dart
+Redis redis = Redis(RedisOptions(host: '127.0.0.1', port: 6379));
+SocketIoServer io = SocketIoServer(
+  adapter: RedisAdapter(subscriber: redis.duplicate(), publisher: redis),
+);
+```
+
+## Details
+
+- With no provider, or with `enabled: false`, there is no extra work per request.
+- Need a plain WebSocket with no Socket.IO protocol? `Route.websocket(path, handler)` in `dox_core` gives you the raw socket.
+- Dox logs a hint at startup when it runs many isolates and polling is allowed.
+- A client that a middleware refuses is closed after `connectTimeout`, unless it joins another namespace.
+- `socket.user` stays on this server. `fetchSockets()` on other servers does not get it.
+- `SocketAuth(findUser, message: '...')` changes the `Unauthorized` message.
+- `handshake.session()` uses `AppConfig.session`. Pass another `SessionConfig` like `handshake.session(config)`. The session is read only, so changes are not saved. It prints a warning once when `allowedOrigins` is `null` or has `'*'`.
+- With `userCacheTtl` on in `dox_auth`, a deleted or banned user can still connect until the cache time ends, unless `forgetUser` runs.
+- With the `cookie` session driver, an old copy of the session cookie still works after logout until the `lifetime` ends. Use the `cache` driver if a logout must stop old cookies.
+- `cors` with `*` in `origins`, or `cors: null`, allows websockets from any origin. `*` with `credentials: true` throws an `ArgumentError`.
+- Websocket compression is off. A message bigger than `maxHttpBufferSize` closes with code 1009. On a plain `dart:io` server, the whole message is read before the size check, so also set a size limit in your proxy.
+- A packet with more than `maxAttachments` binary parts closes that client.
+- `allowRequest` does not run again for the polling requests of an open session. A client that leaves while it runs still holds a `maxSessions` slot until the ping timeout. A browser client only sees a connect error, not the `403` or `503` body.
+- The Redis adapter reads msgpack and JSON, and writes msgpack. Long-polling with it needs sticky sessions too.
+- The emitter `key` must be the same as the adapter `key`. Both default to `socket.io`. Binary data (`Uint8List`, or `Buffer` in Node.js) arrives as binary.

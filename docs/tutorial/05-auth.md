@@ -4,17 +4,19 @@ icon: lucide/key-round
 
 # Step 5: Login with dox_auth
 
-This step adds register and login with a JWT token, and only lets a logged in user create or change posts.
+In this step you add register and login with a JWT token, so only a logged in user can create or change posts.
 
 ## 1. Add the package
+
+`dox_auth` handles login and tokens. Add it to the project:
 
 ```bash
 dart pub add dox_auth
 ```
 
-## 2. Make the users table
+## 2. Look at the users table
 
-The template already has a `User` model in `lib/app/models/user/user.model.dart`:
+You need a user model and a `users` table to log in. You do not need to make them, because the template already has both. This is the `User` model:
 
 ```dart title="lib/app/models/user/user.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -37,10 +39,9 @@ class User extends UserGenerator {
 }
 ```
 
-`password` is in `hidden`, so it is never in the JSON. This matters: the token holds the user as JSON, and anyone can read a JWT.
+`password` is in `hidden`, so it is never in the JSON. This matters because the token holds the user as JSON, and anyone can read a JWT.
 
-The `users` table already exists. The template has its migration, and the
-server ran it at the first start in [step 1](01-create-project.md):
+The `users` table already exists, because the server ran this migration at the first start in [step 1](01-create-project.md):
 
 ```dart title="db/migration/2023_07_16_131937700_create_users_table.dart"
 class CreateUsersTable extends Migration {
@@ -59,15 +60,18 @@ class CreateUsersTable extends Migration {
 }
 ```
 
-`table.softDeletes()` makes the `deleted_at` column that `softDelete: true` needs.
-`email` is unique, so a second register with the same email fails.
+`table.softDeletes()` makes the `deleted_at` column that `softDelete: true` needs. `email` is unique, so a second register with the same email fails.
 
 ## 3. Make the DTOs
+
+Register and login each need their own input checks, so make two DTOs:
 
 ```bash
 dox make:dto RegisterUser
 dox make:dto LoginUser
 ```
+
+Replace the register DTO with this:
 
 ```dart title="lib/app/dtos/register_user/register_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -100,8 +104,9 @@ class RegisterUser {
 }
 ```
 
-`@Unique` comes from `dox_orm`. It reads the database, so it runs after the other rules.
-`dox_orm` also has a class named `Schema`, so the import hides it.
+`@Unique` comes from `dox_orm`. It reads the database, so it runs after the other rules. `dox_orm` also has a class named `Schema`, so the import hides it.
+
+Replace the login DTO with this:
 
 ```dart title="lib/app/dtos/login_user/login_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -125,7 +130,7 @@ class LoginUser {
 
 ## 4. Set up the auth provider
 
-A provider runs once in every isolate at start. This one tells `dox_auth` which model to use and how to sign tokens:
+`dox_auth` needs to know which model to use and how to sign tokens. You tell it in a provider, which runs once in every isolate at start. Make this file:
 
 ```dart title="lib/providers/auth_provider.dart"
 import 'package:blog/app/models/user/user.model.dart';
@@ -158,10 +163,11 @@ class AppAuthProvider extends DoxProvider {
 }
 ```
 
-Dox finds the provider by itself. Run `dart run build_runner build` and it is in `lib/generated/container.g.dart`.
-You do not add it to a list.
+You do not add the provider to a list. Dox finds it by itself, and the code generator adds it to `lib/generated/container.g.dart`.
 
 ## 5. Write the auth controller
+
+This controller has the register, login and "who am I" routes:
 
 ```dart title="lib/app/http/controllers/auth.controller.dart"
 import 'package:blog/app/dtos/login_user/login_user.dto.dart';
@@ -207,13 +213,13 @@ class AuthController {
 }
 ```
 
-- `Hash.makeAsync()` makes a bcrypt hash. It runs in another isolate, so other requests do not wait. Never save a plain password.
+- `Hash.makeAsync()` makes a bcrypt hash of the password. You should never save a plain password. It runs in another isolate, so other requests do not wait.
 - `Auth().attempt()` finds the user by email and checks the password. It gives a token, or `null`.
 - `Auth().login(user)` gives a token without a password check. Register uses it, because the user was just made.
 
 ## 6. Protect the write routes
 
-Replace `Route.resource` with single routes. The routes inside `Route.middleware` need a valid token:
+Reading posts stays public, but writing needs a login. So replace `Route.resource` with single routes, and put the write routes inside `Route.middleware`:
 
 ```dart title="lib/routes/api.dart"
 import 'package:blog/app/http/controllers/api.controller.dart';
@@ -251,21 +257,23 @@ class ApiRouter extends Router {
 }
 ```
 
-`AuthMiddleware` reads the `Authorization: Bearer <token>` header and loads the user.
-When the token is missing or wrong, it answers `401 Authentication failed`.
-On a public route, `AuthMiddleware(optional: true)` loads the user when there is a good token, and lets guests through.
+`AuthMiddleware` reads the `Authorization: Bearer <token>` header and loads the user. When the token is missing or wrong, it answers `401 Authentication failed`.
+
+If you want a public route that still knows the user when there is a good token, use `AuthMiddleware(optional: true)`. It lets guests through.
 
 ## 7. Run the generator
+
+`dox s` runs the generator for you. If it is not running, run it once:
 
 ```bash
 dart run build_runner build
 ```
 
-`dox s` runs it for you. There is no new migration in this step, because the `users` table already exists.
+There is no new migration in this step, because the `users` table already exists.
 
 ## Check it
 
-Register:
+Register a user. You should get `201` with a token:
 
 ```bash
 curl -i -X POST http://localhost:3000/api/auth/register \
@@ -281,13 +289,13 @@ content-type: application/json; charset=utf-8
 {"token":"eyJhbGciOiJIUzI1NiIs...","user":{"id":1,"name":"Ann","email":"ann@example.com","created_at":"2026-10-22T14:01:07.827769Z","updated_at":"2026-10-22T14:01:07.827769Z"}}
 ```
 
-The same email again gives `422`:
+Register with the same email again. You should get `422`:
 
 ```json
 {"email":"The email has already been taken"}
 ```
 
-A wrong password gives `401`:
+Log in with a wrong password. You should get `401`:
 
 ```bash
 curl -i -X POST http://localhost:3000/api/auth/login \
@@ -302,7 +310,7 @@ HTTP/1.1 401 Unauthorized
 {"code":"unauthorized","message":"Wrong email or password"}
 ```
 
-Log in and keep the token in a shell variable:
+Now log in with the right password, and keep the token in a shell variable:
 
 ```bash
 TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
@@ -312,7 +320,7 @@ TOKEN=$(curl -s -X POST http://localhost:3000/api/auth/login \
 echo $TOKEN
 ```
 
-A post without a token is refused:
+Try to make a post without a token. It is refused:
 
 ```bash
 curl -i -X POST http://localhost:3000/api/posts \
@@ -327,7 +335,7 @@ HTTP/1.1 401 Unauthorized
 {"code":"unauthorized","message":"Authentication failed"}
 ```
 
-With the token it works:
+Send the same post with the token. Now it works:
 
 ```bash
 curl -i -X POST http://localhost:3000/api/posts \
@@ -343,7 +351,7 @@ HTTP/1.1 201 Created
 {"id":3,"title":"Third post","body":"Written with a token.","created_at":"2026-10-22T14:01:08.094211Z","updated_at":"2026-10-22T14:01:08.094211Z"}
 ```
 
-Who am I:
+Ask who you are:
 
 ```bash
 curl http://localhost:3000/api/auth/user -H "Authorization: Bearer $TOKEN"
@@ -353,7 +361,7 @@ curl http://localhost:3000/api/auth/user -H "Authorization: Bearer $TOKEN"
 {"id":1,"name":"Ann","email":"ann@example.com","created_at":"2026-10-22T14:01:07.827769Z","updated_at":"2026-10-22T14:01:07.827769Z"}
 ```
 
-No `password` in the answer, because it is in `hidden`.
+The answer has no `password`, because it is in `hidden`.
 
 ## Next
 

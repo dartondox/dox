@@ -4,12 +4,9 @@ icon: lucide/route
 
 # HasManyThrough
 
-Use `HasManyThrough` to read rows that are two steps away.
-A model in the middle links the two ends.
-`HasOneThrough` is the same, but it gives one row.
+Use `HasManyThrough` to read rows that are two steps away, through a model in the middle. `HasOneThrough` is the same, but it gives one row.
 
-For example, a country has many users, and a user has many posts.
-A country has many posts through its users.
+For example, a country has many users, and a user has many posts. So a country has many posts through its users.
 
 ## Tables
 
@@ -19,10 +16,9 @@ A country has many posts through its users.
 | `user` | `id`, `country_id` |
 | `post` | `id`, `user_id`, `title` |
 
-## Define it
+## Defining the relation
 
-Add the field to the first model.
-The `through` option is the model in the middle.
+Add the field to the first model. The `through` option is the model in the middle:
 
 ```dart title="lib/app/models/country/country.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -50,39 +46,13 @@ class Country extends CountryGenerator {
 }
 ```
 
-With `HasOneThrough`, when several rows match, the last row of the query wins.
-So `newest` orders by `post.id` from low to high, and the highest id is the last row.
+With `HasOneThrough`, when several rows match, the last row of the query wins. So `newest` orders by `post.id` from low to high, and the highest id is the last row.
 
 Run `dart run build_runner build` after you add a relationship.
 
-## Load it
+### Custom keys
 
-It loads like the other relations.
-
-```dart
-Country? country = await Country().preload('posts').find(1);
-print(country?.posts.length);
-
-List<Country> countries = await Country().withCount('posts').get();
-List<Country> active = await Country().whereHas('posts').get();
-```
-
-`preload` runs one query for all countries.
-`withCount`, `whereHas`, `whereDoesntHave` and `has` work too.
-See [Counting relations](../counting-relations.md) and [Query by relations](../relation-queries.md).
-
-Rows that are soft deleted are left out, in the middle table and in the far table.
-
-## Options
-
-| Option | Default | What it is |
-|---|---|---|
-| `foreignKey` | `{this model}_id`, like `country_id` | The column in the middle table that points to this model. |
-| `localKey` | the primary key of this model | The column in this table that `foreignKey` points to. |
-| `throughForeignKey` | `{middle model}_id`, like `user_id` | The column in the far table that points to the middle model. |
-| `throughLocalKey` | the primary key of the middle model | The column in the middle table that `throughForeignKey` points to. |
-| `onQuery` | none | A static function that changes the query. |
-| `eager` | `false` | Load the relation on every query. |
+If your columns have other names, set the four keys:
 
 ```dart
 @HasManyThrough(
@@ -96,10 +66,25 @@ Rows that are soft deleted are left out, in the middle table and in the far tabl
 List<Post> posts = <Post>[];
 ```
 
-## Write the table in a column name
+## Loading the relation
 
-The query joins the two tables.
-So in `onQuery` and in a `whereHas` callback, write the table in front of the column.
+It loads like the other relations. `preload` runs one query for all countries. `withCount`, `whereHas`, `whereDoesntHave` and `has` work too:
+
+```dart
+Country? country = await Country().preload('posts').find(1);
+print(country?.posts.length);
+
+List<Country> countries = await Country().withCount('posts').get();
+List<Country> active = await Country().whereHas('posts').get();
+```
+
+See [Counting relations](../counting-relations.md) and [Query by relations](../relation-queries.md).
+
+Soft deleted rows are left out, in the middle table and in the far table.
+
+## Writing column names
+
+The query joins the two tables, and a column like `title` can be in both. So in `onQuery` and in a `whereHas` function, write the table in front of the column:
 
 ```dart
 List<Country> countries = await Country().whereHas('posts', (QueryBuilder<dynamic> q) {
@@ -107,4 +92,15 @@ List<Country> countries = await Country().whereHas('posts', (QueryBuilder<dynami
 }).get();
 ```
 
-A column without the table, like `title`, can be in both tables.
+## Details
+
+### All options
+
+| Option | Default | What it is |
+|---|---|---|
+| `foreignKey` | `{this model}_id`, like `country_id` | The column in the middle table that points to this model. |
+| `localKey` | the primary key of this model | The column in this table that `foreignKey` points to. |
+| `throughForeignKey` | `{middle model}_id`, like `user_id` | The column in the far table that points to the middle model. |
+| `throughLocalKey` | the primary key of the middle model | The column in the middle table that `throughForeignKey` points to. |
+| `onQuery` | none | A static function that changes the query. |
+| `eager` | `false` | Load the relation on every query. |

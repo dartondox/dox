@@ -4,17 +4,34 @@ icon: lucide/syringe
 
 # Dependency injection
 
-Dox has a container.
+The Dox container makes your classes and gives each constructor what it needs, so you never wire classes by hand.
 
-It makes your classes and gives each constructor what it needs.
-You do not register classes by hand.
-Put `@Inject()` above a class, and `dox_builder` adds it to the container.
-Dox does not use `dart:mirrors`.
-All the wiring is generated code.
+Put `@Inject()` above a class, and `dox_builder` adds it to the container. Then any class can ask for it in its constructor. Dox does not use `dart:mirrors`: all the wiring is generated code.
+
+## Setup
+
+The builder writes `lib/generated/container.g.dart`. Give it to the app once:
+
+```dart title="lib/config/app.dart"
+import 'package:my_app/generated/container.g.dart';
+
+AppConfig appConfig = AppConfig(
+  container: registerContainer,
+  // ...
+);
+```
+
+Run the builder again after you add a class:
+
+```bash
+dart run build_runner build
+```
 
 ## A full example
 
-A repository reads the database. A service holds the business logic. A controller answers the route.
+A common setup has three layers. A repository reads the database. A service holds the business logic. A controller answers the route. Each one asks for the one below it in its constructor.
+
+The repository needs nothing:
 
 ```dart title="lib/app/repositories/user.repository.dart"
 import 'package:dox_core/dox_core.dart';
@@ -25,6 +42,8 @@ class UserRepository {
   Future<User?> find(int id) => User().find(id);
 }
 ```
+
+The service asks for the repository:
 
 ```dart title="lib/app/services/user.service.dart"
 import 'package:dox_core/dox_core.dart';
@@ -45,6 +64,8 @@ class UserService {
 }
 ```
 
+The controller asks for the service:
+
 ```dart title="lib/app/http/controllers/user.controller.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/models/user/user.model.dart';
@@ -60,6 +81,8 @@ class UserController {
 }
 ```
 
+And the route points to the controller:
+
 ```dart title="lib/routes/api.dart"
 class ApiRouter extends Router {
   @override
@@ -72,28 +95,181 @@ class ApiRouter extends Router {
 }
 ```
 
-Run the builder:
+That is all. After `dart run build_runner build`, `GET /api/users/5` makes the repository, the service and the controller, and calls `show(5)`.
 
-```bash
-dart run build_runner build
+## Lifetime
+
+By default, `@Inject()` makes one instance per isolate. It is made on first use, and every class that asks for it gets the same one.
+
+If you want a new instance each time it is asked for, use `singleton: false`:
+
+```dart
+@Inject(singleton: false)
+class ReportBuilder {}
 ```
 
-It writes `lib/generated/container.g.dart`. Give it to the app once:
+Dox runs one server per isolate, and isolates do not share objects. So each isolate has its own instances. Do not keep state in a singleton that all isolates must see. Use the cache or the database for that.
 
-```dart title="lib/config/app.dart"
-import 'package:my_app/generated/container.g.dart';
+## Constructor parameters
 
+Each constructor parameter is found by its type. Positional and named parameters both work.
+
+If the type is not in the container, an optional parameter keeps its default value, and a nullable parameter gets `null`. Any other parameter stops the build.
+
+### Abstract types
+
+A constructor parameter of an abstract type gets the one container class that implements it:
+
+```dart
+abstract class Mailer {}
+
+@Inject()
+class SmtpMailer implements Mailer {}
+
+@Inject()
+class SignupService {
+  SignupService(this.mailer); // gets the SmtpMailer
+
+  final Mailer mailer;
+}
+```
+
+This works for constructor parameters only. `c.get<Mailer>()` and handler parameters still need the class itself.
+
+## Routes to controller methods
+
+Pass a function that picks the method. Dox finds the controller by the parameter type:
+
+```dart
+Route.get('/posts', (PostController c) => c.index);
+Route.post('/posts', (PostController c) => c.store);
+```
+
+The controller comes from the container. Dox gets it once per isolate, at start, so a request does no extra work. `.name()`, groups and middleware lists work the same:
+
+```dart
+Route.get('/posts/{id}', (PostController c) => c.show).name('posts.show');
+Route.get('/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
+```
+
+For resource routes, pass the class:
+
+```dart
+Route.resource('posts', PostController);
+```
+
+The method still gets its parameters as usual: `DoxRequest`, a `@Dto`, path params and bound models. See [Controller: parameters](controller.md#parameters).
+
+## Handler parameters
+
+A controller method (or a plain route function) can ask for any class of the container:
+
+```dart
+Route.get('/stats', (StatsService stats) => stats.today());
+```
+
+A singleton is read once, at start. A `singleton: false` class is made on each request.
+
+## Route model binding
+
+Often a route gets the id of a model, and the controller loads the model first. Dox can do this for you. Every `@DoxModel` class gets a binder, so when a handler has a parameter of a model type, Dox loads the model by its primary key:
+
+```dart
+Route.get('/posts/{post}', (PostController c) => c.show);
+
+@Inject()
+class PostController {
+  Post show(Post post) => post;
+}
+```
+
+Dox uses the route param with the name of the model: `{post}` for `Post`, `{blogPost}` for `BlogPost`. When there is no such param, it uses the next route param in order, like `{id}`.
+
+A missing row answers `404`. An `int` key that is not a number also answers `404`, with no database call.
+
+A binder from `Route.bind` wins over this one. See [Routing: route model binding](routing.md#route-model-binding).
+
+## Routers and providers
+
+Routers and providers do not need `@Inject()`. Dox finds every class that extends `Router` and registers its routes at start. It finds every class that extends `DoxProvider` and runs its `setup()` at start, in every isolate. Their constructors get parameters from the container too.
+
+They run in the order of their file path, then the order in the file. If you want to pick the order, list them in `AppConfig`:
+
+```dart
 AppConfig appConfig = AppConfig(
   container: registerContainer,
-  // ...
+  providers: <DoxProvider>[ORMProvider()], // runs first
+  routers: <Router>[ApiRouter()],       // registered first
 );
 ```
 
-That is all. `GET /api/users/5` makes the repository, the service and the controller, and calls `show(5)`.
+A listed class comes first, and the others follow. No class runs twice. A listed provider is also the instance that the container gives.
 
-## The generated file
+A provider can add global middleware with `Dox().addGlobalMiddleware(...)` in `setup()`. See [Middleware](middleware.md#global-middleware).
 
-`lib/generated/container.g.dart` has one function. Each class gets a factory that calls its constructor.
+## Using the container in code
+
+Sometimes you need a class in code that the container does not build, like a script. `Dox().ioc` is the container of the current isolate. Use `get` to read a class:
+
+```dart
+UserService users = Dox().ioc.get<UserService>();
+```
+
+`get` throws when the class is not registered. Use `has` to check first:
+
+```dart
+if (Dox().ioc.has<UserService>()) {
+  // ...
+}
+```
+
+You can also add classes by hand. `singleton` makes one instance per isolate, on first use. `factory` makes a new instance on each `get`. `instance` uses the value you give, for example a config object:
+
+```dart
+Dox().ioc.singleton<Clock>((IocContainer c) => Clock());
+Dox().ioc.factory<Report>((IocContainer c) => Report());
+Dox().ioc.instance<MailConfig>(mailConfig);
+```
+
+## Testing
+
+In a test you often want a fake in place of a real class. Use `override` before the app starts, and `clearOverrides` at the end:
+
+```dart
+setUpAll(() async {
+  Dox().ioc.override<UserRepository>(FakeUserRepository());
+  client = await DoxTestClient.start(appConfig);
+});
+
+tearDownAll(() async {
+  await client.close();
+  Dox().ioc.clearOverrides();
+});
+```
+
+Call `override` before `DoxTestClient.start`, because controllers get their objects once, at start. An override stays when the app registers its classes again.
+
+## Build errors
+
+The build stops with a clear message, with the file and line, when:
+
+- a required parameter has a type that is not in the container,
+- a parameter has an abstract type, and two or more classes in the container implement it,
+- classes need each other in a circle. The message shows the chain, like `A -> B -> C -> A`,
+- `@Inject()` is on an abstract class or a generic class,
+- a class has no unnamed constructor.
+
+A private class (like `_AdminRouter`) is not put in the container. The build shows a warning for it. Remove the `_` to add it.
+
+## Details
+
+- Dox finds classes in `lib/` only.
+- Two classes with the same name in two files both work. But use the typed route style (`Route.get<C>(...)`) for them. They can not be handler parameters, because Dox can not tell them apart by name.
+- A route without a parameter of the model type does not load the model.
+
+### The generated file
+
+`lib/generated/container.g.dart` has one function. Each class gets a factory that calls its constructor. Do not edit it.
 
 ```dart title="lib/generated/container.g.dart"
 // GENERATED CODE - DO NOT MODIFY BY HAND
@@ -128,180 +304,3 @@ void registerContainer(IocContainer c) {
   });
 }
 ```
-
-Do not edit it. Run the builder again after you add a class.
-
-## Lifetime
-
-- `@Inject()`: one instance per isolate. It is made on first use.
-- `@Inject(singleton: false)`: a new instance each time it is asked for.
-
-Dox runs one server per isolate. Isolates do not share objects.
-So each isolate runs `registerContainer` and has its own instances.
-Do not keep state in a singleton that all isolates must see. Use the cache or the database for that.
-
-## Constructor parameters
-
-Each constructor parameter is found by its type.
-
-- Positional and named parameters both work.
-- An optional parameter whose type is not in the container keeps its default value.
-- A nullable parameter whose type is not in the container gets `null`.
-- Any other parameter whose type is not in the container stops the build.
-
-## Routes to controller methods
-
-Pass a function that picks the method. Dox finds the controller by the parameter type:
-
-```dart
-Route.get('/posts', (PostController c) => c.index);
-Route.post('/posts', (PostController c) => c.store);
-Route.put('/posts/{id}', (PostController c) => c.update);
-Route.delete('/posts/{id}', (PostController c) => c.destroy);
-```
-
-The controller comes from the container. Dox gets it once per isolate, at start. A request does no extra work.
-`.name()`, groups and middleware lists work the same:
-
-```dart
-Route.get('/posts/{id}', (PostController c) => c.show).name('posts.show');
-Route.get('/me', <dynamic>[AuthMiddleware(), (AuthController c) => c.me]);
-```
-
-For resource routes, pass the class:
-
-```dart
-Route.resource('posts', PostController);
-```
-
-The method still gets its parameters as usual: `DoxRequest`, a `@Dto`, path params and bound models.
-See [Controller: parameters](controller.md#parameters).
-
-## Handler parameters
-
-A controller method (or a plain route function) can ask for any class of the container:
-
-```dart
-Route.get('/stats', (StatsService stats) => stats.today());
-```
-
-A singleton is read once, at start. A `singleton: false` class is made on each request.
-
-## Route model binding
-
-Every `@DoxModel` class gets a binder in `lib/generated/container.g.dart`.
-When a handler has a parameter of a model type, Dox loads the model by its primary key.
-
-```dart
-Route.get('/posts/{post}', (PostController c) => c.show);
-
-@Inject()
-class PostController {
-  Post show(Post post) => post;
-}
-```
-
-- The route param with the name of the model is used: `{post}` for `Post`, `{blogPost}` for `BlogPost`.
-- When there is no such param, the next route param in order is used, like `{id}`.
-- A missing row answers `404`.
-- An `int` key that is not a number answers `404`, with no database call.
-- A route without a parameter of the model type does not load the model.
-- A binder from `Route.bind` wins over this one. See [Routing: route model binding](routing.md#route-model-binding).
-
-## Routers and providers
-
-You do not need `@Inject()` on them.
-
-- Every class that extends `Router` is found. Its routes are registered at start.
-- Every class that extends `DoxProvider` is found. Its `setup()` runs at start, in every isolate.
-
-Their constructors get parameters from the container too.
-
-They run in the order of their file path, then the order in the file.
-To pick the order, list them in `AppConfig`:
-
-```dart
-AppConfig appConfig = AppConfig(
-  container: registerContainer,
-  providers: <DoxProvider>[ORMProvider()], // runs first
-  routers: <Router>[ApiRouter()],       // registered first
-);
-```
-
-A listed class comes first. The others follow. No class runs twice.
-A listed provider is also the instance that the container gives.
-
-A provider can add global middleware with `Dox().addGlobalMiddleware(...)` in `setup()`. They run before the app's `globalMiddleware`. See [Middleware](middleware.md).
-
-## Use the container in code
-
-`Dox().ioc` is the container of the current isolate.
-
-```dart
-UserService users = Dox().ioc.get<UserService>();
-```
-
-| Method | What it does |
-| --- | --- |
-| `get<T>()` | the instance of `T`. Throws when `T` is not registered. |
-| `has<T>()` | `true` when `T` is registered |
-| `singleton<T>(factory)` | one instance per isolate, made on first use |
-| `factory<T>(factory)` | a new instance on each `get` |
-| `instance<T>(value)` | `value` is the instance, eg. a config object |
-| `override<T>(value)` | replace `T`, eg. with a fake in a test |
-| `clearOverrides()` | remove every override |
-
-## Tests
-
-Replace a class with a fake before the app starts:
-
-```dart
-setUpAll(() async {
-  Dox().ioc.override<UserRepository>(FakeUserRepository());
-  client = await DoxTestClient.start(appConfig);
-});
-
-tearDownAll(() async {
-  await client.close();
-  Dox().ioc.clearOverrides();
-});
-```
-
-An override stays when the app registers its classes again.
-Call it before `DoxTestClient.start`. Controllers get their objects once, at start.
-
-## Build errors
-
-The build stops with a clear message when:
-
-- a required parameter has a type that is not in the container,
-- a parameter has an abstract type, and two or more classes in the container implement it,
-- classes need each other in a circle. The message shows the chain, like `A -> B -> C -> A`,
-- `@Inject()` is on an abstract class or a generic class,
-- a class has no unnamed constructor.
-
-The message shows the file and line of the problem.
-
-A private class (like `_AdminRouter`) is not put in the container. The build shows a warning for it. Remove the `_` to add it.
-
-## Limits
-
-- Dox finds classes in `lib/` only.
-- The container is keyed by the class. A constructor parameter of an abstract type gets the one container class that implements it:
-
-    ```dart
-    abstract class Mailer {}
-
-    @Inject()
-    class SmtpMailer implements Mailer {}
-
-    @Inject()
-    class SignupService {
-      SignupService(this.mailer); // gets the SmtpMailer
-
-      final Mailer mailer;
-    }
-    ```
-
-    This works for constructor parameters only. `c.get<Mailer>()` and handler parameters still need the class itself.
-- Two classes with the same name in two files both work. But use the typed route style (`Route.get<C>(...)`) for them. They can not be handler parameters, because Dox can not tell them apart by name.

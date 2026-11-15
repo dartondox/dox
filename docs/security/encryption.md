@@ -4,28 +4,53 @@ icon: lucide/lock-keyhole
 
 # Encryption
 
-This page shows how to encrypt and decrypt text with `Crypt` and `AESEncryptor`.
+`Crypt` and `AESEncryptor` encrypt and decrypt text with AES-256-GCM, so you can store or send data that nobody else can read or change.
 
-Dox uses `AESEncryptor` to encrypt cookies with your `APP_KEY`.
-You can also call it yourself.
+Dox uses the same encryption for cookies and the `cookie` session driver, with your `APP_KEY`.
 
-## Encrypt with the app key
+## Configuration
 
-`Crypt` uses the `APP_KEY` of the app. You do not pass the key.
+The key is the `APP_KEY` in `.env`. Make a new one with the CLI. It writes a random key of 32 letters and digits:
+
+```bash
+dox key:generate
+```
+
+Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
+
+At startup Dox checks `APP_KEY`. When it is empty, not exactly 32 bytes, or a public sample key, the app stops. In `development`, `local`, `test` and `testing` it only prints a warning.
+
+## Encrypting values
+
+`Crypt` uses the `APP_KEY` of the app, so you do not pass a key. Use `encryptString` for text:
 
 ```dart
 String secret = Crypt.encryptString('card-1234');
+```
+
+Use `encrypt` for any JSON value:
+
+```dart
+String data = Crypt.encrypt(<String, dynamic>{'id': 5}); // any JSON value
+```
+
+The result is base64 text. The same value gives a different result each time.
+
+## Decrypting values
+
+Use `decryptString` or `decrypt` to get the value back:
+
+```dart
 String card = Crypt.decryptString(secret); // 'card-1234'
 
-String data = Crypt.encrypt(<String, dynamic>{'id': 5}); // any JSON value
 Map<String, dynamic> map = Crypt.decrypt(data);
 ```
 
-- `decryptString` and `decrypt` also try the old keys in `AppConfig.previousKeys`.
-- They throw `DecryptException` when the text was changed or made with another key.
-- `Crypt.encryptString(v)` gives the same as `AESEncryptor.encode(v, appKey)`.
+They throw a `DecryptException` when the text was changed or made with another key. The client then gets a `400`. They also try the old keys in `AppConfig.previousKeys`, so values still work after you [rotate the key](#change-the-key-key-rotation).
 
-## Encrypt and decrypt with your own key
+## Using your own key
+
+Sometimes you want a key that is not the `APP_KEY`. Use `AESEncryptor` and pass the key yourself:
 
 ```dart
 import 'package:dox_core/dox_core.dart';
@@ -36,22 +61,17 @@ String encoded = AESEncryptor.encode('Hello world', secret);
 String decoded = AESEncryptor.decode(encoded, secret); // 'Hello world'
 ```
 
-- `encode` returns base64 text.
-- The same text gives a different output each time.
-- `decode` throws `DecryptException` when the text was changed, or the key is wrong. It is a `400 Bad Request` error. The flag `decryptServerError` makes it a reported `500`. See [Core flags](../reference/app-config.md#core-flags).
-- The AES key is not the secret itself. Dox makes a 32-byte key (AES-256) from the secret with HKDF-SHA256 (RFC 5869) and a label. The default label is `dox:encrypt`. Pick another one with `purpose:`, like `AESEncryptor.encode(text, secret, purpose: 'app:invoice')`. `decode` needs the same `purpose`.
+`decode` throws a `DecryptException` when the text was changed or the key is wrong.
 
-Make a new 32-character `APP_KEY` with the CLI:
+### One key per purpose
 
-```bash
-dox key:generate
+Dox does not use your key as it is. It makes a 32-byte key from it with HKDF-SHA256 and a label. The default label is `dox:encrypt`. You should pick your own label with `purpose:`, so a value made for one purpose can not be used for another. `decode` needs the same `purpose`:
+
+```dart
+AESEncryptor.encode(text, secret, purpose: 'app:invoice')
 ```
 
-It writes a random key of letters and digits to `APP_KEY` in `.env`.
-
-## One key per purpose
-
-Dox does not use `APP_KEY` as it is. It makes one key per purpose from it, with HKDF-SHA256 and a label:
+Dox uses these labels for its own keys:
 
 | Label | Used for |
 | --- | --- |
@@ -60,21 +80,29 @@ Dox does not use `APP_KEY` as it is. It makes one key per purpose from it, with 
 | `dox:encrypt` | `AESEncryptor` when you give no `purpose` |
 | `dox:signed-url` | for signed URLs |
 
-So a value made for one purpose can not be used for another one.
-`KeyDerivation.forAppKey(label)` gives the 32-byte key of a label. Each isolate makes it once.
+## Encrypted cookies
 
-At startup Dox checks `APP_KEY`. When it is empty, not exactly 32 bytes, or an old public sample key, the app stops.
-In `development`, `local`, `test` and `testing` it only prints a warning.
+`DoxCookie` encrypts its value with `APP_KEY` by default, and `req.cookie(key)` decrypts it:
 
-- Keep `APP_KEY` in `.env` or in the secrets of your host. Never put it in code or in git.
-- If you change `APP_KEY` with no `previousKeys`, old encrypted cookies and sessions can not be read any more, so every user is logged out. JWT tokens signed with it stop working too. See [Change the key](#change-the-key-key-rotation).
+```dart
+return response().cookie(DoxCookie('theme', 'dark'));  // encrypted
 
-## Change the key (key rotation)
+String? theme = req.cookie('theme');                    // decrypted
+```
 
-Change `APP_KEY` from time to time, or when someone who knew it leaves the team.
-With `previousKeys`, users stay logged in while you change it.
+If you need a plain text cookie, turn encryption off. Read the raw value with `decrypt: false`:
 
-### Steps
+```dart
+DoxCookie('theme', 'dark', encrypt: false);             // plain text
+
+String? raw = req.cookie('theme', decrypt: false);      // as sent
+```
+
+`req.cookie(key)` returns `null` when the cookie was changed, made with another `APP_KEY`, or made for another cookie name. The cookie name is bound to the value, so a value can not be copied from one cookie to another. To decrypt a raw cookie value yourself, use `DoxCookie.decrypt(name, value)`.
+
+## Rotating the key {#change-the-key-key-rotation}
+
+You should change `APP_KEY` from time to time, or when someone who knew it leaves the team. If you just change it, old cookies and sessions can not be read, so every user is logged out, and JWT tokens signed with it stop working. With `previousKeys`, users stay logged in while you change it:
 
 1. Copy the current `APP_KEY` to `APP_PREVIOUS_KEYS`.
 2. Run `dox key:generate`. It writes a new `APP_KEY`. Now `.env` has both:
@@ -101,53 +129,20 @@ With `previousKeys`, users stay logged in while you change it.
 5. Wait until the old cookies have expired: the session `lifetime`, and the `maxAge` of your own cookies.
 6. Remove the old key from `APP_PREVIOUS_KEYS` and deploy again.
 
-`APP_PREVIOUS_KEYS` can hold more than one key, comma separated. Dox tries them in order.
+`APP_PREVIOUS_KEYS` can hold more than one key, comma separated. Dox writes a cookie with the new key the next time it sends it, so a user who comes back during step 5 moves to the new key without noticing.
 
-### What reads the old keys
-
-| Value | With an old key |
-| --- | --- |
-| encrypted cookies (`req.cookie`) | read |
-| `cookie` session driver | read |
-| CSRF token | read (it is in the session) |
-| JWT tokens of `JwtAuthDriver(secret: SecretKey(env.appKey))` | checked. A JWT secret that is not `APP_KEY` needs its own `previousSecrets` option, see [Authentication](authentication.md#change-the-jwt-secret). |
-| `Crypt.decryptString` and `Crypt.decrypt` | read |
-| `AESEncryptor.decode` in your code | read only when you pass `previousSecrets: Dox().config.previousKeys` |
-| anything new | made with `APP_KEY` only |
-
-Dox writes a cookie with the new key the next time it sends that cookie.
-So a user who comes back during step 5 moves to the new key without noticing.
+The old keys are used to read encrypted cookies, the `cookie` session driver, the CSRF token, `Crypt.decrypt`, and JWT tokens signed with `APP_KEY`. A JWT secret that is not `APP_KEY` needs its own `previousSecrets`, see [Authentication](authentication.md#change-the-jwt-secret). Your own `AESEncryptor.decode` calls read old keys only when you pass `previousSecrets: Dox().config.previousKeys`.
 
 ### When the key leaked
 
-Do **not** put a leaked key in `previousKeys`.
-Anyone who has it can still make cookies and JWT tokens that Dox accepts.
-Change `APP_KEY` with no `previousKeys`. Every user is logged out, and that is what you want.
+Do **not** put a leaked key in `previousKeys`, because anyone who has it can still make cookies and JWT tokens that Dox accepts. Change `APP_KEY` with no `previousKeys`. Every user is logged out, and that is what you want.
 
-## Cookies
+## Details
 
-`DoxCookie` encrypts its value with `APP_KEY` by default.
-`req.cookie(key)` decrypts it.
-To decrypt a raw cookie value yourself, call `DoxCookie.decrypt(name, value)`. It returns `null` when the value was changed, was made with another key, or was made for another cookie name.
-
-```dart
-return response().cookie(DoxCookie('theme', 'dark'));  // encrypted
-DoxCookie('theme', 'dark', encrypt: false);             // plain text
-
-String? theme = req.cookie('theme');                    // decrypted
-String? raw = req.cookie('theme', decrypt: false);      // as sent
-```
-
-`req.cookie(key)` returns `null` when the cookie was changed, was made with another `APP_KEY`, or was made for another cookie name.
-The cookie name is bound to the encrypted value, so a value can not be copied from one cookie to another.
-
-## How it works
-
-`AESEncryptor` uses AES-256-GCM. The work runs in Rust (in `dox_http_native`), with the AES instructions of the CPU. One cookie takes about 1–2 µs.
-
-- Each message gets a new random 12-byte nonce.
-- The output is base64 of `nonce + encrypted text + tag`.
-- The 16-byte tag checks the message. If someone changes one byte, `decode` throws.
-- `encode` and `decode` also take `associatedData`, a text like a cookie name. It is not in the output, but `decode` needs the same value. Cookies use the cookie name here.
-
-To store passwords, do not encrypt them. Hash them. See [Hashing](hashing.md).
+- To store passwords, do not encrypt them. Hash them. See [Hashing](hashing.md).
+- `Crypt.encryptString(v)` gives the same as `AESEncryptor.encode(v, appKey)`.
+- The flag `decryptServerError` makes a `DecryptException` a reported `500` instead of a `400`. See [Core flags](../reference/app-config.md#core-flags).
+- `KeyDerivation.forAppKey(label)` gives the 32-byte key of a label.
+- The work runs in Rust with the AES instructions of the CPU. One cookie takes about 1–2 µs.
+- Each message gets a new random 12-byte nonce. The output is base64 of `nonce + encrypted text + tag`. The 16-byte tag makes `decode` throw if one byte is changed.
+- `encode` and `decode` also take `associatedData`, like a cookie name. It is not in the output, but `decode` needs the same value.

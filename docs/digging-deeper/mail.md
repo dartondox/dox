@@ -6,33 +6,29 @@ icon: lucide/mail
 
 The `dox_mailer` package sends email from your app with SMTP, Amazon SES, Azure, Resend, Mailgun, Postmark or sendmail.
 
-You write a `Message` and call `Mail.send()`. A transport sends it. You pick the transport in a config file, so you can change providers with no code change.
-
-The package has its own SMTP client, AWS signer and MIME builder. Next to `dox_core`, it only needs `dox_view`, `markdown`, `http` and `crypto`.
-
-Send slow emails from the [queue](queue.md) with `Mail.queue()`, so the request does not wait. See [Queue an email](#queue-an-email).
+You write a `Message` and call `Mail.send()`, and a transport sends it. You pick the transport in a config file, so you can change providers with no code change. Slow emails can go through the [queue](queue.md), so the request does not wait.
 
 ## Install
+
+Add the package with the `dox` CLI. Add `--transport=smtp` (or `resend`, `mailgun`, `postmark`, `ses`) to pick a transport. `log` is the default:
 
 ```bash
 dox add mailer
 ```
 
-Add `--transport=smtp` (or `resend`, `mailgun`, `postmark`, `ses`) to pick a transport. `log` is the default.
-It adds the package and writes the mail config and the provider. It adds `MAIL_MAILER`, `MAIL_FROM` and the keys of the transport to `.env`.
-When the app has `dox_view`, it also makes the `resources/views/emails` folder. It never overwrites a file, so it is safe to run twice.
+It adds the package, writes the mail config and the provider, and adds `MAIL_MAILER`, `MAIL_FROM` and the keys of the transport to `.env`. If the app has `dox_view`, it also makes the `resources/views/emails` folder. It never overwrites a file, so it is safe to run twice.
 
-### Set it up by hand
+If you want to set it up by hand, add the package and write the two files below yourself:
 
 ```bash
 dart pub add dox_mailer
 ```
 
-## Set up
+## Setup
 
-### 1. Config
+### Configuration
 
-A mailer is a name and a transport. `defaultMailer` is the one that `Mail.send()` uses.
+A mailer is a name and a transport. `defaultMailer` is the one that `Mail.send()` uses:
 
 ```dart title="lib/config/mail.dart"
 import 'package:dox_core/dox_core.dart';
@@ -77,9 +73,9 @@ MAIL_PASSWORD=secret
 | `from` | none | the from address of a message that has none |
 | `replyTo` | none | the reply-to addresses of a message that has none |
 
-### 2. Provider
+### The mail provider
 
-The provider sets up the mailers in every isolate. Put it in `lib/providers/`, so the generated container finds it.
+The provider sets up the mailers in every isolate. Put it in `lib/providers/`, so the generated container finds it:
 
 ```dart title="lib/providers/mail_provider.dart"
 import 'package:dox_mailer/dox_mailer.dart';
@@ -95,44 +91,9 @@ class AppMailProvider extends MailProvider {
 
 When the server stops, the provider closes open SMTP connections and HTTP clients.
 
-## Without Dox
+## Sending mail
 
-`dox_mailer` also works on its own. Call `Mail.configure()` once at start, and `Mail.close()` at the end:
-
-```dart
-import 'dart:io';
-
-import 'package:dox_mailer/dox_mailer.dart';
-
-Future<void> main() async {
-  Map<String, String> env = Platform.environment;
-
-  Mail.configure(MailConfig(
-    defaultMailer: 'smtp',
-    from: Address('hello@example.com', 'My app'),
-    mailers: <String, Transport>{
-      'smtp': SmtpTransport(
-        host: env['MAIL_HOST'] ?? 'localhost',
-        username: env['MAIL_USERNAME'],
-        password: env['MAIL_PASSWORD'],
-      ),
-    },
-  ));
-
-  await Mail.send(Message(
-    to: <Address>[Address('ann@example.com')],
-    subject: 'Hello',
-    text: 'Hello Ann!',
-  ));
-
-  // closes open SMTP connections and HTTP clients
-  await Mail.close();
-}
-```
-
-The rest of this page works the same way.
-
-## Send an email
+Make a `Message` and pass it to `Mail.send()`:
 
 ```dart
 import 'package:dox_mailer/dox_mailer.dart';
@@ -147,34 +108,34 @@ await Mail.send(
 );
 ```
 
-Send with another mailer:
+A message needs a from address, at least one recipient, and a text or HTML body. If the message can not be sent, `send()` throws a `MailException`. It has the `statusCode` and the `body` of the server's answer.
+
+### Using another mailer
+
+If you want to send with a mailer that is not the default, use `Mail.mailer()`:
 
 ```dart
 await Mail.mailer('ses').send(message);
 ```
 
-`send()` gives a `SentMessage`. Its `messageId` is the id of the provider (or the `Message-ID` header for SMTP and sendmail).
-
-When the message can not be sent, `send()` throws a `MailException`. It has the `statusCode` and the `body` of the answer of the server.
-
 ### Short ways to send
 
-`Mail.raw()` sends a plain text email. `Mail.to()` starts an email with chained calls. Both take plain email text:
+For a quick plain text email, use `Mail.raw()`:
 
 ```dart
 await Mail.raw('Your code is 1234', to: 'ann@example.com', subject: 'Your code');
+```
 
+`Mail.to()` starts an email with chained calls. `to()`, `cc()` and `bcc()` take an `Address`, an email text, or a list of these. `send()` takes a [mailable](#mailables), and the recipients are added to the ones of the mailable:
+
+```dart
 await Mail.to('ann@example.com')
     .cc('Bob Lee <bob@example.com>')
     .bcc(<String>['audit@example.com'])
     .send(WelcomeMail(user));
 ```
 
-- `to()`, `cc()` and `bcc()` take an `Address`, an email text, or a list of these.
-- `send()` takes a mailable. The recipients are added to the ones of the mailable.
-- `queue()` and `later()` work too, like `Mail.to(email).queue(WelcomeMail(user))`.
-- `Address.list()` reads addresses the same way: `Message(to: Address.list('ann@example.com'), ...)`.
-- One text is one address. For more addresses, pass a list: `Address.list(<String>['ann@example.com', 'bob@example.com'])`.
+`queue()` and `later()` work here too, like `Mail.to(email).queue(WelcomeMail(user))`.
 
 ### The message
 
@@ -191,11 +152,22 @@ await Mail.to('ann@example.com')
 | `tags` | tags for the reports of the provider |
 | `metadata` | key and value data for the provider, like `{'user_id': '42'}` |
 
-An `Address` is an email and an optional name: `Address('ann@example.com', 'Ann')`. `Address.parse('Ann <ann@example.com>')` reads one from text.
+An `Address` is an email and an optional name. You can also read one from text:
 
-A message needs a from address, at least one recipient, and a text or HTML body. A subject or header with a line break is an error, so user input can not add headers.
+```dart
+Address('ann@example.com', 'Ann');
+Address.parse('Ann <ann@example.com>');
+```
+
+`Address.list()` reads many addresses. One text is one address, so pass a list for more:
+
+```dart
+Message(to: Address.list(<String>['ann@example.com', 'bob@example.com']), ...)
+```
 
 ### Attachments
+
+Add files with `attachments`. The content type comes from the file extension, or you can pass `contentType`:
 
 ```dart
 Message(
@@ -209,8 +181,6 @@ Message(
 );
 ```
 
-The content type comes from the file extension. Pass `contentType` to set it.
-
 To attach a file from a storage disk, like S3, read its bytes first. This works with every disk:
 
 ```dart
@@ -220,7 +190,7 @@ Attachment(pdf!, 'invoice.pdf');
 
 ### Inline images
 
-Give the file a `cid`. Use it in the HTML with `cid:`.
+To show an image inside the HTML, give the file a `cid` and use it with `cid:`:
 
 ```dart
 Message(
@@ -233,11 +203,11 @@ Message(
 );
 ```
 
-Mailgun uses the file name as the cid. So for Mailgun, use a cid like `logo.png`, with the file extension.
+Mailgun uses the file name as the cid. So for Mailgun, use a cid with the file extension, like `logo.png`.
 
 ### HTML from a view
 
-With [views](../the-basic/views.md), render a template to HTML:
+With [views](../the-basic/views.md), you can render a template to HTML:
 
 ```dart
 String html = View.render('emails/welcome', <String, dynamic>{'name': 'Ann'});
@@ -246,7 +216,15 @@ await Mail.send(Message(to: to, subject: 'Welcome', html: html));
 
 ## Mailables
 
-A mailable is one kind of email in its own class, for example the welcome email. It keeps the address, the subject, the template and the data in one place. Override the getters you need:
+A mailable is one kind of email in its own class, for example the welcome email. It keeps the address, the subject, the template and the data in one place.
+
+To make one, run `dox make:mail`. It writes `lib/app/mail/welcome_mail.dart` and the view `resources/views/emails/welcome.dox.html`. Add `--no-view` for a mail with a plain text body. See [`dox make:mail`](../reference/cli.md#dox-makemail).
+
+```bash
+dox make:mail Welcome
+```
+
+Override the getters you need:
 
 ```dart
 class WelcomeMail extends Mailable {
@@ -268,18 +246,6 @@ class WelcomeMail extends Mailable {
 }
 ```
 
-To make a mailable, run `dox make:mail Welcome`. It writes `lib/app/mail/welcome_mail.dart` and the view `resources/views/emails/welcome.dox.html`. Add `--no-view` for a mail with a plain text body and no view. See [`dox make:mail`](../reference/cli.md#dox-makemail).
-
-Then send it, or put it on the queue:
-
-```dart
-await WelcomeMail(user).send();
-await WelcomeMail(user).queue();
-await WelcomeMail(user).later(Duration(minutes: 10));
-```
-
-`queue()` and `later()` render the templates at once. The worker sends the finished email, so it needs no templates and no data. They take the same `queue` and `encrypt` options as `Mail.queue()`.
-
 | Getter | What it is |
 | --- | --- |
 | `to`, `cc`, `bcc`, `replyTo` | the addresses |
@@ -288,12 +254,26 @@ await WelcomeMail(user).later(Duration(minutes: 10));
 | `html`, `text` | the body as text, when there is no template |
 | `view` | a [dox_view](../the-basic/views.md) template for the HTML body |
 | `textView` | a dox_view template for the plain text body |
-| `markdown` | a dox_view template with Markdown, see below |
+| `markdown` | a dox_view template with Markdown, see [Markdown mail](#markdown-mail) |
 | `data` | the variables of the templates |
 | `attachments` | the files |
 | `mailer` | the mailer name, eg. `ses`. Null: the default mailer |
 
-`toMessage()` gives the email as a `Message`. To set more, like headers or tags, override it:
+### Sending a mailable
+
+Call `send()` on the mailable, or put it on the queue with `queue()` or `later()`:
+
+```dart
+await WelcomeMail(user).send();
+await WelcomeMail(user).queue();
+await WelcomeMail(user).later(Duration(minutes: 10));
+```
+
+`queue()` and `later()` render the templates at once, so the worker sends the finished email. They take the same options as [`Mail.queue()`](#queue-an-email).
+
+### Changing the message
+
+`toMessage()` gives the email as a `Message`. If you want to set more, like headers or tags, override it:
 
 ```dart
 @override
@@ -302,15 +282,11 @@ Message toMessage() {
 }
 ```
 
-`{{ }}` in a template escapes HTML. For the plain text body of `textView` and `markdown`, the escape is undone, so `Tom & Jerry` stays `Tom & Jerry`.
-
 ### Markdown mail
 
-Write the email in Markdown. You get a simple HTML email with a layout, and a plain text part, from one template. The Markdown is CommonMark with tables.
+You can write the email in Markdown. From one template you get a simple HTML email with a layout (a white card on a grey page) and a plain text part. The Markdown is CommonMark with tables.
 
-`resources/views/emails/welcome.dox.html`:
-
-```markdown
+```markdown title="resources/views/emails/welcome.dox.html"
 # Hi {{ name }}
 
 Thanks for joining. Here is what you can do next:
@@ -323,30 +299,20 @@ Thanks for joining. Here is what you can do next:
 <a href="https://example.com/dashboard" class="button">Open the app</a>
 ```
 
+Then point the `markdown` getter to it:
+
 ```dart
 @override
 String? get markdown => 'emails/welcome';
 ```
 
-- The HTML body is the Markdown as HTML, inside a white card on a grey page.
-- The text body is the Markdown itself.
-- `<a class="button">` shows as a button. In the text body it stays an `<a>` tag, so the link is still there.
+`<a class="button">` shows as a button. In the text body it stays an `<a>` tag, so the link is still there.
 
-!!! warning "User data in Markdown"
-    `{{ }}` escapes HTML and Markdown. A user's name like `[click](https://evil.example)` shows as that text. It does not become a link.
-    This counts for text values in `data`, in its maps, lists and sets, and in objects with `toJson()`. Values from `View.global()` and from functions are not changed.
-    To put Markdown from a value in the email, pass a `SafeString`.
-    The kept characters are backslash, backtick, `*`, `[`, `]`, `#` and `|`. A `_` is not changed, so `_word_` can still be italic.
-    In `@if`, a value with one of these characters is not equal to the same text written in the template.
-    Links and images with an unsafe URL, like `javascript:`, `vbscript:` or `data:`, lose their URL. Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept.
-    The same goes for the lines of `MailMessage`. `MailMessage.action()` throws an `ArgumentError` for an unsafe URL.
-    Raw HTML in the template, like `<a href="{{ url }}">`, is not checked. In raw HTML, use only full URLs that your app builds. Email apps can not open a relative link like `/dashboard`.
-    For a URL, write `[text]({{ url }})` or `<{{ url }}>`. They go through the URL check, and the URL stays as it is, with `&` and `%XX`.
-    A bare URL does not become a link. Most email apps make it a link anyway.
-    Entity text inside a URL is decoded. So `?q=&lt;b&gt;` reaches the browser as `?q=<b>`.
+Do not indent the Markdown inside `@if` or `@each`, because Markdown makes a line that starts with 4 spaces into a code block.
 
-!!! warning "Indent"
-    Markdown makes a line that starts with 4 spaces into a code block. So do not indent the Markdown inside `@if` or `@each`. Keep it at the start of the line.
+`{{ }}` escapes HTML and Markdown, so a user's name like `[click](https://evil.example)` shows as text and does not become a link. Links with an unsafe URL, like `javascript:`, lose their URL. Raw HTML in the template, like `<a href="{{ url }}">`, is not checked, so only put full URLs that your app builds there. For links, write `[text]({{ url }})` instead. To put Markdown from a value into the email, pass a `SafeString`.
+
+### Custom layout
 
 To use your own look, override `layout()`. It gets the HTML of the Markdown and returns the full page. Put it in a base class to use it for all your mailables:
 
@@ -364,7 +330,7 @@ abstract class AppMail extends Mailable {
 
 ### A simple email with no template
 
-`MailMessage` is a mailable made of lines and a button. It needs no template. It uses the Markdown layout.
+Sometimes you only need a few lines and a button. `MailMessage` is a mailable for this. It needs no template and uses the Markdown layout:
 
 ```dart
 await (MailMessage(subject: 'Invoice paid', to: <Address>[Address('ann@example.com')])
@@ -374,61 +340,47 @@ await (MailMessage(subject: 'Invoice paid', to: <Address>[Address('ann@example.c
     .send();
 ```
 
-More options:
-
 - `cc:` in the constructor adds cc addresses.
 - `attach(Attachment(...))` adds a file.
 - `error()` makes the buttons red, for a message about a problem.
+- The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out.
 
-The email starts with `greeting` (default `Hello!`) and ends with `salutation` (default none). Set them to null to leave them out. Lines can use Markdown, like `**bold**`. HTML in a line shows as text. See "User data in Markdown" above.
+Lines can use Markdown, like `**bold**`. HTML in a line shows as text. `action()` throws an `ArgumentError` for an unsafe URL.
 
 To send one email on more than one channel, see [Notifications](notifications.md).
 
 ## Queue an email
 
-Sending an email can take a second or more. With a queue, the request does not wait. A queue worker sends the email later.
-
-This uses [dox_queue](queue.md), which dox_mailer depends on. You only need the dox_queue `QueueProvider` and a worker. The mail jobs are part of dox_mailer. `build_runner` adds them to `lib/generated/jobs.g.dart`, so the worker can read them. The worker (`bin/queue.dart`) must still run `MailProvider`: the job sends with your mail config, and `MailProvider` sets it up. Without it, the job fails with "Mail is not set up". Then:
+Sending an email can take a second or more. With a queue, the request does not wait, because a queue worker sends the email later:
 
 ```dart
 await Mail.queue(message);
+```
 
-// send it in 10 minutes
+To send it later, use `Mail.later()`. Both methods return the job id:
+
+```dart
 await Mail.later(Duration(minutes: 10), message);
+```
 
-// another mailer and another queue
+You can pick another mailer and another queue:
+
+```dart
 await Mail.mailer('ses').queue(message, queue: 'emails');
 ```
 
-`queue()` and `later()` return the job id.
+This uses [dox_queue](queue.md), so you need its `QueueProvider` and a worker. The mail jobs come with dox_mailer, and `build_runner` adds them to `lib/generated/jobs.g.dart`. The worker (`bin/queue.dart`) must run your `MailProvider` too, because the job sends with your mail config. Without it, the job fails with "Mail is not set up".
 
-- The message is checked at once. A bad message fails in the request, not in the worker.
-- The default from and reply-to addresses are added at once.
-- The mailer name is saved with the job. The worker sends with the same mailer, so with the same transport.
-- The worker starts the providers of your app, so your `MailProvider` and mail config are there too.
-- The worker flags `--tries` and `--timeout` work for queued emails, like for other jobs.
-- With the `sync` queue driver, the email is sent at once. `later()` does not wait.
+The message is checked at once, so a bad message fails in the request and not in the worker. The worker sends with the same mailer you picked.
 
 | Option | Default | What it does |
 | --- | --- | --- |
 | `queue` | `default` | the queue name |
 | `encrypt` | `false` | save the job data encrypted with the app key. The worker needs the same key |
 
-!!! warning "The whole email is saved in the queue"
-    The addresses, the subject, the body and every attachment are saved in Redis or in the `jobs` table.
-    Attachments are saved as base64, so they take about 4/3 of their size.
-    Keep attachments small, a few MB at most. MySQL and MariaDB refuse a job bigger than `max_allowed_packet` (by default 64 MB in MySQL 8, 16 MB in MariaDB). Redis keeps every job in memory.
-    For a big file, write your own job. Save the file path or a storage key in the job, and build the email in `handle()`.
+The whole email, with every attachment, is saved in Redis or in the `jobs` table. So keep attachments small, a few MB at most. For a big file, write your own job that saves the file path, and build the email in `handle()`.
 
-!!! tip "Encrypt personal data"
-    An email has personal data. When other people can read Redis or the `jobs` table, use `encrypt: true`.
-    With `encrypt: true`, a send error is encrypted with the app key too. The plain text of the error is only its type and code, for example `RedactedMailError: MailException (code 550). Details are encrypted: ...`.
-    The full error text, with the answer of the server, is inside the encrypted part (at most the first 64K characters, counted in UTF-16 code units).
-    To read it, take a `FailedJob` from `Queue.driver.failed()` and call `RedactedMailError.decrypt(job.error)` (from `package:dox_mailer/dox_mailer.dart`). It works with the app key or any key in `AppConfig.previousKeys`.
-
-By default `Mail.queue()` and `Mail.later()` use the dox_queue queue. To use another queue, call `Mail.useQueue(queue)` (`null` goes back to the dox_queue queue).
-
-In tests, `Mail.fake()` also catches `Mail.queue()` and `Mail.later()`. The email goes to `mail.queued`, not to the job queue. You need no queue setup. See [Testing](#testing).
+An email has personal data. If other people can read Redis or the `jobs` table, use `encrypt: true`.
 
 ## Transports
 
@@ -456,11 +408,11 @@ In tests, `Mail.fake()` also catches `Mail.queue()` and `Mail.later()`. The emai
 | `timeout` | 30 seconds | the time to connect, and to wait for each reply |
 | `keepAlive` | `false` | keep the connection open for the next message |
 
-With `starttls`, the send fails when the server does not offer STARTTLS. Your password is never sent in plain text by mistake.
+With `starttls`, the send fails if the server does not offer STARTTLS, so your password is never sent in plain text by mistake.
 
 For Gmail or Outlook with OAuth 2, use `auth: SmtpAuth.xoauth2`. The `username` is the email and the `password` is the access token.
 
-`keepAlive: true` is good when you send many emails. One connection sends them one by one. When the server closed it, the next send opens a new one.
+If you send many emails, use `keepAlive: true`, so one connection sends them one by one.
 
 For local work, [Mailpit](https://mailpit.axllent.org) catches all emails:
 
@@ -474,10 +426,7 @@ For local work, [Mailpit](https://mailpit.axllent.org) catches all emails:
 
 ### Amazon SES
 
-There are two classes. Both send the same MIME message, with attachments and inline images.
-
-- `SesTransport`: SES API v1, `SendRawEmail`.
-- `SesV2Transport`: SES API v2, `SendEmail` with raw content.
+There are two classes, and both send the same MIME message with attachments and inline images. `SesTransport` uses SES API v1 (`SendRawEmail`), and `SesV2Transport` uses SES API v2 (`SendEmail` with raw content):
 
 ```dart
 'ses': SesV2Transport(
@@ -496,7 +445,7 @@ There are two classes. Both send the same MIME message, with attachments and inl
 | `configurationSet` | none | the SES configuration set, to track events |
 | `endpoint` | `https://email.<region>.amazonaws.com/` | another API address |
 
-The requests are signed with AWS Signature Version 4. No AWS SDK is needed.
+No AWS SDK is needed.
 
 ### Azure Communication Services
 
@@ -507,7 +456,7 @@ The requests are signed with AWS Signature Version 4. No AWS SDK is needed.
 ),
 ```
 
-Or with the connection string of the Azure portal:
+Or use the connection string of the Azure portal:
 
 ```dart
 'azure': AzureTransport.fromConnectionString(
@@ -522,7 +471,7 @@ Or with the connection string of the Azure portal:
 | `apiVersion` | `2023-03-31` | the API version |
 | `disableTracking` | `false` | turn off open and click tracking |
 
-Requests are signed with the access key (HMAC-SHA256). Inline images need a newer `apiVersion` that supports them.
+Inline images need a newer `apiVersion` that supports them.
 
 ### Resend
 
@@ -555,7 +504,7 @@ Requests are signed with the access key (HMAC-SHA256). Inline images need a newe
 
 ### sendmail
 
-Sends with the `sendmail` program of the server (Postfix, Exim, msmtp and others).
+This sends with the `sendmail` program of the server (Postfix, Exim, msmtp and others):
 
 ```dart
 'sendmail': SendmailTransport(
@@ -571,26 +520,21 @@ Sends with the `sendmail` program of the server (Postfix, Exim, msmtp and others
 
 ### Log
 
-Prints each email and sends nothing. Good for local work.
+The log transport prints each email and sends nothing, so it is good for local work:
 
 ```dart
 'log': LogTransport(),
 ```
 
-Pass `output` to print somewhere else, eg. `LogTransport(output: stderr.writeln)` (from `dart:io`).
-
-Two options, both off by default:
-
-- `useLogger: true` writes each email to the app log with `Logger.info`, not with `print`. The logger is off by default: set `LoggerConfig(enabled: true)`, or nothing is written. The logger level must allow `info`. When the logger throws (eg. Dox is not set up), the email is printed.
-- `bothBodies: true` shows the text body and the HTML body when the email has both. When it is off, only the text body is shown.
+Pass `output` to print somewhere else, eg. `LogTransport(output: stderr.writeln)` (from `dart:io`). To show both the text and the HTML body, set `bothBodies: true`. When it is off, only the text body is shown:
 
 ```dart
-'log': LogTransport(useLogger: true, bothBodies: true),
+'log': LogTransport(bothBodies: true),
 ```
 
 ### Array
 
-Keeps each email in a list and sends nothing. See [Testing](#testing).
+The array transport keeps each email in a list and sends nothing. See [Testing](#testing).
 
 ```dart
 'array': ArrayTransport(),
@@ -598,7 +542,7 @@ Keeps each email in a list and sends nothing. See [Testing](#testing).
 
 ### Failover
 
-Tries each transport in order, until one sends the email. When every transport fails, it throws the error of the last one. To see why the first ones failed, pass `onError`. It gets the error of each transport that fails. When `onError` throws, the error is ignored and the next transport is still tried. An `async` `onError` is not awaited. A line break in an address, the subject or a header throws a `MailException` at once, and no transport tries it.
+If one provider is down, you may want to try another. `FailoverTransport` tries each transport in order, until one sends the email. If every transport fails, it throws the error of the last one:
 
 ```dart
 SesV2Transport ses = SesV2Transport(key: '...', secret: '...');
@@ -611,6 +555,8 @@ MailConfig mailConfig = MailConfig(
   },
 );
 ```
+
+To see why the first ones failed, pass `onError`. It gets the error of each transport that fails.
 
 ## Tags and metadata
 
@@ -628,9 +574,9 @@ For SMTP and sendmail, use `headers` instead.
 
 ## Hooks
 
-Run code before or after each email is sent, eg. to log it. Dox has no event system, so hooks are plain functions.
+Sometimes you want to run code before or after each email is sent, for example to log it. Use `Mail.onSending` and `Mail.onSent`.
 
-Each isolate has its own hooks: the server isolates and the queue worker. So add them in `setup()` of your mail provider, after `super.setup()`. Then every isolate gets them. A hook added in `main()` does not reach queued emails.
+Each isolate has its own hooks, also the queue worker. So add them in `setup()` of your mail provider, after `super.setup()`. A hook added in `main()` does not reach queued emails.
 
 ```dart
 class AppMailProvider extends MailProvider {
@@ -650,14 +596,11 @@ class AppMailProvider extends MailProvider {
 }
 ```
 
-- Hooks run for every mailer. They also run for queued emails, when the worker sends them, and with `Mail.fake()`.
-- When an `onSending` hook throws, the email is not sent. `send()` throws that error.
-- When an `onSent` hook throws, the error is logged and `send()` does not throw. The email is already sent, so a queue worker does not try the job again and send it twice. The other `onSent` hooks still run.
-- `Mail.clearHooks()` removes all hooks. Call it first in `setup()`, as above, and in tests.
+Hooks run for every mailer, for queued emails and with `Mail.fake()`. If an `onSending` hook throws, the email is not sent and `send()` throws that error. If an `onSent` hook throws, the error is only logged, because the email is already sent.
 
-## Send all email to one address
+## Sending all mail to one address
 
-On a staging server, send every email to your own inbox, so real users get nothing. Like hooks, call it in `setup()` of your mail provider, after `super.setup()`, so every isolate gets it:
+On a staging server, you want every email to go to your own inbox, so real users get nothing. Use `Mail.alwaysTo()`. Like hooks, call it in `setup()` of your mail provider, so every isolate gets it:
 
 ```dart
 class AppMailProvider extends MailProvider {
@@ -673,11 +616,62 @@ class AppMailProvider extends MailProvider {
 }
 ```
 
-The `to` of each email becomes that address, and `cc` and `bcc` are cleared. It counts for queued emails too. `Mail.alwaysTo(null)` turns it off.
+The `to` of each email becomes that address, and `cc` and `bcc` are cleared. This counts for queued emails too. `Mail.alwaysTo(null)` turns it off.
+
+## Custom transports
+
+If your provider is not in the list, extend `Transport` and add it to `mailers`:
+
+```dart
+class MyApiTransport extends Transport {
+  @override
+  Future<SentMessage> send(Message message) async {
+    // call your API here
+    return SentMessage(message, messageId: 'id from the API');
+  }
+}
+```
+
+The message is already checked, and has a from address, when it gets to `send()`. For a provider that takes raw MIME, `MimeBuilder().build(message)` gives the MIME text.
+
+## Without Dox
+
+`dox_mailer` also works on its own. Call `Mail.configure()` once at start, and `Mail.close()` at the end. The rest of this page works the same way:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_mailer/dox_mailer.dart';
+
+Future<void> main() async {
+  Map<String, String> env = Platform.environment;
+
+  Mail.configure(MailConfig(
+    defaultMailer: 'smtp',
+    from: Address('hello@example.com', 'My app'),
+    mailers: <String, Transport>{
+      'smtp': SmtpTransport(
+        host: env['MAIL_HOST'] ?? 'localhost',
+        username: env['MAIL_USERNAME'],
+        password: env['MAIL_PASSWORD'],
+      ),
+    },
+  ));
+
+  await Mail.send(Message(
+    to: <Address>[Address('ann@example.com')],
+    subject: 'Hello',
+    text: 'Hello Ann!',
+  ));
+
+  // closes open SMTP connections and HTTP clients
+  await Mail.close();
+}
+```
 
 ## Testing
 
-`Mail.fake()` sends every mailer to one `ArrayTransport`. Nothing goes out. Then check what was sent.
+`Mail.fake()` sends every mailer to one `ArrayTransport`, so nothing goes out. Then you check what was sent:
 
 ```dart
 import 'package:dox_mailer/dox_mailer.dart';
@@ -705,9 +699,11 @@ void main() {
 }
 ```
 
-`Mail.fake()` works with or without a config. The fake stays on when `MailProvider` sets up the config again.
+The fake works with or without a config, and it stays on when `MailProvider` sets up the config again.
 
-`Mail.fake()` also catches `Mail.queue()`, `Mail.later()`, the `queue()` and `later()` of a Mailable, and notifications with `shouldQueue`. These emails go to `mail.queued`, not to `mail.sent` and not to the job queue. Each item is a `QueuedMessage` with `mailer`, `message`, `id`, `delay`, `queue` and `encrypt`.
+### Testing queued mail
+
+The fake also catches queued emails: `Mail.queue()`, `Mail.later()`, the `queue()` and `later()` of a mailable, and notifications with `shouldQueue`. They go to `mail.queued`, not to the job queue, so you need no queue setup:
 
 ```dart
 await Mail.queue(message);
@@ -715,6 +711,10 @@ await Mail.queue(message);
 mail.assertQueued((Message m) => m.subject == 'Welcome');
 mail.assertNothingSent();
 ```
+
+Each item in `mail.queued` is a `QueuedMessage` with `mailer`, `message`, `id`, `delay`, `queue` and `encrypt`.
+
+### Assertions
 
 | Method | Checks |
 |---|---|
@@ -726,24 +726,40 @@ mail.assertNothingSent();
 | `assertNotQueued(test)` | no queued email passes `test` |
 | `assertNothingQueued()` | no email was queued |
 
-`test` is a `bool Function(Message)`. A failed check throws a `StateError`.
+`test` is a `bool Function(Message)`. A failed check throws a `StateError`. `mail.clear()` forgets the sent and the queued emails, and `Mail.restore()` stops the fake.
 
-`mail.clear()` forgets the sent and the queued emails. `Mail.restore()` stops the fake.
+## Details
 
-## Your own transport
+This section is for special cases. Most apps do not need it.
 
-Extend `Transport` and add it to `mailers`:
+### Sending
 
-```dart
-class MyApiTransport extends Transport {
-  @override
-  Future<SentMessage> send(Message message) async {
-    // call your API here
-    return SentMessage(message, messageId: 'id from the API');
-  }
-}
-```
+- `send()` gives a `SentMessage`. Its `messageId` is the id of the provider, or the `Message-ID` header for SMTP and sendmail.
+- A subject or header with a line break is an error, so user input can not add headers. `FailoverTransport` throws this `MailException` at once, and no transport tries it.
+- In `FailoverTransport`, an error thrown by `onError` is ignored and the next transport is still tried. An `async` `onError` is not awaited.
+- `{{ }}` in a template escapes HTML. In the plain text body of `textView` and `markdown`, the escape is undone, so `Tom & Jerry` stays `Tom & Jerry`.
+- With `keepAlive: true`, if the server closed the connection, the next send opens a new one.
+- SES requests are signed with AWS Signature Version 4. Azure requests are signed with the access key (HMAC-SHA256).
+- The package has its own SMTP client, AWS signer and MIME builder.
 
-The message is checked, and has a from address, when it gets to `send()`.
+### Markdown safety
 
-For a provider that takes raw MIME, `MimeBuilder().build(message)` gives the MIME text.
+- The escaped characters are backslash, backtick, `*`, `[`, `]`, `#` and `|`. A `_` is not changed, so `_word_` can still be italic. In `@if`, a value with one of these characters is not equal to the same text written in the template.
+- Escaping covers text values in `data`, in its maps, lists and sets, and in objects with `toJson()`. Values from `View.global()` and from functions are not changed.
+- Only `http`, `https`, `mailto`, `tel`, `cid` and relative URLs are kept. The same check runs on the lines of `MailMessage`. Email apps can not open a relative link like `/dashboard`, so use full URLs.
+- `[text]({{ url }})` and `<{{ url }}>` keep the URL as it is, with `&` and `%XX`. Entity text inside a URL is decoded, so `?q=&lt;b&gt;` reaches the browser as `?q=<b>`.
+- A bare URL does not become a link, but most email apps make it a link anyway.
+
+### Queue
+
+- The default from and reply-to addresses are added when the email is queued.
+- The worker flags `--tries` and `--timeout` work for queued emails, like for other jobs.
+- With the `sync` queue driver, the email is sent at once, and `later()` does not wait.
+- Attachments are saved as base64, so they take about 4/3 of their size. MySQL and MariaDB refuse a job bigger than `max_allowed_packet` (by default 64 MB in MySQL 8, 16 MB in MariaDB). Redis keeps every job in memory.
+- With `encrypt: true`, a send error is encrypted too. The plain text of the error is only its type and code, like `RedactedMailError: MailException (code 550). Details are encrypted: ...`. The encrypted part holds at most the first 64K characters (UTF-16 code units). To read it, take a `FailedJob` from `Queue.driver.failed()` and call `RedactedMailError.decrypt(job.error)`. It works with the app key or any key in `AppConfig.previousKeys`.
+- To use another queue than dox_queue, call `Mail.useQueue(queue)`. `null` goes back to the dox_queue queue.
+
+### Hooks
+
+- If an `onSent` hook throws, a queue worker does not try the job again, so the email is not sent twice. The other `onSent` hooks still run.
+- `Mail.clearHooks()` removes all hooks. Call it first in `setup()`, and in tests.

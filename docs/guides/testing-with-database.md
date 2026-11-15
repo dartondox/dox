@@ -6,7 +6,7 @@ icon: lucide/flask-conical
 
 Run model tests against a real database: SQLite for fast local tests, or a test Postgres for the real thing.
 
-Migrations run once, and every test starts with empty tables.
+A test with a real database finds bugs that a mock can not find, like a wrong column name or a broken query. In this guide the migrations run once, and every test starts with empty tables, so the tests do not change each other's data.
 
 ## What you need
 
@@ -14,7 +14,7 @@ Migrations run once, and every test starts with empty tables.
 
 ## 1. Check the migration
 
-A new app has this migration. Its file name starts with another date. For a new table, run `dox make:migration create_posts_table`.
+The test builds its tables from your migrations. A new app has this one (its file name starts with another date). For a new table, run `dox make:migration create_posts_table`.
 
 ```dart title="db/migration/2026_10_22_000000_create_users_table.dart"
 import 'package:dox_migration/dox_migration.dart';
@@ -39,12 +39,11 @@ class CreateUsersTable extends Migration {
 }
 ```
 
-`db/migration/migrations.dart` is the list of all migrations. `dox make:migration` updates it. The test imports that list.
-A Dart migration works on Postgres, MySQL and SQLite, so the same test runs on all of them.
+`db/migration/migrations.dart` is the list of all migrations, and `dox make:migration` updates it. The test imports that list. Because a Dart migration works on Postgres, MySQL and SQLite, the same test runs on all of them.
 
 ## 2. Write the test (SQLite)
 
-SQLite needs no server. The test makes its own config, so your `.env` does not matter.
+Start with SQLite, because it needs no server. The test makes its own database config, so your `.env` does not matter.
 
 ```dart title="test/user_test.dart"
 import 'dart:io';
@@ -115,16 +114,13 @@ void main() {
 }
 ```
 
-What happens:
+This is what happens:
 
 1. `setUpAll` deletes an old database file, runs the migrations, and starts the ORM on the same file.
 2. `setUp` runs `refreshDatabase()` before each test. It empties every table (not the migrations table) and starts the ids at 1 again.
 3. `tearDownAll` deletes the file.
 
-!!! note "A file, not `:memory:`"
-    The migrator and the ORM each open their own connection.
-    Two connections to `:memory:` are two different databases. A file is shared.
-    Put `storage/test.sqlite` in `.gitignore`.
+Put `storage/test.sqlite` in `.gitignore`. The test uses a file and not `:memory:`, because the migrator and the ORM each open their own connection. Two connections to `:memory:` are two different databases.
 
 ## 3. Run it
 
@@ -134,7 +130,7 @@ dart test test/user_test.dart
 
 ## Check it
 
-The migration names start with the dates of your files. A new app also has the tables of the queue.
+You see the migrations run, and then the tests pass. The migration names start with the dates of your files, and a new app also has the tables of the queue:
 
 ```text
 00:00 +0: (setUpAll)
@@ -149,9 +145,9 @@ Migrated: 2026_10_23_000000_create_queue_tables
 
 ## The same test on Postgres
 
-Use a separate database for tests. Never the one you develop on.
+SQLite is fast, but your app may run on Postgres in production. Then you should test on Postgres too. Use a separate database for tests, never the one you develop on, because the tests delete all rows.
 
-Start one with Docker:
+Start a test database with Docker:
 
 ```bash
 docker run -d --name my_app_test -p 5433:5432 \
@@ -177,13 +173,11 @@ DatabaseConfig testDatabase = DatabaseConfig(
 );
 ```
 
-Delete `deleteDbFile()` and its two calls. The rest is the same.
-Or read the values from the env, and run `DB_PORT=5433 DB_NAME=my_app_test dart test`.
+Delete `deleteDbFile()` and its two calls. The rest of the test stays the same. You can also read these values from the env, and run `DB_PORT=5433 DB_NAME=my_app_test dart test`.
 
 ## Many test files
 
-Each test file runs in its own process. Two files that use the same table at the same time break each other.
-Either give each file its own SQLite file (`storage/test_users.sqlite`, `storage/test_posts.sqlite`), or run them one by one:
+Each test file runs in its own process, at the same time as the others. So two files that use the same table can break each other. To fix it, give each file its own SQLite file (`storage/test_users.sqlite`, `storage/test_posts.sqlite`), or run the files one by one:
 
 ```bash
 dart test --concurrency=1
@@ -191,9 +185,9 @@ dart test --concurrency=1
 
 ## Test a route with the database
 
-This test uses the `GET /api/users` route of the [Pagination](pagination.md) guide.
-`DoxTestClient` starts the app inside the test. It runs the providers, so the ORM is set up by `ORMProvider` from `lib/config/database.dart`.
-Set the database with env variables, so the app picks the test database:
+You can also test a full route, from the request to the database. This test uses the `GET /api/users` route of the [Pagination](pagination.md) guide.
+
+`DoxTestClient` starts the app inside the test. It runs the providers, so the ORM uses the config in `lib/config/database.dart`. So you pick the test database with env variables:
 
 ```dart title="test/api_test.dart"
 import 'package:dox_core/testing.dart';

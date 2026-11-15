@@ -6,11 +6,11 @@ icon: lucide/shield-check
 
 `SecurityHeaders` is a middleware that adds safe HTTP headers to every answer.
 
-The browser reads them and blocks some common attacks, like showing your page in a frame on another site.
+The browser reads these headers and blocks some common attacks, like showing your page in a frame on another site.
 
-## Turn it on
+## Setup
 
-Put it in `globalMiddleware`:
+Put it first in `globalMiddleware`. Then an error from a later middleware, like a `419` or a `429`, also gets the headers:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -32,19 +32,11 @@ Every answer now has these headers:
 | `Cross-Origin-Opener-Policy` | `same-origin` | A page of another site that opens yours can not reach it. |
 | `Strict-Transport-Security` | `max-age=31536000; includeSubDomains` | The browser uses only https for one year. Sent only on https requests. |
 
-`Content-Security-Policy` is off by default. A good policy depends on your pages.
+`Content-Security-Policy` is off by default, because a good policy depends on your pages.
 
-Without this middleware, the server already sends three headers on every answer, also on a `404`:
-`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 0`.
-`SecurityHeaders` replaces them with its own values.
-`X-XSS-Protection: 0` turns the old XSS filter of browsers off, like OWASP says. The filter is gone from new browsers, and in old ones it can make holes. Use `Content-Security-Policy` instead.
+## Changing a header
 
-## Change or turn off a header
-
-Each header has an option. Give a new value to change it, or `null` to turn it off.
-`null` removes the header, also one the server sends by default (like `frameOptions: null` for `X-Frame-Options`).
-The option for `X-XSS-Protection` is `xssProtection` (default `'0'`).
-In `extra`, a `null` value removes that header too.
+Each header has an option. Give a new value to change it, or `null` to remove it. Use `extra` for other headers:
 
 ```dart
 const SecurityHeaders(
@@ -64,25 +56,24 @@ const SecurityHeaders(
 | `crossOriginOpenerPolicy` | `Cross-Origin-Opener-Policy` |
 | `strictTransportSecurity` | `Strict-Transport-Security` |
 | `contentSecurityPolicy` | `Content-Security-Policy` |
-| `extra` | any other headers, name to value |
+| `xssProtection` | `X-XSS-Protection` (default `'0'`) |
+| `extra` | any other headers, name to value. A `null` value removes that header |
 
 ## HSTS behind a proxy
 
-Dox serves plain http. The https part is done by a proxy (Caddy, nginx, a load balancer).
-Dox sends `Strict-Transport-Security` only when the request came in over https.
-It knows that from the `X-Forwarded-Proto: https` header, and it only believes this header from a trusted proxy.
-So add your proxy to `AppConfig.trustedProxies`:
+Dox serves plain http, and a proxy (Caddy, nginx, a load balancer) does the https part. Dox sends `Strict-Transport-Security` only when the request came in over https. It knows this from the `X-Forwarded-Proto: https` header, but it only believes this header from a trusted proxy. So add your proxy to `AppConfig.trustedProxies`, or Dox never sends HSTS:
 
 ```dart
 AppConfig(trustedProxies: <String>['127.0.0.1', '::1']);
 ```
 
-Without it, Dox never sends HSTS. See [App config](../reference/app-config.md).
+See [App config](../reference/app-config.md).
 
-!!! note
-    Middleware runs only for routes that exist. A `404` for an unknown url gets only the three server headers.
-    A preflight `OPTIONS` answer gets only them too.
-    Put `SecurityHeaders` first in `globalMiddleware`. Then an error from a later middleware, like a `419` or a `429`, also gets the headers.
+## Details
+
+- Without this middleware, the server already sends `X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff` and `X-XSS-Protection: 0` on every answer. `SecurityHeaders` replaces them, and `null` also removes them.
+- `X-XSS-Protection: 0` turns off the old XSS filter of browsers, because in old browsers it can make holes. Use `Content-Security-Policy` instead.
+- Middleware runs only for routes that exist. So a `404` for an unknown URL and a preflight `OPTIONS` answer get only the three server headers.
 
 ## See also
 

@@ -4,17 +4,9 @@ icon: lucide/cpu
 
 # Isolate
 
-This page explains how Dox runs your app on many isolates (threads), and what that means for your code.
+Dox runs your app on many isolates (threads) at once, so it can use every CPU core.
 
-## How it works
-
-Dox starts many isolates. Each one runs its own [native server](native-server.md) on the same port. The operating system spreads the connections between them.
-
-- Linux: each isolate has its own socket (`SO_REUSEPORT`).
-- macOS: the isolates share one socket.
-- Windows: only one isolate serves HTTP.
-
-Each isolate has its own Rust acceptor on the port:
+Each isolate runs its own [native server](native-server.md) on the same port, and the operating system spreads the connections between them. You write your app once, and Dox starts a copy of it in every isolate.
 
 ```mermaid
 flowchart TD
@@ -30,11 +22,11 @@ flowchart TD
 
 With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
 
-## How many isolates
+## Setting the number of isolates
 
-By default Dox starts one isolate per CPU core (`Platform.numberOfProcessors`).
+By default Dox starts one isolate per CPU core (`Platform.numberOfProcessors`). You may want fewer when the same machine also runs the database or other heavy work.
 
-To change it, set `totalIsolate` in `lib/config/app.dart`. A new app reads it from `APP_TOTAL_ISOLATE`:
+Set `totalIsolate` in the app config. A new app reads it from `APP_TOTAL_ISOLATE`:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -51,37 +43,34 @@ Dox().totalIsolate(2);
 await Dox().startServer();
 ```
 
-Use fewer isolates when the machine also runs the database or other heavy work.
-
 ## Each isolate has its own memory
 
-Isolates do not share memory:
+Isolates do not share memory. This matters when you keep state in your code:
 
-- A static value or a singleton exists once **per isolate**. When you change it in one isolate, the others do not see it.
+- A static value or a singleton exists once **per isolate**. If you change it in one isolate, the others do not see it.
 - The `memory` cache store is per isolate. See [Cache](cache.md).
 - To share data between isolates or servers, use a database, Redis or files.
 
-`Dox().isolateId` tells you which isolate runs the code. The first isolate is `1`.
+If you need to know which isolate runs your code, use `Dox().isolateId`. The first isolate is `1`:
 
-## Send a message to the other isolates
+```dart
+int id = Dox().isolateId;
+```
 
-`IsolateBus` sends a message from one isolate to all the others in the same process. Use it to tell them that something changed, for example "forget this cache key". Socket.IO uses it to share broadcasts (see [Socket.IO](../packages/socketio.md#many-isolates)).
+## Sending a message to the other isolates
+
+Sometimes one isolate needs to tell the others that something changed, for example "forget this cache key". Use `IsolateBus` for this. It sends a message from one isolate to all the others in the same process.
+
+Listen on a channel in a provider's `setup()`, and publish from anywhere:
 
 ```dart
 IsolateBus.instance.on('users').listen(onMessage); // in a provider's setup()
 IsolateBus.instance.publish('users', <Object>['changed', 42]);
 ```
 
-- A message goes to one channel. A listener on `'users'` never gets the messages of another channel.
-- An isolate never gets its own message.
-- `Dox().isolateCount` is the number of isolates that run, in every isolate.
-- `IsolateBus.instance.size` is the number of isolates that listen, this one included.
-- A message must be something a `SendPort` can send: null, bool, num, String, typed data, and lists and maps of those.
-- A value that a `SendPort` can not send throws an `ArgumentError` in `publish`. Then no isolate gets the message. In the main isolate it throws only when another isolate listens on the bus. With no other isolate there, nobody gets it and nothing throws.
-- It works inside one process only. For many servers, use Redis.
-- There is no backpressure. `publish` never waits. A slow listener gets the messages in a queue in its memory.
-- A message reaches only the isolates that listen at that moment. An isolate that calls `on()` later does not get the messages sent before.
-- `size` changes a little after an isolate joins or leaves. The new number comes in a message, so it can be old for a short time.
+A listener only gets the messages of its own channel, and an isolate never gets its own message. A message must be something a `SendPort` can send: null, bool, num, String, typed data, and lists and maps of those.
+
+The bus works inside one process only. For many servers, use Redis. Socket.IO uses the bus to share broadcasts, see [Socket.IO](../packages/socketio.md#many-isolates).
 
 ## What each isolate does at start
 
@@ -97,7 +86,18 @@ Because the config and providers are copied, they must not hold open sockets or 
 
 ## When an isolate crashes
 
+Dox keeps your app running when code fails:
+
 - An error in a request is caught. Dox sends a `500` and keeps going.
-- An async error outside a request (for example a future that nobody awaits) is caught and passed to the `report` method of the [exception handler](../the-basic/errors.md). The isolate keeps running.
-- If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` to stderr. It starts a new isolate after 1 second.
-- If the first (main) isolate dies, the process exits with a non-zero code. Let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
+- An async error outside a request (for example a future that nobody awaits) is passed to the `report` method of the [exception handler](../the-basic/errors.md). The isolate keeps running.
+- If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` to stderr and starts a new isolate after 1 second.
+
+If the first (main) isolate dies, the process exits with a non-zero code. So let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
+
+## Details
+
+- Linux gives each isolate its own socket (`SO_REUSEPORT`). On macOS the isolates share one socket. On Windows only one isolate serves HTTP.
+- `Dox().isolateCount` is the number of running isolates. `IsolateBus.instance.size` is the number of isolates that listen on the bus, this one included. `size` can be old for a short time after an isolate joins or leaves.
+- `publish` throws an `ArgumentError` for a value a `SendPort` can not send, and then no isolate gets the message. In the main isolate it only throws when another isolate listens.
+- `publish` never waits. A slow listener keeps the messages in a queue in its memory.
+- A message only reaches the isolates that listen at that moment. An isolate that calls `on()` later does not get older messages.

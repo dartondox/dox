@@ -8,14 +8,14 @@ icon: lucide/list-checks
 
 It has two parts:
 
-1. **DTOs**: a class with `@Dto()` and rule annotations. A generator writes the checks. Use this for almost everything.
-2. **Fluent schemas**: `v.object(...)`, like [Zod](https://zod.dev). Use it only when the shape is known at runtime.
+1. **DTOs**: a class with `@Dto()` and rule annotations. A generator writes the checks. Use this for almost everything. See [DTOs](../the-basic/dto.md).
+2. **Fluent schemas**: `v.object(...)`. Use them only when you know the shape of the input at runtime, not when you write the code.
 
-Both give all errors at once, and a JSON Schema for [OpenAPI](openapi.md).
+Both give all errors at once, and both give a JSON Schema for [OpenAPI](openapi.md).
 
 ## In a Dox app
 
-`dox_core` uses `dox_validation` and exports it. There is nothing to install: `import 'package:dox_core/dox_core.dart'` is all you need.
+`dox_core` uses `dox_validation` and exports it, so there is nothing to install. `import 'package:dox_core/dox_core.dart'` is all you need.
 
 1. Make a DTO with `dox make:dto CreateUser`. It writes `lib/app/dtos/create_user/create_user.dto.dart`.
 2. Run the generator: `dox build_runner:build`.
@@ -41,24 +41,11 @@ class UserController {
 }
 ```
 
-The full guide is at [Validation](../the-basic/validation.md). Every rule is in the [rules reference](../the-basic/validation-rules.md).
-The rest of this page is about the package itself.
+The full guide is at [Validation](../the-basic/validation.md). Every rule is in the [rules reference](../the-basic/validation-rules.md). The rest of this page is about the package itself.
 
-## Without Dox
+## Defining a DTO
 
-```bash
-dart pub add dox_validation
-dart pub add dev:dox_builder dev:build_runner
-```
-
-```dart
-import 'package:dox_validation/dox_validation.dart';
-```
-
-The DTO generator is in `dox_builder`. Run it with `dart run build_runner build`.
-`@Unique` and `@Exists` are in `dox_orm`, not here.
-
-## DTOs
+A DTO is a class with `@Dto()`. Each field gets its rules as annotations:
 
 ```dart
 import 'package:dox_validation/dox_validation.dart';
@@ -80,33 +67,25 @@ class CreateUser {
 }
 ```
 
-The generator makes, for each `@Dto` class:
+For each `@Dto` class, the generator writes a `const` `DtoSchema<CreateUser>` named `$CreateUserDto`. It holds the checks, the converter and the JSON Schema. The `static const schema` line lets you reach it as `CreateUser.schema`.
 
-| Name | What it is |
-| --- | --- |
-| `$CreateUserDto` | a `const` `DtoSchema<CreateUser>`: the checks, the converter and the JSON Schema |
-| `lib/generated/dtos.g.dart` | `const List<DtoSchema<Object>> dtos`: every DTO in `lib/`. Dox uses it to find DTOs by type. An app with no DTO gets an empty `final` list. |
+The generator also writes `lib/generated/dtos.g.dart`, with a list `dtos` of every DTO in `lib/`. Dox uses it to find a DTO by its type.
 
-The `static const ... schema = $CreateUserDto;` line is how you reach the schema: `CreateUser.schema`.
+## Validating a map
 
-## `DtoSchema<T>`
+`DtoSchema<T>` is also a normal `Schema<T>`. So you can use it inside `v.object(...)` and `v.list(...)`, and with OpenAPI.
 
-`DtoSchema<T>` is also a `Schema<T>`. So it works everywhere a schema works:
-inside `v.object(...)`, `v.list(...)`, with OpenAPI, and as a `StandardSchema`.
+### Validating and throwing
 
-| Member | Does |
-| --- | --- |
-| `Future<T> validateMap(Map<String, dynamic> input, {Source source = Source.body, Map<String, String> params = const {}, MessageResolver? messages, String? locale})` | all checks, then the object. Throws `ValidationException` with the errors. |
-| `Future<ParseResult<T>> safeValidateMap(input, {source, params, messages, locale})` | the same, but never throws for bad input. `result.success`, `result.value`, `result.errors`. |
-| `T fromMap(Map<String, dynamic> input)` | builds the object with **no checks**. Reads keys, converts JSON types, uses defaults. A wrong type throws a `TypeError`. Only for data you trust. |
-| `Map<String, dynamic> toMap(T value)` | the object as a map with the input keys (snake_case). `DateTime` becomes an ISO 8601 string, an enum its name. |
-| `Map<String, dynamic> toJsonSchema()` | JSON Schema (draft 2020-12). |
-| `parse`, `safeParse`, `parseAsync`, `safeParseAsync` | the normal `Schema` methods, with `Source.body`. `parse` throws a `StateError` when the DTO has async rules. |
-| `Type get type`, `String get name` | `CreateUser` and `'CreateUser'`. |
+Use `validateMap` to run all checks and get the object. It throws a `ValidationException` with the errors when the input is not valid:
 
-`source: Source.query` reads the map like a query string: text is converted to the field type.
-`params` are path params, used by `@Unique(ignoreParam: ...)`.
-`messages` and `locale` change the error text for this call. See [Messages](#messages).
+```dart
+CreateUser user = await CreateUser.schema.validateMap(input);
+```
+
+### Validating without throwing
+
+Use `safeValidateMap` when you want to handle the errors yourself. It never throws for bad input:
 
 ```dart
 ParseResult<CreateUser> result = await CreateUser.schema.safeValidateMap(input);
@@ -115,25 +94,47 @@ if (!result.success) {
 }
 ```
 
-| `ParseResult` member | What it is |
-| --- | --- |
-| `success` | `true` when there are no errors |
-| `value` | the result. `null` when `success` is `false` |
-| `errors` | the first message for each field, like `{'user.email': '...'}` |
-| `fieldErrors` | all messages for each field |
-| `issues` | the full list of `ValidationIssue` objects, with code and path |
+A `ParseResult` has:
 
-!!! note
-    `dox_core` has its own `ValidationException` (the HTTP 422 one), so it does not export the one from `dox_validation`.
-    In a Dox app, both answer `422` when thrown in a controller. In tests, prefer `safeValidateMap`.
+- `success`: `true` when there are no errors.
+- `value`: the result, or `null` when `success` is `false`.
+- `errors`: the first message for each field, like `{'user.email': '...'}`.
+- `fieldErrors`: all messages for each field.
+- `issues`: the full list of `ValidationIssue` objects, with code and path.
 
-### JSON Schema of a DTO
+Both methods take these options:
 
-For the `CreateUser` from the [Validation guide](../the-basic/validation.md) (with `age` and `role`):
+- `source: Source.query` reads the map like a query string, so text is converted to the field type.
+- `params` are the path params. `@Unique(ignoreParam: ...)` uses them.
+- `messages` and `locale` change the error text for this call. See [Messages](#messages).
+
+`dox_core` has its own `ValidationException` (the HTTP 422 one), so it does not export the one from `dox_validation`. In a controller, both answer `422`. In tests, use `safeValidateMap`.
+
+### Building an object with no checks
+
+`fromMap` builds the object with **no checks**. It reads the keys, converts JSON types and fills in defaults. Use it only for data you trust, because a wrong type throws a `TypeError`:
+
+```dart
+CreateUser user = CreateUser.schema.fromMap(trustedData);
+```
+
+### Turning an object back into a map
+
+`toMap` gives the object as a map with the input keys (snake_case). A `DateTime` becomes an ISO 8601 string and an enum becomes its name:
+
+```dart
+Map<String, dynamic> data = CreateUser.schema.toMap(user);
+```
+
+### Getting the JSON Schema
+
+`toJsonSchema` gives the JSON Schema (draft 2020-12) of the DTO:
 
 ```dart
 CreateUser.schema.toJsonSchema();
 ```
+
+For a `CreateUser` with `age` and `role` fields, you get:
 
 ```json
 {
@@ -149,16 +150,11 @@ CreateUser.schema.toJsonSchema();
 }
 ```
 
-- `required` lists the required fields only.
-- A nullable field has `"type": [..., "null"]`. A default becomes `default`.
-- A nested DTO goes in `$defs` under its class name, with a `$ref`. OpenAPI moves it to `components/schemas`.
-- `@Dto(strict: true)` adds `"additionalProperties": false`.
-- A `///` doc comment on a field becomes `description`. `@Describe('...')` on a field sets it too, and wins over the comment. It does not change the checks.
-- Each rule adds its keys. See the [rules reference](../the-basic/validation-rules.md).
+A `///` doc comment on a field becomes its `description`. `@Describe('...')` on a field also sets it, and wins over the comment. Each rule adds its own keys, see the [rules reference](../the-basic/validation-rules.md).
 
 ## Fluent schemas (for dynamic input)
 
-Use these when you only know the fields at runtime. The output is a `Map`, not a class.
+Sometimes you only know the fields at runtime. Then use a fluent schema. The output is a `Map`, not a class:
 
 ```dart
 final ObjectSchema createUser = v.object(<String, Schema<Object?>>{
@@ -169,21 +165,33 @@ final ObjectSchema createUser = v.object(<String, Schema<Object?>>{
   'tags': v.list(v.string()).max(5),
   'address': Address.schema, // a DTO inside a fluent schema
 });
+```
 
-// throws ValidationException when the input is not valid
+Use `parse` to get the data. It throws a `ValidationException` when the input is not valid:
+
+```dart
 Map<String, dynamic> data = createUser.parse(input);
+```
 
-// never throws for bad input
+Use `safeParse` if you do not want it to throw:
+
+```dart
 ParseResult<Map<String, dynamic>> result = createUser.safeParse(input);
 ```
 
-In a controller: `Map<String, dynamic> data = await req.validateSchema(createUser);`
+In a controller, use `req.validateSchema`:
 
-!!! warning "Different defaults"
-    Fluent schemas do not follow the DTO rules. A key is required unless you add `optional()`.
-    `""` is a value, not "missing". Text is not converted, unless you use `v.coerce`.
+```dart
+Map<String, dynamic> data = await req.validateSchema(createUser);
+```
 
-### Schemas
+Fluent schemas do not follow the DTO defaults, so watch out:
+
+- A key is required unless you add `optional()`.
+- `""` is a value, not "missing".
+- Text is not converted to numbers or booleans, unless you use `v.coerce`.
+
+### Available schemas
 
 | Schema | Checks |
 | --- | --- |
@@ -198,22 +206,25 @@ In a controller: `Map<String, dynamic> data = await req.validateSchema(createUse
 | `v.union([...])` | the first match wins |
 | `v.any()`, `v.file()` | `file()` has `maxSize`, `minSize`, `mimes`, `mimeTypes`, `dimensions`, `image` and `extensions` |
 
-On every schema:
+### Optional and nullable values
+
+Every schema has these methods:
 
 - `optional()`: the key may be missing. `null` is still an error.
-  After it: `requiredIf(other, value)` and `requiredWith([others])`.
-- `nullable()`: the value may be `null`. The key must be there.
+- `nullable()`: the value may be `null`, but the key must be there.
 - `nullish()`: both.
 - `defaultTo(x)`: the value when the key is missing. (`default` is a reserved word in Dart.)
-- `transform(fn)`, `refine(fn)`, `refineAsync(fn)`, `superRefine(fn)`, `superRefineAsync(fn)`, `use(rule)`.
-- `same(other)`, `confirmed()`: compare with another key of the same object.
-- `bail()`: stop at the first failed rule. See [Stop at the first error](#stop-at-the-first-error).
-- `excludeIf(other, value)`, `excludeUnless(other, value)`: leave a key out. See [Skip a field](#skip-a-field).
-- `describe(text)`, `example(x)`: only used in the JSON Schema.
 
-### Coercion
+```dart
+v.string().optional();
+v.int().defaultTo(0);
+```
 
-Query strings and form data are text. `v.coerce` turns text into the right type first.
+Every schema also has `transform`, `refine`, `superRefine`, `use(rule)`, `same(other)`, `confirmed()`, and `describe(text)` and `example(x)` for the JSON Schema.
+
+### Converting text
+
+Query strings and form data are always text. `v.coerce` turns the text into the right type first:
 
 ```dart
 v.coerce.int().parse('42');       // 42
@@ -223,7 +234,9 @@ v.coerce.date().parse('2024-01-31');
 v.coerce.string().parse(5);       // '5'
 ```
 
-### Checks across fields
+### Checking across fields
+
+If a rule needs two fields, use `refine` on the object. `path` says which field gets the error:
 
 ```dart
 final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
@@ -235,6 +248,8 @@ final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
 ```
 
 ### More rules
+
+Fluent schemas have the same rules as the DTO annotations, with the same codes and messages:
 
 ```dart
 final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
@@ -254,12 +269,7 @@ final ObjectSchema signUp = v.object(<String, Schema<Object?>>{
 Map<String, dynamic> data = await signUp.parseAsync(input);
 ```
 
-They use the same codes and messages as the DTO annotations. See the [rules reference](../the-basic/validation-rules.md#more-text-rules).
-
-- `requiredIf` and `requiredWith` come after `optional()` or `nullish()`.
-  Then a missing, `null` or blank value is an error when the condition is true.
-
-More rules:
+There are more presence and compare rules:
 
 ```dart
 final ObjectSchema order = v.object(<String, Schema<Object?>>{
@@ -280,37 +290,28 @@ final ObjectSchema order = v.object(<String, Schema<Object?>>{
 });
 ```
 
-- `requiredUnless`, `requiredWithout`, `requiredWithoutAll`, `filled` and `present` come after `optional()`, like `requiredIf`.
-- `present()` needs the key. Add `.nullable()` to allow `null`.
-- `prohibited()` and `prohibitedIf()` come after `optional()`. They treat empty values in different ways:
-    - `prohibited()`: a missing key or blank text passes. Any other sent value fails, also `null`, `[]`, `0` and `false`.
-    - `prohibitedIf()`: when the condition matches, a missing key, `null`, blank text and an empty list or map pass. `0`, `false` and any other value fail.
-- `accepted()` and `declined()` check the value after the type check. `v.bool()` takes only `true` and `false`, so `"yes"` is a `boolean` error there. Use `v.coerce.bool().accepted()` for form words like `yes` and `on` (any case), or `v.string()` or `v.any()` to check the exact words: `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"` for `accepted()`, and `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"` for `declined()`. The text is case sensitive.
-- `gtField`, `gteField`, `ltField` and `lteField` compare with another key. A missing other key fails.
-- The rules are explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing).
-- `exists` and `unique` are async. Use `parseAsync()` or `safeParseAsync()`.
-- For one value, the database decides what matches. On MySQL `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
-- `exists(table, column: 'id')`: the column default is `id`. For a number id column, use `v.int().exists('teams')`, not `v.string()`. Then text like `abc` is a type error, before any query.
-- `unique(table, column: 'email', ignore: id)`: `column` is required. It is never taken from the input key, because a key in `v.map()` comes from the user. `ignore` skips the row where `ignoreColumn` (default `id`) has this value. Use it for updates.
+Each rule is explained in the [rules reference](../the-basic/validation-rules.md#present-or-missing). Keep these points in mind:
 
-#### Stop at the first error
+- The `required...`, `prohibited...`, `filled` and `present` rules come after `optional()` (or `nullish()`).
+- `exists` and `unique` ask the database, so they are async. Use `parseAsync()` or `safeParseAsync()`.
+- `exists(table, column: 'id')`: the column default is `id`. Use `v.int().exists('teams')` for a number id, so text like `abc` fails before any query.
+- `unique(table, column: 'email', ignore: id)`: `column` is required. `ignore` skips the row with this id, so you can use it for updates.
+- `accepted()` on `v.bool()` takes only `true`. For form words like `yes` and `on`, use `v.coerce.bool().accepted()`.
 
-A fluent schema runs all rules of a value, and gives one error for each failed rule. Add `.bail()` to stop at the first failed rule. A DTO always does this.
+### Stop at the first error
+
+A fluent schema runs all rules of a value, and gives one error for each failed rule. If you want only the first error, add `.bail()`. A DTO always does this.
 
 ```dart
 v.string().min(8).email().bail().safeParse('ab');
 // one error: min_length. Without bail(): min_length and email.
 ```
 
-- It counts for all rules of that schema, wherever you put `.bail()` in the chain.
-- Async rules after a failed rule do not run. So no database query is made for a value that is already wrong.
-- Put it before `.optional()`, `.nullable()` or `.transform()`. A rule after one of them belongs to the wrapper, so it does not count. `.bail()` after a wrapper, like `.optional().bail()`, does nothing for the rules inside it.
-- On `v.object()` or `v.list()`, it counts for the rules of the object or list only. Each field and each item keeps its own setting.
-- A type error already stops the rules of a value, with or without `.bail()`.
+Put `.bail()` before `.optional()`, `.nullable()` or `.transform()`, because rules after them belong to the wrapper. Async rules after a failed rule do not run, so no query is made for a value that is already wrong.
 
-#### Skip a field
+### Skip a field
 
-`excludeIf(other, value)` and `excludeUnless(other, value)` skip a field of `v.object()`. When they match, the field is not checked, and its key is not in the output.
+Sometimes a field only matters for some input. `excludeIf(other, value)` and `excludeUnless(other, value)` skip a field of `v.object()`. When they match, the field is not checked and its key is not in the output:
 
 ```dart
 final ObjectSchema account = v.object(<String, Schema<Object?>>{
@@ -323,20 +324,112 @@ account.parse(<String, dynamic>{'type': 'person', 'vat_number': 'x'});
 // {type: person}
 ```
 
-- They work like the DTO `@ExcludeIf` and `@ExcludeUnless`. They read the raw input of the other key, and match like `requiredIf` (also with a list of values).
-- `other` is a key of the same object. A dotted path like `user.type` does not work.
-- `excludeIf`: a missing other key does not skip. `excludeUnless`: a missing other key counts as `null`, so the field is skipped.
-- The key is left out also with `.optional()`, `.nullable()` or `.defaultTo()`, in any order. A skipped field never gets its default.
-- In a `v.list()` of objects, each item is checked on its own.
-- A skipped key is not an unknown key for `strict()`, and `passthrough()` does not add it back.
-- In the JSON Schema, the field is not in `required`.
-- The rules of other fields that read this key (like `same`, `requiredIf` or `gtField`) still see its raw input, also when it is skipped.
-- They work only on a field of `v.object()`. On a top-level value, a list item or a value of `v.map()`, they do nothing.
+`other` must be a key of the same object. A skipped field never gets its default.
 
-#### The presence verifier
+### Async checks
 
-`exists` and `unique` ask a `PresenceVerifier`. `dox_orm` sets one when the database starts, so in a Dox app they just work.
-Outside Dox, or with another database layer, set your own. Each isolate has its own value, so set it in a provider's `setup()`, which runs in every isolate:
+If a check needs the database, use `refineAsync`. Then call `parseAsync()` or `safeParseAsync()`, because `parse()` throws a `StateError` when a schema has async checks:
+
+```dart
+v.string().refineAsync(isFreeName, message: 'The name is taken');
+```
+
+### Custom rules
+
+A `Rule<T>` class works in both places: as an annotation on a DTO, and with `use()` in a fluent schema:
+
+```dart
+v.string().min(3).use(const Slug());
+```
+
+See [Custom rules](../the-basic/validation.md#custom-rules) for how to write one.
+
+## Messages
+
+Each error has a code, like `required` or `min_length`. A message can use placeholders: `{field}`, `{value}`, and rule values like `{min}` and `{max}`.
+
+To change messages for the whole app, set `MessageResolver.global`. In a Dox app, use `AppConfig(validationMessages: ...)` instead:
+
+```dart
+MessageResolver.global = MessageResolver(messages: <String, String>{
+  'required': 'Please fill in {field}',
+});
+```
+
+To change messages for one call, pass `messages`. It replaces the global resolver for that call:
+
+```dart
+createUser.safeParse(input, messages: MessageResolver(messages: <String, String>{
+  'email.required': 'We need your email',
+}));
+```
+
+To show a nice name for `{field}` instead of the key, give `attributes`:
+
+```dart
+MessageResolver.global = MessageResolver(
+  attributes: <String, String>{'first_name': 'first name'},
+);
+// The first name is required
+```
+
+A DTO can give its own names with `@Dto(attributes:)`. For other languages, extend `MessageResolver` and override `resolve()`. See [Messages](../the-basic/validation.md#messages).
+
+## Opt-in flags
+
+`ValidationFlags` turns on behaviors that are off by default. Set it in `Validator.flags`:
+
+```dart
+// turn on one flag
+Validator.flags = const ValidationFlags(unicodeAlpha: true);
+
+// turn on every flag
+Validator.flags = const ValidationFlags.all();
+```
+
+Each isolate has its own `Validator.flags`. So in a Dox app, set it in a provider's `setup()`, which runs in every isolate:
+
+```dart
+class ValidationProvider extends DoxProvider {
+  @override
+  void setup() {
+    Validator.flags = const ValidationFlags.all();
+  }
+}
+```
+
+| Flag | What it does when on |
+| --- | --- |
+| `emptyStringsToNull` | Fluent schemas turn each `""` into `null` before the check, also in nested maps and lists. A DTO checked on its own keeps `""`; use `@Dto(emptyStringsToNull: true)` there. |
+| `unicodeAlpha` | `alpha`, `alphaNumeric` and `alphaDash` accept Unicode letters, like `José`. |
+| `shortInMessage` | The default `in` message is `The selected {field} is invalid`, with no list of allowed values. |
+| `dtoAllErrors` | A DTO runs the rules of every field with the right type, even when another field is missing or wrong. So one request gets all its errors at once. |
+| `dtoRejectEmptyList` | A required `List` field of a DTO fails `required` on `[]`. |
+| `dtoMaybeRejectsEmpty` | A `Maybe<T>` field of a DTO fails `required` when the key is sent with an empty value, like `""`. |
+| `laravelMessageKeys` | A custom message key can also use the short rule name, like `name.min` for the `min_length` error. See the [list of names](../the-basic/validation.md#short-rule-names-in-message-keys). |
+
+The three `dto...` flags need DTO code made by a current `dox_builder`, so run `dart run build_runner build` once after you turn them on.
+
+## Without Dox
+
+You can use `dox_validation` in any Dart program. Add the package, and the builder for DTOs:
+
+```bash
+dart pub add dox_validation
+dart pub add dev:dox_builder dev:build_runner
+```
+
+```dart
+import 'package:dox_validation/dox_validation.dart';
+```
+
+Run the DTO generator with `dart run build_runner build`.
+
+### Database rules
+
+`exists` and `unique` ask a `PresenceVerifier`. In a Dox app, `dox_orm` sets one when the database starts, so they just work. (`@Unique` and `@Exists` for DTOs are in `dox_orm`.)
+
+Without Dox, or with another database layer, write your own. Each isolate has its own value, so set it in code that runs in every isolate:
 
 ```dart
 class MyVerifier extends PresenceVerifier {
@@ -363,107 +456,18 @@ class VerifierProvider extends DoxProvider {
 }
 ```
 
-Table and column names are checked when the schema is built. They take the same names as the dox_orm query builder: letters, digits, `_` and `$`, with `.` between parts, like `2fa_codes` or `public.users`. Other names throw an `ArgumentError`.
+## Details
 
-### Async checks
-
-`refineAsync` runs a check that needs the database. Then use `parseAsync()` or `safeParseAsync()`.
-`parse()` throws a `StateError` when a schema has async checks.
-
-### Custom rules in a fluent schema
-
-A `Rule<T>` class works in both worlds: as an annotation on a DTO, and with `use()` here.
-
-```dart
-v.string().min(3).use(const Slug());
-```
-
-See [Custom rules](../the-basic/validation.md#custom-rules) for how to write one.
-
-## Messages
-
-Each error has a code, like `required` or `min_length`.
-Placeholders: `{field}`, `{value}`, and rule values like `{min}` and `{max}`.
-
-```dart
-// for the whole app (outside Dox; in Dox use AppConfig(validationMessages: ...))
-MessageResolver.global = MessageResolver(messages: <String, String>{
-  'required': 'Please fill in {field}',
-});
-
-// for one call
-createUser.safeParse(input, messages: MessageResolver(messages: <String, String>{
-  'email.required': 'We need your email',
-}));
-```
-
-A resolver for one call is used in place of the global one.
-Codes that it does not have get the built-in text, not the global text.
-
-With the flag `laravelMessageKeys`, a key can use the Laravel rule name too, like `name.min` for the `min_length` error. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys).
-
-To show a name for `{field}` in place of the key, give `attributes`:
-
-```dart
-MessageResolver.global = MessageResolver(
-  attributes: <String, String>{'first_name': 'first name'},
-);
-// The first name is required
-```
-
-A DTO can give its own names with `@Dto(attributes:)`. See [Names for `{field}`](../the-basic/validation.md#names-for-field).
-
-For other languages, extend `MessageResolver` and override `resolve()`.
-See [Messages](../the-basic/validation.md#messages).
-
-## Opt-in flags
-
-`ValidationFlags` turns on behaviors that are off by default.
-Set it in `Validator.flags`.
-
-```dart
-// turn on one flag
-Validator.flags = const ValidationFlags(unicodeAlpha: true);
-
-// turn on every flag
-Validator.flags = const ValidationFlags.all();
-```
-
-| Flag | What it does when on |
-| --- | --- |
-| `emptyStringsToNull` | Fluent schemas turn each `""` in the input into `null` before they check it. This also happens in nested maps and lists. So `""` fails a required field, and `.nullable()` gives `null`. |
-| `unicodeAlpha` | `alpha`, `alphaNumeric` and `alphaDash` accept Unicode letters and marks, like `José`. `alphaNumeric` and `alphaDash` also accept Unicode digits. This works for fluent schemas and DTOs. |
-| `shortInMessage` | The default `in` message is `The selected {field} is invalid`. It does not list the allowed values. |
-| `dtoAllErrors` | A DTO runs the rules of each field that has the right type, also when another field is missing or has the wrong type. So one request gets all its errors at once. The type and `required` errors come first (a nested DTO's errors at its field), then the rule errors. A list or map with a bad item skips its rules. |
-| `dtoRejectEmptyList` | A required `List` field of a DTO fails `required` on `[]`, and its other rules do not run. It does not apply to a nullable list, a list with a default, or a `Maybe<List>`. |
-| `dtoMaybeRejectsEmpty` | A `Maybe<T>` field of a DTO (with `T` not nullable) fails `required` when the key is sent with an empty value, like `""`. A missing key still gives `Maybe.missing()`. It does not apply to `Maybe<T?>`. A text of only spaces is a value and passes. With `@Trim` it becomes `""` and fails. |
-| `laravelMessageKeys` | A custom message key can use the Laravel rule name of a code, like `name.min` for the `min_length` error. It works in `@Dto(messages:)` and in a `MessageResolver`. At each step of the lookup the Dox code wins. The error code does not change. See the [list of names](../the-basic/validation.md#laravel-rule-names-in-message-keys). |
-
-With a flag off, the check works as described in the rest of this page:
-`""` is text, the alpha rules take only `a-z`, `A-Z` and `0-9`, the `in` message lists the allowed values, and a message key matches only the Dox code.
-For DTOs: a missing field or a type error stops the rules of the other fields, `[]` passes a required list, and `""` in a `Maybe` field counts as not sent.
-
-The three DTO flags are read when the check runs.
-They need the DTO code from a `dox_builder` that knows them.
-Run `dart run build_runner build` once to make it.
-
-`emptyStringsToNull` is for fluent schemas.
-A DTO checked on its own keeps `""`; use `@Dto(emptyStringsToNull: true)` there.
-A DTO inside a fluent schema gets the changed input.
-
-Each isolate has its own `Validator.flags`.
-In a Dox app, set it in a provider's `setup()`, so every isolate runs it:
-
-```dart
-class ValidationProvider extends DoxProvider {
-  @override
-  void setup() {
-    Validator.flags = const ValidationFlags.all();
-  }
-}
-```
-
-## Standard Schema
-
-Every schema, and every `DtoSchema`, implements the [Standard Schema](https://standardschema.dev) interface (`StandardSchema`).
-Code that only needs to validate can accept any `StandardSchema`, from Dox or from another library.
+- Every schema and every `DtoSchema` implements the [Standard Schema](https://standardschema.dev) interface (`StandardSchema`). Code that only needs to validate can take any `StandardSchema`.
+- `parse`, `safeParse`, `parseAsync` and `safeParseAsync` also work on a `DtoSchema`, with `Source.body`. `parse` throws a `StateError` when the DTO has async rules.
+- In the JSON Schema, a nested DTO goes in `$defs` with a `$ref`, and `@Dto(strict: true)` adds `"additionalProperties": false`.
+- An app with no DTO gets an empty `final` list in `dtos.g.dart`.
+- Table and column names for `exists` and `unique` may use letters, digits, `_` and `$`, with `.` between parts. Other names throw an `ArgumentError` when the schema is built.
+- `unique` never takes the column from the input key, because a key in `v.map()` comes from the user.
+- The database decides if two values match. On MySQL, `TAKEN@dox.dev` is taken when `taken@dox.dev` is there.
+- `prohibited()` fails on any sent value except blank text, also on `null`, `[]`, `0` and `false`. `prohibitedIf()` lets `null`, blank text and empty lists or maps pass.
+- `accepted()` on `v.string()` or `v.any()` takes the exact words `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"` (case sensitive). `declined()` takes `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"`.
+- `gtField`, `gteField`, `ltField` and `lteField` fail when the other key is missing.
+- `.bail()` counts for all rules of that schema, wherever it is in the chain. On `v.object()` or `v.list()`, each field and item keeps its own setting.
+- `excludeIf` does not skip when the other key is missing. `excludeUnless` treats a missing key as `null`, so it skips. Both work only on a field of `v.object()`, not on a top-level value, list item or `v.map()` value. Other rules that read the skipped key still see its raw input.
+- A per-call `MessageResolver` falls back to the built-in text, not the global text.

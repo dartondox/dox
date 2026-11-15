@@ -6,6 +6,8 @@ icon: lucide/app-window
 
 Let a web app on another origin (`http://localhost:5173` in development, `https://my.app` in production) call your API.
 
+A browser blocks a page from calling an API on another origin, unless the API says it is allowed. CORS headers tell the browser which origins may call. You need this when your front-end and your API run on different hosts or ports.
+
 ## What you need
 
 - A Dox app.
@@ -13,7 +15,7 @@ Let a web app on another origin (`http://localhost:5173` in development, `https:
 
 ## 1. Write the config
 
-A new app already has `lib/config/cors.dart`, with `enabled: false`. Replace the whole file with this one:
+A new app already has `lib/config/cors.dart`, but with `enabled: false`. Replace the whole file with this one:
 
 ```dart title="lib/config/cors.dart"
 import 'package:dox_core/dox_core.dart';
@@ -46,7 +48,7 @@ CORSConfig cors = CORSConfig(
 
 ## 2. Set the origin per environment
 
-`CORS_ORIGIN` is a new key. Add a getter for it to the `AppEnv` class:
+The front-end URL is different in each environment, so read it from a new key, `CORS_ORIGIN`. Add a getter for it to the `AppEnv` class:
 
 ```dart title="lib/config/env.dart"
   /// the front-end URL that may call the API
@@ -59,10 +61,11 @@ Run `dart run build_runner build` to update `env.g.dart`. Then set the value in 
 CORS_ORIGIN=http://localhost:5173
 ```
 
-In staging and production, set `CORS_ORIGIN` as a real environment variable: `https://my.app`.
-The origin is scheme, host and port. No path, no `/` at the end.
+In staging and production, set `CORS_ORIGIN` as a real environment variable, like `https://my.app`. The origin is the scheme, host and port only, with no path and no `/` at the end.
 
 ## 3. Choose `credentials`
+
+The right `origin` and `credentials` depend on how the front-end logs in:
 
 | Your front-end sends | `origin` | `credentials` |
 | --- | --- | --- |
@@ -71,13 +74,11 @@ The origin is scheme, host and port. No path, no `/` at the end.
 | nothing, a public API | `'*'` | `false` |
 
 !!! note "Two or more front-ends"
-    Set `origin` to a list, like `['https://a.com', 'https://b.com']`.
-    Dox compares the `Origin` header of the request with the list.
-    It sends back only the origin that matches, with `Vary: Origin`. If none matches, it sends no `Access-Control-Allow-Origin` header, and the browser blocks the call.
+    Set `origin` to a list, like `['https://a.com', 'https://b.com']`. Dox sends back only the origin that matches the request. If none matches, the browser blocks the call.
 
 ## Check it
 
-The browser sends a preflight `OPTIONS` request before a `POST` with JSON or a custom header. Dox answers it by itself. You do not need an `OPTIONS` route.
+Before a `POST` with JSON or a custom header, the browser first sends an `OPTIONS` request, called a preflight. Dox answers it by itself, so you do not need an `OPTIONS` route:
 
 ```bash
 curl -i -X OPTIONS http://localhost:3000/api/users \
@@ -117,10 +118,9 @@ In the browser, open the front-end and call the API with `fetch`. The console sh
 | `Request header field x-foo is not allowed` | Add the header to `headers`. |
 | `credentials mode is 'include'` with `*` | Set `origin` to the front-end URL and `credentials: true`. |
 
-## Webhooks and server-to-server calls
+## Turning CORS off for some routes
 
-CORS only matters for browsers. A webhook from Stripe or a call from another server ignores these headers.
-Turn CORS off for such routes to send fewer headers:
+CORS only matters for browsers. A webhook from Stripe or a call from another server ignores these headers. So you can turn CORS off for such routes, to send fewer headers:
 
 ```dart
 Route.disabledCors(() {

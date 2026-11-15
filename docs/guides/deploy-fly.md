@@ -6,8 +6,7 @@ icon: lucide/plane
 
 Run the blog API on [Fly.io](https://fly.io) from the `Dockerfile` of your project, with SQLite on a volume or with Postgres.
 
-!!! note
-    These steps follow the Fly.io docs as of 2026-10-22. They were not run on Fly.io in CI.
+Fly.io runs your container on small machines close to your users. You give it a `Dockerfile` and a `fly.toml`, and it builds and runs the app.
 
 ## What you need
 
@@ -27,7 +26,7 @@ fly launch --no-deploy
 
 ## 2. Write `fly.toml`
 
-Replace the file with this one. Change `app` and `primary_region` to your values.
+`fly.toml` holds the app config for Fly.io. Replace the file with this one, and change `app` and `primary_region` to your values:
 
 ```toml title="fly.toml"
 app = "blog-api"
@@ -74,9 +73,11 @@ kill_timeout = 10
 - `internal_port` is the port the app listens on. Dox reads it from `APP_PORT` (or `PORT` when `APP_PORT` is not set). Keep the two the same.
 - Values in `[env]` must be strings, so write `"3000"`, not `3000`.
 - `[[vm]]` wins over `fly scale vm`. Each `fly deploy` sets the machine to these values.
-- `kill_timeout`: keep it above `shutdownTimeout` of `AppConfig`. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown).
+- Keep `kill_timeout` above `shutdownTimeout` of `AppConfig`, so open requests can finish on stop. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown).
 
 ## 3. Set the secrets
+
+Secrets like `APP_KEY` should not be in `fly.toml`, because that file goes into git. Set them with `fly secrets`:
 
 ```bash
 fly secrets set APP_KEY=<output of dox key:generate>
@@ -89,18 +90,17 @@ A secret with the same name as an `[env]` key wins.
 
 ### SQLite on a volume
 
-Make the volume that `[mounts]` asks for, in the same region:
+SQLite is the simplest choice for a small app. Make the volume that `[mounts]` asks for, in the same region:
 
 ```bash
 fly volumes create blog_data --region ams --size 1
 ```
 
-- One volume is attached to one machine only. Fly.io does not copy the data between volumes.
-- So with SQLite, run exactly one machine.
+A volume is attached to one machine only, and Fly.io does not copy the data between volumes. So with SQLite, run exactly one machine.
 
 ### Postgres
 
-Create a Managed Postgres cluster with `fly mpg create`, and attach it to the app:
+Use Postgres if you want more than one machine. Create a Managed Postgres cluster with `fly mpg create`, and attach it to the app:
 
 ```bash
 fly mpg attach <cluster-id> --app blog-api
@@ -152,9 +152,9 @@ Migrated: 2026_10_22_205345_create_posts_table
 
 ## HTTPS and the client IP
 
-Fly.io ends TLS and sends plain HTTP to port 3000. `force_https = true` sends HTTP visitors to HTTPS.
-To make `req.ip()` and `req.scheme()` show the real client, set `trustedProxies` in `AppConfig`.
-The app port is reachable only through the Fly.io proxy, so `['*']` is safe here:
+Fly.io handles HTTPS and sends plain HTTP to port 3000. `force_https = true` sends HTTP visitors to HTTPS.
+
+You want `req.ip()` and `req.scheme()` to show the real client, so set `trustedProxies` in `AppConfig`. Only the Fly.io proxy can reach the app port, so `['*']` is safe here:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -165,7 +165,7 @@ AppConfig appConfig = AppConfig(
 
 See [Deployment: HTTPS](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
 
-## More CPU, more machines
+## Scaling the app
 
 Dox starts one isolate per CPU core it sees. On `cpus = 1` that is one isolate.
 
@@ -177,7 +177,9 @@ Dox starts one isolate per CPU core it sees. On `cpus = 1` that is one isolate.
 
 Each machine is its own process. Socket.IO rooms and the memory cache are not shared between machines.
 
-## Update the app
+## Updating the app
+
+To ship a new version, deploy again:
 
 ```bash
 fly deploy

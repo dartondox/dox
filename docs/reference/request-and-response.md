@@ -4,24 +4,23 @@ icon: lucide/arrow-down-up
 
 # Request and response
 
-A short list of the members of `DoxRequest`, `DoxResponse` and the response helpers.
+A short list of what you can use on `DoxRequest`, `DoxResponse` and the response helpers.
 
 Examples and explanations are on the [Request](../the-basic/request.md) and [Response](../the-basic/response.md) pages.
 
 ## `DoxRequest`
 
-Source: `packages/dox-core/lib/http/request/dox_request.dart`. It implements `IDoxRequest` from `dox_annotation`.
-A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a `next` middleware (`IDoxNextMiddleware`) get a `DoxRequest`. The members marked `IDoxRequest` are on both.
+A controller gets a `DoxRequest`. So does a middleware that uses `next` (`IDoxNextMiddleware`). A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`, which has fewer members. The last column shows which members it has.
 
 ### Input
 
 | Member | Returns | What it gives | On `IDoxRequest` |
 | --- | --- | --- | --- |
-| `validate<T>({Source? source})` | `Future<T>` | The request checked with the DTO `T`. Throws the `422` `ValidationException` on bad input. Throws `StateError` when `T` is not in `AppConfig.dtos`. | no |
+| `validate<T>({Source? source})` | `Future<T>` | The request checked with the DTO `T`. Bad input gives `422`. Throws `StateError` when `T` is not in `AppConfig.dtos`. | no |
 | `validateSchema<O>(Schema<O> schema)` | `Future<O>` | Query and body checked with a fluent `dox_validation` schema. | no |
 | `all()` | `Map<String, dynamic>` | Query and body together. Body wins on the same key. | yes |
 | `only(List<String> keys)` | `Map<String, dynamic>` | Only these keys from `all()`. A missing key gives `null`. | yes |
-| `input(String key, [dynamic defaultValue])` | `dynamic` | One value from `all()`. A dot key like `user.name` or `items.0.id` reads inside maps and lists. The default is used when the key is not there or is null. `IDoxRequest` has `input(key)` only, with no default value. | yes |
+| `input(String key, [dynamic defaultValue])` | `dynamic` | One value from `all()`. A dot key like `user.name` or `items.0.id` reads inside maps and lists. You get the default when the key is not there or is null. `IDoxRequest` has no default value. | yes |
 | `except(List<String> keys)` | `Map<String, dynamic>` | All values from `all()`, without these keys. | no |
 | `has(String key)` | `bool` | `true` when the key is there and its text is not empty. | yes |
 | `exists(String key)` | `bool` | `true` when the key is there, with any value (also `''` or null). | no |
@@ -62,7 +61,7 @@ A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a
 | `origin()` | `String?` | The `Origin` header. | yes |
 | `referer()` | `String?` | The `Referer` header. | yes |
 | `locale` | `String?` | The first language of `Accept-Language`, like `th`. `null` when there is none or it is `*`. | no |
-| `auth` | `IAuth?` | The auth object set by `AuthMiddleware`, or `null`. `req.auth?.id()` gives the user id. For a guest, `req.auth` is `null`. | yes |
+| `auth` | `IAuth?` | The auth object set by `AuthMiddleware`. `req.auth?.id()` gives the user id. It is `null` for a guest. | yes |
 | `expectsJson()` | `bool` | The client wants JSON: an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request is not. | no |
 
 ### Session
@@ -84,13 +83,12 @@ A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`. A controller and a
 | `fullUrl()` | `String` | The full URL with the query string. | no |
 | `pathIs(String pattern)` | `bool` | `true` when the path matches. `*` matches any text. | no |
 | `routeIs(String pattern)` | `bool` | `true` when the route name matches. It is `false` for a route with no name. | no |
-| `getRouteIdentifier()` | `String` | base64 of `<method>|<domain><path>`. Useful as a cache or rate limit key. | yes |
+| `getRouteIdentifier()` | `String` | A key for the route (base64 of `<method>|<domain><path>`). Useful for a cache or rate limit key. | yes |
 | `httpRequest` | `HttpRequest` | The `dart:io` request. Use it for raw access. | yes |
 
 ## `DoxResponse`
 
-Source: `packages/dox-core/lib/http/response/dox_response.dart`.
-Every setter returns the same `DoxResponse`, so calls chain.
+Every setter returns the same `DoxResponse`, so you can chain the calls.
 
 | Member | Returns | What it does |
 | --- | --- | --- |
@@ -106,11 +104,10 @@ Every setter returns the same `DoxResponse`, so calls chain.
 | `withHeaders(Map<String, dynamic> values)` | `DoxResponse` | Adds these headers. A key replaces the header with the same name, in any case. Other headers stay. |
 | `cookie(DoxCookie cookie, {bool setExpire = false})` | `DoxResponse` | Adds a `Set-Cookie` header. `setExpire: true` sends the cookie as expired, which removes it. |
 | `cache(Duration duration)` | `DoxResponse` | Sets `Cache-Control: max-age=<seconds>`. |
-| `process(HttpRequest request)` | `dynamic` | Internal. Writes headers, status, cookies and the body. |
 
 ## Response helpers
 
-Top level functions in the same file. They give a `DoxResponse`.
+These top level functions give a `DoxResponse`.
 
 | Function | What it does |
 | --- | --- |
@@ -118,7 +115,9 @@ Top level functions in the same file. They give a `DoxResponse`.
 | `redirect(String url, {int status = 302})` | A redirect to `url`. It sets the `Location` header. |
 | `back(DoxRequest req, {String fallback = '/'})` | A `302` redirect to the `Referer` header, or to `fallback` when there is none. |
 
-How the content is sent (`responseDataHandler` in `packages/dox-core/lib/http/http_response_handler.dart`):
+## How the content is sent
+
+A controller can return a plain value or a `DoxResponse`. Dox sends the content like this:
 
 | Content | Sent as |
 | --- | --- |
@@ -131,6 +130,4 @@ How the content is sent (`responseDataHandler` in `packages/dox-core/lib/http/ht
 | `DownloadableFile` | streamed with `Content-Disposition: attachment; filename="<name>"` |
 | `Stream<List<int>>` | streamed chunk by chunk |
 | `IHttpException` | its status and `toResponse()`, see [HTTP exceptions](http-exceptions.md) |
-| other `Exception` or `Error` | `500` with `{"code": "server_error", "message": "Server Error"}`. When `APP_ENV` is `development` or `local`, the body is `toString()` as text. |
-
-A plain value returned from a controller (not a `DoxResponse`) is sent the same way. It only goes through a `DoxResponse` when `AppConfig.responseHandler` is set, or when it is a `File`, `StreamFile` or `DownloadableFile`.
+| other `Exception` or `Error` | `500` with `{"code": "server_error", "message": "Server Error"}`. In `development` or `local`, the body is the error text. |

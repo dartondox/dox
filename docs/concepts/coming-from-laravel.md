@@ -4,9 +4,9 @@ icon: lucide/arrow-right-left
 
 # Coming from Laravel
 
-This page is for Laravel developers: it shows the Laravel way and the Dox way side by side.
+This page shows the Laravel way and the Dox way side by side, so a Laravel developer can find the Dox name for each thing.
 
-The Laravel code is Laravel 11. The biggest changes are in [What is different](#what-is-different).
+Most ideas have the same name in Dox. The Laravel code here is Laravel 11. If you only read one part, read [What is different](#what-is-different).
 
 ## Routing
 
@@ -30,7 +30,7 @@ The Laravel code is Laravel 11. The biggest changes are in [What is different](#
 | `Route::view('/welcome', 'welcome')` | `Route.get('/welcome', (DoxRequest req) => view(req, 'welcome'))` with `view()` of `dox_view`. Dox `Route.view` is the WebDAV `VIEW` method, not a template. |
 | `routes/api.php` with the `api` prefix | `lib/routes/api.dart`, a `Router` class with `prefix => 'api'` |
 
-In Dox, the container makes the controller. Put `@Inject()` above the class. The route picks the method with a typed function.
+In Dox, the container makes the controller, so you put `@Inject()` above the class. The route then picks the method with a typed function:
 
 ```dart title="lib/routes/api.dart"
 class ApiRouter extends Router {
@@ -62,9 +62,9 @@ class ApiRouter extends Router {
 | method injection | filled by type: `DoxRequest`, one `@Dto` class, path params, models, container classes |
 | implicit route model binding | the same: a `User user` parameter loads `{user}` by its key |
 
-Dox fills a parameter by its type, not by its name. Path params go by position.
+Dox fills a parameter by its type, not by its name. Path params go by position. A controller can be a class method, a static method or a plain function.
+
 The container is generated code, not reflection. See [Dependency injection](../the-basic/dependency-injection.md).
-A controller can be a class method, a static method or a plain function.
 
 ## Middleware
 
@@ -88,7 +88,8 @@ class LoggerMiddleware implements IDoxMiddleware {
 ```
 
 A plain function `dynamic apiKey(DoxRequest req)` also works as middleware.
-Dox middleware runs before the controller only. There is no "after" step; use a `responseHandler` for that.
+
+Dox middleware runs only before the controller. There is no "after" step. If you want to change every response, use a `responseHandler`.
 
 ## Requests and validation
 
@@ -126,8 +127,7 @@ class CreateBlog {
 }
 ```
 
-The rules are checked by generated Dart code, not by rule strings at run time.
-See [Validation](../the-basic/validation.md).
+Generated Dart code checks the rules, so there are no rule strings to read at run time. See [Validation](../the-basic/validation.md).
 
 ## Responses
 
@@ -148,7 +148,7 @@ See [Validation](../the-basic/validation.md).
 
 With [dox_view](../the-basic/views.md), templates end in `.dox.html`. Most Blade tags have the same name. A block ends with `@end`.
 
-A Blade name that is not a Dox tag, like `@foreach` or `@endif`, is printed as text. Dox writes a warning to `stderr` that names the template, the line and the Dox way. See [Coming from Blade](../the-basic/views.md#coming-from-blade).
+A Blade name that is not a Dox tag, like `@foreach` or `@endif`, is printed as text. Dox writes a warning to `stderr` that names the template, the line and the Dox way. See [Coming from Blade](../the-basic/views.md#unknown-tag-warnings).
 
 | Laravel Blade | Dox |
 | --- | --- |
@@ -247,9 +247,8 @@ class Blog extends BlogGenerator {
 ```
 
 Every column field is nullable, because a new model has no values yet.
-Dox has no `$casts` list. Use the field type, a [cast](../database/model/casts.md), `beforeSave` or `beforeGet`.
-For scopes, see [Scopes](../database/model/scopes.md).
-See [Model](../database/model/index.md).
+
+Dox has no `$casts` list. Use the field type, a [cast](../database/model/casts.md), `beforeSave` or `beforeGet` instead. See [Model](../database/model/index.md) and [Scopes](../database/model/scopes.md).
 
 ## Query builder
 
@@ -304,9 +303,9 @@ See [Model](../database/model/index.md).
 | `->toSql()` | `.toSql()` |
 | `DB::connection('mysql')` | `.withConnection('mysql')` |
 
-Values are always bound parameters. Names you pass are quoted. Do not pass user input as a column name or an operator.
+Values are always bound parameters, and names you pass are quoted. Still, do not pass user input as a column name or an operator.
 
-`exists` and `value` are other names in Dox, because a model already has an `exists` getter, and `value` is a common column name.
+`exists` and `value` have other names in Dox, because a model already has an `exists` getter and `value` is a common column name.
 
 ## Migrations and schema
 
@@ -347,8 +346,7 @@ class CreateUsersTable extends Migration {
 }
 ```
 
-Dart can not load files at run time in an AOT binary. So the CLI keeps a list of your migrations in `db/migration/migrations.dart`. You do not edit it.
-The server can run the migrations at start. See [Migration](../database/migration.md).
+An AOT binary can not load Dart files at run time. So the CLI keeps a list of your migrations in `db/migration/migrations.dart`, and you do not edit it. The server can run the migrations when it starts. See [Migration](../database/migration.md).
 
 ## Artisan vs the dox CLI
 
@@ -365,8 +363,7 @@ The server can run the migrations at start. See [Migration](../database/migratio
 | `php artisan schedule:work` | `dox schedule:work` |
 | `php artisan schedule:clear-cache` | `dox schedule:clear-cache` |
 
-The `make:*` and `migrate` commands are in the tables above. Two commands have no Laravel twin: `dox build_runner:build` makes the generated code, and `dox env:generate` makes the typed env class.
-See [Dox CLI](../digging-deeper/dox-cli.md).
+The `make:*` and `migrate` commands are in the tables above. Two commands have no Laravel twin: `dox build_runner:build` makes the generated code, and `dox env:generate` makes the typed env class. See [Dox CLI](../digging-deeper/dox-cli.md).
 
 ## Auth
 
@@ -388,9 +385,14 @@ See [Dox CLI](../digging-deeper/dox-cli.md).
 | `Crypt::encryptString($v)`, `Crypt::decryptString($v)` | `Crypt.encryptString(v)`, `Crypt.decryptString(v)` |
 | `Hash::make($p)`, `Hash::check($p, $hash)` | `Hash.make(p)`, `Hash.check(p, hash)` (or `Hash.verify`) |
 
-For an API, use access tokens (`AccessTokenAuthDriver`), like Sanctum. JWT is also available. `dox auth:tokens-table` makes the `auth_access_tokens` table. `$user->createToken('cli', ['posts:read'])` is `Auth().createAccessToken(user, name: 'cli', abilities: <String>['posts:read'])`, and `$request->user()->tokenCan('posts:read')` is `(req.auth as Auth).tokenCan('posts:read')`. To renew a token, use `rotateAccessToken`.
-For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie.
-See [Authentication](../security/authentication.md).
+For an API, use access tokens (`AccessTokenAuthDriver`). They work like Sanctum tokens. JWT is also available.
+
+- `dox auth:tokens-table` makes the `auth_access_tokens` table.
+- `$user->createToken('cli', ['posts:read'])` is `Auth().createAccessToken(user, name: 'cli', abilities: <String>['posts:read'])`.
+- `$request->user()->tokenCan('posts:read')` is `(req.auth as Auth).tokenCan('posts:read')`.
+- To renew a token, use `rotateAccessToken`.
+
+For web pages, a guard with `SessionAuthDriver` keeps the login in the session cookie. See [Authentication](../security/authentication.md).
 
 ## Cache
 
@@ -434,7 +436,7 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 
 Three things are different from Laravel:
 
-- `setVisibility()` and `getVisibility()` on a local disk change and read the file mode only when the disk has `'permissions': true`. Without it, `setVisibility()` does nothing on a local disk, and `getVisibility()` gives the disk `visibility` (`public` by default). Laravel always runs `chmod`. So a file you made private is not private on disk until you turn this on.
+- On a local disk, `setVisibility()` changes the file mode only when the disk has `'permissions': true`. Without it, `setVisibility()` does nothing, and `getVisibility()` gives the disk `visibility` (`public` by default). Laravel always runs `chmod`, so in Dox a file you made private is not private on disk until you turn this on.
 - Paths that Dox gives you start with `/`. This is true for `putFile`, `store`, `files`, `allFiles` and `directories`.
 - `put()` returns nothing. `download()` takes `name:` but no headers. For headers, use `response(await Storage().download(path)).header('Cache-Control', 'no-store')`.
 
@@ -450,8 +452,7 @@ See [File Storage](../digging-deeper/file-storage.md).
 | `config('app.name')` | `env.appName` from the typed env class (`@DoxEnv()`) |
 | `php artisan config:cache` | not needed. The typed env is read once, at start. |
 
-The typed env class gives you an `int` for `APP_PORT` and a build error for a bad type.
-A missing key stops the app at start, with a list of every missing key. See [Environment Variables](../digging-deeper/env.md).
+The typed env class gives you an `int` for `APP_PORT`, and a build error for a bad type. If a key is missing, the app stops at start and lists every missing key. See [Environment Variables](../digging-deeper/env.md).
 
 ## Testing
 
@@ -466,8 +467,7 @@ A missing key stops the app at start, with a list of every missing key. See [Env
 | `Cache::fake()` | `Dox().cache = CacheManager(CacheConfig(...))` with a `memory` store |
 | `$this->actingAs($user)` | `client.withToken(token)` with a token from `Auth().createAccessToken(user)` (access tokens) or `Auth().login(user)` (JWT) |
 
-Dox has no fake HTTP kernel. `DoxTestClient.start(appConfig)` starts the real server inside the test, on a free port, and sends real requests.
-See [Testing](../digging-deeper/testing.md).
+Dox has no fake HTTP kernel. Instead, `DoxTestClient.start(appConfig)` starts the real server inside the test on a free port, and sends real requests. See [Testing](../digging-deeper/testing.md).
 
 ## What is different
 

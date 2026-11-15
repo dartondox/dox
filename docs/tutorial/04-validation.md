@@ -4,18 +4,17 @@ icon: lucide/circle-check
 
 # Step 4: Validation
 
-This step checks the input of create and update with a `@Dto` class.
-
-Bad input gets a `422` answer, and the controller does not run.
+In this step you check the input of create and update with a `@Dto` class, so bad input gets a `422` answer and the controller does not run.
 
 ## 1. Make the DTO
+
+A [DTO](../the-basic/dto.md) is a class that describes the input you expect, with a rule on each field. Make one:
 
 ```bash
 dox make:dto SavePost
 ```
 
-One class is enough for create and update, because both need the same fields.
-Replace the file with this:
+Create and update need the same fields, so one class is enough for both. Replace the file with this:
 
 ```dart title="lib/app/dtos/save_post/save_post.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -40,14 +39,12 @@ class SavePost {
 ```
 
 - A field that is not nullable and has no default is required.
-- The rules run from top to bottom. `@Trim()` removes spaces first. An empty string then counts as missing.
+- The rules run from top to bottom. `@Trim()` removes spaces first, so an empty string then counts as missing.
 - See [Validation](../the-basic/validation.md) for all rules.
 
 ## 2. Give the DTO list to the app
 
-The generator writes a list of all DTOs to `lib/generated/dtos.g.dart`.
-Dox needs this list, because it does not use reflection.
-Add two lines to `lib/config/app.dart`:
+The code generator writes a list of all DTOs to `lib/generated/dtos.g.dart`. Dox needs this list, because it does not use reflection. Add two lines to `lib/config/app.dart`:
 
 ```dart title="lib/config/app.dart"
 import 'package:blog/generated/dtos.g.dart';
@@ -62,8 +59,7 @@ AppConfig appConfig = AppConfig(
 
 ## 3. Use the DTO in the controller
 
-Ask for `SavePost` as a parameter. Dox checks the body and gives you a typed object.
-This also adds `update`, so `PUT /api/posts/{id}` works:
+Now ask for `SavePost` as a parameter of the controller method. Dox checks the body and gives you a typed object. This version also adds `update`, so you can change a post:
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 import 'package:blog/app/dtos/save_post/save_post.dto.dart';
@@ -111,11 +107,11 @@ class PostController {
 }
 ```
 
-`Route.resource` in `lib/routes/api.dart` sees the new `update` method and adds `PUT` and `PATCH /api/posts/{id}`. You change nothing there.
+You do not need to change the routes. `Route.resource` sees the new `update` method and adds `PUT` and `PATCH /api/posts/{id}`.
 
 ## 4. Run the generator
 
-`dox s` runs it for you. Without `dox s`:
+`dox s` runs the generator for you. If it is not running, run it once:
 
 ```bash
 dart run build_runner build
@@ -125,13 +121,15 @@ It writes `lib/app/dtos/save_post/save_post.dto.g.dart` and `lib/generated/dtos.
 
 ## Check it
 
-A title that is too short, and a body that is too short:
+Send a title and a body that are too short:
 
 ```bash
 curl -i -X POST http://localhost:3000/api/posts \
   -H 'Content-Type: application/json' \
   -d '{"title":"Hi","body":"Short"}'
 ```
+
+You should get `422` with one message for each field:
 
 ```text
 HTTP/1.1 422 Unprocessable Entity
@@ -141,7 +139,7 @@ content-type: application/json; charset=utf-8
 {"title":"The title must be between 3 and 100 characters","body":"The body must be at least 10 characters"}
 ```
 
-An empty body:
+Send an empty body:
 
 ```bash
 curl -X POST http://localhost:3000/api/posts \

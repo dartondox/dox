@@ -6,6 +6,8 @@ icon: lucide/container
 
 Build a small production image with `dox build`, and run it with Postgres in Docker Compose, with a health check.
 
+A Docker image runs the same way on your laptop and on any server. The image in this guide holds only the compiled app, so it is small and starts fast.
+
 ## What you need
 
 - A Dox app with a database.
@@ -13,8 +15,9 @@ Build a small production image with `dox build`, and run it with Postgres in Doc
 
 ## 1. Add a health route
 
-The health check asks this route. It answers 503 when the database does not answer.
-Put it in `register()` of `WebRouter`. `QueryBuilder` comes from `package:dox_orm/dox_orm.dart`.
+Docker needs a way to know if the app works. Add a health route that it can ask. The route answers `503` when the database does not answer.
+
+Put it in `register()` of `WebRouter`. `QueryBuilder` comes from `package:dox_orm/dox_orm.dart`:
 
 ```dart title="lib/routes/web.dart"
 Route.health(
@@ -29,7 +32,7 @@ See [Health check](../digging-deeper/health-check.md) for more checks.
 
 ## 2. Add the health check binary
 
-The final image has no shell and no `curl`. So the health check is a second small Dart binary.
+The final image has no shell and no `curl`, so the health check is a second small Dart binary:
 
 ```dart title="bin/health.dart"
 import 'dart:io';
@@ -54,7 +57,7 @@ Future<void> main() async {
 
 ## 3. Write the Dockerfile
 
-Two stages: the first builds the AOT bundle, the second holds only the Dart runtime and the bundle. For the blog API the final image is about 17 MB.
+The Dockerfile has two stages. The first stage builds the AOT bundle. The second stage holds only the Dart runtime and the bundle, so the final image is small: about 17 MB for the blog API.
 
 ```dockerfile title="Dockerfile"
 # Stage 1: build the AOT bundle with the Dart SDK and the dox CLI.
@@ -101,21 +104,21 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
 CMD ["/app/bin/server"]
 ```
 
-Delete the `public` lines when your app has no `public` folder.
+Delete the `public` lines if your app has no `public` folder.
 
-Check the start log in the container. It must end with `(native)`:
+When the container starts, check the start log. It must end with `(native)`:
 
 ```text
 Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
-Without the `libgcc_s` lines, the native HTTP server does not load. Dox then stops at start with `dox_http_native did not load` and the reason.
+The `libgcc_s` lines are needed. Without them the native HTTP server does not load, and Dox stops at start with `dox_http_native did not load`.
 
 !!! warning "`dox build`, not `dart compile exe`"
     `dox_orm` bundles SQLite with a build hook. `dart compile exe` does not run build hooks and stops with an error.
     `dox build` runs `dart build cli`, which does. It puts the native libraries in `build/bundle/lib`, next to `bin/server`.
 
-Keep the build context small:
+Keep the build context small with a `.dockerignore`:
 
 ```text title=".dockerignore"
 .dart_tool/
@@ -134,7 +137,7 @@ pubspec_overrides.yaml
 
 ## 4. Write the compose file
 
-`env_file: .env` gives the app your `.env`. The lines under `environment` win over the file, so the app always talks to the `postgres` service.
+Docker Compose runs the app and Postgres together. `env_file: .env` gives the app your `.env`. The lines under `environment` win over the file, so the app always talks to the `postgres` service:
 
 ```yaml title="docker-compose.yml"
 services:
@@ -177,9 +180,9 @@ volumes:
   uploads:
 ```
 
-- `depends_on` with `service_healthy`: the app starts after Postgres answers. The app runs the migrations at start, so the database must be up.
-- `${DB_PASSWORD:?...}`: compose stops with a clear message when `.env` has no password.
-- `restart: unless-stopped`: when the main isolate dies, the process exits and Docker starts it again.
+- `depends_on` with `service_healthy` starts the app after Postgres answers. This matters because the app runs the migrations at start.
+- `${DB_PASSWORD:?...}` stops compose with a clear message if `.env` has no password.
+- When the main isolate dies, the process exits and `restart: unless-stopped` starts it again.
 
 ## 5. Write the `.env`
 
@@ -197,8 +200,7 @@ DB_PASSWORD=<a real password>
 
 `.env` is in `.dockerignore` and `.gitignore`. It never goes into the image or into git.
 
-The app now uses Postgres, so the build needs the Postgres driver.
-A new app skips it in `pubspec.yaml`. Remove the `dox_postgres_native` skip lines.
+The app now uses Postgres, so the build needs the Postgres driver. A new app skips it in `pubspec.yaml`, so remove the `dox_postgres_native` skip lines.
 See [Skip unused drivers](../database/index.md#skip-unused-drivers).
 
 ## 6. Build and run
@@ -228,11 +230,11 @@ curl http://localhost:3000/health
 {"status":"ok","checks":{"database":"ok"}}
 ```
 
-Stop Postgres with `docker compose stop postgres`. After about 45 seconds, `docker compose ps` shows the app as `unhealthy`.
+To see the health check work, stop Postgres with `docker compose stop postgres`. After about 45 seconds, `docker compose ps` shows the app as `unhealthy`.
 
 ## HTTPS
 
-Do not add TLS to the app. Put Caddy or nginx in front, and set `trustedProxies` in `AppConfig`.
+Do not add TLS to the app itself. Put Caddy or nginx in front, and set `trustedProxies` in `AppConfig`.
 See [Deployment: HTTPS](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
 
 ## See also
