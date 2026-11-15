@@ -1,8 +1,10 @@
 ## Unreleased
 
+- Memory: each response called `close()` and did not use its Future. On the native server that Future and its microtask kept the request and its batch of bytes alive a bit longer, so under load the heap grew. Now Dox calls `NativeResponse.end()`, which makes no Future. A `dart:io` response still calls `close()`. Needs the next dox_http_native.
+- Perf: CORS read the `Origin` header on every request, even with the default config that sets no CORS value. With the content type read, that was a second header lookup, and the native server then parsed all headers. Now `Origin` is read only when `origin` is a list, and a config with no values returns at once. The headers sent stay the same.
+- Memory: `DoxResponse` made a map, a set and a list for every response, also when nothing was set. Now they are made on first use. `headers` still gives a map you can change.
 - New: every pretty log line starts with a dim tag that says where it comes from, like `[request] GET /users => {...}`. Request lines get `[request]`. Server start, stop and startup warnings get `[server]`. Error reports get `[error]`. Your own lines get `[app]`. Pass your own tag as the third argument: `Logger.info('done', null, 'billing')`. `Logger.log`, `info`, `warn`, `success` and `danger` all take it. In JSON mode the tag is the `source` field, added at the end of the line. When the data map has its own `source` key, that value is kept and the tag is not added. An empty tag counts as no tag.
 - Change: the plain warnings on stderr use the same tags. `dox: warning:` and `[dox]` are now `[server]` (isolate, server, WebSocket and CORS warnings) or `[request]` (a middleware returned null).
-
 - Perf: a JSON response made a new 8 KB buffer, even for a small body. This made small JSON bodies about 2x slower to encode. The buffer is 1 KB now. Big bodies are about the same speed.
 
 ## 3.2.1

@@ -10,16 +10,17 @@ class DoxResponse {
   /// String, int, Map, json serializable object, `Stream<List<int>>`
   dynamic _contentData;
 
-  final Map<String, dynamic> _headers = <String, dynamic>{};
+  /// made on first use: most responses set no header, cookie or replace
+  Map<String, dynamic>? _headerMap;
 
-  /// names in [_headers] that replace a value already on the response
-  final Set<String> _replaced = <String>{};
+  /// names in [_headerMap] that replace a value already on the response
+  Set<String>? _replaced;
   int? _statusCode;
   ContentType? _contentType;
 
   /// cookies and their expire flag. the header is made in [process],
   /// when Dox knows if the request came over https.
-  final List<(DoxCookie, bool)> _cookies = <(DoxCookie, bool)>[];
+  List<(DoxCookie, bool)>? _cookies;
 
   /// content can be anything
   /// String, int, Map, json serializable object, `Stream<List<int>>`, File
@@ -53,7 +54,7 @@ class DoxResponse {
   int? get status => _statusCode;
 
   /// The headers set with [header], by name.
-  Map<String, dynamic> get headers => _headers;
+  Map<String, dynamic> get headers => _headerMap ??= <String, dynamic>{};
 
   /// Set response status code default 200
   /// ```
@@ -101,14 +102,15 @@ class DoxResponse {
   /// `CoreFlags.replaceHeaders` decides, but `Vary` and `Set-Cookie` are
   /// lists, so the flag does not replace them (CORS adds `Vary: Origin`).
   DoxResponse header(String key, dynamic value, {bool? replace}) {
-    if (_headers.isNotEmpty) {
+    Map<String, dynamic> map = headers;
+    if (map.isNotEmpty) {
       String name = key.toLowerCase();
-      _headers.removeWhere((String k, dynamic _) => k.toLowerCase() == name);
-      _replaced.removeWhere((String k) => k.toLowerCase() == name);
+      map.removeWhere((String k, dynamic _) => k.toLowerCase() == name);
+      _replaced?.removeWhere((String k) => k.toLowerCase() == name);
     }
-    _headers[key] = value;
+    map[key] = value;
     if (replace ?? (Dox().flags.replaceHeaders && !_isList(key))) {
-      _replaced.add(key);
+      (_replaced ??= <String>{}).add(key);
     }
     return this;
   }
@@ -119,7 +121,7 @@ class DoxResponse {
   /// res.cookie(cookie);
   /// ```
   DoxResponse cookie(DoxCookie cookie, {bool setExpire = false}) {
-    _cookies.add((cookie, setExpire));
+    (_cookies ??= <(DoxCookie, bool)>[]).add((cookie, setExpire));
     return this;
   }
 
@@ -152,11 +154,12 @@ class DoxResponse {
     /// a WebSocket route behind a `next` middleware: the socket is open
     if (_contentData is WebSocket) return null;
     HttpHeaders headers = request.response.headers;
-    _headers.forEach((String key, dynamic value) {
+    Set<String>? replaced = _replaced;
+    _headerMap?.forEach((String key, dynamic value) {
       /// Content-Type has one value. `add` would keep the default
       /// `text/plain` too, and the response fails with
       /// "More than one value for header content-type".
-      if (_replaced.contains(key) ||
+      if ((replaced?.contains(key) ?? false) ||
           (key.length == 12 &&
               key.toLowerCase() == HttpHeaders.contentTypeHeader)) {
         headers.set(key, value);
@@ -175,17 +178,19 @@ class DoxResponse {
     }
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
-    } else if (content is String && !_headers.keys.any(_isContentType)) {
+    } else if (content is String &&
+        !(_headerMap?.keys.any(_isContentType) ?? false)) {
       htmlForText(request.response);
     }
-    if (_cookies.isNotEmpty) {
+    List<(DoxCookie, bool)>? cookies = _cookies;
+    if (cookies != null && cookies.isNotEmpty) {
       bool https =
           TrustedProxy.readClient(
             request,
             Dox().config.trustedProxies,
           ).scheme ==
           'https';
-      for ((DoxCookie, bool) item in _cookies) {
+      for ((DoxCookie, bool) item in cookies) {
         DoxCookie cookie = item.$1;
         request.response.headers.add(
           HttpHeaders.setCookieHeader,
