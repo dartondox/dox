@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Memory: each response called `close()` and did not use its Future. On the native server that Future and its microtask kept the request and its batch of bytes alive a bit longer, so under load the heap grew. Now Dox calls `NativeResponse.end()`, which makes no Future. A `dart:io` response still calls `close()`. Needs the next dox_http_native.
+- Perf: CORS read the `Origin` header on every request, even with the default config that sets no CORS value. With the content type read, that was a second header lookup, and the native server then parsed all headers. Now `Origin` is read only when `origin` is a list, and a config with no values returns at once. The headers sent stay the same.
+- Memory: `DoxResponse` made a map, a set and a list for every response, also when nothing was set. Now they are made on first use. `headers` still gives a map you can change.
 - Perf: a JSON response made a new 8 KB buffer, even for a small body. This made small JSON bodies about 2x slower to encode. The buffer is 1 KB now. Big bodies are about the same speed.
 
 ## 3.2.1

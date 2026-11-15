@@ -5,19 +5,29 @@ import 'package:dox_core/dox_core.dart';
 void httpCorsHandler(bool? enabled, HttpRequest req) {
   CORSConfig cors = Dox().config.cors;
   if (!(enabled ?? cors.enabled)) return;
+
+  /// the default config sets no value: nothing to add
+  if (cors.origin == null &&
+      cors.methods == null &&
+      cors.headers == null &&
+      cors.exposeHeaders == null &&
+      cors.credentials == null &&
+      cors.maxAge == null) {
+    return;
+  }
   HttpResponse res = req.response;
 
   /// call each one directly, no map per request.
   /// null values are skipped inside `_setCorsValue`.
-  if (cors.origin is List) {
+  /// only a list needs the request Origin. A header lookup costs, so it
+  /// is not read for one origin or `*`.
+  dynamic origin = cors.origin;
+  if (origin is List) {
     /// the answer depends on the request Origin, so caches must know it.
     res.headers.add(HttpHeaders.varyHeader, 'Origin');
+    origin = corsAllowOrigin(origin, req.headers.value('origin'));
   }
-  _setCorsValue(
-    res,
-    HttpHeaders.accessControlAllowOriginHeader,
-    corsAllowOrigin(cors.origin, req.headers.value('origin')),
-  );
+  _setCorsValue(res, HttpHeaders.accessControlAllowOriginHeader, origin);
   _setCorsValue(res, HttpHeaders.accessControlAllowMethodsHeader, cors.methods);
   _setCorsValue(res, HttpHeaders.accessControlAllowHeadersHeader, cors.headers);
   _setCorsValue(

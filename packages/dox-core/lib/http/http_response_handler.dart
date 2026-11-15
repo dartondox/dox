@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
+import 'package:dox_http_native/dox_http_native.dart' show NativeResponse;
 
 dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
   /// Websocket handler will return websocket payload
@@ -95,7 +96,7 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   HttpResponse res = request.response;
 
   if (payload == null) {
-    res.close();
+    endResponse(res);
     return;
   }
 
@@ -175,7 +176,20 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   /// dart:io only gzips when the length is not set, so skip it then.
   if (!Dox().config.compress) res.contentLength = bytes.length;
   res.add(bytes);
-  res.close();
+  endResponse(res);
+}
+
+/// Sends [res] when nothing waits for it. The native server sends with no
+/// Future: the Future of `close()` would only keep the request alive until
+/// its microtask runs, and under load the heap grows. A `dart:io`
+/// response is closed as before. Errors go to `res.done`, as with an
+/// unused `close()`.
+void endResponse(HttpResponse res) {
+  if (res is NativeResponse) {
+    res.end();
+  } else {
+    res.close();
+  }
 }
 
 /// the APP_ENV value [_show] was made from. the answer is made again
