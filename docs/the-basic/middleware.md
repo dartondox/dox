@@ -356,7 +356,7 @@ This section is for special cases. Most apps do not need it.
 ### LogMiddleware
 
 - It follows `LoggerConfig`: `enabled`, `level` and `prettyPrint`. If the logger is off, `LogMiddleware(enabled: true)` does not turn logs on. `enabled: false` turns only the request logs off. Leave it unset to follow the logger.
-- With `prettyPrint` it prints colored text. Without it, it prints one JSON line with `status`, `message`, `network.client.ip`, `http.method`, `http.url`, `http.request_id` and `payload`.
+- With `prettyPrint` it prints colored text that starts with `[request]`, like `[request] GET /users => {...}`. Without it, it prints one JSON line with `status`, `source` (`request`), `message`, `network.client.ip`, `http.method`, `http.url`, `http.request_id` and `payload`.
 - The `filter` can change `status`, `message` and the other fields. It can not change `timestamp` or `logger`, because `Logger` sets them.
 - Headers are logged only with `withHeader: true`.
 - Body fields and headers whose name has a word like `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`.

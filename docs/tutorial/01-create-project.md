@@ -46,10 +46,10 @@ dox s
 
 `dox s` runs the code generator and the server. When you save a file in `lib/app/`, it hot reloads your code. When you change routes, config or other start-up code, it restarts the server.
 
-The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see a JSON log line with this message:
+The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see this log line:
 
 ```text
-Server started at http://[::]:3000 with 8 isolate (native)
+[server] Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 The number of isolates is the number of CPU cores on your machine.

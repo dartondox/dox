@@ -19,8 +19,8 @@ A `<...>` part changes, like a name or a number. Dart puts a prefix in front of 
 | `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use `transports: ['websocket']` in the client. |
-| `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
-| `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
+| `[server] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
+| `[server] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
 | `SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
 
 ## dox_core: routes and controllers

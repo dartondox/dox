@@ -223,7 +223,7 @@ Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"timestamp":"...","status":"info","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)","logger":{"name":"dox"}}
+{"timestamp":"...","status":"info","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)","logger":{"name":"dox"},"source":"server"}
 ```
 
 `(native)` means the native HTTP server loaded. When it does not load, the app stops at start and the error says why.

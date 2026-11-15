@@ -109,7 +109,7 @@ Delete the `public` lines if your app has no `public` folder.
 When the container starts, check the start log. It must end with `(native)`:
 
 ```text
-Server started at http://[::]:3000 with 8 isolate (native)
+[server] Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 The `libgcc_s` lines are needed. Without them the native HTTP server does not load, and Dox stops at start with `dox_http_native did not load`.

@@ -103,7 +103,7 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | --- | --- | --- | --- |
 | `name` | `String` | `''` | Written as `logger.name` in each JSON log line. Left out when empty. |
 | `enabled` | `bool` | `false` | Turn the `Logger` on. When it is off, `LogMiddleware` logs nothing too. |
-| `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line, for log services. |
+| `prettyPrint` | `bool` | `false` | `true` prints colored text. Each line starts with a tag that says where it comes from, like `[request]`, `[server]` or `[app]`. `false` prints one JSON object per line, for log services. The tag is then in the `source` field, unless your data already has a `source` key. |
 | `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. |
 
 ## CacheConfig

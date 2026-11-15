@@ -98,8 +98,10 @@ class Dox {
     if (appConfig.flags.envExpand && !Env().expanded) {
       Logger.warn(
         'CoreFlags.envExpand is on, but .env was read without it. Set '
-        'Env.flags = flags at the top of main(), before any env value is '
-        'read.',
+            'Env.flags = flags at the top of main(), before any env value is '
+            'read.',
+        null,
+        'server',
       );
     }
     _dtos = null;
@@ -129,7 +131,11 @@ class Dox {
 
     /// Windows has no SO_REUSEPORT: one isolate owns the native listener.
     if (Platform.isWindows && isolatesToSpawn > 1) {
-      Logger.info('Windows: the native server runs on one isolate');
+      Logger.info(
+        'Windows: the native server runs on one isolate',
+        null,
+        'server',
+      );
       isolatesToSpawn = 1;
     }
 
@@ -150,7 +156,9 @@ class Dox {
 
     Logger.info(
       'Server started at ${serverUrl(server)} with $isolatesToSpawn isolate '
-      '(native)',
+          '(native)',
+      null,
+      'server',
     );
     _watchSignals();
   }
@@ -175,7 +183,7 @@ class Dox {
   Future<void> _onSignal(ProcessSignal signal) async {
     // stop watching: the next signal does the default, it ends the process
     _cancelSignals();
-    Logger.info('$signal: stopping, open requests can finish');
+    Logger.info('$signal: stopping, open requests can finish', null, 'server');
     // `stop` writes the log buffer, also when it throws
     await stop();
     // a line logged after the flush of `stop` must not be lost
@@ -258,7 +266,7 @@ class Dox {
 
   /// the text of the warning of [warnWebSocketOrigin]
   static const String webSocketOriginWarning =
-      'dox: warning: WebSocket routes do not check the Origin header. Any '
+      '[server] WebSocket routes do not check the Origin header. Any '
       'website can open a socket with the cookie of a logged in user. To '
       'allow only your own sites, set AppConfig(webSocketAllowedOrigins: '
       "['https://app.example.com']), or allowedOrigins: on Route.websocket. "
@@ -282,7 +290,7 @@ class Dox {
 
   /// the text of the warning of [warnCorsCredentials]
   static const String corsCredentialsWarning =
-      "dox: warning: CORSConfig has origin '*' and credentials: true. "
+      "[server] CORSConfig has origin '*' and credentials: true. "
       'Browsers reject this, so requests with cookies from other sites '
       "fail. List your sites in origin, eg. ['https://app.example.com'].";
 
@@ -334,7 +342,7 @@ class Dox {
     if (!<String>['development', 'local', 'test', 'testing'].contains(env)) {
       throw StateError(message);
     }
-    Logger.warn(message);
+    Logger.warn(message, null, 'server');
   }
 
   /// Add a global middleware from a package. Call it in the `setup()` of a

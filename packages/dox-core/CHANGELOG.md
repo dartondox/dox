@@ -1,5 +1,8 @@
 ## Unreleased
 
+- New: every pretty log line starts with a dim tag that says where it comes from, like `[request] GET /users => {...}`. Request lines get `[request]`. Server start, stop and startup warnings get `[server]`. Error reports get `[error]`. Your own lines get `[app]`. Pass your own tag as the third argument: `Logger.info('done', null, 'billing')`. `Logger.log`, `info`, `warn`, `success` and `danger` all take it. In JSON mode the tag is the `source` field, added at the end of the line. When the data map has its own `source` key, that value is kept and the tag is not added. An empty tag counts as no tag.
+- Change: the plain warnings on stderr use the same tags. `dox: warning:` and `[dox]` are now `[server]` (isolate, server, WebSocket and CORS warnings) or `[request]` (a middleware returned null).
+
 - Perf: a JSON response made a new 8 KB buffer, even for a small body. This made small JSON bodies about 2x slower to encode. The buffer is 1 KB now. Big bodies are about the same speed.
 
 ## 3.2.1
