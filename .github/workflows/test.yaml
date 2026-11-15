@@ -71,8 +71,9 @@ jobs:
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
       # The repo is a Dart pub workspace. One `dart pub get` at the root
-      # is all that `melos bootstrap` does.
-      - run: dart pub get
+      # is all that `melos bootstrap` does. On a tag it waits for a
+      # just-published version on pub.dev.
+      - run: ci/pub-get-retry.sh
       - name: Analyze
         run: dart run melos run analyze
       - name: Check format
@@ -129,7 +130,7 @@ jobs:
           restore-keys: pub-${{ runner.os }}-
       # CI only: the sqlite3 hook uses the runner's SQLite, no download.
       - run: ci/system-sqlite.sh pubspec.yaml
-      - run: dart pub get
+      - run: ci/pub-get-retry.sh
       - name: Wait for services
         if: needs.changes.outputs.unit_services != ''
         run: ci/wait-services.sh ${{ needs.changes.outputs.unit_services }}
