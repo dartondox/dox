@@ -50,7 +50,7 @@ Sessions on a `memory` store are the exception. They live in the main isolate, s
 | --- | --- |
 | every driver | `driver`, `prefix` (default `dox_cache:`) |
 | `memory` | `max_size`: the most items. When full, the least recently used item is removed. No limit when not set |
-| `file` | `path` (default `storage/cache`). Each prefix gets its own sub folder |
+| `file` | `path` (default `storage/cache`). Each prefix gets its own sub folder. `prune_every`, see [Pruning the file store](#pruning-the-file-store). `fsync` (default `true`): sync each write to the disk |
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` (default 10), `max_value_bytes` (values bigger than this throw. No limit by default) |
 
 The `prefix` is added to every key. Use different prefixes when two apps share one Redis database.
@@ -304,17 +304,29 @@ int deleted = await (store.driver as DatabaseCacheDriver).prune();
 
 ## Pruning the file store
 
-A read never deletes a file, so an expired file stays until it is written again. Call `prune()` from time to time to delete expired files, for example in a schedule:
+A read never deletes a file, so an expired file stays until it is written again. The store cleans up by itself: at most once an hour, a write starts a light prune in the background. It deletes expired files, temp files left by a crash, and lock files that are free. It keeps files it can not read or decrypt, because they can belong to another app in the same folder. The first one runs an hour after the first write. Only one runs per hour, also with many isolates or servers on one folder.
+
+To clean up more often, or to also delete broken files, call `prune()` yourself, for example in a schedule:
 
 ```dart
 int deleted = await (store.driver as FileDriver).prune();
 ```
 
-You can also set `prune_every` on the store. It runs `prune()` in the background once every that many writes. Each run reads every file of the store, so pick a big number:
+You can also set `prune_every` on the store. It runs `prune()` in the background once every that many writes, in place of the hourly prune. Each run reads every file of the store, so pick a big number:
 
 ```dart
 'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache', 'prune_every': 1000},
 ```
+
+### Faster writes with `fsync: false`
+
+Each write syncs the file to the disk first. This keeps the newest value after a power cut, but it is slow. A cache can lose its last writes, so you can turn it off:
+
+```dart
+'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache', 'fsync': false},
+```
+
+A crash of the app alone loses nothing. Only a power cut or a crash of the machine can lose the last writes. A lost value reads as a miss. Keep it on for a store that holds sessions, if a power cut must not log users out.
 
 ## Without Dox
 

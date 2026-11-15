@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:dox_cache/dox_cache.dart' show CacheConstants;
+import 'package:dox_cache/dox_cache.dart' show CacheConstants, RedisDriver;
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/middleware/rate_limit_counter.dart';
 
@@ -150,6 +150,14 @@ class RateLimit implements IDoxMiddleware {
     int hits;
     if (counts == null) {
       hits = await RateLimitCounter.instance.increment(cacheKey, per);
+    } else if (counts.driver is RedisDriver) {
+      // both in the same tick: ioredis sends them in one write, in this
+      // order, so it is one round trip
+      List<Object?> replies = await _inOrder(<Future<Object?>>[
+        counts.add(cacheKey, 0, per),
+        counts.increment(cacheKey),
+      ]);
+      hits = replies[1] as int;
     } else {
       await counts.add(cacheKey, 0, per);
       hits = await counts.increment(cacheKey);
@@ -188,7 +196,18 @@ class RateLimit implements IDoxMiddleware {
         beforeKey,
         ttl,
       );
+    } else if (counts.driver is RedisDriver) {
+      // all in the same tick: one round trip, see [handle]
+      List<Object?> replies = await _inOrder(<Future<Object?>>[
+        counts.add(cacheKey, 0, ttl),
+        counts.increment(cacheKey),
+        counts.get(beforeKey),
+      ]);
+      hits = replies[1] as int;
+      before = (replies[2] as num?)?.toInt() ?? 0;
     } else {
+      // other stores (eg. file) may run the steps out of order when they
+      // run at the same time, so one after the other
       await counts.add(cacheKey, 0, ttl);
       hits = await counts.increment(cacheKey);
       before = ((await counts.get(beforeKey)) as num?)?.toInt() ?? 0;
@@ -219,6 +238,24 @@ class RateLimit implements IDoxMiddleware {
       math.max(1, (waitMs / 1000).ceil()),
     );
     throw TooManyRequestsException();
+  }
+
+  /// The results of [futures], awaited in order. The first error is
+  /// thrown, the same one as when they ran one after the other. The
+  /// errors of the later ones are dropped, so they are not unhandled.
+  static Future<List<Object?>> _inOrder(List<Future<Object?>> futures) async {
+    List<Object?> results = <Object?>[];
+    for (int i = 0; i < futures.length; i++) {
+      try {
+        results.add(await futures[i]);
+      } catch (_) {
+        for (int j = i + 1; j < futures.length; j++) {
+          futures[j].ignore();
+        }
+        rethrow;
+      }
+    }
+    return results;
   }
 
   /// the cache store that keeps the counts, or null for the counts of

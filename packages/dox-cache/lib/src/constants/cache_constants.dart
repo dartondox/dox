@@ -18,6 +18,7 @@ class CacheConstants {
   static const String maxSizeOption = 'max_size';
   static const String pathOption = 'path';
   static const String pruneEveryOption = 'prune_every';
+  static const String fsyncOption = 'fsync';
   static const String hostOption = 'host';
   static const String portOption = 'port';
   static const String usernameOption = 'username';
@@ -63,6 +64,18 @@ class CacheConstants {
   /// The file driver runs `prune` once every this many writes.
   /// 0 (the default) means never.
   static const int filePruneEvery = 0;
+
+  /// With `prune_every` 0, the file driver removes expired files, old
+  /// temp files and free lock files by itself at most once in this time.
+  /// One run covers all isolates and processes that share the folder.
+  static const Duration fileAutoPruneInterval = Duration(hours: 1);
+
+  /// Lock name that makes sure only one auto prune runs per interval.
+  static const String fileAutoPruneLock = 'dox:auto-prune';
+
+  /// A temp file older than this is left from a crash, and prune
+  /// deletes it. A write keeps its temp file for a few ms only.
+  static const Duration fileStaleTempAge = Duration(hours: 1);
 
   /// End of file driver lock file names.
   static const String fileLockSuffix = '.lock';

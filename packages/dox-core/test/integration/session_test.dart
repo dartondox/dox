@@ -233,6 +233,15 @@ void main() {
         .expectJson(containsPair('name', null));
   });
 
+  test('a changed cookie on a route that never reads the session', () async {
+    // the cookie driver decrypts on first use: here it never runs
+    TestResponse res = await client
+        .withCookies(<String, String>{'dox_session': 'not-valid'})
+        .get('/untouched');
+    res.expectStatus(200).expectBody('ok');
+    expect(res.header('set-cookie'), isNull);
+  });
+
   test('a cookie session older than the lifetime is a new empty one', () async {
     Future<TestResponse> getAt(DateTime at) {
       String payload = jsonEncode(<String, dynamic>{

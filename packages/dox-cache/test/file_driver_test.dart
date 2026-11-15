@@ -181,7 +181,7 @@ void main() {
       expect(await pruning.get('a'), 2);
     });
 
-    test('auto prune is off by default, prune_every turns it on', () {
+    test('prune_every is 0 by default, the option sets it', () {
       expect(driver.pruneEvery, 0);
       FileDriver built = const FileDriverFactory().create(<String, dynamic>{
         'path': directory.path,
@@ -189,6 +189,104 @@ void main() {
       }) as FileDriver;
       expect(built.pruneEvery, 50);
     });
+
+    test('fsync is on by default, fsync: false turns it off', () {
+      expect(driver.fsync, isTrue);
+      FileDriver built = const FileDriverFactory().create(<String, dynamic>{
+        'path': directory.path,
+        'fsync': false,
+      }) as FileDriver;
+      expect(built.fsync, isFalse);
+      expect(
+        (const FileDriverFactory().create(<String, dynamic>{
+          'path': directory.path,
+        }) as FileDriver).fsync,
+        isTrue,
+      );
+    });
+
+    test('values work with fsync off', () async {
+      FileDriver fast = FileDriver(directory: directory, fsync: false);
+      await fast.put('a', 1, null);
+      expect(await fast.add('b', 2, null), isTrue);
+      expect(await fast.increment('a', 2), 3);
+      expect(await fast.get('b'), 2);
+    });
+
+    test('a failed write leaves no temp file', () async {
+      // a folder with a file in it where the value file goes: the rename
+      // fails
+      await Directory(driver.fileFor('a').path).create(recursive: true);
+      await File('${driver.fileFor('a').path}/x').writeAsString('x');
+      await expectLater(
+        driver.put('a', 1, null),
+        throwsA(isA<FileSystemException>()),
+      );
+      expect(fileNames().where(_isTemp), isEmpty);
+    });
+
+    test('prune deletes old temp files and free lock files', () async {
+      await driver.put('keep', 1, null);
+      File oldTemp = File('${driver.fileFor('a').path}.abc.tmp');
+      await oldTemp.writeAsString('x');
+      await oldTemp.setLastModified(
+        DateTime.now().subtract(const Duration(hours: 2)),
+      );
+      File newTemp = File('${driver.fileFor('b').path}.abc.tmp');
+      await newTemp.writeAsString('x');
+      CacheLock expired = driver.lock('old', const Duration(seconds: 1));
+      expect(await expired.get(), isTrue);
+      clock.advance(const Duration(seconds: 2));
+      CacheLock held = driver.lock('held', const Duration(minutes: 1));
+      expect(await held.get(), isTrue);
+      CacheLock forever = driver.lock('forever', null);
+      expect(await forever.get(), isTrue);
+
+      expect(await driver.prune(), 0);
+      expect(oldTemp.existsSync(), isFalse);
+      expect(newTemp.existsSync(), isTrue);
+      // the expired lock file is gone, the held ones stay
+      expect(fileNames().where(_isLock), hasLength(2));
+      expect(await held.release(), isTrue);
+      expect(await forever.release(), isTrue);
+      expect(await driver.get('keep'), 1);
+    });
+
+    test(
+      'a light prune runs by itself an hour after the first write',
+      () async {
+        FileDriver other = FileDriver(
+          directory: directory,
+          prefix: 'p:',
+          clock: clock,
+        );
+        await other.put('c', 1, null);
+        await driver.put('old', 1, const Duration(seconds: 1));
+        await driver.fileFor('broken').writeAsString('{not json');
+        clock.advance(const Duration(minutes: 59));
+        await driver.put('a', 2, null);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(driver.fileFor('old').existsSync(), isTrue);
+
+        clock.advance(const Duration(minutes: 2));
+        await driver.put('b', 3, null);
+        for (int i = 0; i < 100 && driver.fileFor('old').existsSync(); i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 10));
+        }
+        expect(driver.fileFor('old').existsSync(), isFalse);
+        // a file it can not read may be of another app: it stays
+        expect(driver.fileFor('broken').existsSync(), isTrue);
+        expect(await driver.get('a'), 2);
+
+        // the lock of that run stops a second driver on the same folder
+        // in the same hour
+        await driver.put('late', 1, const Duration(seconds: 1));
+        clock.advance(const Duration(seconds: 2));
+        await other.put('d', 1, null);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        expect(other.fileFor('late').existsSync(), isTrue);
+      },
+    );
 
     test('prune skips a key that add or increment holds', () async {
       await driver.put('old', 1, const Duration(seconds: 1));
@@ -288,6 +386,10 @@ void main() {
       expect(added.where(_isTrue), hasLength(1));
     });
   });
+}
+
+bool _isLock(String name) {
+  return name.endsWith('.lock');
 }
 
 bool _isTemp(String name) {

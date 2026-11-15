@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:math';
 
@@ -9,9 +10,10 @@ import '../constants/cache_constants.dart';
 /// Keeps items in a map inside this isolate.
 ///
 /// Not shared: each Dox isolate has its own copy. Use Redis to share.
-/// Expired items are removed when read, and by a sweep that runs
-/// after many writes. With [maxSize], the least recently used item is
-/// removed when the map is full (LRU).
+/// Expired items are removed when read, by each write when they are the
+/// oldest items, and by a sweep that runs after many writes. With
+/// [maxSize], the least recently used item is removed when the map is
+/// full (LRU). Each step is O(1).
 class MemoryDriver extends CacheDriver {
   MemoryDriver({
     this.prefix = CacheConstants.defaultPrefix,
@@ -28,8 +30,11 @@ class MemoryDriver extends CacheDriver {
   final CacheClock _clock;
 
   /// Values are kept as JSON text, so callers can not change them later.
-  /// A Dart map keeps insert order. The first key is the least recently used.
-  final Map<String, MemoryEntry> _items = <String, MemoryEntry>{};
+  final HashMap<String, _Node> _items = HashMap<String, _Node>();
+
+  /// The items in use order. The first one is the least recently used
+  /// (or, with no [maxSize], the least recently written).
+  final LinkedList<_Node> _order = LinkedList<_Node>();
 
   final Map<String, MemoryEntry> _locks = <String, MemoryEntry>{};
 
@@ -73,7 +78,7 @@ class MemoryDriver extends CacheDriver {
     if (entry == null) {
       return null;
     }
-    _items.remove(fullKey);
+    _remove(fullKey);
     return jsonDecode(entry.value);
   }
 
@@ -84,7 +89,7 @@ class MemoryDriver extends CacheDriver {
     if (entry == null) {
       return false;
     }
-    _items[fullKey] = MemoryEntry(entry.value, _expiresAt(ttl));
+    _items[fullKey]!.entry = MemoryEntry(entry.value, _expiresAt(ttl));
     return true;
   }
 
@@ -114,13 +119,14 @@ class MemoryDriver extends CacheDriver {
 
   @override
   Future<bool> forget(String key) async {
-    MemoryEntry? entry = _items.remove(prefix + key);
+    MemoryEntry? entry = _remove(prefix + key);
     return entry != null && !_isExpired(entry);
   }
 
   @override
   Future<void> flush() async {
     _items.clear();
+    _order.clear();
   }
 
   @override
@@ -158,29 +164,55 @@ class MemoryDriver extends CacheDriver {
   /// The entry when it exists and is not expired. With [maxSize], marks
   /// it as recently used. Without a limit the order does not matter.
   MemoryEntry? _live(String fullKey) {
-    MemoryEntry? entry = _items[fullKey];
-    if (entry == null) {
+    _Node? node = _items[fullKey];
+    if (node == null) {
       return null;
     }
+    MemoryEntry entry = node.entry;
     if (_isExpired(entry)) {
-      _items.remove(fullKey);
+      _remove(fullKey);
       return null;
     }
     if (maxSize != null) {
-      _items.remove(fullKey);
-      _items[fullKey] = entry;
+      node.unlink();
+      _order.add(node);
     }
     return entry;
   }
 
   void _write(String fullKey, MemoryEntry entry) {
-    _items.remove(fullKey);
-    _items[fullKey] = entry;
+    _Node? node = _items[fullKey];
+    if (node == null) {
+      node = _items[fullKey] = _Node(fullKey, entry);
+    } else {
+      node.entry = entry;
+      node.unlink();
+    }
+    _order.add(node);
     int? limit = maxSize;
     while (limit != null && _items.length > limit) {
-      _items.remove(_items.keys.first);
+      _remove(_order.first.key);
     }
+    _dropExpiredFront();
     _countWrite();
+  }
+
+  /// Remove [fullKey]. Gives its entry, or null when it was not there.
+  MemoryEntry? _remove(String fullKey) {
+    _Node? node = _items.remove(fullKey);
+    node?.unlink();
+    return node?.entry;
+  }
+
+  /// Remove up to two expired items from the front (the oldest). Items
+  /// with the same ttl expire in write order, so this keeps up with them
+  /// at O(1) per write, long before the next sweep.
+  void _dropExpiredFront() {
+    for (int i = 0; i < 2 && _order.isNotEmpty; i++) {
+      _Node first = _order.first;
+      if (!_isExpired(first.entry)) return;
+      _remove(first.key);
+    }
   }
 
   /// Remove expired items and locks once every so many writes, so keys
@@ -190,7 +222,12 @@ class MemoryDriver extends CacheDriver {
       return;
     }
     int now = _clock.nowMs();
-    _items.removeWhere((String key, MemoryEntry e) => e.isExpired(now));
+    _Node? node = _order.isEmpty ? null : _order.first;
+    while (node != null) {
+      _Node? next = node.next;
+      if (node.entry.isExpired(now)) _remove(node.key);
+      node = next;
+    }
     _locks.removeWhere((String key, MemoryEntry e) => e.isExpired(now));
     _writesUntilSweep = max(_minSweepWrites, _items.length + _locks.length);
   }
@@ -210,6 +247,14 @@ class MemoryDriver extends CacheDriver {
     }
     throw StateError('Cache value of "$key" is not an integer');
   }
+}
+
+/// One item in the map and in the use order list.
+final class _Node extends LinkedListEntry<_Node> {
+  _Node(this.key, this.entry);
+
+  final String key;
+  MemoryEntry entry;
 }
 
 /// One stored value with its expiry time.

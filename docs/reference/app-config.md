@@ -136,6 +136,8 @@ Options of each driver:
 | all | `driver` | `String` | required | `file`, `memory`, `redis` or `null` |
 | all | `prefix` | `String` | `dox_cache:` | Text in front of every key. |
 | `file` | `path` | `String` | `storage/cache` | Folder of the cache files. |
+| `file` | `prune_every` | `int` | `0` | Run `prune()` once every this many writes. `0`: a light prune at most once an hour. |
+| `file` | `fsync` | `bool` | `true` | Sync each write to the disk. `false` is faster, but a power cut can lose the last writes. |
 | `memory` | `max_size` | `int` | no limit | Most items in the map. |
 | `redis` | `host` | `String` | `127.0.0.1` | Redis host. |
 | `redis` | `port` | `int` | `6379` | Redis port. |
