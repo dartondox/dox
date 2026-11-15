@@ -30,6 +30,9 @@ class IsolateSpawnParameter {
   /// the hub of the main isolate, see `IsolateBus`
   final SendPort? busPort;
 
+  /// the worker pool of the main isolate, see `Dox().compute`
+  final SendPort? computePort;
+
   /// see `Dox().isolateCount`
   final int isolateCount;
 
@@ -49,6 +52,7 @@ class IsolateSpawnParameter {
     this.control,
     this.rateLimitPort,
     this.busPort,
+    this.computePort,
     this.isolateCount = 1,
     this.envExpand = false,
   });

@@ -5,15 +5,33 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/middleware/server_timing.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_core/utils/strict_mode.dart';
 
 /// Run middleware and controllers. It stays sync while every step gives
 /// a plain value, so a simple route needs no Future. At the first Future
 /// it waits, then goes on with the next item.
 FutureOr<dynamic> runMiddlewareAndController(DoxRequest doxReq) {
+  /// strict mode off: one bool check, nothing more
+  if (StrictMode.enabled) return _timed(doxReq);
+  return _runAll(doxReq);
+}
+
+FutureOr<dynamic> _runAll(DoxRequest doxReq) {
   /// a route with a `next` middleware takes the slower async chain.
   /// other routes never pay for it.
   if (doxReq.route.usesNext) return _chain(doxReq, 0);
   return _runFrom(doxReq, 0, null);
+}
+
+/// [_runAll], and warn when its sync part (until the first `await`)
+/// blocked the isolate too long. see `AppConfig.strict`.
+FutureOr<dynamic> _timed(DoxRequest doxReq) {
+  Stopwatch watch = Stopwatch()..start();
+  try {
+    return _runAll(doxReq);
+  } finally {
+    StrictMode.checkHandler(doxReq.route, watch.elapsed);
+  }
 }
 
 FutureOr<dynamic> _runFrom(DoxRequest doxReq, int start, dynamic result) {

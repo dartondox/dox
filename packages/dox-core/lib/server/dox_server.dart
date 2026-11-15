@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_request_handler.dart';
 import 'package:dox_core/utils/log_buffer.dart';
+import 'package:dox_core/utils/strict_mode.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
 class DoxServer {
@@ -81,12 +82,14 @@ class DoxServer {
       },
     );
     httpServer = server;
+    StrictMode.startWatchdog();
     return server;
   }
 
   /// Graceful stop: no new connections, open requests get [timeout] to
   /// finish. Then every connection is closed.
   Future<void> shutdown(Duration timeout) async {
+    StrictMode.stopWatchdog();
     HttpServer server = httpServer;
     // completes when the open requests are done. WebSockets get 1001.
     await server.close().then(_ignore).timeout(timeout, onTimeout: _nothing);
@@ -102,6 +105,7 @@ class DoxServer {
   /// server.close();
   /// ```
   Future<void> close({bool force = false}) async {
+    StrictMode.stopWatchdog();
     await httpServer.close(force: force);
   }
 
