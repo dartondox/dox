@@ -86,13 +86,12 @@ void _guardActiveFile(HttpResponse res, ContentType type) {
 /// makes a list 3 times the text length, then copies the used part.
 Uint8List utf8Bytes(String text) {
   int length = text.length;
+  for (int i = 0; i < length; i++) {
+    if (text.codeUnitAt(i) > 0x7F) return utf8.encode(text) as Uint8List;
+  }
   Uint8List out = Uint8List(length);
   for (int i = 0; i < length; i++) {
-    int unit = text.codeUnitAt(i);
-    // ponytail: non-ASCII falls back to utf8.encode (3x buffer), add an
-    // exact-size encoder if non-ASCII bodies matter
-    if (unit > 0x7F) return utf8.encode(text);
-    out[i] = unit;
+    out[i] = text.codeUnitAt(i);
   }
   return out;
 }

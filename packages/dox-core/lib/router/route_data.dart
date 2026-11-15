@@ -204,8 +204,9 @@ class RouteData {
             '^${path.replaceAllMapped(_param, wheres == null ? _paramPattern : _wherePattern)}\$',
           );
     _matchPrefix = null;
-    if (_pattern != null) {
-      String head = path.substring(0, _param.firstMatch(path)!.start);
+    Match? first = _pattern == null ? null : _param.firstMatch(path);
+    if (first != null) {
+      String head = path.substring(0, first.start);
       if (head.length > 1 && !_regexMarks.hasMatch(head)) _matchPrefix = head;
     }
   }

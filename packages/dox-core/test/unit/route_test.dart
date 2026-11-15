@@ -54,6 +54,11 @@ void main() {
       ]);
     });
 
+    test('a route part that is exactly {} still compiles', () {
+      Route.get('/x/{}', (DoxRequest req) {});
+      expect(Route().routes.single.path, '/x/{}');
+    });
+
     test('get', () {
       Route.get('/ping', (DoxRequest req) {});
       List<RouteData> routes = Route().routes;
