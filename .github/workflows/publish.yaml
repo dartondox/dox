@@ -85,13 +85,15 @@ jobs:
   # against the push `before` commit, which is HEAD~1 or older. So it
   # tested at least everything that HEAD~1..HEAD changed. Without this
   # check, a green push for package B could let a tag for a red package A
-  # skip the tests. A version bump always touches the package folder.
+  # skip the tests. A version bump always changes packages/<folder>/pubspec.yaml, so we
+  # require that file. A docs-only change (*.md) does not run the tests.
   # No parent commit or anything unclear gives false.
   ci-passed:
     if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
     permissions:
       actions: read
+      contents: read
     outputs:
       passed: ${{ steps.check.outputs.passed }}
     steps:
@@ -107,7 +109,7 @@ jobs:
           folder=$(ci/publish-order.sh | head -n1 | cut -d: -f1) || folder=""
           touched=false
           if [ -n "$folder" ] && git rev-parse -q --verify HEAD~1 >/dev/null \
-            && git diff --name-only HEAD~1 HEAD | grep -q "^packages/$folder/"; then
+            && git diff --name-only HEAD~1 HEAD | grep -qx "packages/$folder/pubspec.yaml"; then
             touched=true
           fi
           ids=""

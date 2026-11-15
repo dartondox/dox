@@ -96,7 +96,7 @@ git push origin dox_builder-vx.y.z
 The tag starts `.github/workflows/publish.yaml` (the "Release" workflow).
 It checks that the tag matches the version in `packages/<folder>/pubspec.yaml`.
 Then it runs the tests, unless the `unit` and `lint` jobs of the Test workflow both ran and passed on `main` for the same commit (a docs-only push after a red code push does not count).
-The last commit before the tag must also change `packages/<folder>/`. Main CI only tests the changed packages. A green push that changed another package does not prove the tagged one. A version bump commit always changes the folder, so the normal flow still skips the tests.
+The tagged commit must also change `packages/<folder>/pubspec.yaml`. Main CI only tests the changed packages, and it skips docs (`*.md`). A green push that changed another package, or only docs, does not prove the tagged one. A version bump commit always changes that pubspec, so the normal flow still skips the tests.
 It always runs a short check (`ci/pub-check.sh`): it copies the tagged package to a temp folder outside the workspace and runs `dart pub get` and `dart analyze` there. Every dependency comes from pub.dev, because `main` CI tests against the sibling clones.
 On a tag, when pub.dev does not show a just-published version yet, `dart pub get` tries again every 20 seconds, for up to 5 minutes (`ci/pub-get-retry.sh`).
 The retry covers only "version not found". If pub.dev is stale and a loose constraint picks an older version, `dart analyze` fails. Then run the tag run again a few minutes later.
