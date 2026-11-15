@@ -6,7 +6,8 @@ on:
       - '**'
     # A docs-only tag changes no code, so it needs no test run.
     # A release tag (<package>-v*) runs this workflow from the Release
-    # workflow, before it publishes.
+    # workflow, before it publishes, unless it already passed on main for
+    # this commit.
     tags-ignore:
       - 'docs-v*'
       - 'v*'

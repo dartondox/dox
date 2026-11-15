@@ -81,6 +81,12 @@ jobs:
   # runs only the jobs for the changed packages, so a green run alone does
   # not prove this package was tested. Any API error, skipped job or
   # unclear answer gives false, so the tests run.
+  # Also, the last commit must touch the tagged package. Main CI diffs
+  # against the push `before` commit, which is HEAD~1 or older. So it
+  # tested at least everything that HEAD~1..HEAD changed. Without this
+  # check, a green push for package B could let a tag for a red package A
+  # skip the tests. A version bump always touches the package folder.
+  # No parent commit or anything unclear gives false.
   ci-passed:
     if: github.event_name == 'push' && github.ref_type == 'tag'
     runs-on: ubuntu-latest
@@ -89,12 +95,23 @@ jobs:
     outputs:
       passed: ${{ steps.check.outputs.passed }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
       - id: check
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           passed=false
-          ids=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/test.yaml/runs?event=push&branch=main&status=success&head_sha=$GITHUB_SHA" \
+          # The folder of the tagged package (same script as the other jobs).
+          folder=$(ci/publish-order.sh | head -n1 | cut -d: -f1) || folder=""
+          touched=false
+          if [ -n "$folder" ] && git rev-parse -q --verify HEAD~1 >/dev/null \
+            && git diff --name-only HEAD~1 HEAD | grep -q "^packages/$folder/"; then
+            touched=true
+          fi
+          ids=""
+          [ "$touched" = true ] && ids=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/test.yaml/runs?event=push&branch=main&status=success&head_sha=$GITHUB_SHA" \
             --jq '.workflow_runs[] | select(.conclusion == "success" and .head_sha == env.GITHUB_SHA) | .id') || ids=""
           for id in $ids; do
             # The jobs of the latest attempt. Both `lint` and `unit` must exist and be green.

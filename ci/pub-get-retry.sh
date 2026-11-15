@@ -4,6 +4,9 @@
 # cannot find a version or a package, it tries again every 20 seconds, for
 # up to 5 minutes. Any other error fails at once. Outside a tag it is just
 # `dart pub get`.
+# The retry covers only "version not found". If pub.dev is stale and a loose
+# constraint picks an older version, `dart analyze` fails later. Then run the
+# tag run again a few minutes later.
 set -euo pipefail
 [ "${GITHUB_REF_TYPE:-}" = tag ] || exec dart pub get "$@"
 
