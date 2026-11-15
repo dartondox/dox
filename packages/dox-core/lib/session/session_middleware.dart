@@ -12,9 +12,10 @@ import 'package:dox_core/utils/path_pattern.dart';
 ///   globalMiddleware: <dynamic>[SessionMiddleware(), CsrfMiddleware()],
 /// );
 /// ```
-/// With the `cookie` driver the data is read from the cookie on first
+/// With the `cookie` driver the cookie is decrypted and read on first
 /// use. With the `cache` driver the store is read before the controller,
-/// but only when the request has a session cookie.
+/// but only when the request has a session cookie. The session API is
+/// not async, so the store can not be read later.
 /// The cookie is sent only when the session changed.
 class SessionMiddleware implements IDoxNextMiddleware {
   /// [config] wins over `AppConfig.session`.
@@ -57,25 +58,30 @@ class SessionMiddleware implements IDoxNextMiddleware {
   /// session.get('auth_web');
   /// ```
   Future<Session> fromCookie(String? cookie) {
-    SessionConfig config = this.config;
-    String? value = cookie == null
-        ? null
-        : DoxCookie.decrypt(config.cookie, cookie);
-    return _load(value, config);
+    return _load(cookie, config);
   }
 
   Future<Session> _start(DoxRequest req, SessionConfig config) {
-    return _load(req.cookie(config.cookie), config);
+    return _load(req.cookie(config.cookie, decrypt: false), config);
   }
 
-  /// [value] is the decrypted cookie value, or null.
-  Future<Session> _load(String? value, SessionConfig config) async {
+  /// [raw] is the cookie value as the browser sent it (encrypted), or
+  /// null.
+  Future<Session> _load(String? raw, SessionConfig config) async {
     if (config.driver == 'cookie') {
+      // decrypt on first use, so a request that never reads the
+      // session does not pay for it
       return Session(
-        read: value == null ? null : () => _decode(value, config.lifetime),
+        read: raw == null
+            ? null
+            : () => _decode(
+                DoxCookie.decrypt(config.cookie, raw),
+                config.lifetime,
+              ),
       );
     }
     _checkDriver(config);
+    String? value = raw == null ? null : DoxCookie.decrypt(config.cookie, raw);
     if (value == null) return Session();
     String key = '$_prefix$value';
     Object? stored = SessionMemoryStore.isMemory(config.store)
@@ -141,7 +147,8 @@ class SessionMiddleware implements IDoxNextMiddleware {
   /// session). The cookie holds the time it was saved (`at`). A session
   /// older than [lifetime] is null, so a copied cookie stops working too,
   /// not only when the browser drops it.
-  static Object? _decode(String value, Duration lifetime) {
+  static Object? _decode(String? value, Duration lifetime) {
+    if (value == null) return null;
     Object? stored;
     try {
       stored = jsonDecode(value);

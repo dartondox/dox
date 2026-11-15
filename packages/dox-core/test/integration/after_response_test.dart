@@ -20,6 +20,15 @@ class AfterRouter extends Router {
       log.add('handler');
       return 'ok';
     });
+    Route.get('/late', (DoxRequest req) {
+      // the first work is added after the answer is sent
+      Future<void>.delayed(
+        Duration(milliseconds: 50),
+        () => AfterResponse.run(() => log.add('late')),
+      );
+      return 'ok';
+    });
+    Route.get('/none', (DoxRequest req) => 'none');
     Route.get('/slow', (DoxRequest req) {
       // never ends: the client must still get the answer
       AfterResponse.run(() => Completer<void>().future);
@@ -64,6 +73,17 @@ void main() {
 
   test('the client does not wait for the work', () async {
     (await client.get('/slow')).expectStatus(200).expectBody('fast');
+  });
+
+  test('work first added after the answer runs soon', () async {
+    (await client.get('/late')).expectStatus(200).expectBody('ok');
+    await _until(() => log.length == 1);
+    expect(log, <String>['late']);
+  });
+
+  test('a request with no work still answers', () async {
+    (await client.get('/none')).expectStatus(200).expectBody('none');
+    (await client.get('/none')).expectStatus(200).expectBody('none');
   });
 
   test('outside a request the work runs soon', () async {

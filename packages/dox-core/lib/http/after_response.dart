@@ -49,7 +49,7 @@ class AfterResponse {
   static void run(FutureOr<void> Function() work) {
     Object? pending = Zone.current[_key];
     if (pending is _Pending && !pending.sent) {
-      pending.work.add(work);
+      pending.add(work);
     } else {
       Timer.run(() => _call(work));
     }
@@ -57,10 +57,10 @@ class AfterResponse {
 
   /// Internal: the request handler calls it when it is on. Runs
   /// [handle] in a zone of its own, then the work after [res] is sent.
+  /// The work list and the wait for [res] are made on the first [run],
+  /// so a request that adds no work pays only for the zone.
   static void wrap(HttpResponse res, void Function() handle) {
-    _Pending pending = _Pending();
-    runZoned(handle, zoneValues: <Object, Object>{_key: pending});
-    res.done.then(pending.flush, onError: pending.flushOnError);
+    runZoned(handle, zoneValues: <Object, Object>{_key: _Pending(res)});
   }
 
   static Future<void> _call(FutureOr<void> Function() work) async {
@@ -82,13 +82,30 @@ class AfterResponse {
 
 /// the work of one request
 class _Pending {
-  final List<FutureOr<void> Function()> work = <FutureOr<void> Function()>[];
+  _Pending(this._res);
+
+  final HttpResponse _res;
+
+  /// null until the first work is added
+  List<FutureOr<void> Function()>? _work;
 
   /// true once the response is sent. work added later runs soon.
   bool sent = false;
 
+  void add(FutureOr<void> Function() item) {
+    List<FutureOr<void> Function()>? work = _work;
+    if (work != null) {
+      work.add(item);
+      return;
+    }
+    _work = <FutureOr<void> Function()>[item];
+    // a response that is sent already completes this soon
+    _res.done.then(flush, onError: flushOnError);
+  }
+
   Future<void> flush(Object? _) async {
     sent = true;
+    List<FutureOr<void> Function()> work = _work!;
     for (FutureOr<void> Function() item in work) {
       await AfterResponse._call(item);
     }

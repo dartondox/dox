@@ -52,10 +52,7 @@ class RedisHarness implements DriverHarness {
 }
 
 Future<void> main() async {
-  bool reachable = await RedisEnv.isReachable();
-  Object? skip = reachable
-      ? null
-      : 'Redis not reachable at ${RedisEnv.host}:${RedisEnv.port}';
+  Object? skip = await RedisEnv.skipReason();
 
   runCacheContract(RedisHarness(), skip: skip);
 

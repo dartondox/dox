@@ -103,7 +103,7 @@ void main() {
               'redis': <String, dynamic>{
                 'driver': 'redis',
                 'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
-                'port': int.parse(Platform.environment['REDIS_PORT'] ?? '6379'),
+                'port': int.parse(Platform.environment['REDIS_PORT']!),
                 'prefix': 'dox_core_enc_test:',
                 'encrypt': true,
               },

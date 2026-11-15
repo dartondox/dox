@@ -69,6 +69,56 @@ void main() {
       expect(driver.length, 0);
     });
 
+    test('keeps the right order over many evictions', () async {
+      MemoryDriver driver = MemoryDriver(maxSize: 3);
+      await driver.put('hot', 0, null);
+      for (int i = 0; i < 50; i++) {
+        // a read makes 'hot' the newest, so it is never evicted
+        expect(await driver.get('hot'), 0);
+        await driver.put('k$i', i, null);
+      }
+      expect(driver.length, 3);
+      expect(await driver.has('hot'), isTrue);
+      expect(await driver.has('k49'), isTrue);
+      expect(await driver.has('k48'), isTrue);
+      expect(await driver.has('k47'), isFalse);
+    });
+
+    test('forget, pull and flush free the slot', () async {
+      MemoryDriver driver = MemoryDriver(maxSize: 2);
+      await driver.put('a', 1, null);
+      await driver.put('b', 2, null);
+      await driver.forget('a');
+      expect(await driver.pull('b'), 2);
+      await driver.put('c', 3, null);
+      await driver.put('d', 4, null);
+      expect(await driver.get('c'), 3);
+      await driver.flush();
+      expect(driver.length, 0);
+      await driver.put('e', 5, null);
+      expect(await driver.get('e'), 5);
+    });
+
+    test('a write drops expired items at the front', () async {
+      FakeClock clock = FakeClock();
+      MemoryDriver driver = MemoryDriver(clock: clock);
+      for (int i = 0; i < 4; i++) {
+        await driver.put('old$i', i, const Duration(seconds: 1));
+      }
+      clock.advance(const Duration(seconds: 2));
+      await driver.put('a', 1, null);
+      await driver.put('b', 1, null);
+      // two per write
+      expect(driver.length, 2);
+    });
+
+    test('a returned value can be changed with no effect', () async {
+      MemoryDriver driver = MemoryDriver(maxSize: 2);
+      await driver.put('m', <String, dynamic>{'a': 1}, null);
+      (await driver.get('m') as Map<String, dynamic>)['a'] = 2;
+      expect(await driver.get('m'), <String, dynamic>{'a': 1});
+    });
+
     test('two drivers do not share data', () async {
       MemoryDriver one = MemoryDriver();
       MemoryDriver two = MemoryDriver();

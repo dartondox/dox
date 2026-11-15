@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
-import 'package:dox_cache/dox_cache.dart' show CacheConstants;
+import 'package:dox_cache/dox_cache.dart' show CacheConstants, RedisDriver;
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/middleware/rate_limit_counter.dart';
 
@@ -150,6 +150,8 @@ class RateLimit implements IDoxMiddleware {
     int hits;
     if (counts == null) {
       hits = await RateLimitCounter.instance.increment(cacheKey, per);
+    } else if (counts.driver is RedisDriver) {
+      hits = await _countOnRedis(counts, cacheKey, per);
     } else {
       await counts.add(cacheKey, 0, per);
       hits = await counts.increment(cacheKey);
@@ -188,7 +190,15 @@ class RateLimit implements IDoxMiddleware {
         beforeKey,
         ttl,
       );
+    } else if (counts.driver is RedisDriver) {
+      // started in the same tick as the count: one round trip
+      Future<int> counted = _countOnRedis(counts, cacheKey, ttl);
+      Future<Object?> read = counts.get(beforeKey)..ignore();
+      hits = await counted;
+      before = ((await read) as num?)?.toInt() ?? 0;
     } else {
+      // other stores (eg. file) may run the steps out of order when they
+      // run at the same time, so one after the other
       await counts.add(cacheKey, 0, ttl);
       hits = await counts.increment(cacheKey);
       before = ((await counts.get(beforeKey)) as num?)?.toInt() ?? 0;
@@ -219,6 +229,61 @@ class RateLimit implements IDoxMiddleware {
       math.max(1, (waitMs / 1000).ceil()),
     );
     throw TooManyRequestsException();
+  }
+
+  /// Adds one to [key] on Redis and gives the new count. The add (with
+  /// the ttl) and the increment start in the same tick, so ioredis sends
+  /// them in one write: one round trip.
+  ///
+  /// It does not trust the order. When the increment made the key (the
+  /// add ran late or failed), the key has no ttl, so it is set here. Else
+  /// the count would never end and the client would stay blocked. This
+  /// costs one more round trip, only in that case. An error of the add is
+  /// thrown, the same as when the steps ran one after the other.
+  static Future<int> _countOnRedis(
+    CacheStore counts,
+    String key,
+    Duration ttl,
+  ) async {
+    Future<bool> adding = counts.add(key, 0, ttl)..ignore();
+    Future<int> counting = counts.increment(key)..ignore();
+    bool added = false;
+    Object? addError;
+    StackTrace? addTrace;
+    try {
+      added = await adding;
+    } catch (error, trace) {
+      addError = error;
+      addTrace = trace;
+    }
+    int hits;
+    try {
+      hits = await counting;
+    } catch (_) {
+      if (addError != null) Error.throwWithStackTrace(addError, addTrace!);
+      rethrow;
+    }
+    if (hits == 1 && !added) await _setTtl(counts, key, ttl);
+    if (addError != null) Error.throwWithStackTrace(addError, addTrace!);
+    return hits;
+  }
+
+  /// Sets the ttl of a count that has none. Tries twice.
+  ///
+  /// ponytail: only the request that made the key (count 1) can see that
+  /// it has no ttl. When both tries fail, the key stays with no ttl and
+  /// later requests (count above 1) do not repair it: that would cost a
+  /// TTL read on every request. Delete the key by hand if it happens.
+  static Future<void> _setTtl(
+    CacheStore counts,
+    String key,
+    Duration ttl,
+  ) async {
+    try {
+      await counts.touch(key, ttl);
+    } catch (_) {
+      await counts.touch(key, ttl);
+    }
   }
 
   /// the cache store that keeps the counts, or null for the counts of

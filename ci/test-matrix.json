@@ -1,6 +1,6 @@
 [
-  {"name": "core", "packages": "dox-core", "group": "unit"},
+  {"name": "core", "packages": "dox-core", "services": "redis", "vars": "REDIS_PORT=6379", "group": "unit"},
   {"name": "builder", "packages": "dox-builder", "group": "unit"},
   {"name": "small packages", "packages": "dox-annotation", "group": "unit"},
-  {"name": "redis (cache)", "packages": "dox-cache", "services": "redis", "group": "unit"}
+  {"name": "redis (cache)", "packages": "dox-cache", "services": "redis", "vars": "REDIS_PORT=6379", "group": "unit"}
 ]

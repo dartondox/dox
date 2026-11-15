@@ -214,6 +214,8 @@ AfterResponse.run(() => mailer.sendWelcome(user));
 
 The work runs after the answer is sent, one after the other. An error in it goes to `ExceptionHandler.report`, so it never reaches the client.
 
+A request that adds no work costs almost nothing. The list of work is made on the first `run`.
+
 The work is not saved anywhere. When the server stops, work that did not run yet is lost. So use a [queue](../digging-deeper/queue.md) for work that must run. To run a queue job this way, see `dispatchAfterResponse()` in [Queue](../digging-deeper/queue.md#dispatching-jobs).
 
 ## Built-in middleware

@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dox_cache/dox_cache.dart' show MemoryDriver;
+import 'package:dox_cache/dox_cache.dart' show MemoryDriver, RedisDriver;
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:test/test.dart';
@@ -93,6 +93,33 @@ class QuietHandler extends ExceptionHandler {
   void report(Object error, StackTrace stackTrace) {}
 }
 
+/// A Redis store where `add` runs after the increment, or fails. It
+/// forces the bad cases of the rate limit count.
+class BadOrderStore extends CacheStore {
+  BadOrderStore(super.driver, {this.fail = false, this.failTouchOnce = false});
+
+  final bool fail;
+
+  /// the first `touch` throws, like a short network error
+  bool failTouchOnce;
+
+  @override
+  Future<bool> touch(String key, Duration? ttl) async {
+    if (failTouchOnce) {
+      failTouchOnce = false;
+      throw StateError('touch failed');
+    }
+    return super.touch(key, ttl);
+  }
+
+  @override
+  Future<bool> add(String key, Object? value, [Duration? ttl]) async {
+    await Future<void>.delayed(const Duration(milliseconds: 20));
+    if (fail) throw StateError('add failed');
+    return super.add(key, value, ttl);
+  }
+}
+
 void main() {
   late DoxTestClient client;
 
@@ -169,7 +196,7 @@ void main() {
           'redis': <String, dynamic>{
             'driver': 'redis',
             'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
-            'port': int.parse(redisPort ?? '6379'),
+            'port': int.parse(redisPort!),
           },
         },
       );
@@ -185,6 +212,126 @@ void main() {
       (await client.get('/redis-2')).expectStatus(429);
       await one.close();
       await two.close();
+    }, skip: redisPort == null ? 'set REDIS_PORT to run it' : false);
+
+    test('Redis: fixed and sliding counts, and each key has its ttl', () async {
+      CacheManager manager = CacheManager(
+        CacheConfig(
+          defaultStore: 'redis',
+          stores: <String, Map<String, dynamic>>{
+            'redis': <String, dynamic>{
+              'driver': 'redis',
+              'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
+              'port': int.parse(redisPort!),
+            },
+          },
+        ),
+      );
+      CacheStore store = manager.store();
+      String name = 'pipe-${DateTime.now().microsecondsSinceEpoch}';
+      Route.get('/redis-fixed', <dynamic>[
+        RateLimit(max: 2, name: name, cacheStore: store, now: now),
+        (DoxRequest req) => 'ok',
+      ]);
+      Route.get('/redis-sliding', <dynamic>[
+        RateLimit(
+          max: 2,
+          name: '$name-s',
+          sliding: true,
+          cacheStore: store,
+          now: now,
+        ),
+        (DoxRequest req) => 'ok',
+      ]);
+      for (String path in <String>['/redis-fixed', '/redis-sliding']) {
+        (await client.get(path))
+            .expectStatus(200)
+            .expectHeader('x-ratelimit-remaining', '1');
+        (await client.get(path))
+            .expectStatus(200)
+            .expectHeader('x-ratelimit-remaining', '0');
+        (await client.get(path)).expectStatus(429);
+      }
+      // the SET NX with the ttl runs before the INCRBY, so the key ends
+      RedisDriver driver = store.driver as RedisDriver;
+      List<dynamic> keys = await driver.redis.sendCommand(<String>[
+        'KEYS',
+        '${driver.prefix}rate_limit:$name*',
+      ]) as List<dynamic>;
+      expect(keys, hasLength(2));
+      for (Object? key in keys) {
+        int ttl =
+            await driver.redis.sendCommand(<String>['PTTL', '$key']) as int;
+        expect(ttl, greaterThan(0));
+      }
+      await manager.close();
+    }, skip: redisPort == null ? 'set REDIS_PORT to run it' : false);
+
+    test('Redis: the key gets its ttl when add runs late or fails', () async {
+      CacheManager manager = CacheManager(
+        CacheConfig(
+          defaultStore: 'redis',
+          stores: <String, Map<String, dynamic>>{
+            'redis': <String, dynamic>{
+              'driver': 'redis',
+              'host': Platform.environment['REDIS_HOST'] ?? '127.0.0.1',
+              'port': int.parse(redisPort!),
+            },
+          },
+        ),
+      );
+      RedisDriver driver = manager.store().driver as RedisDriver;
+      String name = 'order-${DateTime.now().microsecondsSinceEpoch}';
+      Route.get('/redis-late', <dynamic>[
+        RateLimit(
+          max: 2,
+          name: '$name-late',
+          cacheStore: BadOrderStore(driver),
+          now: now,
+        ),
+        (DoxRequest req) => 'ok',
+      ]);
+      Route.get('/redis-fail', <dynamic>[
+        RateLimit(
+          max: 2,
+          name: '$name-fail',
+          cacheStore: BadOrderStore(driver, fail: true),
+          now: now,
+        ),
+        (DoxRequest req) => 'ok',
+      ]);
+      Route.get('/redis-touch', <dynamic>[
+        RateLimit(
+          max: 2,
+          name: '$name-touch',
+          cacheStore: BadOrderStore(driver, failTouchOnce: true),
+          now: now,
+        ),
+        (DoxRequest req) => 'ok',
+      ]);
+      // the ttl repair tries again when the first touch fails
+      (await client.get('/redis-touch')).expectStatus(200);
+      (await client.get('/redis-late'))
+          .expectStatus(200)
+          .expectHeader('x-ratelimit-remaining', '1');
+      (await client.get('/redis-late')).expectStatus(200);
+      (await client.get('/redis-late')).expectStatus(429);
+      // the error of the add still reaches the client
+      (await client.get('/redis-fail')).expectStatus(500);
+
+      for (String part in <String>['late', 'fail', 'touch']) {
+        List<dynamic> keys = await driver.redis.sendCommand(<String>[
+          'KEYS',
+          '${driver.prefix}rate_limit:$name-$part*',
+        ]) as List<dynamic>;
+        expect(keys, hasLength(1));
+        int ttl = await driver.redis.sendCommand(<String>[
+          'PTTL',
+          '${keys.first}',
+        ]) as int;
+        expect(ttl, greaterThan(0), reason: part);
+      }
+      await manager.close();
     }, skip: redisPort == null ? 'set REDIS_PORT to run it' : false);
   });
 

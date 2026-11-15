@@ -18,6 +18,7 @@ class CacheConstants {
   static const String maxSizeOption = 'max_size';
   static const String pathOption = 'path';
   static const String pruneEveryOption = 'prune_every';
+  static const String fsyncOption = 'fsync';
   static const String hostOption = 'host';
   static const String portOption = 'port';
   static const String usernameOption = 'username';
@@ -64,10 +65,33 @@ class CacheConstants {
   /// 0 (the default) means never.
   static const int filePruneEvery = 0;
 
+  /// With `prune_every` 0, the file driver removes expired files, old
+  /// temp files and free lock files by itself at most once in this time.
+  /// One run covers all isolates and processes that share the folder.
+  static const Duration fileAutoPruneInterval = Duration(hours: 1);
+
+  /// The first auto prune of a process can start on the first write
+  /// that comes at least this long after its first write. The interval lock on disk decides if it really runs, so
+  /// an app that restarts often still prunes once per interval.
+  static const Duration fileAutoPruneFirstDelay = Duration(minutes: 1);
+
+  /// Lock name that makes sure only one auto prune runs per interval.
+  static const String fileAutoPruneLock = 'dox:auto-prune';
+
+  /// A temp file older than this is left from a crash, and prune
+  /// deletes it. A write keeps its temp file for a few ms only.
+  static const Duration fileStaleTempAge = Duration(hours: 1);
+
   /// End of file driver lock file names.
   static const String fileLockSuffix = '.lock';
   static const String fileKeyLockSuffix = '.klock';
   static const String fileTempSuffix = '.tmp';
+
+  /// End of a file that `pull` or a lock moved away for a moment:
+  /// `<name>.<ms>.<owner>.mv`. A rename keeps the old modified time, so
+  /// the time of the move is in the name. Prune deletes one only when
+  /// that time is older than [fileStaleTempAge].
+  static const String fileMovedSuffix = '.mv';
 
   /// JSON field of a file lock.
   static const String fileOwnerField = 'owner';

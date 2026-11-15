@@ -1,3 +1,14 @@
+## Unreleased
+
+- Fix, disk: the `file` store never cleaned up by default, so expired files (like old sessions) stayed on the disk for ever. Now, with `prune_every` 0 (the default), a write starts a light prune in the background at most once an hour. It deletes expired files, temp files left by a crash, and free lock files. It keeps files it can not read or decrypt, so another app in the same folder keeps its files. It only touches files the cache made: other files in the folder stay. A lock file on disk makes sure only one runs per hour for all isolates and servers on one folder, also when the app restarts often. In a process, the first one can start on the first write that comes at least a minute after the first write of that process, so short commands never start one. Files that `pull` or a lock moved away for a moment and that a crash left behind are deleted after an hour, and `flush()` deletes moved values too. Expired files already read as a miss, so reads do not change.
+- `FileDriver.prune()` now also deletes temp files older than an hour and lock files that are free. Its result still counts only value files.
+- Fix: a value file with JSON that is not a map, or with an expiry time that is not a whole number, threw a `TypeError` on read. Now it reads as a miss, like other broken files.
+- Fix, disk: a write that failed (eg. a full disk) left its temp file. Now it is deleted.
+- New: `fsync` option on a `file` store (default `true`, as before). `fsync: false` skips the sync to disk on each write, so writes are faster. After a power cut the last writes can then be lost (they read as a miss).
+- Perf: lock files of the `file` store (`add`, `increment`, `touch` and `lock()`) are no longer synced to the disk. The sync did not make a lock survive a power cut anyway, because the folder was never synced. This halves the syncs of `add` and `increment`.
+- Perf: the `memory` store with `max_size` removed the least recently used item in O(n) time per write when full. Now each step is O(1).
+- Perf, memory: the `memory` store drops expired items at the front of the list on each write (at most two), not only in the sweep after 1000 or more writes.
+
 ## 3.2.0
 
 - New: `dox cache:install [--store=file|redis|memory|database]`, run by `dox add cache`. It writes `lib/config/cache.dart`, the `CACHE_STORE` key and the `AppEnv` getters, and adds `cache: cache` to `lib/config/app.dart`. With `--store=database` it also adds `dox_cache_database`, its provider and the cache table migration. It never overwrites a file. dox_cache now depends on dox_annotation.
