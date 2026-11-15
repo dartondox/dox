@@ -7,6 +7,9 @@ DatabaseConfig databaseConfig = DatabaseConfig(
   // `dox migrate` reads. When it is set, it wins over the DB_* keys.
   url: env.databaseUrl,
   connection: env.dbConnection,
+
+  /// development only: warns about N+1 relation loads and big results
+  strict: OrmStrict(enabled: appConfig.isDevelopment),
   connections: <String, ConnectionConfig>{
     'postgres': ConnectionConfig(
       driver: Driver.postgres,

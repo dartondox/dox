@@ -18,6 +18,12 @@ DatabaseConfig databaseConfig = DatabaseConfig(
   /// The connection to use. It is one key of `connections` below.
   connection: env.dbConnection,
 
+  /// Strict mode
+  /// -------------------------------
+  /// Only in development. It warns about N+1 relation loads and big results.
+  /// Fix the warning. Do not turn strict mode off.
+  strict: OrmStrict(enabled: appConfig.isDevelopment),
+
   connections: <String, ConnectionConfig>{
     /// Postgres
     'postgres': ConnectionConfig(
