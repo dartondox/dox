@@ -23,13 +23,13 @@ The rest of this section shows each step in detail.
 
 Dox has two parts that work together:
 
-- A native server, written in Rust (`dox_http_native`). It owns the sockets and parses HTTP.
+- A native server (`dox_http_native`). It owns the sockets and parses HTTP.
 - Your app, written in Dart. Routes, middleware, DTOs, controllers and the ORM all run here.
 
 A request goes through these steps:
 
-1. Rust accepts the connection and parses the request line, the headers and the body. If the request is broken, it answers `400`. Headers over 16 KB get `431`, and a body over the size limit gets `413`. Dart never sees these requests.
-2. Rust hands the requests to Dart in a batch, so one message holds many requests.
+1. The native server accepts the connection and parses the request line, the headers and the body. If the request is broken, it answers `400`. Headers over 16 KB get `431`, and a body over the size limit gets `413`. Dart never sees these requests.
+2. The native server hands the requests to Dart in a batch, so one message holds many requests.
 3. Dart finds the route by the method, the `Host` (for domain routes) and the path. If no route matches, the answer is `404`. A CORS preflight (`OPTIONS`) gets `204`.
 4. Dart adds the CORS headers of the route.
 5. Dart reads the body, but only when the request has a `Content-Type`.
@@ -38,14 +38,14 @@ A request goes through these steps:
 8. The controller runs and returns a value.
 9. If you set a `responseHandler` in `AppConfig`, it runs now. It can change every response.
 10. Dox turns the value into the response: a `String` is text, a `Map` or model is JSON, and a `File` is streamed.
-11. Dart sends the answers of the batch back to Rust in one call, and Rust writes the bytes to the socket.
+11. Dart sends the answers of the batch back to the native server in one call, and it writes the bytes to the socket.
 
 If a step throws, Dox catches the error. An `IHttpException` (like `NotFoundHttpException`) gives its own status. Any other error gives `500` and goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
 
 ```mermaid
 sequenceDiagram
     participant C as Client
-    participant R as Rust (dox_http_native)
+    participant R as Native server
     participant D as Dart isolate
     participant M as Middleware
     participant K as Controller
@@ -143,12 +143,12 @@ To change the number, set `totalIsolate` in `AppConfig` or `APP_TOTAL_ISOLATE` i
 
 ## Where the database pools live
 
-The ORM is started in a provider (`ORMProvider`). Every isolate runs `setup()`, so every isolate asks for a pool. But the native drivers live in Rust, and there, isolates that open the same settings get the same pool:
+The ORM is started in a provider (`ORMProvider`). Every isolate runs `setup()`, so every isolate asks for a pool. But the native drivers live outside Dart, and there, isolates that open the same settings get the same pool:
 
 | Driver | Per isolate | Per process |
 | --- | --- | --- |
-| Postgres native (`dox_postgres_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime (`extra['threads']`, default `1`) |
-| MySQL native (`dox_mysql_native`) | nothing | one pool of `maxConnectionCount` connections per settings, and one Rust runtime |
+| Postgres native (`dox_postgres_native`) | nothing | one pool of `maxConnectionCount` connections per settings |
+| MySQL native (`dox_mysql_native`) | nothing | one pool of `maxConnectionCount` connections per settings |
 | SQLite | one connection | nothing shared |
 
 So for Postgres and MySQL, the app opens at most `maxConnectionCount` connections, for any number of isolates. You choose the pool size. Set it below the `max_connections` of the database. The pool closes when the last isolate that uses it closes it. See [Native Postgres driver](../database/postgres-native.md#options).

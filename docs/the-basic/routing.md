@@ -6,14 +6,7 @@ icon: lucide/signpost
 
 A route connects a URL and an HTTP method to the code that answers it.
 
-Routing is the first step in [the life of a request](../concepts/how-dox-works.md#the-life-of-a-request). When a request comes in, the router finds the route by its method, host and path, and calls its controller:
-
-```mermaid
-flowchart LR
-    Q["GET /blogs/42"] --> R{"Find the route"}
-    R -->|found| C["Controller<br>id = 42"]
-    R -->|not found| N["404"]
-```
+Routing is the first step in [the life of a request](../concepts/how-dox-works.md#the-life-of-a-request). When a request comes in, the router finds the route by its method, host and path, and calls its controller.
 
 ## Where routes live
 
