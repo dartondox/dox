@@ -296,6 +296,8 @@ A mode that is not in the map keeps its default. Each mode must be an int from 0
 
 The examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are keys in the disk map. See [File Storage](../digging-deeper/file-storage.md).
 
+Two more fields have defaults. `multipartPartSize` is the size of one part of a big upload (8 MiB). `unsignedPayload` skips the hash of the body (`false`). Only turn it on over HTTPS.
+
 ### Cloudflare R2
 
 Set `supportsAcl: false`, because R2 does not take ACL headers:

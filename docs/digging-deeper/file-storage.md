@@ -71,7 +71,7 @@ Each driver takes these options:
 | Driver | Options |
 | --- | --- |
 | `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility`, `atomic_writes`, `permissions` |
-| `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
+| `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete`, `unsigned_payload` |
 | `memory` | none. For tests |
 
 The provider of a new project sets up these disks in every isolate. It is in `lib/providers/`, so the generated container finds it:
@@ -103,6 +103,19 @@ The `s3` disk reads five keys that a new project does not have yet. Add them to 
 ```
 
 The `s3` disk needs `bucket`, `key` and `secret`. If one is missing, the app stops at start with an `ArgumentError` that names the setting.
+
+### Skipping the body hash
+
+To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body. Only use it over HTTPS:
+
+```dart
+'s3': <String, dynamic>{
+  'driver': 's3',
+  'bucket': env.awsBucket,
+  // ... region, key, secret, endpoint
+  'unsigned_payload': true,
+},
+```
 
 ## Using another disk
 
@@ -359,6 +372,14 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 ## Details
 
 This section is for special cases. Most apps do not need it.
+
+### Signature and the body
+
+`unsigned_payload` is off by default. The signature then does not cover the body, so only use it over HTTPS.
+
+### S3 part size
+
+`multipartPartSize` is the size of one part of a big upload. It is a field of `S3DriverConfig`, not a key of the disk map. The default is 8 MiB. See [Storage](../packages/storage.md). S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
 
 ### Atomic writes
 
