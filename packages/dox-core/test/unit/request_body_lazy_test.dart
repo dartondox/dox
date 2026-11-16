@@ -1,14 +1,16 @@
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/request/http_request_body.dart'
+    show debugBodyMapMade;
 import 'package:test/test.dart';
 
 void main() {
   group('RequestBody.empty |', () {
     test('makes no map until it is read', () {
       RequestBody body = RequestBody.empty();
-      expect(body.isMapMade, false);
+      expect(debugBodyMapMade(body), false);
       expect(body.kind, BodyKind.none);
       expect(body.map, isEmpty);
-      expect(body.isMapMade, true);
+      expect(debugBodyMapMade(body), true);
     });
 
     test('a write is seen by the next read, same map each time', () {

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/request/http_request_body.dart'
+    show debugBodyMapMade;
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 
@@ -109,11 +111,11 @@ void main() {
       Map<String, dynamic> seen = <String, dynamic>{};
       List<Map<String, dynamic>> maps = <Map<String, dynamic>>[];
       Route.get('/lazy_body', (DoxRequest req) {
-        seen['made_before'] = req.requestBody.isMapMade;
+        seen['made_before'] = debugBodyMapMade(req.requestBody);
         req.add('k', 'v');
         seen['same'] = identical(req.body, req.requestBody.map);
         seen['read'] = req.body['k'];
-        seen['made_after'] = req.requestBody.isMapMade;
+        seen['made_after'] = debugBodyMapMade(req.requestBody);
         maps.add(req.body);
         return response(<String, dynamic>{'all': req.all()['k']});
       });

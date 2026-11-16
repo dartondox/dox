@@ -54,9 +54,6 @@ class RequestBody {
   /// value. Bracket keys nest: `tags[]=a&tags[]=b` gives a list.
   Map<String, dynamic> get map => _map ??= <String, dynamic>{};
 
-  /// false while an empty body has not made its [map] yet.
-  bool get isMapMade => _map != null;
-
   final BodyKind kind;
 
   /// The decoded JSON value, any type (a DTO reads this).
@@ -68,6 +65,10 @@ class RequestBody {
   /// The parts of a multipart body, in order, with repeated keys.
   final List<MapEntry<String, Object>>? parts;
 }
+
+/// For tests only (not exported): false while an empty body has not made
+/// its map yet.
+bool debugBodyMapMade(RequestBody body) => body._map != null;
 
 class HttpBody {
   /// header text => its parsed type. Most apps get a few types again and
