@@ -42,7 +42,13 @@ void main() {
       expect(driver.prefix, 'p:');
       expect(
         () => driver.put('k', 'longer than five', null),
-        throwsA(isA<Object>()),
+        throwsA(
+          isA<ArgumentError>().having(
+            (ArgumentError e) => e.message,
+            'message',
+            contains('bigger than 5 bytes'),
+          ),
+        ),
       );
     });
 
@@ -69,15 +75,25 @@ void main() {
     });
 
     test('options with a connection key throws an ArgumentError', () {
-      for (String key in CacheConstants.redisConnectionOptions) {
+      const Map<String, Object> values = <String, Object>{
+        'host': 'x',
+        'port': 1,
+        'username': 'x',
+        'password': 'x',
+        'db': 1,
+        'tls': true,
+        'pool_size': 1,
+      };
+      expect(
+        values.keys,
+        unorderedEquals(CacheConstants.redisConnectionOptions),
+      );
+      for (MapEntry<String, Object> entry in values.entries) {
+        String key = entry.key;
         expect(
           () => factory.create(<String, dynamic>{
             'options': RedisOptions(),
-            key: key == 'port' || key == 'db' || key == 'pool_size'
-                ? 1
-                : key == 'tls'
-                ? true
-                : 'x',
+            key: entry.value,
           }),
           throwsA(
             isA<ArgumentError>().having(

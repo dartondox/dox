@@ -301,23 +301,6 @@ To use a memory store in tests, see [Testing](testing.md#test-the-cache).
 
 ## Details
 
-### Redis options
-
-To set an option that Store options does not have, like a command timeout, give the `redis` store a `RedisOptions` from `ioredis`. It is used as it is. `prefix`, `max_value_bytes` and `encrypt` still work next to it. Do not set `host`, `port`, `username`, `password`, `db`, `tls` or `pool_size` with it. That throws an `ArgumentError`.
-
-```dart title="lib/config/cache.dart"
-'redis': <String, dynamic>{
-  'driver': 'redis',
-  'options': RedisOptions(
-    host: env.redisHost,
-    port: env.redisPort,
-    commandTimeout: const Duration(seconds: 2),
-  ),
-},
-```
-
-Sessions and the [rate limit](../security/rate-limiting.md) use the same store, so they get these options too.
-
 ### Store options
 
 | Driver | Options |
@@ -332,6 +315,29 @@ Sessions and the [rate limit](../security/rate-limiting.md) use the same store, 
 - Each store is made once per isolate, the first time you use it.
 - The `memory` driver removes expired items when they are read, and in a sweep after many writes (at least 1000). It also keeps JSON text, so `get` decodes on every hit.
 - `repository` gives the `dox_cache` `CacheStore`. See [dox_cache](../packages/cache.md) for custom drivers.
+
+### Redis options
+
+To set an option that Store options does not have, like a command timeout, give the `redis` store a `RedisOptions`. It is used as it is. `prefix`, `max_value_bytes` and `encrypt` still work next to it.
+
+Do not set `host`, `port`, `username`, `password`, `db`, `tls` or `pool_size` with it. That throws an `ArgumentError`.
+
+The client uses the ioredis defaults, not the `pool_size` default of the store. For example, `commandTimeout` is 10 seconds.
+
+```dart title="lib/config/cache.dart"
+'redis': <String, dynamic>{
+  'driver': 'redis',
+  'options': RedisOptions(
+    host: env.redisHost,
+    port: env.redisPort,
+    commandTimeout: const Duration(seconds: 2),
+  ),
+},
+```
+
+Sessions and the [rate limit](../security/rate-limiting.md) use the same store, so they get these options too.
+
+`RedisOptions`, `RedisTimeoutError` and `RedisQueueFullError` come with `package:dox_core/dox_core.dart`. You need no `ioredis` import.
 
 ### Encryption
 
