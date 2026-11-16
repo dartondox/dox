@@ -59,7 +59,7 @@ class FormDataVisitor {
       throw BadRequestException(message: 'Multipart body has no boundary');
     }
     MimeMultipartTransformer transformer = MimeMultipartTransformer(separator);
-    _closing = utf8.encode('--$separator--');
+    _closing = utf8.encode('\r\n--$separator--');
 
     await for (MimeMultipart formItem in _watch(body).transform(transformer)) {
       String? partHeaders = formItem.headers['content-disposition'];
@@ -153,7 +153,8 @@ class FormDataVisitor {
     return out.takeBytes();
   }
 
-  /// `--boundary--`, the end mark of the body
+  /// `CRLF--boundary--`, the end mark of the body. The parser takes it as
+  /// the end only after a line break (or at the start of the body).
   List<int> _closing = const <int>[];
 
   /// pass the body through, and mark [_failed] when it fails.
@@ -163,7 +164,9 @@ class FormDataVisitor {
   Stream<List<int>> _watch(Stream<List<int>> source) async* {
     /// the end mark can be split between two chunks, so the last bytes of
     /// the chunk before are kept. any epilogue may follow the mark.
-    List<int> carry = const <int>[];
+
+    /// the body start counts as after a line break
+    List<int> carry = const <int>[0x0D, 0x0A];
     bool closed = false;
     try {
       /// `await for`, not `yield*`: yield* forwards errors without throwing

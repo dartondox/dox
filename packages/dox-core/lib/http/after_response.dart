@@ -21,6 +21,8 @@ import 'package:dox_core/dox_core.dart';
 ///   ends blocks the rest of the work of that request. It also keeps
 ///   the upload temp files of that request for ever, as they are deleted
 ///   after the work.
+/// - After a `RequestTimeout` (the answer is 503), the work may run while
+///   the late handler still runs. The upload temp files stay until it ends.
 /// - Outside a request, or when it is off, the work runs soon, after
 ///   the code that is running now.
 /// - An error in the work is reported to the exception handler. It

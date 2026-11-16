@@ -243,6 +243,30 @@ void main() {
       });
     }
 
+    test('an end mark text inside the file does not end the body', () async {
+      Route.post('/up/fake-end', (DoxRequest req) => 'ok');
+      String head =
+          '--$boundary\r\n'
+          'Content-Disposition: form-data; name="f"; filename="a.bin"\r\n\r\n';
+
+      /// `--boundary--` in the middle of a line, then the body is cut
+      http.Response res = await http
+          .post(
+            Uri.parse('${baseUrl()}/up/fake-end'),
+            headers: <String, String>{
+              'content-type': 'multipart/form-data; boundary=$boundary',
+            },
+            body: <int>[
+              ...head.codeUnits,
+              ...'data--$boundary--data'.codeUnits,
+              ...List<int>.filled(multipartMemoryLimit + 100, 65),
+            ],
+          )
+          .timeout(const Duration(seconds: 10));
+      expect(res.statusCode, 400);
+      await gone(before);
+    });
+
     test('the end mark split between two chunks is fine', () async {
       Route.post('/up/split', (DoxRequest req) => 'ok');
       List<int> body = bigBody(boundary);

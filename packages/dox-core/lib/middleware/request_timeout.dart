@@ -21,7 +21,8 @@ import 'package:dox_core/http/request/upload_temp_files.dart';
 ///
 /// Dart can not stop a running Future. The controller keeps running in
 /// the background, and its late result is dropped. It can not write to
-/// the answer any more.
+/// the answer any more. `AfterResponse` work may run while it still
+/// runs. The upload temp files stay until it ends.
 class RequestTimeout implements IDoxNextMiddleware {
   const RequestTimeout(this.duration);
 
