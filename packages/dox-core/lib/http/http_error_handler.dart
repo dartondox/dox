@@ -31,6 +31,14 @@ void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
 /// a bare 500 with none of the headers set so far. When the head is
 /// already sent, it only closes the response.
 void _plainError(HttpResponse res) {
+  if (headSent(res)) {
+    try {
+      endResponse(res);
+    } catch (_) {
+      /// client already gone
+    }
+    return;
+  }
   try {
     res.headers.clear();
     res.statusCode = HttpStatus.internalServerError;
@@ -62,6 +70,11 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
     if (error is! IHttpException || error.code >= 500) {
       handler.reportFor(req, error, stackTrace);
     }
+
+    /// the head is out (a flush or a stream, eg. server-sent events): the
+    /// status and headers can not change, and an error text would land
+    /// inside the body. the error is reported, and the answer just ends.
+    if (headSent(req.response)) return null;
     payload = handler.render(error, req);
   } catch (handlerError, handlerStack) {
     /// a broken handler must not leave the client waiting.

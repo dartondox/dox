@@ -199,6 +199,11 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   endResponse(res);
 }
 
+/// true when the head of [res] already went out (a flush or a streamed
+/// body). Then the status and headers are fixed and the body is running.
+/// Needs a native server that has `NativeHeaders.sent`.
+bool headSent(HttpResponse res) => res is NativeResponse && res.headers.sent;
+
 /// Sends [res] when nothing waits for it. The native server sends with no
 /// Future: the Future of `close()` would only keep the request alive until
 /// its microtask runs, and under load the heap grows. A `dart:io`

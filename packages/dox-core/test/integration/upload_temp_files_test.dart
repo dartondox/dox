@@ -199,6 +199,53 @@ void main() {
       await gone(before);
     });
 
+    test('a cut multipart body gives 400 and deletes the file', () async {
+      Route.post('/up/cut', (DoxRequest req) => 'ok');
+      List<int> body = bigBody(boundary);
+
+      /// the closing boundary never comes
+      int tail = '\r\n--$boundary--\r\n'.length;
+      body.removeRange(body.length - tail, body.length);
+      http.Response res = await http
+          .post(
+            Uri.parse('${baseUrl()}/up/cut'),
+            headers: <String, String>{
+              'content-type': 'multipart/form-data; boundary=$boundary',
+            },
+            body: body,
+          )
+          .timeout(const Duration(seconds: 10));
+      expect(res.statusCode, 400);
+      await gone(before);
+    });
+
+    test('an error after the head was sent only ends the stream', () async {
+      Route.get('/up/sse', (DoxRequest req) async {
+        HttpResponse res = req.httpRequest.response;
+        res.headers.contentType = ContentType('text', 'event-stream');
+        res.write('data: a\n\n');
+        await res.flush();
+        throw StateError('boom');
+      });
+      Route.get('/up/after-sse', (DoxRequest req) => 'fine');
+      http.Client client = http.Client();
+      http.StreamedResponse res = await client.send(
+        http.Request('GET', Uri.parse('${baseUrl()}/up/sse')),
+      );
+      String text = await res.stream.bytesToString().timeout(
+        const Duration(seconds: 5),
+      );
+      expect(res.statusCode, 200);
+      expect(text, 'data: a\n\n');
+
+      /// the connection still works
+      http.Response next = await client.get(
+        Uri.parse('${baseUrl()}/up/after-sse'),
+      );
+      expect(next.body, 'fine');
+      client.close();
+    });
+
     test('a failed body read deletes the file', () async {
       Route.post('/up/broken', (DoxRequest req) => 'ok');
 

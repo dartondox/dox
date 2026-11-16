@@ -59,6 +59,7 @@ class FormDataVisitor {
       throw BadRequestException(message: 'Multipart body has no boundary');
     }
     MimeMultipartTransformer transformer = MimeMultipartTransformer(separator);
+    _closing = utf8.encode('--$separator--');
 
     await for (MimeMultipart formItem in _watch(body).transform(transformer)) {
       String? partHeaders = formItem.headers['content-disposition'];
@@ -152,17 +153,54 @@ class FormDataVisitor {
     return out.takeBytes();
   }
 
-  /// pass the body through, and mark [_failed] when it fails
+  /// `--boundary--`, the end mark of the body
+  List<int> _closing = const <int>[];
+
+  /// pass the body through, and mark [_failed] when it fails.
+  /// A body that ends with no closing boundary (a cut upload) also fails:
+  /// the mime parser reports it on the outer stream only, so a reader
+  /// that waits for the open part would wait for ever.
   Stream<List<int>> _watch(Stream<List<int>> source) async* {
+    /// the last bytes of the body. the end mark is there, if it is sent
+    BytesBuilder tail = BytesBuilder();
+    int keep = _closing.length + 256;
     try {
       /// `await for`, not `yield*`: yield* forwards errors without throwing
       await for (List<int> chunk in source) {
+        if (chunk.length >= keep) {
+          tail.clear();
+          tail.add(chunk.sublist(chunk.length - keep));
+        } else {
+          tail.add(chunk);
+          if (tail.length > keep * 2) {
+            Uint8List all = tail.takeBytes();
+            tail.add(all.sublist(all.length - keep));
+          }
+        }
         yield chunk;
+      }
+      if (!_hasClosing(tail.takeBytes()) && !_failed.isCompleted) {
+        _failed.completeError(
+          BadRequestException(message: 'Multipart body is cut'),
+          StackTrace.current,
+        );
       }
     } catch (error, stackTrace) {
       if (!_failed.isCompleted) _failed.completeError(error, stackTrace);
       rethrow;
     }
+  }
+
+  bool _hasClosing(List<int> tail) {
+    int last = tail.length - _closing.length;
+    for (int i = last; i >= 0; i--) {
+      int j = 0;
+      while (j < _closing.length && tail[i + j] == _closing[j]) {
+        j++;
+      }
+      if (j == _closing.length) return true;
+    }
+    return false;
   }
 
   /// read a part, but stop with the body error if the body fails.
