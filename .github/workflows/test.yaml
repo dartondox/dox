@@ -179,7 +179,7 @@ jobs:
       # lib and the builder packages), so a builder change never reuses old
       # output. The restore-keys fallback is safe: build_runner checks every
       # input by digest, and --delete-conflicting-outputs stays on. A tag
-      # builds fresh.
+      # builds fresh, with no cache.
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: github.ref_type != 'tag'
         with:
