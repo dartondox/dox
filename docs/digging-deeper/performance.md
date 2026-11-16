@@ -114,6 +114,8 @@ the database, JSON and your own code, so the gaps are smaller there. See
 
 </div>
 
+The Dox numbers are from the 3.2 patch release (2026-11-16). The other servers are from the run before, on the same Mac. See [How it was run](#how-it-was-run).
+
 Requests per second on `GET /` at 64, 256 and 512 connections:
 
 | Server              | 64      | 256     | 512     | p99 at 256 | peak MB |
@@ -189,7 +191,7 @@ database driver directly, with no ORM. Dox uses `dox_postgres_native`.
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
     <span class="dox-bench__num">297,000<span class="dox-bench__vs">fastest</span></span>
     <span class="dox-bench__p99">2.6 ms</span>
-    <span class="dox-bench__ram">104 MB</span>
+    <span class="dox-bench__ram">93 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.sql</span></span>
@@ -232,11 +234,13 @@ database driver directly, with no ORM. Dox uses `dox_postgres_native`.
 
 </div>
 
+The Dox numbers are from the 3.2 patch release (2026-11-16). The other servers are from the run before, on the same Mac.
+
 All three routes at 256 connections, requests per second:
 
 | Server                           | `/json` | `/db`   | `/queries?n=20` | peak MB |
 | -------------------------------- | ------: | ------: | --------------: | ------: |
-| Dox (`dox_postgres_native`)      | 592,900 | 297,000 | 18,015          | 104     |
+| Dox (`dox_postgres_native`)      | 592,900 | 297,000 | 18,015          | 93      |
 | Bun (`Bun.sql`)                  | 564,362 | 198,296 | 18,994          | 64      |
 | Rust (hyper + `tokio-postgres`)  | 667,718 | 128,065 | 9,312           | 11      |
 | Node (`node:http` + `pg`)        | 205,774 | 75,447  | 7,458           | 232     |

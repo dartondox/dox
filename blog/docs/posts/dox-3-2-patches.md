@@ -12,7 +12,7 @@ slug: dox-3-2-patches
 
 # Dox 3.2 patches: faster, less memory, fewer leaks
 
-This release is patch versions only. It makes Dox faster, uses less memory, and fixes memory leaks in long-running apps. There are no breaking changes.
+This release is patch versions only. It makes Dox faster, uses less memory, and fixes memory leaks in long-running apps. There are no API changes. A few defaults changed, so read [Read before you update](#read-before-you-update).
 
 <!-- more -->
 
@@ -20,16 +20,16 @@ This release is patch versions only. It makes Dox faster, uses less memory, and 
 >
 > - **Faster ORM.** A list of 100 rows as JSON is 47% faster on Postgres and 66% faster on MySQL. The query builder is 12–15% faster.
 > - **Faster queue.** A Postgres worker runs 61% more jobs per second, and about 9 times more right after a burst of jobs.
-> - **Less memory.** The ORM app uses half the peak memory (254 MB to 124 MB). A plain Dox server uses about a third less.
+> - **Less memory.** On Postgres, the ORM app uses half the peak memory (253 MB to 117 MB). A plain Dox server uses about a third less.
 > - **Leaks fixed.** The idle queue worker, connections of clients that left, and several Socket.IO and Postgres cases no longer grow memory over time.
-> - **Safe to update.** Patch versions only, no breaking changes. Run `dart pub upgrade` and `dox build_runner:build`.
+> - **Easy to update.** Patch versions only, no API changes. Run `dart pub upgrade` and `dox build_runner:build`, then check [Read before you update](#read-before-you-update).
 
 ## Why this release
 
 Some Dox apps used a bit more memory every day in production. We looked at every package for leaks and slow paths. This release fixes what we found:
 
 - An idle queue worker used about 8 MB more memory per day for each loop. This is fixed.
-- A request whose client went away could keep its connection open for ever. This is fixed.
+- A request whose client went away could keep its connection open forever. This is fixed.
 - Rows from the ORM carried all the query builder state. They are much smaller now.
 - The hot path of every request does less work.
 
@@ -88,14 +88,14 @@ We ran the same apps on the released 3.2 packages and on this release. Same mach
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
     <span class="dox-bench__num">31,183<span class="dox-bench__vs">47% faster</span></span>
     <span class="dox-bench__p99">15.0 ms</span>
-    <span class="dox-bench__ram">124 MB</span>
+    <span class="dox-bench__ram">117 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Dox</strong><span>released 3.2</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 68.2%"></span></span>
     <span class="dox-bench__num">21,274<span class="dox-bench__vs">before</span></span>
     <span class="dox-bench__p99">27.8 ms</span>
-    <span class="dox-bench__ram">254 MB</span>
+    <span class="dox-bench__ram">253 MB</span>
   </div>
 </div>
 
@@ -119,14 +119,14 @@ We ran the same apps on the released 3.2 packages and on this release. Same mach
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
     <span class="dox-bench__num">249,862<span class="dox-bench__vs">15% faster</span></span>
     <span class="dox-bench__p99">3.0 ms</span>
-    <span class="dox-bench__ram">124 MB</span>
+    <span class="dox-bench__ram">117 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Dox</strong><span>released 3.2</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 87.0%"></span></span>
     <span class="dox-bench__num">217,259<span class="dox-bench__vs">before</span></span>
     <span class="dox-bench__p99">3.3 ms</span>
-    <span class="dox-bench__ram">254 MB</span>
+    <span class="dox-bench__ram">253 MB</span>
   </div>
 </div>
 
@@ -165,7 +165,7 @@ We ran the same apps on the released 3.2 packages and on this release. Same mach
 
 </div>
 
-RAM is the peak memory of the whole server during the run. For the database cards it is the peak over all routes of that app.
+RAM is the peak memory of the whole server, the median of the runs. For the database cards it is the peak over all routes of that app.
 
 ### HTTP
 
@@ -182,7 +182,7 @@ A full Dox app with three routes, the rules of [the-benchmarker](https://github.
 | `POST /user` | 64 | 435,214 | 461,935 | +6% |
 | `POST /user` | 256 | 530,144 | 555,397 | +5% |
 | `POST /user` | 512 | 517,625 | 564,322 | +9% |
-| Peak memory | | 31 MB | 21 MB | −32% |
+| Peak memory (median) | | 31 MB | 21 MB | −32% |
 
 The native server alone, with no framework (`dox_http_native`, average of 2 runs), has the same speed as before. It serves about 690,000 requests per second at 512 connections. That is close to the most wrk can send, so wrk is the limit here. Its peak memory went from about 30 MB to 19 MB, because connections now share one read buffer per core. See [Native server](/latest/digging-deeper/native-server/).
 
@@ -205,7 +205,7 @@ Average of 3 runs.
 | `find()`, then `save()` | 95,714 | 105,912 | +11% |
 | One row with `find(id)` | 224,865 | 243,143 | +8% |
 | 20 rows, one query after another | 14,700 | 14,722 | same |
-| Peak memory | 254 MB | 124 MB | **−51%** |
+| Peak memory (median) | 253 MB | 117 MB | **−54%** |
 
 #### MySQL 8.4
 
@@ -222,7 +222,7 @@ Average of 2 runs.
 | `find()`, then `save()` | 94,271 | 98,262 | +4% |
 | Preload a relation, 20 rows | 16,933 | 17,460 | +3% |
 | 20 rows, one query after another | 11,980 | 12,265 | +2% |
-| Peak memory | 253–261 MB | 125–222 MB | lower |
+| Peak memory (range) | 253–261 MB | 125–222 MB | lower |
 
 We also ran the same routes with the driver alone, with no ORM (`dox_postgres_native`, average of 2 runs). One row went from 266,664 to 297,000 requests per second (+11%). The JSON response went from 550,049 to 592,900 (+8%).
 
@@ -272,7 +272,7 @@ Docs: [Performance mistakes](/latest/digging-deeper/performance-mistakes/), [App
 
 ### Log tags
 
-Every pretty log line now starts with a dim tag that says where it comes from: `[request]`, `[server]`, `[error]`, `[app]`, `[db:main]`, `[queue]`, `[scheduler]`, `[socketio]`, `[auth]`, `[mail]` and more. Pass your own tag as the third argument:
+Every pretty log line now starts with a dim tag that says where it comes from: `[request]`, `[server]`, `[error]`, `[app]`, `[db:main]`, `[queue]`, `[socketio]`, `[auth]`, `[mail]` and more. The scheduler uses `[scheduler]` when `SchedulerFlags.loggerLines` is on. Pass your own tag as the third argument:
 
 ```dart
 Logger.info('invoice sent', {'id': 42}, 'billing');
@@ -290,6 +290,7 @@ In JSON logs, the tag is the `source` field.
 - `unsigned_payload: true` on an S3 disk skips the body hash (HTTPS only). See [File storage](/latest/digging-deeper/file-storage/).
 - Socket.IO opt-in limits: `maxAttachmentBytes`, `maxAuthSize`, `maxWriteBufferSize` and `ackTimeout`. See [Socket.IO](/latest/packages/socketio/).
 - ioredis: `maxQueuedCommands` (opt-in) caps the commands that wait for a connect.
+- The queue worker warns once when a job may run longer than `retryAfter`. Then a second worker could take the same job while the first one still runs it.
 - `NativeWebSocket.pingInterval` now works.
 
 ## Faster
@@ -336,16 +337,23 @@ In JSON logs, the tag is the `source` field.
 ### Memory leaks
 
 - Queue: an idle worker leaked a listener on each sleep, about 8 MB a day per loop. This also hit the in-process worker in the web server.
-- Native HTTP: sometimes a client leaves while its request still waits, and the handler never answers (for example, a database call with no timeout). The server then kept that connection for ever. The same happened to a server-sent events stream that wrote nothing after the client left. Now the connection closes after `AppConfig.idleTimeout`.
-- Native HTTP: `response.done` never completed when the client left first. A handler writing events from a timer kept its timer for ever.
+- Native HTTP: sometimes a client leaves while its request still waits, and the handler never answers (for example, a database call with no timeout). The server then kept that connection forever. The same happened to a server-sent events stream that wrote nothing after the client left. Now the connection closes after `AppConfig.idleTimeout`.
+- Native HTTP: `response.done` never completed when the client left first. A handler writing events from a timer kept its timer forever.
 - Native HTTP: accepted sockets now get TCP keep-alive, so a client that vanished with no close is found in about 2 minutes.
 - Postgres: a query that failed after its Parse left a prepared statement on the server. The Postgres backend grew with each one.
+- Postgres: each cached statement kept the whole batch of its request in memory, not only its SQL. It now keeps its own copy of the SQL.
 - Postgres, MySQL and the ORM: SQL longer than 4 KB is no longer kept in the SQL caches. Big generated inserts could fill them with hundreds of MB.
-- Socket.IO: `socket.join()` after a disconnect kept the socket in the room for ever.
+- Socket.IO: `socket.join()` after a disconnect kept the socket in the room forever.
 - Socket.IO: unfinished binary packets, and broadcast acks when Redis was down, stayed in memory.
-- Scheduler: a `Scheduler` made without `out` kept every log line for ever. It now keeps the last 64 KB.
+- Scheduler: a `Scheduler` made without `out` kept every log line forever. It now keeps the last 64 KB.
 - Rate limit: the counter in the main isolate had no cap on clients. It now keeps at most 100,000.
-- ioredis: while Redis was down, every command waited for ever and kept its data. Commands now time out after 10 seconds.
+- ioredis: while Redis was down, every command waited forever and kept its data. Commands now time out after 10 seconds.
+
+### Security
+
+- Socket.IO: a client could send the start of a binary packet and never the rest. The parts stayed in memory, also before the client joined a namespace. Now such a client is closed.
+- Socket.IO: a 1 MB polling body made of separators was split into about 500,000 strings at once. Now packets are read one at a time.
+- Socket.IO: with `maxSessions` not set, every GET request makes a session that lives about 45 seconds. The server now prints a warning at start. Set `maxSessions` in production.
 
 ### Disk
 
@@ -357,9 +365,10 @@ In JSON logs, the tag is the `source` field.
 - [Sessions](/latest/the-basic/session/) with the `cache` driver on a `memory` store lived in each isolate on its own, so users were logged out at random. They now live in the main isolate.
 - Scheduler: a slow tick that ended in the next minute skipped that minute, so a `dailyAt('02:00')` task could miss a day.
 - Scheduler: with `inProcess: true`, the schedule also ran in every `bin/queue.dart` process.
+- Native HTTP: a streamed answer with status 1xx, 204 or 304 broke the next answer on the same keep-alive connection.
 - Native HTTP: `response.flush()` did nothing. It now sends the head and the bytes so far, like `dart:io`.
 - Core: an error after a flush (for example in server-sent events) wrote `Internal Server Error` into the middle of the stream. Now the response just ends.
-- Core: a multipart body with no closing boundary kept the request open for ever.
+- Core: a multipart body with no closing boundary kept the request open forever.
 - ORM: `find('meta->n', 10)` on a JSON path failed the second time on Postgres and MySQL.
 - ORM: `$getRelation<User>('user')` with a type threw a `TypeError`.
 - Database cache store: an `increment` past the 64-bit limit wrapped to a negative number. It is now an error.
@@ -386,7 +395,7 @@ These changes can be seen by an app. Most apps need nothing.
 
     The problem it fixes: `bin/queue.dart` also calls `setup()` on every provider. So the schedule ran in the web server and again in every queue worker process, and each task ran more than once.
 
-    Now `SchedulerProvider.setup()` starts the schedule only in the web server. Dox knows it is the web server because `Dox().startServer()` sets `Dox().isWebServer = true`. Your app and your HTTP tests start the server, so they need no change.
+    Now `SchedulerProvider.setup()` starts the schedule only in the web server. `Dox().startServer()` marks the web server: it sets `Dox().isWebServer = true`. Your app and your HTTP tests start the server. So they need no change.
 
     A test that calls `setup()` itself, with no server, now gets no schedule. Set the flag first:
 
@@ -404,4 +413,5 @@ These changes can be seen by an app. Most apps need nothing.
     });
     ```
 - **Queue indexes.** A new `jobs` table on Postgres or SQLite gets better indexes. They keep a worker fast when many jobs come at once, and when many jobs are delayed. For an old table, add a migration that calls `QueueTables.popIndex(schema)`. It adds only the indexes that are missing, and it does nothing on MySQL and MariaDB. This is optional, but we recommend it for Postgres apps that push jobs in bursts.
+- **Rate limit cap.** The `RateLimit` counter in the main isolate (no Redis) now keeps at most 100,000 clients. When it is full, it drops expired counts first, then the oldest ones. A dropped client starts again at 0. Most apps never reach this.
 - **Cache index.** A new `cache` table gets an index on `expires_at`. For an old table, add it with `schema.table('cache', (Table t) => t.index('expires_at'))`. This is optional.
