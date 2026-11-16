@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/request/upload_temp_files.dart';
 import 'package:mime/mime.dart';
 import 'package:string_scanner/string_scanner.dart';
 
@@ -58,6 +59,7 @@ class FormDataVisitor {
       throw BadRequestException(message: 'Multipart body has no boundary');
     }
     MimeMultipartTransformer transformer = MimeMultipartTransformer(separator);
+    _closing = utf8.encode('\r\n--$separator--');
 
     await for (MimeMultipart formItem in _watch(body).transform(transformer)) {
       String? partHeaders = formItem.headers['content-disposition'];
@@ -92,7 +94,8 @@ class FormDataVisitor {
 
   /// keep small files in memory. once a file passes
   /// [multipartMemoryLimit], write it to a temp file instead.
-  /// the temp file is deleted when the response is done.
+  /// the temp file is deleted when the request is handled (see
+  /// `releaseTempFiles`).
   Future<RequestFile> _readFile(
     MimeMultipart part,
     String filename,
@@ -110,7 +113,7 @@ class FormDataVisitor {
           temp = File(
             '${Directory.systemTemp.path}/dox-upload-${uuid.v4()}.tmp',
           );
-          _deleteWhenDone(temp);
+          keepTempFile(request, temp);
           raf = await temp.open(mode: FileMode.write);
           Uint8List first = buffer.takeBytes();
           head = _headOf(first, chunk);
@@ -150,17 +153,65 @@ class FormDataVisitor {
     return out.takeBytes();
   }
 
-  /// pass the body through, and mark [_failed] when it fails
+  /// `CRLF--boundary--`, the end mark of the body. The parser takes it as
+  /// the end only after a line break (or at the start of the body).
+  List<int> _closing = const <int>[];
+
+  /// pass the body through, and mark [_failed] when it fails.
+  /// A body that ends with no closing boundary (a cut upload) also fails:
+  /// the mime parser reports it on the outer stream only, so a reader
+  /// that waits for the open part would wait for ever.
   Stream<List<int>> _watch(Stream<List<int>> source) async* {
+    /// the end mark can be split between two chunks, so the last bytes of
+    /// the chunk before are kept. any epilogue may follow the mark.
+
+    /// the body start counts as after a line break
+    List<int> carry = const <int>[0x0D, 0x0A];
+    bool closed = false;
     try {
       /// `await for`, not `yield*`: yield* forwards errors without throwing
       await for (List<int> chunk in source) {
+        if (!closed) {
+          closed = _holdsClosing(carry, chunk);
+          if (!closed) carry = _lastOf(carry, chunk);
+        }
         yield chunk;
+      }
+      if (!closed && !_failed.isCompleted) {
+        _failed.completeError(
+          BadRequestException(message: 'Multipart body is cut'),
+          StackTrace.current,
+        );
       }
     } catch (error, stackTrace) {
       if (!_failed.isCompleted) _failed.completeError(error, stackTrace);
       rethrow;
     }
+  }
+
+  /// true when [carry] then [chunk] hold the end mark
+  bool _holdsClosing(List<int> carry, List<int> chunk) {
+    List<int> mark = _closing;
+    int total = carry.length + chunk.length;
+    int first = mark.first;
+    int at(int i) => i < carry.length ? carry[i] : chunk[i - carry.length];
+    for (int i = 0; i + mark.length <= total; i++) {
+      if (at(i) != first) continue;
+      int j = 1;
+      while (j < mark.length && at(i + j) == mark[j]) {
+        j++;
+      }
+      if (j == mark.length) return true;
+    }
+    return false;
+  }
+
+  /// the last `mark.length - 1` bytes of [carry] then [chunk]
+  List<int> _lastOf(List<int> carry, List<int> chunk) {
+    int keep = _closing.length - 1;
+    if (chunk.length >= keep) return chunk.sublist(chunk.length - keep);
+    List<int> all = <int>[...carry, ...chunk];
+    return all.length <= keep ? all : all.sublist(all.length - keep);
   }
 
   /// read a part, but stop with the body error if the body fails.
@@ -188,18 +239,6 @@ class FormDataVisitor {
       await iterator.cancel();
     }
     if (error != null) Error.throwWithStackTrace(error!, stackTrace!);
-  }
-
-  void _deleteWhenDone(File file) {
-    request.response.done.whenComplete(() => _delete(file)).ignore();
-  }
-
-  Future<void> _delete(File file) async {
-    try {
-      await file.delete();
-    } catch (_) {
-      /// already moved by `store()`/`moveTo()`, or already gone
-    }
   }
 
   static const Utf8Decoder _utf8 = Utf8Decoder(allowMalformed: true);
