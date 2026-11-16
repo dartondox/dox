@@ -18,7 +18,9 @@ import 'package:dox_core/dox_core.dart';
 /// - The work of one request runs after the response of that request
 ///   is sent, one after the other, in the order it was added. The next
 ///   one starts only when the one before it ends, so work that never
-///   ends blocks the rest of the work of that request.
+///   ends blocks the rest of the work of that request. It also keeps
+///   the upload temp files of that request for ever, as they are deleted
+///   after the work.
 /// - Outside a request, or when it is off, the work runs soon, after
 ///   the code that is running now.
 /// - An error in the work is reported to the exception handler. It

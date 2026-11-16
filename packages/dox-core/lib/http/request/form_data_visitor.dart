@@ -161,25 +161,20 @@ class FormDataVisitor {
   /// the mime parser reports it on the outer stream only, so a reader
   /// that waits for the open part would wait for ever.
   Stream<List<int>> _watch(Stream<List<int>> source) async* {
-    /// the last bytes of the body. the end mark is there, if it is sent
-    BytesBuilder tail = BytesBuilder();
-    int keep = _closing.length + 256;
+    /// the end mark can be split between two chunks, so the last bytes of
+    /// the chunk before are kept. any epilogue may follow the mark.
+    List<int> carry = const <int>[];
+    bool closed = false;
     try {
       /// `await for`, not `yield*`: yield* forwards errors without throwing
       await for (List<int> chunk in source) {
-        if (chunk.length >= keep) {
-          tail.clear();
-          tail.add(chunk.sublist(chunk.length - keep));
-        } else {
-          tail.add(chunk);
-          if (tail.length > keep * 2) {
-            Uint8List all = tail.takeBytes();
-            tail.add(all.sublist(all.length - keep));
-          }
+        if (!closed) {
+          closed = _holdsClosing(carry, chunk);
+          if (!closed) carry = _lastOf(carry, chunk);
         }
         yield chunk;
       }
-      if (!_hasClosing(tail.takeBytes()) && !_failed.isCompleted) {
+      if (!closed && !_failed.isCompleted) {
         _failed.completeError(
           BadRequestException(message: 'Multipart body is cut'),
           StackTrace.current,
@@ -191,16 +186,29 @@ class FormDataVisitor {
     }
   }
 
-  bool _hasClosing(List<int> tail) {
-    int last = tail.length - _closing.length;
-    for (int i = last; i >= 0; i--) {
-      int j = 0;
-      while (j < _closing.length && tail[i + j] == _closing[j]) {
+  /// true when [carry] then [chunk] hold the end mark
+  bool _holdsClosing(List<int> carry, List<int> chunk) {
+    List<int> mark = _closing;
+    int total = carry.length + chunk.length;
+    int first = mark.first;
+    int at(int i) => i < carry.length ? carry[i] : chunk[i - carry.length];
+    for (int i = 0; i + mark.length <= total; i++) {
+      if (at(i) != first) continue;
+      int j = 1;
+      while (j < mark.length && at(i + j) == mark[j]) {
         j++;
       }
-      if (j == _closing.length) return true;
+      if (j == mark.length) return true;
     }
     return false;
+  }
+
+  /// the last `mark.length - 1` bytes of [carry] then [chunk]
+  List<int> _lastOf(List<int> carry, List<int> chunk) {
+    int keep = _closing.length - 1;
+    if (chunk.length >= keep) return chunk.sublist(chunk.length - keep);
+    List<int> all = <int>[...carry, ...chunk];
+    return all.length <= keep ? all : all.sublist(all.length - keep);
   }
 
   /// read a part, but stop with the body error if the body fails.

@@ -9,6 +9,7 @@ import 'package:dox_validation/dox_validation.dart' as dv;
 /// `AppConfig` reports it and decides the response.
 void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
   /// the request failed: its upload temp files can go (after the answer)
+  if (AfterResponse.enabled) AfterResponse.handlerEnded();
   releaseTempFiles(req);
   try {
     httpResponseHandler(renderError(req, error, stackTrace), req);

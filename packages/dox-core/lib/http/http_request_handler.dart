@@ -155,9 +155,13 @@ bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
   }
 
   /// report the error and answer 500, so the client does not hang
-  handler(req).catchError((Object error, StackTrace stackTrace) {
-    httpErrorHandler(req, error, stackTrace);
-  });
+  handler(req).then(
+    (_) => _handled(req),
+    onError: (Object error, StackTrace stackTrace) {
+      httpErrorHandler(req, error, stackTrace);
+      _handled(req);
+    },
+  );
   return true;
 }
 
@@ -282,7 +286,14 @@ void _run(HttpRequest req, DoxRequest doxReq) {
     _runThenTerminate(req, doxReq, ends);
     return;
   }
-  FutureOr<dynamic> result = runMiddlewareAndController(doxReq);
+  FutureOr<dynamic> result;
+  try {
+    result = runMiddlewareAndController(doxReq);
+  } catch (_) {
+    /// a sync throw: the caller sends the error
+    _handled(req);
+    rethrow;
+  }
   if (result is Future<dynamic>) {
     /// one Future: `then` with `onError`, not `then().onError()`
     result.then(

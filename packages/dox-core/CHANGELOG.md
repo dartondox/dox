@@ -1,8 +1,11 @@
 ## Unreleased
 
 - Fix: the temp files of big uploads were deleted when `response.done` completed. A newer native server completes `done` also when the client leaves, so a slow handler (an S3 upload, image work) could lose its file while it read it. Now the files are deleted when the request is handled (after the middleware and the controller, also on an error) and the response is done. A request with no big upload pays nothing.
-- Fix: when a handler had already sent the head (a flush or a stream, eg. server-sent events) and then threw, Dox cleared the headers, set status 500 and wrote `Internal Server Error` into the middle of the stream. Now the error is reported and the response just ends. This needs a dox-http-native with `NativeHeaders.sent` (dox-http-native#25).
+- Fix: when a handler had already sent the head (a flush or a stream, eg. server-sent events) and then threw, Dox cleared the headers, set status 500 and wrote `Internal Server Error` into the middle of the stream. Now the error is reported and the response just ends. This needs a dox-http-native with `NativeResponse.headSent` (dox-http-native#25).
 - Fix: a multipart body that ended with no closing boundary (a cut upload) kept the request open for ever, with its temp file. Now it gives 400 and the temp file is deleted.
+- Fix: a sync throw in a handler, or a raw `Route.mount` handler (no `middleware: true`), never marked the handler as ended. `AfterResponse` work then never ran and the upload temp files stayed on disk. Now every path ends the handler.
+- Fix: a multipart body with an epilogue after the closing boundary was rejected when the epilogue was longer than about 256 bytes. Any epilogue is fine now.
+- Fix: after a `RequestTimeout` the late handler lost its upload temp files. They now stay until it ends (a handler that never ends keeps them for ever). `AfterResponse` work that never ends does the same.
 - Fix: `AfterResponse` work could start while the handler still ran, when the client left early. Now it starts after the handler ended and the response is done.
 
 - Perf: every request with no body (most GETs) made a new empty body map. Now the map is made on the first use of `req.body` (or `req.requestBody.map`, `req.all()`, `req.input()`, `req.add()`). A request that never reads its body makes no map. Each request still has its own map, so writes never leak between requests. `DoxRequest(body:)` is now optional.

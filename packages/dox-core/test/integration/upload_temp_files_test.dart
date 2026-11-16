@@ -166,6 +166,104 @@ void main() {
       },
     );
 
+    test(
+      'a sync throw still runs AfterResponse work and deletes the file',
+      () async {
+        AfterResponse.enable();
+        addTearDown(AfterResponse.disable);
+        Completer<void> ran = Completer<void>();
+        Route.post('/up/sync-throw', (DoxRequest req) {
+          req.file('f')!;
+          AfterResponse.run(ran.complete);
+          throw StateError('sync');
+        });
+        http.Response res = await http.post(
+          Uri.parse('${baseUrl()}/up/sync-throw'),
+          headers: <String, String>{
+            'content-type': 'multipart/form-data; boundary=$boundary',
+          },
+          body: bigBody(boundary),
+        );
+        expect(res.statusCode, 500);
+        await ran.future.timeout(const Duration(seconds: 5));
+        await gone(before);
+      },
+    );
+
+    test('AfterResponse work runs for a mount without middleware', () async {
+      AfterResponse.enable();
+      addTearDown(AfterResponse.disable);
+      Completer<void> ran = Completer<void>();
+      Route.mount('/rawmount', (HttpRequest req) async {
+        AfterResponse.run(ran.complete);
+        req.response.write('raw');
+        await req.response.close();
+      });
+      http.Response res = await http.get(Uri.parse('${baseUrl()}/rawmount'));
+      expect(res.body, 'raw');
+      await ran.future.timeout(const Duration(seconds: 5));
+    });
+
+    test('a late handler after a timeout still reads the file', () async {
+      Completer<String> result = Completer<String>();
+      Route.post('/up/late', (DoxRequest req) async {
+        RequestFile file = req.file('f')!;
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+        try {
+          result.complete('read ${file.file!.lengthSync()}');
+        } catch (e) {
+          result.complete('failed');
+        }
+        return 'late';
+      }).timeout(const Duration(milliseconds: 100));
+      http.Response res = await http.post(
+        Uri.parse('${baseUrl()}/up/late'),
+        headers: <String, String>{
+          'content-type': 'multipart/form-data; boundary=$boundary',
+        },
+        body: bigBody(boundary),
+      );
+      expect(res.statusCode, 503);
+      expect(await result.future, 'read ${multipartMemoryLimit + 100}');
+      await gone(before);
+    });
+
+    for (int epilogue in <int>[0, 100, 300, 70000]) {
+      test('an epilogue of $epilogue bytes is fine', () async {
+        Route.post('/up/epilogue$epilogue', (DoxRequest req) => 'ok');
+        http.Response res = await http.post(
+          Uri.parse('${baseUrl()}/up/epilogue$epilogue'),
+          headers: <String, String>{
+            'content-type': 'multipart/form-data; boundary=$boundary',
+          },
+          body: <int>[...bigBody(boundary), ...List<int>.filled(epilogue, 66)],
+        );
+        expect(res.statusCode, 200);
+        await gone(before);
+      });
+    }
+
+    test('the end mark split between two chunks is fine', () async {
+      Route.post('/up/split', (DoxRequest req) => 'ok');
+      List<int> body = bigBody(boundary);
+      int cut = body.length - 9;
+      http.StreamedRequest request = http.StreamedRequest(
+        'POST',
+        Uri.parse('${baseUrl()}/up/split'),
+      );
+      request.headers['content-type'] =
+          'multipart/form-data; boundary=$boundary';
+      request.contentLength = body.length;
+      request.sink.add(body.sublist(0, cut));
+      Timer(const Duration(milliseconds: 200), () {
+        request.sink.add(body.sublist(cut));
+        request.sink.close();
+      });
+      http.StreamedResponse res = await request.send();
+      expect(res.statusCode, 200);
+      await gone(before);
+    });
+
     test('an error in the handler deletes the file', () async {
       Route.post('/up/error', (DoxRequest req) {
         req.file('f')!;

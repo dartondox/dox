@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/request/upload_temp_files.dart';
 
 /// Answers `503 Service Unavailable` when the rest of the middleware
 /// and the controller take longer than [duration].
@@ -29,9 +30,12 @@ class RequestTimeout implements IDoxNextMiddleware {
 
   @override
   Future<DoxResponse> handle(DoxRequest req, Next next) async {
+    Future<DoxResponse> work = next();
     try {
-      return await next().timeout(duration);
+      return await work.timeout(duration);
     } on TimeoutException {
+      /// the late handler may still read the upload temp files
+      keepTempFilesUntil(req.httpRequest, work.then((_) {}, onError: (_) {}));
       throw HttpStatusException(
         HttpStatus.serviceUnavailable,
         message: 'The request took too long',
