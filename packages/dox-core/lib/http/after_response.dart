@@ -63,6 +63,23 @@ class AfterResponse {
     runZoned(handle, zoneValues: <Object, Object>{_key: _Pending(res)});
   }
 
+  /// Internal: the request handler calls it when the middleware and the
+  /// controller of the current request have ended. The work waits for it,
+  /// so a client that leaves early does not start it while the handler
+  /// still runs.
+  static void handlerEnded() {
+    Object? pending = Zone.current[_key];
+    if (pending is _Pending) pending.end();
+  }
+
+  /// Internal: ends when the work of the current request has run.
+  /// Done at once when there was no work.
+  static Future<void> flushed() {
+    Object? pending = Zone.current[_key];
+    return (pending is _Pending ? pending._flushed : null) ??
+        Future<void>.value();
+  }
+
   static Future<void> _call(FutureOr<void> Function() work) async {
     try {
       await work();
@@ -92,6 +109,28 @@ class _Pending {
   /// true once the response is sent. work added later runs soon.
   bool sent = false;
 
+  /// ends when the work has run. null until the first work is added.
+  Future<void>? _flushed;
+
+  /// true once the middleware and the controller have ended
+  bool _ended = false;
+  Completer<void>? _endSignal;
+
+  void end() {
+    _ended = true;
+    _endSignal?.complete();
+    _endSignal = null;
+  }
+
+  /// the response is done (also when it failed) and the handler ended.
+  /// With a client that left, `done` can come before the handler ends.
+  Future<void> _ready() {
+    Future<void> done = _res.done.then((Object? _) {}, onError: (Object _) {});
+    if (_ended) return done;
+    Completer<void> signal = _endSignal ??= Completer<void>();
+    return Future.wait(<Future<void>>[done, signal.future]);
+  }
+
   void add(FutureOr<void> Function() item) {
     List<FutureOr<void> Function()>? work = _work;
     if (work != null) {
@@ -100,7 +139,7 @@ class _Pending {
     }
     _work = <FutureOr<void> Function()>[item];
     // a response that is sent already completes this soon
-    _res.done.then(flush, onError: flushOnError);
+    _flushed = _ready().then(flush);
   }
 
   Future<void> flush(Object? _) async {
@@ -111,7 +150,4 @@ class _Pending {
     }
     work.clear();
   }
-
-  /// the response failed (eg. the client left). the work still runs.
-  Future<void> flushOnError(Object _) => flush(null);
 }

@@ -2,11 +2,14 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_response_handler.dart';
+import 'package:dox_core/http/request/upload_temp_files.dart';
 import 'package:dox_validation/dox_validation.dart' as dv;
 
 /// Every error of a request comes here. The `ExceptionHandler` of
 /// `AppConfig` reports it and decides the response.
 void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
+  /// the request failed: its upload temp files can go (after the answer)
+  releaseTempFiles(req);
   try {
     httpResponseHandler(renderError(req, error, stackTrace), req);
   } catch (sendError, sendStack) {

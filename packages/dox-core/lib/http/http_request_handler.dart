@@ -8,6 +8,7 @@ import 'package:dox_core/http/http_error_handler.dart';
 import 'package:dox_core/http/http_response_handler.dart';
 import 'package:dox_core/http/http_route_handler.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
+import 'package:dox_core/http/request/upload_temp_files.dart';
 import 'package:dox_core/router/route_data.dart';
 
 /// this is a class which get matched routes and
@@ -216,6 +217,7 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
   List<IDoxTerminableMiddleware> ends = route.terminable;
   Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
     (dynamic value) {
+      _handled(req);
       if (_started[req] == true) {
         value = null;
       } else {
@@ -225,6 +227,7 @@ void _runMount(HttpRequest req, String prefix, RawRequestHandler handler) {
       if (ends.isNotEmpty) _terminate(req, doxReq, value, ends);
     },
     onError: (Object error, StackTrace stackTrace) {
+      _handled(req);
       _started[req] = true;
       if (ends.isEmpty) {
         httpErrorHandler(req, error, stackTrace);
@@ -285,13 +288,19 @@ void _run(HttpRequest req, DoxRequest doxReq) {
     result.then(
       (dynamic value) {
         _send(req, value);
+        _handled(req);
       },
       onError: (Object error, StackTrace stackTrace) {
         httpErrorHandler(req, error, stackTrace);
+        _handled(req);
       },
     );
   } else {
-    httpResponseHandler(result, req);
+    try {
+      httpResponseHandler(result, req);
+    } finally {
+      _handled(req);
+    }
   }
 }
 
@@ -304,14 +313,25 @@ void _runThenTerminate(
   Future<dynamic>.sync(() => runMiddlewareAndController(doxReq)).then(
     (dynamic value) {
       _send(req, value);
+      _handled(req);
       _terminate(req, doxReq, value, ends);
     },
     onError: (Object error, StackTrace stackTrace) {
       dynamic value = renderError(req, error, stackTrace);
       _send(req, value);
+      _handled(req);
       _terminate(req, doxReq, value, ends);
     },
   );
+}
+
+/// the middleware and the controller of [req] have ended. `AfterResponse`
+/// work may start, and the upload temp files are deleted once the answer
+/// is done. Not `res.done` alone: it can come early (the client left)
+/// while the handler still reads the files.
+void _handled(HttpRequest req) {
+  if (AfterResponse.enabled) AfterResponse.handlerEnded();
+  releaseTempFiles(req);
 }
 
 /// wait until the answer is sent, then run each `terminate`. an error

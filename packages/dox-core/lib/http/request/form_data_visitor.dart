@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/request/upload_temp_files.dart';
 import 'package:mime/mime.dart';
 import 'package:string_scanner/string_scanner.dart';
 
@@ -92,7 +93,8 @@ class FormDataVisitor {
 
   /// keep small files in memory. once a file passes
   /// [multipartMemoryLimit], write it to a temp file instead.
-  /// the temp file is deleted when the response is done.
+  /// the temp file is deleted when the request is handled (see
+  /// `releaseTempFiles`).
   Future<RequestFile> _readFile(
     MimeMultipart part,
     String filename,
@@ -110,7 +112,7 @@ class FormDataVisitor {
           temp = File(
             '${Directory.systemTemp.path}/dox-upload-${uuid.v4()}.tmp',
           );
-          _deleteWhenDone(temp);
+          keepTempFile(request, temp);
           raf = await temp.open(mode: FileMode.write);
           Uint8List first = buffer.takeBytes();
           head = _headOf(first, chunk);
@@ -188,18 +190,6 @@ class FormDataVisitor {
       await iterator.cancel();
     }
     if (error != null) Error.throwWithStackTrace(error!, stackTrace!);
-  }
-
-  void _deleteWhenDone(File file) {
-    request.response.done.whenComplete(() => _delete(file)).ignore();
-  }
-
-  Future<void> _delete(File file) async {
-    try {
-      await file.delete();
-    } catch (_) {
-      /// already moved by `store()`/`moveTo()`, or already gone
-    }
   }
 
   static const Utf8Decoder _utf8 = Utf8Decoder(allowMalformed: true);
