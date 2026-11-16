@@ -26,8 +26,20 @@ class CacheConstants {
   static const String dbOption = 'db';
   static const String tlsOption = 'tls';
   static const String poolSizeOption = 'pool_size';
+  static const String redisOptionsOption = 'options';
   static const String maxValueBytesOption = 'max_value_bytes';
   static const String encryptOption = 'encrypt';
+
+  /// Redis connection keys. They can not be set together with `options`.
+  static const List<String> redisConnectionOptions = <String>[
+    hostOption,
+    portOption,
+    usernameOption,
+    passwordOption,
+    dbOption,
+    tlsOption,
+    poolSizeOption,
+  ];
 
   /// Redis defaults.
   static const String defaultRedisHost = '127.0.0.1';

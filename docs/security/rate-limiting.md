@@ -98,7 +98,7 @@ All clients in one /64 then share one count. An IPv4 address stays as it is. A `
 
 ## Where the counts live
 
-When the default [cache](../digging-deeper/cache.md) store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server.
+When the default [cache](../digging-deeper/cache.md) store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server. To set a command timeout or other Redis options, see [Redis options](../digging-deeper/cache.md#redis-options).
 
 With any other default store, the counts are kept in the main isolate of each server. All isolates of one server share them, but each server has its own counts. So with 3 servers, a client can send up to 3 times `max`.
 
