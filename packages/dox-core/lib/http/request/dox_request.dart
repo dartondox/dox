@@ -100,7 +100,7 @@ class DoxRequest implements IDoxRequest {
     if (headers.value('x-inertia') != null) return false;
     String accept = headers.value(HttpHeaders.acceptHeader) ?? '';
     if (accept.contains('/json') || accept.contains('+json')) return true;
-    return HttpBody.isJson(headers.contentType) ||
+    return HttpBody.isJson(HttpBody.contentTypeOf(headers)) ||
         headers.value('x-requested-with') == 'XMLHttpRequest';
   }
 

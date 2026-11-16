@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 
@@ -28,6 +29,11 @@ class RequestId implements IDoxMiddleware {
   /// the header name
   static const String header = 'X-Request-Id';
 
+  /// [header] in lower case, so no lower case copy is made per request
+  static const String _name = 'x-request-id';
+
+  static const String _hex = '0123456789abcdef';
+
   static final RegExp _safe = RegExp(r'^[A-Za-z0-9._-]{1,128}$');
 
   /// not crypto: the id only has to be unique, not secret
@@ -35,19 +41,23 @@ class RequestId implements IDoxMiddleware {
 
   @override
   IDoxRequest handle(IDoxRequest req) {
-    String? id = trustClient ? req.header(header) : null;
+    String? id = trustClient ? req.header(_name) : null;
     if (id == null || !_safe.hasMatch(id)) id = make();
     if (req is DoxRequest) req.requestId = id;
-    req.httpRequest.response.headers.set(header, id);
+    req.httpRequest.response.headers.set(_name, id);
     return req;
   }
 
   /// A new random id: 32 hex characters (128 bits).
   static String make() {
-    StringBuffer out = StringBuffer();
-    for (int i = 0; i < 4; i++) {
-      out.write(_random.nextInt(1 << 32).toRadixString(16).padLeft(8, '0'));
+    Uint8List out = Uint8List(32);
+    for (int i = 0; i < 32; i += 8) {
+      int value = _random.nextInt(1 << 32);
+      for (int k = i + 7; k >= i; k--) {
+        out[k] = _hex.codeUnitAt(value & 0xF);
+        value >>= 4;
+      }
     }
-    return out.toString();
+    return String.fromCharCodes(out);
   }
 }

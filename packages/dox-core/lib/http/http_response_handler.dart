@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
@@ -77,6 +79,21 @@ void _guardActiveFile(HttpResponse res, ContentType type) {
     res.headers.set(FILE_DOWNLOAD_HEADER, 'attachment');
     res.headers.set('Content-Security-Policy', 'sandbox');
   }
+}
+
+/// [text] as UTF-8 bytes. Same bytes as `utf8.encode`. An ASCII text is
+/// written straight into a list of the right size. `utf8.encode` first
+/// makes a list 3 times the text length, then copies the used part.
+Uint8List utf8Bytes(String text) {
+  int length = text.length;
+  for (int i = 0; i < length; i++) {
+    if (text.codeUnitAt(i) > 0x7F) return utf8.encode(text);
+  }
+  Uint8List out = Uint8List(length);
+  for (int i = 0; i < length; i++) {
+    out[i] = text.codeUnitAt(i);
+  }
+  return out;
 }
 
 /// [payload] as JSON bytes, like the response sends it
@@ -162,7 +179,10 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   /// if payload is Map or List, parse into json
   /// and response as json
   if (payload is String) {
-    bytes = res.encoding.encode(payload);
+    Encoding encoding = res.encoding;
+    bytes = encoding is Utf8Codec
+        ? utf8Bytes(payload)
+        : encoding.encode(payload);
   } else if (payload is JsonBytes) {
     bytes = payload.bytes;
     res.headers.contentType = ContentType.json;

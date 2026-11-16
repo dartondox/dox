@@ -121,6 +121,15 @@ class RouteData {
     return _pattern;
   }
 
+  /// The plain text before the first param, eg. `/api/users` for
+  /// `/api/users/{id}`. A url that does not start with it can not match
+  /// [pattern], so the router skips the regex. Null for a plain route, a
+  /// route that starts with a param, or text with regex marks in it.
+  String? get matchPrefix {
+    _compile();
+    return _matchPrefix;
+  }
+
   /// names of the params, eg. `['id']` for `/blog/{id}`.
   /// `{path*}` matches the rest of the url, slashes too.
   /// `{id?}` is optional: `/blog` and `/blog/5` both match.
@@ -131,6 +140,7 @@ class RouteData {
 
   RegExp? _pattern;
   List<String> _paramNames = const <String>[];
+  String? _matchPrefix;
   String? _compiledFor;
 
   /// param name => regex, set with `Route.where`. null for most routes,
@@ -193,7 +203,16 @@ class RouteData {
         : RegExp(
             '^${path.replaceAllMapped(_param, wheres == null ? _paramPattern : _wherePattern)}\$',
           );
+    _matchPrefix = null;
+    Match? first = _pattern == null ? null : _param.firstMatch(path);
+    if (first != null) {
+      String head = path.substring(0, first.start);
+      if (head.length > 1 && !_regexMarks.hasMatch(head)) _matchPrefix = head;
+    }
   }
+
+  /// text that means more than itself in a regex, eg. `.`
+  static final RegExp _regexMarks = RegExp(r'[\\^$.|?*+()\[\]{}]');
 
   /// like [_paramPattern], with the regex of `Route.where` for the param
   String _wherePattern(Match match) {
