@@ -10,6 +10,11 @@ import 'cache_lock.dart';
 ///     'memory': <String, dynamic>{'driver': 'memory', 'max_size': 1000},
 ///     'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache'},
 ///     'redis': <String, dynamic>{'driver': 'redis', 'host': '127.0.0.1'},
+///     // or any ioredis option, with a RedisOptions:
+///     'redis_slow': <String, dynamic>{
+///       'driver': 'redis',
+///       'options': RedisOptions(commandTimeout: Duration(seconds: 2)),
+///     },
 ///   },
 /// );
 /// ```

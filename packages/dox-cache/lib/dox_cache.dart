@@ -1,6 +1,9 @@
 /// Cache for Dart and Dox: memory, file and Redis drivers.
 library;
 
+export 'package:ioredis/ioredis.dart'
+    show RedisOptions, RedisQueueFullError, RedisTimeoutError;
+
 export 'src/cache_clock.dart';
 export 'src/cache_config.dart';
 export 'src/cache_driver.dart';

@@ -325,6 +325,10 @@ class RedisLock extends CacheLock {
 /// Builds a [RedisDriver] with a new connection.
 /// Options: host, port, username, password, db, tls, prefix, pool_size,
 /// max_value_bytes, encrypt (needs an encrypter).
+/// Or set `options` to a `RedisOptions`. It is used as it is, so every
+/// ioredis option works (commandTimeout, connectTimeout, onError, ...).
+/// `options` can not be set together with host, port, username, password,
+/// db, tls or pool_size. prefix, max_value_bytes and encrypt still work.
 /// pool_size is the most connections to open (ioredis maxConnection).
 /// ioredis shares one connection and only opens more for blocking commands.
 class RedisDriverFactory implements CacheDriverFactory {
@@ -339,24 +343,7 @@ class RedisDriverFactory implements CacheDriverFactory {
 
   @override
   CacheDriver create(Map<String, dynamic> options) {
-    Redis redis = Redis(
-      RedisOptions(
-        host:
-            options[CacheConstants.hostOption] as String? ??
-            CacheConstants.defaultRedisHost,
-        port:
-            options[CacheConstants.portOption] as int? ??
-            CacheConstants.defaultRedisPort,
-        username: options[CacheConstants.usernameOption] as String?,
-        password: options[CacheConstants.passwordOption] as String?,
-        db: options[CacheConstants.dbOption] as int? ?? 0,
-        secure: options[CacheConstants.tlsOption] as bool? ?? false,
-        retryStrategy: retryDelay,
-        maxConnection:
-            options[CacheConstants.poolSizeOption] as int? ??
-            CacheConstants.defaultRedisPoolSize,
-      ),
-    );
+    Redis redis = Redis(_redisOptions(options));
     return RedisDriver(
       redis,
       prefix:
@@ -366,6 +353,44 @@ class RedisDriverFactory implements CacheDriverFactory {
       encrypter: options[CacheConstants.encryptOption] == true
           ? _encrypter
           : null,
+    );
+  }
+
+  RedisOptions _redisOptions(Map<String, dynamic> options) {
+    Object? custom = options[CacheConstants.redisOptionsOption];
+    if (custom != null) {
+      if (custom is! RedisOptions) {
+        throw ArgumentError(
+          "The 'options' key of a redis store must be a RedisOptions, "
+          'not ${custom.runtimeType}.',
+        );
+      }
+      List<String> clash = CacheConstants.redisConnectionOptions
+          .where(options.containsKey)
+          .toList();
+      if (clash.isNotEmpty) {
+        throw ArgumentError(
+          "Set either 'options' (a RedisOptions) or ${clash.join('/')} "
+          'on the redis store, not both.',
+        );
+      }
+      return custom;
+    }
+    return RedisOptions(
+      host:
+          options[CacheConstants.hostOption] as String? ??
+          CacheConstants.defaultRedisHost,
+      port:
+          options[CacheConstants.portOption] as int? ??
+          CacheConstants.defaultRedisPort,
+      username: options[CacheConstants.usernameOption] as String?,
+      password: options[CacheConstants.passwordOption] as String?,
+      db: options[CacheConstants.dbOption] as int? ?? 0,
+      secure: options[CacheConstants.tlsOption] as bool? ?? false,
+      retryStrategy: retryDelay,
+      maxConnection:
+          options[CacheConstants.poolSizeOption] as int? ??
+          CacheConstants.defaultRedisPoolSize,
     );
   }
 }

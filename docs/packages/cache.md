@@ -51,7 +51,7 @@ Sessions on a `memory` store are the exception. They live in the main isolate, s
 | every driver | `driver`, `prefix` (default `dox_cache:`) |
 | `memory` | `max_size`: the most items. When full, the least recently used item is removed. No limit when not set |
 | `file` | `path` (default `storage/cache`). Each prefix gets its own sub folder. `prune_every`, see [Pruning the file store](#pruning-the-file-store). `fsync` (default `true`): sync each write to the disk |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` (default 10), `max_value_bytes` (values bigger than this throw. No limit by default) |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` (default 10), `max_value_bytes` (values bigger than this throw. No limit by default), `options` (a `RedisOptions`, replaces the connection keys. See [Redis options](../digging-deeper/cache.md#redis-options)) |
 
 The `prefix` is added to every key. Use different prefixes when two apps share one Redis database.
 

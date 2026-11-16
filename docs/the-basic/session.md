@@ -192,7 +192,7 @@ The cache driver keeps the data in a cache store, and the cookie only holds an e
 
 Pick the store with the `store` option:
 
-- `redis` shares sessions between all isolates and servers.
+- `redis` shares sessions between all isolates and servers. To set a command timeout or other Redis options, see [Redis options](../digging-deeper/cache.md#redis-options).
 - `database` also shares sessions, if you have no Redis. See [Database store](../packages/cache.md#database-store).
 - `memory` keeps sessions in the main isolate of this server. The other isolates read and write them there, so all isolates of one server see the same sessions. They are lost when the server stops, and each server has its own. Expired sessions are removed by the memory store. Good for tests and a single server.
 

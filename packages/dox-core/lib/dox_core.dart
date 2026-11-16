@@ -10,7 +10,10 @@ export 'package:dox_cache/dox_cache.dart'
         CacheLock,
         CacheManager,
         CacheStore,
-        LockTimeoutException;
+        LockTimeoutException,
+        RedisOptions,
+        RedisQueueFullError,
+        RedisTimeoutError;
 export 'package:dox_openapi/dox_openapi.dart'
     show
         DocsUi,
