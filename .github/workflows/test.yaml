@@ -42,6 +42,7 @@ jobs:
       unit: ${{ steps.diff.outputs.unit }}
       unit_services: ${{ steps.diff.outputs.unit_services }}
       examples: ${{ steps.diff.outputs.examples }}
+      examples_json: ${{ steps.diff.outputs.examples_json }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -143,21 +144,28 @@ jobs:
   # The apps in examples/ hold the code of docs/tutorial and docs/guides.
   # They use the local packages (pubspec_overrides.yaml) and SQLite, so
   # they need no database service. A broken docs example fails CI.
-  # One job runs the picked examples one after the other.
+  # One job per picked example, in parallel (matrix). A failed example does
+  # not cancel the others.
   # dox_orm, dox_migration, dox_auth, dox_openapi, dox_validation,
   # dox_socketio, dox_storage, dox_queue, dox_mailer, dox_view and dox_scheduler come from clones of their repos next to this one (main, or
   # the branch with the same name as this PR, see ci/clone-siblings.sh).
   examples:
     needs: changes
     if: needs.changes.outputs.examples != ''
+    name: examples (${{ matrix.example }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example: ${{ fromJSON(needs.changes.outputs.examples_json) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # On a tag too, the examples use the sibling clones on main, on
       # purpose: dox is released before dox_orm and the other siblings, so
       # pub.dev does not have versions that match this dox yet.
       - run: ci/clone-siblings.sh
-      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+      - id: dart
+        uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
           sdk: stable
       - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -165,6 +173,24 @@ jobs:
           path: ~/.pub-cache
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
+      # One hash of the HEAD commits of all sibling clones. The builders of
+      # dox_orm, dox_view and others live there, so it goes in the key below.
+      - id: siblings
+        if: github.ref_type != 'tag'
+        run: |
+          echo "sha=$(for r in ../*/; do git -C "$r" rev-parse HEAD 2>/dev/null; done | sha256sum | cut -c1-16)" >> "$GITHUB_OUTPUT"
+      # build_runner's incremental cache of this example. It saves part of
+      # the build_runner step. The key has the example, the Dart version, its
+      # pubspec.yaml, its lib, the builder packages in this repo and the
+      # commits of the sibling clones. Any change there builds fresh. There is
+      # no restore-keys fallback, so an old cache is never reused. pub.dev
+      # updates (pubspec.lock is not in git) rely on build_runner, which drops
+      # its cache when the build script changes. A tag builds fresh.
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        if: github.ref_type != 'tag'
+        with:
+          path: examples/${{ matrix.example }}/.dart_tool/build
+          key: build-${{ runner.os }}-${{ matrix.example }}-${{ steps.dart.outputs.dart-version }}-${{ steps.siblings.outputs.sha }}-${{ hashFiles(format('examples/{0}/pubspec.yaml', matrix.example), format('examples/{0}/lib/**', matrix.example), 'packages/dox-builder/**', 'packages/dox-annotation/**') }}
       # dox_http_native comes from its clone too, so a dox_core change that
       # needs new native code is tested before that code is on pub.dev.
       # Caches its Rust dependencies, then builds the library for this
@@ -176,7 +202,7 @@ jobs:
           workspaces: |
             ../dox-http-native/native -> target
       - run: ci/use-siblings.sh build
-      - run: ci/run-examples.sh ${{ needs.changes.outputs.examples }}
+      - run: ci/run-examples.sh ${{ matrix.example }}
 
   # A new app made with `dox create` from the template branch v3.x, on the
   # packages of this commit: build_runner, analyze, the template tests,
@@ -222,6 +248,8 @@ jobs:
 
   # The required check on main is named "test". This job keeps that name
   # and fails when any job above fails or is cancelled. Skipped jobs pass.
+  # The `examples` matrix counts as one job here: its result is `failure`
+  # or `cancelled` when any entry is, and `skipped` when none is picked.
   test:
     if: always()
     needs: [changes, lint, unit, examples, template]

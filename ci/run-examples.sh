@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Builds, analyzes and tests the apps in examples/, one after the other.
+# Builds, analyzes and tests the apps in examples/. CI passes one app per
+# call, and runs the calls in parallel (a matrix of jobs).
 # Each example has its own .env, .dart_tool and pubspec.lock. A failed
 # example does not stop the next one. Exit code 1 when any failed.
 #
