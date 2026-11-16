@@ -362,7 +362,6 @@ DoxRequest _doxRequest(
   return DoxRequest(
     route: route,
     uri: req.uri,
-    body: body.map,
     requestBody: body,
     contentType: contentType,
     httpHeaders: req.headers,

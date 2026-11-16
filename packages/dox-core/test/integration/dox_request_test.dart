@@ -105,6 +105,33 @@ void main() {
       expect(jsonDecode(res.body)['kind'], 'none');
     });
 
+    test('a request with no body makes its body map on first use', () async {
+      Map<String, dynamic> seen = <String, dynamic>{};
+      List<Map<String, dynamic>> maps = <Map<String, dynamic>>[];
+      Route.get('/lazy_body', (DoxRequest req) {
+        seen['made_before'] = req.requestBody.isMapMade;
+        req.add('k', 'v');
+        seen['same'] = identical(req.body, req.requestBody.map);
+        seen['read'] = req.body['k'];
+        seen['made_after'] = req.requestBody.isMapMade;
+        maps.add(req.body);
+        return response(<String, dynamic>{'all': req.all()['k']});
+      });
+      Uri url = Uri.parse('$baseUrl/lazy_body');
+      await http.get(url);
+      Map<String, dynamic> first = <String, dynamic>{...seen};
+      expect(first['made_before'], false);
+      expect(first['made_after'], true);
+      expect(first['read'], 'v');
+      // req.add keeps the map when it adds one key
+      expect(first['same'], true);
+      http.Response res = await http.get(url);
+      expect(jsonDecode(res.body)['all'], 'v');
+      expect(seen['made_before'], false);
+      expect(maps.length, 2);
+      expect(identical(maps[0], maps[1]), false);
+    });
+
     test('get cookies', () async {
       String authKeyValue = 'auth-key-value';
 
