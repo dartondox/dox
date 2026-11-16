@@ -352,7 +352,7 @@ Then turn it on in the config, and run `dart run build_runner build` so the gene
 ScheduleConfig scheduleConfig = const ScheduleConfig(inProcess: true);
 ```
 
-Only the first isolate of the web server runs the tasks, and the other isolates only serve requests. A `bin/queue.dart` worker, a test or the `work` process never runs this schedule. In a test of the in-process schedule, set `Dox().isWebServer = true;` first. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.
+Only the first isolate of the web server runs the tasks, and the other isolates only serve requests. A `bin/queue.dart` worker, a test or the `work` process does not start this in-process schedule. The `work` process runs the tasks on its own. In a test of the in-process schedule, set `Dox().isWebServer = true;` first. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.
 
 The tasks use the CPU of the server, so they can slow down requests on the first isolate. A separate `work` process can be deployed, scaled and restarted on its own. So use `work` for heavy tasks.
 

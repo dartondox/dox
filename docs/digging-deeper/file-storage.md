@@ -71,7 +71,7 @@ Each driver takes these options:
 | Driver | Options |
 | --- | --- |
 | `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility`, `atomic_writes`, `permissions` |
-| `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
+| `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete`, `unsigned_payload` |
 | `memory` | none. For tests |
 
 The provider of a new project sets up these disks in every isolate. It is in `lib/providers/`, so the generated container finds it:
@@ -106,12 +106,13 @@ The `s3` disk needs `bucket`, `key` and `secret`. If one is missing, the app sto
 
 ### Skipping the body hash
 
-To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body:
+To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body. Only use it over HTTPS:
 
 ```dart
 's3': <String, dynamic>{
   'driver': 's3',
   'bucket': env.awsBucket,
+  // ... region, key, secret, endpoint
   'unsigned_payload': true,
 },
 ```
@@ -372,7 +373,7 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 
 This section is for special cases. Most apps do not need it.
 
-### Skipping the body hash
+### Signature and the body
 
 `unsigned_payload` is off by default. The signature then does not cover the body, so only use it over HTTPS.
 

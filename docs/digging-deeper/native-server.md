@@ -97,12 +97,18 @@ To send a body in parts, like server-sent events, write with `add()` and call `f
 import 'dart:convert';
 import 'dart:io';
 
-response.headers.contentType = ContentType('text', 'event-stream');
-response.add(utf8.encode('data: hello\n\n'));
-await response.flush();
+server.listen((HttpRequest req) async {
+  req.response.headers.contentType = ContentType('text', 'event-stream');
+  req.response.add(utf8.encode('data: hello\n\n'));
+  await req.response.flush();
+});
 ```
 
-`NativeResponse.headSent` is `true` once the status and headers went out. After that, an error page can not be sent any more. The response can only end.
+`NativeResponse.headSent` is `true` once the status and headers went out. After that, an error page can not be sent any more. The response can only end. `req.response` is an `HttpResponse`, so cast it to read the flag:
+
+```dart
+bool sent = (req.response as NativeResponse).headSent;
+```
 
 ## Security notes
 
@@ -168,7 +174,7 @@ The server runs on the thread of the isolate, in a loop:
 - A multipart form over `maxMultipartSize`, or any other body over `maxBodySize`, gets `413` from Rust. With `Expect: 100-continue`, the `413` comes before the body is sent. Else Rust reads and drops the body first, so the client sees the `413`.
 - A client that sends no body bytes for 120 seconds gets `408`. A slow but steady upload is fine.
 - Accepted sockets get TCP keep-alive. After 60 seconds with no traffic, the OS checks the client every 10 seconds, and a client that misses 6 checks (about 2 minutes) is closed. A live client always answers.
-- A client that closed its side while the handler has not answered is closed when nothing was written for `idleTimeout` (30 seconds by default).
+- A client that closed its side while the handler has not answered is closed when nothing was written for `idleTimeout` (30 seconds by default). Set it with the `idleTimeout` argument of `NativeHttpServer.bind`. In a Dox app, set `AppConfig.idleTimeout`.
 - A request head must arrive within 30 seconds. A keep-alive connection with no request for 30 seconds is closed. A client that does not read its answer for 30 seconds is cut off.
 - A request with both `Content-Length` and `Transfer-Encoding: chunked` gets `400`. A transfer encoding other than `chunked` gets `501`.
 - At most 64 requests of one connection wait for an answer, and at most 1 MB of answers waits to be sent. Then the server stops reading that connection until the answers go out.
