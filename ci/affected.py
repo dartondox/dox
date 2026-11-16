@@ -11,6 +11,8 @@ everything runs. Prints `key=value` lines for $GITHUB_OUTPUT:
   unit_services
             the services those entries need, for ci/start-services.sh
   examples  the examples/ apps to run, space separated
+  examples_json
+            the same apps as a JSON list, for the examples job matrix
 
 Rules:
 - Docs files (*.md, docs/, mkdocs.yml, requirements-docs.txt, overrides/, hooks/, blog/) are ignored.
@@ -103,3 +105,4 @@ for group in ('unit',):
     print(f'{group}=' + json.dumps(picked, separators=(',', ':')))
     print(f'{group}_services=' + ' '.join(services))
 print('examples=' + ' '.join(examples))
+print('examples_json=' + json.dumps(examples, separators=(',', ':')))
