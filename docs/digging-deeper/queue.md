@@ -178,7 +178,16 @@ A Redis command that gets no reply in 10 seconds fails with `RedisTimeoutError`,
 To cap the commands that wait for a connection, set `maxQueuedCommands`. One more fails at once with `RedisQueueFullError`. It is off by default:
 
 ```dart
-RedisOptions(commandTimeout: Duration(seconds: 5), maxQueuedCommands: 1000);
+QueueConfig queueConfig = QueueConfig(
+  driver: 'redis',
+  jobs: jobRegistry,
+  redis: RedisOptions(
+    host: env.redisHost,
+    port: 6379,
+    commandTimeout: Duration(seconds: 5),
+    maxQueuedCommands: 1000,
+  ),
+);
 ```
 
 You can also read the Redis server from the env with `QueueConfig.redisFromEnv()`:

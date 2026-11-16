@@ -106,7 +106,7 @@ The `s3` disk needs `bucket`, `key` and `secret`. If one is missing, the app sto
 
 ### Skipping the body hash
 
-To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body, and the signature does not cover the body. Only use it over HTTPS. It is off by default:
+To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body:
 
 ```dart
 's3': <String, dynamic>{
@@ -372,9 +372,13 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 
 This section is for special cases. Most apps do not need it.
 
+### Skipping the body hash
+
+`unsigned_payload` is off by default. The signature then does not cover the body, so only use it over HTTPS.
+
 ### S3 part size
 
-`multipartPartSize` is the size of one part of a big upload. S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
+`multipartPartSize` is the size of one part of a big upload. It is a field of `S3DriverConfig`, not a key of the disk map. The default is 8 MiB. See [Storage](../packages/storage.md). S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
 
 ### Atomic writes
 

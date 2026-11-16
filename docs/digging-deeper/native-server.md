@@ -94,6 +94,9 @@ On a graceful stop (SIGTERM), every open WebSocket gets close code `1001`.
 To send a body in parts, like server-sent events, write with `add()` and call `flush()`. The first `flush()` sends the status, the headers and the bytes so far. Later writes go out at once:
 
 ```dart
+import 'dart:convert';
+import 'dart:io';
+
 response.headers.contentType = ContentType('text', 'event-stream');
 response.add(utf8.encode('data: hello\n\n'));
 await response.flush();
