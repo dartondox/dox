@@ -139,6 +139,28 @@ class CreateQueueTables extends Migration {
 
 To keep the jobs in another database connection of `config/database.dart`, use `QueueConfig(connection: 'postgres')`.
 
+#### Adding the pop indexes to an old table
+
+A new `jobs` table has the indexes a worker needs to find the next job fast. A table you made earlier works too, but a poll can read every waiting job. To add the indexes, write a new migration. It adds only the indexes the table does not have, so you can run it more than once:
+
+```dart title="db/migration/2026_11_20_000000_add_queue_pop_index.dart"
+// ignore_for_file: file_names
+import 'package:dox_migration/dox_migration.dart';
+import 'package:dox_queue_database/dox_queue_database.dart';
+
+class AddQueuePopIndex extends Migration {
+  @override
+  Future<void> up(Schema schema) async {
+    await QueueTables.popIndex(schema);
+  }
+
+  @override
+  Future<void> down(Schema schema) async {}
+}
+```
+
+On MySQL and MariaDB it does nothing, because the index on `queue` is enough.
+
 ### Redis driver
 
 Set the driver to `redis` and give the Redis server:
@@ -149,6 +171,14 @@ QueueConfig queueConfig = QueueConfig(
   jobs: jobRegistry,
   redis: RedisOptions(host: env.redisHost, port: 6379),
 );
+```
+
+A Redis command that gets no reply in 10 seconds fails with `RedisTimeoutError`, and the client reconnects. This stops a Redis outage from hanging every request. Change it with `commandTimeout`. `null` turns it off. Blocking commands and subscriber connections never time out.
+
+To cap the commands that wait for a connection, set `maxQueuedCommands`. One more fails at once with `RedisQueueFullError`. It is off by default:
+
+```dart
+RedisOptions(commandTimeout: Duration(seconds: 5), maxQueuedCommands: 1000);
 ```
 
 You can also read the Redis server from the env with `QueueConfig.redisFromEnv()`:
@@ -1055,6 +1085,7 @@ This section is for special cases. Most apps do not need it.
 | `--tries=3` | `1` | tries of a job that does not set `tries` |
 | `--timeout=60` | `60` | max run time in seconds of a job that does not set `timeout` |
 | `--sleep=3` | `3` | seconds to wait when the queues are empty |
+| `--max-sleep=30` | off | when the queues stay empty, double the sleep on each empty poll, up to this many seconds. A job sets it back to `--sleep` |
 | `--stop-when-empty` | off | stop when the queues are empty |
 | `--timeout-grace=10` | none | after a timeout, wait up to this many seconds for the old run to end before the next try |
 | `--backoff=1,5,10` | none | seconds to wait before each retry of a job that does not set `backoff` |
@@ -1067,6 +1098,7 @@ With `--max-jobs`, `--max-time` and `--memory`, the worker stops after its runni
 
 ### Worker details
 
+- The worker logs one warning when a job may run longer than `retryAfter` (the `--timeout`, the `timeout` of a job class, and the grace time all count). Then a second worker can take the job while the first one still runs it. Raise `retryAfter` or lower the timeout.
 - While the worker waits for `--timeout-grace`, it takes no other job. If `timeout` plus the grace time is above `retryAfter`, another worker can take the job while this one waits.
 - When a crashed worker's job has no tries left, it fails with a message that the worker did not finish.
 - `restart` writes a time to the app cache, and each worker reads it every 3 seconds.

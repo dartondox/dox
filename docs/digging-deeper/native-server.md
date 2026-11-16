@@ -81,7 +81,25 @@ WebSocket socket = await NativeWebSocket.upgrade(request);
 
 A message over the size limit closes the socket with code `1009`. Set the limit with `maxMessageSize` of `NativeWebSocket.upgrade`. Socket.IO uses `maxHttpBufferSize`.
 
+To find clients that vanished with no close (like a phone that lost its network), set `pingInterval`. When the client sent nothing for that long, the server sends a ping. When it still sends nothing for one more interval, the socket closes with `1001`. It is off by default:
+
+```dart
+socket.pingInterval = Duration(seconds: 30);
+```
+
 On a graceful stop (SIGTERM), every open WebSocket gets close code `1001`.
+
+## Streaming a response
+
+To send a body in parts, like server-sent events, write with `add()` and call `flush()`. The first `flush()` sends the status, the headers and the bytes so far. Later writes go out at once:
+
+```dart
+response.headers.contentType = ContentType('text', 'event-stream');
+response.add(utf8.encode('data: hello\n\n'));
+await response.flush();
+```
+
+`NativeResponse.headSent` is `true` once the status and headers went out. After that, an error page can not be sent any more. The response can only end.
 
 ## Security notes
 
@@ -146,6 +164,8 @@ The server runs on the thread of the isolate, in a loop:
 - The request line plus headers can be at most 16 KB. Bigger gets `431`. A bad request gets `400`.
 - A multipart form over `maxMultipartSize`, or any other body over `maxBodySize`, gets `413` from Rust. With `Expect: 100-continue`, the `413` comes before the body is sent. Else Rust reads and drops the body first, so the client sees the `413`.
 - A client that sends no body bytes for 120 seconds gets `408`. A slow but steady upload is fine.
+- Accepted sockets get TCP keep-alive. After 60 seconds with no traffic, the OS checks the client every 10 seconds, and a client that misses 6 checks (about 2 minutes) is closed. A live client always answers.
+- A client that closed its side while the handler has not answered is closed when nothing was written for `idleTimeout` (30 seconds by default).
 - A request head must arrive within 30 seconds. A keep-alive connection with no request for 30 seconds is closed. A client that does not read its answer for 30 seconds is cut off.
 - A request with both `Content-Length` and `Transfer-Encoding: chunked` gets `400`. A transfer encoding other than `chunked` gets `501`.
 - At most 64 requests of one connection wait for an answer, and at most 1 MB of answers waits to be sent. Then the server stops reading that connection until the answers go out.

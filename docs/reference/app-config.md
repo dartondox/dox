@@ -107,6 +107,14 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | `prettyPrint` | `bool` | `false` | `true` prints colored text. Each line starts with a tag that says where it comes from, like `[request]`, `[server]` or `[app]`. `false` prints one JSON object per line, for log services. The tag is then in the `source` field, unless your data already has a `source` key. |
 | `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. |
 
+Your own lines get the tag `[app]`. To use another tag, pass it as the third argument. `log`, `info`, `warn`, `success` and `danger` all take it:
+
+```dart
+Logger.info('invoice sent', null, 'billing');
+```
+
+In JSON mode the tag is the `source` field. Plain warnings on stderr use the same tags.
+
 ## CacheConfig
 
 | Field | Type | Default | Meaning |

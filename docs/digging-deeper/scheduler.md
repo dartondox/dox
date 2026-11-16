@@ -352,9 +352,21 @@ Then turn it on in the config, and run `dart run build_runner build` so the gene
 ScheduleConfig scheduleConfig = const ScheduleConfig(inProcess: true);
 ```
 
-Only the first isolate runs the tasks, and the other isolates only serve requests. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.
+Only the first isolate of the web server runs the tasks, and the other isolates only serve requests. A `bin/queue.dart` worker, a test or the `work` process never runs this schedule. In a test of the in-process schedule, set `Dox().isWebServer = true;` first. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.
 
 The tasks use the CPU of the server, so they can slow down requests on the first isolate. A separate `work` process can be deployed, scaled and restarted on its own. So use `work` for heavy tasks.
+
+## Logging the schedule
+
+By default the scheduler prints its own plain `[schedule]` lines. To send them through the app `Logger` instead, turn on `loggerLines`:
+
+```dart title="lib/config/schedule.dart"
+ScheduleConfig scheduleConfig = const ScheduleConfig(
+  flags: SchedulerFlags(loggerLines: true),
+);
+```
+
+The lines get the tag `[scheduler]`, for example `[scheduler] ran cleanup in 12ms`. They follow `LoggerConfig.enabled`, `level` and `prettyPrint`. `SchedulerFlags.all()` turns on every flag.
 
 ## Task output
 
@@ -499,6 +511,7 @@ This section is for special cases. Most apps do not need it.
 ### Filters and locks
 
 - `environments()` ignores case and spaces around the names. It is read at run time. An empty list or a blank name throws.
+- With `loggerLines` on, the plain `[schedule]` line is left out on stdout and stderr when the Logger printed it. So the lock store warning goes to stdout, not to stderr. Other sinks (like a `StringBuffer`) still get every plain line.
 - The once-per-tick lock is not released, so a late server can not run the same minute again. It expires after 10 minutes. When the store is `null`, the scheduler uses a memory store.
 - At start, the scheduler prints one warning to stderr when a task uses `onOneServer()` and the lock store is `memory`, `file` or `null`. It does not print when `APP_ENV` is `development` or `local`. With one server you can ignore it.
 - `clear-cache` removes only the `withoutOverlapping()` lock of each task, by its exact name. Other cache keys and the once-per-tick locks stay. It exits with 0, also when there was no lock. A `memory` store loses its locks with the process, so `clear-cache` is for `file` and Redis stores.

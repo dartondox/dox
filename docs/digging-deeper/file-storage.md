@@ -104,6 +104,18 @@ The `s3` disk reads five keys that a new project does not have yet. Add them to 
 
 The `s3` disk needs `bucket`, `key` and `secret`. If one is missing, the app stops at start with an `ArgumentError` that names the setting.
 
+### Skipping the body hash
+
+To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body, and the signature does not cover the body. Only use it over HTTPS. It is off by default:
+
+```dart
+'s3': <String, dynamic>{
+  'driver': 's3',
+  'bucket': env.awsBucket,
+  'unsigned_payload': true,
+},
+```
+
 ## Using another disk
 
 `Storage()` uses the default disk. Use `disk` to pick another one:
@@ -359,6 +371,10 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 ## Details
 
 This section is for special cases. Most apps do not need it.
+
+### S3 part size
+
+`multipartPartSize` is the size of one part of a big upload. S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
 
 ### Atomic writes
 

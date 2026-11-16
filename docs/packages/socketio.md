@@ -445,7 +445,19 @@ SocketIoServer(
 | `cors` | `null` | CORS headers for polling requests. With a list of origins, it also checks the origin of websockets |
 | `allowedOrigins` | `null` | the sites that may connect, see [Allowed origins](#allowed-origins) |
 | `allowRequest` | `null` | accepts or refuses each request, see [Allow requests and limit sessions](#allow-requests-and-limit-sessions) |
-| `maxSessions` | `null` | the most open sessions per isolate |
+| `maxSessions` | `null` | the most open sessions per isolate. Set it in production |
+| `maxAttachmentBytes` | `null` | the most bytes of all binary parts of one packet. A bigger packet closes the client |
+| `maxAuthSize` | `null` | the most bytes of the `auth` payload of a connect. A bigger one gets `connect_error` (`auth payload too large`) |
+| `maxWriteBufferSize` | `null` | the most bytes kept for a client that does not read, like a polling client that stopped. Above it, the session closes |
+| `ackTimeout` | `null` | the default timeout of `emitWithAck`. With `null`, it waits until the client answers or leaves |
+
+### Waiting for acks
+
+`socket.waitingAcks` is the number of acks a socket still waits for. Use it to see a client that never answers:
+
+```dart
+int waiting = socket.waitingAcks;
+```
 
 ### Allowed origins
 
@@ -475,7 +487,7 @@ SocketIoConfig socketIoConfig = SocketIoConfig(
 );
 ```
 
-When `allowRequest` gives `false` or throws, the client gets `403`. At the limit, a new handshake gets `503` and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times `maxSessions`.
+When `allowRequest` gives `false` or throws, the client gets `403`. At the limit, a new handshake gets `503` and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times `maxSessions`. Without `maxSessions`, every GET request makes a session that lives about 45 seconds, so Dox logs one warning at start.
 
 ## Without Dox
 
