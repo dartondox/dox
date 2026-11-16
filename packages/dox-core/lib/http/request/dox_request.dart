@@ -41,7 +41,10 @@ class DoxRequest implements IDoxRequest {
   /// the request method, so a HEAD request on a GET route says HEAD
   late String method = httpRequest.method.toUpperCase();
 
-  Map<String, dynamic> body;
+  /// The body map. For a request with no body it is made on first use.
+  Map<String, dynamic> get body => _body ??= requestBody.map;
+  set body(Map<String, dynamic> value) => _body = value;
+  Map<String, dynamic>? _body;
 
   /// the route params, eg. `{'id': '5'}`. each request has its own map.
   late Map<String, dynamic> param = _params ?? <String, dynamic>{};
@@ -123,7 +126,7 @@ class DoxRequest implements IDoxRequest {
   DoxRequest({
     required this.route,
     required this.uri,
-    required this.body,
+    Map<String, dynamic>? body,
     this.contentType,
     String? clientIp,
     String scheme = 'http',
@@ -134,7 +137,10 @@ class DoxRequest implements IDoxRequest {
     this._params,
   }) : _givenIp = clientIp,
        _givenScheme = scheme,
-       requestBody = requestBody ?? RequestBody(body);
+       _body = body,
+       requestBody =
+           requestBody ??
+           (body == null ? RequestBody.empty() : RequestBody(body));
 
   /// get route identifier
   @override

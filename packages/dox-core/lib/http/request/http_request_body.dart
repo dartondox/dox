@@ -31,19 +31,28 @@ enum BodyKind {
 /// The body of a request, read once.
 class RequestBody {
   RequestBody(
-    this.map, {
+    Map<String, dynamic> map, {
     this.kind = BodyKind.none,
     this.json,
     this.text,
     this.parts,
-  });
+  }) : _map = map;
 
-  /// An empty body.
-  RequestBody.empty() : this(<String, dynamic>{});
+  /// An empty body. Its map is made on the first read of [map], so a
+  /// request with no body (most GETs) makes no map. Each body has its own
+  /// map, never a shared one, because apps write into it.
+  RequestBody.empty()
+    : _map = null,
+      kind = BodyKind.none,
+      json = null,
+      text = null,
+      parts = null;
+
+  Map<String, dynamic>? _map;
 
   /// The body as a map (`req.body`). A repeated form key keeps the last
   /// value. Bracket keys nest: `tags[]=a&tags[]=b` gives a list.
-  final Map<String, dynamic> map;
+  Map<String, dynamic> get map => _map ??= <String, dynamic>{};
 
   final BodyKind kind;
 
@@ -56,6 +65,10 @@ class RequestBody {
   /// The parts of a multipart body, in order, with repeated keys.
   final List<MapEntry<String, Object>>? parts;
 }
+
+/// For tests only (not exported): false while an empty body has not made
+/// its map yet.
+bool debugBodyMapMade(RequestBody body) => body._map != null;
 
 class HttpBody {
   /// header text => its parsed type. Most apps get a few types again and
