@@ -290,6 +290,7 @@ In JSON logs, the tag is the `source` field.
 - `unsigned_payload: true` on an S3 disk skips the body hash (HTTPS only). See [File storage](/latest/digging-deeper/file-storage/).
 - Socket.IO opt-in limits: `maxAttachmentBytes`, `maxAuthSize`, `maxWriteBufferSize` and `ackTimeout`. See [Socket.IO](/latest/packages/socketio/).
 - ioredis: `maxQueuedCommands` (opt-in) caps the commands that wait for a connect.
+- A `redis` cache store takes `'options': RedisOptions(...)`, so every ioredis option works there too, like `commandTimeout` or `onError`. Sessions and rate limits on Redis use this store. See [Cache](/latest/digging-deeper/cache/).
 - The queue worker warns once when a job may run longer than `retryAfter`. Then a second worker could take the same job while the first one still runs it.
 - `NativeWebSocket.pingInterval` now works.
 
