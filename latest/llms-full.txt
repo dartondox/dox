@@ -2472,7 +2472,9 @@ Source: https://dartondox.dev/latest/concepts/dart-frameworks/
 
 # Dox and the other Dart backends
 
-This page compares Dox with four other ways to build a backend in Dart: Dart Frog, Serverpod, Shelf (with `shelf_router`) and Alfred.
+For a shorter guide with a "how to choose" part, read the blog post [Dart backend frameworks: how to choose](https://dartondox.dev/blog/dart-backend-frameworks-how-to-choose/).
+
+This page compares Dox with five other ways to build a backend in Dart: Dart Frog, Serverpod, Shelf (with `shelf_router`), Vania and Alfred.
 
 Each project is good at different things, so this page lists facts only and helps you pick the one that fits your app.
 
@@ -2485,36 +2487,40 @@ Each project is good at different things, so this page lists facts only and help
 - **Dart Frog** is a small backend framework built on Shelf. Routes come from the files in the `routes/` folder. It describes itself as "a fast, minimalistic backend framework for Dart".
 - **Serverpod** is a full-stack framework for Flutter. You write endpoint methods on the server, and Serverpod generates a typed Dart client for the Flutter app. It has an ORM, auth, streaming and a hosted service (Serverpod Cloud).
 - **Shelf** is the request and middleware model from the Dart team. It is a library, not a framework. `shelf_router` adds a router, and you pick every other part yourself.
+- **Vania** is a full backend framework. Its core has routes, validation, an ORM, migrations, sessions, a cache, mail and storage. Auth, OpenAPI and WebSocket rooms come as add-on packages. It works with MySQL, Postgres and MongoDB.
 - **Alfred** is a small server in the style of Express.js. Routes, middleware, WebSocket and static files are built in.
 
 ## Feature table
 
 "Not built in" means the project does not ship it, but you can still add a package for it.
 
-| Feature | Dox | Dart Frog | Serverpod | Shelf + shelf_router | Alfred |
-| --- | --- | --- | --- | --- | --- |
-| Routing | Route classes: `Route.get(...)`, groups, resources, domain routes | Routes from files in `routes/`, dynamic and nested routes | Endpoint classes become typed client methods. A separate web server (Relic) has its own routing. | `Router()` with `<param>` patterns, nested routers | Express-like, `:id:int` params with types or regex |
-| Typed request validation | `@Dto` classes, checks generated at build time, `422` with errors | Not in their feature list (see their docs) | Typed, generated parameters for endpoints. Rules: see their docs. | Not built in | Route params only (type or regex) |
-| ORM and relations | `dox_orm`: models, has one, has many, belongs to, many to many | Not built in | Built in: filters, joins, one-to-one, one-to-many, many-to-many | Not built in | Not built in |
-| Migrations | `dox migrate` (SQL or Dart files) | Not built in | Built in, versioned migrations | Not built in | Not built in |
-| Auth | `dox_auth`: JWT and session guards. Password hashing (`Hash`) is in `dox_core`. | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs |
-| WebSocket | A Socket.IO v4 server (`dox_socketio`) and raw `Route.websocket` | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in |
-| OpenAPI | Generated OpenAPI 3.1 (JSON, YAML) and a docs page | On their roadmap, not done | See their docs | See their docs | See their docs |
-| CLI and code generation | `dox` CLI, `build_runner` for DTOs, models and OpenAPI | `dart_frog` CLI: `create`, `dev` (hot reload), `build` | `serverpod` CLI, generates server and client code | No CLI (`shelf_router_generator` for routes from annotations) | No CLI |
-| Native binary | `dox build` makes an AOT binary | `dart_frog build` makes a production build with a Dockerfile | Deploy to Serverpod Cloud, Docker or Terraform. Binary: see their docs. | Your app is plain Dart. Compile it like any Dart program. | Your app is plain Dart. Compile it like any Dart program. |
-| Multi-core | One isolate per CPU core by default | See their docs | One isolate per process. Scale with more processes and server roles. | `serve(..., shared: true)` and your own isolates | Yes, a multi-isolate mode is in their README |
-| HTTP server | Native server in Rust, also for WebSocket | Shelf on `dart:io` | Relic (their own) for the web server. API server: see their docs. | `dart:io` `HttpServer` (`shelf_io`) | `dart:io` |
-| Databases | Postgres, MySQL, MariaDB, SQLite | Not built in | Postgres, SQLite (also SQLite on the device). Redis for cache. | Not built in | Not built in |
-| Code sharing with Flutter | `@Dto` classes in a pure Dart package, see [Share code with Flutter](../guides/share-code-with-flutter.md) | Plain Dart packages. A generated client is marked "in progress" in their feature list. | Generated client package, and shared packages for models | Plain Dart packages | Plain Dart packages |
-| License | MIT | MIT | BSD-3 for most packages. The main `serverpod` package is SSPL. | BSD-3-Clause | MIT for the core. Some parts BSD. |
-| First release and maturity | New (2026) | First on pub.dev in 2022, 1.0 about three years ago | First on pub.dev in 2021, now 4.x | First on pub.dev in 2014, 1.0 in 2021 | First on pub.dev in 2021, 1.x |
-| Maintenance (on 2026-10-22) | Active | Active. Moved to the `dart-frog-dev` group in 2025. Last `dart_frog` release: 1.2.6 (November 2025). | Active. Release 4.0.4 in October 2026. | Active. Published by `tools.dart.dev` (the Dart team). | Last release 1.1.3, about 17 months ago. Unverified uploader. |
+| Feature | Dox | Dart Frog | Serverpod | Shelf + shelf_router | Alfred | Vania |
+| --- | --- | --- | --- | --- | --- | --- |
+| Routing | Route classes: `Route.get(...)`, groups, resources, domain routes | Routes from files in `routes/`, dynamic and nested routes | Endpoint classes become typed client methods. A separate web server (Relic) has its own routing. | `Router()` with `<param>` patterns, nested routers | Express-like, `:id:int` params with types or regex | `Router.get(...)`, groups, prefixes, constraints, resource routes |
+| Typed request validation | `@Dto` classes, checks generated at build time, `422` with errors | Not in their feature list (see their docs) | Typed, generated parameters for endpoints. Rules: see their docs. | Not built in | Route params only (type or regex) | Rules in strings (`'required\|email'`), fluent rules and `FormValidation` classes. Not typed classes. |
+| ORM and relations | `dox_orm`: models, has one, has many, belongs to, many to many | Not built in | Built in: filters, joins, one-to-one, one-to-many, many-to-many | Not built in | Not built in | Built in: models, one-to-one, one-to-many, many-to-many, polymorphic |
+| Migrations | `dox migrate` (SQL or Dart files) | Not built in | Built in, versioned migrations | Not built in | Not built in | Built in, versioned migrations (`vania migrate`) |
+| Auth | `dox_auth`: JWT and session guards. Password hashing (`Hash`) is in `dox_core`. | `dart_frog_auth`: Basic, Bearer and Cookie middleware | Built in: email and password, Google, Apple, GitHub, passkeys and more | Not built in | See their docs | `vania_auth`: JWT, guards, personal access tokens, gates |
+| WebSocket | A Socket.IO v4 server (`dox_socketio`) and raw `Route.websocket` | `dart_frog_web_socket` (`webSocketHandler`) | Streaming methods over a managed WebSocket | `shelf_web_socket` | Built in | Built in. `vania_websocket` adds rooms and presence. |
+| OpenAPI | Generated OpenAPI 3.1 (JSON, YAML) and a docs page | On their roadmap, not done | Not built in (third-party packages exist) | See their docs | See their docs | `vania_swagger`: OpenAPI 3.1 and Swagger UI |
+| CLI and code generation | `dox` CLI, `build_runner` for DTOs, models and OpenAPI | `dart_frog` CLI: `create`, `dev` (hot reload), `build` | `serverpod` CLI, generates server and client code | No CLI (`shelf_router_generator` for routes from annotations) | No CLI | `vania` CLI: `create`, `serve` (hot reload), `make:*`, `migrate`, `build` |
+| Native binary | `dox build` makes an AOT binary | `dart_frog build` makes a production build with a Dockerfile | Deploy to Serverpod Cloud, Docker or Terraform. Binary: see their docs. | Your app is plain Dart. Compile it like any Dart program. | Your app is plain Dart. Compile it like any Dart program. | `vania build` makes a native binary |
+| Multi-core | One isolate per CPU core by default | See their docs | One isolate per process. Scale with more processes and server roles. | `serve(..., shared: true)` and your own isolates | Yes, a multi-isolate mode is in their README | `APP_ISOLATES` runs more isolates (since 2.1.0) |
+| HTTP server | Native server in Rust, also for WebSocket | Shelf on `dart:io` | Relic (their own, 2.0 in November 2026) for the web server. API server: see their docs. | `dart:io` `HttpServer` (`shelf_io`) | `dart:io` | `dart:io` |
+| Databases | Postgres, MySQL, MariaDB, SQLite | Not built in | Postgres, SQLite (also SQLite on the device). Redis for cache. | Not built in | Not built in | MySQL, MariaDB, Postgres, MongoDB (a driver package for each) |
+| Code sharing with Flutter | `@Dto` classes in a pure Dart package, see [Share code with Flutter](../guides/share-code-with-flutter.md) | Plain Dart packages. A generated client is marked "in progress" in their feature list. | Generated client package, and shared packages for models | Plain Dart packages | Plain Dart packages | Plain Dart packages |
+| License | MIT | MIT | BSD-3 for most packages. The main `serverpod` package is SSPL. | BSD-3-Clause | MIT for the core. Some parts BSD. | MIT |
+| First release and maturity | First on pub.dev in 2023, 3.0 in October 2026 | First on pub.dev in 2022, 1.0 in 2023 | First on pub.dev in 2021, now 4.x | First on pub.dev in 2014, 1.0 in 2021 | First on pub.dev in 2021, 1.x | First on pub.dev in 2024, now 2.x |
+| Maintenance (on 2026-11-17) | Active | Active. Moved to the `dart-frog-dev` group in 2025. Last `dart_frog` release: 1.2.6 (November 2025). | Active. Release 4.1.2 in November 2026. | Active. Published by `tools.dart.dev` (the Dart team). | Last release 1.1.3, in May 2025. Unverified uploader. | Active. Release 2.1.0 in October 2026. |
+
+Facts checked on 2026-11-17.
 
 Sources:
 
 - Dart Frog: [dart-frog.dev](https://dart-frog.dev), [github.com/dart-frog-dev/dart_frog](https://github.com/dart-frog-dev/dart_frog) (docs in `docs/src/content/docs`, the roadmap and "The Future of Dart Frog"), [pub.dev/packages/dart_frog](https://pub.dev/packages/dart_frog)
 - Serverpod: [docs.serverpod.dev](https://docs.serverpod.dev), [github.com/serverpod/serverpod](https://github.com/serverpod/serverpod), [github.com/serverpod/serverpod_docs](https://github.com/serverpod/serverpod_docs) (scalability, streaming, shared packages, database connection), [pub.dev/packages/serverpod](https://pub.dev/packages/serverpod)
 - Shelf: [pub.dev/packages/shelf](https://pub.dev/packages/shelf), [pub.dev/packages/shelf_router](https://pub.dev/packages/shelf_router), [github.com/dart-lang/shelf](https://github.com/dart-lang/shelf), [`serve` API docs](https://pub.dev/documentation/shelf/latest/shelf_io/serve.html)
+- Vania: [vdart.dev/docs](https://vdart.dev/docs/intro), [github.com/vania-dart/framework](https://github.com/vania-dart/framework) (README and CHANGELOG), [pub.dev/packages/vania](https://pub.dev/packages/vania)
 - Alfred: [pub.dev/packages/alfred](https://pub.dev/packages/alfred), [github.com/rknell/alfred](https://github.com/rknell/alfred)
 
 ## Speed
@@ -2813,7 +2819,7 @@ python3 -m venv .venv
 .venv/bin/mkdocs build --strict  # the same build as CI. Broken links fail.
 ```
 
-`hooks/docs_hooks.py` runs during the build. It makes the changelog page from `packages/*/CHANGELOG.md`, and writes `llms.txt` and `llms-full.txt`.
+`hooks/docs_hooks.py` runs during the build. It writes `llms.txt` and `llms-full.txt`.
 
 Every pull request that changes the docs runs the `Docs check` workflow (`.github/workflows/docs-check.yaml`). It has three checks:
 
@@ -29489,7 +29495,7 @@ These are short pages to look things up: config fields, commands, env vars, erro
 | [Cheat sheet](cheat-sheet.md) | one page of the code you use every day, with links to the full pages |
 | [Production checklist](production-checklist.md) | what to check before you deploy, and what Dox does not do for you |
 | [Error index](errors.md) | every message Dox prints or throws, when it happens and what to do |
-| [Changelog](changelog.md) | what changed in each package, newest first |
+| [Changelog](changelog.md) | what changed in `dox_core`, newest first |
 
 
 ---
@@ -32180,935 +32186,187 @@ Source: https://dartondox.dev/latest/reference/changelog/
 
 # Changelog
 
-What changed in each package, newest first. This page is made from the
-`CHANGELOG.md` files in the repo when the docs are built.
+What changed in `dox_core`, newest first. Each version lists the changes you may notice in your app. The full list, with every detail, is in [`CHANGELOG.md`](https://github.com/dartondox/dox/blob/main/packages/dox-core/CHANGELOG.md).
 
-## dox_annotation
+## 3.2.2
 
-### 3.2.0
+### New
 
-- New: `package:dox_annotation/install.dart` with `Installer`, the steps of a `<package>:install` command that `dox add` runs. `writeFile` (only when the file is not there), `makeFolder`, `addEnv` (to `.env` and `.env.example`, only when the key is missing), `addEnvGetter` (to `AppEnv` in `lib/config/env.dart`), `addDependency` (`dart pub add`, also `dev`), `buildRunner`, `note` (add your own summary line) and `printSummary`. `lines` is read only. Every step is safe to run twice. It is not in the `dox_annotation.dart` barrel.
-- New: `DoxProvider.boot()`. It runs once in every isolate after `setup()` of every provider is done. Optional, the default does nothing. dox_queue starts its in-process worker there, so the other providers (eg. the mail jobs) are ready first.
-- New: `package:dox_annotation/provider.dart` with `DoxProvider`. It moved here from `dox_core`, so a package below `dox_core` can have a provider. It is not in the `dox_annotation.dart` barrel.
-- New: `package:dox_annotation/command.dart` with `Command` and `MigrationFile`. They moved here from `dox_core`, so a package below `dox_core` can add `dox` commands.
-- New: `GlobalMiddleware`, a small shared list that packages use to add global middleware at startup. A package that does not depend on `dox_core` can use it. `GlobalMiddleware.clear()` is for tests.
+- `Dox().compute(task)` runs heavy CPU work (a PDF, an image, a big JSON file) on a worker isolate. The server keeps answering other requests in the meantime. `AppConfig.computeWorkers` sets the number of workers (default 4).
+- Strict mode for development: `AppConfig(strict: StrictConfig(enabled: true))`. It warns when a route blocks the isolate too long, or when `Hash.make` runs in the web server. Off by default.
+- Log lines have a tag that says where they come from: `[request]`, `[server]`, `[error]` or `[app]`. Pass your own tag as the third argument: `Logger.info('done', null, 'billing')`.
+- `CoreFlags.rateLimitIpv6Prefix` counts an IPv6 client by its /64 prefix. Off by default.
 
-### 3.1.3
+### Changed
 
-- Version bump only, to match the other packages.
+- `Hash.makeAsync` and `Hash.verifyAsync` use the `Dox().compute` workers. Before, each call started a new isolate.
+- The stderr warnings use the same tags. `dox: warning:` and `[dox]` are now `[server]` or `[request]`.
 
-### 3.1.2
+### Fixed
 
-- Version bump only, to match the other packages.
+- Sessions with the `cache` driver on a `memory` store were kept per isolate, so users were logged out at random. They are now shared by all isolates.
+- A slow handler could lose its upload temp file when the client left early.
+- An error after a stream started (like server-sent events) wrote `Internal Server Error` into the stream. Now the stream just ends.
+- A cut multipart upload kept the request open for ever. Now it gets 400.
+- `AfterResponse` work could start before the handler ended, or never run after a sync throw.
 
-### 3.1.1
+### Security
 
-- Version bump only, to match the other packages.
+- The `RateLimit` counter without Redis now keeps at most 100,000 clients, so many fake IPs can not fill the memory.
 
-### 3.1.0
+### Performance
 
-- New: `id()` on `IAuth`, so `req.auth?.id()` works. It gives the primary key of the logged-in user from the `id()` of the auth class (like `Auth().id()` of `dox_auth`), or null. It is an extension (`IAuthHelpers`), so a class that implements `IAuth` does not need to change. For a guest, `req.auth` is null.
+- Faster and lighter requests: lazy request body, lazy cookie session, fewer header reads, a smaller JSON buffer, faster route matching and `RateLimit` on Redis in one round trip.
 
-### 3.0.2
+## 3.2.1
 
-- Removed: `ICacheDriver` and `IStorageDriver`. Nothing used them. For a cache driver, use `CacheDriver` from `dox_cache`.
-- Tests for `IHttpException.toResponse()`.
+### New
 
-### 3.0.1
+- `AppConfig.isDevelopment` is true when `APP_ENV` is `development`.
+- `Env.appEnv` gives `APP_ENV` in lower case.
 
-- Version bump only, to match the other packages.
+### Fixed
 
-### 3.0.0
+- `Env.get` as the first env read of the app did not see `.env`. Now every env read loads `.env` first.
+- In `.env`, `KEY=#value` was read as empty. Now it keeps `#value`.
+- A value with only spaces now gives the default.
 
-- The first stable release.
+### Security
 
-### 3.0.0-rc.1
+- An env error no longer prints the bad value, because it may be a secret.
+- The `APP_KEY` check refuses more public sample keys. If your key is one of them, run `dox key:generate`.
 
-- `IDoxRequest.auth` is now a field (getter and setter), not only a getter. The auth is kept apart from the input.
+## 3.2.0
 
-### 3.0.0-alpha.17
+### Breaking
 
-- Version bump only, to match the other packages.
+- The JSON lines of `Logger` and `LogMiddleware` use standard log field names (Datadog). `level` is now `status`. `LogMiddleware` also renames `source_ip` to `network.client.ip` and `request_id` to `http.request_id`.
+- `Command`, `MigrationFile` and `DoxProvider` moved to `dox_annotation`. `dox_core` still exports them. Upgrade `dox_builder` together with `dox_core`.
 
-### 3.0.0-alpha.16
+### New
 
-- Version bump only, to match the other packages.
+- `CoreFlags`: opt-in behaviors, all off by default. Pass them as `AppConfig(flags: ...)`. `CoreFlags.all()` turns on every flag. See [App config](app-config.md).
+- `CoreFlags.envExpand` lets `.env` values use `${OTHER}`. `export KEY=value` lines now work too.
+- `RateLimit(sliding: true)` uses a sliding window.
+- `AppConfig(htmlErrors: true)` sends an HTML error page to browsers. Errors stay JSON by default.
+- Providers get a `boot()` step that runs after every `setup()`.
+- `Dox().addGlobalMiddleware()` lets a provider add global middleware.
+- `Dox().isWebServer` is true only in the web server process.
+- `Dox().loadRoutes()` gives the app routes without a server. `dox route:list` uses it.
+- `Route.resource(..., parameter: 'photo')` names the item param.
+- `route()` and `Route.url()` take `absolute: true`, and put unknown params in the query string.
+- A cache store with `'encrypt': true` encrypts its values with `APP_KEY`.
+- `ServerTiming` middleware adds a `Server-Timing` header.
+- `AfterResponse.run(work)` runs work after the response is sent.
+- `session.regenerate(keepToken: true)` keeps the CSRF token.
+- `dox_core` exports the `JSON` helper.
+- An AI agent skill (`dox-core-guide`). Install it with `dart run skills@ get`.
 
-### 3.0.0-alpha.15
+### Changed
 
-- Version bump only, to match the other packages.
+- `Logger` writes lines in batches, not one `print()` per line. Warnings and errors are written at once.
+- `LogMiddleware` writes through `Logger` and follows `LoggerConfig`.
 
-### 3.0.0-alpha.14
+### Fixed
 
-- New: `@Security.bearer(format: 'API key')` and `@Security.apiKey(header: 'X-API-Key')`. Put it above a middleware class to show its login scheme in the OpenAPI docs.
+- `Route.group` and the other route scopes now restore their state when the callback throws.
+- `Dox().stop()` could keep the process alive.
 
-### 3.0.0-alpha.13
+## 3.1.3
 
-- Version bump only, to match the other packages.
+### New
 
-### 3.0.0-alpha.12
+- `IsolateBus` sends a message to all isolates of the app, with no Redis.
+- `Dox().isolateCount` gives the number of running isolates.
 
-- Version bump only, to match the other packages.
+## 3.1.2
 
-### 3.0.0-alpha.11
+### Changed
 
-- Version bump only, to match the other packages.
+- Uses `dox_validation` 3.1.2, so `@Describe('...')` works on DTO fields.
 
-### 3.0.0-alpha.10
+## 3.1.1
 
-- Version bump only, to match the other packages.
+### New
 
-### 3.0.0-alpha.9
+- `Hash.sha256(value)`, to store API keys and tokens as a hash. Not for passwords.
+- `ValidationException.issues` keeps every issue, so you can build your own 422 body.
+- `Cache().flexible` takes a null `stale`.
+- `RequestBody` and `BodyKind` are exported, to tell invalid JSON from no body.
 
-- New: `@Inject()`. Put it above a class and `dox_builder` adds the class to the Dox container. `@Inject(singleton: false)` makes a new instance each time.
+## 3.1.0
 
-### 3.0.0-alpha.8
+### Breaking
 
-- Version bump only, to match the other packages.
+- Without Redis, `RateLimit` counts are shared by all isolates. Before, the real limit was `max` times the number of isolates. Raise `max` if you relied on that.
+- When two `Route.mount` prefixes match, the longest one wins. Before, the first one won.
+- Removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
 
-### 3.0.0-alpha.7
+### New
 
-- Breaking: `IDox`, `IDoxWebsocket` and `WebsocketEvent` are removed. They were only used by `dox_websocket`.
+- Routes: `Route.match`, `Route.any`, `Route.redirect`, `Route.permanentRedirect`, `Route.fallback` and `.where(param, regex)`.
+- `Route.staticFiles(prefix, folder)` serves CSS, JS and images, with `ETag`, `304` and Range support.
+- `MethodOverride` middleware, so an HTML form can send PUT, PATCH and DELETE.
+- Request helpers: `input` with dot keys and a default, `filled`, `exists`, `missing`, `except`, `boolean`, `integer`, `file`, `hasFile`, `bearerToken`, `path`, `fullUrl`, `pathIs` and `routeIs`.
+- `Crypt.encryptString` and `Crypt.decryptString`, with the `APP_KEY`.
+- `Hash.check`, the same as `Hash.verify`.
+- `Cache().many` and `Cache().putMany`.
+- `Route.mount(..., middleware: true)` runs the global middleware before the raw handler.
+- `SessionMiddleware().fromCookie(value)` loads a session with no request, for a Socket.IO login.
+- `package:dox_core/command.dart` lets a package add its own `dox` commands.
+- `AppConfig.idleTimeout` and `AppConfig.maxConnections`.
+- `Route.websocket(maxMessageSize:)`.
+- A warning in development when a middleware returns `null`.
 
-### 3.0.0-alpha.6
+### Fixed
 
-- Version bump only, to match the other packages.
+- `res.withHeaders` dropped the headers set before it.
+- `res.header` added a second value instead of replacing one.
+- A mounted handler that threw left the client hanging.
+- `Route.mount('/admin')` also matched `/administrator`.
+- Static files added before `startServer()` worked only in one isolate.
+- Many smaller router, OpenAPI and session fixes.
 
-### 3.0.0-alpha.5
+### Security
 
-- New `timestamps` option on `@DoxModel`. `timestamps: false` turns off `created_at` and `updated_at`, like `$timestamps = false` in Laravel. `createdAt: null` or `updatedAt: null` turns off one of them.
-- New `primaryKeyType` option on `@DoxModel`. Use `primaryKeyType: String` for a UUID key. The default is `int`.
-- Fix: `IHttpException.toResponse()` now returns `{"code": errorCode, "message": message}` for a text message, so the client gets the `errorCode`. A `Map` message is returned as it is.
+- `.where` now checks a param again after `%` decoding. Before, `%2F` could slip `../` past it.
+- `req.pathIs()` now cleans the path like the router does, so `/admin//` can not skip a guard.
+- `back()` only follows a `Referer` of the same host. It was an open redirect.
+- WebSocket routes can check the `Origin` header: `Route.websocket(allowedOrigins: [...])`.
 
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- OpenAPI annotations, all optional: `@Summary`, `@Description`, `@Tags`, `@Request`, `@Body`, `@Query`, `@Response`, `@ApiDeprecated`, `@ApiIgnore`, `@DoxController`. Lower case names work too (`@summary(...)`), except `@Response`.
-- The DTO annotations (`@Dto`, `@Length`, `@Email`, ...) live in `dox_validation`. `dox_core` exports them.
-- `IDoxRequest` has no `validate()` and no `processInputMapper()` any more. Use a DTO.
-- Breaking (small): these names are exported by `dox_core` too. If a file also imports a package with a `Request` or `Response` class (like `package:http`) without a prefix, add a prefix to that import.
-- New `@DoxEnv()` and `@EnvKey('X')` for the typed env class.
-
-### 3.0.0-alpha.1
-
-- Version 3 of Dox. All Dox packages now share one version.
-- Needs Dart 3.6 or newer.
-- See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
-
-## dox_builder
-
-### 3.2.2
-
-- Faster: a model gets a `$columnValue(column)` method, a switch that gives one value of `columnsToMap()` without making the whole map. dox_orm reads the relation keys of each row with it. It is made only when the dox_orm of the app has `Model.$columnValue`, so the code still compiles with an older dox_orm. A column with `beforeSave` is not in the switch: it falls back to `columnsToMap()`. A model with its own `columnsToMap()` gets no switch.
-- Faster: `fromMap()` read a date column from the row map two or three times. It now reads it once. The result is the same. Run `dart run build_runner build` to get the new code.
-
-### 3.2.1
-
-- New: a default that reads the global `env` (like `env.appEnv`) stopped the app with a stack overflow. Now `load()` throws a clear `StateError` that says to use the getter directly.
-- Fix: a run of capitals in an env getter name is one word now. `dbURL` read `DB_U_R_L`, now it reads `DB_URL`. Also `jwtTTL` => `JWT_TTL` and `httpURLPath` => `HTTP_URL_PATH`. Names like `s3Bucket` and `oauth2ClientId` do not change. If your `.env` has a key like `DB_U_R_L`, rename it, or use `@EnvKey('DB_U_R_L')`.
-- Fix: `@EnvKey` through a const variable (`const k = EnvKey('X');` then `@k`) was ignored. Now it is read.
-- Fix: an env getter named `r` or `reader` made `env.g.dart` fail to compile. The generated `load()` now uses `$r` and `$reader`.
-- Fix: an instance field in a `@DoxEnv()` class was not read from the env, with no warning. Now it is a build error that says to use a getter.
-- Fix: in a `@DoxEnv()` class, a getter body that uses another getter saw the default of that getter, not the loaded value. So `String get appUrl => 'http://localhost:$appPort';` gave port 3000 even with `APP_PORT=4000`. Now a getter body runs on the loaded env and sees the real values. A key that is set still wins over the body. A default that throws still stops the app in `load()`. Run `dart run build_runner build` to get the new `env.g.dart`.
-
-### 3.2.0
-
-- New: the job builder moved here from dox_queue. It writes `lib/generated/jobs.g.dart` with every `@Job()` class, the same file as before. It runs only in an app that has dox_queue in `dependencies` or `dev_dependencies`. (When the build can not read the app's `pubspec.yaml`, it runs when the app can import dox_queue.) If your `build.yaml` names the builder `dox_queue:jobs`, change it to `dox_builder:jobs`.
-- Breaking: this dox_builder needs dox_queue 3.2 or newer. With dox_queue 3.1, both packages have a builder for `jobs.g.dart`, and `build_runner` stops at start with "outputs collide". Run `dart pub upgrade` to move both together. An app that must stay on dox_queue 3.1 turns off the new builder, and the dox_queue 3.1 builder keeps making the file:
-  ```yaml
-  # build.yaml of the app
-  targets:
-    $default:
-      builders:
-        dox_builder:jobs:
-          enabled: false
-  ```
-- New: when the app can import dox_mailer, `jobs.g.dart` also lists the mail jobs of `Mail.queue()` (`SendQueuedMail` and `SendEncryptedQueuedMail`). So the worker can read them before `Mail.configure()` runs. The saved job names do not change. A dox_mailer without these classes (3.1) gets no mail lines.
-- Finds `DoxProvider` classes from `dox_annotation`. Release it together with `dox_annotation` and `dox_core`. An app must upgrade dox_builder together with dox_core, or its providers are not found.
-- New: the OpenAPI schema of a model reads `visibleFields`, like `hidden`: with a list, only its keys are in the schema. Needs the next dox_orm for `toJson()` to match.
-- New: `onTrashed()` counts as a model hook, so a model with only that hook gets `hasModelHooks`. Needs the next dox_orm.
-- New: models get `$copyColumnsFrom()`. It copies every column field from another model of the same class. `refresh()` in the next dox_orm uses it, so it works for columns with a cast or a `beforeGet`. Nothing else calls it, so reads and saves do no extra work.
-- New: models read `@HasManyThrough` and `@HasOneThrough`. Needs the next dox_orm.
-- New: DTOs read `@Dto(trim: true)`, `@Dto(coerce: true)` and `@Dto(attributes: {...})`. Needs the next dox_validation.
-- New: `@After` and `@Before` take `'today'`, `'tomorrow'`, `'yesterday'` and the input key of another `DateTime` field. New `@AfterOrEqual` and `@BeforeOrEqual`. A text that is not a date, a word or a `DateTime` field stops the build. The words and fields work with any dox_validation. `@AfterOrEqual` and `@BeforeOrEqual` need the next dox_validation.
-- New: DTOs read `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` and `@ExcludeUnless`. Each one on an always-required field stops the build, like `@RequiredIf`. Needs the next dox_validation.
-- New: the rules `@Different` and the field compare rules check the whole field on a `List` field, not each item. Rules that name another key stop the build when they name a Dart field name in place of the input key.
-- A DTO that uses none of these gets the same code as before.
-- OpenAPI: a controller method that calls `req.authorize(...)` gets a `401` and a `403` answer in the docs. A `@Response` with the same status wins.
-- OpenAPI: a controller method that calls `req.validateSchema(...)`, or `req.validate<T>()` with no request class found, gets a `422` answer. A `@Response(422, ...)` wins. Needs the next dox_core.
-- OpenAPI: a controller method that calls `Gate.authorize(...)` gets a `403` answer in the docs. A `@Response(403, ...)` wins.
-- DTOs: a DTO with no `@RequiredIf` or `@RequiredWith` field (and no nested DTO with one) now writes `usesRequiredWhen => false`. Then the check does not keep each converted value, which saves work. Needs the next dox_validation.
-- New: DTO code reads the DTO flags of `ValidationFlags` at run time: `dtoAllErrors`, `dtoRejectEmptyList` and `dtoMaybeRejectsEmpty`. All are off by default, so the checks work as before. The builder writes this code only when the app's dox_validation has `DtoState.allErrors`. With an older dox_validation it writes the old code, so it still compiles.
-- New: a model `@BelongsTo` field passes its name as `relation:` to `belongsTo()`, for the dox_orm flag `belongsToKeyFromRelation`. The builder writes it only when the app's dox_orm has the `relation:` parameter. With an older dox_orm the code does not change.
-- Fix: `@OrDefault()` on a `Maybe<T>` field no longer stops the build. A bad value gives `Maybe.missing()`.
-- Fix: a nested DTO deeper in lists and maps, like `List<List<A>>` or `Map<String, List<A>>`, now runs its `validate()` and its async rules. Before, only one level (`List<A>`, `Map<String, A>`) was found. So after `build_runner`, an app may now get errors from these deeper DTOs that were skipped before.
+## 3.0.2
 
-### 3.1.3
+### Changed
 
-- Version bump only, to match the other packages.
+- A Redis cache store with no `prefix` uses `<app name>_cache:`. Your old cache keys are not found once after the update. Set `'prefix': 'dox_cache:'` to keep them.
 
-### 3.1.2
+### New
 
-- DTOs: `@Describe('...')` on a field sets `description` in its JSON Schema (the generated `toJsonSchema()` and the OpenAPI docs). It wins over the `///` doc comment. Needs dox_validation 3.1.2.
+- Middleware: `RequestId`, `ETag`, `ValidateSignature` and `RequestTimeout`.
+- Signed urls: `Route.signedUrl(...)`.
+- `IDoxTerminableMiddleware` runs a step after the response is sent.
+- `Cache()` has `flexible` and `touch`.
 
-### 3.1.1
+## 3.0.1
 
-- DTOs: `@Dto(emptyStringsToNull: true)` makes the generated code read `""` as `null` (needs the next dox_validation).
-- DTOs: `@OrDefault()` makes a bad value of that field give its default (or `null`) instead of an error. A field with `@OrDefault()` and no default that is not nullable stops the build.
+### New
 
-### 3.1.0
+- A path with routes, but not for the request method, gives `405` with an `Allow` header. Before, it gave `404`.
+- `abort(code, [message, headers])` for any status.
+- Bracket keys nest: `tags[]=a&tags[]=b` gives a list.
+- `AppConfig(previousKeys: [...])` reads cookies made with an old `APP_KEY`, so a new key does not log users out.
 
-- Fix: the JSON Schema pattern of `@AlphaDash` now allows digits, like the check does (needs dox_validation 3.1.0). The OpenAPI output of a DTO with `@AlphaDash` changes.
-- Fix: in generated DTO code, `@RequiredIf` and `@RequiredWith` now run after all fields are converted. Before, a rule on a field read the raw value of a field that comes after it, like `' PRO '`, not `'pro'` after `@Trim` and `@Lowercase`. Run `build_runner` to get the new code.
-- Fix: `reload()` and preload now set a nullable `@HasOne`, `@BelongsTo`, `@MorphOne` or `@MorphTo` field to null when the related row is gone. Before, the field kept its old value. Run `build_runner` to get the new code.
-- Fix: `reload()` and preload now set a `@HasMany`, `@ManyToMany` or `@MorphMany` field to an empty list when there are no related rows. Before, the field kept its old list. Run `build_runner` to get the new code.
-- Behavior change: a nullable list relation, like `List<Tag>? tags`, is now `[]` (not `null`) after a preload with no rows.
-- DTOs: `@RequiredIf('type', 'company')` and `@RequiredWith(['phone'])` from `dox_validation`. The field is required only when the condition is true. Use them on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops with a clear error.
-- DTOs: the build stops when `@RequiredIf`, `@RequiredWith`, `@Same` or `@Confirmed(other:)` names a Dart field (like `accountType`) instead of its input key (`account_type`). The check would never match. It also stops for a `@DateFormatted` format with a letter it does not know.
-- DTOs: in a `@Dto(strict: true)` class, the key that `@Confirmed` reads (like `password_confirmation`) is not an unknown key.
-- New: DTO file rules `@MinSize('10KB')`, `@MimeTypes(['image/png', 'image/*'])` and `@Dimensions(minWidth:, maxWidth:, minHeight:, maxHeight:, width:, height:, ratio:)`. They need dox_validation 3.1.0 or newer. A bad size or a `@Dimensions()` with no limit stops the build.
-- New: `@ManyToMany(withPivot: [...], withTimestamps: true)` is passed to the ORM, so the relation reads the extra pivot columns. Needs dox_orm 3.1.0 or newer.
-- New: the model builder makes the code for `@MorphMany`, `@MorphOne` and `@MorphTo` (polymorphic relations). A `@MorphTo` field has no model: its type is the field type, like `Model<dynamic>`, and its morph name is the field name in snake_case. The OpenAPI model schema has these relation keys too. Needs dox_orm 3.1.0 or newer.
+### Fixed
 
-### 3.0.2
+- Path params are now URL-decoded.
+- 5xx HTTP exceptions now reach `ExceptionHandler.report`.
+- `req.method` said `GET` for a HEAD request.
 
-- **Breaking: column and JSON keys can change.** Please read this before you update.
-  - Digits are no longer split off. Before, `address2` gave the key `address_2`. Now it gives `address2`.
-  - A name you give is used exactly as written. Before, `@Column(name: 'userID')` gave `user_i_d`. Now it gives `userID`. The same is true for `@Computed(name:)`, and for `primaryKey`, `createdAt` and `updatedAt` in `@DoxModel`.
-  - DTO input keys change the same way: a field `line2` now reads the key `line2`, not `line_2`.
-  - What to do: run `build_runner` and look for changed keys in the generated files. Then rename the column in a migration. Or keep the old key with `@Column(name: 'address_2')` (or `@Name('line_2')` on a DTO field).
-- Fix: types from an import with a prefix (`import 'other.dart' as o;`) keep the prefix in the generated code, like `o.Role`, `List<o.Role>`, `EnumCast(o.Role.values)` and `o.$InnerDto`. Before, the code did not compile. This works in models, DTOs, env classes and scopes.
-- Fix: `@Column(cast: ...)` now works for a model in a `part` file. The cast is read from the AST of the field.
-- Fix: table names, column keys and relation keys are escaped in the generated code (`\`, `'` and `$`).
-- Fix: a private class (like `_AdminRouter` or `@Inject() class _Cache`) is no longer put in `container.g.dart`, where it did not compile. The build shows a warning with the class and file.
-- Fix: container errors now show the file and line of the problem.
-- New: a constructor parameter of an abstract type gets the one container class that implements it. When two or more classes implement it, the build stops and names them.
-- Fix: the OpenAPI builder reads the files in path order, so `openapi.g.dart` does not change between builds.
-- Fix: the OpenAPI builder finds routes with a prefixed dox_core import, like `dox.Route.get(...)`. Only the `Route` class of dox_core counts.
-- Fix: the OpenAPI builder stops with a clear error when two controllers, two `@Security` classes or two schema classes have the same name in two files. Before, one silently replaced the other. Dox finds them by name at runtime, so a new name would not match. Rename one of them.
-- Fix: OpenAPI annotations count only when they come from a Dox package (`package:dox_...`). An app class with the same name, like `Summary`, is no longer read as one.
-- Faster builds: the container, DTO list and OpenAPI builders skip `.g.dart` files. They also look at the text of a file first, and only resolve it when it can hold what they look for.
-- Change: the model, DTO and env builder runs on `lib/` only by default. Before, it also ran on `test/`, `bin/` and `tool/`. A package with models or DTOs in `test/` adds this to its `build.yaml`:
+### Performance
 
-    ```yaml
-    targets:
-      $default:
-        builders:
-          dox_builder:
-            generate_for: ["lib/**", "test/**"]
-    ```
+- Encrypted cookies and sessions are about 100 times faster (AES-GCM in Rust).
 
-### 3.0.1
+## 3.0.0
 
-- Version bump only, to match the other packages.
-
-### 3.0.0
-
-- The first stable release.
-
-### 3.0.0-rc.1
-
-- `lib/generated/dtos.g.dart` is now written for every app, also with no `@Dto`. The list is empty then. So the app can always have `dtos: dtos` in `AppConfig`. An app here is a package that imports `AppConfig` (from dox_core). Other packages with no DTO still get no file. The empty list is `final`, not `const`, so `dtos: dtos` does not trigger the `avoid_redundant_argument_values` lint.
-
-### 3.0.0-alpha.17
-
-- New: models get `setColumnValue(column, value)`. It sets a field by its column name, and returns false when the value is not of the field type. `model.increment()` and `model.decrement()` of dox_orm use it to set the field. The generated code needs the dox_orm that has `Model.setColumnValue()`. Run build_runner again after you update.
-
-### 3.0.0-alpha.16
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.15
-
-- Change: the container builder finds every class that extends `DoxProvider` and writes `c.provider<...>` for it.
-
-### 3.0.0-alpha.14
-
-- New: the openapi builder reads `@Security` on middleware classes and writes them to `OpenApiRegistry.security`.
-
-### 3.0.0-alpha.13
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.12
-
-- Fix: a route inside `Route.group('/web-auth', registerWebAuth)` lost the group prefix when the callback was a method or function, not a closure. The builder now reads that method with the prefix, also for nested groups. The route call in `openapi.g.dart` now has the full path, like `/web-auth/login`.
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- The app-wide files are now written to `lib/generated/`: `lib/generated/container.g.dart`, `lib/generated/dtos.g.dart` and `lib/generated/openapi.g.dart`. This keeps them out of the top of `lib/`. Import them from `package:<app>/generated/...`. Delete the old files in `lib/` after you run `dart run build_runner build`.
-- Model part files (like `user.model.g.dart`) still sit next to their source file.
-
-### 3.0.0-alpha.9
-
-- New: `lib/container.g.dart` builder. It finds every `@Inject()` class, every class that extends `Router`, every class that implements `DoxService` and every `@DoxModel` in `lib/`. It writes `registerContainer(IocContainer c)`, which makes each class with its constructor. Constructor parameters come from the container by type. Optional parameters that the container can not give keep their default. Required nullable ones get `null`.
-- The build stops with a clear message for a required parameter the container can not give, for a dependency cycle (it shows the chain, like `A -> B -> A`), and for an abstract or generic `@Inject()` class. Two classes with the same name work: every import has a prefix.
-- OpenAPI: typed routes (`Route.get<C>(path, (C c) => c.method)`) and `Route.resource(path, ControllerClass)` are read too.
-- Generates the query scopes: an extension with one method for each `@Scope()` method, and `globalScopes` for `@Scope(global: true)`.
-- Generates the column casts: `fromMap()` and `columnsToMap()` use the `cast` of `@Column()`. `bool` and enum fields get a cast without `cast`.
-- Run `dart run build_runner build` to get the new code.
-
-### 3.0.0-alpha.8
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.7
-
-- The generated `fromMap()` takes a `DateTime` from the driver as it is. It only parses a string.
-- New generated `columnsToMap()` with the columns only. `convertToMap()` adds the relations to it.
-- Models with no `beforeGet` hook get `readsRowDates => true`, so their rows skip the date to string step. A `beforeGet` hook still gets dates as strings.
-- `tableColumns`, `preloadList`, `timestampsColumn` and the relation matchers are `const`, so no new list or map is made on each call.
-- Run `dart run build_runner build` to get the new code.
-
-### 3.0.0-alpha.6
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.5
-
-- `@DoxModel(timestamps: false)` makes a model without `createdAt` and `updatedAt`. `createdAt: null` or `updatedAt: null` turns off only one.
-- The primary key field has the type of `@DoxModel(primaryKeyType: ...)`. It was always `int?`. The default is still `int`. The OpenAPI model schema uses the same type.
-- Fix: a preloaded relation with a two word name (like `userInfo`) was missing from `toJson()`. The generator looked for `user_info` in the preload list, but the list has `userInfo`.
-- Fix: the OpenAPI route scanner now puts one `/` between a group and a route path, like the router does.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- New builder `dox_builder:openapi`. It writes `lib/openapi.g.dart` with the OpenAPI docs of the app: it reads the `Route.*` calls, the controllers, the `@Dto` classes and the models. It writes nothing when the package has no controllers.
-- `DtoJsonSchema`, `ModelSchema` and `JsonSchemaReader`: the JSON Schema of a `@Dto` class, a model or any Dart type. Other builders can use them.
-- New: the DTO generator. For each `@Dto` class it writes `$<Name>Dto` (a `const DtoSchema<Name>`) into the `.g.dart` part: plain `if` checks per field, the converter, `fromMap`, `toMap` and the JSON Schema. It stops the build with a clear error for a bad DTO (a field that is not final, a type that is not supported, a rule that does not fit, a bad regex, ...).
-- New builder `dox_builder:dtos`. It writes `lib/dtos.g.dart` with every DTO of the app, for `AppConfig(dtos: dtos)`. Two DTOs with the same name stop the build.
-- `DtoReader`: the one place that knows DTO keys. The OpenAPI docs use the same keys as the DTO (snake_case by default, `@Name`, `@Dto(keyCase:)`).
-- OpenAPI: `@Regex` (was `@Pattern`). `@Format` is removed. Form requests are removed.
-- Fix: the OpenAPI route list has the full path, with the `Router` prefix and `Route.group()` prefixes. Two `'/'` routes in two groups now each get their docs.
-- OpenAPI path params: every positional argument that is not the request and not a DTO.
-- New: `@DoxEnv()` classes get `_$<Class>` in the `.g.dart` part. Each getter is read from the env once, converted to its type (String, int, double, num, bool, Uri, Duration, enum, List<String>) and kept in a final field. A getter body is the default. A nullable getter is optional. `load()` throws one `EnvException` with every missing or bad key.
-
-### 3.0.0-alpha.1
-
-- Version 3 of Dox. All Dox packages now share one version.
-- Needs Dart 3.6 or newer.
-- See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
-- Works with analyzer 5 and 6.
-
-## dox_cache
-
-### 3.2.1
-
-- New: a `redis` store takes `'options': RedisOptions(...)`. It is used as it is, so you can set `commandTimeout`, `connectTimeout`, `onError` and more.
-- `options` with `host`, `port`, `username`, `password`, `db`, `tls` or `pool_size`, or a value that is not a `RedisOptions`, throws an `ArgumentError`.
-- `RedisOptions`, `RedisTimeoutError` and `RedisQueueFullError` are exported. Old configs do not change.
-- Fix, disk: the `file` store never cleaned up by default, so expired files (like old sessions) stayed on the disk for ever. Now, with `prune_every` 0 (the default), a write starts a light prune in the background at most once an hour. It deletes expired files, temp files left by a crash, and free lock files. It keeps files it can not read or decrypt, so another app in the same folder keeps its files. It only touches files the cache made: other files in the folder stay. A lock file on disk makes sure only one runs per hour for all isolates and servers on one folder, also when the app restarts often. In a process, the first one can start on the first write that comes at least a minute after the first write of that process, so short commands never start one. Files that `pull` or a lock moved away for a moment and that a crash left behind are deleted after an hour, and `flush()` deletes moved values too. Expired files already read as a miss, so reads do not change.
-- `FileDriver.prune()` now also deletes temp files older than an hour and lock files that are free. Its result still counts only value files.
-- Fix: a value file with JSON that is not a map, or with an expiry time that is not a whole number, threw a `TypeError` on read. Now it reads as a miss, like other broken files.
-- Fix, disk: a write that failed (eg. a full disk) left its temp file. Now it is deleted.
-- New: `fsync` option on a `file` store (default `true`, as before). `fsync: false` skips the sync to disk on each write, so writes are faster. After a power cut the last writes can then be lost (they read as a miss).
-- Perf: lock files of the `file` store (`add`, `increment`, `touch` and `lock()`) are no longer synced to the disk. The sync did not make a lock survive a power cut anyway, because the folder was never synced. This halves the syncs of `add` and `increment`.
-- Perf: the `memory` store with `max_size` removed the least recently used item in O(n) time per write when full. Now each step is O(1).
-- Perf, memory: the `memory` store drops expired items at the front of the list on each write (at most two), not only in the sweep after 1000 or more writes.
-
-### 3.2.0
-
-- New: `dox cache:install [--store=file|redis|memory|database]`, run by `dox add cache`. It writes `lib/config/cache.dart`, the `CACHE_STORE` key and the `AppEnv` getters, and adds `cache: cache` to `lib/config/app.dart`. With `--store=database` it also adds `dox_cache_database`, its provider and the cache table migration. It never overwrites a file. dox_cache now depends on dox_annotation.
-- New: `'encrypt': true` on a `file` or `redis` store encrypts the values. It is off by default, so nothing changes for stores without it. Set `CacheConfig(encrypter: ...)` with a `CacheEncrypter`. A store with `'encrypt': true` and no encrypter throws a `StateError`, for every store type. Memory and null stores do not encrypt. An `encrypt` value that is not `true` or `false` throws an `ArgumentError`.
-- On Redis, a plain `int` stays plain text when encryption is on, so `increment` and `decrement` still work. Every other value is encrypted. To keep a secret number encrypted, store it as a `String`.
-- A value that cannot be decrypted (wrong key, changed text) reads as a miss. An old plain value reads as a miss too, except an `int` on Redis.
-- `FileDriver.prune()` deletes files that cannot be decrypted when encryption is on.
-- Cache keys and tag names are not encrypted, and a value is not tied to its key. Encryption protects against reading only. `maxValueBytes` is checked on the plain JSON size.
-- Ships an AI agent skill (dox-cache-guide). Install it in your app with `dart run skills@ get`.
-- New: `CacheFlags`, opt-in behaviors that work like Laravel, as `CacheConfig(flags: ...)`. All are off by default. `CacheFlags.all()` turns on every flag.
-- New: `CacheFlags.lockThrows` makes `lock.block(timeout)` with no callback throw `LockTimeoutException` when the time is over, not give `false`.
-- New: `CacheLock.throwOnTimeout` picks this for one lock. A store sets it from the flag. `CacheStore` takes `flags:`.
-
-### 3.1.3
-
-- Version bump only, to match the other packages.
-
-### 3.1.2
-
-- Version bump only, to match the other packages.
-
-### 3.1.1
-
-- New: `flexible` takes a null `stale`. Then the value is kept until a refresh replaces it, so callers still get the last good value when `compute` fails.
-
-### 3.1.0
-
-- New: the file driver can delete expired and broken files by itself. Set the `prune_every` option (or `FileDriver(pruneEvery: ...)`) to run `prune()` in the background once every that many writes. It is off by default (`0`). Only one prune runs at a time, and a failed prune is ignored.
-- Fix: `FileDriver.prune()` could delete a new value that `add`, `increment` or `touch` wrote at the same time. Now it takes the same key lock as they do and reads the file again under it. A key that is locked right now is skipped.
-
-### 3.0.2
-
-- Fix: `remember` and `rememberForever` threw on a cache hit when `T` was not a raw JSON type, like `List<String>`. Pass the new `decode` option to turn the cached JSON into `T`. Without it, `T` must be a raw JSON type.
-- Fix: `remember` runs `compute` once when many calls for the same key run at the same time in one isolate. The others wait for the first. With the new `lock: true`, callers in other isolates and servers wait too.
-- Fix: `pull` is atomic now. Redis uses `GETDEL` (needs Redis 6.2 or newer). Drivers get a new `pull` method.
-- Fix: the file driver keeps each prefix in its own sub folder. `flush` deletes only the files of its own prefix, and keeps temp files of writes that are running.
-- Change: because of this, files written by older versions are in the base folder and are not found any more. It is a cache, so they are only misses. You can delete the old files in the base folder by hand.
-- Fix: a file driver read no longer deletes an expired or broken file. Another isolate may have just written a new value. Use the new `FileDriver.prune()` to delete expired and broken files.
-- Fix: the file driver has locks now (`File.create(exclusive: true)`). `add`, `increment` and `touch` take a lock on the key, so they are safe across isolates.
-- Fix: a Redis prefix with no `:` at the end gets one. So the prefix `app` does not match the keys of `app2`.
-- New: `flexible(key, fresh, stale, compute)`: stale while revalidate.
-- New: `touch(key, ttl)` sets a new ttl and keeps the value.
-- New: `get` and `pull` take a function as the default. It runs only on a miss.
-- New: `lock.block(timeout, callback)` runs the callback while it holds the lock. It throws `LockTimeoutException` when the time is over. `lock.forceRelease()` frees a lock of any owner.
-- New: the Redis option `max_value_bytes`.
-- Faster: tagged `many`, `putMany`, `has`, `pull` and `remember` read the tag versions once per call.
-- Faster: the memory driver keeps the expiry as int milliseconds. It does not read the clock for items with no expiry. `has` does not decode the value.
-- Change: `MemoryEntry.expiresAt` is an `int` in milliseconds now. `CacheClock` has a new `nowMs()`.
-
-### 3.0.1
-
-- Version bump only, to match the other packages.
-
-### 3.0.0
-
-- The first stable release.
-
-### 3.0.0-rc.1
-
-- Needs `ioredis` 3.0.1. It fixes a crash on disconnect when the Redis host is a name like `localhost` or `redis`.
-
-### 3.0.0-alpha.17
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.16
-
-- Change: uses ioredis `^3.0.0`, the first stable ioredis release.
-
-### 3.0.0-alpha.15
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.14
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.13
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.12
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.11
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.8
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.7
-
-- Perf: the memory driver removes expired items and expired locks in a sweep after many writes. Before, a key that was written once with a ttl and never read again stayed in memory forever.
-- Perf: the memory driver with no `max_size` does not reorder the map on every hit. The order is only needed for LRU.
-- Perf: a tagged cache reads all tag versions with one `many` call (one `MGET` on Redis). `tags(...).flush()` raises all tag versions at the same time. Before, each tag was one round trip after the other.
-- Perf: the Redis driver frees a lock with `EVALSHA`. It sends the full script only when Redis does not know it yet.
-- Perf: the file driver makes the cache folder only when it is missing. Before, it ran `create(recursive: true)` on every write. Lock tokens use one shared `Random.secure()`.
-
-### 3.0.0-alpha.6
-
-- New `CacheManager.close()`. It closes the connections of every store that was built. The Redis driver closes its connection and its pool connections, with no reconnect. Memory, file and null stores do nothing. It is safe to call twice. A store used after it is built again.
-- New `CacheDriver.close()`, for one driver. Custom drivers can override it. The default does nothing.
-
-### 3.0.0-alpha.5
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- New: `getRaw(key)` gives the stored value as JSON text, with no decode. Use it to send a cached value as a JSON response. Memory and Redis return the stored text as is. A stored String comes back with its quotes (`"bar"`). The stored format did not change, so old values still read the same.
-- Faster `get`: a plain store builds the key with no async step. `itemKey` now returns `FutureOr<String>`. Memory `get` costs about 0.6 µs instead of 0.86 µs. Memory `getRaw` costs about 0.3 µs.
-- New Redis option `pool_size`: the most connections one store opens (ioredis `maxConnection`). Default is 10, the same as before.
-- Uses `ioredis` 2.0.0-alpha.2. It sends all commands on one shared connection and writes them together (auto-pipelining). A Redis read costs much less CPU. The cache now uses one connection per store, so `pool_size` rarely matters.
-
-### 3.0.0-alpha.2
-
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-
-### 3.0.0-alpha.1
-
-- Uses `ioredis` 2. Redis error replies throw `RedisError`.
-- Redis: no value size limit by default (was 60 KB). `maxValueBytes` is still there if you want one.
-- Redis: `many` uses one `MGET`, `putMany` uses one pipeline, `flush` uses `SCAN` + `DEL` (no Lua).
-- First release.
-- `CacheManager` with named stores and custom drivers.
-- Drivers: memory (with LRU), file, Redis, null.
-- `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
-
-## dox_core
-
-### 3.2.2
-
-- Fix: the temp files of big uploads were deleted when `response.done` completed. A newer native server completes `done` also when the client leaves, so a slow handler (an S3 upload, image work) could lose its file while it read it. Now the files are deleted when the request is handled (after the middleware and the controller, also on an error) and the response is done. A request with no big upload pays nothing.
-- Fix: when a handler had already sent the head (a flush or a stream, eg. server-sent events) and then threw, Dox cleared the headers, set status 500 and wrote `Internal Server Error` into the middle of the stream. Now the error is reported and the response just ends. This needs a dox-http-native with `NativeResponse.headSent` (dox-http-native#25).
-- Fix: a multipart body that ended with no closing boundary (a cut upload) kept the request open for ever, with its temp file. Now it gives 400 and the temp file is deleted.
-- Fix: a sync throw in a handler, or a raw `Route.mount` handler (no `middleware: true`), never marked the handler as ended. `AfterResponse` work then never ran and the upload temp files stayed on disk. Now every path ends the handler.
-- Fix: a multipart body with an epilogue after the closing boundary was rejected when the epilogue was longer than about 256 bytes. Any epilogue is fine now.
-- Fix: after a `RequestTimeout` the late handler lost its upload temp files. They now stay until it ends (a handler that never ends keeps them for ever). `AfterResponse` work that never ends does the same.
-- Fix: `AfterResponse` work could start while the handler still ran, when the client left early. Now it starts after the handler ended and the response is done.
-
-- Perf: every request with no body (most GETs) made a new empty body map. Now the map is made on the first use of `req.body` (or `req.requestBody.map`, `req.all()`, `req.input()`, `req.add()`). A request that never reads its body makes no map. Each request still has its own map, so writes never leak between requests. `DoxRequest(body:)` is now optional.
-- Fix: sessions with the `cache` driver on a `memory` store were kept in each isolate on its own. The server runs one isolate per CPU core, so a session saved by one isolate was missing when the next request came to another one. Users were logged out at random. Now these sessions live in the memory store of the main isolate, and the other isolates read and write them there (one message per session read, one per changed session). Expired sessions are removed by the memory store as before. A server with one isolate, the `cookie` driver and the other stores work as before.
-- Security: the `RateLimit` counts in the main isolate (no Redis) had no limit on the number of clients. A client with many ips (an IPv6 /64 has 2^64) could grow the memory with no end. Now the counter keeps at most 100,000 clients (`RateLimitCounter.defaultMaxKeys`, about 15 MB). This cap is on by default. When it is full, the counter first drops the expired counts, then the oldest ones. A dropped client starts again at 0. New clients are never turned away, so a flood of fake clients can not lock out real users.
-- Security: new opt-in flag `CoreFlags.rateLimitIpv6Prefix` (off by default). With it, the default `RateLimit` key counts an IPv6 client by its /64 prefix, so a client can not get a new count by changing its address inside its /64. Clients in one /64 then share a count. `RateLimit.ipBucket(ip)` gives this key for your own `key` function.
-- Perf: `RateLimit` on a Redis store sent its commands one after the other: 2 round trips per request (3 with `sliding`). Now they go out in one write, so it is one round trip. The commands, the counts and the errors are the same. If the count is made before its time limit is set (or setting the limit fails), Dox sets the limit after (it tries twice), so a client is not blocked for ever. Other stores work as before.
-- Perf: `AfterResponse` made a list and waited for each response, also when no work was added. Now this happens on the first `AfterResponse.run` of a request. A request that adds no work pays only for its zone. Apps with the queue package have `AfterResponse` on.
-- Perf: the `cookie` session driver decrypted the session cookie on every request. Now it decrypts on the first use of `req.session`. The `cache` driver still reads the store before the controller, because the session API is not async.
-- Perf: a `String` body was encoded with `utf8.encode`, which first makes a list 3 times the text length, then copies the used part. Now an ASCII text is written straight into a list of the right size (new `utf8Bytes`). A text with other characters still uses `utf8.encode`. The bytes are the same.
-- Perf: the `Content-Type` of a request with a body was parsed on every request. Now the parsed type is kept per header text (at most 64 texts, a multipart boundary is not kept), so a repeated type is parsed once. New `HttpBody.contentTypeOf(headers)`.
-- Perf: a route with params ran its regex for every url with the same first segment. Now the router first checks the plain text before the first param (new `RouteData.matchPrefix`, eg. `/api/users` for `/api/users/{id}`), and skips the regex when the url does not start with it. A route with regex marks (like `.`) in that text runs the regex as before. The matched routes are the same.
-- Perf: `SecurityHeaders` and `RequestId` use lower case header names, so the server makes no lower case copy per header. `RequestId.make()` builds the id with one list, not 9 strings. The id is still 32 hex characters.
-- Perf: a worker isolate made one timer per rate limited request for the 5 second timeout to the main isolate. Now one timer checks all waiting requests, and it only runs while a request waits.
-
-- The AI agent skill (dox-core-guide) has a Performance section and `references/performance.md`: the common mistakes that block the isolate, the right code for each, and strict mode.
-- New: `Dox().compute(task)` runs heavy CPU work (a PDF, an image, a big JSON file) on a worker isolate and gives the result. The server can answer other requests in the meantime. There is one small pool of workers for the whole process, shared by every server isolate. The workers start on the first task. More tasks than workers wait in line, first come first served. An error of the task is thrown to the caller, with its stack trace. A worker that dies is replaced, and its task fails with a clear error. The pool stops with the server and never keeps a command or a test running. The task runs in another isolate, so it can only use values that can be sent between isolates, not the IoC container or a database pool.
-- New: `AppConfig.computeWorkers` sets the number of workers. Default `AppConfig.defaultComputeWorkers` (4).
-- Change: `Hash.makeAsync` and `Hash.verifyAsync` run on the worker pool of `Dox().compute`. Before, each call started a new isolate, so 500 logins at once started 500 isolates. The results are the same. They still work without a server.
-- New: strict mode for development: `AppConfig(strict: StrictConfig(enabled: true))`. Off by default, and then it costs one bool check per request. When on, it writes a `[strict]` warning to stderr when a route blocks the isolate longer than `StrictConfig.blockLimit` (default 50 ms, once per route), when the event loop was blocked that long after an `await` (at most once in 10 seconds), and when `Hash.make`, `Hash.verify` or `Hash.check` runs in the web server (once per place in the code). Each warning says what to use instead.
-- Memory: each response called `close()` and did not use its Future. On the native server that Future and its microtask kept the request and its batch of bytes alive a bit longer, so under load the heap grew. Now Dox calls `NativeResponse.end()`, which makes no Future. A `dart:io` response still calls `close()`. Needs the next dox_http_native.
-- Perf: CORS read the `Origin` header on every request, even with the default config that sets no CORS value. With the content type read, that was a second header lookup, and the native server then parsed all headers. Now `Origin` is read only when `origin` is a list, and a config with no values returns at once. The headers sent stay the same.
-- Memory: `DoxResponse` made a map, a set and a list for every response, also when nothing was set. Now they are made on first use. `headers` still gives a map you can change.
-- New: every pretty log line starts with a dim tag that says where it comes from, like `[request] GET /users => {...}`. Request lines get `[request]`. Server start, stop and startup warnings get `[server]`. Error reports get `[error]`. Your own lines get `[app]`. Pass your own tag as the third argument: `Logger.info('done', null, 'billing')`. `Logger.log`, `info`, `warn`, `success` and `danger` all take it. In JSON mode the tag is the `source` field, added at the end of the line. When the data map has its own `source` key, that value is kept and the tag is not added. An empty tag counts as no tag.
-- Change: the plain warnings on stderr use the same tags. `dox: warning:` and `[dox]` are now `[server]` (isolate, server, WebSocket and CORS warnings) or `[request]` (a middleware returned null).
-- Perf: a JSON response made a new 8 KB buffer, even for a small body. This made small JSON bodies about 2x slower to encode. The buffer is 1 KB now. Big bodies are about the same speed.
-
-### 3.2.1
-
-- Fix: `Env.get` read as the first env read of the app saw only the shell, because nothing had loaded `.env` yet. Now every env read (`Env.get`, `Env.appEnv`, `Env().env`) loads `.env` once when it is not loaded. After that it is a plain map read, also when there is no `.env` file. Setting `Env().env` in a test counts as loaded, so the file is not put on top. When the `.env` file can not be read (like bad UTF-8), every read throws again; it never looks like an empty file.
-- New: `AppConfig.isDevelopment`. It is true when the env `APP_ENV` is `development` (not `local`). Not set means production, so false. It reads the env on each call, so it works before the server starts and in every isolate. Use it for config like a database `debug` flag, in place of a computed getter in the env class: every env getter is an env key.
-- New: `Env.appEnv` gives `APP_ENV` in lower case. It loads `.env` first when nothing did yet, so it gives the same answer when it is the first env read. `Dox().checkAppKey()`, `HealthCheck`, `OpenApiConfig.isEnabled` and the null middleware warning use it now. `showErrors()` keeps its own read, so its per-request cache stays the same.
-- Security: an env error printed the bad value, like `DB_PORT must be an int, not "..."`. A value may be a secret, and the error goes to the startup log and to CI output. Now `EnvException` and the `Env.get` cast error name only the key and the expected type.
-- Security: more public sample keys are refused by the `APP_KEY` check at startup: the keys from the docs, the dox_core test fixture and the sample app. They get the same rule as the old sample keys: an error outside development, local, test and testing, and a warning in those. If your `APP_KEY` is one of them, run `dox key:generate`.
-- Fix: in `.env`, an unquoted value that starts with `#` was read as empty. So `DB_PASSWORD=#Secret1` used the default. Now `KEY=#fff` keeps `#fff`, as the docs say. `KEY= #x` and `KEY=a #x` are still comments.
-- Fix: `Env.get` read a value with only spaces as text, so `Env.get<int>('MAIL_PORT', 587)` threw for `MAIL_PORT="  "`. Now only spaces counts as empty and gives the default, the same as `EnvReader`.
-- Fix: `EnvReader.list` of only commas (`,`) gave an empty list. Now it counts as missing, so the default is used.
-- Fix: a `Duration` too big for an int (`99999999999999999999s`) threw a `FormatException` right away, and a big one (`9223372036854775807d`) gave a wrong value. Now both are bad values, listed by `check()` with the others.
-
-### 3.2.0
-
-- New: `Dox().isWebServer`. It is true only in the web server process (`startServer()` and its isolates). It is false in `bin/queue.dart`, the scheduler and tests. A provider can use it to skip work that only a web server needs, like a startup warning.
-- New: after `setup()` of every provider (and the routes), the app runs `boot()` of every provider (see `DoxProvider.boot()` of dox_annotation).
-- Changed: `Command`, `MigrationFile` and `DoxProvider` now live in dox_annotation. `package:dox_core/command.dart` and `package:dox_core/dox_core.dart` still export them. dox_core needs the dox_builder release that finds providers from dox_annotation, so upgrade dox_builder together with dox_core.
-- New: `RateLimit(sliding: true)` uses a sliding window. A client can no longer send 2 x `max` requests around the edge of a window. The count is the count of this window plus a part of the count of the window before. That part gets smaller as the window goes on. `Retry-After` is the time until one more request fits. Off by default: the fixed window works as before.
-- New: `CoreFlags.envExpand`. `.env` values can use `${OTHER}`, unquoted or in `"..."` (not in `'...'`). It reads a real environment variable first, then a key above it (`.env.testing` also sees the keys of `.env`). An unknown name stays as it is. In a `"..."` value, `\n`, `\t`, `\"`, `\\` and `\$` become a new line, a tab, `"`, `\` and `$`. Off by default: values are read as before. The `.env` file is read before `AppConfig` exists, so also set `Env.flags = flags` at the top of `main()`. The server isolates read `.env` the same way as the main isolate. `Dox().initialize` warns when the flag is on in `AppConfig` but `.env` was read without it.
-- New: `export KEY=value` lines in `.env` are read like `KEY=value`.
-- New: `AppConfig(htmlErrors: true)` sends a small HTML error page to a request that does not want JSON (see `DoxRequest.expectsJson`). Off by default, so errors stay JSON. In `development` or `local` the page also shows the error text and the stack trace. JSON clients, validation errors and answers from `ExceptionHandler.render` do not change. `AppConfig(errorPage: ...)` replaces the page; `defaultErrorPage` is the default.
-- New: `DoxRequest.expectsJsonFor(headers)` is `expectsJson()` for the headers of a raw `HttpRequest`.
-- New: `Route.resource(..., parameter: 'photo')` names the param of one item `{photo}` instead of `{id}`, so `Route.bind` and model binding work on resource routes. The default is still `{id}`.
-- New: `route()` and `Route.url()` put a param that is not in the path into the query string. Before, it threw an `ArgumentError`. When `params` and `query` have the same key, `query` wins.
-- New: `route(..., absolute: true)` and `Route.url(..., absolute: true)` give the full url, with `APP_URL` (or `baseUrl:`) in front, like `Route.signedUrl`.
-- New: a cache store with `'encrypt': true` encrypts its values with the `APP_KEY` (`Crypt`). Old keys in `previousKeys` can still read old entries. No setup is needed: `CryptCacheEncrypter` is the default. Set `CacheConfig(encrypter: ...)` to use your own. `CacheEncrypter` is exported from dox_core. `CryptCacheEncrypter.encrypt` throws a `StateError` when `APP_KEY` is empty.
-- New: `Dox().addGlobalMiddleware(middleware)`. A provider calls it in `setup()` to add global middleware. They run on every route (and on mounts), before the app's `globalMiddleware`. The same middleware added twice runs once. `Dox().allGlobalMiddleware` gives the full list.
-- Ships an AI agent skill (dox-core-guide). Install it in your app with `dart run skills@ get`.
-- New: `Dox().loadRoutes()` registers the routes of the app routers and gives them as `AppRoutes` (routes, fallbacks and mounts), without a server and without providers. When OpenAPI is on, the docs routes (`/docs`, `/openapi.json`, `/openapi.yaml`) are in it too. It is safe to call more than once: the route list is empty before and after the call, so a later `startServer()` starts clean. `dox route:list` uses it.
-- New: `RouteData.isWebSocket` is true for a route added with `Route.websocket`.
-- Fix: `Route.group`, `Route.domain`, `Route.middleware`, `Route.enabledCors` and `Route.disabledCors` restore the prefix, name prefix, domain, middleware and CORS setting also when the callback throws. Before, the next routes got the wrong path, name or middleware.
-- New: `CoreFlags`, opt-in behaviors that work like Laravel, as `AppConfig(flags: ...)`. All are off by default, so nothing changes until you turn one on. `CoreFlags.all()` turns on every flag. `Dox().flags` gives the flags of the current isolate.
-- New: `CoreFlags.laravelErrors` sends a `422` as `{"message": "...", "errors": {"field": ["..."]}}`. The OpenAPI `ValidationError` schema follows it.
-- New: `CoreFlags.onlyPresent` makes `req.only([...])` leave out keys that are not in the input.
-- New: `CoreFlags.cookieDefaults` sends `Path=/` and `SameSite=Lax` for a `DoxCookie` with no `path` or `sameSite`.
-- New: `CoreFlags.hasKeyOnly` makes `req.has('x')` only check that the key is there, like `req.exists('x')`.
-- New: `CoreFlags.htmlStrings` sends a string from a controller as `text/html`. A content type set by the app wins.
-- New: `res.header(k, v, replace: true)` replaces a value that a middleware put on the response. `CoreFlags.replaceHeaders` makes it the default. `Vary` and `Set-Cookie` still get one more value with the flag.
-- New: `session.regenerate(keepToken: true)` keeps the CSRF token, so forms open in other tabs keep working. The default is still a new token. Do not use it at login: a token from before the login would stay valid.
-- New: `CoreFlags.decryptServerError` makes a `DecryptException` a reported `500`.
-- New: `CoreFlags.cacheCopies` makes `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`.
-- New: `dox_core` exports `CacheFlags` and `LockTimeoutException` of `dox_cache`. `Cache.withAppPrefix` keeps the `flags` of the `CacheConfig`.
-- Fix: `HealthCheck.cache('name')` uses the result of `Cache().store('name')`, so it checks the named store with `CoreFlags.cacheCopies` too.
-- Change: `DecryptException.toString()` gives `DecryptException: The encrypted value is not valid`, so a log line says what failed.
-- BREAKING: the JSON line of `Logger` uses the standard names of log services (Datadog). `level` is now `status` (lower case). `name` is now `logger.name` (left out when empty). A `Map` in the data goes to the top level, other data goes under `payload`. The standard fields can not be replaced by a data key. Pretty mode is the same.
-- BREAKING: the JSON line of `LogMiddleware` has new field names. `level` is now `status`. `source_ip` is now `network.client.ip`. `request_id` is now `http.request_id`. New: `http.method` and `http.url`. `payload.request` and `payload.headers` stay. The `filter` gets the new map. It can not change `timestamp` or `logger`. A `logger` key in the data is always ignored.
-- Change: `LogMiddleware` now writes through `Logger`. It follows `LoggerConfig` (`enabled`, `level`, `prettyPrint`). With `prettyPrint` it prints the colored text line. `enabled` is now optional: not set follows the logger, `false` turns only the request logs off.
-- Change: `Logger` collects lines and writes them in one write every 20 ms (or 64 KB), not one `print()` per line. A `warn`, `warning`, `danger` or `error` line is written at once, after the lines before it. The buffer is written when the app stops.
-- Fix: pretty `Logger` lines for `debug`, `warning` and `error` have a color. Before, they printed `null` in the color code.
-- New: `dox_core` exports the `JSON` helper. `JSON.stringify` gives a String. `JSON.bytes` gives UTF-8 bytes in one pass. `JSON.parse` reads a String or UTF-8 bytes. Use bytes for sockets, files, queues and HTTP client bodies. Do not return `JSON.bytes` from a controller.
-- OpenAPI: a route with the `Can` middleware gets a `401` and a `403` answer in the docs. A route with `GuestMiddleware` or `ValidateSignature` gets a `403`. They are found by class name. A `@Response` with the same status wins.
-- OpenAPI: the `ValidationError` schema is in the docs whenever a route has the automatic `422` answer, also when it comes from a `req.validateSchema(...)` call.
-- New: `ServerTiming` middleware. It adds a `Server-Timing` header with the `handler` and `total` time of the request. It is off unless you add it, because it shows timing to clients. Use it in development or for trusted clients.
-- New: `ServerTiming.add(name, duration)` and `ServerTiming.measure(name, fn)` add your own timing to the current request, with no request passed. The same name is summed and counted. Without the middleware they do nothing. The names `total` and `handler` are kept for the built-in times: your own ones are sent as `app_total` and `app_handler`. A `Server-Timing` header that the app sets itself is kept, and the times are added after it.
-- New: `AfterResponse.run(work)` runs work after the answer of the current request is sent. Any code can call it, with no request passed. It is off until `AfterResponse.enable()` (for example in the `setup()` of a provider). Errors in the work are reported and never stop the server.
-- Fix: `Dox().stop()` closes the `IsolateBus` again after the providers shut down. Before, a provider that used the bus during its shutdown joined it again, and the open port could keep the process alive.
-- Docs: `IsolateBus.publish` throws for a value that can not be sent, before any isolate gets it. In the main isolate it throws only when another isolate listens on the bus.
-
-### 3.1.3
-
-- New: `IsolateBus` sends a message from one isolate to all the other isolates of the app, with no Redis. `publish(channel, message)` sends, `on(channel)` gets the messages of one channel, `size` counts the isolates that listen. The main isolate keeps the hub, like the `RateLimit` counts.
-- New: `Dox().isolateCount` is the number of isolates that really run, in every isolate. It also counts `Dox().totalIsolate(n)` and the one isolate on Windows.
-
-### 3.1.2
-
-- Uses dox_validation 3.1.2, so `@Describe('...')` can be used on DTO fields.
-
-### 3.1.1
-
-- `Cache().flexible` takes a null `stale`: keep the last good value until a refresh replaces it.
-- New: `Hash.sha256(value)` gives the SHA-256 hex of a value, to store API keys and access tokens as a hash (not for passwords).
-- New: `ValidationException.issues` keeps every issue of a failed DTO or schema check (path, rule code, message, params). An `ExceptionHandler` can use it for another 422 shape, like `[{field, message, rule}]`.
-- New: `RequestBody` and `BodyKind` are exported, so `req.requestBody.kind` can tell invalid JSON (`BodyKind.invalidJson`) from no body, without importing a file of `lib/http`.
-
-### 3.1.0
-
-- Behavior change: without Redis, `RateLimit` counts are now shared by all isolates. Before, each isolate counted alone, so the real limit was `max` times the number of isolates. Now `max` holds for the whole server. An app with more than one isolate gets a lower real limit than before. Raise `max` if you relied on the old number.
-- Security: new check of the `Origin` header on a WebSocket upgrade. Use `Route.websocket(allowedOrigins: [...])` for one route, or `AppConfig.webSocketAllowedOrigins` for all of them. It is off by default, so apps do not change. A WebSocket route with no check prints one warning on stderr at start.
-- Security fix: `back()` only follows a `Referer` of the same host. A referer of another site goes to the fallback. Before, it was an open redirect.
-- Fix: a multipart body with no boundary or no `Content-Disposition` gets 400, not 500.
-- Fix: the headers of `abort()` are kept on routes that have a next middleware.
-- Fix: a mounted handler that throws now gives 500. Before, the client could hang.
-- Fix: a download name with quotes or non-ASCII letters now gets a safe `Content-Disposition`.
-- New: one warning on stderr when CORS has origin `*` together with `credentials: true`.
-- New: `Crypt.encryptString` / `Crypt.decryptString` (and `Crypt.encrypt` / `Crypt.decrypt` for JSON values) use the `APP_KEY` of the app. Old keys in `previousKeys` still decrypt.
-- New: `Hash.check`, the same as `Hash.verify`, with the Laravel name.
-- New: `Cache().many(keys)` and `Cache().putMany(values, duration:)` on the facade. The store already had them.
-- New: `MethodOverride(header: true)` also reads the `X-HTTP-Method-Override` header on a POST. It is off by default, so apps do not change.
-- Fix: `Route().setStatics(Route().statics)` emptied the static folders. It cleared the list before it copied it.
-- Fix: after `%` decoding, the `.where` check now lets `.` match a new line. Before, `.where('page', '.*')` did not match `/docs/a%0Ab` any more.
-- `req.pathIs(pattern)` cleans each pattern once, not on every call.
-- Docs: `Route.view` is the WebDAV `VIEW` method. It does not render a template like Laravel `Route::view`. `Route.where` says the value is checked again after decoding.
-- Security fix: `.where` now checks the param again after `%` decoding. Before, it checked only the text as it is in the URL. So `.where('name', '[^/]+')` let `/nos/..%2F..%2Fetc%2Fpasswd` through, and the controller got `../../etc/passwd`. Now a decoded value that does not match the regex makes the route not match, like any other miss (the next route, the fallback or 404). Params with no `%` and routes without `.where` do not change.
-- Security fix: `req.pathIs()` now cleans the path like the router does. Before, it only dropped the `/` at the start. So `/admin/` and `/admin//` reached the `/admin` route, but `pathIs('admin')` was false, and a middleware guard on it was skipped. Now `//` counts as one `/`, and a `/` at the end does not matter, in the path and in the pattern. A path that matched before still matches.
-- Fix: with more than one isolate, `Route.staticFiles` added before `startServer()` and outside a `Router` worked only in the main isolate. A file like `/app.css` got a 404 at random. Now the static folders go to every isolate, like routes and fallbacks.
-- Fix: a route with an optional param, like `/greet/{name?}`, now shows in the OpenAPI docs as both `/greet` and `/greet/{name}`. Before, only `/greet/{name}` was there, because the `?` was removed before `dox_openapi` could see it.
-- Fix: `req.session.reflash()` now keeps the flash data when it is the first use of the session in a request. Before, it kept nothing, because the old flash keys were read before the session was loaded.
-- Docs: `has` does not read dot keys (only `input`, `filled`, `exists`, `missing`, `boolean` and `integer` do). `Route.redirect` does not fill `{id}` in the target and drops the query string. A GET to a POST-only path gets the fallback if a fallback covers the path, else 405. A fallback added after `startServer()` does not reach the other isolates.
-- With `MethodOverride`, a POST to a path with no route for any method gets 404 at once. Before, Dox read the whole body first.
-- Fix: with `MethodOverride`, a POST with `_method=PUT` to a path with no PUT route now says "PUT is not allowed" in the 405 message. Before, it said "POST is not allowed".
-- The router calls `Route()` once per route lookup, not twice.
-- The warning for a middleware that returns `null` reads `APP_ENV` once, not on every such request.
-- Fix: `Crypt.decrypt` of a value made with `Crypt.encryptString` (text that is not JSON) gave a 500 error with a `FormatException`. Now it throws `DecryptException`, a 400 error.
-- Fix: in the OpenAPI docs, the short path of an optional route, like `/greet` for `/greet/{name?}`, listed a 404 "Not found" answer. It has no param, so no record can be missing. Now only `/greet/{name}` lists the 404.
-- Fix: a `Route.fallback` in a group with a param in its prefix, like `{tenant}`, now matches, and `req.param` gives the param. Before, the prefix was compared as plain text, so the fallback never ran.
-- Fix: `.where('id', '^[0-9]+$')` now matches. A leading `^` and a trailing `$` are dropped. Before, they ended up inside the route regex, so the route never matched.
-- `req.pathIs()` and `req.routeIs()` build the regex of a pattern once, not on every call.
-- Fix: `req.pathIs()` gives false for a path with a bare `%` or a bad code like `%zz`. Before, it threw an error and the client got 500.
-- `req.boolean()` no longer makes a new set of true words on every call.
-- New: `Route.match(methods, path, handler)` adds one route for each method in the list. `Route.any(path, handler)` adds one for GET, POST, PUT, PATCH and DELETE. OPTIONS is left out, so the CORS preflight answer still works.
-- New: `Route.redirect(from, to, status:)` and `Route.permanentRedirect(from, to)`. 302 and 301.
-- New: `.where(param, regex)` on a route. The route matches only when the param text matches the regex. Else the next route is tried. Routes without it match the same as before.
-- New: `Route.fallback(handler)` answers a GET or HEAD request that matches no route and no static file. It runs its middleware, so in a router the global middleware runs too. It follows the group prefix and domain. The built-in 404 and 405 do not change.
-- New: in development (`APP_ENV` is `development` or `local`), Dox prints a warning to stderr when a middleware returns `null`. That ends the request with an empty 200, and the controller does not run. Nothing else changes.
-- New request helpers on `DoxRequest`:
-  - `input(key, defaultValue)` takes a default. A dot key like `user.name` or `items.0.id` reads inside maps and lists. A key that is in the input as it is still wins, so old code works the same.
-  - `filled(key)`: the key is there and not empty. `exists(key)`: the key is there, with any value. `missing(key)`: the key is not there. `has` does not change.
-  - `except(keys)`, `boolean(key)`, `integer(key, defaultValue)`.
-  - `file(key)` and `hasFile(key)` for uploads.
-  - `bearerToken()` reads the token of an `Authorization: Bearer` header.
-  - `path()`, `fullUrl()`, `pathIs(pattern)` and `routeIs(pattern)`. A `*` in the pattern matches any text. It is `pathIs`, not `is`, because `is` is a Dart keyword.
-- Docs: the `abort` example now uses `req.auth?.id()`. `req.auth?.id` does not exist.
-- New: `MethodOverride` middleware. Add it to `AppConfig.globalMiddleware`, and a POST request with a `_method` field of `PUT`, `PATCH` or `DELETE` goes to the route of that method. So a plain HTML form can reach `Route.put`, `Route.patch`, `Route.delete` and `Route.resource` routes. `req.method` gives the new method. `CsrfMiddleware` still checks the request. Other `_method` values and other request methods are ignored. It is off when the middleware is not there.
-- Fix: `res.header(name, value)` now replaces a header with the same name in any case, like `withHeaders` does. Before, `header('Cache-Control', ..)` after `cache()` sent two `Cache-Control` values.
-- Break: removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
-- Fix: `res.withHeaders(map)` now adds the headers to the ones set before it. Before, it dropped them all, also the `Content-Disposition` of a download. A key in the map replaces the header with the same name, in any case (`cache-control` and `Cache-Control` are one header).
-- New: `SessionMiddleware().fromCookie(value)` loads a session from its cookie value, with no request. Use it for a Socket.IO login. Give the value as the browser sent it (still encrypted). It runs the same checks as the middleware: a changed cookie, a cookie of another name, a cookie made with another APP_KEY, an expired session or an unknown session id gives an empty session. Changes to it are not saved.
-- New: `DoxCookie.decrypt(name, value)` decrypts a cookie value like `req.cookie(name)` does. `req.cookie` now uses it, with no change in what it accepts.
-- New: `package:dox_core/command.dart` with the `Command` base class. A package or an app adds its own `dox` commands with it. Name a library with a top-level `commands` list in the `dox: commands:` key of pubspec.yaml, and the `dox` CLI finds it. It is a separate library, so it does not clash with other `Command` classes (like the one of `package:args`).
-- New: `MigrationFile` in `package:dox_core/command.dart`. A command writes a migration into `db/migration` with it, with the same file name as `dox make:migration`. It does not write a second migration with the same name.
-- Fix: `Route.mount` matches whole path parts only. A mount at `/admin` now gets `/admin`, `/admin/` and `/admin/...`, but no longer `/administrator` or `/admin-login`. Only requests that went to the wrong handler change. A prefix that ends in `/` (like Socket.IO's `/socket.io/`) works as before.
-- Fix: `//` counts as one `/` when a path is matched to a mount prefix. So `/admin//secure/x` goes to a mount at `/admin/secure`. The handler still gets the path as it came.
-- Behavior change: when two mount prefixes match, the longest one wins. Before, the first one added won. Apps with one mount, or with mounts that do not overlap, do not change.
-- New: `Route.mount(prefix, handler, middleware: true)` runs `AppConfig.globalMiddleware` (security headers, CSRF, rate limit) before the raw handler. A middleware that gives a response stops the request. `RequestTimeout` does not run for a mount. When two mount prefixes match, the longest one wins. `terminate` steps run once the answer is sent. The global CORS config does not apply to a mount. The default is still no middleware, so Socket.IO does not change.
-- `RequestFile.head` now keeps the first 128 KB of a big upload (on disk), and all bytes of a small upload (in memory, no copy). Before, it kept 32 bytes. A JPEG keeps its image size after the photo metadata, so `@Dimensions` and `v.file().dimensions()` need these bytes.
-- New: `Route.staticFiles(prefix, folder, maxAge:)` serves a folder (CSS, JS, images) for GET and HEAD requests that match no route. Routes always win. `..`, dot files and folders get 404. Files get `Last-Modified`, `304`, Range support, the global CORS headers and an optional `Cache-Control`. The prefix follows `Route.group`, the router prefix and `Route.domain`.
-- New: `Route.staticFiles` sends a weak `ETag` (from the file size and change time). A matching `If-None-Match` gets `304` with no body. `If-None-Match` wins over `If-Modified-Since`.
-- New: `Route.staticFiles` sends files in a `.well-known` folder at the top of the folder (ACME challenges, `security.txt`). Every other dot name, also inside `.well-known`, still gets `404`.
-- Fix: a file response with `If-Range` now uses the `Range` only when `If-Range` is the file's `Last-Modified` date or its strong `ETag`. Else it sends the whole file with `200`, so a resumed download does not mix two versions of a file.
-- Fix: a `Range`, `If-Modified-Since` or `If-None-Match` header sent on two lines no longer gives `500`.
-- Fix: a static file `304` has the file's content type, not `text/plain`.
-- New: `AppConfig.idleTimeout`. A keep-alive connection with no new request for this long is closed. Default 30 seconds, as before. Behind a load balancer, set it longer than the balancer's idle timeout (eg. 65 seconds for AWS ALB). Needs dox_http_native 3.0.3.
-- New: `AppConfig.maxConnections`. The most connections one isolate holds open at once. Must be 1 or more (0 or less throws an `ArgumentError` when the server starts). When it is full, new clients wait in the OS listen queue until a connection closes. WebSocket connections and connections that are still closing count too. The queue holds up to 1024 clients, and the OS can make it smaller (`somaxconn`; 128 by default on macOS). When the queue is full, new clients wait and then time out. On Linux each new client goes to one isolate (`SO_REUSEPORT`), so it can wait for a full isolate even when others have room. Default no limit, as before. Needs dox_http_native 3.0.3.
-- New: `Route.websocket(maxMessageSize:)`. A bigger message closes the socket with 1009. Default 16 MB, as before.
-
-### 3.0.2
-
-- Change: a Redis cache store with no `prefix` gets `<app name>_cache:` from `APP_NAME` (like `my_shop_cache:`), so two apps on one Redis do not share keys or flush each other's cache. Existing Redis cache keys are not found once after the update. Rate limit counters, cache locks and `cache` driver sessions start fresh, so users with a `cache` driver session log in again. Set `'prefix': 'dox_cache:'` on the store to keep the old keys.
-- New: the `Cache()` facade has `flexible` and `touch`, and `remember` / `rememberForever` take `decode` and `lock`.
-- Perf: the route binder does not load a value again when a middleware already bound it, like `Can(param: 'post')` of dox_auth.
-- New: `RequestId` middleware. Each request gets an id in the `X-Request-Id` header and in `req.requestId`. A safe id from the client is kept. `LogMiddleware` lines have `request_id`, and `ExceptionHandler.report` can read `ExceptionHandler.requestId`.
-- New: `ETag` middleware. GET and HEAD answers with a body in memory get a weak `ETag`. A matching `If-None-Match` gets `304 Not Modified` with no body.
-- New: signed urls. `Route.signedUrl(name, params:, query:, expires:, absolute:, baseUrl:)` adds a `signature` (HMAC-SHA256 with the `dox:signed-url` key) and an optional `expires`. The `ValidateSignature` middleware answers `403` for a bad or expired url. Old keys from `AppConfig.previousKeys` still work.
-- New: `RequestTimeout(Duration)` middleware and `Route.get(...).timeout(Duration)`. A slow route answers `503` with the code `request_timeout`. The late result is dropped.
-- New: `IDoxTerminableMiddleware`. Its `terminate(req, res)` runs after the answer is sent. An error in it is reported, and never changes the answer. Routes without one do not pay for it.
-- Fix: a middleware item with no `handle` step at the start of a route list ended the request with an empty answer. It is now skipped.
-
-### 3.0.1
-
-- Perf: `AESEncryptor` (encrypted cookies, the cookie session, CSRF) now runs AES-GCM in Rust (`AesGcm` of dox_http_native 3.0.2), with the AES instructions of the CPU. One session cookie took about 116 µs to encrypt and 95 µs to decrypt, now about 1.7 µs and 0.9 µs. The output is the same, so cookies made before still open.
-- Removed the `pointycastle` dependency. HKDF now uses HMAC-SHA256 of `package:crypto` (from the Dart team). The keys are the same.
-- New: a path that has routes, but not for the request method, answers `405 Method Not Allowed` with an `Allow` header (like `Allow: GET, POST, HEAD`). Before, it was `404`.
-- New: `abort(code, [message, headers])` and `HttpStatusException(code)` for any status. Common codes get a default `errorCode` and `message`. The `headers` are sent with the answer.
-- New: `ForbiddenHttpException` (403) and `MethodNotAllowedHttpException` (405).
-- New: bracket keys in form bodies and query strings nest, like in Laravel. `tags[]=a&tags[]=b` gives `req.input('tags') == ['a', 'b']`, and `address[city]=x` gives a map. A repeated key with no brackets still keeps its last value.
-- New: `AppConfig(previousKeys: [...])`. Encrypted cookies and cookie sessions made with an old `APP_KEY` can still be read, so a new key does not log out every user. `AESEncryptor.decode` has a new `previousSecrets` option.
-- Fix: path params are now URL-decoded. `/users/a%20b` gives `'a b'`, not `'a%20b'`. A URL from `Route.url()` now gives back the same value. A param that is not valid UTF-8 (like `%ff`) gives 404.
-- Fix: 5xx HTTP exceptions (like `InternalErrorException` and `QueryException`) are now sent to `ExceptionHandler.report`. Before, every `IHttpException` was skipped, so real server errors never reached the logs or Sentry. 4xx exceptions are still not reported.
-- Fix: `req.headers` joins repeated header values with `, `. Before, two `Accept` values became one string with no separator.
-- Fix: a `Range` header with a number too big for an int gave 200 with an empty body. A start that is too big now gives 416, and a suffix that is too big gives the whole file.
-- Fix: `req.method` is now the request method. A HEAD request on a GET route said `GET`.
-- Fix: on a route with no params, a write to `req.param` stayed for the next requests to that route. Each request now has its own map.
-
-### 3.0.0
-
-- The first stable release.
-
-### 3.0.0-rc.1
-
-- Breaking: Dox no longer uses `APP_KEY` as it is. It makes one key per purpose from it with HKDF-SHA256 (RFC 5869): `dox:cookie` for cookies and the cookie session, `dox:encrypt` for `AESEncryptor`, and more. See the new `KeyDerivation` class. Existing encrypted cookies, sessions and tokens become invalid after this version. Users must log in again.
-- `AESEncryptor.encode` and `decode` take a `purpose` label. The default is `dox:encrypt`. The secret can now have any length.
-- Fix: `Hash.make` and `Hash.makeAsync` with a password over 72 bytes threw the bcrypt error, and its text held the password. So the password could end up in the logs. Dox now throws its own `ArgumentError` with no password in the text.
-- New: `Hash.equals(a, b)` compares two secrets in constant time. `CsrfMiddleware` uses it.
-- Fix: the `cookie` session driver did not check the save time in the cookie. A copied cookie stayed valid until `APP_KEY` changed. A session older than `lifetime` is now a new empty session.
-- Breaking: `req.auth` is now its own field on the request, not a value in the input. Before, a query or body field `dox_authentication_instance` made `req.auth` throw a 500. `AUTH_REQUEST_KEY` is removed. Use `Auth().setUser(req, user)` or set `req.auth`.
-- Fix: `APP_ENV=testing` stopped the app on a bad `APP_KEY`. It is now treated like `test`: only a warning.
-- `Logger` is now exported from `package:dox_core/dox_core.dart`.
-- The HTTP exceptions (`NotFoundHttpException` and the others) take a `dynamic message`, like `IHttpException`. A map message is sent as JSON as it is, like `NotFoundHttpException(message: {'error': 'not_found'})`.
-- Security: the server now sends `X-XSS-Protection: 0`, not `1; mode=block`. OWASP says the old browser filter should be off. `SecurityHeaders` has a new `xssProtection` option. A `null` option (or a `null` value in `extra`) now removes the header, also a server default like `X-Frame-Options`.
-- Security: `CsrfMiddleware` no longer reads `_token` from the query string. It reads only the body and the `X-CSRF-TOKEN` / `X-XSRF-TOKEN` headers.
-- Doc comments: fixed the examples of `Cache.remember`, `Route.domain`, `Route.middleware` and `Route.disabledCors`.
-
-### 3.0.0-alpha.17
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.16
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.15
-
-- Change: the startup hook is `DoxProvider`. Write `class X extends DoxProvider`. `setup()` runs once in every isolate at start. `shutdown()` is optional and runs once in every isolate when the app stops. List providers in `AppConfig.providers`, or add them with `Dox().addProvider()` and `Dox().addProviders()`. The container method is `c.provider<T>()`.
-
-### 3.0.0-alpha.14
-
-- Fix: `AUTH_REQUEST_KEY` is now only in `dox_core`, so importing `dox_core` and `dox_auth` together no longer gives an "ambiguous import" error.
-- Fix: `response(x).header('Content-Type', 'image/svg+xml')` failed with "More than one value for header content-type". The default `text/plain` stayed next to the new type. Now `header()` replaces the content type, the same as `contentType()`. The name can be in any case.
-- Fix: when sending the error answer failed too, the client got no answer and waited until the timeout. Now Dox reports the error and sends a plain 500. When the head is already sent, it closes the response.
-- New: `.env.testing`. When the app runs its tests (`dart test`, or a real `APP_ENV=testing`), Dox reads `.env.testing` on top of `.env`. Its keys win over `.env`. A real environment variable still wins over both. It works for `Env.get()` and the typed `AppEnv.load()`. Use it for a test database: `DB_NAME=my_app_test`. New `Env.isTesting`, and `Env().load(testing: true)`.
-- New: `DoxTestClient.withSession()` gives a test client that works like a browser. It keeps the cookies of every response, removes deleted or expired ones, and sends the `XSRF-TOKEN` cookie back in `X-XSRF-TOKEN` on `POST`, `PUT`, `PATCH` and `DELETE`. It does not follow redirects. `client.cookies` gives the kept cookies. The normal client does not change.
-- Fix: `OpenApiConfig(enabled: null)` now treats an empty `APP_ENV` as `development`, the same default as `appEnv` of the typed env. Before, `/docs` was off when `APP_ENV` was not set (for example in CI). Set `APP_ENV=production` in production.
-- Change: an empty `APP_ENV` means production everywhere in Dox: `/docs` is off, the 500 error text is hidden and a bad `APP_KEY` stops the app. Set `APP_ENV=development` in your `.env` and in CI. The `appEnv` default of the typed env in the docs and examples is now `production` too (was `development`).
-- New: `@Security` on a middleware class sets the login scheme of its routes in the OpenAPI docs. `OpenApiConfig.securityByMiddleware` still wins over it.
-- Change: a middleware class name that ends with `AuthMiddleware` (and has no `@Security`) now gets a `bearerAuth` scheme with no `bearerFormat`. Before, the docs called every such token a JWT.
-
-### 3.0.0-alpha.13
-
-- New: `OpenApiConfig(include: ['/api/*'], exclude: ['/api/internal/*'])` picks which routes go in the OpenAPI docs by path. A `*` at the end matches the rest of the path.
-
-### 3.0.0-alpha.12
-
-- Breaking: `dox_core` no longer depends on `dox_storage` and `dox_socketio`. Add the package you use to your app.
-  - Storage: `Storage()`, `StorageConfig` and `StorageDiskFactory` moved to `dox_storage`. `AppConfig.storage` is removed: extend `StorageService` from `dox_storage` (`class AppStorageService extends StorageService { AppStorageService() : super(storageConfig); }`). `Route.files()` is now `Storage.route()`. `Dox().storage` is now `Storage.manager`. `RequestFile.store()` needs `import 'package:dox_storage/dox_storage.dart'`.
-  - Socket.IO: `SocketIoConfig` moved to `dox_socketio`. `AppConfig.socketIo` is removed: extend `SocketIoService` from `dox_socketio`. `Dox().socketIo` is now `SocketIoService.server`.
-  - `dox_core` no longer exports `Disk`, `DriveManager`, `FileNotFoundException` and `StorageException`. Import them from `dox_storage`.
-  - `StreamFile` and `DownloadableFile` stay in `dox_core`.
-- Fix: the OpenAPI docs could give a route the docs of another controller with the same method name. The docs now pass the controller class of `(C c) => c.method` and `Route.get<C>` routes to the registry.
-- New: `ControllerAction.controller` gives the controller class.
-
-### 3.0.0-alpha.11
-
-- New: middleware that runs after the controller. Implement `IDoxNextMiddleware` (`handle(DoxRequest req, Next next)`), or use a function `(DoxRequest req, Next next)`. `await next()` runs the rest of the middleware and the controller and gives a `DoxResponse`, so the code after it can change the status, headers and cookies. A thrown error comes back as its error response, so the after part still runs. Before-only middleware work as before. A route with no `next` middleware takes the same fast path as before.
-- New: `DoxResponse.status` and `DoxResponse.headers` getters.
-- New: `redirect(url, status: 302)` and `back(req, fallback: '/')` helpers.
-- New: sessions. `SessionMiddleware` gives each request `req.session` with `get`, `put`, `has`, `forget`, `all`, `flush`, `pull`, `flash`, `reflash`, `keep`, `regenerate`, `invalidate` and `token`. `AppConfig(session: SessionConfig(...))` picks the `cookie` driver (all data in a cookie, encrypted with AES-GCM, 4 KB limit) or the `cache` driver (a random id in the cookie, the data in a `dox_cache` store like `redis`). The cookie is `HttpOnly` and `SameSite=Lax` by default. The cookie driver reads the session on first use. The session is saved, and the cookie sent, only when it changed.
-- New: `CsrfMiddleware`. `POST`, `PUT`, `PATCH` and `DELETE` requests must send the session token in `_token`, `X-CSRF-TOKEN` or `X-XSRF-TOKEN`, else `419` (`TokenMismatchException`). It sets an `XSRF-TOKEN` cookie that axios and Inertia send back for you. `except:` skips paths like `/api/*`.
-- New: a validation error on a request with a session that does not want JSON (a form post, an Inertia request) flashes `errors` and the old input (never password fields), and redirects back. JSON requests still get `422`. Read them with `req.session.errors` and `req.session.old('email')`. `req.session.flashErrors(...)` does the same by hand. New `req.expectsJson()` and `req.hasSession`.
-- New: `DoxCookie(sameSite: SameSite.lax)`.
-- New: `TestResponse.cookies` and `DoxTestClient.withCookies(...)`, to go on with a session in tests.
-
-### 3.0.0-alpha.10
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.9
-
-- New: a real IoC container. `IocContainer` (`Dox().ioc`) has `get<T>()`, `has<T>()`, `singleton<T>()`, `factory<T>()`, `instance<T>()`, `override<T>()` and `clearOverrides()`. Each isolate has its own container: a singleton is one instance per isolate, made on first use.
-- New: `AppConfig(container: registerContainer)` with the function from `lib/container.g.dart` (made by `dox_builder`). Every isolate runs it. The routers and services it finds are registered for you, so `AppConfig.routers` and `AppConfig.services` can stay empty. The ones you list there still work and come first.
-- New: typed routes. `Route.get<UserController>('users', (UserController c) => c.index)` (also post, put, patch, delete and the others). The controller comes from the container, once per isolate, at start. `(UserController c) => c.index` without `<UserController>` works too. `Route.resource('users', UserController)` takes a controller class.
-- New: a controller parameter whose type is in the container gets it from the container.
-- New: route model binding for `@DoxModel` classes. A controller parameter of type `User` gets the `User` of the `{user}` param (or the next param), found by its primary key. No row answers 404. `Route.bind` still wins.
-- Breaking: the old `IocContainer` methods `register`, `registerByName`, `registerSingleton` and `getByName` are removed. Use `factory`, `singleton` and `get`.
-- New: named routes. `Route.get('/users/{id}', c).name('users.show')`, then `route('users.show', params: {'id': 5})` gives `/users/5`. `query:` adds a query string. `Route.group(..., name: 'admin.')` puts a prefix in front of the names inside. Resource routes are named `blogs.index` ... `blogs.destroy`; `Route.resource(..., name:)` picks another base name. A name used twice stops the app at start. An unknown name, a missing param or an extra param throws an `ArgumentError`.
-- New: route model binding without `dart:mirrors`. `Route.bind<User>('user', (String id) => User().find(id))` runs before the controller of every route with a `{user}` param. The controller gets it as a `User user` parameter, or with `req.bound<User>('user')`. A binder that gives `null` answers 404.
-- New: `ExceptionHandler`, the one place that turns an error into a response. Extend it and set `AppConfig(exceptionHandler: ...)`. `report(error, stackTrace)` logs, `render(error, req)` picks the response. The default answers are the same as before. A URL with no route goes through it too.
-- Breaking: `AppConfig.errorHandler` and `defaultErrorHandler` are removed. Override `ExceptionHandler.report` instead. It gets the same errors: every error that is not an `IHttpException`, also errors outside a request. A thrown value that is not an `Exception` or `Error` (like a `String`) is now reported too.
-- `responseHandler` still works and still runs after `render`.
-- New: `RateLimit` middleware. `RateLimit(max: 60, per: Duration(minutes: 1), key: (DoxRequest req) => req.ip())`. One request too many gets `429` with `Retry-After`. Every answer has `X-RateLimit-Limit` and `X-RateLimit-Remaining`. The counts live in Redis when the default cache store is Redis (shared by all isolates and servers), else in memory. Fixed window. New `TooManyRequestsException`.
-- New: `SecurityHeaders` middleware. It adds `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` and `Cross-Origin-Opener-Policy`, and `Strict-Transport-Security` on https requests only. Each one can be changed or turned off with `null`. `Content-Security-Policy` is off by default.
-- New: `Route.health('/health', checks: {...})`. It answers 200 `{"status": "ok"}`, or 503 when a check throws, returns `false` or times out. `HealthCheck.cache()` checks the cache. The error text is in the answer only in `development` and `local`.
-- New: `package:dox_core/testing.dart` with `DoxTestClient`. `DoxTestClient.start(appConfig)` runs the app in the test on a free port. `get`, `post`, `put`, `patch`, `delete`, `send`, `withHeaders` and `withToken`. `TestResponse` has `status`, `body`, `json`, `headers` and `expectStatus`, `expectJson`, `expectBody`, `expectHeader`.
-- dox_core now depends on `matcher` (for the `expect` methods of `TestResponse`).
-
-### 3.0.0-alpha.8
-
-- Uses dox_http_native 3.0.0-alpha.8: pipelined requests are about 2.8 times faster (1 core: 172k to 480k req/s). Normal requests are as fast as before.
-- Security: every file response (`File`, `Storage().stream()`, `Storage().download()`, `Route.files`) sends `X-Content-Type-Options: nosniff`. Before, a `File` response and a raw download did not.
-- New: `Route.files(path, download: true)` sends every file as a download (`Content-Disposition: attachment`). Use it for user uploads. html, svg, xml and javascript files are still always sent as a download in a sandbox.
-- Fix: a trusted proxy `X-Forwarded-For` hop with a port (`1.2.3.4:5678`, `[::1]:5678`) is now read without the port. Before, it was not a valid ip, so `req.ip()` could be wrong. A bare IPv6 like `::1` still works.
-
-### 3.0.0-alpha.7
-
-- Breaking: `dox_websocket` is gone. Use `dox_socketio` for realtime. `Dox().websocket` and `Dox().setWebsocket()` are removed.
-- Breaking: `Route.websocket(path, handler)` is now a raw WebSocket route. `handler` gets the open `WebSocket` and the `DoxRequest`. Middleware runs first. A request that is not a WebSocket upgrade gets 400.
-- `dox_http_native` now lives in its own repo (dartondox/dox-http-native). Dox uses it from pub.dev (`^3.0.0-alpha.7`). Its build hook downloads a ready-built library, so you do not need Rust.
-- Perf: faster route matching. A plain route is found with one map lookup, also when a param route was added before it (as long as that param route can not match the same path). Param routes are grouped by their first path segment, so a request only tries the routes that can match. The first matching route still wins.
-- Perf: the request handler reads `Host` and `Content-Type` once per request. `Host` is read only when the app has a `Route.domain()` route. `HttpBody.read()` takes an optional `contentType`.
-- Perf: on the native server, a JSON or form body is used as it is, with no stream in between. The size limit is still checked.
-- Perf: JSON responses are encoded in 8 KB chunks, not 256 bytes.
-- Perf: fewer objects per request. `RouteData.params`, `DoxRequest.param` and `DoxRequest.method` are made on first use. `RouteData.domainLower` is made once. CORS header lists are joined once.
-- Perf: one Future less per async request (`then(onError:)` instead of `then().onError()`).
-- Perf: multipart parsing makes its regexes once, and no longer builds a `Future.any` per chunk.
-- Perf: `LogMiddleware` lowercases the `redact` words once, not per key.
-- Perf: an error response reads `APP_ENV` and lowercases it only when the value changed.
-- Perf: `IocContainer` calls `T.toString()` once per call.
-- Breaking: the `dart:io` server is gone. Every app runs on the native server (`dox_http_native`), also an app with WebSocket or Socket.IO routes. `AppConfig.server`, the `ServerBackend` enum and the `DOX_SERVER` env var are removed. `DoxServer.usesNative()` and the `isolateId` option of `DoxServer.listen()` are removed.
-- Breaking: when the native library does not load, Dox stops at start with an error. It says why (eg. an ABI mismatch) and how to fix it (install Rust so the build hook can build it, or rebuild your `lib_path` library). Before, Dox logged a warning and used `dart:io`.
-- On a graceful stop (SIGTERM, `Dox().stop()`), open WebSockets get close code 1001.
-- Perf: `AESEncryptor` keeps the key bytes of the last secret and writes the output into one buffer. Decode reads the nonce and text without copies. The output format is the same.
-- New: `Hash.makeAsync()` and `Hash.verifyAsync()`. They run bcrypt in another isolate, so a request does not block the server.
-- New: `Hash.rounds` (default 10) sets the bcrypt cost. `Hash.make()` also takes `rounds:`.
-- Security: the app does not start when `APP_KEY` is empty, not exactly 32 characters, or one of the old public sample keys from `.env.example`. With such a key anyone can sign tokens and cookies. In `APP_ENV` `development`, `local` or `test` Dox only logs a warning. A longer key (eg. 48 or 64 characters) is refused too, because AES needs a key of 16, 24 or 32 bytes and every encrypted cookie failed with it. Before, only an empty key in `production` stopped the app. Run `dox key:generate` for a new key.
-- Security: a multipart part header with many backslashes (`name="\\\\...`) no longer blocks a server isolate for hours (ReDoS in the quoted string regex).
-- Security: a `StreamFile` response (`Storage().stream()`, `Route.files()`) with an html, xml, svg or javascript type is sent with `Content-Disposition: attachment` and `Content-Security-Policy: sandbox`. Every `StreamFile` gets `X-Content-Type-Options: nosniff`. Before, an uploaded `x.html` or `x.svg` was shown inline, and its script ran on the app origin (stored XSS).
-- Security: a `Route.domain()` route only matches when the `Host` header matches. Before, a request with no `Host` matched every domain route. A `Host` with a port (`admin.app.com:8080`) now matches `Route.domain('admin.app.com')`.
-- Security: an encrypted cookie is bound to its name (AES-GCM associated data). A value made for `locale` gives `null` when it is sent as `user_id`. `AESEncryptor.encode()`/`decode()` take a new `associatedData` option. Encrypted cookies made by older versions no longer decrypt, so `req.cookie()` gives `null` for them once. Users may need to log in again.
-- Security: `DoxCookie` is `HttpOnly` by default. `secure` is `null` by default, which sets `Secure` when the request came over https (`req.scheme()`, see `trustedProxies`). Set `httpOnly: false` or `secure: false` to change it.
-- Security: the native server checks `maxBodySize` and `maxMultipartSize` on their own. Before, Rust let any body up to the bigger limit (100 MB) through, so a JSON body could take 100 MB of RAM before Dart said 413.
-- New `AppConfig.bodyTimeout` (default 120 seconds). On the native server, a client that does not send the whole body in this time gets 408. It stops slow clients that hold memory and connections.
-
-### 3.0.0-alpha.6
-
-- Security: `Storage().putRequestFile()` and `RequestFile.store()` no longer trust the client file name when the bytes are a known format that does not match it. Before, a valid png sent as `a.html` passed `@Image`/`@Mimes` and was saved as `.html`, so `Route.files()` served it as `text/html` on the app origin (stored XSS). Now it is saved with the extension of the bytes (`.png`).
-- Security: new upload file names use a random uuid (v4), not a time-based one (v1). A v1 name shows the upload time and the server, and the next name is easy to guess.
-- Security: `trustedProxies: ['*']` trusts the direct peer only. `req.ip()` is the right-most `X-Forwarded-For` hop, the one the proxy added. Before, `*` also trusted every hop in the header, so `req.ip()` was the left-most value, which the client sets (`X-Forwarded-For: 6.6.6.6`). That broke IP rate limits and allow lists, also behind the Fly.io proxy of the deploy guide.
-- Security: `LogMiddleware` writes `[REDACTED]` for body fields and headers whose name has `password`, `passwd`, `secret`, `token`, `authorization`, `cookie`, `api_key`, `api-key` or `apikey` in it (upper or lower case). Before, the login body (with the password) and, with `withHeader: true`, the `Authorization` header went to the log as plain text. Change the list with `LogMiddleware(redact: [...])`.
-- Security: an error that is not an `IHttpException` answers `500` with `{"code": "server_error", "message": "Server Error"}`. The error text is sent only when `APP_ENV` is `development` or `local`. Before, the client always got `error.toString()`, which can hold SQL, table names, file paths or database hosts. `errorHandler` still gets the full error.
-- Graceful shutdown closes the cache stores of `Cache()` (eg. Redis), in every isolate, after the `DoxShutdown` services. Your app needs no extra code.
-- The `ORMService` of a new project implements `DoxShutdown` and calls `SqlQueryBuilder.close()`, so the database connections close on shutdown too. In an older project, add this to `lib/services/orm_service.dart`:
-  ```dart
-  class ORMService implements DoxService, DoxShutdown {
-    // setup() as before
-
-    @override
-    Future<void> shutdown() async {
-      await SqlQueryBuilder.close();
-    }
-  }
-  ```
-
-### 3.0.0-alpha.5
-
-- Fix: CORS `origin` can be a list. Dox compares the request `Origin` with the list and sends back only the origin that matches, or no header. Before, it joined the list with commas, and browsers rejected it. A list also sends `Vary: Origin`.
-- Breaking: `AESEncryptor` now uses AES-GCM with a random nonce for each message. Before, it used AES-CTR with an all-zero nonce and no message check. Old encrypted cookies and values can not be read.
-- Breaking: `AESEncryptor.decode` throws `DecryptException` (400) when the text was changed or the key is wrong. Before, it printed an error and returned `''`.
-- `req.cookie()` returns `null` for an encrypted cookie that can not be decrypted.
-- Fix: `Hash.verify` returns `false` for a malformed hash. Before, it threw.
-- `AESEncryptor` and `DecryptException` are now exported from `package:dox_core/dox_core.dart`.
-- Fix: in `.env`, `KEY=value # note` gave the value `value # note`. A `#` after a space now starts a comment. A `#` inside quotes, or with no space before it, is kept.
-- Fix: the `.env` parser removed every quote character inside a value. Now only the quotes around the value are removed.
-- Fix: `HEAD` requests got 404, also `HEAD /docs`. A `HEAD` request now runs the `GET` route of the same path. The answer has the status and headers of `GET`, with no body.
-- New: Dox listens on `PORT` when `APP_PORT` is not set. Cloud Run, Fly, Render and Heroku set `PORT`. `APP_PORT` still wins.
-- New: `AppConfig.host` and the env var `APP_HOST` pick the network interface to listen on, like `127.0.0.1`. The default is the same as before: all interfaces (`::`, IPv6 and IPv4).
-- Fix: the start log always said `http://127.0.0.1:<port>`. It now shows the real host and port, like `http://[::]:3000`.
-- Removed the unused `sprintf` dependency.
-- New: graceful shutdown. On `SIGTERM` or `SIGINT` every isolate stops taking new connections and lets open requests finish, up to `AppConfig.shutdownTimeout` (default 8 seconds). Then Dox runs `DoxShutdown` services and exits with code 0. Before, open requests were cut. A second signal stops at once.
-- New: `DoxShutdown`. A service that also implements it gets `shutdown()` in every isolate on stop, to close connections.
-- New: `await Dox().stop()` stops the server gracefully in every isolate, without exit.
-- Fix: an `s3` storage disk without `bucket`, `key` or `secret` failed with `Null is not a subtype of String`. Now it fails with a clear message that names the missing setting.
-- Fix: a URL with no route now answers like a thrown `NotFoundHttpException`. The body is JSON (`{"code": "not_found", "message": "GET /x not found"}`), and the app `responseHandler` runs for it, so apps can format it.
-- Fix: the error answer of an `IHttpException` now has its `errorCode`. A text message gives `{"code": "<errorCode>", "message": "<text>"}` as JSON. Before, the body was plain text and `errorCode` was never sent. A `Map` message (like validation errors) is still sent as it is.
-- Fix: the `Logger` now reads `LoggerConfig.level`. Lines below that level are not printed. Levels from low to high: `debug`, `info` (and `success`), `warn`, `error` (and `danger`).
-- Fix: `Route.group('blogs')` with `Route.get('all')` made `/blogsall`. Path parts now join with one `/`. This also works for nested groups, `Route.prefix` and `Route.resource`.
-- Fix: `Route.resource` hid every error from the controller. Now it only skips methods the controller does not have.
-
-### 3.0.0-alpha.4
-
-- Version bump only, to match the other packages.
-
-### 3.0.0-alpha.3
-
-- New: `Cache().getRaw(key)` gives the cached value as JSON text, with no decode. Send it as a JSON response with no extra encode step.
-- New Redis cache option `pool_size` (see `dox_cache`).
-
-### 3.0.0-alpha.2
-
-- New default server: `dox_http_native` (Rust hyper parses HTTP, your code stays in Dart). Hello world goes from about 41k to about 144k req/s on one isolate. Set `server: ServerBackend.dartIo` in `AppConfig` (or `DOX_SERVER=dartio`) to use `dart:io`. Dox uses `dart:io` by itself, with one warning line, when the native library does not load, and for apps with WebSocket or Socket.IO routes.
-- Faster requests: a simple `GET` hello world went from about 31k to about 40k req/s on one isolate (plain `dart:io` is about 46k). A request with no body and sync middleware and controller now runs with no `Future`. `req.ip()`, the query, `req.all()` and cookies are read on first use only. Reading the client ip was the biggest cost, because it asks the socket. Clean paths skip the two regex calls, and plain routes are found with a map lookup.
-- Fix: a `@Dto` body with a `RequestFile` field shows as `multipart/form-data` in the OpenAPI docs.
-- Fix: `req.ip()` gave `::ffff:127.0.0.1` for IPv4 clients. Now it gives `127.0.0.1`. The same goes for `X-Forwarded-For` hops.
-- Needs Dart 3.13 or newer.
-- All dependencies updated to their latest versions.
-- Removed the `encrypt` package (not maintained, and it blocked `pointycastle` 4). AES for cookies and the file cache now uses `pointycastle` 4. The output is the same, so old cookies and cache files still decode.
-- Fix: `Env.get()` of a missing key with no default gave the text `"null"`. A missing `APP_KEY` became the key `"null"`, which anyone can guess. Now `String` gives `''`, `String?` gives `null`, and `int`/`num`/`double`/`bool` throw a clear error. New: `Env.get<bool>()`.
-- Startup stops with an error when `APP_KEY` is empty and `APP_ENV=production`. Other environments log a warning.
-- New: typed input with DTOs. A controller asks for a `@Dto` class by type: `store(CreateUser body)`. Dox reads the body (or the query for `GET`), checks it, and answers `422` with `{"items.1.quantity": "..."}` when it is wrong. `await req.validate<T>()` does the same inside a method. See the Validation guide.
-- New: `AppConfig(dtos: dtos)` (from `lib/dtos.g.dart`) and `AppConfig(validationMessages:)` for other languages. `req.locale` is the first `Accept-Language`.
-- New: typed controller parameters. `DoxRequest` anywhere, one `@Dto`, and `String`, `int`, `double`, `num`, `bool` path params by position. A path param that does not fit its type answers `404`. The types are read once at start; an unknown type stops the server with a clear error.
-- New: optional path params `{id?}`.
-- New: query strings and form data with repeated keys (`tags=a&tags=b`) and bracket keys (`address[city]`, `items[0][name]`) for DTOs.
-- A DTO answers `400` for a body that is not valid JSON, and `415` for a body type it can not read.
-- `RequestFile` implements `FileInput` and keeps its first bytes, so `@Mimes` and `@Image` check the real file type.
-- Breaking: removed `req.validate(Map)`, `req.validateAsync()`, `FormRequest`, `AppConfig(formRequests:)`, `DoxValidator`, `IocContainer.registerRequest()` and `processInputMapper()`. Use a DTO. `req.validateSchema(schema)` stays for input you only know at runtime.
-- Breaking: a controller with more path params than the route has `{...}` params stops the start. Before, the extra ones got `''`.
-- Fix: a typed path param like `int id` gave a 500 (it was always a `String`).
-- A `ValidationException` from `dox_validation` (for example `schema.parse()` in a controller) answers 422.
-- `dox_core` exports `dox_validation` (not its `ValidationException`), with the DTO annotations. `dox_orm` also has `Schema`, and `package:uuid` has `Uuid`: use `hide` or a prefix in a file that needs both.
-- Breaking: `Cache()` runs on `dox_cache`. `AppConfig.cache` is a `dox_cache` `CacheConfig(defaultStore:, stores:)` with option maps. `CacheDriverInterface` and `FileCacheDriver` are removed. Values must be JSON types. `put` without a duration keeps the value forever (was 1 hour). New: `add`, `pull`, `increment`, `decrement`, `remember`, `rememberForever`, `lock`, `tags`.
-- Breaking: `Storage()` runs on `dox_storage`. `AppConfig.fileStorage` is now `AppConfig.storage` (`StorageConfig(defaultDisk:, disks:)` with option maps for `local`, `s3`, `memory`). `StorageDriverInterface` and `LocalStorageDriver` are removed. An unknown disk name throws.
-- `Storage().stream()` and `download()` stream from any disk (S3 too), with `Content-Length`. New: `url`, `signedUrl`, `use()` for the full `Disk`.
-- New `Route.files('files')` serves local signed URLs (403 for a bad signature). New catch-all route param `{path*}`.
-- OpenAPI: `AppConfig(openApi: OpenApiConfig(...))` adds `/docs`, `/openapi.json` and `/openapi.yaml`. On by default only when `APP_ENV` is development or local. Bodies come from the route `body:` option or a DTO. `Dox().writeOpenApi(dir)` writes the files.
-- `RouteData.preMiddleware` now holds the group and router middleware.
-- Socket.IO: `AppConfig(socketIo: SocketIoConfig(enabled: true, ...))` serves `/socket.io/` on the app port, before the router. `Route.mount(prefix, handler)` is the raw hook. Off by default.
-- No extra work per request when OpenAPI or Socket.IO is off.
-- OpenAPI docs are automatic. `dart run build_runner build` writes `lib/openapi.g.dart`. Pass it as `OpenApiConfig(registry: openApiRegistry)`. Each route then gets its summary and description (from the `///` comment), tags, `Class.method` operation id, typed path params, request (a `@Dto` class) and answer schema (from the return type), plus `401`, `404`, `422` and `500`.
-- A middleware whose class name ends with `AuthMiddleware` adds `bearerAuth` to the docs, with no config.
-- A `GET` or `DELETE` request class becomes query params in the docs.
-- `dox_core` exports `OpenApi`, `OpenApiRegistry`, `OpenApiOperation`, `OpenApiRouteBinding` and `ResponseDoc` of `dox_openapi`.
-- The OpenAPI JSON and YAML are encoded once and kept, not on each request.
-- New `EnvReader` and `EnvException` for the typed env class (`@DoxEnv()`). The real environment wins over `.env`, the same as `Env.get()`. `Env.get()` stays for dynamic keys.
-- OpenAPI: `/docs` uses Scalar by default. `OpenApiConfig(ui: DocsUi.swagger)` gives Swagger UI. New `OpenApiConfig` options: `scalar: ScalarOptions(...)` (theme, dark mode, download button, proxy) and `pageTitle`.
-
-### 3.0.0-alpha.1
-
-- Version 3 of Dox. All Dox packages now share one version.
-- Needs Dart 3.6 or newer.
-- See the [release notes](https://github.com/dartondox/dox/pull/112) for all main changes.
-- Faster: streamed bodies, all CPU cores, faster router.
-- `uuid` 4 and `mime` 2.
+The first stable release.
 

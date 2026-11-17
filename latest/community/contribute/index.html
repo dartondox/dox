@@ -7567,7 +7567,7 @@ In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>..
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>.venv/bin/mkdocs<span class="w"> </span>serve<span class="w">           </span><span class="c1"># live preview of this branch</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same build as CI. Broken links fail.</span>
 </span></code></pre></div>
-<p><code>hooks/docs_hooks.py</code> runs during the build. It makes the changelog page from <code>packages/*/CHANGELOG.md</code>, and writes <code>llms.txt</code> and <code>llms-full.txt</code>.</p>
+<p><code>hooks/docs_hooks.py</code> runs during the build. It writes <code>llms.txt</code> and <code>llms-full.txt</code>.</p>
 <p>Every pull request that changes the docs runs the <code>Docs check</code> workflow (<code>.github/workflows/docs-check.yaml</code>). It has three checks:</p>
 <ul>
 <li><code>mkdocs build --strict</code></li>
