@@ -1,3 +1,7 @@
+## Unreleased
+
+- Fix: with `OpenApiConfig.include` or `exclude`, the docs still listed every schema of the registry, also the ones used only by hidden routes. Now they list only the schemas that the shown routes use, and the schemas used inside those. With no `include` and no `exclude`, all schemas are listed as before.
+
 ## 3.2.2
 
 - Fix: the temp files of big uploads were deleted when `response.done` completed. A newer native server completes `done` also when the client leaves, so a slow handler (an S3 upload, image work) could lose its file while it read it. Now the files are deleted when the request is handled (after the middleware and the controller, also on an error) and the response is done. A request with no big upload pays nothing.

@@ -67,8 +67,11 @@ class OpenApiDocument {
       RouteDoc? doc = reader.read(route);
       if (doc != null) docs.add(doc);
     }
-    for (MapEntry<String, Map<String, dynamic>> schema
-        in config.registry.schemas.entries) {
+    Map<String, Map<String, dynamic>> schemas = config.registry.schemas;
+    if (config.include.isNotEmpty || config.exclude.isNotEmpty) {
+      schemas = _usedSchemas(docs);
+    }
+    for (MapEntry<String, Map<String, dynamic>> schema in schemas.entries) {
       docs.schema(schema.key, schema.value);
     }
     if (reader.usesValidationError) {
@@ -91,6 +94,54 @@ class OpenApiDocument {
       securitySchemes: schemes,
       docs: docs,
     );
+  }
+
+  /// The registry schemas that the shown routes use, also the ones used
+  /// only from inside another used schema. Hidden routes then do not leak
+  /// their schemas into the docs. A ref to a name that is not in the
+  /// registry is skipped.
+  Map<String, Map<String, dynamic>> _usedSchemas(ApiDoc docs) {
+    Map<String, Map<String, dynamic>> registry = config.registry.schemas;
+    List<String> todo = <String>[];
+    for (RouteDoc route in docs.routes) {
+      _collectRefs(route.toOperation(docs.resolver), todo);
+    }
+    Set<String> used = <String>{};
+    while (todo.isNotEmpty) {
+      String name = todo.removeLast();
+      Map<String, dynamic>? schema = registry[name];
+      if (schema == null || !used.add(name)) continue;
+      _collectRefs(schema, todo);
+    }
+
+    /// keep the registry order, so the docs do not change with route order
+    Map<String, Map<String, dynamic>> schemas =
+        <String, Map<String, dynamic>>{};
+    for (MapEntry<String, Map<String, dynamic>> entry in registry.entries) {
+      if (used.contains(entry.key)) schemas[entry.key] = entry.value;
+    }
+    return schemas;
+  }
+
+  /// Adds the schema name of every `#/components/schemas/<Name>` ref in
+  /// [json] to [names].
+  void _collectRefs(Object? json, List<String> names) {
+    if (json is Map) {
+      for (MapEntry<dynamic, dynamic> entry in json.entries) {
+        Object? value = entry.value;
+        if (entry.key == r'$ref' &&
+            value is String &&
+            value.startsWith(OpenApiConstants.schemaRefPrefix)) {
+          names.add(value.substring(OpenApiConstants.schemaRefPrefix.length));
+        } else {
+          _collectRefs(value, names);
+        }
+      }
+    } else if (json is List) {
+      for (Object? item in json) {
+        _collectRefs(item, names);
+      }
+    }
   }
 
   /// Write `openapi.json` and `openapi.yaml` into [dir].

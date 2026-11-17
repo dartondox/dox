@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_openapi/dox_openapi.dart'
+    show JsonSchemaSource, SchemaResolver;
 import 'package:http/http.dart' as http;
 import 'package:test/test.dart';
 import 'package:yaml/yaml.dart';
@@ -329,6 +331,22 @@ class DocsRouter extends Router {
   }
 }
 
+/// a route body that is not a map, so the resolver makes the `$ref`
+class NoteBody implements JsonSchemaSource {
+  NoteBody(this.name);
+
+  final String name;
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    return const SchemaResolver().ref(name);
+  }
+}
+
+dynamic noteHandler(DoxRequest req) {
+  return 'ok';
+}
+
 AppConfig config = AppConfig(
   appKey: testAppKey,
   // the OS picks a free port, so test files can run in parallel
@@ -570,6 +588,73 @@ void main() {
       ),
     ).build(Route().routes).toJson();
     expect(doc['paths'].keys, <String>['/api/auth/login']);
+  });
+
+  test('with exclude, a schema used only by a hidden route is gone', () {
+    Map<String, dynamic> doc = OpenApiDocument(
+      const OpenApiConfig(registry: registry, exclude: <String>['/search']),
+    ).build(Route().routes).toJson();
+    expect(OpenApiChecker().check(doc), isEmpty);
+    expect(doc['components']['schemas'].keys, <String>[
+      'Post',
+      'UploadPhoto',
+      // the 422 of the shown body routes, added as before
+      'ValidationError',
+    ]);
+  });
+
+  test('with exclude, a schema used inside a used schema is kept', () {
+    OpenApiRegistry nested = const OpenApiRegistry(
+      schemas: <String, Map<String, dynamic>>{
+        'Note': <String, dynamic>{
+          'type': 'object',
+          'properties': <String, dynamic>{
+            'author': <String, dynamic>{r'$ref': '#/components/schemas/Author'},
+          },
+        },
+        'Author': <String, dynamic>{'type': 'object'},
+        'Hidden': <String, dynamic>{'type': 'object'},
+      },
+    );
+    List<RouteData> routes = <RouteData>[
+      /// a non-map body: the ref comes from the resolver
+      RouteData(
+        method: 'POST',
+        path: '/notes',
+        controllers: <dynamic>[noteHandler],
+        body: NoteBody('Note'),
+      ),
+      RouteData(
+        method: 'POST',
+        path: '/hidden',
+        controllers: <dynamic>[noteHandler],
+        body: NoteBody('Hidden'),
+      ),
+    ];
+    Map<String, dynamic> doc = OpenApiDocument(
+      OpenApiConfig(registry: nested, exclude: <String>['/hidden']),
+    ).build(routes).toJson();
+    expect(OpenApiChecker().check(doc), isEmpty);
+    expect(doc['components']['schemas'].keys, <String>[
+      'Note',
+      'Author',
+      'ValidationError',
+    ]);
+  });
+
+  test('with no include or exclude, all schemas stay', () {
+    List<RouteData> routes = <RouteData>[
+      for (RouteData route in Route().routes)
+        if (route.path.endsWith('/gate/can')) route,
+    ];
+    Map<String, dynamic> doc = OpenApiDocument(
+      const OpenApiConfig(registry: registry),
+    ).build(routes).toJson();
+    expect(doc['components']['schemas'].keys, <String>[
+      'Post',
+      'SearchPosts',
+      'UploadPhoto',
+    ]);
   });
 
   test('YAML and JSON give the same document', () async {
