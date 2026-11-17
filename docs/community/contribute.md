@@ -193,7 +193,7 @@ python3 -m venv .venv
 .venv/bin/mkdocs build --strict  # the same build as CI. Broken links fail.
 ```
 
-`hooks/docs_hooks.py` runs during the build. It makes the changelog page from `packages/*/CHANGELOG.md`, and writes `llms.txt` and `llms-full.txt`.
+`hooks/docs_hooks.py` runs during the build. It writes `llms.txt` and `llms-full.txt`.
 
 Every pull request that changes the docs runs the `Docs check` workflow (`.github/workflows/docs-check.yaml`). It has three checks:
 
