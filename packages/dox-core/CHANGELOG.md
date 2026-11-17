@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.2
 
 - Fix: the temp files of big uploads were deleted when `response.done` completed. A newer native server completes `done` also when the client leaves, so a slow handler (an S3 upload, image work) could lose its file while it read it. Now the files are deleted when the request is handled (after the middleware and the controller, also on an error) and the response is done. A request with no big upload pays nothing.
 - Fix: when a handler had already sent the head (a flush or a stream, eg. server-sent events) and then threw, Dox cleared the headers, set status 500 and wrote `Internal Server Error` into the middle of the stream. Now the error is reported and the response just ends. This needs a dox-http-native with `NativeResponse.headSent` (dox-http-native#25).
