@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.2
 
 - Faster: a model gets a `$columnValue(column)` method, a switch that gives one value of `columnsToMap()` without making the whole map. dox_orm reads the relation keys of each row with it. It is made only when the dox_orm of the app has `Model.$columnValue`, so the code still compiles with an older dox_orm. A column with `beforeSave` is not in the switch: it falls back to `columnsToMap()`. A model with its own `columnsToMap()` gets no switch.
 - Faster: `fromMap()` read a date column from the row map two or three times. It now reads it once. The result is the same. Run `dart run build_runner build` to get the new code.

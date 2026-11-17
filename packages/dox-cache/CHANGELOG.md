@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.1
 
 - New: a `redis` store takes `'options': RedisOptions(...)`. It is used as it is, so you can set `commandTimeout`, `connectTimeout`, `onError` and more.
 - `options` with `host`, `port`, `username`, `password`, `db`, `tls` or `pool_size`, or a value that is not a `RedisOptions`, throws an `ArgumentError`.
