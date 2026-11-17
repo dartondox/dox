@@ -20,7 +20,7 @@ This post compares five Dart backend options, Serverpod, Dart Frog, Shelf, Vania
 <!-- more -->
 
 You know Dart, maybe from Flutter, and now you need a server.
-Most articles compare only three options, and they rarely check what a real backend needs: a database, migrations, background jobs and mail.
+The articles we found compare only three options, and they rarely check what a real backend needs: a database, migrations, background jobs and mail.
 This post does.
 
 We build Dox, so we are not neutral.
@@ -78,17 +78,16 @@ It does not mean you can not do it.
 | Auth | JWT, sessions, access tokens | Email, Google, Apple, passkeys and more | `dart_frog_auth` (Basic, Bearer, Cookie) | Not built in | `vania_auth`: JWT, guards, access tokens |
 | Background jobs | Queue (database, Redis) | Future calls, stored in the database | Not built in | Not built in | Not in their docs |
 | Scheduled tasks | Scheduler | Recurring future calls (interval or cron) | Not built in | Not built in | Not in their docs |
-| Mail | SMTP, SES, Resend, Mailgun and more | Not built in | Not built in | Not built in | SMTP |
+| Mail | SMTP, SES, Resend, Mailgun and more | Only sign-in emails, through Serverpod Cloud. Otherwise your own provider. | Not built in | Not built in | SMTP |
 | Cache | Memory, file, Redis, database | Local and Redis caches | Not built in | Not built in | File, Redis with `vania_redis` |
 | File storage | Local, S3 and S3-compatible | Database, Google Cloud Storage, S3, R2 | Not built in | Not built in | Local, S3 |
 | WebSocket | Socket.IO server, raw WebSocket | Streaming methods | `dart_frog_web_socket` | `shelf_web_socket` | Built in. Rooms with `vania_websocket`. |
-| OpenAPI | Made from routes and DTOs | See their docs | Not built in | Not built in | `vania_swagger` |
+| OpenAPI | Made from routes and DTOs | Not built in (third-party packages exist) | Not built in | Not built in | `vania_swagger` |
 | CLI | `dox` | `serverpod` | `dart_frog` | No CLI | `vania` (from `vania_cli`) |
 | Databases | Postgres, MySQL, MariaDB, SQLite | Postgres, SQLite | Not built in | Not built in | MySQL, MariaDB, Postgres, MongoDB |
 | License | MIT | BSD-3 for most packages. The main `serverpod` package is SSPL. | MIT | BSD-3-Clause | MIT |
 | On pub.dev since | 2023 (3.0 in October 2026) | 2021 | 2022 | 2014 | 2024 |
 
-<!-- UNIQUE INSIGHT: a checklist of what each Dart backend ships, checked against each project's own docs. -->
 
 Facts checked on 2026-11-17.
 We analyzed the docs, READMEs and pub.dev pages of each project on 2026-11-17, and we read the source of `vania` 2.1.0 from pub.dev.
@@ -168,7 +167,7 @@ Things to know:
 
 - A queue and a scheduler are not in [their docs](https://vdart.dev/docs/intro).
 - Validation rules are written as strings or fluent rules, not as typed fields on a class. See [their validation page](https://vdart.dev/docs/core/validation).
-- There is no SQLite driver in their docs.
+- There is no SQLite driver package in their docs.
 
 ## Dox
 
