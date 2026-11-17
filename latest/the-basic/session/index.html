@@ -2644,6 +2644,8 @@
       
         
       
+        
+      
     
     
     
@@ -3383,6 +3385,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7369,7 +7416,7 @@
 <li><code>cookie</code> (the default): all data is in the session cookie, encrypted with your <code>APP_KEY</code>. There is nothing to store on the server.</li>
 <li><code>cache</code>: the cookie only holds a random session id. The data lives in a <a href="../../packages/cache/">cache store</a>, such as <code>redis</code>.</li>
 </ul>
-<p>If you run more than one isolate or more than one server, use the <code>cache</code> driver with a shared store like <code>redis</code>, so all of them see the same sessions. See <a href="#choosing-a-driver">Choosing a driver</a> for more.</p>
+<p>If you run more than one server, use the <code>cache</code> driver with a shared store like <code>redis</code>, so all of them see the same sessions. See <a href="#choosing-a-driver">Choosing a driver</a> for more.</p>
 <h2 id="retrieving-data">Retrieving data</h2>
 <p>Use <code>get</code> to read a value. The second argument is the default, which you get when the key is not in the session:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
@@ -7459,9 +7506,9 @@
 <p>The cache driver keeps the data in a cache store, and the cookie only holds an encrypted session id. On logout the data is deleted, so old cookies stop working.</p>
 <p>Pick the store with the <code>store</code> option:</p>
 <ul>
-<li><code>redis</code> shares sessions between all isolates and servers.</li>
+<li><code>redis</code> shares sessions between all isolates and servers. To set a command timeout or other Redis options, see <a href="../../digging-deeper/cache/#redis-options">Redis options</a>.</li>
 <li><code>database</code> also shares sessions, if you have no Redis. See <a href="../../packages/cache/#database-store">Database store</a>.</li>
-<li><code>memory</code> is good for tests. It is not shared between isolates.</li>
+<li><code>memory</code> keeps sessions in the main isolate of this server. The other isolates read and write them there, so all isolates of one server see the same sessions. They are lost when the server stops, and each server has its own. Expired sessions are removed by the memory store. Good for tests and a single server.</li>
 </ul>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">SessionConfig</span><span class="p">(</span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'cache'</span><span class="p">,</span><span class="w"> </span><span class="nl">store:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">)</span>
 </span></code></pre></div>

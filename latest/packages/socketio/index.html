@@ -2343,6 +2343,8 @@
       
         
       
+        
+      
     
     
     
@@ -3082,6 +3084,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -5505,6 +5552,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#waiting-for-acks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Waiting for acks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#allowed-origins" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7473,6 +7531,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#waiting-for-acks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Waiting for acks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#allowed-origins" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8022,13 +8091,37 @@
 <tr>
 <td><code>maxSessions</code></td>
 <td><code>null</code></td>
-<td>the most open sessions per isolate</td>
+<td>the most open sessions per isolate. Set it in production</td>
+</tr>
+<tr>
+<td><code>maxAttachmentBytes</code></td>
+<td><code>null</code></td>
+<td>the most bytes of all binary parts of one packet. A bigger packet closes the client</td>
+</tr>
+<tr>
+<td><code>maxAuthSize</code></td>
+<td><code>null</code></td>
+<td>the most bytes of the <code>auth</code> payload of a connect. A bigger one gets <code>connect_error</code> (<code>auth payload too large</code>)</td>
+</tr>
+<tr>
+<td><code>maxWriteBufferSize</code></td>
+<td><code>null</code></td>
+<td>the most bytes kept for a client that does not read, like a polling client that stopped. Above it, the session closes</td>
+</tr>
+<tr>
+<td><code>ackTimeout</code></td>
+<td><code>null</code></td>
+<td>the default timeout of <code>emitWithAck</code>. With <code>null</code>, it waits until the client answers or leaves</td>
 </tr>
 </tbody>
 </table>
+<h3 id="waiting-for-acks">Waiting for acks</h3>
+<p><code>socket.waitingAcks</code> is the number of acks a socket still waits for. Use it to see a client that never answers:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">waiting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="n">waitingAcks</span><span class="p">;</span>
+</span></code></pre></div>
 <h3 id="allowed-origins">Allowed origins</h3>
 <p><code>allowedOrigins</code> says which websites may open a socket. You should set it when you log users in with cookies:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">ServerOptions</span><span class="p">(</span><span class="nl">allowedOrigins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://app.example.com'</span><span class="p">]);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">ServerOptions</span><span class="p">(</span><span class="nl">allowedOrigins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://app.example.com'</span><span class="p">]);</span>
 </span></code></pre></div>
 <ul>
 <li><code>null</code> (the default): no extra check. Dox logs a warning at start.</li>
@@ -8039,23 +8132,23 @@
 <p>Other sites get 403. A client with no <code>Origin</code> header (not a browser) is always allowed.</p>
 <h3 id="allow-requests-and-limit-sessions">Allow requests and limit sessions</h3>
 <p><code>allowRequest</code> runs for every handshake and every websocket upgrade. It gets an <code>EngineRequest</code> with the headers, query and address, and returns <code>true</code> or <code>false</code>. <code>maxSessions</code> is the most open sessions:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/socketio.dart</span><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">SocketIoConfig</span><span class="w"> </span><span class="n">socketIoConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoConfig</span><span class="p">(</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">ServerOptions</span><span class="p">(</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">    </span><span class="nl">allowRequest:</span><span class="w"> </span><span class="p">(</span><span class="n">EngineRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">query</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">,</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">    </span><span class="nl">maxSessions:</span><span class="w"> </span><span class="m">10000</span><span class="p">,</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/socketio.dart</span><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">SocketIoConfig</span><span class="w"> </span><span class="n">socketIoConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoConfig</span><span class="p">(</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">ServerOptions</span><span class="p">(</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="nl">allowRequest:</span><span class="w"> </span><span class="p">(</span><span class="n">EngineRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">query</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">,</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">    </span><span class="nl">maxSessions:</span><span class="w"> </span><span class="m">10000</span><span class="p">,</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>When <code>allowRequest</code> gives <code>false</code> or throws, the client gets <code>403</code>. At the limit, a new handshake gets <code>503</code> and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times <code>maxSessions</code>.</p>
+<p>When <code>allowRequest</code> gives <code>false</code> or throws, the client gets <code>403</code>. At the limit, a new handshake gets <code>503</code> and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times <code>maxSessions</code>. Without <code>maxSessions</code>, every GET request makes a session that lives about 45 seconds, so Dox logs one warning at start.</p>
 <h2 id="without-dox">Without Dox</h2>
 <p><code>dox_socketio</code> also runs on its own, with no Dox app:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">  </span><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">();</span>
-</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">  </span><span class="n">io</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">ChatNamespace</span><span class="p">());</span>
-</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">listen</span><span class="p">(</span><span class="m">3001</span><span class="p">);</span>
-</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">();</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span><span class="n">io</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">ChatNamespace</span><span class="p">());</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">listen</span><span class="p">(</span><span class="m">3001</span><span class="p">);</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
 <li><code>io.listen(port)</code> starts a native server on its own port. Run it in its own small program, like <code>bin/socket.dart</code>, behind the same proxy as the HTTP server.</li>
@@ -8065,10 +8158,10 @@
 <li><code>io.use(SocketAuth(findUser).handle)</code> logs users in on the default namespace.</li>
 </ul>
 <p>To use the Redis adapter, pass it to the server:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">(</span>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">),</span>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">(</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">),</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="details">Details</h2>
 <ul>

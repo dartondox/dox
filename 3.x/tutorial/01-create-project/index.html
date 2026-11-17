@@ -2475,6 +2475,8 @@
       
         
       
+        
+      
     
     
     
@@ -3214,6 +3216,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7024,8 +7071,8 @@
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox<span class="w"> </span>s
 </span></code></pre></div>
 <p><code>dox s</code> runs the code generator and the server. When you save a file in <code>lib/app/</code>, it hot reloads your code. When you change routes, config or other start-up code, it restarts the server.</p>
-<p>The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see a JSON log line with this message:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
+<p>The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see this log line:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[server] Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
 <p>The number of isolates is the number of CPU cores on your machine.</p>
 <h2 id="check-it">Check it</h2>

@@ -2343,6 +2343,8 @@
       
         
       
+        
+      
     
     
     
@@ -3082,6 +3084,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7188,7 +7235,7 @@
 </span></code></pre></div>
 <p>Delete the <code>public</code> lines if your app has no <code>public</code> folder.</p>
 <p>When the container starts, check the start log. It must end with <code>(native)</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Server started at http://[::]:3000 with 8 isolate (native)
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[server] Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
 <p>The <code>libgcc_s</code> lines are needed. Without them the native HTTP server does not load, and Dox stops at start with <code>dox_http_native did not load</code>.</p>
 <div class="admonition warning">

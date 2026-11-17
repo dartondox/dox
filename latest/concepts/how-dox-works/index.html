@@ -2552,6 +2552,8 @@
       
         
       
+        
+      
     
     
     
@@ -3291,6 +3293,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7289,7 +7336,7 @@
 <ul>
 <li>An error in a request is caught. Dox answers <code>500</code> and keeps going.</li>
 <li>An async error outside a request is caught and passed to the <code>ExceptionHandler</code>, and the isolate keeps running.</li>
-<li>If a worker isolate still dies, Dox prints <code>[dox] isolate N exited, restarting</code> and starts a new one after 1 second.</li>
+<li>If a worker isolate still dies, Dox prints <code>[server] isolate N exited, restarting</code> and starts a new one after 1 second.</li>
 <li>If the first (main) isolate dies, the process exits with a non-zero code. So in production, use a supervisor (Docker <code>restart:</code>, systemd <code>Restart=always</code>) to start it again.</li>
 </ul>
 <h3 id="how-many-isolates">How many isolates</h3>

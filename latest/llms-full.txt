@@ -594,10 +594,10 @@ dox s
 
 `dox s` runs the code generator and the server. When you save a file in `lib/app/`, it hot reloads your code. When you change routes, config or other start-up code, it restarts the server.
 
-The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see a JSON log line with this message:
+The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see this log line:
 
 ```text
-Server started at http://[::]:3000 with 8 isolate (native)
+[server] Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 The number of isolates is the number of CPU cores on your machine.
@@ -1856,7 +1856,7 @@ Dox tries hard to keep isolates alive:
 
 - An error in a request is caught. Dox answers `500` and keeps going.
 - An async error outside a request is caught and passed to the `ExceptionHandler`, and the isolate keeps running.
-- If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` and starts a new one after 1 second.
+- If a worker isolate still dies, Dox prints `[server] isolate N exited, restarting` and starts a new one after 1 second.
 - If the first (main) isolate dies, the process exits with a non-zero code. So in production, use a supervisor (Docker `restart:`, systemd `Restart=always`) to start it again.
 
 ### How many isolates
@@ -3661,6 +3661,8 @@ AfterResponse.run(() => mailer.sendWelcome(user));
 
 The work runs after the answer is sent, one after the other. An error in it goes to `ExceptionHandler.report`, so it never reaches the client.
 
+A request that adds no work costs almost nothing. The list of work is made on the first `run`.
+
 The work is not saved anywhere. When the server stops, work that did not run yet is lost. So use a [queue](../digging-deeper/queue.md) for work that must run. To run a queue job this way, see `dispatchAfterResponse()` in [Queue](../digging-deeper/queue.md#dispatching-jobs).
 
 ## Built-in middleware
@@ -3803,7 +3805,7 @@ This section is for special cases. Most apps do not need it.
 ### LogMiddleware
 
 - It follows `LoggerConfig`: `enabled`, `level` and `prettyPrint`. If the logger is off, `LogMiddleware(enabled: true)` does not turn logs on. `enabled: false` turns only the request logs off. Leave it unset to follow the logger.
-- With `prettyPrint` it prints colored text. Without it, it prints one JSON line with `status`, `message`, `network.client.ip`, `http.method`, `http.url`, `http.request_id` and `payload`.
+- With `prettyPrint` it prints colored text that starts with `[request]`, like `[request] GET /users => {...}`. Without it, it prints one JSON line with `status`, `source` (`request`), `message`, `network.client.ip`, `http.method`, `http.url`, `http.request_id` and `payload`.
 - The `filter` can change `status`, `message` and the other fields. It can not change `timestamp` or `logger`, because `Logger` sets them.
 - Headers are logged only with `withHeader: true`.
 - Body fields and headers whose name has a word like `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`.
@@ -3874,7 +3876,7 @@ The `driver` option decides where the session data is kept. Dox has two drivers:
 - `cookie` (the default): all data is in the session cookie, encrypted with your `APP_KEY`. There is nothing to store on the server.
 - `cache`: the cookie only holds a random session id. The data lives in a [cache store](../packages/cache.md), such as `redis`.
 
-If you run more than one isolate or more than one server, use the `cache` driver with a shared store like `redis`, so all of them see the same sessions. See [Choosing a driver](#choosing-a-driver) for more.
+If you run more than one server, use the `cache` driver with a shared store like `redis`, so all of them see the same sessions. See [Choosing a driver](#choosing-a-driver) for more.
 
 ## Retrieving data
 
@@ -4020,9 +4022,9 @@ The cache driver keeps the data in a cache store, and the cookie only holds an e
 
 Pick the store with the `store` option:
 
-- `redis` shares sessions between all isolates and servers.
+- `redis` shares sessions between all isolates and servers. To set a command timeout or other Redis options, see [Redis options](../digging-deeper/cache.md#redis-options).
 - `database` also shares sessions, if you have no Redis. See [Database store](../packages/cache.md#database-store).
-- `memory` is good for tests. It is not shared between isolates.
+- `memory` keeps sessions in the main isolate of this server. The other isolates read and write them there, so all isolates of one server see the same sessions. They are lost when the server stops, and each server has its own. Expired sessions are removed by the memory store. Good for tests and a single server.
 
 ```dart
 SessionConfig(driver: 'cache', store: 'redis')
@@ -8078,6 +8080,8 @@ A store uses one driver. The driver decides where the data is kept:
 
 Dox runs one isolate per CPU core, and each isolate has its own `memory` store. So a value you put in one isolate is missing in the others. If all isolates and servers must see the same data, use `redis` or `database`.
 
+Sessions on a `memory` store are the exception. They live in the main isolate, so every isolate sees them. See [Session](../the-basic/session.md).
+
 ### Adding a Redis store
 
 To add a store, edit `lib/config/cache.dart`. This example adds a `redis` store:
@@ -8348,10 +8352,34 @@ To use a memory store in tests, see [Testing](testing.md#test-the-cache).
 | `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db` (default `0`), `tls` (`true`/`false`), `pool_size` (default 10), `max_value_bytes` (no limit by default), `prefix`, `encrypt` |
 
 - A `redis` store with no `prefix` gets `<app name>_cache:` from `APP_NAME`, like `my_shop_cache:`. So two apps on one Redis do not share keys. The other drivers use `dox_cache:`.
+- To set any other ioredis option, see [Redis options](#redis-options).
 - You rarely need `pool_size`. The cache sends no blocking commands, so each isolate uses about one Redis connection.
 - Each store is made once per isolate, the first time you use it.
 - The `memory` driver removes expired items when they are read, and in a sweep after many writes (at least 1000). It also keeps JSON text, so `get` decodes on every hit.
 - `repository` gives the `dox_cache` `CacheStore`. See [dox_cache](../packages/cache.md) for custom drivers.
+
+### Redis options
+
+To set an option that Store options does not have, like a command timeout, give the `redis` store a `RedisOptions`. It is used as it is. `prefix`, `max_value_bytes` and `encrypt` still work next to it.
+
+Do not set `host`, `port`, `username`, `password`, `db`, `tls` or `pool_size` with it. That throws an `ArgumentError`.
+
+The client uses the ioredis defaults, not the `pool_size` default of the store. For example, `commandTimeout` is 10 seconds.
+
+```dart title="lib/config/cache.dart"
+'redis': <String, dynamic>{
+  'driver': 'redis',
+  'options': RedisOptions(
+    host: env.redisHost,
+    port: env.redisPort,
+    commandTimeout: const Duration(seconds: 2),
+  ),
+},
+```
+
+Sessions and the [rate limit](../security/rate-limiting.md) use the same store, so they get these options too.
+
+`RedisOptions`, `RedisTimeoutError` and `RedisQueueFullError` come with `package:dox_core/dox_core.dart`. You need no `ioredis` import.
 
 ### Encryption
 
@@ -8508,6 +8536,28 @@ class CreateQueueTables extends Migration {
 
 To keep the jobs in another database connection of `config/database.dart`, use `QueueConfig(connection: 'postgres')`.
 
+#### Adding the pop indexes to an old table
+
+A new `jobs` table has the indexes a worker needs to find the next job fast. A table you made earlier works too, but a poll can read every waiting job. To add the indexes, write a new migration. It adds only the indexes the table does not have, so you can run it more than once:
+
+```dart title="db/migration/2026_11_20_000000_add_queue_pop_index.dart"
+// ignore_for_file: file_names
+import 'package:dox_migration/dox_migration.dart';
+import 'package:dox_queue_database/dox_queue_database.dart';
+
+class AddQueuePopIndex extends Migration {
+  @override
+  Future<void> up(Schema schema) async {
+    await QueueTables.popIndex(schema);
+  }
+
+  @override
+  Future<void> down(Schema schema) async {}
+}
+```
+
+On MySQL and MariaDB it does nothing, because the index on `queue` is enough.
+
 ### Redis driver
 
 Set the driver to `redis` and give the Redis server:
@@ -8517,6 +8567,23 @@ QueueConfig queueConfig = QueueConfig(
   driver: 'redis',
   jobs: jobRegistry,
   redis: RedisOptions(host: env.redisHost, port: 6379),
+);
+```
+
+A Redis command that gets no reply in 10 seconds fails with `RedisTimeoutError`, and the client reconnects. This stops a Redis outage from hanging every request. Change it with `commandTimeout`. `null` turns it off. Blocking commands and subscriber connections never time out.
+
+To cap the commands that wait for a connection, set `maxQueuedCommands`. One more fails at once with `RedisQueueFullError`. It is off by default:
+
+```dart
+QueueConfig queueConfig = QueueConfig(
+  driver: 'redis',
+  jobs: jobRegistry,
+  redis: RedisOptions(
+    host: env.redisHost,
+    port: 6379,
+    commandTimeout: Duration(seconds: 5),
+    maxQueuedCommands: 1000,
+  ),
 );
 ```
 
@@ -9424,6 +9491,7 @@ This section is for special cases. Most apps do not need it.
 | `--tries=3` | `1` | tries of a job that does not set `tries` |
 | `--timeout=60` | `60` | max run time in seconds of a job that does not set `timeout` |
 | `--sleep=3` | `3` | seconds to wait when the queues are empty |
+| `--max-sleep=30` | off | when the queues stay empty, double the sleep on each empty poll, up to this many seconds. A job sets it back to `--sleep` |
 | `--stop-when-empty` | off | stop when the queues are empty |
 | `--timeout-grace=10` | none | after a timeout, wait up to this many seconds for the old run to end before the next try |
 | `--backoff=1,5,10` | none | seconds to wait before each retry of a job that does not set `backoff` |
@@ -9436,6 +9504,7 @@ With `--max-jobs`, `--max-time` and `--memory`, the worker stops after its runni
 
 ### Worker details
 
+- The worker logs one warning when a job may run longer than `retryAfter` (the `--timeout`, the `timeout` of a job class, and the grace time all count). Then a second worker can take the job while the first one still runs it. Raise `retryAfter` or lower the timeout.
 - While the worker waits for `--timeout-grace`, it takes no other job. If `timeout` plus the grace time is above `retryAfter`, another worker can take the job while this one waits.
 - When a crashed worker's job has no tries left, it fails with a message that the worker did not finish.
 - `restart` writes a time to the app cache, and each worker reads it every 3 seconds.
@@ -11287,9 +11356,21 @@ Then turn it on in the config, and run `dart run build_runner build` so the gene
 ScheduleConfig scheduleConfig = const ScheduleConfig(inProcess: true);
 ```
 
-Only the first isolate runs the tasks, and the other isolates only serve requests. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.
+Only the first isolate of the web server runs the tasks, and the other isolates only serve requests. A `bin/queue.dart` worker, a test or the `work` process does not start this in-process schedule. The `work` process runs the tasks on its own. In a test of the in-process schedule, set `Dox().isWebServer = true;` first. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.
 
 The tasks use the CPU of the server, so they can slow down requests on the first isolate. A separate `work` process can be deployed, scaled and restarted on its own. So use `work` for heavy tasks.
+
+## Logging the schedule
+
+By default the scheduler prints its own plain `[schedule]` lines. To send them through the app `Logger` instead, turn on `loggerLines`:
+
+```dart title="lib/config/schedule.dart"
+ScheduleConfig scheduleConfig = const ScheduleConfig(
+  flags: SchedulerFlags(loggerLines: true),
+);
+```
+
+The lines get the tag `[scheduler]`, for example `[scheduler] ran cleanup in 12ms`. They follow `LoggerConfig.enabled`, `level` and `prettyPrint`. `SchedulerFlags.all()` turns on every flag.
 
 ## Task output
 
@@ -11434,6 +11515,7 @@ This section is for special cases. Most apps do not need it.
 ### Filters and locks
 
 - `environments()` ignores case and spaces around the names. It is read at run time. An empty list or a blank name throws.
+- With `loggerLines` on, the plain `[schedule]` line is left out on stdout and stderr when the Logger printed it. So the lock store warning goes to stdout, not to stderr. Other sinks (like a `StringBuffer`) still get every plain line.
 - The once-per-tick lock is not released, so a late server can not run the same minute again. It expires after 10 minutes. When the store is `null`, the scheduler uses a memory store.
 - At start, the scheduler prints one warning to stderr when a task uses `onOneServer()` and the lock store is `memory`, `file` or `null`. It does not print when `APP_ENV` is `development` or `local`. With one server you can ignore it.
 - `clear-cache` removes only the `withoutOverlapping()` lock of each task, by its exact name. Other cache keys and the once-per-tick locks stay. It exits with 0, also when there was no lock. A `memory` store loses its locks with the process, so `clear-cache` is for `file` and Redis stores.
@@ -11530,7 +11612,7 @@ Each driver takes these options:
 | Driver | Options |
 | --- | --- |
 | `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility`, `atomic_writes`, `permissions` |
-| `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete` |
+| `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete`, `unsigned_payload` |
 | `memory` | none. For tests |
 
 The provider of a new project sets up these disks in every isolate. It is in `lib/providers/`, so the generated container finds it:
@@ -11562,6 +11644,19 @@ The `s3` disk reads five keys that a new project does not have yet. Add them to 
 ```
 
 The `s3` disk needs `bucket`, `key` and `secret`. If one is missing, the app stops at start with an `ArgumentError` that names the setting.
+
+### Skipping the body hash
+
+To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body. Only use it over HTTPS:
+
+```dart
+'s3': <String, dynamic>{
+  'driver': 's3',
+  'bucket': env.awsBucket,
+  // ... region, key, secret, endpoint
+  'unsigned_payload': true,
+},
+```
 
 ## Using another disk
 
@@ -11818,6 +11913,14 @@ To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-s
 ## Details
 
 This section is for special cases. Most apps do not need it.
+
+### Signature and the body
+
+`unsigned_payload` is off by default. The signature then does not cover the body, so only use it over HTTPS.
+
+### S3 part size
+
+`multipartPartSize` is the size of one part of a big upload. It is a field of `S3DriverConfig`, not a key of the disk map. The default is 8 MiB. See [Storage](../packages/storage.md). S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
 
 ### Atomic writes
 
@@ -12233,7 +12336,7 @@ Dox keeps your app running when code fails:
 
 - An error in a request is caught. Dox sends a `500` and keeps going.
 - An async error outside a request (for example a future that nobody awaits) is passed to the `report` method of the [exception handler](../the-basic/errors.md). The isolate keeps running.
-- If a worker isolate still dies, Dox prints `[dox] isolate N exited, restarting` to stderr and starts a new isolate after 1 second.
+- If a worker isolate still dies, Dox prints `[server] isolate N exited, restarting` to stderr and starts a new isolate after 1 second.
 
 If the first (main) isolate dies, the process exits with a non-zero code. So let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
 
@@ -13303,7 +13406,34 @@ WebSocket socket = await NativeWebSocket.upgrade(request);
 
 A message over the size limit closes the socket with code `1009`. Set the limit with `maxMessageSize` of `NativeWebSocket.upgrade`. Socket.IO uses `maxHttpBufferSize`.
 
+To find clients that vanished with no close (like a phone that lost its network), set `pingInterval`. When the client sent nothing for that long, the server sends a ping. When it still sends nothing for one more interval, the socket closes with `1001`. It is off by default:
+
+```dart
+socket.pingInterval = Duration(seconds: 30);
+```
+
 On a graceful stop (SIGTERM), every open WebSocket gets close code `1001`.
+
+## Streaming a response
+
+To send a body in parts, like server-sent events, write with `add()` and call `flush()`. The first `flush()` sends the status, the headers and the bytes so far. Later writes go out at once:
+
+```dart
+import 'dart:convert';
+import 'dart:io';
+
+server.listen((HttpRequest req) async {
+  req.response.headers.contentType = ContentType('text', 'event-stream');
+  req.response.add(utf8.encode('data: hello\n\n'));
+  await req.response.flush();
+});
+```
+
+`NativeResponse.headSent` is `true` once the status and headers went out. After that, an error page can not be sent any more. The response can only end. `req.response` is an `HttpResponse`, so cast it to read the flag:
+
+```dart
+bool sent = (req.response as NativeResponse).headSent;
+```
 
 ## Security notes
 
@@ -13368,6 +13498,8 @@ The server runs on the thread of the isolate, in a loop:
 - The request line plus headers can be at most 16 KB. Bigger gets `431`. A bad request gets `400`.
 - A multipart form over `maxMultipartSize`, or any other body over `maxBodySize`, gets `413` from Rust. With `Expect: 100-continue`, the `413` comes before the body is sent. Else Rust reads and drops the body first, so the client sees the `413`.
 - A client that sends no body bytes for 120 seconds gets `408`. A slow but steady upload is fine.
+- Accepted sockets get TCP keep-alive. After 60 seconds with no traffic, the OS checks the client every 10 seconds, and a client that misses 6 checks (about 2 minutes) is closed. A live client always answers.
+- A client that closed its side while the handler has not answered is closed when nothing was written for `idleTimeout` (30 seconds by default). Set it with the `idleTimeout` argument of `NativeHttpServer.bind`. In a Dox app, set `AppConfig.idleTimeout`.
 - A request head must arrive within 30 seconds. A keep-alive connection with no request for 30 seconds is closed. A client that does not read its answer for 30 seconds is cut off.
 - A request with both `Content-Length` and `Transfer-Encoding: chunked` gets `400`. A transfer encoding other than `chunked` gets `501`.
 - At most 64 requests of one connection wait for an answer, and at most 1 MB of answers waits to be sent. Then the server stops reading that connection until the answers go out.
@@ -13394,6 +13526,8 @@ Dox is fast by default, so most apps only need to follow a few rules in producti
 2. Put Caddy or nginx in front, for HTTPS and gzip.
 3. Keep the default isolates, one per CPU core.
 4. Keep the body limits on. Uploads stream to disk.
+
+For the code mistakes that slow an app down, see [Performance mistakes](performance-mistakes.md).
 
 ## Bodies, uploads and big responses
 
@@ -13675,6 +13809,279 @@ A bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64` or `128`
 - The argument types of each controller are read once at start, not on every request.
 - JSON and text responses are encoded once, straight to bytes, with `Content-Length` set.
 - The native server gzips on a Rust thread, and the gzipped body still gets a `Content-Length`.
+
+
+---
+
+# Performance mistakes
+
+Source: https://dartondox.dev/latest/digging-deeper/performance-mistakes/
+
+# Performance mistakes
+
+These are the mistakes that make a Dox app slow, with the fix for each one, and a strict mode that warns you about the worst of them while you develop.
+
+Dart runs one thing at a time in each isolate. When one request does slow work without an `await`, every other request on that isolate waits. Most of the mistakes below come from this, or from using too much memory or too many connections. For server settings, see [Performance](performance.md).
+
+## Heavy CPU work in a request
+
+Hashing, building a PDF, resizing an image or parsing a huge JSON file keeps the CPU busy. Run it on a worker isolate with `Dox().compute`, so the server can answer other requests meanwhile:
+
+```dart title="Wrong"
+Future<List<int>> invoice(DoxRequest req) async {
+  Order order = await Order().findOrFail(req.param['id']);
+  return buildPdf(order.toJson()); // blocks the isolate
+}
+```
+
+```dart title="Right"
+Future<List<int>> invoice(DoxRequest req) async {
+  Order order = await Order().findOrFail(req.param['id']);
+  return renderPdf(order.toJson());
+}
+
+Future<List<int>> renderPdf(Map<String, dynamic> data) {
+  return Dox().compute(() => buildPdf(data));
+}
+```
+
+The task runs in another isolate. So make it in a small top-level or static function, and pass only plain values (numbers, strings, lists, maps). Do not use a database connection, the container or a cache store inside it. To change the number of workers, set `computeWorkers` in `AppConfig`.
+
+## Sync password hashing
+
+`Hash.make` and `Hash.verify` run bcrypt on the isolate, and bcrypt is slow on purpose. In a handler, use the async methods. They run bcrypt on a worker:
+
+```dart title="Wrong"
+bool ok = Hash.verify(password, user.password);
+```
+
+```dart title="Right"
+bool ok = await Hash.verifyAsync(password, user.password);
+String hashed = await Hash.makeAsync(password);
+```
+
+## Sync file calls
+
+A sync file call stops the isolate until the disk answers. Use the async call:
+
+```dart title="Wrong"
+String text = File('data/terms.txt').readAsStringSync();
+```
+
+```dart title="Right"
+String text = await File('data/terms.txt').readAsString();
+```
+
+## Loading a whole table
+
+`all()` and `get()` read every row into memory. On a big table, this is slow and can use all your memory. Read one page, or read the rows in parts:
+
+```dart title="Wrong"
+List<Order> orders = await Order().all();
+```
+
+```dart title="Right"
+Pagination<Order> page = await Order().orderBy('id').paginate(currentPage: 1, perPage: 50);
+```
+
+To work on all rows, use `chunk()`, `lazy()` or `cursor()`. They keep only a few rows in memory:
+
+```dart
+await for (Order order in Order().orderBy('id').cursor(chunkSize: 500)) {
+  // one row at a time
+}
+```
+
+See [Paginating results](../database/query-builder.md#paginating-results), [Chunking results](../database/query-builder.md#chunking-results) and [Streaming results](../database/query-builder.md#streaming-results).
+
+## A query inside a loop
+
+This is the N+1 problem. One query loads the rows, then one more query runs for each row. 100 posts make 101 queries. Use `preload()` to load the relation for all rows in one extra query:
+
+```dart title="Wrong"
+List<Post> posts = await Post().all();
+for (Post post in posts) {
+  await post.$getRelation('author'); // one query per post
+  User? author = post.author;
+}
+```
+
+```dart title="Right"
+List<Post> posts = await Post().preload('author').get();
+for (Post post in posts) {
+  User? author = post.author; // already loaded
+}
+```
+
+## Awaiting independent work one by one
+
+If two calls do not need each other, start both and wait for both. The total time is then the slowest call, not the sum:
+
+```dart title="Wrong"
+int users = await User().count();
+int orders = await Order().count();
+```
+
+```dart title="Right"
+(int, int) counts = await (User().count(), Order().count()).wait;
+```
+
+For a list of futures, use `Future.wait(futures)`.
+
+## A static Map as a cache
+
+A `static` Map that you fill and never clean grows until the memory is full. Also, each isolate has its own copy, so the isolates do not agree. Use the [cache](cache.md) with a time to live:
+
+```dart title="Wrong"
+static final Map<String, Object> _settings = <String, Object>{};
+```
+
+```dart title="Right"
+Map<String, dynamic> settings = await Cache().remember(
+  'settings',
+  Duration(minutes: 10),
+  loadSettings,
+);
+```
+
+With the `redis` or `database` store, all isolates and servers share the same values.
+
+## Forgetting await
+
+If you call an async function without `await`, the work runs on its own. Its error is lost, and it can end after the response is sent. Await it:
+
+```dart title="Wrong"
+mailer.sendWelcome(user);
+```
+
+```dart title="Right"
+await mailer.sendWelcome(user);
+```
+
+Turn on the `unawaited_futures` lint in `analysis_options.yaml` and the analyzer finds these for you. If you really want the client to answer first, use a [queue job with `dispatchAfterResponse`](queue.md).
+
+## A new client for every request
+
+An HTTP client or a Redis client opens connections. If you make one in each request, you open and close a connection every time. Make one client and share it:
+
+```dart title="Wrong"
+Future<String> rate(DoxRequest req) async {
+  HttpClient client = HttpClient();
+  // ...
+}
+```
+
+```dart title="Right"
+class RateService {
+  RateService(this._client);
+
+  final HttpClient _client;
+
+  Future<String> rate() async {
+    // use _client
+  }
+}
+```
+
+Register the client once in the [container](../the-basic/dependency-injection.md) and inject it. Each isolate makes its own copy, which is fine.
+
+## A long transaction
+
+A transaction holds one database connection until it ends. If you call an outside API inside it, the connection waits for that API. When many requests do this, the pool runs out of connections. Do the slow call before or after the transaction:
+
+```dart title="Wrong"
+await QueryBuilder.transaction(() async {
+  await order.save();
+  await paymentApi.charge(order); // the connection waits here
+});
+```
+
+```dart title="Right"
+await paymentApi.charge(order);
+await QueryBuilder.transaction(() async {
+  await order.save();
+});
+```
+
+## Reading a big file into memory
+
+`bytes` loads the whole upload into memory. A big download read into a variable does the same. Stream both. See [Request](../the-basic/request.md#requestfile) and [Files and big responses](../the-basic/response.md#files-and-big-responses):
+
+```dart title="Wrong"
+List<int> data = await file.bytes;
+```
+
+```dart title="Right"
+Stream<List<int>> data = file.stream();
+```
+
+Keep `maxBodySize` and `maxMultipartSize` set, so a huge body gets `413` before Dart reads it. See [Size limits](../the-basic/request.md#size-limits).
+
+## Timers and listeners that never stop
+
+On a long connection, like server-sent events or a WebSocket, a `Timer.periodic` or a stream listener keeps running after the client leaves. Keep it and cancel it when the connection closes:
+
+```dart
+StreamSubscription<Event> subscription = events.listen(send);
+// when the client disconnects
+await subscription.cancel();
+```
+
+## Let Dox warn you
+
+Strict mode finds the worst mistakes while you develop. It writes a warning, and it never throws or changes the response. It is off by default, and when it is off it costs nothing.
+
+### Strict mode in Dox
+
+Set `strict` in `AppConfig`. Turn it on only in development:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  strict: StrictConfig(enabled: Env.appEnv == 'development'),
+  // ...
+);
+```
+
+Warnings go to stderr with a `[strict]` tag. `blockLimit` is how long code may block the isolate, 50 ms by default. To change it, use `StrictConfig(enabled: true, blockLimit: Duration(milliseconds: 100))`.
+
+A route that blocks the isolate for too long warns once:
+
+```text
+[strict] GET /invoices/{id} blocked the isolate for 180 ms (limit 50 ms). Other requests on this isolate had to wait. Move heavy CPU work (like bcrypt, PDF or image work) to await Dox().compute(...), and use Hash.makeAsync or Hash.verifyAsync for passwords.
+```
+
+Code that blocks the event loop, also after an `await`, warns at most once in 10 seconds. It cannot tell you which code did it:
+
+```text
+[strict] The event loop of isolate 1 was blocked for about 120 ms (limit 50 ms). Some code ran that long without an await, so other requests had to wait. Move heavy CPU work to await Dox().compute(...).
+```
+
+`Hash.make`, `Hash.verify` and `Hash.check` in the web server warn once for each place in your code:
+
+```text
+[strict] Hash.make ran in the web server at AuthController.register (package:my_app/app/http/controllers/auth_controller.dart:21:18). It blocks the isolate while bcrypt runs, so other requests wait. Use await Hash.makeAsync(...) instead.
+```
+
+### Strict mode in the ORM
+
+Set `strict` in `DatabaseConfig`:
+
+```dart title="lib/config/database.dart"
+DatabaseConfig databaseConfig = DatabaseConfig(
+  // ...
+  strict: OrmStrict(enabled: appConfig.isDevelopment),
+);
+```
+
+`nPlusOneCount` (default 5) is how many row by row loads of one relation in about one second make a warning. `maxRows` (default 1000) is how many rows `get()` or `all()` may read. The warnings are printed with a `[db]` tag:
+
+```text
+[db] Strict mode: possible N+1 query. The relation "author" of Post was loaded row by row 5 times in a short time. Load it for all rows in one query with preload('author').
+```
+
+```text
+[db] Strict mode: table "orders" read 25000 rows into memory (the limit is 1000). Use paginate(), chunk(), lazy() or cursor() for big results.
+```
 
 
 ---
@@ -22346,9 +22753,24 @@ Route.post('/auth/register', <dynamic>[
 
 Behind Caddy, nginx or a load balancer, every request comes from the proxy ip, so all clients share one count. Add the proxy to `AppConfig.trustedProxies`, so `req.ip()` is the real client ip. See [App config](../reference/app-config.md).
 
+## IPv6 clients
+
+A home or a server with IPv6 often gets a whole /64 block. That is 2^64 addresses. By default each address has its own count, so such a client can send from a new address each time and never hit the limit.
+
+Turn on `rateLimitIpv6Prefix` in `CoreFlags` to count each IPv6 client by its /64 prefix:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  flags: CoreFlags(rateLimitIpv6Prefix: true),
+  // ...
+);
+```
+
+All clients in one /64 then share one count. An IPv4 address stays as it is. A `key` function you give is used as it is. To use the same rule in your own key, call `RateLimit.ipBucket(req.ip())`.
+
 ## Where the counts live
 
-When the default [cache](../digging-deeper/cache.md) store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server.
+When the default [cache](../digging-deeper/cache.md) store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server. To set a command timeout or other Redis options, see [Redis options](../digging-deeper/cache.md#redis-options).
 
 With any other default store, the counts are kept in the main isolate of each server. All isolates of one server share them, but each server has its own counts. So with 3 servers, a client can send up to 3 times `max`.
 
@@ -22374,6 +22796,7 @@ The count is then the count of this window, plus a part of the window before. Th
 
 - A blocked request still counts, so a client that keeps sending while it is blocked stays blocked.
 - In the main isolate mode, each limited request sends one small message to the main isolate.
+- In the main isolate mode, the counter keeps at most 100,000 clients (about 15 MB). When it is full, it first drops the expired counts, then the oldest ones. A dropped client starts again at 0. New clients are never turned away, so a flood of fake clients can not lock out real users.
 - A `memory` store named in `store` also counts in the main isolate. A store passed in `cacheStore` is used as it is.
 - Sliding window example: 4 requests last minute, 1 this minute, 15 seconds in: the count is `4 x 45/60 + 1 = 4`. `X-RateLimit-Remaining` is `max` minus this count, rounded up. Each count is kept for 2 windows.
 
@@ -23852,6 +24275,8 @@ A mode that is not in the map keeps its default. Each mode must be an int from 0
 
 The examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are keys in the disk map. See [File Storage](../digging-deeper/file-storage.md).
 
+Two more fields have defaults. `multipartPartSize` is the size of one part of a big upload (8 MiB). `unsignedPayload` skips the hash of the body (`false`). Only turn it on over HTTPS.
+
 ### Cloudflare R2
 
 Set `supportsAcl: false`, because R2 does not take ACL headers:
@@ -24074,14 +24499,16 @@ Then set `CACHE_STORE=redis` in `.env`. With no config at all, Dox has a `file` 
 
 Dox runs many isolates, and each isolate has its own `memory` cache. So use `redis` or `database` when all isolates and servers must see the same data.
 
+Sessions on a `memory` store are the exception. They live in the main isolate, so every isolate sees them. See [Session](../the-basic/session.md).
+
 ### Store options
 
 | Driver | Options |
 | --- | --- |
 | every driver | `driver`, `prefix` (default `dox_cache:`) |
 | `memory` | `max_size`: the most items. When full, the least recently used item is removed. No limit when not set |
-| `file` | `path` (default `storage/cache`). Each prefix gets its own sub folder |
-| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` (default 10), `max_value_bytes` (values bigger than this throw. No limit by default) |
+| `file` | `path` (default `storage/cache`). Each prefix gets its own sub folder. `prune_every`, see [Pruning the file store](#pruning-the-file-store). `fsync` (default `true`): sync each write to the disk |
+| `redis` | `host` (default `127.0.0.1`), `port` (default `6379`), `username`, `password`, `db`, `tls`, `pool_size` (default 10), `max_value_bytes` (values bigger than this throw. No limit by default), `options` (a `RedisOptions`, replaces the connection keys. See [Redis options](../digging-deeper/cache.md#redis-options)) |
 
 The `prefix` is added to every key. Use different prefixes when two apps share one Redis database.
 
@@ -24326,25 +24753,53 @@ Then add a store to `lib/config/cache.dart`:
 
 Cache calls inside an app transaction on the same connection join that transaction, so their writes roll back with it. If you do not want this, give the store its own `connection`: a second connection with the same database settings.
 
-An expired row reads as a miss, but it stays in the table. So call `prune()` from time to time, for example in a schedule:
+An expired row reads as a miss, but it stays in the table, so the table keeps growing. To delete expired rows, set `prune_interval` on the store. It is in seconds. A write then starts a delete of expired rows in the background, at most once per that time. A read never starts it, and no call waits for it. Each server counts its own time. It is off by default:
+
+```dart
+'database': <String, dynamic>{'driver': 'database', 'prune_interval': 3600},
+```
+
+On a very big table the first delete can be slow. On MySQL and MariaDB it can make writes wait for a short time.
+
+You can also call `prune()` yourself from time to time, for example in a schedule:
 
 ```dart
 int deleted = await (store.driver as DatabaseCacheDriver).prune();
 ```
 
+A new `cache` table has an index on `expires_at`, so a prune reads only the expired rows. A table you made earlier does not have it. Add it with a migration:
+
+```dart
+await schema.table('cache', (Table t) => t.index('expires_at'));
+```
+
+An `increment` that goes past the 64-bit integer limit throws an error. The stored value does not change.
+
 ## Pruning the file store
 
-A read never deletes a file, so an expired file stays until it is written again. Call `prune()` from time to time to delete expired files, for example in a schedule:
+A read never deletes a file, so an expired file stays until it is written again. The store cleans up by itself: at most once an hour, a write starts a light prune in the background. The first one can start on the first write that comes at least a minute after the first write of the app. It deletes expired files, temp files left by a crash, and lock files that are free. It keeps files it can not read or decrypt, because they can belong to another app in the same folder. It never touches files the cache did not make. Only one runs per hour, also with many isolates or servers on one folder, and also when the app restarts often.
+
+To clean up more often, or to also delete broken files, call `prune()` yourself, for example in a schedule:
 
 ```dart
 int deleted = await (store.driver as FileDriver).prune();
 ```
 
-You can also set `prune_every` on the store. It runs `prune()` in the background once every that many writes. Each run reads every file of the store, so pick a big number:
+You can also set `prune_every` on the store. It runs `prune()` in the background once every that many writes, in place of the hourly prune. Each run reads every file of the store, so pick a big number:
 
 ```dart
 'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache', 'prune_every': 1000},
 ```
+
+### Faster writes with `fsync: false`
+
+Each write syncs the file to the disk first. This keeps the newest value after a power cut, but it is slow. A cache can lose its last writes, so you can turn it off:
+
+```dart
+'file': <String, dynamic>{'driver': 'file', 'path': 'storage/cache', 'fsync': false},
+```
+
+A crash of the app alone loses nothing. Only a power cut or a crash of the machine can lose the last writes. A lost value reads as a miss. Keep it on for a store that holds sessions, if a power cut must not log users out.
 
 ## Without Dox
 
@@ -24889,7 +25344,19 @@ SocketIoServer(
 | `cors` | `null` | CORS headers for polling requests. With a list of origins, it also checks the origin of websockets |
 | `allowedOrigins` | `null` | the sites that may connect, see [Allowed origins](#allowed-origins) |
 | `allowRequest` | `null` | accepts or refuses each request, see [Allow requests and limit sessions](#allow-requests-and-limit-sessions) |
-| `maxSessions` | `null` | the most open sessions per isolate |
+| `maxSessions` | `null` | the most open sessions per isolate. Set it in production |
+| `maxAttachmentBytes` | `null` | the most bytes of all binary parts of one packet. A bigger packet closes the client |
+| `maxAuthSize` | `null` | the most bytes of the `auth` payload of a connect. A bigger one gets `connect_error` (`auth payload too large`) |
+| `maxWriteBufferSize` | `null` | the most bytes kept for a client that does not read, like a polling client that stopped. Above it, the session closes |
+| `ackTimeout` | `null` | the default timeout of `emitWithAck`. With `null`, it waits until the client answers or leaves |
+
+### Waiting for acks
+
+`socket.waitingAcks` is the number of acks a socket still waits for. Use it to see a client that never answers:
+
+```dart
+int waiting = socket.waitingAcks;
+```
 
 ### Allowed origins
 
@@ -24919,7 +25386,7 @@ SocketIoConfig socketIoConfig = SocketIoConfig(
 );
 ```
 
-When `allowRequest` gives `false` or throws, the client gets `403`. At the limit, a new handshake gets `503` and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times `maxSessions`.
+When `allowRequest` gives `false` or throws, the client gets `403`. At the limit, a new handshake gets `503` and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times `maxSessions`. Without `maxSessions`, every GET request makes a session that lives about 45 seconds, so Dox logs one warning at start.
 
 ## Without Dox
 
@@ -26414,7 +26881,7 @@ Route.get('/boom', (DoxRequest req) => throw StateError('boom'));
 After `GET /api/boom`, the server prints one line:
 
 ```json
-{"timestamp":"2026-10-22T14:01:12.000Z","status":"error","message":"Bad state: boom","error":{"stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ..."}}
+{"timestamp":"2026-10-22T14:01:12.000Z","status":"error","message":"Bad state: boom","error":{"stack":"#0  ApiRouter.register.<anonymous closure> (package:my_app/routes/api.dart:41:44) ..."},"source":"error"}
 ```
 
 Remove the `/boom` route when you are done.
@@ -28222,7 +28689,7 @@ Delete the `public` lines if your app has no `public` folder.
 When the container starts, check the start log. It must end with `(native)`:
 
 ```text
-Server started at http://[::]:3000 with 8 isolate (native)
+[server] Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
 The `libgcc_s` lines are needed. Without them the native HTTP server does not load, and Dox stops at start with `dox_http_native did not load`.
@@ -28584,7 +29051,7 @@ Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"timestamp":"...","status":"info","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)","logger":{"name":"dox"}}
+{"timestamp":"...","status":"info","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)","logger":{"name":"dox"},"source":"server"}
 ```
 
 `(native)` means the native HTTP server loaded. When it does not load, the app stops at start and the error says why.
@@ -28779,7 +29246,7 @@ Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"timestamp":"...","status":"info","message":"Server started at http://[::]:3000 with 1 isolate (native)","logger":{"name":"dox"}}
+{"timestamp":"...","status":"info","message":"Server started at http://[::]:3000 with 1 isolate (native)","logger":{"name":"dox"},"source":"server"}
 ```
 
 ## HTTPS and the client IP
@@ -28958,7 +29425,7 @@ Migrating: 2023_07_16_131937700_create_users_table
 Migrated: 2023_07_16_131937700_create_users_table
 Migrating: 2026_10_22_205345_create_posts_table
 Migrated: 2026_10_22_205345_create_posts_table
-{"timestamp":"...","status":"info","message":"Server started at http://[::]:3000 with 1 isolate (native)","logger":{"name":"dox"}}
+{"timestamp":"...","status":"info","message":"Server started at http://[::]:3000 with 1 isolate (native)","logger":{"name":"dox"},"source":"server"}
 ```
 
 If the deploy fails with "the container did not listen on the port", the app listens on a different port than `--port`. Check `APP_PORT` and `--port`.
@@ -29735,6 +30202,7 @@ AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
 | `replaceHeaders` | `res.header(k, v)` replaces a value that a middleware set before. `Vary` and `Set-Cookie` still get one more value. Off: it adds a second value. Pass `replace:` to pick for one call. |
 | `decryptServerError` | A `DecryptException` gives a `500` `server_error`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. |
 | `envExpand` | `.env` values can use `${OTHER}`, and a `"..."` value reads `\n`, `\t`, `\"`, `\\` and `\$`. Also set `Env.flags = flags;` at the top of `main()` in `bin/server.dart` and in your tests, because `.env` is read before `AppConfig` exists. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another). Off: values are read as written. |
+| `rateLimitIpv6Prefix` | The default key of `RateLimit` counts an IPv6 client by its /64 prefix. One home or server gets a whole /64, so with one count per address a client gets a new count with each new address. Clients in one /64 share a count. A `key` you give is used as it is. Off: each full ip has its own count. See [Rate limiting](../security/rate-limiting.md#ipv6-clients). |
 | `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
 
 The cache has its own flag class, `CacheFlags`, in [`CacheConfig`](#cacheconfig).
@@ -29759,8 +30227,16 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | --- | --- | --- | --- |
 | `name` | `String` | `''` | Written as `logger.name` in each JSON log line. Left out when empty. |
 | `enabled` | `bool` | `false` | Turn the `Logger` on. When it is off, `LogMiddleware` logs nothing too. |
-| `prettyPrint` | `bool` | `false` | `true` prints colored text. `false` prints one JSON object per line, for log services. |
+| `prettyPrint` | `bool` | `false` | `true` prints colored text. Each line starts with a tag that says where it comes from, like `[request]`, `[server]` or `[app]`. `false` prints one JSON object per line, for log services. The tag is then in the `source` field, unless your data already has a `source` key. |
 | `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. |
+
+Your own lines get the tag `[app]`. To use another tag, pass it as the third argument. `log`, `info`, `warn`, `success` and `danger` all take it:
+
+```dart
+Logger.info('invoice sent', null, 'billing');
+```
+
+In JSON mode the tag is the `source` field. Plain warnings on stderr use the same tags.
 
 ## CacheConfig
 
@@ -29791,6 +30267,8 @@ Options of each driver:
 | all | `driver` | `String` | required | `file`, `memory`, `redis` or `null` |
 | all | `prefix` | `String` | `dox_cache:` | Text in front of every key. |
 | `file` | `path` | `String` | `storage/cache` | Folder of the cache files. |
+| `file` | `prune_every` | `int` | `0` | Run `prune()` once every this many writes. `0`: a light prune at most once an hour. |
+| `file` | `fsync` | `bool` | `true` | Sync each write to the disk. `false` is faster, but a power cut can lose the last writes. |
 | `memory` | `max_size` | `int` | no limit | Most items in the map. |
 | `redis` | `host` | `String` | `127.0.0.1` | Redis host. |
 | `redis` | `port` | `int` | `6379` | Redis port. |
@@ -29982,6 +30460,9 @@ AppConfig appConfig = AppConfig(
     LogMiddleware(enabled: env.appEnv != 'production'),
   ],
   container: registerContainer,
+
+  /// Only in development. Warns when a handler blocks the isolate.
+  strict: StrictConfig(enabled: env.appEnv == 'development'),
   cache: cache,
   cors: cors,
   logger: logger,
@@ -30028,6 +30509,9 @@ bool _debug = appConfig.isDevelopment;
 
 DatabaseConfig databaseConfig = DatabaseConfig(
   connection: env.dbConnection,
+
+  /// Only in development. Warns about N+1 relation loads and big results.
+  strict: OrmStrict(enabled: appConfig.isDevelopment),
   connections: <String, ConnectionConfig>{
     'postgres': ConnectionConfig(
       driver: Driver.postgres,
@@ -31423,8 +31907,8 @@ A `<...>` part changes, like a name or a number. Dart puts a prefix in front of 
 | `Server started at http://<host>:<port> with <n> isolate (native)` | Normal start. `<host>` is the address it listens on: `[::]` means all interfaces. | Nothing. |
 | `Windows: the native server runs on one isolate` | Windows has no `SO_REUSEPORT`. | Nothing. |
 | `Socket.IO runs on <n> isolates: clients should use transports: ['websocket'] ...` | Socket.IO with more than one isolate and long-polling on. | Use `transports: ['websocket']` in the client. |
-| `[dox] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
-| `[dox] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
+| `[server] isolate <n> error: <error>` | An error killed a worker isolate. The stack is on the next line. | Fix the error. Dox restarts the isolate. |
+| `[server] isolate <n> exited, restarting` | A worker isolate died. A new one starts after 1 second. | Look at the error line above it. |
 | `SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = <port>` | The port is in use. | See [Troubleshooting](troubleshooting.md#port-already-in-use). |
 
 ## dox_core: routes and controllers
@@ -31818,6 +32302,11 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_builder
 
+### 3.2.2
+
+- Faster: a model gets a `$columnValue(column)` method, a switch that gives one value of `columnsToMap()` without making the whole map. dox_orm reads the relation keys of each row with it. It is made only when the dox_orm of the app has `Model.$columnValue`, so the code still compiles with an older dox_orm. A column with `beforeSave` is not in the switch: it falls back to `columnsToMap()`. A model with its own `columnsToMap()` gets no switch.
+- Faster: `fromMap()` read a date column from the row map two or three times. It now reads it once. The result is the same. Run `dart run build_runner build` to get the new code.
+
 ### 3.2.1
 
 - New: a default that reads the global `env` (like `env.appEnv`) stopped the app with a stack overflow. Now `load()` throws a clear `StateError` that says to use the getter directly.
@@ -32022,6 +32511,20 @@ What changed in each package, newest first. This page is made from the
 
 ## dox_cache
 
+### 3.2.1
+
+- New: a `redis` store takes `'options': RedisOptions(...)`. It is used as it is, so you can set `commandTimeout`, `connectTimeout`, `onError` and more.
+- `options` with `host`, `port`, `username`, `password`, `db`, `tls` or `pool_size`, or a value that is not a `RedisOptions`, throws an `ArgumentError`.
+- `RedisOptions`, `RedisTimeoutError` and `RedisQueueFullError` are exported. Old configs do not change.
+- Fix, disk: the `file` store never cleaned up by default, so expired files (like old sessions) stayed on the disk for ever. Now, with `prune_every` 0 (the default), a write starts a light prune in the background at most once an hour. It deletes expired files, temp files left by a crash, and free lock files. It keeps files it can not read or decrypt, so another app in the same folder keeps its files. It only touches files the cache made: other files in the folder stay. A lock file on disk makes sure only one runs per hour for all isolates and servers on one folder, also when the app restarts often. In a process, the first one can start on the first write that comes at least a minute after the first write of that process, so short commands never start one. Files that `pull` or a lock moved away for a moment and that a crash left behind are deleted after an hour, and `flush()` deletes moved values too. Expired files already read as a miss, so reads do not change.
+- `FileDriver.prune()` now also deletes temp files older than an hour and lock files that are free. Its result still counts only value files.
+- Fix: a value file with JSON that is not a map, or with an expiry time that is not a whole number, threw a `TypeError` on read. Now it reads as a miss, like other broken files.
+- Fix, disk: a write that failed (eg. a full disk) left its temp file. Now it is deleted.
+- New: `fsync` option on a `file` store (default `true`, as before). `fsync: false` skips the sync to disk on each write, so writes are faster. After a power cut the last writes can then be lost (they read as a miss).
+- Perf: lock files of the `file` store (`add`, `increment`, `touch` and `lock()`) are no longer synced to the disk. The sync did not make a lock survive a power cut anyway, because the folder was never synced. This halves the syncs of `add` and `increment`.
+- Perf: the `memory` store with `max_size` removed the least recently used item in O(n) time per write when full. Now each step is O(1).
+- Perf, memory: the `memory` store drops expired items at the front of the list on each write (at most two), not only in the sweep after 1000 or more writes.
+
 ### 3.2.0
 
 - New: `dox cache:install [--store=file|redis|memory|database]`, run by `dox add cache`. It writes `lib/config/cache.dart`, the `CACHE_STORE` key and the `AppEnv` getters, and adds `cache: cache` to `lib/config/app.dart`. With `--store=database` it also adds `dox_cache_database`, its provider and the cache table migration. It never overwrites a file. dox_cache now depends on dox_annotation.
@@ -32167,6 +32670,41 @@ What changed in each package, newest first. This page is made from the
 - `remember`, `pull`, `add`, `increment`, `many`, tags and atomic locks.
 
 ## dox_core
+
+### 3.2.2
+
+- Fix: the temp files of big uploads were deleted when `response.done` completed. A newer native server completes `done` also when the client leaves, so a slow handler (an S3 upload, image work) could lose its file while it read it. Now the files are deleted when the request is handled (after the middleware and the controller, also on an error) and the response is done. A request with no big upload pays nothing.
+- Fix: when a handler had already sent the head (a flush or a stream, eg. server-sent events) and then threw, Dox cleared the headers, set status 500 and wrote `Internal Server Error` into the middle of the stream. Now the error is reported and the response just ends. This needs a dox-http-native with `NativeResponse.headSent` (dox-http-native#25).
+- Fix: a multipart body that ended with no closing boundary (a cut upload) kept the request open for ever, with its temp file. Now it gives 400 and the temp file is deleted.
+- Fix: a sync throw in a handler, or a raw `Route.mount` handler (no `middleware: true`), never marked the handler as ended. `AfterResponse` work then never ran and the upload temp files stayed on disk. Now every path ends the handler.
+- Fix: a multipart body with an epilogue after the closing boundary was rejected when the epilogue was longer than about 256 bytes. Any epilogue is fine now.
+- Fix: after a `RequestTimeout` the late handler lost its upload temp files. They now stay until it ends (a handler that never ends keeps them for ever). `AfterResponse` work that never ends does the same.
+- Fix: `AfterResponse` work could start while the handler still ran, when the client left early. Now it starts after the handler ended and the response is done.
+
+- Perf: every request with no body (most GETs) made a new empty body map. Now the map is made on the first use of `req.body` (or `req.requestBody.map`, `req.all()`, `req.input()`, `req.add()`). A request that never reads its body makes no map. Each request still has its own map, so writes never leak between requests. `DoxRequest(body:)` is now optional.
+- Fix: sessions with the `cache` driver on a `memory` store were kept in each isolate on its own. The server runs one isolate per CPU core, so a session saved by one isolate was missing when the next request came to another one. Users were logged out at random. Now these sessions live in the memory store of the main isolate, and the other isolates read and write them there (one message per session read, one per changed session). Expired sessions are removed by the memory store as before. A server with one isolate, the `cookie` driver and the other stores work as before.
+- Security: the `RateLimit` counts in the main isolate (no Redis) had no limit on the number of clients. A client with many ips (an IPv6 /64 has 2^64) could grow the memory with no end. Now the counter keeps at most 100,000 clients (`RateLimitCounter.defaultMaxKeys`, about 15 MB). This cap is on by default. When it is full, the counter first drops the expired counts, then the oldest ones. A dropped client starts again at 0. New clients are never turned away, so a flood of fake clients can not lock out real users.
+- Security: new opt-in flag `CoreFlags.rateLimitIpv6Prefix` (off by default). With it, the default `RateLimit` key counts an IPv6 client by its /64 prefix, so a client can not get a new count by changing its address inside its /64. Clients in one /64 then share a count. `RateLimit.ipBucket(ip)` gives this key for your own `key` function.
+- Perf: `RateLimit` on a Redis store sent its commands one after the other: 2 round trips per request (3 with `sliding`). Now they go out in one write, so it is one round trip. The commands, the counts and the errors are the same. If the count is made before its time limit is set (or setting the limit fails), Dox sets the limit after (it tries twice), so a client is not blocked for ever. Other stores work as before.
+- Perf: `AfterResponse` made a list and waited for each response, also when no work was added. Now this happens on the first `AfterResponse.run` of a request. A request that adds no work pays only for its zone. Apps with the queue package have `AfterResponse` on.
+- Perf: the `cookie` session driver decrypted the session cookie on every request. Now it decrypts on the first use of `req.session`. The `cache` driver still reads the store before the controller, because the session API is not async.
+- Perf: a `String` body was encoded with `utf8.encode`, which first makes a list 3 times the text length, then copies the used part. Now an ASCII text is written straight into a list of the right size (new `utf8Bytes`). A text with other characters still uses `utf8.encode`. The bytes are the same.
+- Perf: the `Content-Type` of a request with a body was parsed on every request. Now the parsed type is kept per header text (at most 64 texts, a multipart boundary is not kept), so a repeated type is parsed once. New `HttpBody.contentTypeOf(headers)`.
+- Perf: a route with params ran its regex for every url with the same first segment. Now the router first checks the plain text before the first param (new `RouteData.matchPrefix`, eg. `/api/users` for `/api/users/{id}`), and skips the regex when the url does not start with it. A route with regex marks (like `.`) in that text runs the regex as before. The matched routes are the same.
+- Perf: `SecurityHeaders` and `RequestId` use lower case header names, so the server makes no lower case copy per header. `RequestId.make()` builds the id with one list, not 9 strings. The id is still 32 hex characters.
+- Perf: a worker isolate made one timer per rate limited request for the 5 second timeout to the main isolate. Now one timer checks all waiting requests, and it only runs while a request waits.
+
+- The AI agent skill (dox-core-guide) has a Performance section and `references/performance.md`: the common mistakes that block the isolate, the right code for each, and strict mode.
+- New: `Dox().compute(task)` runs heavy CPU work (a PDF, an image, a big JSON file) on a worker isolate and gives the result. The server can answer other requests in the meantime. There is one small pool of workers for the whole process, shared by every server isolate. The workers start on the first task. More tasks than workers wait in line, first come first served. An error of the task is thrown to the caller, with its stack trace. A worker that dies is replaced, and its task fails with a clear error. The pool stops with the server and never keeps a command or a test running. The task runs in another isolate, so it can only use values that can be sent between isolates, not the IoC container or a database pool.
+- New: `AppConfig.computeWorkers` sets the number of workers. Default `AppConfig.defaultComputeWorkers` (4).
+- Change: `Hash.makeAsync` and `Hash.verifyAsync` run on the worker pool of `Dox().compute`. Before, each call started a new isolate, so 500 logins at once started 500 isolates. The results are the same. They still work without a server.
+- New: strict mode for development: `AppConfig(strict: StrictConfig(enabled: true))`. Off by default, and then it costs one bool check per request. When on, it writes a `[strict]` warning to stderr when a route blocks the isolate longer than `StrictConfig.blockLimit` (default 50 ms, once per route), when the event loop was blocked that long after an `await` (at most once in 10 seconds), and when `Hash.make`, `Hash.verify` or `Hash.check` runs in the web server (once per place in the code). Each warning says what to use instead.
+- Memory: each response called `close()` and did not use its Future. On the native server that Future and its microtask kept the request and its batch of bytes alive a bit longer, so under load the heap grew. Now Dox calls `NativeResponse.end()`, which makes no Future. A `dart:io` response still calls `close()`. Needs the next dox_http_native.
+- Perf: CORS read the `Origin` header on every request, even with the default config that sets no CORS value. With the content type read, that was a second header lookup, and the native server then parsed all headers. Now `Origin` is read only when `origin` is a list, and a config with no values returns at once. The headers sent stay the same.
+- Memory: `DoxResponse` made a map, a set and a list for every response, also when nothing was set. Now they are made on first use. `headers` still gives a map you can change.
+- New: every pretty log line starts with a dim tag that says where it comes from, like `[request] GET /users => {...}`. Request lines get `[request]`. Server start, stop and startup warnings get `[server]`. Error reports get `[error]`. Your own lines get `[app]`. Pass your own tag as the third argument: `Logger.info('done', null, 'billing')`. `Logger.log`, `info`, `warn`, `success` and `danger` all take it. In JSON mode the tag is the `source` field, added at the end of the line. When the data map has its own `source` key, that value is kept and the tag is not added. An empty tag counts as no tag.
+- Change: the plain warnings on stderr use the same tags. `dox: warning:` and `[dox]` are now `[server]` (isolate, server, WebSocket and CORS warnings) or `[request]` (a middleware returned null).
+- Perf: a JSON response made a new 8 KB buffer, even for a small body. This made small JSON bodies about 2x slower to encode. The buffer is 1 KB now. Big bodies are about the same speed.
 
 ### 3.2.1
 

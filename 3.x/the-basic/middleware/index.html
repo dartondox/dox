@@ -2677,6 +2677,8 @@
       
         
       
+        
+      
     
     
     
@@ -3416,6 +3418,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7560,6 +7607,7 @@ When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, Dox
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">AfterResponse</span><span class="p">.</span><span class="n">run</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">mailer</span><span class="p">.</span><span class="n">sendWelcome</span><span class="p">(</span><span class="n">user</span><span class="p">));</span>
 </span></code></pre></div>
 <p>The work runs after the answer is sent, one after the other. An error in it goes to <code>ExceptionHandler.report</code>, so it never reaches the client.</p>
+<p>A request that adds no work costs almost nothing. The list of work is made on the first <code>run</code>.</p>
 <p>The work is not saved anywhere. When the server stops, work that did not run yet is lost. So use a <a href="../../digging-deeper/queue/">queue</a> for work that must run. To run a queue job this way, see <code>dispatchAfterResponse()</code> in <a href="../../digging-deeper/queue/#dispatching-jobs">Queue</a>.</p>
 <h2 id="built-in-middleware">Built-in middleware</h2>
 <h3 id="request-id">Request id</h3>
@@ -7655,7 +7703,7 @@ When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, Dox
 <h3 id="logmiddleware">LogMiddleware</h3>
 <ul>
 <li>It follows <code>LoggerConfig</code>: <code>enabled</code>, <code>level</code> and <code>prettyPrint</code>. If the logger is off, <code>LogMiddleware(enabled: true)</code> does not turn logs on. <code>enabled: false</code> turns only the request logs off. Leave it unset to follow the logger.</li>
-<li>With <code>prettyPrint</code> it prints colored text. Without it, it prints one JSON line with <code>status</code>, <code>message</code>, <code>network.client.ip</code>, <code>http.method</code>, <code>http.url</code>, <code>http.request_id</code> and <code>payload</code>.</li>
+<li>With <code>prettyPrint</code> it prints colored text that starts with <code>[request]</code>, like <code>[request] GET /users =&gt; {...}</code>. Without it, it prints one JSON line with <code>status</code>, <code>source</code> (<code>request</code>), <code>message</code>, <code>network.client.ip</code>, <code>http.method</code>, <code>http.url</code>, <code>http.request_id</code> and <code>payload</code>.</li>
 <li>The <code>filter</code> can change <code>status</code>, <code>message</code> and the other fields. It can not change <code>timestamp</code> or <code>logger</code>, because <code>Logger</code> sets them.</li>
 <li>Headers are logged only with <code>withHeader: true</code>.</li>
 <li>Body fields and headers whose name has a word like <code>password</code>, <code>secret</code>, <code>token</code>, <code>authorization</code>, <code>cookie</code> or <code>api_key</code> in it (upper or lower case) are logged as <code>[REDACTED]</code>. Change the list with <code>redact:</code>.</li>

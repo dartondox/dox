@@ -2345,6 +2345,8 @@
       
         
       
+        
+      
     
     
     
@@ -3032,6 +3034,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#logging-the-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging the schedule
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#task-output" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3573,6 +3586,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7575,6 +7633,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#logging-the-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging the schedule
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#task-output" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8075,32 +8144,39 @@
 <p>Then turn it on in the config, and run <code>dart run build_runner build</code> so the generated container finds the provider:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/schedule.dart</span><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">ScheduleConfig</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">(</span><span class="nl">inProcess:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Only the first isolate runs the tasks, and the other isolates only serve requests. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.</p>
+<p>Only the first isolate of the web server runs the tasks, and the other isolates only serve requests. A <code>bin/queue.dart</code> worker, a test or the <code>work</code> process does not start this in-process schedule. The <code>work</code> process runs the tasks on its own. In a test of the in-process schedule, set <code>Dox().isWebServer = true;</code> first. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.</p>
 <p>The tasks use the CPU of the server, so they can slow down requests on the first isolate. A separate <code>work</code> process can be deployed, scaled and restarted on its own. So use <code>work</code> for heavy tasks.</p>
+<h2 id="logging-the-schedule">Logging the schedule</h2>
+<p>By default the scheduler prints its own plain <code>[schedule]</code> lines. To send them through the app <code>Logger</code> instead, turn on <code>loggerLines</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/schedule.dart</span><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">ScheduleConfig</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">(</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="n">SchedulerFlags</span><span class="p">(</span><span class="nl">loggerLines:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>The lines get the tag <code>[scheduler]</code>, for example <code>[scheduler] ran cleanup in 12ms</code>. They follow <code>LoggerConfig.enabled</code>, <code>level</code> and <code>prettyPrint</code>. <code>SchedulerFlags.all()</code> turns on every flag.</p>
 <h2 id="task-output">Task output</h2>
 <p>These hooks keep the output (stdout and stderr) of an <code>exec()</code> or <code>command()</code> task. They do nothing on a function task.</p>
 <p>Use <code>sendOutputTo</code> to write the output to a file. It replaces the file each run:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">s</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">'pg_dump'</span><span class="p">,</span><span class="w"> </span><span class="nl">args:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'mydb'</span><span class="p">]).</span><span class="n">daily</span><span class="p">().</span><span class="n">sendOutputTo</span><span class="p">(</span><span class="s1">'storage/logs/backup.log'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">s</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">'pg_dump'</span><span class="p">,</span><span class="w"> </span><span class="nl">args:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'mydb'</span><span class="p">]).</span><span class="n">daily</span><span class="p">().</span><span class="n">sendOutputTo</span><span class="p">(</span><span class="s1">'storage/logs/backup.log'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Use <code>appendOutputTo</code> to add the output to the end of the file:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">s</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">'pg_dump'</span><span class="p">,</span><span class="w"> </span><span class="nl">args:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'mydb'</span><span class="p">]).</span><span class="n">daily</span><span class="p">().</span><span class="n">appendOutputTo</span><span class="p">(</span><span class="s1">'storage/logs/backup.log'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">s</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">'pg_dump'</span><span class="p">,</span><span class="w"> </span><span class="nl">args:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'mydb'</span><span class="p">]).</span><span class="n">daily</span><span class="p">().</span><span class="n">appendOutputTo</span><span class="p">(</span><span class="s1">'storage/logs/backup.log'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Use <code>onOutput</code> to get the output in code after the process ends. It holds the whole output in memory, so do not use it for a very large output:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">s</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">'pg_dump'</span><span class="p">,</span><span class="w"> </span><span class="nl">args:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'mydb'</span><span class="p">]).</span><span class="n">daily</span><span class="p">().</span><span class="n">onOutput</span><span class="p">((</span><span class="kt">String</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="w"> </span><span class="p">{...});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="n">s</span><span class="p">.</span><span class="n">exec</span><span class="p">(</span><span class="s1">'pg_dump'</span><span class="p">,</span><span class="w"> </span><span class="nl">args:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'mydb'</span><span class="p">]).</span><span class="n">daily</span><span class="p">().</span><span class="n">onOutput</span><span class="p">((</span><span class="kt">String</span><span class="w"> </span><span class="n">output</span><span class="p">)</span><span class="w"> </span><span class="p">{...});</span>
 </span></code></pre></div>
 <h2 id="task-hooks">Task hooks</h2>
 <p>Hooks run code around a task, for example to log it or to alert your team when it fails:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="n">s</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">    </span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="n">sendReport</span><span class="p">)</span>
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">    </span><span class="p">.</span><span class="n">daily</span><span class="p">()</span>
-</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="w">    </span><span class="p">.</span><span class="n">before</span><span class="p">(</span><span class="n">logStart</span><span class="p">)</span>
-</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a><span class="w">    </span><span class="p">.</span><span class="n">onSuccess</span><span class="p">(</span><span class="n">logDone</span><span class="p">)</span>
-</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="w">    </span><span class="p">.</span><span class="n">onFailure</span><span class="p">(</span><span class="n">alertTeam</span><span class="p">)</span>
-</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">    </span><span class="p">.</span><span class="n">after</span><span class="p">(</span><span class="n">cleanUp</span><span class="p">);</span>
-</span><span id="__span-33-8"><a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a>
-</span><span id="__span-33-9"><a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">alertTeam</span><span class="p">(</span><span class="kt">Object</span><span class="w"> </span><span class="n">error</span><span class="p">,</span><span class="w"> </span><span class="n">StackTrace</span><span class="w"> </span><span class="n">stack</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-33-10"><a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">notifyTeam</span><span class="p">(</span><span class="s1">'report failed: </span><span class="si">$</span><span class="n">error</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-33-11"><a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">s</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'report'</span><span class="p">,</span><span class="w"> </span><span class="n">sendReport</span><span class="p">)</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="p">.</span><span class="n">daily</span><span class="p">()</span>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="p">.</span><span class="n">before</span><span class="p">(</span><span class="n">logStart</span><span class="p">)</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="p">.</span><span class="n">onSuccess</span><span class="p">(</span><span class="n">logDone</span><span class="p">)</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="w">    </span><span class="p">.</span><span class="n">onFailure</span><span class="p">(</span><span class="n">alertTeam</span><span class="p">)</span>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="w">    </span><span class="p">.</span><span class="n">after</span><span class="p">(</span><span class="n">cleanUp</span><span class="p">);</span>
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a>
+</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">alertTeam</span><span class="p">(</span><span class="kt">Object</span><span class="w"> </span><span class="n">error</span><span class="p">,</span><span class="w"> </span><span class="n">StackTrace</span><span class="w"> </span><span class="n">stack</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-34-10"><a id="__codelineno-34-10" name="__codelineno-34-10" href="#__codelineno-34-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">notifyTeam</span><span class="p">(</span><span class="s1">'report failed: </span><span class="si">$</span><span class="n">error</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-34-11"><a id="__codelineno-34-11" name="__codelineno-34-11" href="#__codelineno-34-11"></a><span class="p">}</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -8131,62 +8207,62 @@
 <p>An error in a task is logged, and the next task still runs.</p>
 <h3 id="pinging-urls">Pinging URLs</h3>
 <p>You can send a GET request to a URL around a task, for example to a health check service:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">s</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">    </span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'backup'</span><span class="p">,</span><span class="w"> </span><span class="n">backup</span><span class="p">)</span>
-</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="w">    </span><span class="p">.</span><span class="n">daily</span><span class="p">()</span>
-</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">    </span><span class="p">.</span><span class="n">pingBefore</span><span class="p">(</span><span class="s1">'https://health.example.com/backup/start'</span><span class="p">)</span>
-</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">    </span><span class="p">.</span><span class="n">pingOnSuccess</span><span class="p">(</span><span class="s1">'https://health.example.com/backup'</span><span class="p">)</span>
-</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="w">    </span><span class="p">.</span><span class="n">pingOnFailure</span><span class="p">(</span><span class="s1">'https://health.example.com/backup/fail'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">s</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="w">    </span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'backup'</span><span class="p">,</span><span class="w"> </span><span class="n">backup</span><span class="p">)</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="w">    </span><span class="p">.</span><span class="n">daily</span><span class="p">()</span>
+</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="w">    </span><span class="p">.</span><span class="n">pingBefore</span><span class="p">(</span><span class="s1">'https://health.example.com/backup/start'</span><span class="p">)</span>
+</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="w">    </span><span class="p">.</span><span class="n">pingOnSuccess</span><span class="p">(</span><span class="s1">'https://health.example.com/backup'</span><span class="p">)</span>
+</span><span id="__span-35-6"><a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="w">    </span><span class="p">.</span><span class="n">pingOnFailure</span><span class="p">(</span><span class="s1">'https://health.example.com/backup/fail'</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>thenPing(url)</code> pings after the task, always. Each ping method also has an <code>If</code> form that takes a bool first, like <code>pingOnFailureIf(isProduction, url)</code>. A failed ping is logged, but it never fails the task.</p>
 <h2 id="without-dox">Without Dox</h2>
 <p><code>dox_scheduler</code> also works in a plain Dart app. Leave out <code>app</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>
-</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
-</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a>
-</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="kt">void</span><span class="w"> </span><span class="n">schedule</span><span class="p">(</span><span class="n">Schedule</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-35-6"><a id="__codelineno-35-6" name="__codelineno-35-6" href="#__codelineno-35-6"></a><span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'cleanup'</span><span class="p">,</span><span class="w"> </span><span class="n">cleanup</span><span class="p">).</span><span class="n">dailyAt</span><span class="p">(</span><span class="s1">'02:00'</span><span class="p">);</span>
-</span><span id="__span-35-7"><a id="__codelineno-35-7" name="__codelineno-35-7" href="#__codelineno-35-7"></a><span class="p">}</span>
-</span><span id="__span-35-8"><a id="__codelineno-35-8" name="__codelineno-35-8" href="#__codelineno-35-8"></a>
-</span><span id="__span-35-9"><a id="__codelineno-35-9" name="__codelineno-35-9" href="#__codelineno-35-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cleanup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-35-10"><a id="__codelineno-35-10" name="__codelineno-35-10" href="#__codelineno-35-10"></a><span class="w">  </span><span class="c1">// delete old files, ...</span>
-</span><span id="__span-35-11"><a id="__codelineno-35-11" name="__codelineno-35-11" href="#__codelineno-35-11"></a><span class="p">}</span>
-</span><span id="__span-35-12"><a id="__codelineno-35-12" name="__codelineno-35-12" href="#__codelineno-35-12"></a>
-</span><span id="__span-35-13"><a id="__codelineno-35-13" name="__codelineno-35-13" href="#__codelineno-35-13"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-35-14"><a id="__codelineno-35-14" name="__codelineno-35-14" href="#__codelineno-35-14"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">SchedulerRunner</span><span class="p">(</span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
-</span><span id="__span-35-15"><a id="__codelineno-35-15" name="__codelineno-35-15" href="#__codelineno-35-15"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="kt">void</span><span class="w"> </span><span class="n">schedule</span><span class="p">(</span><span class="n">Schedule</span><span class="w"> </span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="w">  </span><span class="n">s</span><span class="p">.</span><span class="n">call</span><span class="p">(</span><span class="s1">'cleanup'</span><span class="p">,</span><span class="w"> </span><span class="n">cleanup</span><span class="p">).</span><span class="n">dailyAt</span><span class="p">(</span><span class="s1">'02:00'</span><span class="p">);</span>
+</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="p">}</span>
+</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>
+</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cleanup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-36-10"><a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a><span class="w">  </span><span class="c1">// delete old files, ...</span>
+</span><span id="__span-36-11"><a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="p">}</span>
+</span><span id="__span-36-12"><a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a>
+</span><span id="__span-36-13"><a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-36-14"><a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">SchedulerRunner</span><span class="p">(</span><span class="nl">schedule:</span><span class="w"> </span><span class="n">schedule</span><span class="p">).</span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
+</span><span id="__span-36-15"><a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>With no <code>app</code>, no providers start, and the locks use a memory store. For many servers, pass a shared <code>CacheStore</code> from <code>dox_cache</code>, like <code>SchedulerRunner(schedule: schedule, store: myRedisStore)</code>. The commands are the same.</p>
 <h2 id="testing">Testing</h2>
 <p><code>Scheduler</code> runs the tasks. Give it a fake clock, so you can test a schedule with no waiting:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_cache/dox_cache.dart'</span><span class="p">;</span>
-</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
-</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
-</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
-</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a>
-</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">FakeClock</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ScheduleClock</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="w">  </span><span class="n">FakeClock</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">time</span><span class="p">);</span>
-</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a>
-</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
-</span><span id="__span-36-10"><a id="__codelineno-36-10" name="__codelineno-36-10" href="#__codelineno-36-10"></a>
-</span><span id="__span-36-11"><a id="__codelineno-36-11" name="__codelineno-36-11" href="#__codelineno-36-11"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-36-12"><a id="__codelineno-36-12" name="__codelineno-36-12" href="#__codelineno-36-12"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-36-13"><a id="__codelineno-36-13" name="__codelineno-36-13" href="#__codelineno-36-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
-</span><span id="__span-36-14"><a id="__codelineno-36-14" name="__codelineno-36-14" href="#__codelineno-36-14"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-36-15"><a id="__codelineno-36-15" name="__codelineno-36-15" href="#__codelineno-36-15"></a><span class="p">}</span>
-</span><span id="__span-36-16"><a id="__codelineno-36-16" name="__codelineno-36-16" href="#__codelineno-36-16"></a>
-</span><span id="__span-36-17"><a id="__codelineno-36-17" name="__codelineno-36-17" href="#__codelineno-36-17"></a><span class="n">test</span><span class="p">(</span><span class="s1">'cleanup runs at 02:00'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-36-18"><a id="__codelineno-36-18" name="__codelineno-36-18" href="#__codelineno-36-18"></a><span class="w">  </span><span class="n">Schedule</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Schedule</span><span class="p">(</span><span class="nl">timezone:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">.</span><span class="n">timezone</span><span class="p">);</span>
-</span><span id="__span-36-19"><a id="__codelineno-36-19" name="__codelineno-36-19" href="#__codelineno-36-19"></a><span class="w">  </span><span class="n">schedule</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
-</span><span id="__span-36-20"><a id="__codelineno-36-20" name="__codelineno-36-20" href="#__codelineno-36-20"></a><span class="w">  </span><span class="n">Scheduler</span><span class="w"> </span><span class="n">scheduler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Scheduler</span><span class="p">(</span>
-</span><span id="__span-36-21"><a id="__codelineno-36-21" name="__codelineno-36-21" href="#__codelineno-36-21"></a><span class="w">    </span><span class="nl">tasks:</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">tasks</span><span class="p">,</span>
-</span><span id="__span-36-22"><a id="__codelineno-36-22" name="__codelineno-36-22" href="#__codelineno-36-22"></a><span class="w">    </span><span class="nl">store:</span><span class="w"> </span><span class="n">CacheStore</span><span class="p">(</span><span class="n">MemoryDriver</span><span class="p">()),</span>
-</span><span id="__span-36-23"><a id="__codelineno-36-23" name="__codelineno-36-23" href="#__codelineno-36-23"></a><span class="w">    </span><span class="nl">clock:</span><span class="w"> </span><span class="n">FakeClock</span><span class="p">(</span><span class="n">DateTime</span><span class="p">.</span><span class="n">utc</span><span class="p">(</span><span class="m">2026</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)),</span>
-</span><span id="__span-36-24"><a id="__codelineno-36-24" name="__codelineno-36-24" href="#__codelineno-36-24"></a><span class="w">  </span><span class="p">);</span>
-</span><span id="__span-36-25"><a id="__codelineno-36-25" name="__codelineno-36-25" href="#__codelineno-36-25"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="o">&gt;</span><span class="w"> </span><span class="n">outcomes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">scheduler</span><span class="p">.</span><span class="n">runDue</span><span class="p">();</span>
-</span><span id="__span-36-26"><a id="__codelineno-36-26" name="__codelineno-36-26" href="#__codelineno-36-26"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">outcomes</span><span class="p">[</span><span class="s1">'cleanup'</span><span class="p">],</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="p">.</span><span class="n">ran</span><span class="p">);</span>
-</span><span id="__span-36-27"><a id="__codelineno-36-27" name="__codelineno-36-27" href="#__codelineno-36-27"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_cache/dox_cache.dart'</span><span class="p">;</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_scheduler/dox_scheduler.dart'</span><span class="p">;</span>
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/schedule.dart'</span><span class="p">;</span>
+</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:test/test.dart'</span><span class="p">;</span>
+</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a>
+</span><span id="__span-37-6"><a id="__codelineno-37-6" name="__codelineno-37-6" href="#__codelineno-37-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">FakeClock</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ScheduleClock</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-37-7"><a id="__codelineno-37-7" name="__codelineno-37-7" href="#__codelineno-37-7"></a><span class="w">  </span><span class="n">FakeClock</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">time</span><span class="p">);</span>
+</span><span id="__span-37-8"><a id="__codelineno-37-8" name="__codelineno-37-8" href="#__codelineno-37-8"></a>
+</span><span id="__span-37-9"><a id="__codelineno-37-9" name="__codelineno-37-9" href="#__codelineno-37-9"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
+</span><span id="__span-37-10"><a id="__codelineno-37-10" name="__codelineno-37-10" href="#__codelineno-37-10"></a>
+</span><span id="__span-37-11"><a id="__codelineno-37-11" name="__codelineno-37-11" href="#__codelineno-37-11"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-37-12"><a id="__codelineno-37-12" name="__codelineno-37-12" href="#__codelineno-37-12"></a><span class="w">  </span><span class="n">DateTime</span><span class="w"> </span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-37-13"><a id="__codelineno-37-13" name="__codelineno-37-13" href="#__codelineno-37-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">time</span><span class="p">;</span>
+</span><span id="__span-37-14"><a id="__codelineno-37-14" name="__codelineno-37-14" href="#__codelineno-37-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-37-15"><a id="__codelineno-37-15" name="__codelineno-37-15" href="#__codelineno-37-15"></a><span class="p">}</span>
+</span><span id="__span-37-16"><a id="__codelineno-37-16" name="__codelineno-37-16" href="#__codelineno-37-16"></a>
+</span><span id="__span-37-17"><a id="__codelineno-37-17" name="__codelineno-37-17" href="#__codelineno-37-17"></a><span class="n">test</span><span class="p">(</span><span class="s1">'cleanup runs at 02:00'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-37-18"><a id="__codelineno-37-18" name="__codelineno-37-18" href="#__codelineno-37-18"></a><span class="w">  </span><span class="n">Schedule</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Schedule</span><span class="p">(</span><span class="nl">timezone:</span><span class="w"> </span><span class="n">scheduleConfig</span><span class="p">.</span><span class="n">timezone</span><span class="p">);</span>
+</span><span id="__span-37-19"><a id="__codelineno-37-19" name="__codelineno-37-19" href="#__codelineno-37-19"></a><span class="w">  </span><span class="n">schedule</span><span class="p">(</span><span class="n">s</span><span class="p">);</span>
+</span><span id="__span-37-20"><a id="__codelineno-37-20" name="__codelineno-37-20" href="#__codelineno-37-20"></a><span class="w">  </span><span class="n">Scheduler</span><span class="w"> </span><span class="n">scheduler</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Scheduler</span><span class="p">(</span>
+</span><span id="__span-37-21"><a id="__codelineno-37-21" name="__codelineno-37-21" href="#__codelineno-37-21"></a><span class="w">    </span><span class="nl">tasks:</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">tasks</span><span class="p">,</span>
+</span><span id="__span-37-22"><a id="__codelineno-37-22" name="__codelineno-37-22" href="#__codelineno-37-22"></a><span class="w">    </span><span class="nl">store:</span><span class="w"> </span><span class="n">CacheStore</span><span class="p">(</span><span class="n">MemoryDriver</span><span class="p">()),</span>
+</span><span id="__span-37-23"><a id="__codelineno-37-23" name="__codelineno-37-23" href="#__codelineno-37-23"></a><span class="w">    </span><span class="nl">clock:</span><span class="w"> </span><span class="n">FakeClock</span><span class="p">(</span><span class="n">DateTime</span><span class="p">.</span><span class="n">utc</span><span class="p">(</span><span class="m">2026</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">)),</span>
+</span><span id="__span-37-24"><a id="__codelineno-37-24" name="__codelineno-37-24" href="#__codelineno-37-24"></a><span class="w">  </span><span class="p">);</span>
+</span><span id="__span-37-25"><a id="__codelineno-37-25" name="__codelineno-37-25" href="#__codelineno-37-25"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="o">&gt;</span><span class="w"> </span><span class="n">outcomes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">scheduler</span><span class="p">.</span><span class="n">runDue</span><span class="p">();</span>
+</span><span id="__span-37-26"><a id="__codelineno-37-26" name="__codelineno-37-26" href="#__codelineno-37-26"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">outcomes</span><span class="p">[</span><span class="s1">'cleanup'</span><span class="p">],</span><span class="w"> </span><span class="n">TaskOutcome</span><span class="p">.</span><span class="n">ran</span><span class="p">);</span>
+</span><span id="__span-37-27"><a id="__codelineno-37-27" name="__codelineno-37-27" href="#__codelineno-37-27"></a><span class="p">});</span>
 </span></code></pre></div>
 <p>To check a schedule without running anything, use <code>ScheduledTask.isDue(time)</code> and <code>ScheduledTask.nextRun(time)</code>. To replace the ping request in tests, set <code>ScheduledTask.sendPing = (Uri url) async {...};</code>.</p>
 <h2 id="details">Details</h2>
@@ -8206,6 +8282,7 @@
 <h3 id="filters-and-locks">Filters and locks</h3>
 <ul>
 <li><code>environments()</code> ignores case and spaces around the names. It is read at run time. An empty list or a blank name throws.</li>
+<li>With <code>loggerLines</code> on, the plain <code>[schedule]</code> line is left out on stdout and stderr when the Logger printed it. So the lock store warning goes to stdout, not to stderr. Other sinks (like a <code>StringBuffer</code>) still get every plain line.</li>
 <li>The once-per-tick lock is not released, so a late server can not run the same minute again. It expires after 10 minutes. When the store is <code>null</code>, the scheduler uses a memory store.</li>
 <li>At start, the scheduler prints one warning to stderr when a task uses <code>onOneServer()</code> and the lock store is <code>memory</code>, <code>file</code> or <code>null</code>. It does not print when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. With one server you can ignore it.</li>
 <li><code>clear-cache</code> removes only the <code>withoutOverlapping()</code> lock of each task, by its exact name. Other cache keys and the once-per-tick locks stay. It exits with 0, also when there was no lock. A <code>memory</code> store loses its locks with the process, so <code>clear-cache</code> is for <code>file</code> and Redis stores.</li>

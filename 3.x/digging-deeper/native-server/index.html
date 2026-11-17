@@ -2345,6 +2345,8 @@
       
         
       
+        
+      
     
     
     
@@ -3155,6 +3157,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#streaming-a-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming a response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security-notes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3266,6 +3279,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7013,6 +7071,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#streaming-a-response" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Streaming a response
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security-notes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7154,7 +7223,24 @@
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">WebSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeWebSocket</span><span class="p">.</span><span class="n">upgrade</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
 </span></code></pre></div>
 <p>A message over the size limit closes the socket with code <code>1009</code>. Set the limit with <code>maxMessageSize</code> of <code>NativeWebSocket.upgrade</code>. Socket.IO uses <code>maxHttpBufferSize</code>.</p>
+<p>To find clients that vanished with no close (like a phone that lost its network), set <code>pingInterval</code>. When the client sent nothing for that long, the server sends a ping. When it still sends nothing for one more interval, the socket closes with <code>1001</code>. It is off by default:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">socket</span><span class="p">.</span><span class="n">pingInterval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">);</span>
+</span></code></pre></div>
 <p>On a graceful stop (SIGTERM), every open WebSocket gets close code <code>1001</code>.</p>
+<h2 id="streaming-a-response">Streaming a response</h2>
+<p>To send a body in parts, like server-sent events, write with <code>add()</code> and call <code>flush()</code>. The first <code>flush()</code> sends the status, the headers and the bytes so far. Later writes go out at once:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">server</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">contentType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ContentType</span><span class="p">(</span><span class="s1">'text'</span><span class="p">,</span><span class="w"> </span><span class="s1">'event-stream'</span><span class="p">);</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">utf8</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'data: hello</span><span class="se">\n\n</span><span class="s1">'</span><span class="p">));</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">});</span>
+</span></code></pre></div>
+<p><code>NativeResponse.headSent</code> is <code>true</code> once the status and headers went out. After that, an error page can not be sent any more. The response can only end. <code>req.response</code> is an <code>HttpResponse</code>, so cast it to read the flag:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">sent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">NativeResponse</span><span class="p">).</span><span class="n">headSent</span><span class="p">;</span>
+</span></code></pre></div>
 <h2 id="security-notes">Security notes</h2>
 <ul>
 <li>On the internet, run it behind a reverse proxy like Caddy or nginx. The proxy does HTTPS, buffers slow clients and caps connections.</li>
@@ -7167,10 +7253,10 @@
 <ol>
 <li>
 <p>A path you give in the root <code>pubspec.yaml</code> of your app:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">hooks</span><span class="p">:</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
 </span></code></pre></div>
 </li>
 <li>
@@ -7183,10 +7269,10 @@
 <p>When none works, the app still builds, but it stops at start with the error above. Install Rust and run it again, so step 4 works.</p>
 <h2 id="working-on-the-native-code">Working on the native code</h2>
 <p><code>dox_http_native</code> lives in its own repo: <a href="https://github.com/dartondox/dox-http-native">dartondox/dox-http-native</a>. The Rust code is in its <code>native</code> folder:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">cd</span><span class="w"> </span>dox-http-native/native
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>cargo<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span><span class="w"> </span>dox-http-native/native
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>cargo<span class="w"> </span><span class="nb">test</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
 </span></code></pre></div>
 <p>To use your local copy in the Dox repo, or to release the package, see <a href="../../community/contribute/#native-packages">Contribute</a>.</p>
 <h2 id="details">Details</h2>
@@ -7212,6 +7298,8 @@
 <li>The request line plus headers can be at most 16 KB. Bigger gets <code>431</code>. A bad request gets <code>400</code>.</li>
 <li>A multipart form over <code>maxMultipartSize</code>, or any other body over <code>maxBodySize</code>, gets <code>413</code> from Rust. With <code>Expect: 100-continue</code>, the <code>413</code> comes before the body is sent. Else Rust reads and drops the body first, so the client sees the <code>413</code>.</li>
 <li>A client that sends no body bytes for 120 seconds gets <code>408</code>. A slow but steady upload is fine.</li>
+<li>Accepted sockets get TCP keep-alive. After 60 seconds with no traffic, the OS checks the client every 10 seconds, and a client that misses 6 checks (about 2 minutes) is closed. A live client always answers.</li>
+<li>A client that closed its side while the handler has not answered is closed when nothing was written for <code>idleTimeout</code> (30 seconds by default). Set it with the <code>idleTimeout</code> argument of <code>NativeHttpServer.bind</code>. In a Dox app, set <code>AppConfig.idleTimeout</code>.</li>
 <li>A request head must arrive within 30 seconds. A keep-alive connection with no request for 30 seconds is closed. A client that does not read its answer for 30 seconds is cut off.</li>
 <li>A request with both <code>Content-Length</code> and <code>Transfer-Encoding: chunked</code> gets <code>400</code>. A transfer encoding other than <code>chunked</code> gets <code>501</code>.</li>
 <li>At most 64 requests of one connection wait for an answer, and at most 1 MB of answers waits to be sent. Then the server stops reading that connection until the answers go out.</li>

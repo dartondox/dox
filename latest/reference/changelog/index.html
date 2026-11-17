@@ -2341,6 +2341,8 @@
       
         
       
+        
+      
     
     
     
@@ -3080,6 +3082,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7096,6 +7143,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#322" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#321" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7410,6 +7468,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#321_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#320_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7713,7 +7782,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#321_1" class="md-nav__link">
+  <a href="#322_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#321_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         3.2.1
@@ -8399,6 +8479,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#322" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#321" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8713,6 +8804,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#321_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.1
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#320_2" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -9016,7 +9118,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#321_1" class="md-nav__link">
+  <a href="#322_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2.2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#321_2" class="md-nav__link">
     <span class="md-ellipsis">
       
         3.2.1
@@ -9458,6 +9571,11 @@
 <li>See the <a href="https://github.com/dartondox/dox/pull/112">release notes</a> for all main changes.</li>
 </ul>
 <h2 id="dox_builder">dox_builder</h2>
+<h3 id="322">3.2.2</h3>
+<ul>
+<li>Faster: a model gets a <code>$columnValue(column)</code> method, a switch that gives one value of <code>columnsToMap()</code> without making the whole map. dox_orm reads the relation keys of each row with it. It is made only when the dox_orm of the app has <code>Model.$columnValue</code>, so the code still compiles with an older dox_orm. A column with <code>beforeSave</code> is not in the switch: it falls back to <code>columnsToMap()</code>. A model with its own <code>columnsToMap()</code> gets no switch.</li>
+<li>Faster: <code>fromMap()</code> read a date column from the row map two or three times. It now reads it once. The result is the same. Run <code>dart run build_runner build</code> to get the new code.</li>
+</ul>
 <h3 id="321">3.2.1</h3>
 <ul>
 <li>New: a default that reads the global <code>env</code> (like <code>env.appEnv</code>) stopped the app with a stack overflow. Now <code>load()</code> throws a clear <code>StateError</code> that says to use the getter directly.</li>
@@ -9660,6 +9778,20 @@
 <li>Works with analyzer 5 and 6.</li>
 </ul>
 <h2 id="dox_cache">dox_cache</h2>
+<h3 id="321_1">3.2.1</h3>
+<ul>
+<li>New: a <code>redis</code> store takes <code>'options': RedisOptions(...)</code>. It is used as it is, so you can set <code>commandTimeout</code>, <code>connectTimeout</code>, <code>onError</code> and more.</li>
+<li><code>options</code> with <code>host</code>, <code>port</code>, <code>username</code>, <code>password</code>, <code>db</code>, <code>tls</code> or <code>pool_size</code>, or a value that is not a <code>RedisOptions</code>, throws an <code>ArgumentError</code>.</li>
+<li><code>RedisOptions</code>, <code>RedisTimeoutError</code> and <code>RedisQueueFullError</code> are exported. Old configs do not change.</li>
+<li>Fix, disk: the <code>file</code> store never cleaned up by default, so expired files (like old sessions) stayed on the disk for ever. Now, with <code>prune_every</code> 0 (the default), a write starts a light prune in the background at most once an hour. It deletes expired files, temp files left by a crash, and free lock files. It keeps files it can not read or decrypt, so another app in the same folder keeps its files. It only touches files the cache made: other files in the folder stay. A lock file on disk makes sure only one runs per hour for all isolates and servers on one folder, also when the app restarts often. In a process, the first one can start on the first write that comes at least a minute after the first write of that process, so short commands never start one. Files that <code>pull</code> or a lock moved away for a moment and that a crash left behind are deleted after an hour, and <code>flush()</code> deletes moved values too. Expired files already read as a miss, so reads do not change.</li>
+<li><code>FileDriver.prune()</code> now also deletes temp files older than an hour and lock files that are free. Its result still counts only value files.</li>
+<li>Fix: a value file with JSON that is not a map, or with an expiry time that is not a whole number, threw a <code>TypeError</code> on read. Now it reads as a miss, like other broken files.</li>
+<li>Fix, disk: a write that failed (eg. a full disk) left its temp file. Now it is deleted.</li>
+<li>New: <code>fsync</code> option on a <code>file</code> store (default <code>true</code>, as before). <code>fsync: false</code> skips the sync to disk on each write, so writes are faster. After a power cut the last writes can then be lost (they read as a miss).</li>
+<li>Perf: lock files of the <code>file</code> store (<code>add</code>, <code>increment</code>, <code>touch</code> and <code>lock()</code>) are no longer synced to the disk. The sync did not make a lock survive a power cut anyway, because the folder was never synced. This halves the syncs of <code>add</code> and <code>increment</code>.</li>
+<li>Perf: the <code>memory</code> store with <code>max_size</code> removed the least recently used item in O(n) time per write when full. Now each step is O(1).</li>
+<li>Perf, memory: the <code>memory</code> store drops expired items at the front of the list on each write (at most two), not only in the sweep after 1000 or more writes.</li>
+</ul>
 <h3 id="320_2">3.2.0</h3>
 <ul>
 <li>New: <code>dox cache:install [--store=file|redis|memory|database]</code>, run by <code>dox add cache</code>. It writes <code>lib/config/cache.dart</code>, the <code>CACHE_STORE</code> key and the <code>AppEnv</code> getters, and adds <code>cache: cache</code> to <code>lib/config/app.dart</code>. With <code>--store=database</code> it also adds <code>dox_cache_database</code>, its provider and the cache table migration. It never overwrites a file. dox_cache now depends on dox_annotation.</li>
@@ -9805,7 +9937,48 @@
 <li><code>remember</code>, <code>pull</code>, <code>add</code>, <code>increment</code>, <code>many</code>, tags and atomic locks.</li>
 </ul>
 <h2 id="dox_core">dox_core</h2>
-<h3 id="321_1">3.2.1</h3>
+<h3 id="322_1">3.2.2</h3>
+<ul>
+<li>Fix: the temp files of big uploads were deleted when <code>response.done</code> completed. A newer native server completes <code>done</code> also when the client leaves, so a slow handler (an S3 upload, image work) could lose its file while it read it. Now the files are deleted when the request is handled (after the middleware and the controller, also on an error) and the response is done. A request with no big upload pays nothing.</li>
+<li>Fix: when a handler had already sent the head (a flush or a stream, eg. server-sent events) and then threw, Dox cleared the headers, set status 500 and wrote <code>Internal Server Error</code> into the middle of the stream. Now the error is reported and the response just ends. This needs a dox-http-native with <code>NativeResponse.headSent</code> (dox-http-native#25).</li>
+<li>Fix: a multipart body that ended with no closing boundary (a cut upload) kept the request open for ever, with its temp file. Now it gives 400 and the temp file is deleted.</li>
+<li>Fix: a sync throw in a handler, or a raw <code>Route.mount</code> handler (no <code>middleware: true</code>), never marked the handler as ended. <code>AfterResponse</code> work then never ran and the upload temp files stayed on disk. Now every path ends the handler.</li>
+<li>Fix: a multipart body with an epilogue after the closing boundary was rejected when the epilogue was longer than about 256 bytes. Any epilogue is fine now.</li>
+<li>Fix: after a <code>RequestTimeout</code> the late handler lost its upload temp files. They now stay until it ends (a handler that never ends keeps them for ever). <code>AfterResponse</code> work that never ends does the same.</li>
+<li>
+<p>Fix: <code>AfterResponse</code> work could start while the handler still ran, when the client left early. Now it starts after the handler ended and the response is done.</p>
+</li>
+<li>
+<p>Perf: every request with no body (most GETs) made a new empty body map. Now the map is made on the first use of <code>req.body</code> (or <code>req.requestBody.map</code>, <code>req.all()</code>, <code>req.input()</code>, <code>req.add()</code>). A request that never reads its body makes no map. Each request still has its own map, so writes never leak between requests. <code>DoxRequest(body:)</code> is now optional.</p>
+</li>
+<li>Fix: sessions with the <code>cache</code> driver on a <code>memory</code> store were kept in each isolate on its own. The server runs one isolate per CPU core, so a session saved by one isolate was missing when the next request came to another one. Users were logged out at random. Now these sessions live in the memory store of the main isolate, and the other isolates read and write them there (one message per session read, one per changed session). Expired sessions are removed by the memory store as before. A server with one isolate, the <code>cookie</code> driver and the other stores work as before.</li>
+<li>Security: the <code>RateLimit</code> counts in the main isolate (no Redis) had no limit on the number of clients. A client with many ips (an IPv6 /64 has 2^64) could grow the memory with no end. Now the counter keeps at most 100,000 clients (<code>RateLimitCounter.defaultMaxKeys</code>, about 15 MB). This cap is on by default. When it is full, the counter first drops the expired counts, then the oldest ones. A dropped client starts again at 0. New clients are never turned away, so a flood of fake clients can not lock out real users.</li>
+<li>Security: new opt-in flag <code>CoreFlags.rateLimitIpv6Prefix</code> (off by default). With it, the default <code>RateLimit</code> key counts an IPv6 client by its /64 prefix, so a client can not get a new count by changing its address inside its /64. Clients in one /64 then share a count. <code>RateLimit.ipBucket(ip)</code> gives this key for your own <code>key</code> function.</li>
+<li>Perf: <code>RateLimit</code> on a Redis store sent its commands one after the other: 2 round trips per request (3 with <code>sliding</code>). Now they go out in one write, so it is one round trip. The commands, the counts and the errors are the same. If the count is made before its time limit is set (or setting the limit fails), Dox sets the limit after (it tries twice), so a client is not blocked for ever. Other stores work as before.</li>
+<li>Perf: <code>AfterResponse</code> made a list and waited for each response, also when no work was added. Now this happens on the first <code>AfterResponse.run</code> of a request. A request that adds no work pays only for its zone. Apps with the queue package have <code>AfterResponse</code> on.</li>
+<li>Perf: the <code>cookie</code> session driver decrypted the session cookie on every request. Now it decrypts on the first use of <code>req.session</code>. The <code>cache</code> driver still reads the store before the controller, because the session API is not async.</li>
+<li>Perf: a <code>String</code> body was encoded with <code>utf8.encode</code>, which first makes a list 3 times the text length, then copies the used part. Now an ASCII text is written straight into a list of the right size (new <code>utf8Bytes</code>). A text with other characters still uses <code>utf8.encode</code>. The bytes are the same.</li>
+<li>Perf: the <code>Content-Type</code> of a request with a body was parsed on every request. Now the parsed type is kept per header text (at most 64 texts, a multipart boundary is not kept), so a repeated type is parsed once. New <code>HttpBody.contentTypeOf(headers)</code>.</li>
+<li>Perf: a route with params ran its regex for every url with the same first segment. Now the router first checks the plain text before the first param (new <code>RouteData.matchPrefix</code>, eg. <code>/api/users</code> for <code>/api/users/{id}</code>), and skips the regex when the url does not start with it. A route with regex marks (like <code>.</code>) in that text runs the regex as before. The matched routes are the same.</li>
+<li>Perf: <code>SecurityHeaders</code> and <code>RequestId</code> use lower case header names, so the server makes no lower case copy per header. <code>RequestId.make()</code> builds the id with one list, not 9 strings. The id is still 32 hex characters.</li>
+<li>
+<p>Perf: a worker isolate made one timer per rate limited request for the 5 second timeout to the main isolate. Now one timer checks all waiting requests, and it only runs while a request waits.</p>
+</li>
+<li>
+<p>The AI agent skill (dox-core-guide) has a Performance section and <code>references/performance.md</code>: the common mistakes that block the isolate, the right code for each, and strict mode.</p>
+</li>
+<li>New: <code>Dox().compute(task)</code> runs heavy CPU work (a PDF, an image, a big JSON file) on a worker isolate and gives the result. The server can answer other requests in the meantime. There is one small pool of workers for the whole process, shared by every server isolate. The workers start on the first task. More tasks than workers wait in line, first come first served. An error of the task is thrown to the caller, with its stack trace. A worker that dies is replaced, and its task fails with a clear error. The pool stops with the server and never keeps a command or a test running. The task runs in another isolate, so it can only use values that can be sent between isolates, not the IoC container or a database pool.</li>
+<li>New: <code>AppConfig.computeWorkers</code> sets the number of workers. Default <code>AppConfig.defaultComputeWorkers</code> (4).</li>
+<li>Change: <code>Hash.makeAsync</code> and <code>Hash.verifyAsync</code> run on the worker pool of <code>Dox().compute</code>. Before, each call started a new isolate, so 500 logins at once started 500 isolates. The results are the same. They still work without a server.</li>
+<li>New: strict mode for development: <code>AppConfig(strict: StrictConfig(enabled: true))</code>. Off by default, and then it costs one bool check per request. When on, it writes a <code>[strict]</code> warning to stderr when a route blocks the isolate longer than <code>StrictConfig.blockLimit</code> (default 50 ms, once per route), when the event loop was blocked that long after an <code>await</code> (at most once in 10 seconds), and when <code>Hash.make</code>, <code>Hash.verify</code> or <code>Hash.check</code> runs in the web server (once per place in the code). Each warning says what to use instead.</li>
+<li>Memory: each response called <code>close()</code> and did not use its Future. On the native server that Future and its microtask kept the request and its batch of bytes alive a bit longer, so under load the heap grew. Now Dox calls <code>NativeResponse.end()</code>, which makes no Future. A <code>dart:io</code> response still calls <code>close()</code>. Needs the next dox_http_native.</li>
+<li>Perf: CORS read the <code>Origin</code> header on every request, even with the default config that sets no CORS value. With the content type read, that was a second header lookup, and the native server then parsed all headers. Now <code>Origin</code> is read only when <code>origin</code> is a list, and a config with no values returns at once. The headers sent stay the same.</li>
+<li>Memory: <code>DoxResponse</code> made a map, a set and a list for every response, also when nothing was set. Now they are made on first use. <code>headers</code> still gives a map you can change.</li>
+<li>New: every pretty log line starts with a dim tag that says where it comes from, like <code>[request] GET /users =&gt; {...}</code>. Request lines get <code>[request]</code>. Server start, stop and startup warnings get <code>[server]</code>. Error reports get <code>[error]</code>. Your own lines get <code>[app]</code>. Pass your own tag as the third argument: <code>Logger.info('done', null, 'billing')</code>. <code>Logger.log</code>, <code>info</code>, <code>warn</code>, <code>success</code> and <code>danger</code> all take it. In JSON mode the tag is the <code>source</code> field, added at the end of the line. When the data map has its own <code>source</code> key, that value is kept and the tag is not added. An empty tag counts as no tag.</li>
+<li>Change: the plain warnings on stderr use the same tags. <code>dox: warning:</code> and <code>[dox]</code> are now <code>[server]</code> (isolate, server, WebSocket and CORS warnings) or <code>[request]</code> (a middleware returned null).</li>
+<li>Perf: a JSON response made a new 8 KB buffer, even for a small body. This made small JSON bodies about 2x slower to encode. The buffer is 1 KB now. Big bodies are about the same speed.</li>
+</ul>
+<h3 id="321_2">3.2.1</h3>
 <ul>
 <li>Fix: <code>Env.get</code> read as the first env read of the app saw only the shell, because nothing had loaded <code>.env</code> yet. Now every env read (<code>Env.get</code>, <code>Env.appEnv</code>, <code>Env().env</code>) loads <code>.env</code> once when it is not loaded. After that it is a plain map read, also when there is no <code>.env</code> file. Setting <code>Env().env</code> in a test counts as loaded, so the file is not put on top. When the <code>.env</code> file can not be read (like bad UTF-8), every read throws again; it never looks like an empty file.</li>
 <li>New: <code>AppConfig.isDevelopment</code>. It is true when the env <code>APP_ENV</code> is <code>development</code> (not <code>local</code>). Not set means production, so false. It reads the env on each call, so it works before the server starts and in every isolate. Use it for config like a database <code>debug</code> flag, in place of a computed getter in the env class: every env getter is an env key.</li>

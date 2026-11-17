@@ -2343,6 +2343,8 @@
       
         
       
+        
+      
     
     
     
@@ -3082,6 +3084,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7266,7 +7313,7 @@
 </tbody>
 </table>
 <p>After <code>GET /api/boom</code>, the server prints one line:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="nt">"timestamp"</span><span class="p">:</span><span class="s2">"2026-10-22T14:01:12.000Z"</span><span class="p">,</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"error"</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Bad state: boom"</span><span class="p">,</span><span class="nt">"error"</span><span class="p">:{</span><span class="nt">"stack"</span><span class="p">:</span><span class="s2">"#0  ApiRouter.register.&lt;anonymous closure&gt; (package:my_app/routes/api.dart:41:44) ..."</span><span class="p">}}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="nt">"timestamp"</span><span class="p">:</span><span class="s2">"2026-10-22T14:01:12.000Z"</span><span class="p">,</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"error"</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Bad state: boom"</span><span class="p">,</span><span class="nt">"error"</span><span class="p">:{</span><span class="nt">"stack"</span><span class="p">:</span><span class="s2">"#0  ApiRouter.register.&lt;anonymous closure&gt; (package:my_app/routes/api.dart:41:44) ..."</span><span class="p">},</span><span class="nt">"source"</span><span class="p">:</span><span class="s2">"error"</span><span class="p">}</span>
 </span></code></pre></div>
 <p>Remove the <code>/boom</code> route when you are done.</p>
 <div class="admonition note">

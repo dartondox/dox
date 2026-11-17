@@ -2343,6 +2343,8 @@
       
         
       
+        
+      
     
     
     
@@ -3082,6 +3084,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7876,6 +7923,7 @@
 <p>A mode that is not in the map keeps its default. Each mode must be an int from 0 to 0x1ff (0777). It is off by default, and it does nothing on Windows.</p>
 <h2 id="s3-compatible-services">S3-compatible services</h2>
 <p>The examples use <code>S3DriverConfig</code>, the class behind an <code>s3</code> disk. In a Dox config, the same settings are keys in the disk map. See <a href="../../digging-deeper/file-storage/">File Storage</a>.</p>
+<p>Two more fields have defaults. <code>multipartPartSize</code> is the size of one part of a big upload (8 MiB). <code>unsignedPayload</code> skips the hash of the body (<code>false</code>). Only turn it on over HTTPS.</p>
 <h3 id="cloudflare-r2">Cloudflare R2</h3>
 <p>Set <code>supportsAcl: false</code>, because R2 does not take ACL headers:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>

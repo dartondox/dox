@@ -55,6 +55,7 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 - [Deployment](https://dartondox.dev/latest/digging-deeper/deployment/)
 - [Native server](https://dartondox.dev/latest/digging-deeper/native-server/)
 - [Performance](https://dartondox.dev/latest/digging-deeper/performance/)
+- [Performance mistakes](https://dartondox.dev/latest/digging-deeper/performance-mistakes/)
 - [Testing](https://dartondox.dev/latest/digging-deeper/testing/)
 - [Health check](https://dartondox.dev/latest/digging-deeper/health-check/)
 - [Database](https://dartondox.dev/latest/database/)

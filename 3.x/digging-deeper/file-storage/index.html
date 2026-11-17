@@ -2345,6 +2345,8 @@
       
         
       
+        
+      
     
     
     
@@ -2810,6 +2812,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#skipping-the-body-hash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skipping the body hash
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -3081,6 +3094,28 @@
   
     <nav class="md-nav" aria-label="Details">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#signature-and-the-body" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signature and the body
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3-part-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 part size
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#atomic-writes" class="md-nav__link">
@@ -3505,6 +3540,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -7241,6 +7321,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#skipping-the-body-hash" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skipping the body hash
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7514,6 +7605,28 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#signature-and-the-body" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signature and the body
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3-part-size" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3 part size
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#atomic-writes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7649,7 +7762,7 @@
 </tr>
 <tr>
 <td><code>s3</code></td>
-<td><code>bucket</code>, <code>region</code>, <code>key</code>, <code>secret</code>, <code>token</code>, <code>endpoint</code>, <code>path_style</code> (MinIO), <code>url</code> (CDN), <code>visibility</code>, <code>acl</code>, <code>batch_delete</code></td>
+<td><code>bucket</code>, <code>region</code>, <code>key</code>, <code>secret</code>, <code>token</code>, <code>endpoint</code>, <code>path_style</code> (MinIO), <code>url</code> (CDN), <code>visibility</code>, <code>acl</code>, <code>batch_delete</code>, <code>unsigned_payload</code></td>
 </tr>
 <tr>
 <td><code>memory</code></td>
@@ -7679,99 +7792,108 @@
 </span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsEndpoint</span><span class="p">;</span>
 </span></code></pre></div>
 <p>The <code>s3</code> disk needs <code>bucket</code>, <code>key</code> and <code>secret</code>. If one is missing, the app stops at start with an <code>ArgumentError</code> that names the setting.</p>
+<h3 id="skipping-the-body-hash">Skipping the body hash</h3>
+<p>To save CPU on big uploads, add <code>unsigned_payload</code> to the <code>s3</code> disk. The upload then skips the hash of the body. Only use it over HTTPS:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s1">'s3'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'s3'</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="s1">'bucket'</span><span class="o">:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">awsBucket</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="c1">// ... region, key, secret, endpoint</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="s1">'unsigned_payload'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">},</span>
+</span></code></pre></div>
 <h2 id="using-another-disk">Using another disk</h2>
 <p><code>Storage()</code> uses the default disk. Use <code>disk</code> to pick another one:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'reports/2026.pdf'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'reports/2026.pdf'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="storing-files">Storing files</h2>
 <p>The <code>putFile</code> method saves a file in a folder with a new uuid name, and returns the path. It takes a <code>RequestFile</code> or bytes. For bytes, Dox finds the extension from the bytes, or you pass <code>extension:</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">// save with a new uuid file name, returns '/images/&lt;uuid&gt;.png'</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span><span class="w">  </span><span class="c1">// a RequestFile</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Uint8List</span><span class="p">.</span><span class="n">fromList</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">path2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kt">String</span><span class="w"> </span><span class="n">path3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span><span class="w"> </span><span class="c1">// like putFile</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// save with a new uuid file name, returns '/images/&lt;uuid&gt;.png'</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span><span class="w">  </span><span class="c1">// a RequestFile</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Uint8List</span><span class="p">.</span><span class="n">fromList</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">path2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="kt">String</span><span class="w"> </span><span class="n">path3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span><span class="w"> </span><span class="c1">// like putFile</span>
 </span></code></pre></div>
 <h3 id="storing-with-your-own-name">Storing with your own name</h3>
 <p>If you want to pick the file name, use <code>putFileAs</code>. It replaces an old file with the same name:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">path4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFileAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span><span class="w"> </span><span class="c1">// your own name</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">path4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFileAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span><span class="w"> </span><span class="c1">// your own name</span>
 </span></code></pre></div>
 <p>Do not use the file name from the client here, because the name is used as it is. Make your own name, like <code>user-1.png</code>.</p>
 <h3 id="storing-at-an-exact-path">Storing at an exact path</h3>
 <p>Use <code>put</code> with <code>exact: true</code> to write to an exact path. It replaces an old file there and returns the path. It takes a <code>String</code>, a <code>List&lt;int&gt;</code> or a <code>Stream&lt;List&lt;int&gt;&gt;</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1">// save to this exact path. String, List&lt;int&gt; or Stream&lt;List&lt;int&gt;&gt;</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1">// save to this exact path. String, List&lt;int&gt; or Stream&lt;List&lt;int&gt;&gt;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="storing-uploaded-files">Storing uploaded files</h3>
 <p>An uploaded file can store itself. <code>store</code> gives it a new uuid name, like <code>putFile</code>. <code>storeAs</code> uses your name, like <code>putFileAs</code>. Both take <code>disk:</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'image'</span><span class="p">);</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">onS3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'s3'</span><span class="p">);</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">avatar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">storeAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'image'</span><span class="p">);</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">onS3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'s3'</span><span class="p">);</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">avatar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">storeAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>putFile</code> and <code>store</code> take the extension from the file name. But if the bytes are a known format (png, jpg, pdf, zip, ...) that does not match the name, the extension of the bytes is used. So a png sent as <code>a.html</code> is saved as <code>.png</code>, and it is never served as a web page.</p>
 <h3 id="prepending-and-appending">Prepending and appending</h3>
 <p>Use <code>append</code> and <code>prepend</code> to add text to the end or the start of a file. A missing file is made:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">append</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'new line'</span><span class="p">);</span><span class="w">    </span><span class="c1">// a missing file is made</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">prepend</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'first line'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">append</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'new line'</span><span class="p">);</span><span class="w">    </span><span class="c1">// a missing file is made</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">prepend</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'first line'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>They add a new line between the old and the new text, if the file is not empty. Change it with <code>separator</code>.</p>
 <h2 id="retrieving-files">Retrieving files</h2>
 <p>The <code>get</code> method returns the bytes of a file, or <code>null</code> when the file is missing:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Uint8List</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">  </span><span class="c1">// null when missing</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Uint8List</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">  </span><span class="c1">// null when missing</span>
 </span></code></pre></div>
 <h3 id="checking-if-a-file-exists">Checking if a file exists</h3>
 <p><code>exists</code> checks for a file. <code>missing</code> is the opposite:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">           </span><span class="c1">// files only</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">gone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">missing</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">            </span><span class="c1">// not exists()</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">           </span><span class="c1">// files only</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">gone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">missing</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">            </span><span class="c1">// not exists()</span>
 </span></code></pre></div>
 <h3 id="file-metadata">File metadata</h3>
 <p><code>size</code> gives the size in bytes, and <code>lastModified</code> gives the time of the last change. Both throw <code>FileNotFoundException</code> when the file is missing:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">size</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">                 </span><span class="c1">// throws when missing</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">DateTime</span><span class="w"> </span><span class="n">changed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">lastModified</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w"> </span><span class="c1">// throws when missing</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">size</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">                 </span><span class="c1">// throws when missing</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">DateTime</span><span class="w"> </span><span class="n">changed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">lastModified</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w"> </span><span class="c1">// throws when missing</span>
 </span></code></pre></div>
 <h2 id="downloading-files">Downloading files</h2>
 <p>Sometimes you want to send a stored file to the browser. <code>stream</code> shows it in the browser, and <code>download</code> makes the browser save it as a file:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/photo'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">stream</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'path'</span><span class="p">));</span><span class="w">    </span><span class="c1">// shown in the browser</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="p">});</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/report'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">download</span><span class="p">(</span><span class="s1">'reports/2024.pdf'</span><span class="p">);</span><span class="w"> </span><span class="c1">// saved as a file</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/photo'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">stream</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'path'</span><span class="p">));</span><span class="w">    </span><span class="c1">// shown in the browser</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">});</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/report'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">download</span><span class="p">(</span><span class="s1">'reports/2024.pdf'</span><span class="p">);</span><span class="w"> </span><span class="c1">// saved as a file</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">});</span>
 </span></code></pre></div>
 <p>Both read the file as a stream, so a big file is never loaded into memory. A missing file answers <code>404</code>.</p>
 <p><code>download</code> names the file after the last part of the path. Pass <code>name:</code> to pick another name:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">,</span><span class="w"> </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'Invoice 42.pdf'</span><span class="p">);</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">,</span><span class="w"> </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'Invoice 42.pdf'</span><span class="p">);</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">});</span>
 </span></code></pre></div>
 <p>If you want to add headers, put the download in a <code>response()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="n">DownloadableFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">);</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">file</span><span class="p">).</span><span class="n">header</span><span class="p">(</span><span class="s1">'Cache-Control'</span><span class="p">,</span><span class="w"> </span><span class="s1">'no-store'</span><span class="p">);</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="n">DownloadableFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">);</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">file</span><span class="p">).</span><span class="n">header</span><span class="p">(</span><span class="s1">'Cache-Control'</span><span class="p">,</span><span class="w"> </span><span class="s1">'no-store'</span><span class="p">);</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">});</span>
 </span></code></pre></div>
 <h2 id="file-urls">File URLs</h2>
 <p>The <code>url</code> method gives the URL of a file. On a local disk with no <code>url</code> option, it gives <code>/storage/&lt;path&gt;</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">url</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">         </span><span class="c1">// /storage/&lt;path&gt; when the disk has no `url`</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">url</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w">         </span><span class="c1">// /storage/&lt;path&gt; when the disk has no `url`</span>
 </span></code></pre></div>
 <p>Dox only serves that URL when you add <code>Storage.route('storage', signed: false)</code>. See <a href="#serving-local-files">Serving local files</a>.</p>
 <h3 id="signed-urls">Signed URLs</h3>
 <p>Sometimes a file should only be open for a short time, like a private invoice. Use <code>signedUrl</code> for this. <code>temporaryUrl</code> is the same method:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">signed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="nl">expiresIn:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">));</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">temporaryUrl</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w"> </span><span class="c1">// the same as signedUrl()</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">signed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="nl">expiresIn:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">));</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">temporaryUrl</span><span class="p">(</span><span class="n">path</span><span class="p">);</span><span class="w"> </span><span class="c1">// the same as signedUrl()</span>
 </span></code></pre></div>
 <p>On a local disk, <code>signedUrl</code> needs the disk <code>url</code> option. Set it to the full URL of the route, like <code>https://app.test/files</code>.</p>
 <h3 id="serving-local-files">Serving local files</h3>
 <p>A local disk needs a route, so the browser can open its files. <code>Storage.route</code> adds one:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="c1">// lib/routes/web.dart</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// GET /files/{key*}, signed URLs only</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">    </span><span class="c1">// any file of the disk</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'docs'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// another disk than the default</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'uploads'</span><span class="p">,</span><span class="w"> </span><span class="nl">download:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w">  </span><span class="c1">// every file is a download</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="c1">// lib/routes/web.dart</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span><span class="w">                    </span><span class="c1">// GET /files/{key*}, signed URLs only</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">    </span><span class="c1">// any file of the disk</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'docs'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// another disk than the default</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'uploads'</span><span class="p">,</span><span class="w"> </span><span class="nl">download:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w">  </span><span class="c1">// every file is a download</span>
 </span></code></pre></div>
 <p>With a signed route, the URL looks like this:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="s1">'invoices/1.pdf'</span><span class="p">);</span><span class="w"> </span><span class="c1">// https://app.test/files/invoices/1.pdf?expires=...&amp;signature=...</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="s1">'invoices/1.pdf'</span><span class="p">);</span><span class="w"> </span><span class="c1">// https://app.test/files/invoices/1.pdf?expires=...&amp;signature=...</span>
 </span></code></pre></div>
 <ul>
 <li>A missing, wrong or expired signature answers <code>403</code>.</li>
@@ -7781,33 +7903,33 @@
 </ul>
 <h2 id="copying-and-moving-files">Copying and moving files</h2>
 <p><code>copy</code> and <code>move</code> replace an old file at the new path:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">copy</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'backup/a.txt'</span><span class="p">);</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">move</span><span class="p">(</span><span class="s1">'backup/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'old/a.txt'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">copy</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'backup/a.txt'</span><span class="p">);</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">move</span><span class="p">(</span><span class="s1">'backup/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'old/a.txt'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>On S3 the copy runs inside S3, so the bytes do not pass through your app. A missing source file answers <code>404</code>.</p>
 <h2 id="deleting-files">Deleting files</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">delete</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">delete</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="directories">Directories</h2>
 <p><code>files</code> gives the files in a folder. <code>allFiles</code> also gives the files in sub-folders. <code>directories</code> gives the sub-folders. All paths start with <code>/</code>, like the paths from <code>putFile</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">files</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span><span class="w">         </span><span class="c1">// direct files only</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">allFiles</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span><span class="w">        </span><span class="c1">// in sub-folders too</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">folders</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directories</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span><span class="w"> </span><span class="c1">// direct sub-folders</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">files</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span><span class="w">         </span><span class="c1">// direct files only</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">allFiles</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span><span class="w">        </span><span class="c1">// in sub-folders too</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">folders</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directories</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span><span class="w"> </span><span class="c1">// direct sub-folders</span>
 </span></code></pre></div>
 <p>Use <code>directoryExists</code> to check for a folder. On S3 and memory disks, a folder exists when a file is under it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directoryExists</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directoryExists</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>makeDirectory</code> makes a folder. It only works on a local disk. On other disks it does nothing:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">makeDirectory</span><span class="p">(</span><span class="s1">'reports'</span><span class="p">);</span><span class="w">              </span><span class="c1">// local disk only</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">makeDirectory</span><span class="p">(</span><span class="s1">'reports'</span><span class="p">);</span><span class="w">              </span><span class="c1">// local disk only</span>
 </span></code></pre></div>
 <p><code>deleteDirectory</code> deletes a folder and every file in it. A missing folder is not an error:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">deleteDirectory</span><span class="p">(</span><span class="s1">'old'</span><span class="p">);</span><span class="w">                       </span><span class="c1">// the folder and its files</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">deleteDirectory</span><span class="p">(</span><span class="s1">'old'</span><span class="p">);</span><span class="w">                       </span><span class="c1">// the folder and its files</span>
 </span></code></pre></div>
 <p>It refuses the root (<code>''</code> or <code>/</code>) with <code>InvalidKeyException</code>, so a wrong path can not empty the disk. To empty a whole disk on purpose, use <code>Storage().use().deleteAll()</code>.</p>
 <h2 id="file-visibility">File visibility</h2>
 <p>A file can be <code>public</code> or <code>private</code>. Use <code>setVisibility</code> and <code>getVisibility</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">setVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">Visibility</span><span class="p">.</span><span class="n">private</span><span class="p">);</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">Visibility</span><span class="w"> </span><span class="n">visibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">getVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">setVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">Visibility</span><span class="p">.</span><span class="n">private</span><span class="p">);</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">Visibility</span><span class="w"> </span><span class="n">visibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">getVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
 <ul>
 <li>On S3, <code>setVisibility</code> sets the ACL, because <code>acl</code> is on by default. With <code>'acl': false</code> (R2 and similar), it does nothing, and <code>getVisibility</code> gives the disk <code>visibility</code>.</li>
@@ -7815,36 +7937,40 @@
 </ul>
 <h3 id="visibility-on-a-local-disk">Visibility on a local disk</h3>
 <p>If you want visibility to be the file mode on a local disk, add <code>'permissions': true</code> to the disk. Then <code>setVisibility</code> runs <code>chmod</code>, and <code>getVisibility</code> reads the mode of the file:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span><span class="w"> </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span><span class="w"> </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
 </span></code></pre></div>
 <p>The modes are: public file <code>0644</code>, private file <code>0600</code>, public folder <code>0755</code>, private folder <code>0700</code>. To change them, see <a href="#custom-file-modes">Custom file modes</a>. On Windows, <code>permissions</code> does nothing, because there is no <code>chmod</code>.</p>
 <h2 id="full-disk-api">Full disk API</h2>
 <p><code>Storage().use('s3')</code> returns the <code>dox_storage</code> <code>Disk</code>. It has more methods, like <code>listAll</code> with pages, <code>getMetaData</code>, <code>putStream</code>, <code>deleteAll</code> and write options. See <a href="../../packages/storage/">dox_storage</a>.</p>
 <h2 id="custom-drivers">Custom drivers</h2>
 <p>Implement <code>DriverContract</code> from <code>package:dox_storage/dox_storage.dart</code>. Register it in a <a href="../providers/">provider</a>, so every isolate has it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">,</span><span class="w"> </span><span class="n">DropboxDriver</span><span class="p">());</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">,</span><span class="w"> </span><span class="n">DropboxDriver</span><span class="p">());</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="testing">Testing</h2>
 <p>To swap a disk with a memory disk in tests, see <a href="../testing/#test-file-storage">Testing</a>.</p>
 <h2 id="details">Details</h2>
 <p>This section is for special cases. Most apps do not need it.</p>
+<h3 id="signature-and-the-body">Signature and the body</h3>
+<p><code>unsigned_payload</code> is off by default. The signature then does not cover the body, so only use it over HTTPS.</p>
+<h3 id="s3-part-size">S3 part size</h3>
+<p><code>multipartPartSize</code> is the size of one part of a big upload. It is a field of <code>S3DriverConfig</code>, not a key of the disk map. The default is 8 MiB. See <a href="../../packages/storage/">Storage</a>. S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.</p>
 <h3 id="atomic-writes">Atomic writes</h3>
 <p>A local disk writes a file in place by default. Add <code>'atomic_writes': true</code> to write to a temp file and rename it when the write is done. Then a failed upload never leaves a partial file, and the old file stays:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span><span class="w"> </span><span class="s1">'atomic_writes'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span><span class="w"> </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span><span class="w"> </span><span class="s1">'atomic_writes'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
 </span></code></pre></div>
 <p>The rename makes a new file. So the folder must be writable, the file gets the default mode and owner, a hard link keeps the old content, and a symlink is replaced.</p>
 <h3 id="custom-file-modes">Custom file modes</h3>
 <p>Give <code>permissions</code> a map with a <code>file</code> and a <code>dir</code> key. Each has a <code>public</code> and a <code>private</code> mode. A mode you leave out keeps its default. Dart has no octal numbers, so write the modes in hex: <code>0x1a0</code> is <code>0640</code>, <code>0x1e8</code> is <code>0750</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage-private'</span><span class="p">,</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span><span class="s1">'visibility'</span><span class="o">:</span><span class="w"> </span><span class="s1">'private'</span><span class="p">,</span>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">  </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">    </span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a4</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a0</span><span class="p">},</span>
-</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="w">    </span><span class="s1">'dir'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1ed</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1e8</span><span class="p">},</span>
-</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="p">},</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">  </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage-private'</span><span class="p">,</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="w">  </span><span class="s1">'visibility'</span><span class="o">:</span><span class="w"> </span><span class="s1">'private'</span><span class="p">,</span>
+</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a><span class="w">  </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a><span class="w">    </span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a4</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a0</span><span class="p">},</span>
+</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="w">    </span><span class="s1">'dir'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1ed</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1e8</span><span class="p">},</span>
+</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-32-9"><a id="__codelineno-32-9" name="__codelineno-32-9" href="#__codelineno-32-9"></a><span class="p">},</span>
 </span></code></pre></div>
 <p>Each mode must be an int from 0 to 0x1ff (0777). Anything else, like the string <code>'0644'</code>, throws <code>ArgumentError</code> when the disk is made. Other keys are ignored.</p>
 <h3 id="how-file-modes-work">How file modes work</h3>

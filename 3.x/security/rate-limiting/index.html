@@ -2343,6 +2343,8 @@
       
         
       
+        
+      
     
     
     
@@ -3082,6 +3084,51 @@
     
   
     Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../digging-deeper/performance-mistakes/" class="md-nav__link">
+        
+  
+  
+    <svg
+  class="lucide lucide-triangle-alert"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3" />
+  <path d="M12 9v4" />
+  <path d="M12 17h.01" />
+</svg>
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance mistakes
   
 
     
@@ -4869,6 +4916,17 @@
     <span class="md-ellipsis">
       
         Behind a proxy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ipv6-clients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IPv6 clients
       
     </span>
   </a>
@@ -7006,6 +7064,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ipv6-clients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IPv6 clients
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-the-counts-live" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7127,22 +7196,32 @@
 </span></code></pre></div>
 <h2 id="behind-a-proxy">Behind a proxy</h2>
 <p>Behind Caddy, nginx or a load balancer, every request comes from the proxy ip, so all clients share one count. Add the proxy to <code>AppConfig.trustedProxies</code>, so <code>req.ip()</code> is the real client ip. See <a href="../../reference/app-config/">App config</a>.</p>
+<h2 id="ipv6-clients">IPv6 clients</h2>
+<p>A home or a server with IPv6 often gets a whole /64 block. That is 2^64 addresses. By default each address has its own count, so such a client can send from a new address each time and never hit the limit.</p>
+<p>Turn on <code>rateLimitIpv6Prefix</code> in <code>CoreFlags</code> to count each IPv6 client by its /64 prefix:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="n">CoreFlags</span><span class="p">(</span><span class="nl">rateLimitIpv6Prefix:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>All clients in one /64 then share one count. An IPv4 address stays as it is. A <code>key</code> function you give is used as it is. To use the same rule in your own key, call <code>RateLimit.ipBucket(req.ip())</code>.</p>
 <h2 id="where-the-counts-live">Where the counts live</h2>
-<p>When the default <a href="../../digging-deeper/cache/">cache</a> store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server.</p>
+<p>When the default <a href="../../digging-deeper/cache/">cache</a> store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server. To set a command timeout or other Redis options, see <a href="../../digging-deeper/cache/#redis-options">Redis options</a>.</p>
 <p>With any other default store, the counts are kept in the main isolate of each server. All isolates of one server share them, but each server has its own counts. So with 3 servers, a client can send up to 3 times <code>max</code>.</p>
 <p>To use a store by name, pass <code>store</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">RateLimit</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="nl">store:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">)</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">RateLimit</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="nl">store:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">)</span>
 </span></code></pre></div>
 <h2 id="sliding-window">Sliding window</h2>
 <p>By default the count starts at 0 at the start of each window. So a client can send <code>max</code> requests at the end of one minute, and <code>max</code> more at the start of the next. That is fine for most apps.</p>
 <p>If you want to stop this burst, set <code>sliding: true</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">RateLimit</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="nl">per:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">1</span><span class="p">),</span><span class="w"> </span><span class="nl">sliding:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">RateLimit</span><span class="p">(</span><span class="nl">max:</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="nl">per:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">1</span><span class="p">),</span><span class="w"> </span><span class="nl">sliding:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
 </span></code></pre></div>
 <p>The count is then the count of this window, plus a part of the window before. That part gets smaller as the window goes on. It costs one more read per request.</p>
 <h2 id="details">Details</h2>
 <ul>
 <li>A blocked request still counts, so a client that keeps sending while it is blocked stays blocked.</li>
 <li>In the main isolate mode, each limited request sends one small message to the main isolate.</li>
+<li>In the main isolate mode, the counter keeps at most 100,000 clients (about 15 MB). When it is full, it first drops the expired counts, then the oldest ones. A dropped client starts again at 0. New clients are never turned away, so a flood of fake clients can not lock out real users.</li>
 <li>A <code>memory</code> store named in <code>store</code> also counts in the main isolate. A store passed in <code>cacheStore</code> is used as it is.</li>
 <li>Sliding window example: 4 requests last minute, 1 this minute, 15 seconds in: the count is <code>4 x 45/60 + 1 = 4</code>. <code>X-RateLimit-Remaining</code> is <code>max</code> minus this count, rounded up. Each count is kept for 2 windows.</li>
 </ul>
