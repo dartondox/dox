@@ -15,18 +15,22 @@ definitions:
       {{ page.meta.get("title", page.title) }}
     {%- endif -%}
 
-  - &image >-
-    {{ page.meta.image or image.url }}
-
 # Only the image tags. overrides/main.html writes og:title, og:description,
 # twitter:card and the rest, and leaves out its own image tags on the blog.
+# The plugin does not escape tag values, so `| e` keeps a quote in a title
+# or URL from breaking the tag. The card text above must stay unescaped.
 tags:
-  og:image: *image
+  og:image: "{{ (page.meta.image or image.url) | e }}"
   og:image:type: "{{ 'image/png' if not page.meta.image }}"
   og:image:width: "{{ image.width if not page.meta.image }}"
   og:image:height: "{{ image.height if not page.meta.image }}"
-  og:image:alt: *title
-  twitter:image: *image
+  og:image:alt: >-
+    {%- if page.file.src_uri == "index.md" -%}
+      {{ config.site_description | e }}
+    {%- else -%}
+      {{ page.meta.get("title", page.title) | e }}
+    {%- endif -%}
+  twitter:image: "{{ (page.meta.image or image.url) | e }}"
 
 size: { width: 1200, height: 630 }
 layers:
