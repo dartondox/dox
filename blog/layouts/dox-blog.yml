@@ -1,0 +1,77 @@
+# Social card of the Dox blog (1200x630). The social plugin in
+# blog/mkdocs.yml makes one PNG per page with this layout.
+# File paths are read from the folder where mkdocs runs (the repo root).
+#
+# A post can use its own image: set `image:` in its front matter to a full
+# https:// URL. Then og:image and twitter:image point to that URL.
+
+definitions:
+
+  # The blog home page shows the blog description, other pages their title.
+  - &title >-
+    {%- if page.file.src_uri == "index.md" -%}
+      {{ config.site_description }}
+    {%- else -%}
+      {{ page.meta.get("title", page.title) }}
+    {%- endif -%}
+
+  - &image >-
+    {{ page.meta.image or image.url }}
+
+# Only the image tags. overrides/main.html writes og:title, og:description,
+# twitter:card and the rest, and leaves out its own image tags on the blog.
+tags:
+  og:image: *image
+  og:image:type: "{{ 'image/png' if not page.meta.image }}"
+  og:image:width: "{{ image.width if not page.meta.image }}"
+  og:image:height: "{{ image.height if not page.meta.image }}"
+  og:image:alt: *title
+  twitter:image: *image
+
+size: { width: 1200, height: 630 }
+layers:
+
+  # Brand blue gradient
+  - background:
+      image: blog/layouts/background.svg
+
+  # Hex D logo (white)
+  - size: { width: 96, height: 96 }
+    offset: { x: 72, y: 64 }
+    background:
+      image: docs/assets/logo.svg
+
+  # Label next to the logo
+  - size: { width: 600, height: 48 }
+    offset: { x: 188, y: 88 }
+    typography:
+      content: Dox blog
+      color: "#FFFFFF"
+      font:
+        family: Instrument Sans
+        style: Bold
+
+  # Post title, up to 3 lines, smaller text when it is long
+  - size: { width: 1056, height: 300 }
+    offset: { x: 72, y: 220 }
+    typography:
+      content: *title
+      align: start center
+      overflow: shrink
+      color: "#FFFFFF"
+      line:
+        amount: 3
+        height: 1.2
+      font:
+        family: Instrument Sans
+        style: Bold
+
+  # Site address at the bottom
+  - size: { width: 600, height: 32 }
+    offset: { x: 72, y: 542 }
+    typography:
+      content: dartondox.dev/blog
+      color: "#E6F4FF"
+      font:
+        family: Instrument Sans
+        style: Regular

@@ -30,3 +30,6 @@ __pycache__/
 # test coverage output
 coverage/
 .claude/
+
+# mkdocs social plugin cache (blog cards)
+.cache/

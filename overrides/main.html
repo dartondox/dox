@@ -34,15 +34,20 @@
   <meta property="og:title" content="{{ title }}">
   <meta property="og:description" content="{{ description }}">
   <meta property="og:url" content="{{ page.canonical_url }}">
+  {#- the blog makes one card per page (social plugin, blog/layouts) #}
+  {%- if not config.extra.blog %}
   <meta property="og:image" content="{{ image }}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Dox: fast web backend framework for Dart">
+  {%- endif %}
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ title }}">
   <meta name="twitter:description" content="{{ description }}">
+  {%- if not config.extra.blog %}
   <meta name="twitter:image" content="{{ image }}">
+  {%- endif %}
   {% if is_home %}
   <script type="application/ld+json">
   {

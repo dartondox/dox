@@ -2,7 +2,9 @@
 # Keep mkdocs on 1.x: MkDocs 2.0 breaks Material, plugins and overrides.
 # Local: pip install -r requirements-docs.txt && mkdocs serve
 mkdocs==1.6.1
-mkdocs-material==9.7.7
+mkdocs-material[imaging]==9.7.7 # imaging: blog social cards, needs Cairo
+cairosvg==2.9.1
+pillow==13.0.0
 mike==2.2.0
 mkdocs-redirects==1.2.3
 mkdocs-rss-plugin==1.19.0 # the blog feed (blog/mkdocs.yml)
