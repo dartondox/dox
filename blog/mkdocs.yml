@@ -34,6 +34,11 @@ plugins:
       archive_name: Archive
       categories_name: Categories
   - tags
+  # One social card (og:image) per page, made at build time. Needs Cairo
+  # (mkdocs-material[imaging]). Paths are read from the repo root.
+  - social:
+      cards_layout_dir: blog/layouts
+      cards_layout: dox-blog
   - rss:
       match_path: "posts/.*"
       date_from_meta:
