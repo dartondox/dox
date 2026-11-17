@@ -49,7 +49,7 @@ layers:
   - size: { width: 600, height: 48 }
     offset: { x: 188, y: 88 }
     typography:
-      content: Dox blog
+      content: Dox
       color: "#FFFFFF"
       font:
         family: Instrument Sans
