@@ -1,6 +1,6 @@
 ---
 date:
-  created: 2026-11-20
+  created: 2026-11-17
 authors:
   - dox
 categories:
@@ -415,4 +415,6 @@ These changes can be seen by an app. Most apps need nothing.
     ```
 - **Queue indexes.** A new `jobs` table on Postgres or SQLite gets better indexes. They keep a worker fast when many jobs come at once, and when many jobs are delayed. For an old table, add a migration that calls `QueueTables.popIndex(schema)`. It adds only the indexes that are missing, and it does nothing on MySQL and MariaDB. This is optional, but we recommend it for Postgres apps that push jobs in bursts.
 - **Rate limit cap.** The `RateLimit` counter in the main isolate (no Redis) now keeps at most 100,000 clients. When it is full, it drops expired counts first, then the oldest ones. A dropped client starts again at 0. Most apps never reach this.
+- **File cache clean-up.** The `file` cache store now deletes expired files by itself, at most once an hour. It only touches files the cache made. Before, expired files (like old sessions) stayed on the disk for ever.
+- **Database cache `increment`.** An `increment` past the 64-bit int limit is now an error, and the value does not change. Before, it wrapped to a negative number.
 - **Cache index.** A new `cache` table gets an index on `expires_at`. For an old table, add it with `schema.table('cache', (Table t) => t.index('expires_at'))`. This is optional.
