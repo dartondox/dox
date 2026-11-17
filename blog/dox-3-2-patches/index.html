@@ -1,0 +1,1967 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="This release is patch versions only. It makes Dox faster, uses less memory, and fixes memory leaks in long-running apps. There are no API changes. A few...">
+      
+      
+      
+        <link rel="canonical" href="https://dartondox.dev/blog/dox-3-2-patches/">
+      
+      
+        <link rel="prev" href="../dox-3-2/">
+      
+      
+      
+        
+      
+      
+        <link rel="alternate" type="application/rss+xml" title="RSS feed" href="../feed_rss_created.xml">
+        <link rel="alternate" type="application/rss+xml" title="RSS feed of updated content" href="../feed_rss_updated.xml">
+      
+      <link rel="icon" href="../assets/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+  
+  
+    <title>Dox 3.2 patches: faster, less memory, fewer leaks | Dox blog</title>
+  
+
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/style.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function e(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],e("js",new Date),e("config","G-GY82BXCJF8"),document.addEventListener("DOMContentLoaded",(function(){document.forms.search&&document.forms.search.query.addEventListener("blur",(function(){this.value&&e("event","search",{search_term:this.value})}));document$.subscribe((function(){var t=document.forms.feedback;if(void 0!==t)for(var a of t.querySelectorAll("[type=submit]"))a.addEventListener("click",(function(a){a.preventDefault();var n=document.location.pathname,d=this.getAttribute("data-md-value");e("event","feedback",{page:n,data:d}),t.firstElementChild.disabled=!0;var r=t.querySelector(".md-feedback__note [data-md-value='"+d+"']");r&&(r.hidden=!1)})),t.hidden=!1})),location$.subscribe((function(t){e("config","G-GY82BXCJF8",{page_path:t.pathname})}))}));var t=document.createElement("script");t.async=!0,t.src="https://www.googletagmanager.com/gtag/js?id=G-GY82BXCJF8",document.getElementById("__analytics").insertAdjacentElement("afterEnd",t)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+  
+  
+  
+  
+  
+  
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Dox">
+  <meta property="og:title" content="Dox 3.2 patches: faster, less memory, fewer leaks | Dox">
+  <meta property="og:description" content="This release is patch versions only. It makes Dox faster, uses less memory, and fixes memory leaks in long-running apps. There are no API changes. A few...">
+  <meta property="og:url" content="https://dartondox.dev/blog/dox-3-2-patches/">
+  <meta property="og:image" content="https://dartondox.dev/blog/assets/social-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Dox: fast web backend framework for Dart">
+  <meta property="og:locale" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Dox 3.2 patches: faster, less memory, fewer leaks | Dox">
+  <meta name="twitter:description" content="This release is patch versions only. It makes Dox faster, uses less memory, and fixes memory leaks in long-running apps. There are no API changes. A few...">
+  <meta name="twitter:image" content="https://dartondox.dev/blog/assets/social-card.png">
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Dox", "item": "https://dartondox.dev/blog/" }
+      ,{ "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://dartondox.dev/blog/" }
+      ,{ "@type": "ListItem", "position": 3, "name": "Dox 3.2 patches: faster, less memory, fewer leaks", "item": "https://dartondox.dev/blog/dox-3-2-patches/" }
+    ]
+  }
+  </script>
+  
+  
+
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#dox-32-patches-faster-less-memory-fewer-leaks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="DOX" class="md-header__button md-logo" aria-label="DOX" data-md-component="logo">
+      
+  <img src="../assets/logo.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DOX
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Dox 3.2 patches: faster, less memory, fewer leaks
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/dartondox/dox" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="/latest/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Docs
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href=".." class="md-tabs__link">
+          
+  
+  
+    
+  
+  Blog
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" hidden>
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="DOX" class="md-nav__button md-logo" aria-label="DOX" data-md-component="logo">
+      
+  <img src="../assets/logo.svg" alt="logo">
+
+    </a>
+    DOX
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/dartondox/dox" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/latest/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Docs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href=".." class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Blog
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Blog
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tags/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tags
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Archive
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Archive
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../archive/2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Categories
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Categories
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../category/guides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../category/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../category/performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Performance
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    
+  
+  
+    <li class="md-nav__item">
+      <a href="../category/releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+                
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-this-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why this release
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#versions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Versions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to update
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Benchmark">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#http" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-query-builder-and-orm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database, query builder and ORM
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Database, query builder and ORM">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgres-18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Postgres 18
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql-84" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL 8.4
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Queue
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        New
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="New">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-heavy-work-off-the-server-isolate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run heavy work off the server isolate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strict-mode-for-development" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Strict mode for development
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#log-tags" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log tags
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-new-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other new options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Faster
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Faster">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#orm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ORM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#database-drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Database drivers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#queue-cache-storage-and-socketio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Queue, cache, storage and Socket.IO
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fixes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Fixes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-leaks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory leaks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Security
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bugs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bugs
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#read-before-you-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Read before you update
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+  <div class="md-content md-content--post" data-md-component="content">
+    <div class="md-sidebar md-sidebar--post" data-md-component="sidebar" data-md-type="navigation">
+      <div class="md-sidebar__scrollwrap">
+        <div class="md-sidebar__inner md-post">
+          <nav class="md-nav md-nav--primary">
+            <div class="md-post__back">
+              <div class="md-nav__title md-nav__container">
+                <a href=".." class="md-nav__link">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+                  <span class="md-ellipsis">
+                    Back to index
+                  </span>
+                </a>
+              </div>
+            </div>
+            
+              <div class="md-post__authors md-typeset">
+                
+                  <div class="md-profile md-post__profile">
+                    <span class="md-author md-author--long">
+                      <img src="../assets/logo.svg" alt="Dox team">
+                    </span>
+                    <span class="md-profile__description">
+                      <strong>
+                        
+                          <a href="https://github.com/dartondox">Dox team</a>
+                        
+                      </strong>
+                      <br>
+                      Maintainers
+                    </span>
+                  </div>
+                
+              </div>
+            
+            <ul class="md-post__meta md-nav__list">
+              <li class="md-nav__item md-nav__item--section">
+                <div class="md-post__title">
+                  <span class="md-ellipsis">
+                    Metadata
+                  </span>
+                </div>
+                <nav class="md-nav">
+                  <ul class="md-nav__list">
+                    <li class="md-nav__item">
+                      <div class="md-nav__link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 19H5V8h14m-3-7v2H8V1H6v2H5c-1.11 0-2 .89-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1m-1 11h-5v5h5z"/></svg>
+                        <time datetime="2026-11-17 00:00:00+00:00" class="md-ellipsis">November 17, 2026</time>
+                      </div>
+                    </li>
+                    
+                    
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9 3v15h3V3zm3 2 4 13 3-1-4-13zM5 5v13h3V5zM3 19v2h18v-2z"/></svg>
+                          <span class="md-ellipsis">
+                            in
+                            
+                              <a href="../category/releases/">Releases</a></span>
+                        </div>
+                      </li>
+                    
+                    
+                      
+                      <li class="md-nav__item">
+                        <div class="md-nav__link">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
+                          <span class="md-ellipsis">
+                            
+                              13 min read
+                            
+                          </span>
+                        </div>
+                      </li>
+                    
+                  </ul>
+                </nav>
+              </li>
+            </ul>
+            
+          </nav>
+          
+        </div>
+      </div>
+    </div>
+    <article class="md-content__inner md-typeset">
+      
+        
+  
+
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <a href="../tags/#tag:release" class="md-tag">release</a>
+      
+    
+  </nav>
+
+
+  
+    <a href="https://github.com/dartondox/dox/edit/main/blog/docs/posts/dox-3-2-patches.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
+    </a>
+  
+  
+
+
+<h1 id="dox-32-patches-faster-less-memory-fewer-leaks">Dox 3.2 patches: faster, less memory, fewer leaks</h1>
+<p>This release is patch versions only. It makes Dox faster, uses less memory, and fixes memory leaks in long-running apps. There are no API changes. A few defaults changed, so read <a href="#read-before-you-update">Read before you update</a>.</p>
+<!-- more -->
+
+<blockquote>
+<p><strong>Key takeaways</strong></p>
+<ul>
+<li><strong>Faster ORM.</strong> A list of 100 rows as JSON is 47% faster on Postgres and 66% faster on MySQL. The query builder is 12–15% faster.</li>
+<li><strong>Faster queue.</strong> A Postgres worker runs 61% more jobs per second, and about 9 times more right after a burst of jobs.</li>
+<li><strong>Less memory.</strong> On Postgres, the ORM app uses half the peak memory (253 MB to 117 MB). A plain Dox server uses about a third less.</li>
+<li><strong>Leaks fixed.</strong> The idle queue worker, connections of clients that left, and several Socket.IO and Postgres cases no longer grow memory over time.</li>
+<li><strong>Easy to update.</strong> Patch versions only, no API changes. Run <code>dart pub upgrade</code> and <code>dox build_runner:build</code>, then check <a href="#read-before-you-update">Read before you update</a>.</li>
+</ul>
+</blockquote>
+<h2 id="why-this-release">Why this release</h2>
+<p>Some Dox apps used a bit more memory every day in production. We looked at every package for leaks and slow paths. This release fixes what we found:</p>
+<ul>
+<li>An idle queue worker used about 8 MB more memory per day for each loop. This is fixed.</li>
+<li>A request whose client went away could keep its connection open forever. This is fixed.</li>
+<li>Rows from the ORM carried all the query builder state. They are much smaller now.</li>
+<li>The hot path of every request does less work.</li>
+</ul>
+<h2 id="versions">Versions</h2>
+<p>Every package with a change gets a new patch version. Packages with no change keep their version.</p>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>New version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>dox_core</code>, <code>dox_builder</code></td>
+<td>3.2.2</td>
+</tr>
+<tr>
+<td><code>dox_cache</code></td>
+<td>3.2.1</td>
+</tr>
+<tr>
+<td><code>dox_orm</code>, <code>dox_migration</code>, <code>dox_cache_database</code></td>
+<td>3.2.2</td>
+</tr>
+<tr>
+<td><code>dox_queue</code>, <code>dox_queue_database</code></td>
+<td>3.2.2</td>
+</tr>
+<tr>
+<td><code>dox_scheduler</code>, <code>dox_storage</code>, <code>dox_inertia</code></td>
+<td>3.2.2</td>
+</tr>
+<tr>
+<td><code>dox_socketio</code>, <code>dox_auth</code>, <code>dox_mailer</code></td>
+<td>3.2.1</td>
+</tr>
+<tr>
+<td><code>dox_http_native</code>, <code>dox_postgres_native</code>, <code>dox_mysql_native</code></td>
+<td>3.2.1</td>
+</tr>
+<tr>
+<td><code>ioredis</code></td>
+<td>3.2.1</td>
+</tr>
+</tbody>
+</table>
+<p>No change: <code>dox_annotation</code>, <code>dox_validation</code>, <code>dox_openapi</code>, <code>dox_view</code>, <code>dox_mcp</code> and the <code>dox</code> CLI.</p>
+<h2 id="how-to-update">How to update</h2>
+<ol>
+<li>
+<p>Get the new versions:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>upgrade
+</span></code></pre></div>
+<p>Upgrade <code>dox_core</code> and <code>dox_http_native</code> together. The new <code>dox_core</code> uses <code>NativeResponse.end()</code> and <code>headSent</code> from the new <code>dox_http_native</code>.</p>
+</li>
+<li>
+<p>Make the generated code again. The new <code>dox_builder</code> writes faster model code:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox<span class="w"> </span>build_runner:build
+</span></code></pre></div>
+</li>
+<li>
+<p>Read <a href="#read-before-you-update">Read before you update</a>. Most apps need nothing more.</p>
+</li>
+</ol>
+<h2 id="benchmark">Benchmark</h2>
+<p>We ran the same apps on the released 3.2 packages and on this release. Same machine, same rig, one server at a time, old and new taking turns, 2 or 3 runs each. The numbers are the average of the runs.</p>
+<div class="dox-bench">
+<p class="dox-bench__title">ORM: 47% more requests, half the memory</p>
+<p class="dox-bench__sub"><code>GET /orm-list</code>: 100 rows with a model query, as JSON. Postgres, 256 connections.</p>
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">req/s</span>
+  <span class="dox-bench__head">p99</span>
+  <span class="dox-bench__head dox-bench__head--ram">RAM</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>Dox</strong><span>this release</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">31,183<span class="dox-bench__vs">47% faster</span></span>
+    <span class="dox-bench__p99">15.0 ms</span>
+    <span class="dox-bench__ram">117 MB</span>
+  </div>
+<div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Dox</strong><span>released 3.2</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 68.2%"></span></span>
+    <span class="dox-bench__num">21,274<span class="dox-bench__vs">before</span></span>
+    <span class="dox-bench__p99">27.8 ms</span>
+    <span class="dox-bench__ram">253 MB</span>
+  </div>
+</div>
+<p class="dox-bench__foot"><span>Dart 3.13 · 2 cores · Postgres 18 · 256 connections · wrk</span></p>
+</div>
+<div class="dox-bench">
+<p class="dox-bench__title">Query builder: one row</p>
+<p class="dox-bench__sub"><code>GET /qb</code>: <code>table('world').where('id', id).first()</code>. Postgres, 256 connections.</p>
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">req/s</span>
+  <span class="dox-bench__head">p99</span>
+  <span class="dox-bench__head dox-bench__head--ram">RAM</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>Dox</strong><span>this release</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">249,862<span class="dox-bench__vs">15% faster</span></span>
+    <span class="dox-bench__p99">3.0 ms</span>
+    <span class="dox-bench__ram">117 MB</span>
+  </div>
+<div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Dox</strong><span>released 3.2</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 87.0%"></span></span>
+    <span class="dox-bench__num">217,259<span class="dox-bench__vs">before</span></span>
+    <span class="dox-bench__p99">3.3 ms</span>
+    <span class="dox-bench__ram">253 MB</span>
+  </div>
+</div>
+<p class="dox-bench__foot"><span>Dart 3.13 · 2 cores · Postgres 18 · 256 connections · wrk</span></p>
+</div>
+<div class="dox-bench">
+<p class="dox-bench__title">HTTP: a bit faster, a third less memory</p>
+<p class="dox-bench__sub"><code>GET /</code> on a full Dox app, 512 connections.</p>
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">req/s</span>
+  <span class="dox-bench__head">p99</span>
+  <span class="dox-bench__head dox-bench__head--ram">RAM</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>Dox</strong><span>this release</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">649,990<span class="dox-bench__vs">5% faster</span></span>
+    <span class="dox-bench__p99">1.8 ms</span>
+    <span class="dox-bench__ram">21 MB</span>
+  </div>
+<div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Dox</strong><span>released 3.2</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 95.0%"></span></span>
+    <span class="dox-bench__num">617,618<span class="dox-bench__vs">before</span></span>
+    <span class="dox-bench__p99">1.9 ms</span>
+    <span class="dox-bench__ram">31 MB</span>
+  </div>
+</div>
+<p class="dox-bench__foot"><span>Dart 3.13 · 2 cores · 512 connections · wrk</span></p>
+</div>
+<p>RAM is the peak memory of the whole server, the median of the runs. For the database cards it is the peak over all routes of that app.</p>
+<h3 id="http">HTTP</h3>
+<p>A full Dox app with three routes, the rules of <a href="https://github.com/the-benchmarker/web-frameworks">the-benchmarker</a>. Requests per second, the average of 3 runs.</p>
+<table>
+<thead>
+<tr>
+<th>Route</th>
+<th style="text-align: right;">Connections</th>
+<th style="text-align: right;">3.2</th>
+<th style="text-align: right;">This release</th>
+<th style="text-align: right;">Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>GET /</code></td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">495,089</td>
+<td style="text-align: right;">521,583</td>
+<td style="text-align: right;">+5%</td>
+</tr>
+<tr>
+<td><code>GET /</code></td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">617,487</td>
+<td style="text-align: right;">626,655</td>
+<td style="text-align: right;">+1%</td>
+</tr>
+<tr>
+<td><code>GET /</code></td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">617,618</td>
+<td style="text-align: right;">649,990</td>
+<td style="text-align: right;">+5%</td>
+</tr>
+<tr>
+<td><code>GET /user/:id</code></td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">456,879</td>
+<td style="text-align: right;">482,241</td>
+<td style="text-align: right;">+6%</td>
+</tr>
+<tr>
+<td><code>GET /user/:id</code></td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">560,239</td>
+<td style="text-align: right;">552,170</td>
+<td style="text-align: right;">about the same</td>
+</tr>
+<tr>
+<td><code>GET /user/:id</code></td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">550,589</td>
+<td style="text-align: right;">557,409</td>
+<td style="text-align: right;">+1%</td>
+</tr>
+<tr>
+<td><code>POST /user</code></td>
+<td style="text-align: right;">64</td>
+<td style="text-align: right;">435,214</td>
+<td style="text-align: right;">461,935</td>
+<td style="text-align: right;">+6%</td>
+</tr>
+<tr>
+<td><code>POST /user</code></td>
+<td style="text-align: right;">256</td>
+<td style="text-align: right;">530,144</td>
+<td style="text-align: right;">555,397</td>
+<td style="text-align: right;">+5%</td>
+</tr>
+<tr>
+<td><code>POST /user</code></td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">517,625</td>
+<td style="text-align: right;">564,322</td>
+<td style="text-align: right;">+9%</td>
+</tr>
+<tr>
+<td>Peak memory (median)</td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;">31 MB</td>
+<td style="text-align: right;">21 MB</td>
+<td style="text-align: right;">−32%</td>
+</tr>
+</tbody>
+</table>
+<p>The native server alone, with no framework (<code>dox_http_native</code>, average of 2 runs), has the same speed as before. It serves about 690,000 requests per second at 512 connections. That is close to the most wrk can send, so wrk is the limit here. Its peak memory went from about 30 MB to 19 MB, because connections now share one read buffer per core. See <a href="/latest/digging-deeper/native-server/">Native server</a>.</p>
+<h3 id="database-query-builder-and-orm">Database, query builder and ORM</h3>
+<p>A small app with one table of 10,000 rows. 256 connections, requests per second, higher is better.</p>
+<h4 id="postgres-18">Postgres 18</h4>
+<p>Average of 3 runs.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th style="text-align: right;">3.2</th>
+<th style="text-align: right;">Now</th>
+<th style="text-align: right;">Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100 rows to JSON (ORM)</td>
+<td style="text-align: right;">21,274</td>
+<td style="text-align: right;">31,183</td>
+<td style="text-align: right;"><strong>+47%</strong></td>
+</tr>
+<tr>
+<td>Preload a relation, 20 rows</td>
+<td style="text-align: right;">20,596</td>
+<td style="text-align: right;">25,978</td>
+<td style="text-align: right;">+26%</td>
+</tr>
+<tr>
+<td>2 relations in a transaction</td>
+<td style="text-align: right;">8,325</td>
+<td style="text-align: right;">9,936</td>
+<td style="text-align: right;">+19%</td>
+</tr>
+<tr>
+<td>JSON response</td>
+<td style="text-align: right;">472,715</td>
+<td style="text-align: right;">555,149</td>
+<td style="text-align: right;">+17%</td>
+</tr>
+<tr>
+<td>Query builder, one row</td>
+<td style="text-align: right;">217,259</td>
+<td style="text-align: right;">249,862</td>
+<td style="text-align: right;">+15%</td>
+</tr>
+<tr>
+<td><code>where('id', id).first()</code></td>
+<td style="text-align: right;">207,500</td>
+<td style="text-align: right;">237,464</td>
+<td style="text-align: right;">+14%</td>
+</tr>
+<tr>
+<td><code>find()</code>, then <code>save()</code></td>
+<td style="text-align: right;">95,714</td>
+<td style="text-align: right;">105,912</td>
+<td style="text-align: right;">+11%</td>
+</tr>
+<tr>
+<td>One row with <code>find(id)</code></td>
+<td style="text-align: right;">224,865</td>
+<td style="text-align: right;">243,143</td>
+<td style="text-align: right;">+8%</td>
+</tr>
+<tr>
+<td>20 rows, one query after another</td>
+<td style="text-align: right;">14,700</td>
+<td style="text-align: right;">14,722</td>
+<td style="text-align: right;">same</td>
+</tr>
+<tr>
+<td>Peak memory (median)</td>
+<td style="text-align: right;">253 MB</td>
+<td style="text-align: right;">117 MB</td>
+<td style="text-align: right;"><strong>−54%</strong></td>
+</tr>
+</tbody>
+</table>
+<h4 id="mysql-84">MySQL 8.4</h4>
+<p>Average of 2 runs.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th style="text-align: right;">3.2</th>
+<th style="text-align: right;">Now</th>
+<th style="text-align: right;">Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100 rows to JSON (ORM)</td>
+<td style="text-align: right;">18,481</td>
+<td style="text-align: right;">30,671</td>
+<td style="text-align: right;"><strong>+66%</strong></td>
+</tr>
+<tr>
+<td>JSON response</td>
+<td style="text-align: right;">518,197</td>
+<td style="text-align: right;">598,645</td>
+<td style="text-align: right;">+16%</td>
+</tr>
+<tr>
+<td>Query builder, one row</td>
+<td style="text-align: right;">214,335</td>
+<td style="text-align: right;">240,542</td>
+<td style="text-align: right;">+12%</td>
+</tr>
+<tr>
+<td>2 relations in a transaction</td>
+<td style="text-align: right;">5,573</td>
+<td style="text-align: right;">6,235</td>
+<td style="text-align: right;">+12%</td>
+</tr>
+<tr>
+<td><code>where('id', id).first()</code></td>
+<td style="text-align: right;">212,650</td>
+<td style="text-align: right;">228,801</td>
+<td style="text-align: right;">+8%</td>
+</tr>
+<tr>
+<td>One row with <code>find(id)</code></td>
+<td style="text-align: right;">222,045</td>
+<td style="text-align: right;">238,263</td>
+<td style="text-align: right;">+7%</td>
+</tr>
+<tr>
+<td><code>find()</code>, then <code>save()</code></td>
+<td style="text-align: right;">94,271</td>
+<td style="text-align: right;">98,262</td>
+<td style="text-align: right;">+4%</td>
+</tr>
+<tr>
+<td>Preload a relation, 20 rows</td>
+<td style="text-align: right;">16,933</td>
+<td style="text-align: right;">17,460</td>
+<td style="text-align: right;">+3%</td>
+</tr>
+<tr>
+<td>20 rows, one query after another</td>
+<td style="text-align: right;">11,980</td>
+<td style="text-align: right;">12,265</td>
+<td style="text-align: right;">+2%</td>
+</tr>
+<tr>
+<td>Peak memory (range)</td>
+<td style="text-align: right;">253–261 MB</td>
+<td style="text-align: right;">125–222 MB</td>
+<td style="text-align: right;">lower</td>
+</tr>
+</tbody>
+</table>
+<p>We also ran the same routes with the driver alone, with no ORM (<code>dox_postgres_native</code>, average of 2 runs). One row went from 266,664 to 297,000 requests per second (+11%). The JSON response went from 550,049 to 592,900 (+8%).</p>
+<p>Why the numbers moved:</p>
+<ul>
+<li>ORM rows no longer carry the query builder state. So a list of rows is much cheaper to make, to keep in memory and to turn into JSON.</li>
+<li>In a <a href="/latest/database/transactions/">transaction</a>, the <a href="/latest/database/model/relationship/has-many/">relations</a> of a model now load together, not one by one.</li>
+<li>"20 rows, one query after another" waits for the database 20 times in a row. The database is the limit there, so it barely moves.</li>
+</ul>
+<h3 id="queue">Queue</h3>
+<p>20,000 jobs that do nothing, on Postgres 18, with 4 worker loops on 2 cores. Jobs per second, the average of 3 runs.</p>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th style="text-align: right;">3.2</th>
+<th style="text-align: right;">Now</th>
+<th style="text-align: right;">Change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Run the jobs</td>
+<td style="text-align: right;">6,800</td>
+<td style="text-align: right;">10,924</td>
+<td style="text-align: right;"><strong>+61%</strong></td>
+</tr>
+<tr>
+<td>Run the jobs right after a burst</td>
+<td style="text-align: right;">816</td>
+<td style="text-align: right;">7,452</td>
+<td style="text-align: right;"><strong>about 9×</strong></td>
+</tr>
+<tr>
+<td>Push 20,000 jobs with <code>Queue.batch()</code></td>
+<td style="text-align: right;">2.0 s</td>
+<td style="text-align: right;">0.33 s</td>
+<td style="text-align: right;"><strong>6× faster</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>A worker now takes a job with one statement, not a transaction of 4 round trips.</li>
+<li><code>Queue.batch()</code> inserts the jobs with multi-row inserts, not one insert per job.</li>
+<li>"Right after a burst" is a table that was nearly empty and just got many jobs. Postgres still thinks the table is small for up to about a minute. Before, each pop then sorted every waiting job, so the worker was 10 times slower until Postgres updated its statistics. A new index fixes this. See <a href="#read-before-you-update">Read before you update</a> to add it to an old table.</li>
+</ul>
+<p>How it was run: Docker on an Apple M2, <code>linux/arm64</code>. The server gets 2 CPUs, wrk gets the others. For the database routes, the database gets 2 CPUs of its own. wrk with keep-alive, 5 seconds warm-up, then 15 seconds per route. AOT build (<code>dart build cli</code>). See <a href="/latest/digging-deeper/performance/">Performance</a> for the full rig.</p>
+<h2 id="new">New</h2>
+<h3 id="run-heavy-work-off-the-server-isolate">Run heavy work off the server isolate</h3>
+<p><code>Dox().compute(task)</code> runs heavy CPU work, like a PDF, an image or a big JSON file, on a worker isolate. The server answers other requests in the meantime. One small pool of workers is shared by every server isolate. <code>AppConfig.computeWorkers</code> sets its size (default 4).</p>
+<p><code>Hash.makeAsync</code> and <code>Hash.verifyAsync</code> now run on this pool. Before, each call started a new isolate, so 500 logins at once started 500 isolates.</p>
+<p>Docs: <a href="/latest/digging-deeper/performance-mistakes/">Performance mistakes</a></p>
+<h3 id="strict-mode-for-development">Strict mode for development</h3>
+<p>Strict mode warns about code that makes an app slow. It is off by default.</p>
+<ul>
+<li><code>AppConfig(strict: StrictConfig(enabled: true))</code> warns when a route blocks the isolate longer than 50 ms, and when <code>Hash.make</code> or <code>Hash.verify</code> runs in the web server.</li>
+<li><code>DatabaseConfig(strict: OrmStrict(enabled: true))</code> warns about N+1 queries (the same relation loaded row by row) and about a <code>get()</code> with no <code>limit()</code> that reads more than 1,000 rows.</li>
+</ul>
+<p>Each warning says what to use instead. Turn both on in development with <code>appConfig.isDevelopment</code>.</p>
+<p>Docs: <a href="/latest/digging-deeper/performance-mistakes/">Performance mistakes</a>, <a href="/latest/reference/app-config/">App config</a></p>
+<h3 id="log-tags">Log tags</h3>
+<p>Every pretty log line now starts with a dim tag that says where it comes from: <code>[request]</code>, <code>[server]</code>, <code>[error]</code>, <code>[app]</code>, <code>[db:main]</code>, <code>[queue]</code>, <code>[socketio]</code>, <code>[auth]</code>, <code>[mail]</code> and more. The scheduler uses <code>[scheduler]</code> when <code>SchedulerFlags.loggerLines</code> is on. Pass your own tag as the third argument:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'invoice sent'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">42</span><span class="p">},</span><span class="w"> </span><span class="s1">'billing'</span><span class="p">);</span>
+</span></code></pre></div>
+<p>In JSON logs, the tag is the <code>source</code> field.</p>
+<h3 id="other-new-options">Other new options</h3>
+<ul>
+<li><code>CoreFlags.rateLimitIpv6Prefix</code> (opt-in): <code>RateLimit</code> counts an IPv6 client by its /64 prefix. See <a href="/latest/security/rate-limiting/">Rate limiting</a>.</li>
+<li><code>fsync: false</code> on a <code>file</code> cache store skips the sync to disk on each write. See <a href="/latest/digging-deeper/cache/">Cache</a>.</li>
+<li><code>prune_interval</code> on a <code>database</code> cache store prunes expired rows now and then.</li>
+<li><code>--max-sleep</code> for the queue worker: an idle worker sleeps longer, up to this time. See <a href="/latest/digging-deeper/queue/">Queue</a>.</li>
+<li><code>SchedulerFlags.loggerLines</code> (opt-in): scheduler lines go through the app <code>Logger</code>. See <a href="/latest/digging-deeper/scheduler/">Scheduler</a>.</li>
+<li><code>unsigned_payload: true</code> on an S3 disk skips the body hash (HTTPS only). See <a href="/latest/digging-deeper/file-storage/">File storage</a>.</li>
+<li>Socket.IO opt-in limits: <code>maxAttachmentBytes</code>, <code>maxAuthSize</code>, <code>maxWriteBufferSize</code> and <code>ackTimeout</code>. See <a href="/latest/packages/socketio/">Socket.IO</a>.</li>
+<li>ioredis: <code>maxQueuedCommands</code> (opt-in) caps the commands that wait for a connect.</li>
+<li>A <code>redis</code> cache store takes <code>'options': RedisOptions(...)</code>, so every ioredis option works there too, like <code>commandTimeout</code> or <code>onError</code>. Sessions and rate limits on Redis use this store. See <a href="/latest/digging-deeper/cache/">Cache</a>.</li>
+<li>The queue worker warns once when a job may run longer than <code>retryAfter</code>. Then a second worker could take the same job while the first one still runs it.</li>
+<li><code>NativeWebSocket.pingInterval</code> now works.</li>
+</ul>
+<h2 id="faster">Faster</h2>
+<h3 id="requests">Requests</h3>
+<ul>
+<li>A request with no body makes no body map until you read <code>req.body</code>.</li>
+<li>A response makes no Future, map, set or list unless you use them.</li>
+<li>CORS does not read the <code>Origin</code> header when it has nothing to check.</li>
+<li>A route with params skips its regex when the url does not start with the route's text.</li>
+<li>A JSON response starts with a 1 KB buffer, not 8 KB. Small JSON bodies encode about 2 times faster.</li>
+<li>An ASCII text body is written straight to bytes.</li>
+<li>The <code>cookie</code> session driver decrypts the cookie only when you use <code>req.session</code>.</li>
+<li><code>RateLimit</code> on Redis is one round trip per request, not two or three.</li>
+</ul>
+<h3 id="orm">ORM</h3>
+<ul>
+<li>Rows no longer carry the query builder state. Each row from <code>get()</code> uses much less memory.</li>
+<li><code>toJson()</code>, <code>preload()</code> and relation loading do less work per row.</li>
+<li>A relation load reads only the key column of each row (needs <code>dox build_runner:build</code>).</li>
+<li><code>where(column, value).first()</code> reuses the SQL of <code>find()</code>. The <a href="/latest/database/query-builder/">query builder</a> does less work per query too.</li>
+<li><code>create()</code> and <code>save()</code> copy less.</li>
+<li>Inside a transaction, the relations of a model load together, not one by one.</li>
+</ul>
+<h3 id="database-drivers">Database drivers</h3>
+<ul>
+<li>Postgres: each isolate gets a fair share of the connection pool. Before, under load, isolates passed connections back and forth, and the slowest requests got slower.</li>
+<li>The native HTTP server uses one shared read buffer per core, not 16 KB per connection.</li>
+</ul>
+<h3 id="queue-cache-storage-and-socketio">Queue, cache, storage and Socket.IO</h3>
+<ul>
+<li>Postgres queue: a worker takes a job with one statement, not a transaction of 4 round trips. Several queues are polled in one statement. An idle worker makes one round trip per poll.</li>
+<li>Postgres and SQLite queue: right after a burst of jobs, a pop no longer sorts every waiting job (a new index).</li>
+<li><code>Queue.batch()</code> inserts its jobs with multi-row inserts.</li>
+<li>Database cache store: <code>add</code>, <code>increment</code>, <code>pull</code>, <code>touch</code> and locks run one statement on Postgres and SQLite.</li>
+<li>Memory cache store: removing the least recently used item is O(1), not O(n).</li>
+<li>S3 <code>putStream</code> keeps one part in memory, not two or three (about 8 MiB in place of 24 MiB per upload). <code>stream()</code> and <code>download()</code> send one GET, not a HEAD and a GET.</li>
+<li>Local disk <code>append</code> adds to the file, without reading and writing the whole file.</li>
+<li>Socket.IO: a room broadcast with <code>except</code> makes no copy of the room. With the Redis adapter, a server does not decode broadcasts for rooms it does not have.</li>
+<li>ioredis: text like Burmese or emoji is encoded in one pass.</li>
+</ul>
+<h2 id="fixes">Fixes</h2>
+<h3 id="memory-leaks">Memory leaks</h3>
+<ul>
+<li>Queue: an idle worker leaked a listener on each sleep, about 8 MB a day per loop. This also hit the in-process worker in the web server.</li>
+<li>Native HTTP: sometimes a client leaves while its request still waits, and the handler never answers (for example, a database call with no timeout). The server then kept that connection forever. The same happened to a server-sent events stream that wrote nothing after the client left. Now the connection closes after <code>AppConfig.idleTimeout</code>.</li>
+<li>Native HTTP: <code>response.done</code> never completed when the client left first. A handler writing events from a timer kept its timer forever.</li>
+<li>Native HTTP: accepted sockets now get TCP keep-alive, so a client that vanished with no close is found in about 2 minutes.</li>
+<li>Postgres: a query that failed after its Parse left a prepared statement on the server. The Postgres backend grew with each one.</li>
+<li>Postgres: each cached statement kept the whole batch of its request in memory, not only its SQL. It now keeps its own copy of the SQL.</li>
+<li>Postgres, MySQL and the ORM: SQL longer than 4 KB is no longer kept in the SQL caches. Big generated inserts could fill them with hundreds of MB.</li>
+<li>Socket.IO: <code>socket.join()</code> after a disconnect kept the socket in the room forever.</li>
+<li>Socket.IO: unfinished binary packets, and broadcast acks when Redis was down, stayed in memory.</li>
+<li>Scheduler: a <code>Scheduler</code> made without <code>out</code> kept every log line forever. It now keeps the last 64 KB.</li>
+<li>Rate limit: the counter in the main isolate had no cap on clients. It now keeps at most 100,000.</li>
+<li>ioredis: while Redis was down, every command waited forever and kept its data. Commands now time out after 10 seconds.</li>
+</ul>
+<h3 id="security">Security</h3>
+<ul>
+<li>Socket.IO: a client could send the start of a binary packet and never the rest. The parts stayed in memory, also before the client joined a namespace. Now such a client is closed.</li>
+<li>Socket.IO: a 1 MB polling body made of separators was split into about 500,000 strings at once. Now packets are read one at a time.</li>
+<li>Socket.IO: with <code>maxSessions</code> not set, every GET request makes a session that lives about 45 seconds. The server now prints a warning at start. Set <code>maxSessions</code> in production.</li>
+</ul>
+<h3 id="disk">Disk</h3>
+<ul>
+<li>The <code>file</code> cache store never cleaned up by default. Now a write starts a light prune at most once an hour. Temp files left by a crash are removed too.</li>
+<li>Upload temp files are deleted when the request is handled, also on an error or a raw <code>Route.mount</code> handler.</li>
+</ul>
+<h3 id="bugs">Bugs</h3>
+<ul>
+<li><a href="/latest/the-basic/session/">Sessions</a> with the <code>cache</code> driver on a <code>memory</code> store lived in each isolate on its own, so users were logged out at random. They now live in the main isolate.</li>
+<li>Scheduler: a slow tick that ended in the next minute skipped that minute, so a <code>dailyAt('02:00')</code> task could miss a day.</li>
+<li>Scheduler: with <code>inProcess: true</code>, the schedule also ran in every <code>bin/queue.dart</code> process.</li>
+<li>Native HTTP: a streamed answer with status 1xx, 204 or 304 broke the next answer on the same keep-alive connection.</li>
+<li>Native HTTP: <code>response.flush()</code> did nothing. It now sends the head and the bytes so far, like <code>dart:io</code>.</li>
+<li>Core: an error after a flush (for example in server-sent events) wrote <code>Internal Server Error</code> into the middle of the stream. Now the response just ends.</li>
+<li>Core: a multipart body with no closing boundary kept the request open forever.</li>
+<li>ORM: <code>find('meta-&gt;n', 10)</code> on a JSON path failed the second time on Postgres and MySQL.</li>
+<li>ORM: <code>$getRelation&lt;User&gt;('user')</code> with a type threw a <code>TypeError</code>.</li>
+<li>Database cache store: an <code>increment</code> past the 64-bit limit wrapped to a negative number. It is now an error.</li>
+<li>S3: <code>directoryExists</code> was false for a folder made in the S3 console, and <code>deleteDirectory</code> left the folder marker.</li>
+<li>ioredis: a bad reply byte from the server could crash the app.</li>
+</ul>
+<h2 id="read-before-you-update">Read before you update</h2>
+<p>These changes can be seen by an app. Most apps need nothing.</p>
+<ul>
+<li><strong>Log text.</strong> Pretty log lines start with a tag, and plain warnings use tags like <code>[server]</code>, <code>[db]</code> and <code>[queue]</code> in place of <code>dox: warning:</code>, <code>[dox]</code> or <code>Queue:</code>. JSON lines get a <code>source</code> field at the end. Check tools that match on log text.</li>
+<li><strong>ioredis commands time out after 10 seconds.</strong> Blocking commands and subscribers never time out. To turn it off: <code>RedisOptions(commandTimeout: null)</code>.</li>
+<li>
+<p><strong>Half-closed clients.</strong> A client that closed only its sending side now waits at most <code>idleTimeout</code> (30 seconds by default) for its answer. If such clients call slow handlers, raise it in <code>lib/config/app.dart</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">120</span><span class="p">),</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>See <a href="/latest/reference/app-config/">App config</a>.
+- <strong>A test that starts the scheduler by hand.</strong> This only matters if you use <code>ScheduleConfig(inProcess: true)</code>, so the schedule runs inside the web server.</p>
+<p>The problem it fixes: <code>bin/queue.dart</code> also calls <code>setup()</code> on every provider. So the schedule ran in the web server and again in every queue worker process, and each task ran more than once.</p>
+<p>Now <code>SchedulerProvider.setup()</code> starts the schedule only in the web server. <code>Dox().startServer()</code> marks the web server: it sets <code>Dox().isWebServer = true</code>. Your app and your HTTP tests start the server. So they need no change.</p>
+<p>A test that calls <code>setup()</code> itself, with no server, now gets no schedule. Set the flag first:</p>
+<p><div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">test</span><span class="p">(</span><span class="s1">'the schedule runs in the server'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">isWebServer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w"> </span><span class="c1">// new: without it, setup() does nothing</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="n">SchedulerProvider</span><span class="w"> </span><span class="n">provider</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SchedulerProvider</span><span class="p">(</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span><span class="nl">schedule:</span><span class="w"> </span><span class="n">appSchedule</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="nl">config:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScheduleConfig</span><span class="p">(</span><span class="nl">inProcess:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="nl">store:</span><span class="w"> </span><span class="n">CacheStore</span><span class="p">(</span><span class="n">MemoryDriver</span><span class="p">()),</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="p">);</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">provider</span><span class="p">.</span><span class="n">setup</span><span class="p">();</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="n">expect</span><span class="p">(</span><span class="n">provider</span><span class="p">.</span><span class="n">scheduler</span><span class="p">,</span><span class="w"> </span><span class="n">isNotNull</span><span class="p">);</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">provider</span><span class="p">.</span><span class="n">shutdown</span><span class="p">();</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">});</span>
+</span></code></pre></div>
+- <strong>Queue indexes.</strong> A new <code>jobs</code> table on Postgres or SQLite gets better indexes. They keep a worker fast when many jobs come at once, and when many jobs are delayed. For an old table, add a migration that calls <code>QueueTables.popIndex(schema)</code>. It adds only the indexes that are missing, and it does nothing on MySQL and MariaDB. This is optional, but we recommend it for Postgres apps that push jobs in bursts.
+- <strong>Rate limit cap.</strong> The <code>RateLimit</code> counter in the main isolate (no Redis) now keeps at most 100,000 clients. When it is full, it drops expired counts first, then the oldest ones. A dropped client starts again at 0. Most apps never reach this.
+- <strong>File cache clean-up.</strong> The <code>file</code> cache store now deletes expired files by itself, at most once an hour. It only touches files the cache made. Before, expired files (like old sessions) stayed on the disk for ever.
+- <strong>Database cache <code>increment</code>.</strong> An <code>increment</code> past the 64-bit int limit is now an error, and the value does not change. Before, it wrapped to a negative number.
+- <strong>Cache index.</strong> A new <code>cache</code> table gets an index on <code>expires_at</code>. For an old table, add it with <code>schema.table('cache', (Table t) =&gt; t.index('expires_at'))</code>. This is optional.</p>
+</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+
+  
+
+
+
+      
+    </article>
+  </div>
+
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+        
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../dox-3-2/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Dox 3.2 is out">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Dox 3.2 is out
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2023 - 2026 Dart On Dox
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://github.com/dartondox" target="_blank" rel="noopener" title="Github" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../assets/script.js"></script>
+      
+    
+  </body>
+</html>
