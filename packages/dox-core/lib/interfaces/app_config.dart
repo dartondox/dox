@@ -1,8 +1,6 @@
 /// coverage:ignore-file
 library;
 
-import 'dart:io';
-
 import 'package:dox_core/dox_core.dart';
 
 class AppConfig {
@@ -223,7 +221,7 @@ class AppConfig {
     this.strict = const StrictConfig(),
     this.htmlErrors = false,
     this.errorPage = defaultErrorPage,
-  }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
+  }) : totalIsolate = totalIsolate ?? Processors.available;
 }
 
 class CORSConfig {
