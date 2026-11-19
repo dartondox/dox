@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.3
 
 - Fix: the default `totalIsolate` was `Platform.numberOfProcessors`. In a Linux container with `--cpuset-cpus` or a CPU quota (`--cpus`, Kubernetes limits), Dart still reports all CPUs of the host. Dox then started too many isolates, and the OS paused them, so some requests waited longer. Now the default is `Processors.available`. It uses the CPUs the container allows (cpuset and CPU quota, cgroup v1 and v2). Outside Linux it is still `Platform.numberOfProcessors`.
 - Fix: with `OpenApiConfig.include` or `exclude`, the docs still listed every schema of the registry, also the ones used only by hidden routes. Now they list only the schemas that the shown routes use, and the schemas used inside those. With no `include` and no `exclude`, all schemas are listed as before.
