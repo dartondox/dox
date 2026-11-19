@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dox_core/dox_core.dart';
 import 'package:my_app/app/error_handler.dart';
 import 'package:my_app/app/http/response_handler.dart';
@@ -16,7 +14,7 @@ import 'package:my_app/providers/orm_provider.dart';
 AppConfig appConfig = AppConfig(
   appKey: env.appKey,
   serverPort: env.appPort,
-  totalIsolate: env.appTotalIsolate ?? Platform.numberOfProcessors,
+  totalIsolate: env.appTotalIsolate,
   globalMiddleware: <dynamic>[
     LogMiddleware(enabled: env.appEnv != 'production'),
   ],

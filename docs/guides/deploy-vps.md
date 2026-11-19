@@ -140,7 +140,7 @@ systemctl status blog
 
 - When the main isolate dies, the process exits and `Restart=always` starts it again. See [Deployment: keep it running](../digging-deeper/deployment.md#keep-it-running).
 - The app runs the migrations at start, before it takes requests.
-- Dox starts one isolate per CPU core. Set `APP_TOTAL_ISOLATE` in `/etc/blog.env` to change it.
+- Dox starts one isolate per CPU the process may use. Set `APP_TOTAL_ISOLATE` in `/etc/blog.env` to change it.
 
 ## 6. Close the app port
 

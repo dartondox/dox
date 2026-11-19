@@ -1,8 +1,6 @@
 /// coverage:ignore-file
 library;
 
-import 'dart:io';
-
 import 'package:dox_core/dox_core.dart';
 
 class AppConfig {
@@ -32,6 +30,8 @@ class AppConfig {
   /// The host (network interface) to listen on, like `127.0.0.1`.
   /// Default: the env var `APP_HOST`, else all interfaces (IPv6 and IPv4).
   final String? host;
+
+  /// Isolates that serve HTTP. Default: `Processors.available`.
   final int totalIsolate;
   final ResponseHandlerInterface? responseHandler;
 
@@ -188,7 +188,7 @@ class AppConfig {
     this.serverPort = 3000,
     this.host,
 
-    /// isolates (threads) that serve http. Default: one per CPU core.
+    /// isolates (threads) that serve http. Default: one per CPU the process may use.
     int? totalIsolate,
     this.providers = const <DoxProvider>[],
     this.dtos = const <DtoSchema<Object>>[],
@@ -223,7 +223,7 @@ class AppConfig {
     this.strict = const StrictConfig(),
     this.htmlErrors = false,
     this.errorPage = defaultErrorPage,
-  }) : totalIsolate = totalIsolate ?? Platform.numberOfProcessors;
+  }) : totalIsolate = totalIsolate ?? Processors.available;
 }
 
 class CORSConfig {

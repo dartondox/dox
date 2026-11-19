@@ -49,7 +49,7 @@ Go through each table once before your first deploy. Items marked **Dox limit** 
 | AOT binary, not `dart run` | Run `dox build`, then `build/bundle/bin/server`. Keep `bin/` and `lib/` together. Do not use `dart compile exe`. | [Deployment](../digging-deeper/deployment.md) |
 | Native server loads | The start line says `(native)`. If the library does not load, the app stops and prints the fix. | [Native server](../digging-deeper/native-server.md) |
 | Native database driver loads | The database works. If the library does not load, the app stops and prints the fix. | [Postgres native](../database/postgres-native.md) |
-| Isolates = cores | Keep the default `totalIsolate` (one per CPU core), or set `APP_TOTAL_ISOLATE` to the cores the container really gets. Use fewer when the database runs on the same machine. With SQLite, 1-2 isolates are enough. | [Isolate](../digging-deeper/isolate.md) |
+| Isolates = cores | Keep the default `totalIsolate`. It uses the CPUs the container allows (cpuset and CPU quota). Use fewer when the database runs on the same machine. With SQLite, 1-2 isolates are enough. | [Isolate](../digging-deeper/isolate.md) |
 | Shared state across isolates | Use a `redis` cache, not `memory`. For Socket.IO, use `transports: ['websocket']` on the client, and a Redis adapter with many servers. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Use Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
 | Writable temp folder | Uploads over 1 MB go to a temp file. A `FROM scratch` image needs `/tmp` with mode `1777`. | [Docker](../guides/docker.md) |

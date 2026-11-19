@@ -167,7 +167,7 @@ See [Deployment: HTTPS](../digging-deeper/deployment.md#https-put-a-proxy-in-fro
 
 ## Scaling the app
 
-Dox starts one isolate per CPU core it sees. On `cpus = 1` that is one isolate.
+Dox starts one isolate per CPU the container allows. On `cpus = 1` that is one isolate.
 
 | You want | Do this |
 | --- | --- |

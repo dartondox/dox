@@ -25,7 +25,7 @@ abstract class AppEnv {
   /// required: used to sign tokens and encrypt cookies
   String get appKey;
 
-  /// isolates (threads) of the HTTP server. Null: one per CPU core.
+  /// isolates (threads) of the HTTP server. Null: one per CPU the process may use.
   int? get appTotalIsolate;
 
   String get logLevel => 'info';

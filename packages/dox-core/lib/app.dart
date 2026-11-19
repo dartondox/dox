@@ -140,7 +140,7 @@ class Dox {
   }
 
   /// override total isolate from config
-  /// default is one per CPU core
+  /// default is one per CPU the process may use
   void totalIsolate(int value) {
     _totalIsolate = value;
   }

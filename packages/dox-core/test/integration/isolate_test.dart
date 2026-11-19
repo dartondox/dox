@@ -151,8 +151,10 @@ void main() {
       expect(values, <Object?>{'2:xy', '3:xy', '4:xy', '5:xy'});
     });
 
-    test('default isolates is one per cpu core', () {
-      expect(AppConfig(appKey: 'x').totalIsolate, Platform.numberOfProcessors);
+    test('default isolates is one per usable cpu', () {
+      int total = AppConfig(appKey: 'x').totalIsolate;
+      expect(total, greaterThanOrEqualTo(1));
+      expect(total, lessThanOrEqualTo(Platform.numberOfProcessors));
     });
   });
 }

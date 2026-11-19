@@ -46,7 +46,7 @@ A new project (`dox create`) reads these keys with its typed env class in `lib/c
 | `APP_ENV` | `appEnv` | `String` | `production` | `development`, `staging` or `production`. `development` turns on colored logs and the query log. Any value except `production` turns on `LogMiddleware` (one log line per request). The framework reads it too, see above. |
 | `APP_PORT` | `appPort` | `int` | `3000` | `AppConfig.serverPort`. When it is not set, Dox uses `PORT` if the env has it. |
 | `APP_KEY` | `appKey` | `String` | required | `AppConfig.appKey`. Exactly 32 characters. Run `dox key:generate` to make one. |
-| `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU core | `AppConfig.totalIsolate`. |
+| `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU the process may use (cpuset and CPU quota) | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
 | `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`. A new project has the stores `file` and `memory`. Add a `redis` store in `lib/config/cache.dart` before you use it. |
 | `STORAGE_DISK` | `storageDisk` | `String` | `local` | `StorageConfig.defaultDisk`. A new project has the disk `local`. Add an `s3` or `memory` disk in `lib/config/storage.dart` before you use it. |

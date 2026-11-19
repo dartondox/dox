@@ -85,7 +85,7 @@ See [Routing](../the-basic/routing.md), [Middleware](../the-basic/middleware.md)
 
 ## Isolates
 
-Dart runs code on isolates. An isolate is like a thread, but it has its own memory. Dox starts one isolate per CPU core (`Platform.numberOfProcessors`), and every isolate runs the full app. This is how one Dox process uses all cores.
+Dart runs code on isolates. An isolate is like a thread, but it has its own memory. Dox starts one isolate per CPU the process may use (it respects the container cpuset and CPU quota), and every isolate runs the full app. This is how one Dox process uses all cores.
 
 ### One port, many isolates
 
