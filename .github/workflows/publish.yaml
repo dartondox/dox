@@ -63,7 +63,7 @@ jobs:
         env:
           PACKAGE: ${{ inputs.package }}
         run: ci/publish-order.sh
-      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+      - uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
         with:
           sdk: stable
       # Pub workspace: one `dart pub get` at the root links all local packages,
@@ -149,7 +149,7 @@ jobs:
       # The tagged package only. Sets PACKAGES for the next steps.
       - name: Package to release
         run: ci/publish-order.sh
-      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+      - uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
         with:
           sdk: stable
       - name: Resolve and analyze against pub.dev
@@ -176,7 +176,7 @@ jobs:
       - name: Package to release
         run: ci/publish-order.sh
       # Sets up the OIDC token for pub.dev. No PUB_CREDENTIALS secret needed.
-      - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
+      - uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
         with:
           sdk: stable
       # Check the package before it is uploaded. The workspace links
