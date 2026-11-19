@@ -25,7 +25,7 @@ AppConfig appConfig = AppConfig(
   /// Total isolate (multi thread)
   /// -------------------------------
   /// Isolates that serve http requests, all on the same port.
-  /// Default is one per CPU core, so the app uses all cores.
+  /// Default is one per CPU the process may use.
   /// Set `APP_TOTAL_ISOLATE` to change it.
   totalIsolate: env.appTotalIsolate,
 

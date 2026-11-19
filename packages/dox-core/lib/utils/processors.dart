@@ -11,15 +11,21 @@ class Processors {
 
   /// CPUs this process may use. Never below 1.
   static int get available {
-    return _cached ??= detect(
+    return _cached ??= ProcessorsDetector.detect(
       reader: ProcFileReader(),
       numberOfProcessors: Platform.numberOfProcessors,
       isLinux: Platform.isLinux,
     );
   }
+}
+
+/// Does the work for [Processors]. Not exported from dox_core.
+/// The parsers take file text, so tests can call them without real files.
+class ProcessorsDetector {
+  ProcessorsDetector._();
 
   /// Works out the usable CPUs from the files the [reader] gives.
-  /// Public so tests can pass a fake reader. Use [available] in apps.
+  /// Tests pass a fake reader.
   static int detect({
     required ProcFileReader reader,
     required int numberOfProcessors,
@@ -32,6 +38,13 @@ class Processors {
     count = _min(count, parseCpusAllowed(reader.read('/proc/self/status')));
     count = _min(count, _quota(reader));
     return count < 1 ? 1 : count;
+  }
+
+  static int _min(int current, int? other) {
+    if (other == null || other < 1) {
+      return current;
+    }
+    return other < current ? other : current;
   }
 
   /// The tightest CPU quota of the cgroup of this process and its parents.
@@ -51,9 +64,9 @@ class Processors {
       // The path may hold ':', so join the rest.
       String path = parts.sublist(2).join(':');
       if (parts[0] == '0' && parts[1].isEmpty) {
-        v2 = _walk(reader, '/sys/fs/cgroup', path, _readV2);
+        v2 = _walk(reader, '/sys/fs/cgroup', path, v2: true);
       } else if (parts[1].split(',').contains('cpu')) {
-        v1 = _walk(reader, '/sys/fs/cgroup/cpu', path, _readV1);
+        v1 = _walk(reader, '/sys/fs/cgroup/cpu', path, v2: false);
       }
     }
     return v2 ?? v1;
@@ -75,9 +88,9 @@ class Processors {
   static int? _walk(
     ProcFileReader reader,
     String root,
-    String path,
-    int? Function(ProcFileReader, String) read,
-  ) {
+    String path, {
+    required bool v2,
+  }) {
     List<String> names = <String>[];
     for (String name in path.split('/')) {
       if (name.isNotEmpty) {
@@ -88,22 +101,15 @@ class Processors {
       names.clear();
     }
     int? best;
-    // ponytail: bounded by the path depth.
+    // The loop runs once per folder level.
     for (int i = names.length; i >= 0; i--) {
       String dir = <String>[root, ...names.take(i)].join('/');
-      int? quota = read(reader, dir);
+      int? quota = v2 ? _readV2(reader, dir) : _readV1(reader, dir);
       if (quota != null && (best == null || quota < best)) {
         best = quota;
       }
     }
     return best;
-  }
-
-  static int _min(int current, int? other) {
-    if (other == null || other < 1) {
-      return current;
-    }
-    return other < current ? other : current;
   }
 
   /// Reads the `Cpus_allowed_list:` line of `/proc/self/status`.

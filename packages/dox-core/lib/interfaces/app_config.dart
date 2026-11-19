@@ -188,7 +188,7 @@ class AppConfig {
     this.serverPort = 3000,
     this.host,
 
-    /// isolates (threads) that serve http. Default: one per CPU core.
+    /// isolates (threads) that serve http. Default: one per CPU the process may use.
     int? totalIsolate,
     this.providers = const <DoxProvider>[],
     this.dtos = const <DtoSchema<Object>>[],

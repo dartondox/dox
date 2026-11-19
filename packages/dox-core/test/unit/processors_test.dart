@@ -13,7 +13,7 @@ class FakeReader extends impl.ProcFileReader {
 }
 
 int detect(Map<String, String> files, {int cpus = 8}) {
-  return impl.Processors.detect(
+  return impl.ProcessorsDetector.detect(
     reader: FakeReader(files),
     numberOfProcessors: cpus,
     isLinux: true,
@@ -27,52 +27,54 @@ String status(String list) {
 void main() {
   group('parsers', () {
     test('parseCpuList counts ids and ranges', () {
-      expect(impl.Processors.parseCpuList('0-3,8,10-11'), 7);
-      expect(impl.Processors.parseCpuList('5'), 1);
-      expect(impl.Processors.parseCpuList('0-1,'), 2);
+      expect(impl.ProcessorsDetector.parseCpuList('0-3,8,10-11'), 7);
+      expect(impl.ProcessorsDetector.parseCpuList('5'), 1);
+      expect(impl.ProcessorsDetector.parseCpuList('0-1,'), 2);
     });
 
     test('parseCpuList gives null on bad input', () {
-      expect(impl.Processors.parseCpuList(''), isNull);
-      expect(impl.Processors.parseCpuList('a-b'), isNull);
-      expect(impl.Processors.parseCpuList('3-1'), isNull);
-      expect(impl.Processors.parseCpuList('1-2-3'), isNull);
+      expect(impl.ProcessorsDetector.parseCpuList(''), isNull);
+      expect(impl.ProcessorsDetector.parseCpuList('a-b'), isNull);
+      expect(impl.ProcessorsDetector.parseCpuList('3-1'), isNull);
+      expect(impl.ProcessorsDetector.parseCpuList('1-2-3'), isNull);
     });
 
     test('parseCpusAllowed handles trailing space and CRLF', () {
-      expect(impl.Processors.parseCpusAllowed(status('0-1')), 2);
-      expect(impl.Processors.parseCpusAllowed(status('0-1 ')), 2);
+      expect(impl.ProcessorsDetector.parseCpusAllowed(status('0-1')), 2);
+      expect(impl.ProcessorsDetector.parseCpusAllowed(status('0-1 ')), 2);
       expect(
-        impl.Processors.parseCpusAllowed('Cpus_allowed_list:\t0-3\r\nMems:\t0'),
+        impl.ProcessorsDetector.parseCpusAllowed(
+          'Cpus_allowed_list:\t0-3\r\nMems:\t0',
+        ),
         4,
       );
-      expect(impl.Processors.parseCpusAllowed('Name:\tdart\n'), isNull);
-      expect(impl.Processors.parseCpusAllowed(null), isNull);
+      expect(impl.ProcessorsDetector.parseCpusAllowed('Name:\tdart\n'), isNull);
+      expect(impl.ProcessorsDetector.parseCpusAllowed(null), isNull);
     });
 
     test('parseCgroupV2 reads cpu.max', () {
-      expect(impl.Processors.parseCgroupV2('max 100000\n'), isNull);
-      expect(impl.Processors.parseCgroupV2('400000 100000\n'), 4);
-      expect(impl.Processors.parseCgroupV2('150000 100000'), 2);
-      expect(impl.Processors.parseCgroupV2('50000 100000'), 1);
-      expect(impl.Processors.parseCgroupV2('100000 0'), isNull);
-      expect(impl.Processors.parseCgroupV2('100000 100000 5'), isNull);
-      expect(impl.Processors.parseCgroupV2('junk'), isNull);
-      expect(impl.Processors.parseCgroupV2(null), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV2('max 100000\n'), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV2('400000 100000\n'), 4);
+      expect(impl.ProcessorsDetector.parseCgroupV2('150000 100000'), 2);
+      expect(impl.ProcessorsDetector.parseCgroupV2('50000 100000'), 1);
+      expect(impl.ProcessorsDetector.parseCgroupV2('100000 0'), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV2('100000 100000 5'), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV2('junk'), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV2(null), isNull);
     });
 
     test('parseCgroupV1 reads quota and period', () {
-      expect(impl.Processors.parseCgroupV1('-1\n', '100000\n'), isNull);
-      expect(impl.Processors.parseCgroupV1('200000\n', '100000\n'), 2);
-      expect(impl.Processors.parseCgroupV1('x', '100000'), isNull);
-      expect(impl.Processors.parseCgroupV1(null, '100000'), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV1('-1\n', '100000\n'), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV1('200000\n', '100000\n'), 2);
+      expect(impl.ProcessorsDetector.parseCgroupV1('x', '100000'), isNull);
+      expect(impl.ProcessorsDetector.parseCgroupV1(null, '100000'), isNull);
     });
   });
 
   group('detect', () {
     test('not Linux uses the CPU count', () {
       expect(
-        impl.Processors.detect(
+        impl.ProcessorsDetector.detect(
           reader: FakeReader(<String, String>{}),
           numberOfProcessors: 6,
           isLinux: false,
