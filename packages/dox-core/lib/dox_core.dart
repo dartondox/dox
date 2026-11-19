@@ -109,6 +109,6 @@ export 'utils/crypt.dart';
 export 'utils/extensions.dart';
 export 'utils/hash.dart';
 export 'utils/json.dart' show JSON;
-export 'utils/processors.dart';
 export 'utils/key_derivation.dart';
 export 'utils/logger.dart';
+export 'utils/processors.dart' show Processors;

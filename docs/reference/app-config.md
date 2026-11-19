@@ -15,7 +15,7 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | `appKey` | `String` | required | Encrypts cookies and signs local storage URLs. It must be exactly 32 characters. Make one with `dox key:generate`. In production a bad key stops the app at start, see [`APP_ENV`](env.md#read-by-the-framework). |
 | `serverPort` | `int` | `3000` | The port to listen on. When the env has no `APP_PORT` but has `PORT`, Dox uses `PORT` (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads `APP_HOST`. With neither, Dox listens on all interfaces (`::`). |
-| `totalIsolate` | `int?` | the CPUs the container allows | How many isolates (threads) serve HTTP, all on the same port. The default is the number of CPUs this process may use. It respects the container cpuset and CPU quota. Windows always uses one. |
+| `totalIsolate` | `int?` | the CPUs the container allows | How many isolates (threads) serve HTTP, all on the same port. The default is the number of CPUs this process may use. It respects the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one. |
 | `compress` | `bool` | `false` | gzip the responses. It costs CPU on every response, so let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |

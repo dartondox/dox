@@ -11,22 +11,92 @@ class Processors {
 
   /// CPUs this process may use. Never below 1.
   static int get available {
-    return _cached ??= _detect();
+    return _cached ??= detect(
+      reader: ProcFileReader(),
+      numberOfProcessors: Platform.numberOfProcessors,
+      isLinux: Platform.isLinux,
+    );
   }
 
-  static int _detect() {
-    int count = Platform.numberOfProcessors;
-    if (!Platform.isLinux) {
-      return count;
+  /// Works out the usable CPUs from the files the [reader] gives.
+  /// Public so tests can pass a fake reader. Use [available] in apps.
+  static int detect({
+    required ProcFileReader reader,
+    required int numberOfProcessors,
+    required bool isLinux,
+  }) {
+    int count = numberOfProcessors;
+    if (!isLinux) {
+      return count < 1 ? 1 : count;
     }
-    count = _min(count, parseCpusAllowed(_read('/proc/self/status')));
-    int? quota = parseCgroupV2(_read('/sys/fs/cgroup/cpu.max'));
-    quota ??= parseCgroupV1(
-      _read('/sys/fs/cgroup/cpu/cpu.cfs_quota_us'),
-      _read('/sys/fs/cgroup/cpu/cpu.cfs_period_us'),
-    );
-    count = _min(count, quota);
+    count = _min(count, parseCpusAllowed(reader.read('/proc/self/status')));
+    count = _min(count, _quota(reader));
     return count < 1 ? 1 : count;
+  }
+
+  /// The tightest CPU quota of the cgroup of this process and its parents.
+  static int? _quota(ProcFileReader reader) {
+    String? self = reader.read('/proc/self/cgroup');
+    if (self == null) {
+      return null;
+    }
+    int? v2;
+    int? v1;
+    for (String line in self.split('\n')) {
+      line = line.trim();
+      List<String> parts = line.split(':');
+      if (parts.length < 3) {
+        continue;
+      }
+      // The path may hold ':', so join the rest.
+      String path = parts.sublist(2).join(':');
+      if (parts[0] == '0' && parts[1].isEmpty) {
+        v2 = _walk(reader, '/sys/fs/cgroup', path, _readV2);
+      } else if (parts[1].split(',').contains('cpu')) {
+        v1 = _walk(reader, '/sys/fs/cgroup/cpu', path, _readV1);
+      }
+    }
+    return v2 ?? v1;
+  }
+
+  static int? _readV2(ProcFileReader reader, String dir) {
+    return parseCgroupV2(reader.read('$dir/cpu.max'));
+  }
+
+  static int? _readV1(ProcFileReader reader, String dir) {
+    return parseCgroupV1(
+      reader.read('$dir/cpu.cfs_quota_us'),
+      reader.read('$dir/cpu.cfs_period_us'),
+    );
+  }
+
+  /// Reads [root] plus [path], then each parent folder, then [root].
+  /// Returns the smallest quota found, or null.
+  static int? _walk(
+    ProcFileReader reader,
+    String root,
+    String path,
+    int? Function(ProcFileReader, String) read,
+  ) {
+    List<String> names = <String>[];
+    for (String name in path.split('/')) {
+      if (name.isNotEmpty) {
+        names.add(name);
+      }
+    }
+    if (names.contains('..') || names.contains('.')) {
+      names.clear();
+    }
+    int? best;
+    // ponytail: bounded by the path depth.
+    for (int i = names.length; i >= 0; i--) {
+      String dir = <String>[root, ...names.take(i)].join('/');
+      int? quota = read(reader, dir);
+      if (quota != null && (best == null || quota < best)) {
+        best = quota;
+      }
+    }
+    return best;
   }
 
   static int _min(int current, int? other) {
@@ -34,14 +104,6 @@ class Processors {
       return current;
     }
     return other < current ? other : current;
-  }
-
-  static String? _read(String path) {
-    try {
-      return File(path).readAsStringSync();
-    } on Object {
-      return null;
-    }
   }
 
   /// Reads the `Cpus_allowed_list:` line of `/proc/self/status`.
@@ -60,10 +122,14 @@ class Processors {
     return parseCpuList(line.group(1)!.trim());
   }
 
-  /// Counts the CPUs in a list like `0-3,8,10-11`. Returns null on bad input.
+  /// Counts the CPUs in a list like `0-3,8,10-11`. Empty parts are skipped.
+  /// Returns null on bad input.
   static int? parseCpuList(String list) {
     int total = 0;
     for (String part in list.split(',')) {
+      if (part.trim().isEmpty) {
+        continue;
+      }
       List<String> range = part.trim().split('-');
       int? from = int.tryParse(range.first);
       int? to = range.length == 2 ? int.tryParse(range.last) : from;
@@ -102,5 +168,17 @@ class Processors {
       return null;
     }
     return (quota + period - 1) ~/ period;
+  }
+}
+
+/// Reads a file as text. Gives null when the file can not be read.
+/// Tests pass a fake that extends this class.
+class ProcFileReader {
+  String? read(String path) {
+    try {
+      return File(path).readAsStringSync();
+    } on Object {
+      return null;
+    }
   }
 }

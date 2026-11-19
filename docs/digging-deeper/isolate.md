@@ -24,7 +24,7 @@ With the Postgres and MySQL drivers, all isolates share one database pool in Rus
 
 ## Setting the number of isolates
 
-By default Dox starts one isolate per CPU the process may use. In a container, this respects the cpuset and the CPU quota (`--cpuset-cpus`, `--cpus`, Kubernetes limits). You may want fewer when the same machine also runs the database or other heavy work.
+By default Dox starts one isolate per CPU the process may use. In a container, this respects the cpuset and the CPU quota (`--cpuset-cpus`, `--cpus`, Kubernetes limits). A quota rounds up: 1.5 CPUs gives 2 isolates. You may want fewer when the same machine also runs the database or other heavy work.
 
 Set `totalIsolate` in the app config. A new app reads it from `APP_TOTAL_ISOLATE`:
 

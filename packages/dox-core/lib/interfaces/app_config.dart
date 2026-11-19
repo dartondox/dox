@@ -30,6 +30,8 @@ class AppConfig {
   /// The host (network interface) to listen on, like `127.0.0.1`.
   /// Default: the env var `APP_HOST`, else all interfaces (IPv6 and IPv4).
   final String? host;
+
+  /// Isolates that serve HTTP. Default: `Processors.available`.
   final int totalIsolate;
   final ResponseHandlerInterface? responseHandler;
 

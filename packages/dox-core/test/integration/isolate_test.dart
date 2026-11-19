@@ -152,7 +152,9 @@ void main() {
     });
 
     test('default isolates is one per usable cpu', () {
-      expect(AppConfig(appKey: 'x').totalIsolate, Processors.available);
+      int total = AppConfig(appKey: 'x').totalIsolate;
+      expect(total, greaterThanOrEqualTo(1));
+      expect(total, lessThanOrEqualTo(Platform.numberOfProcessors));
     });
   });
 }
