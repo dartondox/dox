@@ -2,7 +2,8 @@ name: Blog
 
 # The blog (blog/mkdocs.yml) lives at https://dartondox.dev/blog/.
 # It is not versioned: a push to main that changes blog/ builds it and puts
-# it in the blog/ folder of the gh-pages branch. Only that folder changes.
+# it in the blog/ folder of the gh-pages branch. Only that folder and the
+# root sitemap.xml change (ci/root_sitemap.py adds the blog posts to it).
 # The docs versions (3.x, latest, ...), versions.json and the root files of
 # docs.yaml are never touched. ci/docs_redirects.py keeps blog/ too.
 
@@ -13,6 +14,7 @@ on:
     paths:
       - 'blog/**'
       - 'ci/blog-deploy.sh'
+      - 'ci/root_sitemap.py'
       - 'hooks/**'
       - 'overrides/**'
       - 'docs/assets/**'

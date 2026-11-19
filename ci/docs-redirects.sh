@@ -8,6 +8,7 @@ ci=$(cd "$(dirname "$0")" && pwd)
 git worktree add ../gh-pages gh-pages
 cd ../gh-pages
 python3 "$ci/docs_redirects.py"
+python3 "$ci/root_sitemap.py"
 git add -A
 git diff --cached --quiet || git commit -m "Redirect old docs links"
 git push origin gh-pages
