@@ -7260,7 +7260,7 @@
 </tr>
 <tr>
 <td>Isolates = cores</td>
-<td>Keep the default <code>totalIsolate</code> (one per CPU core), or set <code>APP_TOTAL_ISOLATE</code> to the cores the container really gets. Use fewer when the database runs on the same machine. With SQLite, 1-2 isolates are enough.</td>
+<td>Keep the default <code>totalIsolate</code>. It uses the CPUs the container allows (cpuset and CPU quota). Use fewer when the database runs on the same machine. With SQLite, 1-2 isolates are enough.</td>
 <td><a href="../../digging-deeper/isolate/">Isolate</a></td>
 </tr>
 <tr>

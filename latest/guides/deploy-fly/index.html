@@ -7336,7 +7336,7 @@ If the database asks for TLS, add <code>?sslmode=require</code> to the url with 
 </span></code></pre></div>
 <p>See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment: HTTPS</a>.</p>
 <h2 id="scaling-the-app">Scaling the app</h2>
-<p>Dox starts one isolate per CPU core it sees. On <code>cpus = 1</code> that is one isolate.</p>
+<p>Dox starts one isolate per CPU the container allows. On <code>cpus = 1</code> that is one isolate.</p>
 <table>
 <thead>
 <tr>

@@ -7080,11 +7080,11 @@
     I1 -. "crash: the process exits" .-&gt; S["Supervisor restarts the process&lt;br&gt;Docker, systemd"]</code></pre>
 <p>With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See <a href="../../concepts/how-dox-works/#where-the-database-pools-live">How Dox works</a>.</p>
 <h2 id="setting-the-number-of-isolates">Setting the number of isolates</h2>
-<p>By default Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>). You may want fewer when the same machine also runs the database or other heavy work.</p>
+<p>By default Dox starts one isolate per CPU the process may use. In a container, this respects the cpuset and the CPU quota (<code>--cpuset-cpus</code>, <code>--cpus</code>, Kubernetes limits). A quota rounds up: 1.5 CPUs gives 2 isolates. You may want fewer when the same machine also runs the database or other heavy work.</p>
 <p>Set <code>totalIsolate</code> in the app config. A new app reads it from <code>APP_TOTAL_ISOLATE</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">totalIsolate:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appTotalIsolate</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="n">Platform</span><span class="p">.</span><span class="n">numberOfProcessors</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">totalIsolate:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appTotalIsolate</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>You can also set it in code, before <code>startServer()</code>. This wins over the config:</p>

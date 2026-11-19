@@ -7281,7 +7281,7 @@
 <p>See <a href="../../the-basic/routing/">Routing</a>, <a href="../../the-basic/middleware/">Middleware</a>,
 <a href="../../the-basic/validation/">Validation</a> and <a href="../../the-basic/response/">Response</a>.</p>
 <h2 id="isolates">Isolates</h2>
-<p>Dart runs code on isolates. An isolate is like a thread, but it has its own memory. Dox starts one isolate per CPU core (<code>Platform.numberOfProcessors</code>), and every isolate runs the full app. This is how one Dox process uses all cores.</p>
+<p>Dart runs code on isolates. An isolate is like a thread, but it has its own memory. Dox starts one isolate per CPU the process may use (it respects the container cpuset and CPU quota), and every isolate runs the full app. This is how one Dox process uses all cores.</p>
 <h3 id="one-port-many-isolates">One port, many isolates</h3>
 <p>Every isolate runs its own HTTP server on the same port, and the operating system spreads the connections between them:</p>
 <table>

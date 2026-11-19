@@ -7243,8 +7243,8 @@
 <tr>
 <td><code>totalIsolate</code></td>
 <td><code>int?</code></td>
-<td><code>Platform.numberOfProcessors</code></td>
-<td>How many isolates (threads) serve HTTP, all on the same port. Windows always uses one.</td>
+<td>the CPUs the container allows</td>
+<td>How many isolates (threads) serve HTTP, all on the same port. The default is the number of CPUs this process may use. It respects the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one.</td>
 </tr>
 <tr>
 <td><code>compress</code></td>
@@ -8509,7 +8509,7 @@
 </span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="c1">/// Changing the key makes old cookies and encrypted data unreadable.</span>
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">,</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">  </span><span class="nl">serverPort:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appPort</span><span class="p">,</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="nl">totalIsolate:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appTotalIsolate</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="n">Platform</span><span class="p">.</span><span class="n">numberOfProcessors</span><span class="p">,</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="nl">totalIsolate:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appTotalIsolate</span><span class="p">,</span>
 </span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
 </span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="n">LogMiddleware</span><span class="p">(</span><span class="nl">enabled:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appEnv</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'production'</span><span class="p">),</span>
 </span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span><span class="p">],</span>

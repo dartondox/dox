@@ -7328,7 +7328,7 @@ See <a href="../environments/">Environments</a> for all keys.</p>
 <ul>
 <li>When the main isolate dies, the process exits and <code>Restart=always</code> starts it again. See <a href="../../digging-deeper/deployment/#keep-it-running">Deployment: keep it running</a>.</li>
 <li>The app runs the migrations at start, before it takes requests.</li>
-<li>Dox starts one isolate per CPU core. Set <code>APP_TOTAL_ISOLATE</code> in <code>/etc/blog.env</code> to change it.</li>
+<li>Dox starts one isolate per CPU the process may use. Set <code>APP_TOTAL_ISOLATE</code> in <code>/etc/blog.env</code> to change it.</li>
 </ul>
 <h2 id="6-close-the-app-port">6. Close the app port</h2>
 <p>Only Caddy should talk to the app. Caddy runs on the same machine, so let Dox listen on <code>127.0.0.1</code> only. Add this line to <code>/etc/blog.env</code>:</p>
