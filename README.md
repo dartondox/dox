@@ -58,9 +58,6 @@ class ApiRouter extends Router {
   }
 }
 
-// lib/app/dtos/blog_filter/blog_filter.dto.dart
-part 'blog_filter.dto.g.dart';
-
 enum Status { active, draft }
 
 // build_runner makes the checks from the fields and their types.
