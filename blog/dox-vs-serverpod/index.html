@@ -930,6 +930,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#speed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Speed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#when-to-pick-serverpod" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1107,7 +1118,7 @@
                           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 20a8 8 0 0 0 8-8 8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8m0-18a10 10 0 0 1 10 10 10 10 0 0 1-10 10C6.47 22 2 17.5 2 12A10 10 0 0 1 12 2m.5 5v5.25l4.5 2.67-.75 1.23L11 13V7z"/></svg>
                           <span class="md-ellipsis">
                             
-                              7 min read
+                              8 min read
                             
                           </span>
                         </div>
@@ -1446,6 +1457,52 @@ You can also host it yourself with the Dockerfile in the server package (<a href
 <p><strong>Dox</strong> has no hosted service.
 <code>dox build</code> makes a native binary, and you run it on a VPS or in Docker.
 The docs have guides for <a href="/latest/guides/docker/">Docker</a>, <a href="/latest/guides/deploy-vps/">a VPS</a>, <a href="/latest/guides/deploy-fly/">Fly.io</a> and <a href="/latest/guides/deploy-cloud-run/">Cloud Run</a>.</p>
+<h2 id="speed">Speed</h2>
+<p>We did not run this benchmark.
+The numbers come from the public <a href="https://web-frameworks-benchmark.vercel.app/">Web Frameworks Benchmark</a> by <a href="https://github.com/the-benchmarker/web-frameworks">the-benchmarker</a>.</p>
+<p>Serverpod itself is not in that benchmark.
+<a href="https://pub.dev/packages/relic">Relic</a> is in it.
+Relic is the HTTP server from the Serverpod team, and Serverpod's <a href="https://docs.serverpod.dev/concepts/web-server/overview">web server</a> is built on it.
+So this compares the HTTP layer of the two projects.
+It does not measure Serverpod endpoint calls or a database.</p>
+<table>
+<thead>
+<tr>
+<th>Connections</th>
+<th>Dox (requests per second)</th>
+<th>Relic (requests per second)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>64</td>
+<td>157,805</td>
+<td>45,785</td>
+</tr>
+<tr>
+<td>256</td>
+<td>189,869</td>
+<td>45,034</td>
+</tr>
+<tr>
+<td>512</td>
+<td>189,851</td>
+<td>44,291</td>
+</tr>
+</tbody>
+</table>
+<p>At 64 connections, half of the Dox requests took 0.11 ms or less.
+For Relic, it was 0.86 ms.</p>
+<p>How they measured it:</p>
+<ul>
+<li>Three small routes: <code>GET /</code>, <code>GET /user/:id</code> and <code>POST /user</code>.</li>
+<li>One machine with an AMD Ryzen 7 5700U. The server and the load tool run on it, with the same limits for every framework.</li>
+<li>Both apps are AOT builds, and both start one isolate per CPU that Dart reports.</li>
+<li>Versions: <code>dox_core</code> 3.2 and <code>relic</code> 2.0. Results from 2026-11-18. See <a href="https://github.com/the-benchmarker/web-frameworks/blob/32b8757714a4ceac24cf0eafb5edd99f0522224c/data.min.json">the raw data</a> and the code of <a href="https://github.com/the-benchmarker/web-frameworks/tree/master/dart/dox">the Dox app</a> and <a href="https://github.com/the-benchmarker/web-frameworks/tree/master/dart/relic">the Relic app</a>.</li>
+</ul>
+<p>Small routes show the cost of the framework itself.
+In a real app, the database and your own code often take most of the time.
+For how Dox gets these numbers, see <a href="../what-makes-dox-fast/">What makes Dox fast</a>.</p>
 <h2 id="when-to-pick-serverpod">When to pick Serverpod</h2>
 <ul>
 <li>Your only client is a Flutter app, and you want the client made for you.</li>
@@ -1459,6 +1516,7 @@ The docs have guides for <a href="/latest/guides/docker/">Docker</a>, <a href="/
 <li>You want an OpenAPI document made from your code.</li>
 <li>You use MySQL or MariaDB.</li>
 <li>You want a job queue with a worker, a scheduler and mail in one framework.</li>
+<li>You want a fast HTTP layer. See <a href="#speed">Speed</a>.</li>
 <li>The license matters to you. Dox uses the MIT license.</li>
 </ul>
 <h3 id="when-not-to-pick-dox">When not to pick Dox</h3>
