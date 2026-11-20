@@ -346,6 +346,23 @@ class GreeterService extends GreeterServiceBase {
 }
 ```
 
+## Performance
+
+`dox_grpc` is about 2x faster than the plain `package:grpc` server. Both servers ran the same service, so the gap comes from the server. `dox_grpc` runs on the native HTTP/2 server, and `package:grpc` runs on `dart:io`.
+
+| Test                                   | `dox_grpc`  | `package:grpc` | Faster |
+| -------------------------------------- | ----------- | -------------- | ------ |
+| Unary, small message                   | 50,600 /s   | 25,500 /s      | 2.0x   |
+| Unary, 100 KB answer                   | 13,000 /s   | 9,700 /s       | 1.3x   |
+| Server streaming, 100 messages of 1 KB | 2,750 /s    | 1,190 /s       | 2.3x   |
+
+How it was run:
+
+- The service is the gRPC interop `TestService`. Both servers were AOT-compiled (`dart build cli`).
+- Each server ran in one isolate. More isolates give more calls a second.
+- The client was [ghz](https://ghz.sh), with 50 calls in flight for unary and 8 for streaming, for 6 seconds each.
+- The machine was one 8-core laptop, with the client and the server on it.
+
 ## Deployment
 
 Put TLS on a proxy in front of the app. The proxy talks h2c to Dox. nginx uses `grpc_pass` for the gRPC paths, and Caddy uses `h2c://`. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc) for the config.
