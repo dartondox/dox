@@ -12,11 +12,20 @@ gRPC is a good fit when services call each other. You describe the calls once in
 
 ## Installation
 
-Add the package. Because the generated code imports `protobuf` and `grpc`, add them too:
+Run the setup command in your app:
 
 ```bash
-dart pub add dox_grpc protobuf grpc
+dox add grpc
 ```
+
+It does these steps. It never overwrites a file, so it is safe to run twice:
+
+- Adds `dox_grpc`, `protobuf` and `grpc` to `pubspec.yaml`. The generated code imports the last two.
+- Writes a sample `protos/greeter.proto`.
+- Writes `lib/routes/grpc.dart`, a router that registers the [health check](#health-check).
+- Adds `APP_HTTP2=true` to `.env` and `.env.example`.
+
+Then it prints the steps that are left. To add the package by hand instead, run `dart pub add dox_grpc protobuf grpc`.
 
 ### Turning on HTTP/2
 
@@ -28,6 +37,8 @@ AppConfig appConfig = AppConfig(
   // ...
 );
 ```
+
+The `APP_HTTP2` key in `.env` does nothing by itself. To use it, add a `bool? get appHttp2` getter to `AppEnv` and write `http2: env.appHttp2 ?? false`.
 
 Your normal HTTP routes keep working on the same port.
 
