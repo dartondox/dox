@@ -56,6 +56,8 @@ class DoxServer {
       bodyTimeout: config.bodyTimeout,
       idleTimeout: config.idleTimeout,
       maxConnections: config.maxConnections,
+      http2: config.http2,
+      maxConcurrentStreams: config.maxConcurrentStreams,
     );
     server.autoCompress = config.compress;
 

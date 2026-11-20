@@ -22,6 +22,8 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. |
 | `idleTimeout` | `Duration` | `Duration(seconds: 30)` | A keep-alive connection with no new request for this long is closed. Behind a load balancer, set it longer than the balancer's idle timeout. See [Behind a load balancer](../digging-deeper/deployment.md#behind-a-load-balancer). |
 | `maxConnections` | `int?` | `null` (no limit) | The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue until a connection closes. The whole app holds up to `maxConnections * totalIsolate`, so keep that below `ulimit -n`. |
+| `http2` | `bool` | `false` | The same port also speaks HTTP/2 over plain TCP (h2c). HTTP/1.1 keeps working. See [HTTP/2](../digging-deeper/native-server.md#http2). |
+| `maxConcurrentStreams` | `int` | `250` | The most open requests one HTTP/2 connection can have (1 or more). Used only when `http2` is `true`. |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
 | `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of your reverse proxies. Dox reads `X-Forwarded-For` (for `req.ip()`) and `X-Forwarded-Proto` (for `req.scheme()`) only from these. `['*']` trusts any direct client. |
 
