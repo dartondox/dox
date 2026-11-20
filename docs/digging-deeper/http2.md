@@ -4,16 +4,16 @@ icon: lucide/arrow-right-left
 
 # HTTP/2
 
-HTTP/2 lets one connection carry many requests at the same time, and Dox can serve it on the same port as HTTP/1.1.
+With HTTP/2, one connection can send many requests at the same time, and Dox serves HTTP/2 on the same port as HTTP/1.1.
 
-There are two reasons to use it:
+Use HTTP/2 for one of these reasons:
 
-- You want to serve [gRPC](grpc.md). gRPC only works over HTTP/2.
-- Your proxy talks HTTP/2 to the app. It then sends many requests on a few connections, so the app does more work with fewer connections.
+- You want to serve [gRPC](grpc.md). gRPC works only over HTTP/2.
+- Your proxy sends HTTP/2 to the app. The proxy then sends many requests on a small number of connections. The app can serve more requests with fewer connections.
 
-HTTP/2 is off by default. If you do not turn it on, nothing changes.
+HTTP/2 is off by default. If you do not turn on HTTP/2, nothing changes.
 
-## Turning on HTTP/2
+## Turn on HTTP/2
 
 Set `http2` to `true` in the app config:
 
@@ -24,13 +24,13 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-The port now takes both HTTP/1.1 and HTTP/2. Dox picks the right one for each connection, so old clients and health checks keep working.
+The port then accepts HTTP/1.1 and HTTP/2. Old clients and health checks continue to work, because Dox finds the protocol of each connection.
 
-Your routes, middleware and controllers stay the same.
+You do not change your routes, middleware, or controllers.
 
-## Checking the protocol of a request
+## Read the protocol of a request
 
-If you need to know how a request came in, read `req.protocolVersion`. It is `2.0` for an HTTP/2 request, and `1.0` or `1.1` for the others:
+To find the protocol of a request, read `req.protocolVersion`. The value is `2.0` for an HTTP/2 request. For an HTTP/1.x request, the value is `1.0` or `1.1`:
 
 ```dart
 Route.get('/protocol', (DoxRequest req) {
@@ -38,17 +38,17 @@ Route.get('/protocol', (DoxRequest req) {
 });
 ```
 
-You can try it with curl:
+You can do a test with curl:
 
 ```bash
 curl --http2-prior-knowledge http://localhost:3000/protocol
 ```
 
-## Limiting requests per connection
+## Limit the open requests on one connection
 
-One HTTP/2 connection can have many open requests. `maxConcurrentStreams` is the most that one connection can have at the same time. The default is `250`, and it fits most apps.
+One HTTP/2 connection can have many open requests. `maxConcurrentStreams` sets the maximum number of open requests on one connection. The default is `250`. This value is correct for most apps.
 
-Set a lower number if you want each client to hold fewer open requests:
+To let each client keep fewer open requests, set a lower number:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -58,21 +58,21 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-## Running behind a proxy
+## Use a proxy
 
-Dox speaks h2c, which is HTTP/2 over plain TCP. It has no TLS, so TLS stays at your proxy.
+Dox uses h2c. h2c is HTTP/2 over plain TCP, without TLS. Your proxy must do the TLS.
 
-Browsers only speak HTTP/2 with TLS. So a browser talks HTTP/2 to the proxy, and the proxy talks to Dox:
+Browsers use HTTP/2 only with TLS. The browser sends HTTP/2 with TLS to the proxy, and the proxy sends the requests to Dox:
 
 ```text
 browser  --HTTP/2 + TLS-->  proxy  --h2c or HTTP/1.1-->  Dox
 ```
 
-See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc) for the Caddy and nginx config.
+For the Caddy and nginx config, see [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
 
-## Using the server without Dox
+## Use the server without Dox
 
-If you use the [native server](native-server.md) on its own, pass the same two options to `NativeHttpServer.bind`:
+If you use the [native server](native-server.md) without Dox, give the same two options to `NativeHttpServer.bind`:
 
 ```dart
 NativeHttpServer server = await NativeHttpServer.bind(
@@ -84,18 +84,18 @@ NativeHttpServer server = await NativeHttpServer.bind(
 
 ## Protection
 
-HTTP/2 has some known attacks. Dox guards against them by default, so there is nothing to set:
+HTTP/2 has some known attacks. Dox has protection against these attacks by default. You do not set anything.
 
-- **Fast cancels (Rapid Reset).** A client can open requests and cancel them very fast to pile up work in your app. In Dox, a cancelled request still counts against `maxConcurrentStreams` until your handler really ends, so this does not work. A normal client with a few timeouts is not cut.
-- **Floods.** If a client sends too many resets, `SETTINGS`, `PING`s or empty frames, Dox answers `GOAWAY ENHANCE_YOUR_CALM` and closes the connection.
-- **Big or slow bodies.** A request body has the same limits as on HTTP/1.1: `maxBodySize`, `maxMultipartSize` and `bodyTimeout`. See [Size limits](../the-basic/request.md#size-limits).
-- **Idle and slow clients.** A connection with no open request closes after `idleTimeout`. If a client does not read an answer for 30 seconds, Dox stops that answer.
+- **Rapid Reset.** A client can open requests and cancel them very quickly. This adds work to your app. In Dox, a cancelled request stays in the `maxConcurrentStreams` count until your handler stops. For this reason, the attack does not work. Dox does not close the connection of a normal client that has some timeouts.
+- **Floods.** If a client sends too many resets, `SETTINGS` frames, `PING` frames, or empty frames, Dox sends `GOAWAY ENHANCE_YOUR_CALM`. Then Dox closes the connection.
+- **Large or slow bodies.** A request body on HTTP/2 has the same limits as on HTTP/1.1: `maxBodySize`, `maxMultipartSize`, and `bodyTimeout`. See [Size limits](../the-basic/request.md#size-limits).
+- **Idle and slow clients.** A connection with no open request closes after `idleTimeout`. If a client does not read a response for 30 seconds, Dox stops that response.
 
-You should still keep a proxy in front of Dox on the internet, as the [deployment guide](deployment.md) says.
+On the internet, keep a proxy in front of Dox. See the [deployment guide](deployment.md).
 
 ## Benchmark
 
-HTTP/2 is faster when a client sends many requests on one connection. On one isolate, it handles about 1.6 times the requests of HTTP/1.1.
+HTTP/2 is faster when a client sends many requests on one connection. On one isolate, HTTP/2 does approximately 1.6 times the requests of HTTP/1.1.
 
 <div class="dox-bench dox-bench--simple" markdown>
 
@@ -132,7 +132,7 @@ HTTP/2 is faster when a client sends many requests on one connection. On one iso
 
 </div>
 
-The two HTTP/1.1 rows are almost the same. So turning `http2` on does not slow down your HTTP/1.1 clients.
+The two HTTP/1.1 rows are almost the same. Thus, `http2: true` does not make your HTTP/1.1 clients slower.
 
 | Load                                       | Requests a second |
 | ------------------------------------------ | ----------------: |
@@ -141,15 +141,16 @@ The two HTTP/1.1 rows are almost the same. So turning `http2` on does not slow d
 | HTTP/2, 16 connections × 16 requests each  | 587,000           |
 | HTTP/2, 4 connections × 64 requests each   | 465,000           |
 
-With 4 isolates, HTTP/1.1 and HTTP/2 both reach about 630,000 requests a second. That is the limit of the load tool on 4 cores, not the limit of Dox. So the gain of HTTP/2 shows most when the app has few isolates.
+With 4 isolates, HTTP/1.1 and HTTP/2 both do approximately 630,000 requests a second. This number is the limit of the load tool on 4 cores, not the limit of Dox. HTTP/2 gives the largest increase when the app has few isolates.
 
-### How it was run
+### Test setup
 
-- The app has one route, `GET /`, that answers `Hello, World!`. It is an AOT build (`dart build cli`).
-- Everything ran in Linux containers on one 8-core machine. The server had 4 cores, and the load tool ([oha](https://github.com/hatoo/oha)) had the other 4.
-- Each number is the median of 3 runs of 10 seconds, after 3 seconds of warm up.
+- The app has one route, `GET /`. This route sends `Hello, World!`.
+- The app is an AOT build. The build command is `dart build cli`.
+- All tests ran in Linux containers on one machine with 8 cores. The server used 4 cores. The load tool, [oha](https://github.com/hatoo/oha), used the other 4 cores.
+- Each number is the median of 3 runs. Each run took 10 seconds, after a warm up of 3 seconds.
 
 ## Details
 
 - Dox passes all 146 tests of the [h2spec](https://github.com/summerwind/h2spec) conformance suite in strict mode.
-- `maxConcurrentStreams` must be 1 or more. It is used only when `http2` is `true`.
+- `maxConcurrentStreams` must be 1 or more. Dox uses it only when `http2` is `true`.

@@ -4,9 +4,9 @@ icon: simple/graphql
 
 # GraphQL
 
-`dox_graphql` gives your app a GraphQL API, made from your models.
+`dox_graphql` makes a GraphQL API for your app from your models.
 
-GraphQL is an API with one URL. The client writes the fields it wants, and it gets JSON with only those fields. One request can read a post, its user and its comments together. To learn GraphQL itself, read [graphql.org/learn](https://graphql.org/learn/).
+GraphQL is an API with one URL. The client writes the fields that it wants, and it gets JSON with only those fields. One request can read a post, the user of the post, and its comments. To learn GraphQL, read [graphql.org/learn](https://graphql.org/learn/).
 
 ## Quick start
 
@@ -16,7 +16,7 @@ GraphQL is an API with one URL. The client writes the fields it wants, and it ge
 dox add graphql
 ```
 
-It adds the packages, `lib/config/graphql.dart` and `lib/providers/graphql_provider.dart`. It never overwrites a file.
+The command adds the packages, `lib/config/graphql.dart`, and `lib/providers/graphql_provider.dart`. It does not overwrite a file.
 
 ### Add a model to the API
 
@@ -43,9 +43,9 @@ class Post extends PostGenerator {
 }
 ```
 
-The `id`, the columns and the relations of the model are now fields a client can ask for. `Post` has a relation to `User`, so put `@GraphQLType()` on `User` too.
+The `id`, the columns, and the relations of the model are now fields that a client can ask for. `Post` has a relation to `User`. Thus, put `@GraphQLType()` on `User` also.
 
-Then run the builder and start the app again. Do this after every change on this page:
+Then run the builder and start the app again. Do these two steps after each change on this page:
 
 ```bash
 dart run build_runner build
@@ -53,12 +53,12 @@ dart run build_runner build
 
 ### Run a query
 
-A **query** is a request that reads data. Each model gets two queries for free. For `Post` they are:
+A **query** is a request that reads data. Dox gives each model two automatic queries. For `Post`, the queries are:
 
-- `posts(limit, offset)`: a list of posts. `limit` is `20` by default and can be at most `100`.
-- `post(id)`: one post, or `null` when no post has that id.
+- `posts(limit, offset)`: a list of posts. The default `limit` is `20`, and the maximum is `100`.
+- `post(id)`: one post. The result is `null` if no post has that id.
 
-Open `http://localhost:3000/graphql` in a browser. In development this shows GraphiQL, a page where you write and run queries. Run this one:
+Open `http://localhost:3000/graphql` in a browser. In development, this URL shows GraphiQL. GraphiQL is a page where you write and run queries. Run this query:
 
 ```graphql
 {
@@ -69,7 +69,7 @@ Open `http://localhost:3000/graphql` in a browser. In development this shows Gra
 }
 ```
 
-The answer has the same shape as the query:
+The result has the same shape as the query:
 
 ```json
 { "data": { "posts": [{ "title": "Hello GraphQL", "user": { "name": "Ada" } }] } }
@@ -77,21 +77,21 @@ The answer has the same shape as the query:
 
 Dox loads the users of all ten posts with one database query.
 
-Your own client sends the same query as a `POST` request to `/graphql`, with the JSON body `{"query": "..."}`.
+Your client sends the same query as a `POST` request to `/graphql`. The JSON body is `{"query": "..."}`.
 
 ### Hide a field
 
-A client must not see some columns. Fields in `hidden` of the model are already left out, so a password never shows. To hide another field, put `@GraphQLIgnore()` on the line above its `@Column()`.
+Some columns must not be visible to a client. Dox does not show the fields in the `hidden` list of the model. Thus, a password is never visible. To hide a different field, put `@GraphQLIgnore()` on the line above its `@Column()`.
 
-### Turn off the free queries
+### Turn off the automatic queries
 
-Sometimes a model must be reachable only through a relation, like `post.user`. Then write `@GraphQLType(queries: false)` on it, and it gets no queries of its own.
+Sometimes a client must get a model only through a relation, for example `post.user`. For this model, write `@GraphQLType(queries: false)`. Then the model does not get its own queries.
 
-To turn off the free queries and mutations of all models, set `autoResolvers: false` in the [configuration](#configuration).
+To turn off the automatic queries and mutations of all models, set `autoResolvers: false` in the [configuration](#configuration).
 
-## Your own query
+## Write your own query
 
-Write your own query when the free ones are not enough, for example a search or a top ten. Put `@GraphQLQuery()` on a method of any class in `lib/`. This method is called a **resolver**: it is your code that answers the query.
+Write your own query when the automatic queries are not sufficient, for example for a search or a top-ten list. Put `@GraphQLQuery()` on a method of a class in `lib/`. This method is a **resolver**. A resolver is your code that gives the result of the query.
 
 ```dart title="lib/app/graphql/post.resolver.dart"
 import 'package:dox_graphql/dox_graphql.dart';
@@ -110,28 +110,28 @@ class PostResolver {
 }
 ```
 
-Run the builder and start the app again. The builder finds the class by itself. Dox reads the rest from the method:
+Run the builder and start the app again. The builder finds the class automatically. Dox gets the other data from the method:
 
 - The method name is the query name: `trendingPosts`.
-- The parameters are the values a client can send. A parameter with a default value is optional.
-- The return type says what the client gets back.
-- The constructor parameters come from the [container](../the-basic/dependency-injection.md).
+- The parameters are the values that a client can send. A parameter with a default value is optional.
+- The return type is the type that the client gets.
+- Dox gets the constructor parameters from the [container](../the-basic/dependency-injection.md).
 
-A client calls it like this: `{ trendingPosts(limit: 3) { title } }`.
+A client calls the query like this: `{ trendingPosts(limit: 3) { title } }`.
 
 ### Send an error to the client
 
-Throw a `GraphQLError` to send your own message, like `throw GraphQLError('This post is not published yet');`.
+To send your own message, throw a `GraphQLError`. For example: `throw GraphQLError('This post is not published yet');`.
 
-For any other error, the client sees "Internal server error" in production. The real error goes to the `ExceptionHandler` of your app.
+For all other errors, the client sees "Internal server error" in production. Dox sends the real error to the `ExceptionHandler` of your app.
 
-## Create, update and delete
+## Create, update, and delete
 
-A **mutation** is a request that changes data. Dox can make the create, update and delete mutations of a model for you.
+A **mutation** is a request that changes data. Dox can make the create, update, and delete mutations of a model for you.
 
 ### Create
 
-Write a [DTO](../the-basic/dto.md) with the fields a client may set:
+Write a [DTO](../the-basic/dto.md) with the fields that a client can set:
 
 ```dart title="lib/app/dtos/create_post/create_post.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -147,7 +147,7 @@ class CreatePostDto {
 }
 ```
 
-Give it to the model with `dto:`, then run the builder:
+Give the DTO to the model with `dto:`. Then run the builder:
 
 ```dart title="lib/app/models/post/post.model.dart"
 @DoxModel()
@@ -155,7 +155,7 @@ Give it to the model with `dto:`, then run the builder:
 class Post extends PostGenerator {}
 ```
 
-Now the API has `createPost`:
+The API now has `createPost`:
 
 ```graphql
 mutation {
@@ -163,23 +163,23 @@ mutation {
 }
 ```
 
-A client can set only the fields of the DTO. So it can never set another column, like `userId`.
+A client can set only the fields of the DTO. Thus, a client cannot set a different column, for example `userId`.
 
-To set `userId` to the logged-in user, add `owner:`. Create then needs a login.
+To set `userId` to the logged-in user, add `owner:`. Then a client must log in to create a post.
 
 ```dart
 @GraphQLType(dto: CreatePostDto, owner: 'userId')
 ```
 
-The rules of the DTO run before the post is saved. When the input is wrong, nothing is saved. The client gets the error `VALIDATION_FAILED`, with the message of each field in `extensions.fields`.
+Dox applies the rules of the DTO before it saves the post. If the input is not correct, Dox saves nothing. The client gets the error `VALIDATION_FAILED`, with the message for each field in `extensions.fields`.
 
 ### Update and delete
 
-Update and delete change a row that already exists, so Dox must know who may change it. You say this with a policy. See [Authorization](#authorization) below.
+Update and delete change a row that exists. Thus, Dox must know who can change the row. A policy gives this data. See [Authorization](#authorization).
 
-### Your own mutation
+### Write your own mutation
 
-Write your own mutation when saving one row is not enough. Put `@GraphQLMutation()` on a resolver method, and take the input as a DTO. The rules of the DTO run before your method.
+Write your own mutation when one saved row is not sufficient. Put `@GraphQLMutation()` on a resolver method, and use a DTO for the input. Dox applies the rules of the DTO before your method runs.
 
 ```dart title="lib/app/graphql/post.resolver.dart"
 @GraphQLMutation()
@@ -190,7 +190,7 @@ Future<Post> importPost(CreatePostDto input) {
 
 ## Authentication
 
-At the start, everyone can call everything. To ask for a login, use `AuthMiddleware` from `dox_auth`. If your app has no login yet, set it up first with [`dox add auth`](../security/authentication.md).
+By default, all clients can call all queries and mutations. To make clients log in, use `AuthMiddleware` from `dox_auth`. If your app does not have a login, set it up first with [`dox add auth`](../security/authentication.md).
 
 Add `AuthMiddleware()` to the config:
 
@@ -205,13 +205,13 @@ GraphQLConfig graphqlConfig = GraphQLConfig(
 );
 ```
 
-Now every query, every mutation and every relation (like `post.user`) needs a logged-in user. The client sends its token as usual, in the `Authorization: Bearer <token>` header.
+Now each query, each mutation, and each relation, for example `post.user`, needs a logged-in user. The client sends its token in the `Authorization: Bearer <token>` header, as usual.
 
-A guest who asks for a protected field gets the error `UNAUTHENTICATED` for that field. Public fields in the same request still give their data. The GraphiQL page stays open in development, but it shows no data to a guest.
+If a guest asks for a protected field, the guest gets the error `UNAUTHENTICATED` for that field. Public fields in the same request still give their data. In development, the GraphiQL page stays open, but it shows no data to a guest.
 
 ### Make a field public
 
-Set `auth: false` on the fields a guest may use:
+Set `auth: false` on the fields that a guest can use:
 
 ```dart title="lib/app/graphql/post.resolver.dart"
 @GraphQLQuery(auth: false)
@@ -220,21 +220,21 @@ Future<List<Post>> trendingPosts({int limit = 10}) {
 }
 ```
 
-It works the same on `@GraphQLMutation`.
+`auth: false` works the same on `@GraphQLMutation`.
 
-On a model, `@GraphQLType(auth: false)` makes the model public everywhere: its free queries and mutations, and every relation that gives it.
+On a model, `@GraphQLType(auth: false)` makes the model public everywhere. This includes its automatic queries and mutations, and all relations that give the model.
 
-A public query does not open the relations inside it. When `trendingPosts` is public, a guest gets the `title` of each post, but `user` inside a post still needs a login. To open it, `User` needs `auth: false` too.
+A public query does not make the relations in it public. If `trendingPosts` is public, a guest gets the `title` of each post. But `user` in a post still needs a login. To make `user` public, set `auth: false` on `User` also.
 
 ### Protect a model everywhere
 
-Write `@GraphQLType(auth: true)` on a model that a guest must never see, like `User`. Then every field that gives a user needs a login, even inside a public query.
+Write `@GraphQLType(auth: true)` on a model that a guest must never see, for example `User`. Then each field that gives a user needs a login. This is also true in a public query.
 
-`auth: true` needs `AuthMiddleware()` in the config. Without it, the app stops at start and names the type or field.
+`auth: true` needs `AuthMiddleware()` in the config. If the config does not have it, the app stops at start and shows the name of the type or field.
 
 ### Read the logged-in user
 
-Add a `DoxGraphQLContext` parameter to a resolver method. It is not a value the client sends. Dox fills it with the current request:
+Add a `DoxGraphQLContext` parameter to a resolver method. The client does not send this value. Dox puts the current request in it:
 
 ```dart title="lib/app/graphql/user.resolver.dart"
 @GraphQLQuery()
@@ -247,7 +247,7 @@ Future<User?> me(DoxGraphQLContext context) {
 
 ## Authorization
 
-Authentication asks "who are you". Authorization asks "may you change this row". For update and delete, you answer with a [policy](../security/authorization.md#writing-policies) that has an `update` and a `delete` method:
+Authentication finds who the user is. Authorization finds if the user can change a row. For update and delete, write a [policy](../security/authorization.md#writing-policies) with an `update` method and a `delete` method:
 
 ```dart title="lib/app/policies/post_policy.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -266,7 +266,7 @@ class PostPolicy extends Policy<User, Post> {
 }
 ```
 
-Register it with `Gate.policy<Post>(PostPolicy());` in the [`setup()` of a provider](../security/authorization.md#registering-the-rules). Then give it to the model with `policy:`, next to `dto:`, and run the builder:
+Register the policy with `Gate.policy<Post>(PostPolicy());` in the [`setup()` of a provider](../security/authorization.md#registering-the-rules). Then give the policy to the model with `policy:`, next to `dto:`. Then run the builder:
 
 ```dart title="lib/app/models/post/post.model.dart"
 @DoxModel()
@@ -274,7 +274,7 @@ Register it with `Gate.policy<Post>(PostPolicy());` in the [`setup()` of a provi
 class Post extends PostGenerator {}
 ```
 
-Now the API has `updatePost` and `deletePost`:
+The API now has `updatePost` and `deletePost`:
 
 ```graphql
 mutation {
@@ -283,13 +283,13 @@ mutation {
 }
 ```
 
-For each call, Dox loads the row and asks the policy. When the policy says no, nothing is written and the client gets the error `FORBIDDEN`. A guest can never update or delete, because the policy needs a user.
+For each call, Dox loads the row and asks the policy. If the policy refuses, Dox writes nothing, and the client gets the error `FORBIDDEN`. A guest can never update or delete, because the policy needs a user.
 
-`updatePost` changes only the fields the client sends, and checks only the rules of those fields.
+`updatePost` changes only the fields that the client sends. Dox applies only the rules of those fields.
 
 ## Configuration
 
-All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, like `path: '/api/graphql'`. Every setting in the table has a default, so you only set the ones you want to change.
+All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, for example `path: '/api/graphql'`. Each setting in the table has a default. Set only the settings that you want to change.
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -303,13 +303,13 @@ All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, like `p
 | `maxFields` | `20000` | The most fields one query can ask for. |
 | `maxNodes` | `100000` | The most values one request can load. |
 
-"On in development" means on when `APP_ENV` is `development`. So in production GraphiQL is off, nobody can list your fields, and error details stay on the server. You change nothing for this.
+"On in development" means on when `APP_ENV` is `development`. Thus, in production, GraphiQL is off, nobody can get a list of your fields, and error details stay on the server. You do not change anything for this.
 
-The three `max` settings stop a very big query before it costs your server much work. Lower them when your API is open to the public.
+The three `max` settings stop a very large query before it causes much work on your server. Set lower values when your API is open to the public.
 
 ## Without the ORM
 
-If your app does not use models, install with `dox add graphql --no-orm`. Put `@GraphQLType()` on a plain Dart class. Its public fields are the fields a client can ask for. You write every query yourself:
+If your app does not use models, install with `dox add graphql --no-orm`. Put `@GraphQLType()` on a plain Dart class. Its public fields are the fields that a client can ask for. You write all the queries yourself:
 
 ```dart title="lib/app/graphql/product.resolver.dart"
 import 'package:dox_graphql/dox_graphql.dart';
@@ -349,4 +349,6 @@ class ProductResolver {
 }
 ```
 
-`@ResolveField()` adds a field to the class of its first parameter. So `Product` gets a `shop` field, and `Shop` needs `@GraphQLType()` too. The `DataLoader` collects the shop ids of the whole request, so fifty products run one shop query and not fifty. `findByIds` takes a `List<int>` and returns a `Future<List<Shop?>>`, in the same order as the ids.
+`@ResolveField()` adds a field to the class of its first parameter. Thus, `Product` gets a `shop` field, and `Shop` also needs `@GraphQLType()`.
+
+The `DataLoader` collects the shop ids of the full request. Thus, fifty products cause one shop query, not fifty queries. `findByIds` takes a `List<int>` and returns a `Future<List<Shop?>>`, in the same order as the ids.
