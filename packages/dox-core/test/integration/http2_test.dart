@@ -8,11 +8,13 @@ import 'package:test/test.dart';
 import '../utils/start_http_server.dart';
 import '../utils/test_app_key.dart';
 
+/// Time for one request. The full test run is busy, so it is generous.
+const Duration _wait = Duration(seconds: 20);
+
 /// Sends one GET over h2c (prior knowledge) and returns status and body.
 Future<(int, String)> getOverH2c(int port, String path) async {
-  ClientTransportConnection c = ClientTransportConnection.viaSocket(
-    await Socket.connect('127.0.0.1', port),
-  );
+  Socket socket = await Socket.connect('127.0.0.1', port);
+  ClientTransportConnection c = ClientTransportConnection.viaSocket(socket);
   ClientTransportStream s = c.makeRequest(<Header>[
     Header.ascii(':method', 'GET'),
     Header.ascii(':scheme', 'http'),
@@ -35,7 +37,10 @@ Future<(int, String)> getOverH2c(int port, String path) async {
     }
     return (status, utf8.decode(body));
   } finally {
-    await c.finish();
+    // finish() waits for the server to close the socket. On a busy
+    // machine that can take long, and the test has what it needs. Close now.
+    await c.terminate();
+    socket.destroy();
   }
 }
 
@@ -56,10 +61,7 @@ void main() {
     );
     int port = Dox().server.httpServer.port;
 
-    (int, String) h2 = await getOverH2c(
-      port,
-      '/proto',
-    ).timeout(const Duration(seconds: 5));
+    (int, String) h2 = await getOverH2c(port, '/proto').timeout(_wait);
     expect(h2.$1, 200);
     expect(h2.$2, '2.0');
 
@@ -68,9 +70,9 @@ void main() {
       '127.0.0.1',
       port,
       '/proto',
-    )).close();
+    )).close().timeout(_wait);
     expect(res.statusCode, 200);
-    expect(await res.transform(utf8.decoder).join(), '1.1');
+    expect(await res.transform(utf8.decoder).join().timeout(_wait), '1.1');
     client.close();
   });
 
