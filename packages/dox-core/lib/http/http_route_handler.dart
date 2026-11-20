@@ -17,7 +17,14 @@ typedef RouteMatch = ({RouteData route, Map<String, dynamic>? params});
 
 /// [method] is the method to match, when it is not the request method
 /// (a `_method` form field, see `MethodOverride`).
-RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
+///
+/// [body] is a body that is already read. A fallback uses it, so it does
+/// not read the request body a second time.
+RouteMatch? httpRouteHandler(
+  HttpRequest req, {
+  String? method,
+  RequestBody? body,
+}) {
   /// read Host once. only domain routes need it.
   _routeIndex();
   String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
@@ -46,14 +53,14 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
       /// a file of `Route.staticFiles`, else 404
       httpStaticHandler(req, Route().statics).then(
         (bool sent) {
-          if (!sent) _notFound(req, host, method);
+          if (!sent) _notFound(req, host, method, body);
         },
         onError: (Object error, StackTrace stackTrace) {
           httpErrorHandler(req, error, stackTrace);
         },
       );
     } else {
-      _notFound(req, host, method);
+      _notFound(req, host, method, body);
     }
   }
   return match;
@@ -63,11 +70,21 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
 /// responseHandler can format it. the default body is JSON.
 /// when the path has routes for other methods, it is 405.
 /// [method] is the `_method` override, when there is one.
-void _notFound(HttpRequest req, String? host, String? method) {
-  if (Route().fallbacks.isNotEmpty) {
+void _notFound(
+  HttpRequest req,
+  String? host,
+  String? method,
+  RequestBody? body,
+) {
+  List<RouteData> fallbacks = Route().fallbacks;
+
+  /// a plain fallback takes GET and HEAD only, so other methods skip the
+  /// search unless a fallback with `when` is registered
+  if (fallbacks.isNotEmpty &&
+      (req.method == 'GET' || req.method == 'HEAD' || _anyWhen(fallbacks))) {
     RouteMatch? fallback = _fallbackFor(req, host);
     if (fallback != null) {
-      runRoute(req, fallback);
+      runRoute(req, fallback, body: body);
       return;
     }
   }
@@ -87,6 +104,21 @@ void _notFound(HttpRequest req, String? host, String? method) {
   );
 }
 
+List<RouteData>? _whenChecked;
+int _whenCount = -1;
+bool _whenAny = false;
+
+/// true when a fallback has a `when` check. made again when the list
+/// changes.
+bool _anyWhen(List<RouteData> fallbacks) {
+  if (!identical(fallbacks, _whenChecked) || fallbacks.length != _whenCount) {
+    _whenChecked = fallbacks;
+    _whenCount = fallbacks.length;
+    _whenAny = fallbacks.any((RouteData r) => r.fallbackWhen != null);
+  }
+  return _whenAny;
+}
+
 /// the [Route.fallback] for [req]: the one with the longest prefix that
 /// its path is under, and whose domain matches. A plain fallback takes
 /// GET and HEAD only, one with `when` takes what `when` allows. null when
@@ -102,21 +134,25 @@ RouteMatch? _fallbackFor(HttpRequest req, String? host) {
     String? domain = route.domainLower;
     if (domain != null && domain != hostLower && domain != hostName) continue;
     if (best != null && want.length <= best.route.path.length) continue;
-    FallbackCondition? when = route.fallbackWhen;
-    if (when == null ? !getOrHead : !when(req)) continue;
     RegExp? pattern = route.pattern;
+    Map<String, dynamic>? params;
     if (pattern == null) {
       bool under =
           want == '/' ||
           path == want ||
           (path.startsWith(want) && path.codeUnitAt(want.length) == 0x2F);
-      if (under) best = (route: route, params: null);
-      continue;
+      if (!under) continue;
+    } else {
+      RegExpMatch? match = _prefixPattern(pattern).firstMatch(path);
+      if (match == null) continue;
+      params = _decodeParams(route, match);
+      if (params == null) continue;
     }
-    RegExpMatch? match = _prefixPattern(pattern).firstMatch(path);
-    if (match == null) continue;
-    Map<String, dynamic>? params = _decodeParams(route, match);
-    if (params != null) best = (route: route, params: params);
+
+    /// user code runs only for a fallback that can match
+    FallbackCondition? when = route.fallbackWhen;
+    if (when == null ? !getOrHead : !when(req)) continue;
+    best = (route: route, params: params);
   }
   return best;
 }

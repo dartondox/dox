@@ -353,3 +353,13 @@ Future<void> _sendFile(File file, HttpRequest request) async {
   res.contentLength = end - start + 1;
   await res.addStream(file.openRead(start, end + 1));
 }
+
+/// true when the answer of [req] is already started or ended by its
+/// handler: the head is sent or the response is closed
+bool answerStarted(HttpResponse res) {
+  return res is! NativeResponse || res.headSent || res.isClosed;
+}
+
+/// the handler took over, but never started the answer (it threw first).
+/// Dox answers for it, so the client does not wait for a timeout.
+void releaseTakeOver(HttpRequest req) => _owned[req] = false;

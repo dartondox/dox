@@ -374,8 +374,12 @@ class Route {
   }
 
   /// do not run the middleware of type [T] on the route added last. It
-  /// takes out global, router and group middleware of that type, and
-  /// also of any subtype of [T]. So `withoutMiddleware<IDoxNextMiddleware>()`
+  /// takes out every middleware of type [T] or a subtype of [T] on that
+  /// route. That includes global, router and group middleware, the
+  /// middleware in the route's own list, and a `.timeout()` added before.
+  /// The controller stays. [T] is required: with no type argument (or
+  /// `Object` or `dynamic`) it would drop everything, auth and CSRF too,
+  /// so it throws an [ArgumentError]. So `withoutMiddleware<IDoxNextMiddleware>()`
   /// takes out every next-style middleware. Use it for a route that a
   /// global middleware does not fit, like a long stream and
   /// `RequestTimeout`. The OpenAPI docs of the route follow it.
@@ -383,6 +387,13 @@ class Route {
   /// Route.post('events', controller).withoutMiddleware<RequestTimeout>();
   /// ```
   Route withoutMiddleware<T extends Object>() {
+    if (T == Object) {
+      throw ArgumentError(
+        'Route.withoutMiddleware() needs a type, like '
+        'withoutMiddleware<RequestTimeout>(). Object would drop every '
+        'middleware, auth and CSRF too.',
+      );
+    }
     RouteData? last = _last;
     if (last == null) {
       throw StateError('Route.withoutMiddleware(): there is no route.');
@@ -407,7 +418,10 @@ class Route {
   /// `ExceptionHandler.render` of `AppConfig`. It covers the errors of the
   /// middleware too, and a body that fails to read (eg. a broken multipart body). A
   /// request with a `_method` override is not covered for a body error,
-  /// because its route is not known yet. The error is still reported.
+  /// because its route is not known yet. For a body that failed to read, the
+  /// renderer gets a request with an empty body. The error is still
+  /// reported when it is a 5xx or not an HTTP error. A 4xx error (like
+  /// 400 or 413) is not reported, as everywhere in Dox.
   /// Return null to let Dox render it as usual. Use it when the route
   /// answers in its own format, like gRPC.
   ///

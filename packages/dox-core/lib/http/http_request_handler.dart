@@ -45,7 +45,10 @@ void _handle(HttpRequest req) {
 }
 
 /// read the body, then run the middleware and controller of [match]
-void runRoute(HttpRequest req, RouteMatch match) {
+///
+/// [body] is a body that was read already (the `_method` check reads it
+/// first). Then it is not read again.
+void runRoute(HttpRequest req, RouteMatch match, {RequestBody? body}) {
   RouteData route = match.route;
   Map<String, dynamic>? params = match.params;
   ContentType? contentType;
@@ -56,9 +59,11 @@ void runRoute(HttpRequest req, RouteMatch match) {
     /// already holds is read at once too. then the request is made with
     /// no Future in between. read the header once and pass it on.
     contentType = HttpBody.contentTypeOf(req.headers);
-    RequestBody? now = contentType == null
-        ? RequestBody.empty()
-        : HttpBody.readNow(req, contentType);
+    RequestBody? now =
+        body ??
+        (contentType == null
+            ? RequestBody.empty()
+            : HttpBody.readNow(req, contentType));
     if (now != null) {
       _run(req, _doxRequest(req, route, params, now, contentType));
     } else {
@@ -133,7 +138,7 @@ void _runOverridden(
   String? method =
       MethodOverride.fromHeader(req.headers.value(MethodOverride.headerName)) ??
       MethodOverride.from(body.map);
-  RouteMatch? match = httpRouteHandler(req, method: method);
+  RouteMatch? match = httpRouteHandler(req, method: method, body: body);
   if (match == null) return;
   httpCorsHandler(match.route.corsEnabled, req);
   DoxRequest doxReq = _doxRequest(

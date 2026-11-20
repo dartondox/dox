@@ -99,7 +99,10 @@ class DoxRequest implements IDoxRequest {
   /// request: not the value the handler returns, not a change of a `next`
   /// middleware (like `ETag`), not the `responseHandler` of `AppConfig`,
   /// and not an error answer. Errors are still reported. Your code must
-  /// end the response.
+  /// end the response. One safety net: if the handler throws before it
+  /// wrote the head or closed the response, Dox sends the normal error
+  /// answer (or the route renderer's), so the client does not wait. Once
+  /// the handler started writing, Dox sends nothing more.
   /// ```
   /// Future<void> handle(DoxRequest req) async {
   ///   req.takeOverResponse();

@@ -94,7 +94,14 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
     /// the head is out (a flush or a stream, eg. server-sent events): the
     /// status and headers can not change, and an error text would land
     /// inside the body. the error is reported, and the answer just ends.
-    if (headSent(req.response) || responseTakenOver(req)) return null;
+    /// the same when the handler took over and started its answer.
+    if (headSent(req.response)) return null;
+    if (responseTakenOver(req)) {
+      if (answerStarted(req.response)) return null;
+
+      /// took over, then threw before it wrote anything: Dox answers
+      releaseTakeOver(req);
+    }
 
     /// the route renders its own errors (`Route.renderErrorsWith`)
     DoxRequest? doxReq = _renderersUsed ? _withRenderer[req] : null;

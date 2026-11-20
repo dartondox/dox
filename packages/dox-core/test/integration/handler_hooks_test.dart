@@ -100,6 +100,12 @@ bool isRpc(HttpRequest req) {
   return req.method == 'POST' && req.headers.value('x-kind') == 'rpc';
 }
 
+/// the renderer sees an empty body when the body failed to read
+DoxResponse? bodyErrors(Object error, DoxRequest req) {
+  return response('rendered ${error.runtimeType} note=${req.input('note')}')
+      .statusCode(298);
+}
+
 DoxResponse? rpcErrors(Object error, DoxRequest req) {
   if (req.input('own') == '1') {
     req.takeOverResponse();
@@ -172,6 +178,10 @@ class HooksRouter extends Router {
         (DoxRequest req) => 'g',
       ).withoutMiddleware<GroupTag>();
     });
+    Route.post(
+      'json-big',
+      (DoxRequest req) => 'ok',
+    ).renderErrorsWith(bodyErrors);
     Route.post('no-renderer', <dynamic>[failing, (DoxRequest req) => 'ok']);
   }
 }
@@ -185,10 +195,11 @@ void main() {
   late DoxTestClient client;
   CountingHandler counter = CountingHandler();
   Errors errors = Errors();
+  late AppConfig baseConfig;
 
   setUpAll(() async {
     client = await DoxTestClient.start(
-      AppConfig(
+      baseConfig = AppConfig(
         appKey: testAppKey,
         globalMiddleware: <dynamic>[
           const RequestTimeout(Duration(milliseconds: 100)),
@@ -342,6 +353,28 @@ void main() {
       res.expectStatus(200).expectHeader('x-rpc-status', '13');
       expect(counter.calls, 0);
       expect(errors.reported, hasLength(1));
+    });
+
+    test('a body that fails to read: empty body, 4xx not reported', () async {
+      /// the native server has the big limit. Dox has a small one, so
+      /// `readNow` throws 413 at once, before any Future.
+      Dox().config = AppConfig(
+        appKey: testAppKey,
+        maxBodySize: 1024,
+        globalMiddleware: baseConfig.globalMiddleware,
+        responseHandler: counter,
+        exceptionHandler: errors,
+      );
+      addTearDown(() => Dox().config = baseConfig);
+      TestResponse res = await client.post(
+        '/json-big',
+        body: '{"note":"${'x' * 2000}"}',
+        headers: <String, String>{'content-type': 'application/json'},
+      );
+      res
+          .expectStatus(298)
+          .expectBody('rendered PayloadTooLargeException note=null');
+      expect(errors.reported, isEmpty);
     });
 
     test('routes without one keep the default answer', () async {
