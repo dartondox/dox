@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/http/http_response_handler.dart' as response_handler;
 import 'package:dox_core/http/request/form_input.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/http/request/trusted_proxy.dart';
@@ -92,6 +93,28 @@ class DoxRequest implements IDoxRequest {
 
   /// True when the request has a session, see [session].
   bool get hasSession => _session != null;
+
+  /// Say that this handler sends the response itself, on
+  /// `httpRequest.response`. After this call Dox sends nothing more for the
+  /// request: not the value the handler returns, not a change of a `next`
+  /// middleware (like `ETag`), not the `responseHandler` of `AppConfig`,
+  /// and not an error answer. Errors are still reported. Your code must
+  /// end the response. One safety net: if the handler throws before it
+  /// wrote the head or closed the response, Dox sends the normal error
+  /// answer (or the route renderer's), so the client does not wait. Once
+  /// the handler started writing, Dox sends nothing more.
+  /// ```
+  /// Future<void> handle(DoxRequest req) async {
+  ///   req.takeOverResponse();
+  ///   HttpResponse res = req.httpRequest.response;
+  ///   res.write('done');
+  ///   await res.close();
+  /// }
+  /// ```
+  void takeOverResponse() => response_handler.takeOverResponse(httpRequest);
+
+  /// True after [takeOverResponse].
+  bool get responseTakenOver => response_handler.responseTakenOver(httpRequest);
 
   /// True when the client wants a JSON answer, not a page: an `Accept`
   /// header with json, a JSON body, or an `X-Requested-With:

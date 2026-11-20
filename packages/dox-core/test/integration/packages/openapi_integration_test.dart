@@ -293,6 +293,28 @@ class GateRouter extends Router {
   }
 }
 
+/// `AuthMiddleware` is a router middleware, so it gives bearerAuth
+class HooksRouter extends Router {
+  @override
+  String get prefix => 'hooks';
+
+  @override
+  List<dynamic> get middleware => <dynamic>[AuthMiddleware()];
+
+  @override
+  void register() {
+    Route.get('kept', (DoxRequest req) => 'ok');
+    Route.get(
+      'open',
+      (DoxRequest req) => 'ok',
+    ).withoutMiddleware<AuthMiddleware>();
+    Route.get('swapped', <dynamic>[
+      ApiKeyAuthMiddleware(),
+      (DoxRequest req) => 'ok',
+    ]).withoutMiddleware<AuthMiddleware>();
+  }
+}
+
 class DocsRouter extends Router {
   @override
   List<dynamic> get middleware => <dynamic>[AuthMiddleware()];
@@ -353,7 +375,13 @@ AppConfig config = AppConfig(
   // the OS picks a free port, so test files can run in parallel
   serverPort: 0,
   totalIsolate: 1,
-  routers: <Router>[DocsRouter(), ApiRouter(), WebRouter(), GateRouter()],
+  routers: <Router>[
+    DocsRouter(),
+    ApiRouter(),
+    WebRouter(),
+    GateRouter(),
+    HooksRouter(),
+  ],
   container: (IocContainer c) {
     c.singleton<LinkApiController>((IocContainer c) => LinkApiController());
     c.singleton<LinkPageController>((IocContainer c) => LinkPageController());
@@ -521,6 +549,20 @@ void main() {
     );
     expect(doc['paths']['/search']['get']['security'], <dynamic>[
       <String, dynamic>{'bearerAuth': <dynamic>[]},
+    ]);
+  });
+
+  test('withoutMiddleware also changes the docs of the route', () {
+    Map<String, dynamic> doc = OpenApiDocument(config.openApi)
+        .build(Route().routes)
+        .toJson();
+    Map<String, dynamic> paths = doc['paths'];
+    expect(paths['/hooks/kept']['get']['security'], <dynamic>[
+      <String, dynamic>{'bearerAuth': <dynamic>[]},
+    ]);
+    expect(paths['/hooks/open']['get'].containsKey('security'), isFalse);
+    expect(paths['/hooks/swapped']['get']['security'], <dynamic>[
+      <String, dynamic>{'apiKeyAuth': <dynamic>[]},
     ]);
   });
 

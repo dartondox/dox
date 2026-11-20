@@ -45,20 +45,25 @@ void _handle(HttpRequest req) {
 }
 
 /// read the body, then run the middleware and controller of [match]
-void runRoute(HttpRequest req, RouteMatch match) {
+///
+/// [body] is a body that was read already (the `_method` check reads it
+/// first). Then it is not read again.
+void runRoute(HttpRequest req, RouteMatch match, {RequestBody? body}) {
+  RouteData route = match.route;
+  Map<String, dynamic>? params = match.params;
+  ContentType? contentType;
   try {
-    RouteData route = match.route;
-    Map<String, dynamic>? params = match.params;
-
     httpCorsHandler(route.corsEnabled, req);
 
     /// no Content-Type means no body to read. a body the native server
     /// already holds is read at once too. then the request is made with
     /// no Future in between. read the header once and pass it on.
-    ContentType? contentType = HttpBody.contentTypeOf(req.headers);
-    RequestBody? now = contentType == null
-        ? RequestBody.empty()
-        : HttpBody.readNow(req, contentType);
+    contentType = HttpBody.contentTypeOf(req.headers);
+    RequestBody? now =
+        body ??
+        (contentType == null
+            ? RequestBody.empty()
+            : HttpBody.readNow(req, contentType));
     if (now != null) {
       _run(req, _doxRequest(req, route, params, now, contentType));
     } else {
@@ -71,15 +76,32 @@ void runRoute(HttpRequest req, RouteMatch match) {
           }
         },
         onError: (Object error, StackTrace stackTrace) {
-          httpErrorHandler(req, error, stackTrace);
+          _failed(req, route, params, contentType, error, stackTrace);
         },
       );
     }
 
     /// form data do not support isolate or multithread
   } catch (error, stackTrace) {
-    httpErrorHandler(req, error, stackTrace);
+    _failed(req, route, params, contentType, error, stackTrace);
   }
+}
+
+/// an error before the request was made (the body failed to read).
+/// A route with its own error renderer still gets it, so it needs a
+/// request. Routes without one pay nothing.
+void _failed(
+  HttpRequest req,
+  RouteData route,
+  Map<String, dynamic>? params,
+  ContentType? contentType,
+  Object error,
+  StackTrace stackTrace,
+) {
+  if (route.errorRenderer != null && !errorRendererReady(req)) {
+    _doxRequest(req, route, params, RequestBody.empty(), contentType);
+  }
+  httpErrorHandler(req, error, stackTrace);
 }
 
 /// read the body first, then find the route for the method in its
@@ -116,7 +138,7 @@ void _runOverridden(
   String? method =
       MethodOverride.fromHeader(req.headers.value(MethodOverride.headerName)) ??
       MethodOverride.from(body.map);
-  RouteMatch? match = httpRouteHandler(req, method: method);
+  RouteMatch? match = httpRouteHandler(req, method: method, body: body);
   if (match == null) return;
   httpCorsHandler(match.route.corsEnabled, req);
   DoxRequest doxReq = _doxRequest(
@@ -390,7 +412,7 @@ DoxRequest _doxRequest(
   RequestBody body,
   ContentType? contentType,
 ) {
-  return DoxRequest(
+  DoxRequest doxReq = DoxRequest(
     route: route,
     uri: req.uri,
     requestBody: body,
@@ -401,4 +423,6 @@ DoxRequest _doxRequest(
     // the client ip needs a socket call, so it is read on first use only
     readClient: true,
   );
+  if (route.errorRenderer != null) keepForErrorRenderer(req, doxReq);
+  return doxReq;
 }

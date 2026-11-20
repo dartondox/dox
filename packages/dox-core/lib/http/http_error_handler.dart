@@ -57,6 +57,25 @@ void _plainError(HttpResponse res) {
 
 final List<int> _plainErrorBody = 'Internal Server Error'.codeUnits;
 
+/// the requests of routes with `Route.renderErrorsWith`
+final Expando<DoxRequest> _withRenderer = Expando<DoxRequest>();
+
+/// true once any route has a renderer. Until then no error pays for the
+/// [_withRenderer] lookup.
+bool _renderersUsed = false;
+
+/// keep [doxReq] so an error of [req] goes to the renderer of its route.
+/// Only for a route that has one.
+void keepForErrorRenderer(HttpRequest req, DoxRequest doxReq) {
+  _renderersUsed = true;
+  _withRenderer[req] = doxReq;
+}
+
+/// true when [req] already has its request kept for the renderer
+bool errorRendererReady(HttpRequest req) {
+  return _renderersUsed && _withRenderer[req] != null;
+}
+
 /// Report [error] and give the response for it, from the
 /// `ExceptionHandler` of `AppConfig`. It is not sent yet.
 dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
@@ -75,7 +94,23 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
     /// the head is out (a flush or a stream, eg. server-sent events): the
     /// status and headers can not change, and an error text would land
     /// inside the body. the error is reported, and the answer just ends.
+    /// the same when the handler took over and started its answer.
     if (headSent(req.response)) return null;
+    if (responseTakenOver(req)) {
+      if (answerStarted(req.response)) return null;
+
+      /// took over, then threw before it wrote anything: Dox answers
+      releaseTakeOver(req);
+    }
+
+    /// the route renders its own errors (`Route.renderErrorsWith`)
+    DoxRequest? doxReq = _renderersUsed ? _withRenderer[req] : null;
+    RouteErrorRenderer? renderer = doxReq?.route.errorRenderer;
+    if (renderer != null) {
+      DoxResponse? custom = renderer(error, doxReq!);
+      if (custom != null) return custom;
+      if (responseTakenOver(req)) return null;
+    }
     payload = handler.render(error, req);
   } catch (handlerError, handlerStack) {
     /// a broken handler must not leave the client waiting.

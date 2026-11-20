@@ -15,6 +15,9 @@ dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
     return;
   }
 
+  /// the handler sent the answer itself (`DoxRequest.takeOverResponse`)
+  if (responseTakenOver(request)) return;
+
   ResponseHandlerInterface? customResponseHandler = DoxServer().responseHandler;
 
   /// a plain value (text, map, list...) with no custom handler needs no
@@ -217,13 +220,34 @@ void endResponse(HttpResponse res) {
   }
 }
 
+/// requests whose handler sends the answer itself
+final Expando<bool> _owned = Expando<bool>();
+
+/// true once any request took over its answer. Until then no request
+/// pays for the [_owned] lookup.
+bool _ownedUsed = false;
+
+/// Dox sends nothing more for [req]: its handler owns the answer. See
+/// `DoxRequest.takeOverResponse`.
+void takeOverResponse(HttpRequest req) {
+  _ownedUsed = true;
+  _owned[req] = true;
+}
+
+/// true when the handler of [req] took over its answer
+bool responseTakenOver(HttpRequest req) => _ownedUsed && _owned[req] == true;
+
 /// the APP_ENV value [_show] was made from. the answer is made again
 /// only when the value changes, so most errors skip the string work.
 String? _shownFor;
 bool _show = false;
 
-/// True when `APP_ENV` is `development` or `local`: error text may be
-/// sent to the client then.
+/// True when `APP_ENV` is `development` or `local`. Then error text may
+/// be sent to the client. Dox uses this rule for its own error answers.
+/// Use it when your code sends errors itself, so it follows the same rule.
+/// ```
+/// String message = showErrors() ? '$error' : 'Server Error';
+/// ```
 bool showErrors() {
   String env = Env.get<String>('APP_ENV');
   if (!identical(env, _shownFor)) {
@@ -329,3 +353,13 @@ Future<void> _sendFile(File file, HttpRequest request) async {
   res.contentLength = end - start + 1;
   await res.addStream(file.openRead(start, end + 1));
 }
+
+/// true when the answer of [req] is already started or ended by its
+/// handler: the head is sent or the response is closed
+bool answerStarted(HttpResponse res) {
+  return res is! NativeResponse || res.headSent || res.isClosed;
+}
+
+/// the handler took over, but never started the answer (it threw first).
+/// Dox answers for it, so the client does not wait for a timeout.
+void releaseTakeOver(HttpRequest req) => _owned[req] = false;

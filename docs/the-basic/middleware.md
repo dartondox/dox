@@ -127,6 +127,17 @@ class AuditProvider extends DoxProvider {
 }
 ```
 
+### Skip a middleware on one route
+
+Some routes do not fit a global middleware. For example, a long stream should not end with `RequestTimeout`. `.withoutMiddleware<T>()` takes every middleware of type `T` out of the route, also global, router and group middleware:
+
+```dart
+Route.post('/events', (EventController c) => c.stream)
+    .withoutMiddleware<RequestTimeout>();
+```
+
+It takes out `T` and any subtype of `T`. So `withoutMiddleware<IDoxNextMiddleware>()` takes out every middleware that uses `next`. Use a specific type. The route is also left out of the OpenAPI docs of that middleware, for example its security.
+
 ### The order
 
 Middleware runs in this order: package middleware from providers, then the app's global middleware, then router middleware, then group middleware, then route middleware. If one returns a value or throws, the rest do not run:
@@ -273,6 +284,8 @@ The answer is the normal error JSON:
 ```
 
 Dart can not stop a running Future, so the controller keeps running in the background. Its late result is dropped, so nothing is sent twice.
+
+A global `RequestTimeout` also ends long streams. To keep it off one route, see [Skip a middleware on one route](#skip-a-middleware-on-one-route).
 
 ### Server timing
 

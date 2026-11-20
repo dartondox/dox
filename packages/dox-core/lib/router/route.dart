@@ -48,6 +48,16 @@ final List<StaticFolder> _statics = <StaticFolder>[];
 /// routes added with [Route.fallback]. empty unless one is added.
 List<RouteData> _fallbacks = <RouteData>[];
 
+/// Gives the response for an [error] of a route, see
+/// [Route.renderErrorsWith]. null: Dox renders it as usual.
+typedef RouteErrorRenderer = DoxResponse? Function(
+  Object error,
+  DoxRequest req,
+);
+
+/// true when a [Route.fallback] with `when` should answer [req]
+typedef FallbackCondition = bool Function(HttpRequest req);
+
 /// gets the open socket of a [Route.websocket] request
 typedef WebSocketHandler = FutureOr<void> Function(
   WebSocket socket,
@@ -363,6 +373,78 @@ class Route {
     return this;
   }
 
+  /// do not run the middleware of type [T] on the route added last. It
+  /// takes out every middleware of type [T] or a subtype of [T] on that
+  /// route. That includes global, router and group middleware, the
+  /// middleware in the route's own list, and a `.timeout()` added before.
+  /// The controller stays. [T] is required: with no type argument (or
+  /// `Object` or `dynamic`) it would drop everything, auth and CSRF too,
+  /// so it throws an [ArgumentError]. So `withoutMiddleware<IDoxNextMiddleware>()`
+  /// takes out every next-style middleware. Use it for a route that a
+  /// global middleware does not fit, like a long stream and
+  /// `RequestTimeout`. The OpenAPI docs of the route follow it.
+  /// ```
+  /// Route.post('events', controller).withoutMiddleware<RequestTimeout>();
+  /// ```
+  Route withoutMiddleware<T extends Object>() {
+    if (T == Object) {
+      throw ArgumentError(
+        'Route.withoutMiddleware() needs a type, like '
+        'withoutMiddleware<RequestTimeout>(). Object would drop every '
+        'middleware, auth and CSRF too.',
+      );
+    }
+    RouteData? last = _last;
+    if (last == null) {
+      throw StateError('Route.withoutMiddleware(): there is no route.');
+    }
+    for (RouteData data in _lastGroup ?? <RouteData>[last]) {
+      List<dynamic> controllers = data.controllers as List<dynamic>;
+      Object? action = controllers.isEmpty ? null : controllers.last;
+
+      /// the controller stays, even when it is a [T]
+      bool drop(dynamic item) => item is T && !identical(item, action);
+      controllers.removeWhere(drop);
+
+      /// the OpenAPI docs read `preMiddleware` too (it is a read-only copy)
+      data.preMiddleware = List<dynamic>.unmodifiable(
+        data.preMiddleware.where((dynamic item) => !drop(item)),
+      );
+    }
+    return this;
+  }
+
+  /// send the errors of the route added last to [renderer], not to the
+  /// `ExceptionHandler.render` of `AppConfig`. It covers the errors of the
+  /// middleware too, and a body that fails to read (eg. a broken multipart body). A
+  /// request with a `_method` override is not covered for a body error,
+  /// because its route is not known yet. For a body that failed to read, the
+  /// renderer gets a request with an empty body. The error is still
+  /// reported when it is a 5xx or not an HTTP error. A 4xx error (like
+  /// 400 or 413) is not reported, as everywhere in Dox.
+  /// Return null to let Dox render it as usual. Use it when the route
+  /// answers in its own format, like gRPC.
+  ///
+  /// Routes are sent to every isolate, so [renderer] must be a top-level
+  /// or static function, or a function that captures nothing.
+  /// ```
+  /// DoxResponse? rpcError(Object error, DoxRequest req) {
+  ///   return response(<String, String>{'error': '$error'}).statusCode(500);
+  /// }
+  ///
+  /// Route.post('rpc', controller).renderErrorsWith(rpcError);
+  /// ```
+  Route renderErrorsWith(RouteErrorRenderer renderer) {
+    RouteData? last = _last;
+    if (last == null) {
+      throw StateError('Route.renderErrorsWith(): there is no route.');
+    }
+    for (RouteData data in _lastGroup ?? <RouteData>[last]) {
+      data.errorRenderer = renderer;
+    }
+    return this;
+  }
+
   /// only match the route added last when its [param] matches [regex].
   /// Else the route does not match, and the next route is tried (or the
   /// client gets 404). The regex must match the whole param text. Use
@@ -416,6 +498,15 @@ class Route {
   /// no [staticFiles] file. Use it for a custom 404 page, or to send
   /// `index.html` of a single page app. Other methods still get 404 or 405.
   ///
+  /// With [when], the fallback is tried for a request of any method, and
+  /// it answers only when [when] gives true. Use it for a package that
+  /// answers unknown paths in its own format, like gRPC. Check the method
+  /// in [when] when it matters. [when] also runs for a path that has a
+  /// route for another method, so a gRPC `POST` to a path that only has a
+  /// `GET` route gets the fallback, not 405. It never runs for a request
+  /// that a route matches. Routes are sent to every isolate, so [when]
+  /// must be a top-level or static function, or one that captures nothing.
+  ///
   /// Like other routes, it follows [group], the router prefix, [domain]
   /// and middleware. So in a router, the global middleware runs for it.
   /// Inside a group, it only answers paths under the group prefix. When
@@ -425,14 +516,19 @@ class Route {
   /// Route.group('admin', () {
   ///   Route.fallback(controller); // only for /admin/...
   /// });
+  /// bool isPost(HttpRequest req) => req.method == 'POST';
+  /// Route.fallback(apiNotFound, when: isPost);
   /// ```
-  static Route fallback<T extends Object>(dynamic controller) {
+  static Route fallback<T extends Object>(
+    dynamic controller, {
+    FallbackCondition? when,
+  }) {
     Route r = Route();
     RouteData data = r._routeData(
       HttpRequestMethod.GET,
       r._join(''),
       _action<T>(controller),
-    );
+    )..fallbackWhen = when;
     _fallbacks.add(data);
     r._last = data;
     r._lastGroup = null;
