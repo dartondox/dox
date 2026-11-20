@@ -66,7 +66,7 @@ message HelloReply {
 
 ## Make the Dart code
 
-Install the Dart plugin for `protoc` once:
+Install `protoc` first (for example `brew install protobuf`). Then install the Dart plugin for it once, and make sure `~/.pub-cache/bin` is on your `PATH`:
 
 ```bash
 dart pub global activate protoc_plugin
@@ -95,7 +95,7 @@ class GreeterService extends GreeterServiceBase {
     return HelloReply(message: 'Hello ${request.name}');
   }
 
-  // the other three methods are in "The 4 call types"
+  // the other three methods are in "The call types"
 }
 ```
 
@@ -106,6 +106,9 @@ Register the service in a router with no prefix:
 ```dart title="lib/routes/grpc_router.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_grpc/dox_grpc.dart';
+
+import '../app/grpc/greeter_service.dart'; // your GreeterService
+import '../app/http/middleware/auth_middleware.dart'; // your AuthMiddleware
 
 class GrpcRouter extends Router {
   @override
@@ -126,7 +129,19 @@ A call to a service you did not register, or to a method the service does not ha
 
 The gRPC routes skip `RequestTimeout`, so a long stream is not cut.
 
-## The 4 call types
+A load balancer has no token. Register the [health service](#health-check) in its own router, without the auth middleware:
+
+```dart title="lib/routes/grpc_health_router.dart"
+class GrpcHealthRouter extends Router {
+  @override
+  void register() {
+    // the first Grpc.register in the app
+    Grpc.register(HealthService());
+  }
+}
+```
+
+## The call types
 
 ### Unary
 
@@ -147,6 +162,7 @@ One request, many replies. The method returns a `Stream`:
 @override
 Stream<HelloReply> sayHelloMany(ServiceCall call, HelloRequest request) async* {
   for (int i = 1; i <= 3; i++) {
+    if (call.isCanceled) return;
     yield HelloReply(message: 'Hello ${request.name} $i');
   }
 }
@@ -187,7 +203,7 @@ Stream<HelloReply> chat(ServiceCall call, Stream<HelloRequest> request) async* {
 
 ## Errors
 
-Throw a `GrpcException` to end the call with a status. `GrpcStatus` is an enum of the 17 gRPC status codes:
+Throw a `GrpcException` to end the call with a status. `GrpcStatus` is an enum of the gRPC status codes:
 
 ```dart
 throw GrpcException(GrpcStatus.notFound, 'No user 5');
@@ -212,7 +228,7 @@ Metadata is the gRPC word for headers.
 Future<HelloReply> sayHello(ServiceCall call, HelloRequest request) async {
   String? language = call.clientMetadata['accept-language'];
   call.headers!['x-served-by'] = 'greeter';
-  return HelloReply(message: 'Hello ${request.name}');
+  return HelloReply(message: 'Hello ${request.name} ($language)');
 }
 ```
 
@@ -226,7 +242,7 @@ When the client cancels or leaves, `call.isCanceled` is true and the request str
 
 ## Middleware
 
-The middleware of the router runs before each call. This is how you add auth. A client sends its token as metadata, and the middleware reads it the same way as an HTTP header:
+Most services need to know who calls them. The middleware of the router runs before each call, so this is where you add auth. A client sends its token as metadata, and the middleware reads it the same way as an HTTP header:
 
 ```dart
 class AuthMiddleware implements IDoxMiddleware {
@@ -241,7 +257,7 @@ class AuthMiddleware implements IDoxMiddleware {
 }
 ```
 
-When a middleware throws a Dox error, the client gets a gRPC status with the message. The map is:
+When a middleware throws a Dox error, the client gets a gRPC status with the message. The message of a 5xx error is hidden unless `APP_ENV` is `development` or `local`. The map is:
 
 | HTTP error | gRPC status |
 | --- | --- |
@@ -254,13 +270,14 @@ When a middleware throws a Dox error, the client gets a gRPC status with the mes
 | 413, 429 | `RESOURCE_EXHAUSTED` |
 | 501 | `UNIMPLEMENTED` |
 | 502, 503 | `UNAVAILABLE` |
+| other 4xx | `FAILED_PRECONDITION` |
 | other 5xx | `INTERNAL` |
 
 You can also wrap a service in `Route.middleware([...], () => Grpc.register(...))`. But the first `Grpc.register` in your app must stay outside it. See [Health check](#health-check).
 
 ## Options
 
-Pass `GrpcOptions` to change the limits of one service:
+The defaults fit most services. Pass `GrpcOptions` to change the limits of one service:
 
 ```dart
 Grpc.register(
@@ -293,9 +310,15 @@ The quiet time of your own method counts too, so set it longer than your slowest
 `HealthService` is the standard `grpc.health.v1.Health` service, with `Check` and `Watch`. Load balancers and Kubernetes can call it:
 
 ```dart
-HealthService health = HealthService();
-Grpc.register(health);
-health.setStatus('helloworld.Greeter', ServingStatus.SERVING);
+class GrpcHealthRouter extends Router {
+  @override
+  void register() {
+    // this is the first Grpc.register in the app
+    HealthService health = HealthService();
+    Grpc.register(health);
+    health.setStatus('helloworld.Greeter', ServingStatus.SERVING);
+  }
+}
 ```
 
 The empty name `''` is the whole server. It starts as `SERVING`. A change you make in one isolate goes to the other isolates too.
