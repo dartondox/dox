@@ -524,7 +524,7 @@ The page is rendered by the Inertia SSR server. It is a JavaScript process (Bun 
 
 ### 1. The SSR entry file
 
-`dox inertia:install --ssr` writes this file for you, and adds a `build:ssr` script to `package.json`. It never overwrites a file. To write it yourself, use this:
+`dox inertia:install --ssr` writes this file for you, and adds a `build:ssr` script to `package.json`. It never overwrites a file. With no `package.json` (or one it cannot change safely), it prints a hint instead. To write it yourself, use this:
 
 ```jsx title="resources/js/ssr.jsx"
 import { createInertiaApp } from '@inertiajs/react'
@@ -584,7 +584,7 @@ bun run build:ssr
 dox inertia:start-ssr
 ```
 
-`dox inertia:start-ssr` runs `bootstrap/ssr/ssr.js` (or `ssr.mjs`) with Bun, in the foreground. It stops with an error when the file is not built yet.
+`dox inertia:start-ssr` runs `bootstrap/ssr/ssr.js` (or `ssr.mjs`) with Bun, in the foreground. When both files exist, it starts the newer one and prints which. It stops with an error when the file is not built yet. A stop signal (Ctrl+C, `docker stop`) is sent on to the SSR process.
 
 With Node, use `npm run build:ssr` and `dox inertia:start-ssr --node`.
 
