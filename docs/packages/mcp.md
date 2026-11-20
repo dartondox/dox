@@ -156,7 +156,7 @@ With `McpOAuth`, you give the client only the address, for example `https://my.a
 
 1. **Tokens.** Implement `McpOAuthTokens`. `issue` makes a token for a grant. `verify` gives the subject of a token, for example a user, or `null`. You choose the table and how to revoke a token. Keep only a hash of the token.
 2. **The consent page.** Serve the page at `<issuer>/oauth/authorize`, or set `authorizePage`. The page reads `client_id`, `redirect_uri`, `state`, `code_challenge`, `code_challenge_method`, and `resource` from the query. The person signs in on this page with the usual login of your app.
-3. **The answer.** Your page calls a route of your app, behind your login. If the person agrees, the route calls `oauth.approve(subject: ...)`. Then the route gives the page the address for the browser. If the person refuses, the route calls `oauth.deny(...)`.
+3. **The answer.** Your page calls a route of your app, behind your login. If the person agrees, the route calls `oauth.approve(subject: ...)`. Then the route gives the page the address for the browser. If the person refuses, the route calls `await oauth.denyClient(...)`.
 
 Then add the routes, and verify the token on the MCP route:
 
@@ -189,8 +189,8 @@ Call `oauth.routes()` in a router with no prefix, because clients look for `/.we
 The consent page controls who gets access. Obey these rules:
 
 - Put the answer route behind [CSRF protection](../security/csrf.md). If you do not, a different site can make a signed-in person agree to a client. The person does not know about it.
-- Use `oauth.checkClient(...)` to get the client for the page. This method throws an error when the client or the redirect address is not correct. In that case, do not send the browser to any address.
-- Show the redirect host. Then the person sees where the browser goes.
+- Use `await oauth.verifyClient(...)` to get the client for the page. This method throws an error when the client or the redirect address is not correct. In that case, do not send the browser to any address.
+- Show `client.host` next to the client name, and show the redirect host. A client can choose any name, but not its host. Then the person sees who asks and where the browser goes.
 - HTML-escape the client name before you show it. The client chose the name, so do not trust it.
 
 There is no refresh token. To revoke a client, delete its token.
@@ -230,6 +230,7 @@ This section gives special cases. Most apps do not need it.
 | `POST` with a body that is not valid JSON | `400` with the JSON-RPC error `-32700` |
 | `POST` with an empty batch, or a message that is not JSON-RPC 2.0 | `400` with the JSON-RPC error `-32600` |
 | `POST` with `initialize` in a batch with other messages | `400` with the JSON-RPC error `-32600`. Send `initialize` alone |
+| `POST` with a batch of more than 50 messages | `400` with the JSON-RPC error `-32600`. No message runs |
 | `POST` with an unsupported `MCP-Protocol-Version` header | `400` |
 | `POST` with another `Content-Type` than JSON | `415` |
 | Any request with an `Origin` header that is not in `allowedOrigins` | `403` |

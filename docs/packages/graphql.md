@@ -55,7 +55,7 @@ dart run build_runner build
 
 A **query** is a request that reads data. Dox gives each model two automatic queries. For `Post`, the queries are:
 
-- `posts(limit, offset)`: a list of posts. The default `limit` is `20`, and the maximum is `100`.
+- `posts(limit, offset)`: a list of posts. The default `limit` is `20`, and the maximum is `100`. If the model has a policy with `view`, the list can have fewer rows than `limit` (see [Authorization](#authorization)).
 - `post(id)`: one post. The result is `null` if no post has that id.
 
 Open `http://localhost:3000/graphql` in a browser. In development, this URL shows GraphiQL. GraphiQL is a page where you write and run queries. Run this query:
@@ -247,7 +247,20 @@ Future<User?> me(DoxGraphQLContext context) {
 
 ## Authorization
 
-Authentication finds who the user is. Authorization finds if the user can change a row. For update and delete, write a [policy](../security/authorization.md#writing-policies) with an `update` method and a `delete` method:
+Authentication finds who the user is. Authorization finds if the user can read or change a row. Write a [policy](../security/authorization.md#writing-policies). Dox uses these methods of the policy, when the policy has them:
+
+| Method | What it guards |
+|---|---|
+| `viewAny` | The list query, and each relation to the model. If it refuses, the field is `null` with the error `FORBIDDEN`. |
+| `view` | The `post(id)` query. In lists and relations, Dox removes the rows that `view` refuses. |
+| `create` | The create mutation. |
+| `update`, `delete` | The update and delete mutations. |
+
+Dox reads the names in `abilities`, not the names of your methods. If `abilities` has no `view`, Dox does not check `view`.
+
+These checks run only in the queries and mutations that Dox makes for a model. In your own `@GraphQLQuery`, `@ResolveField` or getter that returns a model, call [`Gate`](../security/authorization.md) yourself.
+
+This policy lets each user change only their own posts:
 
 ```dart title="lib/app/policies/post_policy.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -283,7 +296,9 @@ mutation {
 }
 ```
 
-For each call, Dox loads the row and asks the policy. If the policy refuses, Dox writes nothing, and the client gets the error `FORBIDDEN`. A guest can never update or delete, because the policy needs a user.
+For each call, Dox loads the row and asks the policy. If the policy refuses, Dox writes nothing, and the client gets the error `FORBIDDEN`. A guest gets the error `UNAUTHENTICATED` before Dox reads the database, because the policy needs a user.
+
+If no row has the id, Dox asks the policy about an empty row. Thus a user that the policy refuses gets `FORBIDDEN` for each id, and cannot find which ids exist. If your policy allows an empty row (for example `!post.isPrivate`), the client can still find which ids exist.
 
 `updatePost` changes only the fields that the client sends. Dox applies only the rules of those fields.
 
@@ -302,10 +317,12 @@ All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, for exa
 | `maxDepth` | `64` | How deep a query can nest fields. |
 | `maxFields` | `20000` | The most fields one query can ask for. |
 | `maxNodes` | `100000` | The most values one request can load. |
+| `maxRootFields` | `50` | The most top-level fields in one request. Each alias counts. |
+| `maxRelationRows` | `50000` | The most rows that one relation can load for all parent rows together. |
 
 "On in development" means on when `APP_ENV` is `development`. Thus, in production, GraphiQL is off, nobody can get a list of your fields, and error details stay on the server. You do not change anything for this.
 
-The three `max` settings stop a very large query before it causes much work on your server. Set lower values when your API is open to the public.
+The `max` settings stop a very large query before it causes much work on your server. Set lower values when your API is open to the public.
 
 ## Without the ORM
 
