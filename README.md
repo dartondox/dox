@@ -39,6 +39,62 @@ dox s                          # start the server on port 3000
 curl localhost:3000/ping       # pong
 ```
 
+## Without the template
+
+Dox also works in a plain Dart project. You do not need the CLI or the starter project.
+
+Add the core package:
+
+```bash
+dart pub add dox_core
+```
+
+Put a secret key in `.env`. Dox uses it to encrypt cookies:
+
+```bash
+echo "APP_KEY=$(openssl rand -hex 16)" > .env
+```
+
+Write `bin/server.dart`:
+
+```dart
+import 'package:dox_core/dox_core.dart';
+
+class ApiRouter extends Router {
+  @override
+  String get prefix => 'api';
+
+  @override
+  void register() {
+    Route.get('/ping', (DoxRequest req) => 'pong');
+
+    // {id} must be an int, so /api/users/abc gets a 404.
+    Route.get('/users/{id}', (DoxRequest req, int id) {
+      return <String, dynamic>{'id': id};
+    });
+  }
+}
+
+void main() async {
+  Dox().initialize(AppConfig(
+    appKey: Env.get('APP_KEY'),
+    serverPort: 3000,
+    routers: <Router>[ApiRouter()],
+  ));
+  await Dox().startServer();
+}
+```
+
+Run it:
+
+```bash
+dart run bin/server.dart
+curl localhost:3000/api/ping      # pong
+curl localhost:3000/api/users/7   # {"id":7}
+```
+
+Add more packages when you need them, for example `dart pub add dox_orm`.
+
 ## A small example
 
 A route, a typed input and a database query:
