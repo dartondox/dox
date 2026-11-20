@@ -87,7 +87,7 @@ The tool does not find GitHub Copilot automatically. For Copilot, always use `--
 
 The installed skills are copies. They do not change when a package changes.
 
-Run `dart run skills@ get` again after you add a package or update a package. The tool then installs the new skills. It also removes the skills of packages that your app does not use now.
+Run `dart run skills@ get` again after you add a package or update a package. The tool then installs the new skills. With `--all`, it also removes the skills of packages that you no longer use. Without `--all`, it asks first.
 
 ### Packages that come in through another package
 
@@ -144,7 +144,7 @@ Not every tool can read skills, and a chat does not see your project. For these,
 The docs build makes the two files again each time the docs change. Thus they always agree with this site.
 
 - They hold the docs of the latest Dox version. The links in them go to `https://dartondox.dev/latest/`.
-- They hold each page of the menu of this site, in the same sequence.
+- They hold the docs pages, in the sequence of the menu of this site.
 - In `llms-full.txt`, each page starts with its title and its link. Then comes the Markdown source of the page, with all its code examples.
 - The blog and the docs of older Dox versions are not in the files.
 
@@ -153,7 +153,7 @@ The docs build makes the two files again each time the docs change. Thus they al
 There are three ways to give the files to an agent:
 
 1. **Paste the link.** In a chat agent that can open links, paste `https://dartondox.dev/llms-full.txt` and ask your question.
-2. **Add a docs source.** Some editors let you add documentation by its link. In Cursor, add the link as a new doc, then use `@Docs` in the chat.
+2. **Add a docs source.** Some editors let you add documentation by its link. If your editor has this feature, add the link of `llms-full.txt`.
 3. **Download the file.** Save it, then point the agent at the file or attach it to the chat:
 
     ```bash
