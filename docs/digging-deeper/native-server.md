@@ -81,7 +81,7 @@ AppConfig(
 
 - It is h2c only: HTTP/2 over plain TCP. There is no TLS in Dox. TLS stays at your proxy.
 - HTTP/1.1 and HTTP/2 share one port. The server looks at the first bytes of each connection and picks the right one. Old clients and health checks keep working.
-- Routes, middleware and controllers do not change. `req.protocolVersion` is `2.0` for an HTTP/2 request, and `1.1` for the others.
+- Routes, middleware and controllers do not change. `req.protocolVersion` is `2.0` for an HTTP/2 request, and `1.0` or `1.1` for the others.
 - A browser does not speak h2c. It talks HTTP/2 to your proxy, and the proxy talks to Dox. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
 
 ### maxConcurrentStreams

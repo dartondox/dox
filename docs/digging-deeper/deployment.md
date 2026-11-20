@@ -251,7 +251,7 @@ example.com {
 }
 ```
 
-With nginx, send gRPC calls with `grpc_pass`. Use the `grpc://` scheme, because the app has no TLS:
+With nginx, gRPC calls need `grpc_pass`, and normal routes need `proxy_pass`. Use a separate location for each. The `grpc://` scheme is used because the app has no TLS:
 
 ```nginx
 server {
@@ -262,13 +262,22 @@ server {
   ssl_certificate     /etc/letsencrypt/live/example.com/fullchain.pem;
   ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
 
+  # Normal routes: HTTP/1.1 to the app
   location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+  }
+
+  # gRPC service paths only
+  location /helloworld.Greeter/ {
     grpc_pass grpc://127.0.0.1:3000;
   }
 }
 ```
 
 nginx can not send normal `proxy_pass` requests to an upstream over HTTP/2. It always uses HTTP/1.1 there, and that works fine because Dox accepts it on the same port. Use `grpc_pass` only for gRPC routes, and keep `proxy_pass` for the rest.
+
+nginx `grpc_read_timeout` and `grpc_send_timeout` are 60 seconds by default. A long stream is cut when it is quiet for that long, so raise them for long streams.
 
 ### Pass the real `Host` header
 

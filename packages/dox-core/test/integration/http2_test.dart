@@ -19,21 +19,24 @@ Future<(int, String)> getOverH2c(int port, String path) async {
     Header.ascii(':path', path),
     Header.ascii(':authority', 'localhost'),
   ], endStream: true);
-  int status = 0;
-  List<int> body = <int>[];
-  await for (StreamMessage m in s.incomingMessages) {
-    if (m is HeadersStreamMessage) {
-      for (Header h in m.headers) {
-        if (ascii.decode(h.name) == ':status') {
-          status = int.parse(ascii.decode(h.value));
+  try {
+    int status = 0;
+    List<int> body = <int>[];
+    await for (StreamMessage m in s.incomingMessages) {
+      if (m is HeadersStreamMessage) {
+        for (Header h in m.headers) {
+          if (ascii.decode(h.name) == ':status') {
+            status = int.parse(ascii.decode(h.value));
+          }
         }
+      } else if (m is DataStreamMessage) {
+        body.addAll(m.bytes);
       }
-    } else if (m is DataStreamMessage) {
-      body.addAll(m.bytes);
     }
+    return (status, utf8.decode(body));
+  } finally {
+    await c.finish();
   }
-  await c.finish();
-  return (status, utf8.decode(body));
 }
 
 void main() {
@@ -53,7 +56,10 @@ void main() {
     );
     int port = Dox().server.httpServer.port;
 
-    (int, String) h2 = await getOverH2c(port, '/proto');
+    (int, String) h2 = await getOverH2c(
+      port,
+      '/proto',
+    ).timeout(const Duration(seconds: 5));
     expect(h2.$1, 200);
     expect(h2.$2, '2.0');
 
