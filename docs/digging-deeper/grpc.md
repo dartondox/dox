@@ -303,7 +303,7 @@ Grpc.register(
   GreeterService(),
   options: GrpcOptions(
     maxReceiveMessageSize: 16 * 1024 * 1024,
-    idleTimeout: Duration(minutes: 5),
+    idleTimeout: Duration(minutes: 5), // the default
   ),
 );
 ```
@@ -331,13 +331,14 @@ Dox always reads gzip requests, with or without this option.
 
 ### Stop idle calls
 
-A client can open a call and then not read the reply. To release these calls, set `idleTimeout`. If no message goes in or out for that time, the call stops with `DEADLINE_EXCEEDED`:
+A client can open a call and then not read the reply. Dox releases these calls: if no message goes in or out for 5 minutes, the call stops with `DEADLINE_EXCEEDED`. To change the time, set `idleTimeout`. To turn the limit off, set it to `null`:
 
 ```dart
-GrpcOptions(idleTimeout: Duration(minutes: 5))
+GrpcOptions(idleTimeout: Duration(minutes: 30))
+GrpcOptions(idleTimeout: null) // no limit
 ```
 
-It is off by default. Set `idleTimeout` longer than your slowest method, because the time also counts while your method works and sends no message.
+Set `idleTimeout` longer than your slowest method, because the time also counts while your method works and sends no message. A quiet `Watch` or other long stream also stops, and the client must connect again. Send a message from time to time, or set a longer time.
 
 ## Health check
 
