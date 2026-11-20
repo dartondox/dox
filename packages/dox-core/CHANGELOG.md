@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `IAuthMiddleware` is an interface for a middleware that logs a user in. `asOptional()` gives a copy that lets guests through with `req.auth` null. A package like GraphQL can use it to read the user without needing the auth package.
 - New: `AppConfig.http2` (off by default) lets the same port also speak HTTP/2 over plain TCP (h2c), and `AppConfig.maxConcurrentStreams` (default 250) sets the open requests of one connection. HTTP/1.1 keeps working on the port. Add `req.protocolVersion` (`1.0`, `1.1` or `2.0`). This needs a dox_http_native with HTTP/2.
 - Fix: a `:` in a route path, like `/books:search`, is a literal char in Dox. The OpenAPI docs read it as a param and showed `/books{search}`. Now the path is shown as it is: `/books:search`.
 - New: `req.takeOverResponse()` says that the handler sends the response itself. Then Dox sends nothing more for the request: not the returned value, not a change of a `next` middleware (like `ETag`), not the `responseHandler`, and not an error answer. Errors are still reported.

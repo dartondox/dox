@@ -70,6 +70,7 @@ export 'http/response/stream_file.dart';
 
 /// interfaces
 export 'interfaces/app_config.dart';
+export 'interfaces/auth_middleware.dart';
 export 'interfaces/core_flags.dart';
 export 'interfaces/next_middleware.dart';
 export 'interfaces/response_handler_interface.dart';
