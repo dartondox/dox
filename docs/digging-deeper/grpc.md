@@ -35,7 +35,7 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-The same port then speaks HTTP/1.1 and HTTP/2. Your normal routes do not change. See [Native server: HTTP/2](native-server.md#http2) for the details.
+The same port then speaks HTTP/1.1 and HTTP/2. Your normal routes do not change. See [HTTP/2](http2.md) for the details.
 
 A gRPC call to a server that has no `http2: true` gets HTTP status `505`.
 
@@ -348,21 +348,32 @@ class GreeterService extends GreeterServiceBase {
 
 ## Performance
 
-`dox_grpc` is about 2x faster than the plain `package:grpc` server on unary calls, and 3.7x faster on server streaming. Both servers ran the same service, so the gap comes from the server. `dox_grpc` runs on the native HTTP/2 server, and `package:grpc` runs on `dart:io`.
+`dox_grpc` is faster than the plain `package:grpc` server: 1.4x on small calls and 2.2x on server streaming. It is close to grpc-go, the official Go server. All servers ran the same service, so the gap comes from the server. `dox_grpc` runs on the native [HTTP/2](http2.md) server, and `package:grpc` runs on `dart:io`.
 
-| Test                                   | `dox_grpc`  | `package:grpc` | Faster |
-| -------------------------------------- | ----------- | -------------- | ------ |
-| Unary, small message                   | 50,900 /s   | 25,000 /s      | 2.0x   |
-| Unary, 100 KB answer                   | 11,800 /s   | 9,300 /s       | 1.3x   |
-| Server streaming, 100 messages of 1 KB | 4,160 /s    | 1,130 /s       | 3.7x   |
+On one core (Dox: one isolate):
+
+| Test                                   | `dox_grpc` | `package:grpc` | grpc-go  |
+| -------------------------------------- | ---------- | -------------- | -------- |
+| Unary, small message                   | 48,700 /s  | 35,300 /s      | 44,000 /s |
+| Unary, 100 KB answer                   | 14,600 /s  | 11,400 /s      | 17,200 /s |
+| Server streaming, 100 messages of 1 KB | 4,390 /s   | 2,010 /s       | 6,240 /s |
+
+On four cores (Dox: four isolates):
+
+| Test                                   | `dox_grpc` | grpc-go   |
+| -------------------------------------- | ---------- | --------- |
+| Unary, small message                   | 56,500 /s  | 56,800 /s |
+| Unary, 100 KB answer                   | 19,300 /s  | 21,000 /s |
+| Server streaming, 100 messages of 1 KB | 7,550 /s   | 7,650 /s  |
 
 How it was run:
 
-- The service is the gRPC interop `TestService`. Both servers were AOT-compiled (`dart build cli`).
-- Each server ran in one isolate. More isolates give more calls a second.
-- The client was [ghz](https://ghz.sh), with 50 calls in flight for unary and 8 for streaming.
-- Each number is the median of 3 runs.
-- The machine was one 8-core laptop, with the client and the server on it.
+- The service is the gRPC interop `TestService`. The Dart servers were AOT-compiled (`dart build cli`). `package:grpc` has one isolate.
+- Linux containers on one 8-core machine. The server had 4 cores and the client ([ghz](https://ghz.sh)) had the other 4. A one-core run limits the server: one isolate, or `GOMAXPROCS=1` for Go.
+- 16 connections, with 128 calls in flight for small calls and 32 for the others.
+- Each number is the median of 3 runs of 10 seconds, after 3 seconds of warm up.
+
+On four cores, small calls reach about 57,000 a second for both servers. That is near the limit of the client on 4 cores, so the real limit of both may be higher.
 
 ## Deployment
 

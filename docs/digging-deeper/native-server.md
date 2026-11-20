@@ -71,31 +71,7 @@ You must build with `dox build` or `dart build cli`, because `dart compile exe` 
 
 ## HTTP/2
 
-Turn it on when your proxy talks HTTP/2 to the app. gRPC needs it, because gRPC only runs over HTTP/2. It is off by default, so nothing changes until you ask for it.
-
-```dart
-AppConfig(
-  http2: true,
-);
-```
-
-- It is h2c only: HTTP/2 over plain TCP. There is no TLS in Dox. TLS stays at your proxy.
-- HTTP/1.1 and HTTP/2 share one port. The server looks at the first bytes of each connection and picks the right one. Old clients and health checks keep working.
-- Routes, middleware and controllers do not change. `req.protocolVersion` is `2.0` for an HTTP/2 request, and `1.0` or `1.1` for the others.
-- A browser does not speak h2c. It talks HTTP/2 to your proxy, and the proxy talks to Dox. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
-
-### maxConcurrentStreams
-
-It stops one client from opening too many requests on one connection. The default is `250`. Keep it unless you have a reason:
-
-```dart
-AppConfig(
-  http2: true,
-  maxConcurrentStreams: 100,
-);
-```
-
-Without Dox, pass the same two arguments to `NativeHttpServer.bind`.
+The native server also speaks HTTP/2 (h2c) on the same port, when you turn it on with `http2: true`. See [HTTP/2](http2.md).
 
 ## WebSocket
 
