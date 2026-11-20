@@ -317,6 +317,37 @@ You can also host it yourself with the Dockerfile in the server package ([hostin
 `dox build` makes a native binary, and you run it on a VPS or in Docker.
 The docs have guides for [Docker](/latest/guides/docker/), [a VPS](/latest/guides/deploy-vps/), [Fly.io](/latest/guides/deploy-fly/) and [Cloud Run](/latest/guides/deploy-cloud-run/).
 
+## Speed
+
+We did not run this benchmark.
+The numbers come from the public [Web Frameworks Benchmark](https://web-frameworks-benchmark.vercel.app/) by [the-benchmarker](https://github.com/the-benchmarker/web-frameworks).
+
+Serverpod itself is not in that benchmark.
+[Relic](https://pub.dev/packages/relic) is in it.
+Relic is the HTTP server from the Serverpod team, and Serverpod's [web server](https://docs.serverpod.dev/concepts/web-server/overview) is built on it.
+So this compares the HTTP layer of the two projects.
+It does not measure Serverpod endpoint calls or a database.
+
+| Connections | Dox (requests per second) | Relic (requests per second) |
+| --- | --- | --- |
+| 64 | 157,805 | 45,785 |
+| 256 | 189,869 | 45,034 |
+| 512 | 189,851 | 44,291 |
+
+At 64 connections, half of the Dox requests took 0.11 ms or less.
+For Relic, it was 0.86 ms.
+
+How they measured it:
+
+- Three small routes: `GET /`, `GET /user/:id` and `POST /user`.
+- One machine with an AMD Ryzen 7 5700U. The server and the load tool run on it, with the same limits for every framework.
+- Both apps are AOT builds, and both start one isolate per CPU that Dart reports.
+- Versions: `dox_core` 3.2 and `relic` 2.0. Results from 2026-11-18. See [the raw data](https://github.com/the-benchmarker/web-frameworks/blob/32b8757714a4ceac24cf0eafb5edd99f0522224c/data.min.json) and the code of [the Dox app](https://github.com/the-benchmarker/web-frameworks/tree/master/dart/dox) and [the Relic app](https://github.com/the-benchmarker/web-frameworks/tree/master/dart/relic).
+
+Small routes show the cost of the framework itself.
+In a real app, the database and your own code often take most of the time.
+For how Dox gets these numbers, see [What makes Dox fast](what-makes-dox-fast.md).
+
 ## When to pick Serverpod
 
 - Your only client is a Flutter app, and you want the client made for you.
@@ -330,6 +361,7 @@ The docs have guides for [Docker](/latest/guides/docker/), [a VPS](/latest/guide
 - You want an OpenAPI document made from your code.
 - You use MySQL or MariaDB.
 - You want a job queue with a worker, a scheduler and mail in one framework.
+- You want a fast HTTP layer. See [Speed](#speed).
 - The license matters to you. Dox uses the MIT license.
 
 ### When not to pick Dox
