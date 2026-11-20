@@ -31,6 +31,8 @@ class ApiRouter extends Router {
 
 Dox finds every `Router` class by itself after `dart run build_runner build`. If you want to pick the order of routers, list them in `routers:` of `AppConfig`. See [Dependency injection: routers and providers](dependency-injection.md#routers-and-providers).
 
+Some routes need an exact path, like gRPC routes (`/pkg.Service/Method`). Register them in a router with no prefix. A router without a `prefix` getter has none.
+
 To see every route of your app, run `dox route:list`. It does not start the server. See [`dox route:list`](../reference/cli.md#dox-routelist).
 
 ## Defining routes
@@ -407,6 +409,21 @@ The handler decides the status. So return a `404` status for a "not found" page,
 
 Add the fallback in a `Router`, so the global middleware (like security headers) runs for it. The built-in `404` and `405` answers do not run the global middleware.
 
+### Fallback for other methods
+
+Some packages answer unknown paths in their own format. For example, a gRPC client wants a gRPC error, not a JSON `404`. Give `when:` a check. Then the fallback is tried for every method, and it answers only when the check gives `true`:
+
+```dart
+bool isGrpc(HttpRequest req) {
+  String type = req.headers.value('content-type') ?? '';
+  return req.method == 'POST' && type.startsWith('application/grpc');
+}
+
+Route.fallback(grpcNotFound, when: isGrpc);
+```
+
+Other requests still get the plain fallback, or `404` and `405`. So a `when:` fallback can not take the answers of normal routes.
+
 ## Serve storage files
 
 `Storage.route(path)` from the [`dox_storage`](../packages/storage.md) package serves the files of a storage disk at `GET <path>/{key*}`. By default only signed URLs work, and other requests get `403`:
@@ -504,7 +521,7 @@ This section is for special cases. Most apps do not need it.
 
 ### Fallback route
 
-- Other methods still get the normal `404` or `405`. A `GET` to a path that only has a `POST` route gets the fallback, if one covers that path. If none does, the client gets `405`.
+- Without `when:`, other methods still get the normal `404` or `405`. A `GET` to a path that only has a `POST` route gets the fallback, if one covers that path. If none does, the client gets `405`.
 - Add the fallback before `startServer()`. A fallback added later only works in the isolate that added it.
 - It follows `Route.group`, the router prefix and `Route.domain`. In a group, it only answers paths under the group prefix. A prefix can have params, like `{tenant}`. When two fallbacks match, the one with the longest prefix wins.
 - The built-in `404` and `405` skip the global middleware because, for example, `CsrfMiddleware` would answer `419` to a `POST` to an unknown path, and `SessionMiddleware` would start a session for every bad link.

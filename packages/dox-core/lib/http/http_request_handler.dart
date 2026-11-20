@@ -390,7 +390,7 @@ DoxRequest _doxRequest(
   RequestBody body,
   ContentType? contentType,
 ) {
-  return DoxRequest(
+  DoxRequest doxReq = DoxRequest(
     route: route,
     uri: req.uri,
     requestBody: body,
@@ -401,4 +401,6 @@ DoxRequest _doxRequest(
     // the client ip needs a socket call, so it is read on first use only
     readClient: true,
   );
+  if (route.errorRenderer != null) keepForErrorRenderer(req, doxReq);
+  return doxReq;
 }

@@ -114,6 +114,28 @@ AppConfig appConfig = AppConfig(
 
 See [Custom errors](../guides/custom-errors.md) for a full example with your own exception classes.
 
+## Errors of one route
+
+Some routes answer in their own format, like gRPC. A JSON error makes no sense to their clients. `.renderErrorsWith` gives the errors of one route to your own function. It covers the errors of the middleware too:
+
+```dart
+Route.post('/rpc', (RpcController c) => c.call).renderErrorsWith(
+  (Object error, DoxRequest req) {
+    return response(<String, String>{'error': 'failed'}).statusCode(500);
+  },
+);
+```
+
+The error is still reported. Return `null` to get the normal answer from your `ExceptionHandler`.
+
+## Show error text only in development
+
+Your code may send an error answer itself. Then use `showErrors()` to decide if the client may see the error text. It is `true` when `APP_ENV` is `development` or `local`, the same rule as the Dox error answers:
+
+```dart
+String message = showErrors() ? '$error' : 'Server Error';
+```
+
 ## Details
 
 - A request wants JSON (`DoxRequest.expectsJson()`) when it has an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request does not want JSON, so it gets the HTML page.

@@ -64,9 +64,8 @@ RouteMatch? httpRouteHandler(HttpRequest req, {String? method}) {
 /// when the path has routes for other methods, it is 405.
 /// [method] is the `_method` override, when there is one.
 void _notFound(HttpRequest req, String? host, String? method) {
-  if (Route().fallbacks.isNotEmpty &&
-      (req.method == 'GET' || req.method == 'HEAD')) {
-    RouteMatch? fallback = _fallbackFor(req.uri.path, host);
+  if (Route().fallbacks.isNotEmpty) {
+    RouteMatch? fallback = _fallbackFor(req, host);
     if (fallback != null) {
       runRoute(req, fallback);
       return;
@@ -88,11 +87,13 @@ void _notFound(HttpRequest req, String? host, String? method) {
   );
 }
 
-/// the [Route.fallback] for [path]: the one with the longest prefix
-/// that [path] is under, and whose domain matches. null when none.
-/// a prefix with a param, like `/{tenant}`, gives its params.
-RouteMatch? _fallbackFor(String path, String? host) {
-  path = sanitizeRoutePath(path);
+/// the [Route.fallback] for [req]: the one with the longest prefix that
+/// its path is under, and whose domain matches. A plain fallback takes
+/// GET and HEAD only, one with `when` takes what `when` allows. null when
+/// none. a prefix with a param, like `/{tenant}`, gives its params.
+RouteMatch? _fallbackFor(HttpRequest req, String? host) {
+  String path = sanitizeRoutePath(req.uri.path);
+  bool getOrHead = req.method == 'GET' || req.method == 'HEAD';
   String? hostLower = host?.toLowerCase();
   String? hostName = hostLower == null ? null : _withoutPort(hostLower);
   RouteMatch? best;
@@ -101,6 +102,8 @@ RouteMatch? _fallbackFor(String path, String? host) {
     String? domain = route.domainLower;
     if (domain != null && domain != hostLower && domain != hostName) continue;
     if (best != null && want.length <= best.route.path.length) continue;
+    FallbackCondition? when = route.fallbackWhen;
+    if (when == null ? !getOrHead : !when(req)) continue;
     RegExp? pattern = route.pattern;
     if (pattern == null) {
       bool under =

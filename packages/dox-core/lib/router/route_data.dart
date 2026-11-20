@@ -22,6 +22,13 @@ class RouteData {
   /// true for a route added with `Route.websocket`
   bool isWebSocket = false;
 
+  /// renders the errors of this route, see `Route.renderErrorsWith`
+  RouteErrorRenderer? errorRenderer;
+
+  /// for a `Route.fallback` with `when`: runs for any method when it
+  /// gives true. null: GET and HEAD only.
+  FallbackCondition? fallbackWhen;
+
   /// [domain] in lower case, made once.
   late final String? domainLower = domain?.toLowerCase();
   final bool? corsEnabled;

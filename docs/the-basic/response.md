@@ -234,6 +234,21 @@ Dox encrypts the cookie value with `APP_KEY`, and decrypts it when you read it. 
 
 To read a cookie, see [Request: cookies](request.md#cookies).
 
+## Send the response yourself
+
+Some handlers write the raw response, for example a stream with trailers. Call `req.takeOverResponse()` first. Then Dox sends nothing more for the request: not the value you return, not a change of a middleware after `next` (like `ETag`), and not the `responseHandler`:
+
+```dart
+Future<void> handle(DoxRequest req) async {
+  req.takeOverResponse();
+  HttpResponse res = req.httpRequest.response;
+  res.write('done');
+  await res.close();
+}
+```
+
+Your code must end the response. An error after this call is still reported, but Dox does not send an error answer.
+
 ## Change every response
 
 Sometimes you want to change every response in one place, for example to add a header. Set a `responseHandler` in `AppConfig` for this:

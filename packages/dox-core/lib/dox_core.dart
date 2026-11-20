@@ -54,6 +54,8 @@ export 'exception/validation_exception.dart';
 
 /// Request
 export 'http/after_response.dart';
+// the rule for sending error text to the client (APP_ENV development/local)
+export 'http/http_response_handler.dart' show showErrors;
 export 'http/request/dox_request.dart';
 // the body of a request (`req.requestBody`): its kind tells invalid JSON
 // from no body at all.
