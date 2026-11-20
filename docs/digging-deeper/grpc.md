@@ -108,7 +108,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_grpc/dox_grpc.dart';
 
 import '../app/grpc/greeter_service.dart'; // your GreeterService
-import '../app/http/middleware/auth_middleware.dart'; // your AuthMiddleware
+import '../app/http/middleware/auth.middleware.dart'; // dox make:middleware auth
 
 class GrpcRouter extends Router {
   @override
