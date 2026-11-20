@@ -520,11 +520,21 @@ The next Inertia page tells the browser to clear its history, once. The mark is 
 
 By default, the first visit gets an empty page, and the browser renders it. With SSR, the first visit gets the full HTML of the page. Search engines can read it, and the visitor sees the page sooner.
 
-The page is rendered by the Inertia SSR server. It is a Node process that you build with Vite and run next to your Dox app. On a first visit, Dox sends the page to it and puts the answer in the root view. Inertia requests (links and forms) never use it.
+The page is rendered by the Inertia SSR server. It is a JavaScript process (Bun or Node) that you build with Vite and run next to your Dox app. On a first visit, Dox sends the page to it and puts the answer in the root view. Inertia requests (links and forms) never use it.
 
 ### 1. The SSR entry file
 
-Write an entry file for the SSR server:
+`dox inertia:install --ssr` writes this file for you, and adds a `build:ssr` script to `package.json`. It never overwrites a file. With no `package.json` (or one it cannot change safely), it prints a hint instead.
+
+```json title="package.json"
+{
+  "scripts": {
+    "build:ssr": "vite build && vite build --ssr resources/js/ssr.jsx --outDir bootstrap/ssr"
+  }
+}
+```
+
+Without `--ssr`, add the `build:ssr` line to `scripts` yourself, and write the entry file like this:
 
 ```jsx title="resources/js/ssr.jsx"
 import { createInertiaApp } from '@inertiajs/react'
@@ -577,17 +587,20 @@ The `else` part is for a page that was sent without SSR.
 
 ### 3. Build and run
 
-Build the browser files, then the SSR file. Then start the SSR server with Node:
+Build the browser files and the SSR file, then start the SSR server:
 
 ```bash
-vite build
-vite build --ssr resources/js/ssr.jsx --outDir bootstrap/ssr
-node bootstrap/ssr/ssr.js
+bun run build:ssr
+dox inertia:start-ssr
 ```
+
+`dox inertia:start-ssr` runs `bootstrap/ssr/ssr.js` (or `ssr.mjs`) with Bun, in the foreground. When both files exist, it starts the newer one and prints which. It stops with an error when the file is not built yet. A stop signal (Ctrl+C, `docker stop`) is sent on to the SSR process.
+
+With Node, use `npm run build:ssr` and `dox inertia:start-ssr --node`.
 
 The file is `ssr.js` when your `package.json` has `"type": "module"`. Else it is `ssr.mjs`. The SSR file loads your packages from `node_modules`, so keep that folder on the server.
 
-Keep the Node process running with your process manager, like the Dox app. Build and start it again on each deploy.
+The command does not run in the background. Run it under Docker, pm2 or systemd, like the Dox app. Build and start it again on each deploy.
 
 ### 4. Turn it on
 
@@ -630,7 +643,6 @@ If the SSR server is down, is too slow, or gives a bad answer, the visitor gets 
 - The Inertia 1 and 2 clients. They read the page from `<div id="app" data-page="...">`. Use the Inertia 3 client.
 - Once props, scroll props (infinite scroll), `prependProps`, `deepMergeProps` and `matchPropsOn`.
 - Partial reloads of nested props with dots, like `only: ['auth.user']`. Ask for the top level prop (`auth`).
-- Starting the SSR server from Dox. You run the Node process yourself.
 
 Inertia needs [sessions](session.md) for the errors, flash data and redirects. The client sends the CSRF token by itself, see [CSRF](../security/csrf.md#axios-and-inertia).
 
