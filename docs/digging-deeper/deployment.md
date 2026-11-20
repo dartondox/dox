@@ -269,7 +269,7 @@ server {
   }
 
   # gRPC service paths only
-  location /helloworld.Greeter/ {
+  location /greeter.Greeter/ {
     grpc_pass grpc://127.0.0.1:3000;
   }
 }

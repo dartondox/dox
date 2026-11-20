@@ -51,7 +51,7 @@ A `.proto` file lists the calls of a service and the messages they use. Put it i
 ```proto title="protos/greeter.proto"
 syntax = "proto3";
 
-package helloworld;
+package greeter;
 
 service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply);
@@ -108,7 +108,7 @@ class GreeterService extends GreeterServiceBase {
 
 Call `Grpc.register` in a router that has no prefix:
 
-```dart title="lib/routes/grpc_router.dart"
+```dart title="lib/routes/grpc.dart"
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_grpc/dox_grpc.dart';
 
@@ -122,13 +122,13 @@ class GrpcRouter extends Router {
 }
 ```
 
-The router must have no prefix, because a gRPC client always calls the path `/<package.Service>/<Method>`, like `/helloworld.Greeter/SayHello`. A prefix would change the path, and no client could reach the service. So do not use the `api` router, a `Route.group` or a `Route.prefix`. If the path did change, Dox throws a `StateError` when the app starts.
+The router must have no prefix, because a gRPC client always calls the path `/<package.Service>/<Method>`, like `/greeter.Greeter/SayHello`. A prefix would change the path, and no client could reach the service. So do not use the `api` router, a `Route.group` or a `Route.prefix`. If the path did change, Dox throws a `StateError` when the app starts.
 
 You can now call the service, for example with [grpcurl](https://github.com/fullstorydev/grpcurl):
 
 ```bash
 grpcurl -plaintext -import-path protos -proto greeter.proto \
-  -d '{"name": "Ann"}' localhost:3000 helloworld.Greeter/SayHello
+  -d '{"name": "Ann"}' localhost:3000 greeter.Greeter/SayHello
 ```
 
 ## Call types
@@ -247,7 +247,7 @@ Stream<HelloReply> sayHelloMany(ServiceCall call, HelloRequest request) async* {
 
 Most services need to know who is calling. The middleware of the router runs before each call, so add your auth middleware there:
 
-```dart title="lib/routes/grpc_router.dart"
+```dart title="lib/routes/grpc.dart"
 import '../app/http/middleware/auth.middleware.dart'; // dox make:middleware auth
 
 class GrpcRouter extends Router {
@@ -339,7 +339,7 @@ It is off by default. The time also runs while your own method works and sends n
 
 Load balancers and Kubernetes ask a server if it is healthy before they send it calls. `HealthService` answers them. It is the standard `grpc.health.v1.Health` service, with `Check` and `Watch`.
 
-A load balancer has no token. So register the health service in its own router, with no auth middleware:
+`dox add grpc` already registers it in `lib/routes/grpc.dart`. A load balancer has no token, so keep the health service out of any auth middleware. If your services need auth, register the health service in its own router:
 
 ```dart title="lib/routes/grpc_health_router.dart"
 import 'package:dox_core/dox_core.dart';
@@ -363,7 +363,7 @@ The whole server has the empty name `''`, and it starts as `SERVING`. To report 
 HealthService health = HealthService();
 Grpc.register(health);
 
-health.setStatus('helloworld.Greeter', ServingStatus.SERVING);
+health.setStatus('greeter.Greeter', ServingStatus.SERVING);
 ```
 
 Call `setStatus` again with `ServingStatus.NOT_SERVING` when the service can not work, for example when its database is down. The change reaches all isolates.
