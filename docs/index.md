@@ -222,5 +222,5 @@ at a time.
 ## Get help
 
 - Found a bug or have a question? Open an [issue on GitHub](https://github.com/dartondox/dox/issues).
-- Using an AI assistant? Give it [llms-full.txt](https://dartondox.dev/llms-full.txt): all of these docs as one plain text file. [llms.txt](https://dartondox.dev/llms.txt) is the page list.
+- Using an AI assistant? Install the package skills, or give it [llms-full.txt](https://dartondox.dev/llms-full.txt): all of these docs as one plain text file. See [AI agents](getting-started/ai-agents.md).
 - Want to help? Read [Contribute](community/contribute.md).

@@ -114,17 +114,7 @@ dox build_runner:build   # runs once
 
 ## AI agents
 
-If you use an AI coding agent, it should know the real API of each package. The Dox packages ship skills for this. Install them in your app, after `dart pub get`:
-
-```bash
-dart run skills@ get
-```
-
-It finds the skills of your dependencies and installs them for your agent. It works with Claude Code, Codex, Cursor, GitHub Copilot and others. Run it again after you add a package or update one.
-
-It only reads the packages listed in your own `pubspec.yaml`. To get the skill of a package that comes in through another one (like `ioredis`), add it to `pubspec.yaml`. See [skills](https://pub.dev/packages/skills) for the options.
-
-The starter project also has an `AGENTS.md` file with the rules of the project.
+If you use an AI coding agent, give it the real API of each package. Run `dart run skills@ get` in your app after `dart pub get`. See [AI agents](ai-agents.md) for the skills, `AGENTS.md` and the llms files.
 
 ## Packages
 
