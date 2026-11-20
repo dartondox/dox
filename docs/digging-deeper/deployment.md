@@ -239,6 +239,46 @@ server {
 }
 ```
 
+### HTTP/2 and gRPC
+
+Dox can speak HTTP/2 to your proxy. This is needed for gRPC. It is opt-in: set `http2: true` in `AppConfig` (see [Native server: HTTP/2](native-server.md#http2)). Dox speaks h2c only, which is HTTP/2 without TLS. The proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port, so the same upstream address works for both.
+
+With Caddy, `h2c://` tells it to use HTTP/2 without TLS to the app:
+
+```
+example.com {
+  reverse_proxy h2c://127.0.0.1:3000
+}
+```
+
+With nginx, gRPC calls need `grpc_pass`, and normal routes need `proxy_pass`. Use a separate location for each. The `grpc://` scheme is used because the app has no TLS:
+
+```nginx
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name example.com;
+
+  ssl_certificate     /etc/letsencrypt/live/example.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+
+  # Normal routes: HTTP/1.1 to the app
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+  }
+
+  # gRPC service paths only
+  location /helloworld.Greeter/ {
+    grpc_pass grpc://127.0.0.1:3000;
+  }
+}
+```
+
+nginx can not send normal `proxy_pass` requests to an upstream over HTTP/2. It always uses HTTP/1.1 there, and that works fine because Dox accepts it on the same port. Use `grpc_pass` only for gRPC routes, and keep `proxy_pass` for the rest.
+
+nginx `grpc_read_timeout` and `grpc_send_timeout` are 60 seconds by default. A long stream is cut when it is quiet for that long, so raise them for long streams.
+
 ### Pass the real `Host` header
 
 The proxy must pass the real `Host` header to Dox, like `proxy_set_header Host $host;` above. Some checks compare the request with this header:

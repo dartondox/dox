@@ -113,6 +113,17 @@ class AppConfig {
   /// only. Default null: no limit.
   final int? maxConnections;
 
+  /// Let the same port also speak HTTP/2 over plain TCP (h2c, no TLS).
+  /// HTTP/1.1 clients keep working on that port. Use it behind a proxy
+  /// that speaks h2c to the app (Caddy, nginx), eg. for gRPC. TLS stays
+  /// at the proxy. Native server only. Default false.
+  final bool http2;
+
+  /// The most open requests one HTTP/2 connection can have. Must be 1 or
+  /// more. 0 or less throws an `ArgumentError` when the server starts.
+  /// Only used when [http2] is true. Native server only. Default 250.
+  final int maxConcurrentStreams;
+
   /// IPs or CIDR ranges of reverse proxies (nginx, Caddy, load balancer)
   /// that Dox trusts. Only when the direct client is in this list does Dox
   /// read `X-Forwarded-For` for `req.ip()` and `X-Forwarded-Proto` for
@@ -214,6 +225,8 @@ class AppConfig {
     this.bodyTimeout = const Duration(seconds: 120),
     this.idleTimeout = const Duration(seconds: 30),
     this.maxConnections,
+    this.http2 = false,
+    this.maxConcurrentStreams = 250,
     this.trustedProxies = const <String>[],
     this.compress = false,
     this.shutdownTimeout = const Duration(seconds: 8),

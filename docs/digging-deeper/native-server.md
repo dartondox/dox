@@ -69,6 +69,34 @@ Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 
 You must build with `dox build` or `dart build cli`, because `dart compile exe` does not run build hooks, so it has no library. See [Deployment](deployment.md).
 
+## HTTP/2
+
+Turn it on when your proxy talks HTTP/2 to the app. gRPC needs it, because gRPC only runs over HTTP/2. It is off by default, so nothing changes until you ask for it.
+
+```dart
+AppConfig(
+  http2: true,
+);
+```
+
+- It is h2c only: HTTP/2 over plain TCP. There is no TLS in Dox. TLS stays at your proxy.
+- HTTP/1.1 and HTTP/2 share one port. The server looks at the first bytes of each connection and picks the right one. Old clients and health checks keep working.
+- Routes, middleware and controllers do not change. `req.protocolVersion` is `2.0` for an HTTP/2 request, and `1.0` or `1.1` for the others.
+- A browser does not speak h2c. It talks HTTP/2 to your proxy, and the proxy talks to Dox. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
+
+### maxConcurrentStreams
+
+It stops one client from opening too many requests on one connection. The default is `250`. Keep it unless you have a reason:
+
+```dart
+AppConfig(
+  http2: true,
+  maxConcurrentStreams: 100,
+);
+```
+
+Without Dox, pass the same two arguments to `NativeHttpServer.bind`.
+
 ## WebSocket
 
 Rust also does the WebSocket upgrade and the WebSocket protocol. Your route, middleware and the `Origin` check run first, like for any request. If they give a normal answer (like `403`), the upgrade is refused.

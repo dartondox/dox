@@ -1,5 +1,6 @@
 ## Unreleased
 
+- New: `AppConfig.http2` (off by default) lets the same port also speak HTTP/2 over plain TCP (h2c), and `AppConfig.maxConcurrentStreams` (default 250) sets the open requests of one connection. HTTP/1.1 keeps working on the port. Add `req.protocolVersion` (`1.0`, `1.1` or `2.0`). This needs a dox_http_native with HTTP/2.
 - Fix: a `:` in a route path, like `/books:search`, is a literal char in Dox. The OpenAPI docs read it as a param and showed `/books{search}`. Now the path is shown as it is: `/books:search`.
 - Change: the OpenAPI spec no longer lists the middleware class names of a route (`x-dox-middleware`). The names were internal details. Security and error answers still come from the middleware, as before.
 

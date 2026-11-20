@@ -203,6 +203,15 @@ class DoxRequest implements IDoxRequest {
     return clientIp ?? UNKNOWN;
   }
 
+  /// The HTTP version of the request: `1.0`, `1.1` or `2.0`. It is `2.0`
+  /// only when `AppConfig.http2` is on and the client used HTTP/2.
+  /// ```
+  /// req.protocolVersion;
+  /// ```
+  String get protocolVersion {
+    return httpRequest.protocolVersion;
+  }
+
   /// `http` or `https`. Behind a proxy listed in `trustedProxies` this
   /// comes from `X-Forwarded-Proto`. Dart itself only serves plain http.
   /// ```
