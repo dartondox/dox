@@ -165,6 +165,12 @@ mutation {
 
 A client can set only the fields of the DTO. So it can never set another column, like `userId`.
 
+To set `userId` to the logged-in user, add `owner:`. Create then needs a login.
+
+```dart
+@GraphQLType(dto: CreatePostDto, owner: 'userId')
+```
+
 The rules of the DTO run before the post is saved. When the input is wrong, nothing is saved. The client gets the error `VALIDATION_FAILED`, with the message of each field in `extensions.fields`.
 
 ### Update and delete
