@@ -164,7 +164,7 @@ Stream<HelloReply> sayHelloMany(ServiceCall call, HelloRequest request) async* {
 }
 ```
 
-The `call.isCanceled` check stops the work when the client cancels the call. See [Deadlines and cancelled calls](#deadlines-and-cancelled-calls).
+The `call.isCanceled` check stops the work when the client cancels the call or disconnects. See [Deadlines and cancelled calls](#deadlines-and-cancelled-calls).
 
 ### Client streaming
 
@@ -361,7 +361,7 @@ The health service must be the first `Grpc.register` call of the app. In the app
 
 ### Set the status of a service
 
-The full server has the empty name `''`. Its status at start is `SERVING`. To give the status of one service by its name, keep the `HealthService` object and call `setStatus`:
+The whole server has the empty name `''`. Its status at start is `SERVING`. To set the status of one service by its name, keep the `HealthService` object and call `setStatus`:
 
 ```dart
 HealthService health = HealthService();
@@ -376,7 +376,7 @@ When the service cannot work, call `setStatus` again with `ServingStatus.NOT_SER
 
 Dox runs your app in many [isolates](isolate.md). Each isolate gets its own copy of your service. You cannot copy a database connection, a socket, or a `ReceivePort` to a different isolate. Thus, do not create these objects when you register the service.
 
-Create them on the first call. Then the isolate that uses them also creates them:
+Create them on the first call, inside the isolate that uses them:
 
 ```dart
 class GreeterService extends GreeterServiceBase {
