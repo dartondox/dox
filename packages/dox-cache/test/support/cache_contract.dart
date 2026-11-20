@@ -353,6 +353,20 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
       });
     });
 
+    test('a user key can not hit a flexible created key', () async {
+      const Duration fresh = Duration(minutes: 1);
+      expect(await cache.flexible<int>('x', fresh, null, () => 1), 1);
+      await cache.put('flexible:created:x', 'mine');
+      expect(await cache.get('flexible:created:x'), 'mine');
+      int calls = 0;
+      int value = await cache.flexible<int>('x', fresh, null, () {
+        calls++;
+        return 2;
+      });
+      expect(value, 1);
+      expect(calls, 0);
+    });
+
     test('a tag name like a namespace hash can not hit tagged items', () async {
       TaggedCache tagged = cache.tags(<String>['t']);
       await tagged.put('k', 1);
@@ -372,6 +386,21 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
         expect(await cache.get('lock:report'), 'x');
         expect(await cache.lock('report').get(), isFalse);
         expect(await lock.release(), isTrue);
+      });
+
+      test('a user lock can not take a flexible lock', () async {
+        // fresh is zero, so the next call refreshes in the background
+        await cache.flexible<int>('x', Duration.zero, null, () => 1);
+        expect(await cache.lock('flexible:x').get(), isTrue);
+        int calls = 0;
+        await cache.flexible<int>('x', Duration.zero, null, () {
+          calls++;
+          return 2;
+        });
+        for (int i = 0; i < 40 && calls == 0; i++) {
+          await Future<void>.delayed(const Duration(milliseconds: 25));
+        }
+        expect(calls, 1);
       });
 
       test('a user lock can not take a remember lock', () async {
