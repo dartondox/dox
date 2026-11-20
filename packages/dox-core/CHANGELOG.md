@@ -1,3 +1,8 @@
+## Unreleased
+
+- Fix: a `:` in a route path, like `/books:search`, is a literal char in Dox. The OpenAPI docs read it as a param and showed `/books{search}`. Now the path is shown as it is: `/books:search`.
+- Change: the OpenAPI spec no longer lists the middleware class names of a route (`x-dox-middleware`). The names were internal details. Security and error answers still come from the middleware, as before.
+
 ## 3.2.3
 
 - Fix: the default `totalIsolate` was `Platform.numberOfProcessors`. In a Linux container with `--cpuset-cpus` or a CPU quota (`--cpus`, Kubernetes limits), Dart still reports all CPUs of the host. Dox then started too many isolates, and the OS paused them, so some requests waited longer. Now the default is `Processors.available`. It uses the CPUs the container allows (cpuset and CPU quota, cgroup v1 and v2). Outside Linux it is still `Platform.numberOfProcessors`.

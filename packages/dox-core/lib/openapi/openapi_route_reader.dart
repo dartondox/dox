@@ -77,7 +77,8 @@ class OpenApiRouteReader {
     OpenApiOperation? op = handler == null ? null : _find(route, handler);
     if (op != null && op.ignore) return null;
     String method = PathConverter.method(route.method);
-    String path = PathConverter.path(route.path);
+    // a `:` in a Dox route path is a literal char, not a param
+    String path = PathConverter.path(route.path, colonParams: false);
     List<String> middleware = _adapter.middlewareNames(
       route.controllers,
       preMiddleware: route.preMiddleware,
@@ -94,6 +95,7 @@ class OpenApiRouteReader {
       // the raw path: RouteDoc converts it itself, and needs the `?` of an
       // optional param like `{name?}` to also add the path without it
       path: route.path,
+      colonParams: false,
       summary: op?.summary ?? '${method.toUpperCase()} $path',
       description: op?.description,
       operationId: _operationId(op, method, path),
@@ -112,9 +114,6 @@ class OpenApiRouteReader {
           ? const <int, ResponseDoc>{404: ResponseDoc(description: 'Not found')}
           : const <int, ResponseDoc>{},
       security: security,
-      extensions: middleware.isEmpty
-          ? const <String, dynamic>{}
-          : <String, dynamic>{'x-dox-middleware': middleware},
     );
   }
 

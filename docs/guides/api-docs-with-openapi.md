@@ -115,8 +115,7 @@ This is `POST /api/posts`. You wrote no docs code for it:
     },
     "500": {"description": "Server error"}
   },
-  "security": [{"bearerAuth": []}],
-  "x-dox-middleware": ["LogMiddleware", "AuthMiddleware"]
+  "security": [{"bearerAuth": []}]
 }
 ```
 
@@ -130,7 +129,6 @@ Where each part comes from:
 | `401` and `bearerAuth` | `AuthMiddleware` on the route |
 | `422` | the route has a request class |
 | `200` with no body | `store` returns `DoxResponse`, so the builder can not see the body. Step 6 fixes this |
-| `x-dox-middleware` | the middleware of the route: the global `LogMiddleware` and `AuthMiddleware` |
 
 Other routes get error answers in the same way. The `Can` middleware or a `req.authorize(...)` call gives `401` and `403`. The `GuestMiddleware` and `ValidateSignature` middleware give `403`. A `req.validateSchema(...)` call gives `422`.
 

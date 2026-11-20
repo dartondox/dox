@@ -66,6 +66,28 @@ class CacheConstants {
   /// Key part of the "created at" time that `flexible` stores.
   static const String flexibleCreatedPart = 'flexible:created:';
 
+  /// Mark put in front of a user key, lock name or tag name that starts
+  /// like an internal key. So `forget('lock:a')` can not free `lock('a')`.
+  static const String escapeMark = '#';
+
+  /// Starts of internal item keys. A user key that starts with one of
+  /// these, or with [escapeMark], gets [escapeMark] in front.
+  static const List<String> internalKeyStarts = <String>[
+    escapeMark,
+    lockKeyPart,
+    tagKeyPart,
+    flexibleCreatedPart,
+  ];
+
+  /// Starts of internal lock names. A user lock name that starts with one
+  /// of these, or with [escapeMark], gets [escapeMark] in front.
+  static const List<String> internalLockStarts = <String>[
+    escapeMark,
+    rememberLockPart,
+    flexibleLockPart,
+    fileAutoPruneLock,
+  ];
+
   /// Lock ttl and wait time of `remember(lock: true)` and `flexible`.
   /// A compute that runs longer lets a second caller start.
   static const Duration computeLockTtl = Duration(seconds: 10);

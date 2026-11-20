@@ -249,7 +249,8 @@ class CacheStore {
   /// An atomic lock. Supported by memory, file and redis drivers.
   /// Null [ttl] means the lock never expires by itself.
   CacheLock lock(String name, [Duration? ttl, String? owner]) {
-    return driver.lock(name, ttl, owner)..throwOnTimeout = flags.lockThrows;
+    String safeName = _escape(name, CacheConstants.internalLockStarts);
+    return driver.lock(safeName, ttl, owner)..throwOnTimeout = flags.lockThrows;
   }
 
   /// A view of this store where keys belong to [names].
@@ -261,13 +262,28 @@ class CacheStore {
   /// Key sent to the driver. Tagged caches change it.
   /// Plain stores return it right away, with no async step.
   FutureOr<String> itemKey(String key) {
-    return key;
+    return _escape(key, CacheConstants.internalKeyStarts);
   }
 
   /// Keys sent to the driver for many [keys]. Tagged caches read the
   /// tag versions once for all keys.
   FutureOr<List<String>> itemKeys(List<String> keys) {
-    return keys;
+    return <String>[
+      for (String key in keys) _escape(key, CacheConstants.internalKeyStarts),
+    ];
+  }
+
+  /// [value] with [CacheConstants.escapeMark] in front when it starts with
+  /// one of [starts]. [starts] holds the mark too, so two different values
+  /// never give the same result, and a result never starts like an
+  /// internal key.
+  static String _escape(String value, List<String> starts) {
+    for (String start in starts) {
+      if (value.startsWith(start)) {
+        return '${CacheConstants.escapeMark}$value';
+      }
+    }
+    return value;
   }
 
   Future<dynamic> _getOrDefault(
@@ -448,7 +464,14 @@ class TaggedCache extends CacheStore {
     return '${CacheConstants.tagKeyPart}$hash:';
   }
 
+  /// A tag name that looks like a namespace hash (`<sha1>:`) gets the
+  /// escape mark, so its version key can not hit a tagged item key.
   String _tagKey(String name) {
-    return '${CacheConstants.tagKeyPart}$name';
+    bool unsafe =
+        name.startsWith(CacheConstants.escapeMark) || _hashStart.hasMatch(name);
+    String safeName = unsafe ? '${CacheConstants.escapeMark}$name' : name;
+    return '${CacheConstants.tagKeyPart}$safeName';
   }
+
+  static final RegExp _hashStart = RegExp(r'^[0-9a-f]{40}:');
 }
