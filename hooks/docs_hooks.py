@@ -2,6 +2,7 @@
 
 - `llms.txt` and `llms-full.txt` are written next to the site: the docs as
   plain Markdown, for AI tools. See https://llmstxt.org.
+  Changelog pages are in `llms.txt` only, not in `llms-full.txt`.
 - Every page gets a meta description from its first paragraph.
 
 The blog (blog/mkdocs.yml) uses this file too. It gets only the meta
@@ -100,6 +101,9 @@ def on_post_build(config):
             continue
         link = base + page.url
         index.append(f"- [{page.title}]({link})")
+        # ponytail: changelogs are long history that wastes agent context
+        if page.file.src_uri.rsplit("/", 1)[-1] == "changelog.md":
+            continue
         full += ["", "---", "", f"# {page.title}", "", f"Source: {link}", "", markdown]
     (site / "llms.txt").write_text("\n".join(index) + "\n")
     (site / "llms-full.txt").write_text("\n".join(full) + "\n")
