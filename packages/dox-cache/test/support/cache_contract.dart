@@ -321,7 +321,68 @@ void runCacheContract(DriverHarness harness, {Object? skip}) {
       expect(await cache.tags(both).get('k'), isNull);
     });
 
+    test('a user key can not hit a tag version key', () async {
+      await cache.tags(<String>['dart']).put('k', 1);
+      await cache.put('tag:dart', <String, dynamic>{'a': 1});
+      expect(await cache.get('tag:dart'), <String, dynamic>{'a': 1});
+      expect(await cache.tags(<String>['dart']).get('k'), 1);
+      await cache.tags(<String>['dart']).flush();
+      expect(await cache.tags(<String>['dart']).get('k'), isNull);
+      expect(await cache.get('tag:dart'), <String, dynamic>{'a': 1});
+    });
+
+    test('user keys that start like internal keys stay apart', () async {
+      List<String> keys = <String>[
+        'lock:a',
+        '#lock:a',
+        '##lock:a',
+        'tag:a',
+        '#tag:a',
+        'flexible:created:a',
+        '#',
+        'a',
+      ];
+      for (String key in keys) {
+        await cache.put(key, key);
+      }
+      for (String key in keys) {
+        expect(await cache.get(key), key);
+      }
+      expect(await cache.many(keys), <String, dynamic>{
+        for (String key in keys) key: key,
+      });
+    });
+
+    test('a tag name like a namespace hash can not hit tagged items', () async {
+      TaggedCache tagged = cache.tags(<String>['t']);
+      await tagged.put('k', 1);
+      String space = await tagged.namespace();
+      String hashName = '${space.substring('tag:'.length)}k';
+      await cache.tags(<String>[hashName]).flush();
+      expect(await tagged.get('k'), 1);
+    });
+
     group('locks', () {
+      test('forget of a user key does not free a lock', () async {
+        CacheLock lock = cache.lock('report', const Duration(seconds: 5));
+        expect(await lock.get(), isTrue);
+        expect(await cache.forget('lock:report'), isFalse);
+        expect(await cache.lock('report').get(), isFalse);
+        await cache.put('lock:report', 'x');
+        expect(await cache.get('lock:report'), 'x');
+        expect(await cache.lock('report').get(), isFalse);
+        expect(await lock.release(), isTrue);
+      });
+
+      test('a user lock can not take a remember lock', () async {
+        expect(await cache.lock('remember:once').get(), isTrue);
+        // The remember lock is free, so this does not wait for its ttl.
+        int value = await cache
+            .remember<int>('once', ttl, () => 5, lock: true)
+            .timeout(const Duration(seconds: 2));
+        expect(value, 5);
+      });
+
       test('a lock can be released many times in a row', () async {
         for (int i = 0; i < 3; i++) {
           CacheLock lock = cache.lock('again', const Duration(seconds: 5));
