@@ -245,4 +245,4 @@ Dox is inspired by [Laravel](https://laravel.com).
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://github.com/dartondox/dox/blob/main/LICENSE).
