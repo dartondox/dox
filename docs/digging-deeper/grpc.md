@@ -352,15 +352,16 @@ class GreeterService extends GreeterServiceBase {
 
 | Test                                   | `dox_grpc`  | `package:grpc` | Faster |
 | -------------------------------------- | ----------- | -------------- | ------ |
-| Unary, small message                   | 50,600 /s   | 25,500 /s      | 2.0x   |
-| Unary, 100 KB answer                   | 13,000 /s   | 9,700 /s       | 1.3x   |
-| Server streaming, 100 messages of 1 KB | 2,750 /s    | 1,190 /s       | 2.3x   |
+| Unary, small message                   | 48,700 /s   | 26,200 /s      | 1.9x   |
+| Unary, 100 KB answer                   | 12,100 /s   | 9,300 /s       | 1.3x   |
+| Server streaming, 100 messages of 1 KB | 2,440 /s    | 1,120 /s       | 2.2x   |
 
 How it was run:
 
 - The service is the gRPC interop `TestService`. Both servers were AOT-compiled (`dart build cli`).
 - Each server ran in one isolate. More isolates give more calls a second.
-- The client was [ghz](https://ghz.sh), with 50 calls in flight for unary and 8 for streaming, for 6 seconds each.
+- The client was [ghz](https://ghz.sh), with 50 calls in flight for unary and 8 for streaming.
+- Each number is the median of 3 runs.
 - The machine was one 8-core laptop, with the client and the server on it.
 
 ## Deployment
