@@ -224,7 +224,7 @@ A public query does not open the relations inside it. When `trendingPosts` is pu
 
 Write `@GraphQLType(auth: true)` on a model that a guest must never see, like `User`. Then every field that gives a user needs a login, even inside a public query.
 
-`auth: true` needs `AuthMiddleware()` in the config. Without it, the app stops at start and names the field.
+`auth: true` needs `AuthMiddleware()` in the config. Without it, the app stops at start and names the type or field.
 
 ### Read the logged-in user
 
@@ -283,7 +283,7 @@ For each call, Dox loads the row and asks the policy. When the policy says no, n
 
 ## Configuration
 
-All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, like `path: '/api/graphql'`. Every setting has a default, so you only set the ones you want to change.
+All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, like `path: '/api/graphql'`. Every setting in the table has a default, so you only set the ones you want to change.
 
 | Setting | Default | What it does |
 |---|---|---|
