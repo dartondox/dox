@@ -40,8 +40,7 @@ curl localhost:3000/ping       # pong
 A route, a typed input and a database query:
 
 ```dart
-import 'package:dox_core/dox_core.dart';
-
+// lib/routes/api.dart
 class ApiRouter extends Router {
   @override
   String get prefix => 'api';
@@ -53,6 +52,9 @@ class ApiRouter extends Router {
   }
 }
 
+// lib/app/dtos/blog_filter/blog_filter.dto.dart
+part 'blog_filter.dto.g.dart';
+
 enum Status { active, draft }
 
 // build_runner makes the checks from the fields and their types.
@@ -63,6 +65,7 @@ class BlogFilter {
   static const DtoSchema<BlogFilter> schema = $BlogFilterDto;
 }
 
+// lib/app/http/controllers/blog.controller.dart
 class BlogController {
   // Dox reads the query, checks it and gives you a typed object.
   static Future<List<Blog>> index(BlogFilter query) async {
@@ -177,7 +180,7 @@ Dox take the security of our framework seriously. If you identify any security v
 
 ## Contributing
 
-We welcome contributions from the community! If you'd like to contribute to the Dox framework, please fork the repo and PR to us. Please visit [contribution guide](/docs/community/contribute.md) for more information.
+We welcome contributions from the community! If you'd like to contribute to the Dox framework, please fork the repo and PR to us. Please visit [contribution guide](https://dartondox.dev/community/contribute/) for more information.
 
 ## Credits
 
