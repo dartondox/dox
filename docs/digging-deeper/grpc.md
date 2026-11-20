@@ -348,13 +348,13 @@ class GreeterService extends GreeterServiceBase {
 
 ## Performance
 
-`dox_grpc` is about 2x faster than the plain `package:grpc` server. Both servers ran the same service, so the gap comes from the server. `dox_grpc` runs on the native HTTP/2 server, and `package:grpc` runs on `dart:io`.
+`dox_grpc` is about 2x faster than the plain `package:grpc` server on unary calls, and 3.7x faster on server streaming. Both servers ran the same service, so the gap comes from the server. `dox_grpc` runs on the native HTTP/2 server, and `package:grpc` runs on `dart:io`.
 
 | Test                                   | `dox_grpc`  | `package:grpc` | Faster |
 | -------------------------------------- | ----------- | -------------- | ------ |
-| Unary, small message                   | 48,700 /s   | 26,200 /s      | 1.9x   |
-| Unary, 100 KB answer                   | 12,100 /s   | 9,300 /s       | 1.3x   |
-| Server streaming, 100 messages of 1 KB | 2,440 /s    | 1,120 /s       | 2.2x   |
+| Unary, small message                   | 50,900 /s   | 25,000 /s      | 2.0x   |
+| Unary, 100 KB answer                   | 11,800 /s   | 9,300 /s       | 1.3x   |
+| Server streaming, 100 messages of 1 KB | 4,160 /s    | 1,130 /s       | 3.7x   |
 
 How it was run:
 
