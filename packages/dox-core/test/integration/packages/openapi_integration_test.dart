@@ -315,6 +315,7 @@ class DocsRouter extends Router {
     Route.get('/posts/{id}/full', PostController().show);
     Route.get('/greet/{name?}', (DoxRequest req) => 'hi');
     Route.get('/search', PostController().search);
+    Route.get('/books:search', (DoxRequest req) => 'found');
     Route.get('/secret', PostController().secret);
     Route.post('/upload', PostController().upload);
     Route.group('/api/auth', () {
@@ -404,13 +405,24 @@ void main() {
     expect(post['security'], <dynamic>[
       <String, dynamic>{'bearerAuth': <dynamic>[]},
     ]);
-    expect(post['x-dox-middleware'], <String>['AuthMiddleware']);
+    // middleware class names are not in the spec
+    expect(jsonEncode(doc), isNot(contains('x-dox-middleware')));
 
     Map<String, dynamic> put = paths['/posts/{id}']['put'];
     expect(
       put['requestBody']['content']['application/json']['schema']['properties']['title']['minLength'],
       3,
     );
+  });
+
+  test('a colon in a route path stays a literal char', () {
+    Map<String, dynamic> doc = OpenApiDocument(config.openApi)
+        .build(Route().routes)
+        .toJson();
+    Map<String, dynamic> paths = doc['paths'];
+    expect(paths.keys, contains('/books:search'));
+    expect(paths.keys, isNot(contains('/books{search}')));
+    expect(paths['/books:search']['get']['parameters'], isNull);
   });
 
   test('the registry adds summary, params, query, schemas and errors', () {
