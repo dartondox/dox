@@ -334,7 +334,6 @@ The docs have guides for [Docker](/latest/guides/docker/), [a VPS](/latest/guide
 
 ### When not to pick Dox
 
-- **You want a long track record.** Dox 3 came out in October 2026.
 - **You want the Dart client made for you.** Dox does not generate one.
 - **You want a hosted service.** You deploy Dox yourself.
 
