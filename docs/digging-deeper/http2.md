@@ -11,7 +11,7 @@ Use HTTP/2 for one of these reasons:
 - You want to serve [gRPC](grpc.md). gRPC works only over HTTP/2.
 - Your proxy sends HTTP/2 to the app. The proxy then sends many requests on a small number of connections. The app does the same work with fewer connections.
 
-HTTP/2 is off by default. If you do not turn it on, Dox does not change.
+HTTP/2 is off by default. If you do not turn on HTTP/2, nothing changes.
 
 ## Turn on HTTP/2
 

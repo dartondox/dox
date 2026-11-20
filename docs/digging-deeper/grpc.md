@@ -376,7 +376,7 @@ When the service cannot work, call `setStatus` again with `ServingStatus.NOT_SER
 
 Dox runs your app in many [isolates](isolate.md). Each isolate gets its own copy of your service. You cannot copy a database connection, a socket, or a `ReceivePort` to a different isolate. Thus, do not create these objects when you register the service.
 
-Create them on the first call. Then the isolate that uses the object also creates it:
+Create them on the first call. Then the isolate that uses them also creates them:
 
 ```dart
 class GreeterService extends GreeterServiceBase {
