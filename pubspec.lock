@@ -221,26 +221,26 @@ packages:
     dependency: transitive
     description:
       name: dox_http_native
-      sha256: "3b824e361391d45eb59bd2ae588bc5232c65a76bb932431a1a7c355d2c84d88c"
+      sha256: "5433e514a5faea4e57ceee9175c9734d4b9e8f9334e4acbaf35b7f428caebcaf"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.4"
+    version: "3.2.1"
   dox_openapi:
     dependency: transitive
     description:
       name: dox_openapi
-      sha256: "44b928047dfe99525ee9dac219ef50a28c7560f44b0bada27589499240359c31"
+      sha256: "2b8e3a2719abf5320c8af8aa103a1f857628e4a2a69a5e95b723aadb6d098dcd"
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.0"
+    version: "3.2.0"
   dox_validation:
     dependency: transitive
     description:
       name: dox_validation
-      sha256: "2bc67273cce46cd33d4f01e71e7f6c687f6917479cc92570b8e8f5ebcdc23aab"
+      sha256: a7f096bcdfe01429a0bf826b5c29c9cb40f983735ec7c990c08bf7f87ffd2810
       url: "https://pub.dev"
     source: hosted
-    version: "3.1.2"
+    version: "3.2.0"
   ffi:
     dependency: transitive
     description:
@@ -341,10 +341,10 @@ packages:
     dependency: transitive
     description:
       name: ioredis
-      sha256: b1360155ec2e73c2c15da947205c31b4d6fd922b129ef39f59f88305a968a562
+      sha256: "2cfdb47cc5e630f8cc1cb3e6e0d8897830ee39421d6750db77d32196bcc3b38f"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.2"
+    version: "3.2.1"
   json_annotation:
     dependency: transitive
     description:
