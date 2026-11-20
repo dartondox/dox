@@ -4,8 +4,8 @@
 - Fix: a `:` in a route path, like `/books:search`, is a literal char in Dox. The OpenAPI docs read it as a param and showed `/books{search}`. Now the path is shown as it is: `/books:search`.
 - New: `req.takeOverResponse()` says that the handler sends the response itself. Then Dox sends nothing more for the request: not the returned value, not a change of a `next` middleware (like `ETag`), not the `responseHandler`, and not an error answer. Errors are still reported.
 - New: `Route.fallback(controller, when: check)`. With `when`, the fallback is tried for any method and answers only when the check gives true. Without it, a fallback is GET and HEAD only, as before.
-- New: `.withoutMiddleware<T>()` on a route takes out every middleware of type `T`, also global, router and group middleware. For example, a long stream can skip a global `RequestTimeout`.
-- New: `.renderErrorsWith(renderer)` on a route sends its errors (also the errors of its middleware) to the renderer, not to `ExceptionHandler.render`. The error is still reported. A null result gives the normal answer.
+- New: `.withoutMiddleware<T>()` on a route takes out every middleware of type `T` (or a subtype), also global, router and group middleware, and in the OpenAPI docs too. For example, a long stream can skip a global `RequestTimeout`.
+- New: `.renderErrorsWith(renderer)` on a route sends its errors (also the errors of its middleware and a body that fails to read) to the renderer, not to `ExceptionHandler.render`. The error is still reported. A null result gives the normal answer.
 - New: `showErrors()` is public. It is true when `APP_ENV` is `development` or `local`, the rule Dox uses to send error text.
 - Change: the OpenAPI spec no longer lists the middleware class names of a route (`x-dox-middleware`). The names were internal details. Security and error answers still come from the middleware, as before.
 

@@ -422,7 +422,9 @@ bool isGrpc(HttpRequest req) {
 Route.fallback(grpcNotFound, when: isGrpc);
 ```
 
-Other requests still get the plain fallback, or `404` and `405`. So a `when:` fallback can not take the answers of normal routes.
+Other requests still get the plain fallback, or `404` and `405`. A `when:` fallback never takes a request that a route matches. It does take a path that only has a route for another method: a gRPC `POST` to a path with only a `GET` route gets the fallback, not `405`.
+
+Dox sends routes to every isolate. So `when` must be a top-level or static function, or one that captures nothing.
 
 ## Serve storage files
 

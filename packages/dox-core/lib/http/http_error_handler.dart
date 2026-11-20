@@ -60,10 +60,20 @@ final List<int> _plainErrorBody = 'Internal Server Error'.codeUnits;
 /// the requests of routes with `Route.renderErrorsWith`
 final Expando<DoxRequest> _withRenderer = Expando<DoxRequest>();
 
+/// true once any route has a renderer. Until then no error pays for the
+/// [_withRenderer] lookup.
+bool _renderersUsed = false;
+
 /// keep [doxReq] so an error of [req] goes to the renderer of its route.
 /// Only for a route that has one.
 void keepForErrorRenderer(HttpRequest req, DoxRequest doxReq) {
+  _renderersUsed = true;
   _withRenderer[req] = doxReq;
+}
+
+/// true when [req] already has its request kept for the renderer
+bool errorRendererReady(HttpRequest req) {
+  return _renderersUsed && _withRenderer[req] != null;
 }
 
 /// Report [error] and give the response for it, from the
@@ -87,7 +97,7 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
     if (headSent(req.response) || responseTakenOver(req)) return null;
 
     /// the route renders its own errors (`Route.renderErrorsWith`)
-    DoxRequest? doxReq = _withRenderer[req];
+    DoxRequest? doxReq = _renderersUsed ? _withRenderer[req] : null;
     RouteErrorRenderer? renderer = doxReq?.route.errorRenderer;
     if (renderer != null) {
       DoxResponse? custom = renderer(error, doxReq!);

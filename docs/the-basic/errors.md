@@ -116,17 +116,19 @@ See [Custom errors](../guides/custom-errors.md) for a full example with your own
 
 ## Errors of one route
 
-Some routes answer in their own format, like gRPC. A JSON error makes no sense to their clients. `.renderErrorsWith` gives the errors of one route to your own function. It covers the errors of the middleware too:
+Some routes answer in their own format, like gRPC. A JSON error makes no sense to their clients. `.renderErrorsWith` gives the errors of one route to your own function. It covers the errors of the middleware too, and a body that fails to read (for example a broken multipart body):
 
 ```dart
-Route.post('/rpc', (RpcController c) => c.call).renderErrorsWith(
-  (Object error, DoxRequest req) {
-    return response(<String, String>{'error': 'failed'}).statusCode(500);
-  },
-);
+DoxResponse? rpcError(Object error, DoxRequest req) {
+  return response(<String, String>{'error': 'failed'}).statusCode(500);
+}
+
+Route.post('/rpc', (RpcController c) => c.call).renderErrorsWith(rpcError);
 ```
 
 The error is still reported. Return `null` to get the normal answer from your `ExceptionHandler`.
+
+Dox sends routes to every isolate. So the function must be a top-level or static function, or one that captures nothing. A request with a `_method` override (`MethodOverride`) is not covered for a body error, because its route is not known before the body is read.
 
 ## Show error text only in development
 

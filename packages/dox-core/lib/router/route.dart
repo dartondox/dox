@@ -374,9 +374,11 @@ class Route {
   }
 
   /// do not run the middleware of type [T] on the route added last. It
-  /// takes out global, router and group middleware of that type. Use it
-  /// for a route that a global middleware does not fit, like a long
-  /// stream and `RequestTimeout`.
+  /// takes out global, router and group middleware of that type, and
+  /// also of any subtype of [T]. So `withoutMiddleware<IDoxNextMiddleware>()`
+  /// takes out every next-style middleware. Use it for a route that a
+  /// global middleware does not fit, like a long stream and
+  /// `RequestTimeout`. The OpenAPI docs of the route follow it.
   /// ```
   /// Route.post('events', controller).withoutMiddleware<RequestTimeout>();
   /// ```
@@ -390,8 +392,12 @@ class Route {
       Object? action = controllers.isEmpty ? null : controllers.last;
 
       /// the controller stays, even when it is a [T]
-      controllers.removeWhere(
-        (dynamic item) => item is T && !identical(item, action),
+      bool drop(dynamic item) => item is T && !identical(item, action);
+      controllers.removeWhere(drop);
+
+      /// the OpenAPI docs read `preMiddleware` too (it is a read-only copy)
+      data.preMiddleware = List<dynamic>.unmodifiable(
+        data.preMiddleware.where((dynamic item) => !drop(item)),
       );
     }
     return this;
@@ -399,15 +405,20 @@ class Route {
 
   /// send the errors of the route added last to [renderer], not to the
   /// `ExceptionHandler.render` of `AppConfig`. It covers the errors of the
-  /// middleware too. The error is still reported. Return null to let Dox
-  /// render it as usual. Use it when the route answers in its own format,
-  /// like gRPC.
+  /// middleware too, and a body that fails to read (eg. a broken multipart body). A
+  /// request with a `_method` override is not covered for a body error,
+  /// because its route is not known yet. The error is still reported.
+  /// Return null to let Dox render it as usual. Use it when the route
+  /// answers in its own format, like gRPC.
+  ///
+  /// Routes are sent to every isolate, so [renderer] must be a top-level
+  /// or static function, or a function that captures nothing.
   /// ```
-  /// Route.post('rpc', controller).renderErrorsWith(
-  ///   (Object error, DoxRequest req) {
-  ///     return response(<String, String>{'error': '$error'}).statusCode(500);
-  ///   },
-  /// );
+  /// DoxResponse? rpcError(Object error, DoxRequest req) {
+  ///   return response(<String, String>{'error': '$error'}).statusCode(500);
+  /// }
+  ///
+  /// Route.post('rpc', controller).renderErrorsWith(rpcError);
   /// ```
   Route renderErrorsWith(RouteErrorRenderer renderer) {
     RouteData? last = _last;
@@ -476,7 +487,11 @@ class Route {
   /// With [when], the fallback is tried for a request of any method, and
   /// it answers only when [when] gives true. Use it for a package that
   /// answers unknown paths in its own format, like gRPC. Check the method
-  /// in [when] when it matters.
+  /// in [when] when it matters. [when] also runs for a path that has a
+  /// route for another method, so a gRPC `POST` to a path that only has a
+  /// `GET` route gets the fallback, not 405. It never runs for a request
+  /// that a route matches. Routes are sent to every isolate, so [when]
+  /// must be a top-level or static function, or one that captures nothing.
   ///
   /// Like other routes, it follows [group], the router prefix, [domain]
   /// and middleware. So in a router, the global middleware runs for it.
@@ -487,7 +502,8 @@ class Route {
   /// Route.group('admin', () {
   ///   Route.fallback(controller); // only for /admin/...
   /// });
-  /// Route.fallback(apiNotFound, when: (HttpRequest req) => req.method == 'POST');
+  /// bool isPost(HttpRequest req) => req.method == 'POST';
+  /// Route.fallback(apiNotFound, when: isPost);
   /// ```
   static Route fallback<T extends Object>(
     dynamic controller, {

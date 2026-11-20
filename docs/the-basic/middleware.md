@@ -136,6 +136,8 @@ Route.post('/events', (EventController c) => c.stream)
     .withoutMiddleware<RequestTimeout>();
 ```
 
+It takes out `T` and any subtype of `T`. So `withoutMiddleware<IDoxNextMiddleware>()` takes out every middleware that uses `next`. Use a specific type. The route is also left out of the OpenAPI docs of that middleware, for example its security.
+
 ### The order
 
 Middleware runs in this order: package middleware from providers, then the app's global middleware, then router middleware, then group middleware, then route middleware. If one returns a value or throws, the rest do not run:

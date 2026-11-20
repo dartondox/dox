@@ -11,7 +11,7 @@ class RouteData {
 
   /// middleware from groups and routers (`Route.middleware`, global
   /// middleware). they are also the first items of [controllers].
-  final List<dynamic> preMiddleware;
+  List<dynamic> preMiddleware;
 
   /// request body schema for the OpenAPI docs, from the `body:` option.
   /// any object with `toJsonSchema()`, like a `dox_validation` schema.
