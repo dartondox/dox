@@ -217,6 +217,7 @@ nav:
     - packages/pdf-lib.md
     - packages/pdfme.md
     - packages/mcp.md
+    - packages/graphql.md
   - Guides:
     - guides/index.md
     - guides/file-upload.md
