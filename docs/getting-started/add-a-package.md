@@ -55,6 +55,7 @@ These packages have a setup command:
 | `dox add view` | Views and `resources/views/`. See [Views](../the-basic/views.md). |
 | `dox add inertia` | The server side of Inertia. It prints the Vite steps. See [Inertia](../the-basic/inertia.md). |
 | `dox add mcp` | An MCP server with a sample tool. See [MCP](../packages/mcp.md). |
+| `dox add grpc` | gRPC: a sample `.proto` file, a router with the health service and `APP_HTTP2` in `.env`. See [gRPC](../digging-deeper/grpc.md). |
 
 The first `dox add orm` can download (or build) the Postgres and MySQL drivers once, also the one you do not use. After that, `pubspec.yaml` skips the unused drivers, so later builds do not get them.
 

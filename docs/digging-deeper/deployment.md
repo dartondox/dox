@@ -241,7 +241,7 @@ server {
 
 ### HTTP/2 and gRPC
 
-Dox can speak HTTP/2 to your proxy. This is needed for gRPC. It is opt-in: set `http2: true` in `AppConfig` (see [Native server: HTTP/2](native-server.md#http2)). Dox speaks h2c only, which is HTTP/2 without TLS. The proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port, so the same upstream address works for both.
+Dox can speak HTTP/2 to your proxy. This is needed for gRPC. It is opt-in: set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Dox speaks h2c only, which is HTTP/2 without TLS. The proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port, so the same upstream address works for both.
 
 With Caddy, `h2c://` tells it to use HTTP/2 without TLS to the app:
 
@@ -269,7 +269,7 @@ server {
   }
 
   # gRPC service paths only
-  location /helloworld.Greeter/ {
+  location /greeter.Greeter/ {
     grpc_pass grpc://127.0.0.1:3000;
   }
 }
