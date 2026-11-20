@@ -11,10 +11,16 @@
 **Everything your Dart backend needs.**
 </div>
 
-Dox is a web backend framework for Dart. Routing, an ORM, migrations,
-typed validation, auth, queues, cache and a CLI are in one place.
-It runs one isolate per CPU core on a native HTTP server, and
-`dox build` makes one small native binary.
+Build your whole backend in Dart: a REST API, a full-stack web app,
+or a real-time service.
+
+Dox gives you what a real app needs in one framework: routes, database
+models, input checks, login, background jobs, emails, file uploads and
+WebSockets. You write your features. You do not glue ten packages together.
+
+It is also fast. In our benchmark, a full Dox app serves more requests per
+second than plain Bun, Node and Go servers, and uses little memory.
+When you are ready to ship, `dox build` gives you one native binary to deploy.
 
 [Documentation](https://dartondox.dev) · [Tutorial](https://dartondox.dev/tutorial/) · [Blog](https://dartondox.dev/blog/)
 
