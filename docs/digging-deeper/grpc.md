@@ -515,7 +515,7 @@ For small calls, both servers stop at approximately 57,000 calls a second. This 
 This section gives special cases. Most apps do not need it.
 
 - To add the package manually, run `dart pub add dox_grpc protobuf grpc`. The generated code imports `protobuf` and `grpc`.
-- The `APP_HTTP2` key in `.env` does not turn on HTTP/2 alone. Add a `bool? get appHttp2;` getter to `AppEnv`, and run `dart run build_runner build`. Then set `http2: env.appHttp2 ?? false` in the app config.
+- An app made with `dox create` reads the `APP_HTTP2` key already. In an older app, the key does not turn on HTTP/2 alone. Add a `bool? get appHttp2;` getter to `AppEnv`, and run `dart run build_runner build`. Then set `http2: env.appHttp2 ?? false` in the app config.
 - `GrpcException` takes a list of protobuf messages as a third argument. Dox sends them to the client as error details in `grpc-status-details-bin`.
 - A `GrpcError` from `package:grpc` works the same as a `GrpcException`.
 - `call.clientMetadata` does not contain the `grpc-*` headers.
