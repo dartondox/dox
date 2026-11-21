@@ -1,4 +1,4 @@
-## Unreleased
+## 3.2.2
 
 - Fix: a user key could hit an internal key of the cache. `forget('lock:report')` freed the lock held by `lock('report')` on Redis and database stores. `put('tag:dart', {...})` broke `tags(['dart']).flush()`. `lock('remember:x')` blocked `remember('x', lock: true)`. Now a key, lock name or tag name that starts like an internal one gets a `#` in front before it goes to the driver. Internal keys do not change.
 - Upgrade note: user keys that start with `lock:`, `tag:`, `flexible:created:` or `#` are stored under a new name, so they miss the cache once after the upgrade. The same goes for lock names that start with `remember:`, `flexible:`, `dox:auto-prune` or `#`, and for tag names that start with `#` or with 40 hex digits and `:`. Nothing else changes.
