@@ -226,7 +226,7 @@ at a time.
 ## Get help
 
 - Found a bug or have a question? Open an [issue on GitHub](https://github.com/dartondox/dox/issues).
-- Using an AI assistant? Give it [llms-full.txt](https://dartondox.dev/llms-full.txt): all of these docs as one plain text file. [llms.txt](https://dartondox.dev/llms.txt) is the page list.
+- Using an AI assistant? Install the package skills, or give it [llms-full.txt](https://dartondox.dev/llms-full.txt): all of these docs as one plain text file. See [AI agents](getting-started/ai-agents.md).
 - Want to help? Read [Contribute](community/contribute.md).
 
 
@@ -348,17 +348,7 @@ dox build_runner:build   # runs once
 
 ## AI agents
 
-If you use an AI coding agent, it should know the real API of each package. The Dox packages ship skills for this. Install them in your app, after `dart pub get`:
-
-```bash
-dart run skills@ get
-```
-
-It finds the skills of your dependencies and installs them for your agent. It works with Claude Code, Codex, Cursor, GitHub Copilot and others. Run it again after you add a package or update one.
-
-It only reads the packages listed in your own `pubspec.yaml`. To get the skill of a package that comes in through another one (like `ioredis`), add it to `pubspec.yaml`. See [skills](https://pub.dev/packages/skills) for the options.
-
-The starter project also has an `AGENTS.md` file with the rules of the project.
+If you use an AI coding agent, give it the real API of each package. Run `dart run skills@ get` in your app after `dart pub get`. See [AI agents](ai-agents.md) for the skills, `AGENTS.md` and the llms files.
 
 ## Packages
 
@@ -386,6 +376,184 @@ Dox is split into packages, so you add only what you need:
 | `dox_inertia` | [Inertia.js pages](../the-basic/inertia.md) |
 | `dox_http_native` | [native HTTP server](../digging-deeper/native-server.md) (Rust) |
 | `dox_postgres_native`, `dox_mysql_native` | native drivers for [Postgres](../database/postgres-native.md) and [MySQL/MariaDB](../database/mysql-native.md) |
+
+
+---
+
+# AI agents
+
+Source: https://dartondox.dev/latest/getting-started/ai-agents/
+
+# AI agents
+
+An AI coding agent must know the real Dox API. If it does not, it guesses class names and method names, and the code does not compile.
+
+Dox gives the agent two sources:
+
+- **Skills**: short guides that each package ships. The agent reads them while it writes code in your app.
+- **`llms.txt` and `llms-full.txt`**: these docs as plain text files, for a chat or for a tool that has no skills.
+
+## Skills
+
+A skill is a `SKILL.md` file with the real API of one package and the steps for the usual tasks. Each Dox package ships its skill in its `skills/<name>/` folder.
+
+The agent does not read all skills at the start. It reads a skill only when your task matches it. Thus the skills use little space in the memory of the agent.
+
+A skill comes with the package. Thus it always agrees with the package version that your app uses.
+
+These packages ship a skill:
+
+| Package | Skill | Use it for |
+| --- | --- | --- |
+| `dox_core` | `dox-core-guide` | routes, controllers, DTOs, serializers, middleware, providers, env config, CLI commands, HTTP tests |
+| `dox_orm` | `dox-orm-guide` | models, queries, relations, pagination, transactions, factories, the switch to Postgres or MySQL |
+| `dox_migration` | `dox-migration-guide` | migrations, table changes, seeders |
+| `dox_validation` | `dox-validation-guide` | DTO rules, custom rules and messages, fluent schemas, database rules |
+| `dox_auth` | `dox-auth-guide` | login and logout, JWT, session and access token guards, gates and policies |
+| `dox_openapi` | `dox-openapi-guide` | the API docs at `/docs`, annotations for the OpenAPI document |
+| `dox_cache` | `dox-cache-guide` | cache stores, `remember`, tags, cache locks, the cache in tests |
+| `dox_queue` | `dox-queue-guide` | queue jobs, the worker, the Redis and database drivers, failed jobs, chains and batches |
+| `dox_scheduler` | `dox-scheduler-guide` | scheduled tasks, cron frequencies, no double runs on many servers |
+| `dox_storage` | `dox-storage-guide` | files and uploads, local, S3 and memory disks, signed URLs |
+| `dox_mailer` | `dox-mailer-guide` | mail config, mailables, Markdown mail, queued mail, transports, mail in tests |
+| `dox_socketio` | `dox-socketio-guide` | realtime events, rooms, socket login, the Redis adapter, broadcasts |
+| `dox_view` | `dox-view-guide` | HTML pages with `.dox.html` templates, layouts, components, forms with CSRF |
+| `dox_inertia` | `dox-inertia-guide` | Inertia.js pages with React, Vue or Svelte, shared props, Vite and SSR |
+| `dox_mcp` | `dox-mcp-guide` | an MCP server: tools, a route with auth, sessions, OAuth sign-in |
+| `dox_grpc` | `dox-grpc-guide` | gRPC services: the `.proto` file, the service class, status codes, deadlines |
+| `dox_graphql` | `dox-graphql-guide` | a GraphQL API from annotations and ORM models, auth and limits |
+| `ioredis` | `ioredis-guide` | Redis connections, commands, pipelines, transactions, pub/sub |
+
+## Install the skills
+
+The skills are not in your project until you install them. The [skills](https://pub.dev/packages/skills) tool copies them from your packages into the skills folder of your agent.
+
+Run it in the root folder of your app, after `dart pub get`:
+
+```bash
+dart run skills@ get
+```
+
+The tool finds the skills of your packages. Then it asks which skills to install. To install all of them with no question, add `--all`:
+
+```bash
+dart run skills@ get --all
+```
+
+### Select your agent
+
+The tool finds your agent from the folders in your project, for example `.claude/` or `.cursor/`. If it finds more than one agent, it installs the skills for each of them. If it finds none, it asks you.
+
+To set the agent yourself, use `--agent`:
+
+```bash
+dart run skills@ get --all --agent claude
+```
+
+Each agent has its own skills folder:
+
+| Agent | `--agent` | Skills folder |
+| --- | --- | --- |
+| Claude Code | `claude` | `.claude/skills/` |
+| Codex | `codex` | `.agents/skills/` |
+| Cursor | `cursor` | `.cursor/skills/` |
+| GitHub Copilot | `copilot` | `.github/skills/` |
+| Cline | `cline` | `.cline/skills/` |
+| OpenCode | `opencode` | `.opencode/skills/` |
+| Antigravity | `antigravity` | `.agents/skills/` |
+| Other agents | `generic` | `.agents/skills/` |
+
+The tool does not find GitHub Copilot automatically. For Copilot, always use `--agent copilot`.
+
+### Run it again after a package change
+
+The installed skills are copies. They do not change when a package changes.
+
+Run `dart run skills@ get` again after you add a package or update a package. The tool then installs the new skills. With `--all`, it also removes the skills of packages that you no longer use. Without `--all`, it asks first.
+
+### Packages that come in through another package
+
+The tool only reads the packages in your own `pubspec.yaml`. It does not see a package that comes in through a different package.
+
+For example, `dox_cache` uses `ioredis`. If you use `ioredis` directly in your code, add it to your `pubspec.yaml`:
+
+```bash
+dart pub add ioredis
+dart run skills@ get
+```
+
+### Make sure that it worked
+
+List the installed skills:
+
+```bash
+dart run skills@ list
+```
+
+You can also look in the skills folder of your agent. For Claude Code, the `dox_core` skill is the file `.claude/skills/dox-core-guide/SKILL.md`.
+
+If your tool has no support for skills, open the `SKILL.md` file as a normal file, or give it to the agent.
+
+## AGENTS.md
+
+A skill tells the agent how a package works. It does not tell the agent how your project is organized. The `AGENTS.md` file in the root folder of your app does that. Most coding agents read this file before they change code.
+
+The starter project that `dox create` makes has an `AGENTS.md` file. It holds:
+
+- what the project is, and the links to the llms files
+- the command that installs the skills, and the list of skills
+- the folder layout and the file names
+- the `dox` commands that make files
+- when to run the code generator, and which files are generated
+- the conventions for routes, input, models, migrations, jobs, config and errors
+- how to switch the database
+- the checks to run before a change is done: `dart format .`, `dart analyze` and `dart test`
+- a list of things that the agent must not do
+
+This file is yours. Edit it when your app gets its own rules, for example a new folder or a rule for tests.
+
+## llms.txt and llms-full.txt
+
+Not every tool can read skills, and a chat does not see your project. For these, the docs site has two plain text files. They obey the [llms.txt](https://llmstxt.org) convention.
+
+| File | What it holds |
+| --- | --- |
+| [llms.txt](https://dartondox.dev/llms.txt) | The page list: a short description of Dox, then one line for each page with its title and its link. |
+| [llms-full.txt](https://dartondox.dev/llms-full.txt) | All the docs as one Markdown file. |
+
+### What is in the files
+
+The docs build makes the two files again each time the docs change. Thus they always agree with this site.
+
+- They hold the docs of the latest Dox version. The links in them go to `https://dartondox.dev/latest/`.
+- They hold the docs pages, in the sequence of the menu of this site.
+- In `llms-full.txt`, each page starts with its title and its link. Then comes the Markdown source of the page, with all its code examples.
+- The blog and the docs of older Dox versions are not in the files.
+
+### Use them
+
+There are three ways to give the files to an agent:
+
+1. **Paste the link.** In a chat agent that can open links, paste `https://dartondox.dev/llms-full.txt` and ask your question.
+2. **Add a docs source.** Some editors let you add documentation by its link. If your editor has this feature, add the link of `llms-full.txt`.
+3. **Download the file.** Save it, then point the agent at the file or attach it to the chat:
+
+    ```bash
+    curl -o dox-docs.md https://dartondox.dev/llms-full.txt
+    ```
+
+`llms-full.txt` is a large file. If your agent cannot hold it, give it `llms.txt`. The agent then opens only the pages that it needs.
+
+## Skills or llms-full.txt
+
+| | Skills | `llms-full.txt` |
+| --- | --- | --- |
+| Use it for | code changes in your app | questions in a chat, or a tool with no skills |
+| Size | small, one skill for each package | large, all the docs |
+| Version | the package version of your app | the latest Dox version |
+| How the agent gets it | automatically, when the task matches | you give it the link or the file |
+
+For daily work in your app, install the skills and keep `AGENTS.md`. Use `llms-full.txt` when you ask about Dox out of your project, or when your tool cannot read skills.
 
 
 ---
@@ -447,6 +615,7 @@ These packages have a setup command:
 | `dox add view` | Views and `resources/views/`. See [Views](../the-basic/views.md). |
 | `dox add inertia` | The server side of Inertia. It prints the Vite steps. See [Inertia](../the-basic/inertia.md). |
 | `dox add mcp` | An MCP server with a sample tool. See [MCP](../packages/mcp.md). |
+| `dox add grpc` | gRPC: a sample `.proto` file, a router with the health service and `APP_HTTP2` in `.env`. See [gRPC](../digging-deeper/grpc.md). |
 
 The first `dox add orm` can download (or build) the Postgres and MySQL drivers once, also the one you do not use. After that, `pubspec.yaml` skips the unused drivers, so later builds do not get them.
 
@@ -2963,6 +3132,8 @@ class ApiRouter extends Router {
 
 Dox finds every `Router` class by itself after `dart run build_runner build`. If you want to pick the order of routers, list them in `routers:` of `AppConfig`. See [Dependency injection: routers and providers](dependency-injection.md#routers-and-providers).
 
+Some routes need an exact path, like gRPC routes (`/pkg.Service/Method`). Register them in a router with no prefix. A router without a `prefix` getter has none.
+
 To see every route of your app, run `dox route:list`. It does not start the server. See [`dox route:list`](../reference/cli.md#dox-routelist).
 
 ## Defining routes
@@ -3339,6 +3510,23 @@ The handler decides the status. So return a `404` status for a "not found" page,
 
 Add the fallback in a `Router`, so the global middleware (like security headers) runs for it. The built-in `404` and `405` answers do not run the global middleware.
 
+### Fallback for other methods
+
+Some packages answer unknown paths in their own format. For example, a gRPC client wants a gRPC error, not a JSON `404`. Give `when:` a check. Then the fallback is tried for every method, and it answers only when the check gives `true`:
+
+```dart
+bool isGrpc(HttpRequest req) {
+  String type = req.headers.value('content-type') ?? '';
+  return req.method == 'POST' && type.startsWith('application/grpc');
+}
+
+Route.fallback(grpcNotFound, when: isGrpc);
+```
+
+Other requests still get the plain fallback, or `404` and `405`. A `when:` fallback never takes a request that a route matches. It does take a path that only has a route for another method: a gRPC `POST` to a path with only a `GET` route gets the fallback, not `405`.
+
+Dox sends routes to every isolate. So `when` must be a top-level or static function, or one that captures nothing.
+
 ## Serve storage files
 
 `Storage.route(path)` from the [`dox_storage`](../packages/storage.md) package serves the files of a storage disk at `GET <path>/{key*}`. By default only signed URLs work, and other requests get `403`:
@@ -3436,7 +3624,7 @@ This section is for special cases. Most apps do not need it.
 
 ### Fallback route
 
-- Other methods still get the normal `404` or `405`. A `GET` to a path that only has a `POST` route gets the fallback, if one covers that path. If none does, the client gets `405`.
+- Without `when:`, other methods still get the normal `404` or `405`. A `GET` to a path that only has a `POST` route gets the fallback, if one covers that path. If none does, the client gets `405`.
 - Add the fallback before `startServer()`. A fallback added later only works in the isolate that added it.
 - It follows `Route.group`, the router prefix and `Route.domain`. In a group, it only answers paths under the group prefix. A prefix can have params, like `{tenant}`. When two fallbacks match, the one with the longest prefix wins.
 - The built-in `404` and `405` skip the global middleware because, for example, `CsrfMiddleware` would answer `419` to a `POST` to an unknown path, and `SessionMiddleware` would start a session for every bad link.
@@ -3579,6 +3767,17 @@ class AuditProvider extends DoxProvider {
   }
 }
 ```
+
+### Skip a middleware on one route
+
+Some routes do not fit a global middleware. For example, a long stream should not end with `RequestTimeout`. `.withoutMiddleware<T>()` takes every middleware of type `T` out of the route, also global, router and group middleware:
+
+```dart
+Route.post('/events', (EventController c) => c.stream)
+    .withoutMiddleware<RequestTimeout>();
+```
+
+It takes out `T` and any subtype of `T`. So `withoutMiddleware<IDoxNextMiddleware>()` takes out every middleware that uses `next`. Use a specific type. The route is also left out of the OpenAPI docs of that middleware, for example its security.
 
 ### The order
 
@@ -3726,6 +3925,8 @@ The answer is the normal error JSON:
 ```
 
 Dart can not stop a running Future, so the controller keeps running in the background. Its late result is dropped, so nothing is sent twice.
+
+A global `RequestTimeout` also ends long streams. To keep it off one route, see [Skip a middleware on one route](#skip-a-middleware-on-one-route).
 
 ### Server timing
 
@@ -7278,11 +7479,21 @@ The next Inertia page tells the browser to clear its history, once. The mark is 
 
 By default, the first visit gets an empty page, and the browser renders it. With SSR, the first visit gets the full HTML of the page. Search engines can read it, and the visitor sees the page sooner.
 
-The page is rendered by the Inertia SSR server. It is a Node process that you build with Vite and run next to your Dox app. On a first visit, Dox sends the page to it and puts the answer in the root view. Inertia requests (links and forms) never use it.
+The page is rendered by the Inertia SSR server. It is a JavaScript process (Bun or Node) that you build with Vite and run next to your Dox app. On a first visit, Dox sends the page to it and puts the answer in the root view. Inertia requests (links and forms) never use it.
 
 ### 1. The SSR entry file
 
-Write an entry file for the SSR server:
+`dox inertia:install --ssr` writes this file for you, and adds a `build:ssr` script to `package.json`. It never overwrites a file. With no `package.json` (or one it cannot change safely), it prints a hint instead.
+
+```json title="package.json"
+{
+  "scripts": {
+    "build:ssr": "vite build && vite build --ssr resources/js/ssr.jsx --outDir bootstrap/ssr"
+  }
+}
+```
+
+Without `--ssr`, add the `build:ssr` line to `scripts` yourself, and write the entry file like this:
 
 ```jsx title="resources/js/ssr.jsx"
 import { createInertiaApp } from '@inertiajs/react'
@@ -7335,17 +7546,20 @@ The `else` part is for a page that was sent without SSR.
 
 ### 3. Build and run
 
-Build the browser files, then the SSR file. Then start the SSR server with Node:
+Build the browser files and the SSR file, then start the SSR server:
 
 ```bash
-vite build
-vite build --ssr resources/js/ssr.jsx --outDir bootstrap/ssr
-node bootstrap/ssr/ssr.js
+bun run build:ssr
+dox inertia:start-ssr
 ```
+
+`dox inertia:start-ssr` runs `bootstrap/ssr/ssr.js` (or `ssr.mjs`) with Bun, in the foreground. When both files exist, it starts the newer one and prints which. It stops with an error when the file is not built yet. A stop signal (Ctrl+C, `docker stop`) is sent on to the SSR process.
+
+With Node, use `npm run build:ssr` and `dox inertia:start-ssr --node`.
 
 The file is `ssr.js` when your `package.json` has `"type": "module"`. Else it is `ssr.mjs`. The SSR file loads your packages from `node_modules`, so keep that folder on the server.
 
-Keep the Node process running with your process manager, like the Dox app. Build and start it again on each deploy.
+The command does not run in the background. Run it under Docker, pm2 or systemd, like the Dox app. Build and start it again on each deploy.
 
 ### 4. Turn it on
 
@@ -7388,7 +7602,6 @@ If the SSR server is down, is too slow, or gives a bad answer, the visitor gets 
 - The Inertia 1 and 2 clients. They read the page from `<div id="app" data-page="...">`. Use the Inertia 3 client.
 - Once props, scroll props (infinite scroll), `prependProps`, `deepMergeProps` and `matchPropsOn`.
 - Partial reloads of nested props with dots, like `only: ['auth.user']`. Ask for the top level prop (`auth`).
-- Starting the SSR server from Dox. You run the Node process yourself.
 
 Inertia needs [sessions](session.md) for the errors, flash data and redirects. The client sends the CSRF token by itself, see [CSRF](../security/csrf.md#axios-and-inertia).
 
@@ -7890,6 +8103,21 @@ Dox encrypts the cookie value with `APP_KEY`, and decrypts it when you read it. 
 
 To read a cookie, see [Request: cookies](request.md#cookies).
 
+## Send the response yourself
+
+Some handlers write the raw response, for example a stream with trailers. Call `req.takeOverResponse()` first. Then Dox sends nothing more for the request: not the value you return, not a change of a middleware after `next` (like `ETag`), and not the `responseHandler`:
+
+```dart
+Future<void> handle(DoxRequest req) async {
+  req.takeOverResponse();
+  HttpResponse res = req.httpRequest.response;
+  res.write('done');
+  await res.close();
+}
+```
+
+Your code must end the response. An error after this call is still reported, but Dox does not send an error answer.
+
 ## Change every response
 
 Sometimes you want to change every response in one place, for example to add a header. Set a `responseHandler` in `AppConfig` for this:
@@ -8035,6 +8263,30 @@ AppConfig appConfig = AppConfig(
 `req` is the raw `HttpRequest`. It is there even when the error came before Dox read the body. Use it to read headers, like `req.headers.value('accept')`.
 
 See [Custom errors](../guides/custom-errors.md) for a full example with your own exception classes.
+
+## Errors of one route
+
+Some routes answer in their own format, like gRPC. A JSON error makes no sense to their clients. `.renderErrorsWith` gives the errors of one route to your own function. It covers the errors of the middleware too, and a body that fails to read (for example a broken multipart body):
+
+```dart
+DoxResponse? rpcError(Object error, DoxRequest req) {
+  return response(<String, String>{'error': 'failed'}).statusCode(500);
+}
+
+Route.post('/rpc', (RpcController c) => c.call).renderErrorsWith(rpcError);
+```
+
+The error is still reported. Return `null` to get the normal answer from your `ExceptionHandler`.
+
+Dox sends routes to every isolate. So the function must be a top-level or static function, or one that captures nothing. A request with a `_method` override (`MethodOverride`) is not covered for a body error, because its route is not known before the body is read.
+
+## Show error text only in development
+
+Your code may send an error answer itself. Then use `showErrors()` to decide if the client may see the error text. It is `true` when `APP_ENV` is `development` or `local`, the same rule as the Dox error answers:
+
+```dart
+String message = showErrors() ? '$error' : 'Server Error';
+```
 
 ## Details
 
@@ -11008,6 +11260,669 @@ This section is for special cases. Most apps do not need it.
 
 ---
 
+# HTTP/2
+
+Source: https://dartondox.dev/latest/digging-deeper/http2/
+
+# HTTP/2
+
+With HTTP/2, one connection can send many requests at the same time, and Dox serves HTTP/2 on the same port as HTTP/1.1.
+
+Use HTTP/2 for one of these reasons:
+
+- You want to serve [gRPC](grpc.md). gRPC works only over HTTP/2.
+- Your proxy sends HTTP/2 to the app. The proxy then sends many requests on a small number of connections. The app can serve more requests with fewer connections.
+
+HTTP/2 is off by default. If you do not turn on HTTP/2, nothing changes.
+
+## Turn on HTTP/2
+
+Set `http2` to `true` in the app config:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  http2: true,
+  // ...
+);
+```
+
+The port then accepts HTTP/1.1 and HTTP/2. Old clients and health checks continue to work, because Dox finds the protocol of each connection.
+
+You do not change your routes, middleware, or controllers.
+
+## Read the protocol of a request
+
+To find the protocol of a request, read `req.protocolVersion`. The value is `2.0` for an HTTP/2 request. For an HTTP/1.x request, the value is `1.0` or `1.1`:
+
+```dart
+Route.get('/protocol', (DoxRequest req) {
+  return req.protocolVersion; // '2.0'
+});
+```
+
+You can do a test with curl:
+
+```bash
+curl --http2-prior-knowledge http://localhost:3000/protocol
+```
+
+## Limit the open requests on one connection
+
+One HTTP/2 connection can have many open requests. `maxConcurrentStreams` sets the maximum number of open requests on one connection. The default is `250`. This value is correct for most apps.
+
+To let each client keep fewer open requests, set a lower number:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  http2: true,
+  maxConcurrentStreams: 100,
+  // ...
+);
+```
+
+## Use a proxy
+
+Dox uses h2c. h2c is HTTP/2 over plain TCP, without TLS. Your proxy must do the TLS.
+
+Browsers use HTTP/2 only with TLS. The browser sends HTTP/2 with TLS to the proxy, and the proxy sends the requests to Dox:
+
+```text
+browser  --HTTP/2 + TLS-->  proxy  --h2c or HTTP/1.1-->  Dox
+```
+
+For the Caddy and nginx config, see [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
+
+## Use the server without Dox
+
+If you use the [native server](native-server.md) without Dox, give the same two options to `NativeHttpServer.bind`:
+
+```dart
+NativeHttpServer server = await NativeHttpServer.bind(
+  3000,
+  http2: true,
+  maxConcurrentStreams: 100,
+);
+```
+
+## Protection
+
+HTTP/2 has some known attacks. Dox has protection against these attacks by default. You do not set anything.
+
+- **Rapid Reset.** A client can open requests and cancel them very quickly. This adds work to your app. In Dox, a cancelled request stays in the `maxConcurrentStreams` count until your handler stops. For this reason, the attack does not work. Dox does not close the connection of a normal client that has some timeouts.
+- **Floods.** If a client sends too many resets, `SETTINGS` frames, `PING` frames, or empty frames, Dox sends `GOAWAY ENHANCE_YOUR_CALM`. Then Dox closes the connection.
+- **Large or slow bodies.** A request body on HTTP/2 has the same limits as on HTTP/1.1: `maxBodySize`, `maxMultipartSize`, and `bodyTimeout`. See [Size limits](../the-basic/request.md#size-limits).
+- **Idle and slow clients.** A connection with no open request closes after `idleTimeout`. If a client does not read a response for 30 seconds, Dox stops that response.
+
+On the internet, keep a proxy in front of Dox. See the [deployment guide](deployment.md).
+
+## Benchmark
+
+HTTP/2 is faster when a client sends many requests on one connection. On one isolate, HTTP/2 does approximately 1.6 times the requests of HTTP/1.1.
+
+<div class="dox-bench dox-bench--simple" markdown>
+
+<p class="dox-bench__title">One isolate: HTTP/2 is 1.6× faster</p>
+<p class="dox-bench__sub"><code>GET /</code> answers <code>Hello, World!</code>. The server has 4 cores and runs one isolate.</p>
+
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">req/s</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>HTTP/2</strong><span>16 conn × 16 requests</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">587,000<span class="dox-bench__vs">fastest</span></span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>HTTP/2</strong><span>4 conn × 64 requests</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 79.2%"></span></span>
+    <span class="dox-bench__num">465,000<span class="dox-bench__vs">1.3× slower</span></span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>HTTP/1.1</strong><span>256 conn, http2 on</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 63.5%"></span></span>
+    <span class="dox-bench__num">373,000<span class="dox-bench__vs">1.6× slower</span></span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>HTTP/1.1</strong><span>256 conn, http2 off</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 62%"></span></span>
+    <span class="dox-bench__num">364,000<span class="dox-bench__vs">1.6× slower</span></span>
+  </div>
+</div>
+
+<p class="dox-bench__foot"><span>Dox · one isolate · Linux · oha · median of 3 runs</span></p>
+
+</div>
+
+The two HTTP/1.1 rows are almost the same. Thus, `http2: true` does not make your HTTP/1.1 clients slower.
+
+| Load                                       | Requests a second |
+| ------------------------------------------ | ----------------: |
+| HTTP/1.1, 256 connections, `http2` off     | 364,000           |
+| HTTP/1.1, 256 connections, `http2` on      | 373,000           |
+| HTTP/2, 16 connections × 16 requests each  | 587,000           |
+| HTTP/2, 4 connections × 64 requests each   | 465,000           |
+
+With 4 isolates, HTTP/1.1 and HTTP/2 both do approximately 630,000 requests a second. This number is the limit of the load tool on 4 cores, not the limit of Dox. HTTP/2 gives the largest increase when the app has few isolates.
+
+### Test setup
+
+- The app has one route, `GET /`. This route sends `Hello, World!`.
+- The app is an AOT build. The build command is `dart build cli`.
+- All tests ran in Linux containers on one machine with 8 cores. The server used 4 cores. The load tool, [oha](https://github.com/hatoo/oha), used the other 4 cores.
+- Each number is the median of 3 runs. Each run took 10 seconds, after a warm up of 3 seconds.
+
+## Details
+
+- Dox passes all 146 tests of the [h2spec](https://github.com/summerwind/h2spec) conformance suite in strict mode.
+- `maxConcurrentStreams` must be 1 or more. Dox uses it only when `http2` is `true`.
+
+
+---
+
+# gRPC
+
+Source: https://dartondox.dev/latest/digging-deeper/grpc/
+
+# gRPC
+
+The `dox_grpc` package lets your Dox app serve gRPC services on the same port as your HTTP routes.
+
+Use gRPC when your services send calls to each other. You write the calls one time in a `.proto` file. Each side then gets typed code from this file. gRPC also has streaming: a client and a server can send many messages in one call.
+
+A client in any language can call `dox_grpc`, because it serves standard gRPC. Your Dox middleware runs before each call. Thus, you can use the same auth for your gRPC services and your HTTP routes.
+
+## Installation
+
+Run the setup command in your app:
+
+```bash
+dox add grpc
+```
+
+The command does these steps:
+
+- It adds `dox_grpc`, `protobuf`, and `grpc` to `pubspec.yaml`. The generated code imports `protobuf` and `grpc`.
+- It writes a sample `protos/greeter.proto` file.
+- It writes `lib/routes/grpc.dart`. This router registers the [health check](#health-check).
+- It adds `APP_HTTP2=true` to `.env` and `.env.example`.
+
+The command does not overwrite a file. It is safe to run the command again. At the end, the command shows the steps that you must do.
+
+To add the package manually, run `dart pub add dox_grpc protobuf grpc`.
+
+### Turn on HTTP/2
+
+gRPC works only over HTTP/2, and [HTTP/2](http2.md) is off by default. Turn on HTTP/2 in the app config:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  http2: true,
+  // ...
+);
+```
+
+The `APP_HTTP2` key in `.env` does not turn on HTTP/2 alone. To use this key, add a `bool? get appHttp2` getter to `AppEnv`. Then set `http2: env.appHttp2 ?? false` in the app config.
+
+Your HTTP routes continue to work on the same port.
+
+## Define a service
+
+### Write the .proto file
+
+A `.proto` file gives the calls of a service and the messages that the calls use. Put the file in the `protos/` folder:
+
+```proto title="protos/greeter.proto"
+syntax = "proto3";
+
+package greeter;
+
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply);
+  rpc SayHelloMany (HelloRequest) returns (stream HelloReply);
+  rpc CollectNames (stream HelloRequest) returns (HelloReply);
+  rpc Chat (stream HelloRequest) returns (stream HelloReply);
+}
+
+message HelloRequest {
+  string name = 1;
+}
+
+message HelloReply {
+  string message = 1;
+}
+```
+
+### Generate the Dart code
+
+The `protoc` tool makes Dart code from the `.proto` file. Install `protoc`. For example, run `brew install protobuf`. Then install the Dart plugin of `protoc`. You do this step one time only:
+
+```bash
+dart pub global activate protoc_plugin
+```
+
+Make sure that `~/.pub-cache/bin` is on your `PATH`. Then `protoc` can find the plugin. Generate the code:
+
+```bash
+protoc --dart_out=grpc:lib/generated -Iprotos protos/greeter.proto
+```
+
+This command writes the message classes and a `GreeterServiceBase` class to `lib/generated`. Each time you change the `.proto` file, run the command again.
+
+### Write the service
+
+Extend the generated base class. Each `rpc` in the `.proto` file is one method:
+
+```dart title="lib/app/grpc/greeter_service.dart"
+import 'package:dox_grpc/dox_grpc.dart';
+
+import '../../generated/greeter.pbgrpc.dart';
+
+class GreeterService extends GreeterServiceBase {
+  @override
+  Future<HelloReply> sayHello(ServiceCall call, HelloRequest request) async {
+    return HelloReply(message: 'Hello ${request.name}');
+  }
+
+  // sayHelloMany, collectNames and chat: see "Call types"
+}
+```
+
+## Register a service
+
+Call `Grpc.register` in a router that has no prefix:
+
+```dart title="lib/routes/grpc.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_grpc/dox_grpc.dart';
+
+import '../app/grpc/greeter_service.dart';
+
+class GrpcRouter extends Router {
+  @override
+  void register() {
+    Grpc.register(GreeterService());
+  }
+}
+```
+
+The router must not have a prefix. A gRPC client always calls the path `/<package.Service>/<Method>`, for example `/greeter.Greeter/SayHello`. A prefix changes this path, and then no client can find the service.
+
+Do not use the `api` router, a `Route.group`, or a `Route.prefix`. If the path changes, Dox throws a `StateError` when the app starts.
+
+You can now call the service. For example, use [grpcurl](https://github.com/fullstorydev/grpcurl):
+
+```bash
+grpcurl -plaintext -import-path protos -proto greeter.proto \
+  -d '{"name": "Ann"}' localhost:3000 greeter.Greeter/SayHello
+```
+
+## Call types
+
+gRPC has four types of calls. The position of `stream` in the `.proto` file sets the type.
+
+### Unary calls
+
+A unary call has one request and one reply. The method returns a `Future`:
+
+```dart
+@override
+Future<HelloReply> sayHello(ServiceCall call, HelloRequest request) async {
+  return HelloReply(message: 'Hello ${request.name}');
+}
+```
+
+### Server streaming
+
+The client sends one request and gets many replies. The method returns a `Stream`. Use `async*` and `yield`:
+
+```dart
+@override
+Stream<HelloReply> sayHelloMany(ServiceCall call, HelloRequest request) async* {
+  for (int i = 1; i <= 3; i++) {
+    if (call.isCanceled) return;
+    yield HelloReply(message: 'Hello ${request.name} $i');
+  }
+}
+```
+
+The `call.isCanceled` check stops the work when the client cancels the call or disconnects. See [Deadlines and cancelled calls](#deadlines-and-cancelled-calls).
+
+### Client streaming
+
+The client sends many requests and gets one reply. The method gets a `Stream` of requests:
+
+```dart
+@override
+Future<HelloReply> collectNames(
+  ServiceCall call,
+  Stream<HelloRequest> request,
+) async {
+  List<String> names = <String>[];
+  await for (HelloRequest item in request) {
+    names.add(item.name);
+  }
+  return HelloReply(message: 'Hello ${names.join(', ')}');
+}
+```
+
+### Bidirectional streaming
+
+The client and the server both send many messages. The method gets a `Stream` and returns a `Stream`:
+
+```dart
+@override
+Stream<HelloReply> chat(ServiceCall call, Stream<HelloRequest> request) async* {
+  await for (HelloRequest item in request) {
+    yield HelloReply(message: 'Hello ${item.name}');
+  }
+}
+```
+
+## Return errors
+
+To stop a call with an error, throw a `GrpcException`. The first argument is a value of the `GrpcStatus` enum. This enum has all the gRPC status codes. The second argument is the message for the client:
+
+```dart
+throw GrpcException(GrpcStatus.notFound, 'No user 5');
+```
+
+If your method throws a different error, the call stops with `INTERNAL`. Dox sends the error to your `ExceptionHandler`, the same as for HTTP routes. The client sees the error text only when `APP_ENV` is `development` or `local`.
+
+A call to a service or a method that does not exist gets `UNIMPLEMENTED`.
+
+## Metadata
+
+Metadata is the gRPC name for headers. The `call` argument gives you three maps:
+
+- `call.clientMetadata`: the headers that the client sent.
+- `call.headers`: the headers that you send back. Set them before the first reply.
+- `call.trailers`: the headers that you send at the end of the call.
+
+```dart
+@override
+Future<HelloReply> sayHello(ServiceCall call, HelloRequest request) async {
+  String? language = call.clientMetadata!['accept-language'];
+  call.headers!['x-served-by'] = 'greeter';
+  call.trailers!['x-done'] = 'yes';
+  return HelloReply(message: 'Hello ${request.name} ($language)');
+}
+```
+
+You must use `!`, because the maps are nullable in the `ServiceCall` type.
+
+## Deadlines and cancelled calls
+
+A client can set a deadline for a call. When the deadline passes, Dox stops the call with `DEADLINE_EXCEEDED`. A client can also cancel a call or lose its connection.
+
+In these cases, your method can continue to run. If your method runs for a long time, make it read `call.isCanceled` and `call.isTimedOut`, and stop:
+
+```dart
+@override
+Stream<HelloReply> sayHelloMany(ServiceCall call, HelloRequest request) async* {
+  while (!call.isCanceled && !call.isTimedOut) {
+    yield HelloReply(message: 'Hello ${request.name}');
+    await Future<void>.delayed(Duration(seconds: 1));
+  }
+}
+```
+
+`call.deadline` is the time of the deadline. It is `null` if the client did not set a deadline. When the client cancels a streaming call, the request stream also stops.
+
+## Middleware
+
+Most services must know the caller. The middleware of the router runs before each call. Add your auth middleware there:
+
+```dart title="lib/routes/grpc.dart"
+import '../app/http/middleware/auth.middleware.dart'; // dox make:middleware auth
+
+class GrpcRouter extends Router {
+  @override
+  List<dynamic> get middleware => <dynamic>[AuthMiddleware()];
+
+  @override
+  void register() {
+    Grpc.register(GreeterService());
+  }
+}
+```
+
+A gRPC client sends its token as metadata. The middleware reads the token the same as an HTTP header:
+
+```dart title="lib/app/http/middleware/auth.middleware.dart"
+class AuthMiddleware implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) {
+    String token = Env.get<String>('API_TOKEN');
+    if (!Hash.equals(req.header('authorization') ?? '', 'Bearer $token')) {
+      throw HttpStatusException(401, message: 'Bad token');
+    }
+    return req;
+  }
+}
+```
+
+When a middleware throws an HTTP error, the client gets the related gRPC status and the message. For example, `401` becomes `UNAUTHENTICATED`. See [the full list](#http-errors-and-grpc-statuses).
+
+### Add middleware to some services
+
+If only some services of a router need a middleware, put them in `Route.middleware`:
+
+```dart
+Route.middleware(<dynamic>[AuthMiddleware()], () {
+  Grpc.register(GreeterService());
+});
+```
+
+The first `Grpc.register` call of your app must not be in `Route.middleware`. To obey this rule easily, register the [health check](#health-check) first.
+
+## Options
+
+The default values are correct for most services. To change them for one service, give a `GrpcOptions`:
+
+```dart
+Grpc.register(
+  GreeterService(),
+  options: GrpcOptions(
+    maxReceiveMessageSize: 16 * 1024 * 1024,
+    idleTimeout: Duration(minutes: 5), // the default
+  ),
+);
+```
+
+### Set the maximum message size
+
+`maxReceiveMessageSize` is the maximum size of a request message, in bytes. `maxSendMessageSize` is the maximum size of a reply message. Both are 4 MiB by default. If a message is larger, the call stops with `RESOURCE_EXHAUSTED`.
+
+```dart
+GrpcOptions(
+  maxReceiveMessageSize: 16 * 1024 * 1024,
+  maxSendMessageSize: 16 * 1024 * 1024,
+)
+```
+
+### Compress replies
+
+Set `gzipResponses` to compress replies with gzip for clients that accept gzip. It is off by default, because gzip uses CPU time for each message, and most gRPC messages are small. Turn it on when your replies are large and contain text:
+
+```dart
+GrpcOptions(gzipResponses: true)
+```
+
+Dox always reads gzip requests, with or without this option.
+
+### Stop idle calls
+
+A client can open a call and then not read the reply. Dox releases these calls: if no message goes in or out for 5 minutes, the call stops with `DEADLINE_EXCEEDED`. To change the time, set `idleTimeout`. To turn the limit off, set it to `null`:
+
+```dart
+GrpcOptions(idleTimeout: Duration(minutes: 30))
+GrpcOptions(idleTimeout: null) // no limit
+```
+
+Set `idleTimeout` longer than your slowest method, because the time also counts while your method works and sends no message. A quiet `Watch` or other long stream also stops, and the client must connect again. Send a message from time to time, or set a longer time.
+
+## Health check
+
+Load balancers and Kubernetes ask a server for its health before they send calls to it. `HealthService` answers them. It is the standard `grpc.health.v1.Health` service, with `Check` and `Watch`.
+
+`dox add grpc` registers it in `lib/routes/grpc.dart`. Do not put the health service behind auth middleware, because a load balancer has no token. If your services need auth, register the health service in a separate router:
+
+```dart title="lib/routes/grpc_health_router.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_grpc/dox_grpc.dart';
+
+class GrpcHealthRouter extends Router {
+  @override
+  void register() {
+    Grpc.register(HealthService());
+  }
+}
+```
+
+The health service must be the first `Grpc.register` call of the app. In the app config, put this router in `routers` before the other gRPC routers. See [Routers and providers](../the-basic/dependency-injection.md#routers-and-providers).
+
+### Set the status of a service
+
+The whole server has the empty name `''`. Its status at start is `SERVING`. To set the status of one service by its name, keep the `HealthService` object and call `setStatus`:
+
+```dart
+HealthService health = HealthService();
+Grpc.register(health);
+
+health.setStatus('greeter.Greeter', ServingStatus.SERVING);
+```
+
+When the service cannot work, call `setStatus` again with `ServingStatus.NOT_SERVING`. For example, do this when the database of the service is down. All isolates get the change.
+
+## Services and isolates
+
+Dox runs your app in many [isolates](isolate.md). Each isolate gets its own copy of your service. You cannot copy a database connection, a socket, or a `ReceivePort` to a different isolate. Thus, do not create these objects when you register the service.
+
+Create them on the first call, inside the isolate that uses them:
+
+```dart
+class GreeterService extends GreeterServiceBase {
+  HttpClient? _client;
+
+  // made on the first call, in the isolate that runs the call
+  HttpClient get client => _client ??= HttpClient();
+
+  @override
+  Future<HelloReply> sayHello(ServiceCall call, HelloRequest request) async {
+    // use client here
+    return HelloReply(message: 'Hello ${request.name}');
+  }
+}
+```
+
+## Deployment
+
+gRPC runs on the [native server](native-server.md). Build your app with `dox build`. See [Deployment](deployment.md#build).
+
+Dox does not have TLS. Put a proxy in front of the app. The proxy does the TLS and sends h2c to Dox. h2c is plain HTTP/2 without TLS.
+
+With nginx, use `grpc_pass` for the gRPC paths. With Caddy, use `h2c://` in `reverse_proxy`. For the full config, see [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
+
+## Benchmark
+
+On one core, `dox_grpc` does the most small calls. Small calls are the most usual type of gRPC call.
+
+<div class="dox-bench dox-bench--simple" markdown>
+
+<p class="dox-bench__title">One core: the most small calls</p>
+<p class="dox-bench__sub">Unary calls with a small message. Every server has one core: Dox one isolate, grpc-go <code>GOMAXPROCS=1</code>.</p>
+
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">calls/s</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>Dox</strong><span>dox_grpc</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">48,700<span class="dox-bench__vs">fastest</span></span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Go</strong><span>grpc-go</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 90.3%"></span></span>
+    <span class="dox-bench__num">44,000<span class="dox-bench__vs">1.1× slower</span></span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>dart:io</strong><span>package:grpc</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 72.5%"></span></span>
+    <span class="dox-bench__num">35,300<span class="dox-bench__vs">1.4× slower</span></span>
+  </div>
+</div>
+
+<p class="dox-bench__foot"><span>Linux · 16 connections · 128 calls in flight · ghz · median of 3 runs</span></p>
+
+</div>
+
+Dox is not the fastest in all tests. With large messages and with streaming, grpc-go is faster on one core. `dox_grpc` is faster than `package:grpc` in all three tests.
+
+Calls a second on one core:
+
+| Test                                   | `dox_grpc` | `package:grpc` | grpc-go |
+| -------------------------------------- | ---------: | -------------: | ------: |
+| Unary, small message                   | 48,700     | 35,300         | 44,000  |
+| Unary, 100 KB reply                    | 14,600     | 11,400         | 17,200  |
+| Server streaming, 100 messages of 1 KB | 4,390      | 2,010          | 6,240   |
+
+On four cores, Dox runs four isolates. Then the two servers are almost equal:
+
+| Test                                   | `dox_grpc` | grpc-go |
+| -------------------------------------- | ---------: | ------: |
+| Unary, small message                   | 56,500     | 56,800  |
+| Unary, 100 KB reply                    | 19,300     | 21,000  |
+| Server streaming, 100 messages of 1 KB | 7,550      | 7,650   |
+
+For small calls, both servers stop at approximately 57,000 calls a second. This number is near the limit of the client on 4 cores. Both servers can possibly do more.
+
+### Test setup
+
+- All servers run the same service: the gRPC interop `TestService`.
+- The Dart servers are AOT builds. The build command is `dart build cli`.
+- `package:grpc` runs on `dart:io` and has one isolate. For this reason, it is only in the one-core table.
+- All tests ran in Linux containers on one machine with 8 cores. The server used 4 cores. The client, [ghz](https://ghz.sh), used the other 4 cores.
+- The client used 16 connections. For small calls, it kept 128 calls open at the same time. For the other two tests, it kept 32 calls open.
+- Each number is the median of 3 runs. Each run took 10 seconds, after a warm up of 3 seconds.
+
+## Details
+
+This section gives special cases. Most apps do not need it.
+
+### HTTP errors and gRPC statuses
+
+| HTTP error | gRPC status |
+| --- | --- |
+| 400, 422 | `INVALID_ARGUMENT` |
+| 401 | `UNAUTHENTICATED` |
+| 403 | `PERMISSION_DENIED` |
+| 404 | `NOT_FOUND` |
+| 408, 504 | `DEADLINE_EXCEEDED` |
+| 409 | `ABORTED` |
+| 413, 429 | `RESOURCE_EXHAUSTED` |
+| 501 | `UNIMPLEMENTED` |
+| 502, 503 | `UNAVAILABLE` |
+| other 4xx | `FAILED_PRECONDITION` |
+| other 5xx | `INTERNAL` |
+
+Dox shows the message of a 5xx error only when `APP_ENV` is `development` or `local`.
+
+### Other cases
+
+- `GrpcException` takes a list of protobuf messages as a third argument. Dox sends them to the client as error details in `grpc-status-details-bin`.
+- A `GrpcError` from `package:grpc` works the same as a `GrpcException`.
+- `call.clientMetadata` does not contain the `grpc-*` headers.
+- A metadata value with a name that ends in `-bin` is base64 text. `GrpcWire.decodeBinary` gives its bytes. `GrpcWire.encodeBinary` makes a value from bytes.
+- `maxReceiveMessageSize` also applies to the size of a gzip message after Dox decompresses it.
+- gRPC routes skip the `RequestTimeout` middleware. Thus, Dox does not stop a long stream.
+- If the first `Grpc.register` call is in `Route.middleware`, Dox throws a `StateError` when the app starts.
+- `health.clearStatus(name)` removes the status of a service. A `Check` for a name with no status gets `NOT_FOUND`.
+
+
+---
+
 # Scheduler
 
 Source: https://dartondox.dev/latest/digging-deeper/scheduler/
@@ -13233,6 +14148,46 @@ server {
 }
 ```
 
+### HTTP/2 and gRPC
+
+Dox can speak HTTP/2 to your proxy. This is needed for gRPC. It is opt-in: set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Dox speaks h2c only, which is HTTP/2 without TLS. The proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port, so the same upstream address works for both.
+
+With Caddy, `h2c://` tells it to use HTTP/2 without TLS to the app:
+
+```
+example.com {
+  reverse_proxy h2c://127.0.0.1:3000
+}
+```
+
+With nginx, gRPC calls need `grpc_pass`, and normal routes need `proxy_pass`. Use a separate location for each. The `grpc://` scheme is used because the app has no TLS:
+
+```nginx
+server {
+  listen 443 ssl;
+  http2 on;
+  server_name example.com;
+
+  ssl_certificate     /etc/letsencrypt/live/example.com/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+
+  # Normal routes: HTTP/1.1 to the app
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+  }
+
+  # gRPC service paths only
+  location /greeter.Greeter/ {
+    grpc_pass grpc://127.0.0.1:3000;
+  }
+}
+```
+
+nginx can not send normal `proxy_pass` requests to an upstream over HTTP/2. It always uses HTTP/1.1 there, and that works fine because Dox accepts it on the same port. Use `grpc_pass` only for gRPC routes, and keep `proxy_pass` for the rest.
+
+nginx `grpc_read_timeout` and `grpc_send_timeout` are 60 seconds by default. A long stream is cut when it is quiet for that long, so raise them for long streams.
+
 ### Pass the real `Host` header
 
 The proxy must pass the real `Host` header to Dox, like `proxy_set_header Host $host;` above. Some checks compare the request with this header:
@@ -13399,6 +14354,10 @@ Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 `<reason>` is for example `native library ABI 8, expected 9`. This means the library on disk is from another version of the package. See [Troubleshooting](../reference/troubleshooting.md#the-native-http-library-did-not-load).
 
 You must build with `dox build` or `dart build cli`, because `dart compile exe` does not run build hooks, so it has no library. See [Deployment](deployment.md).
+
+## HTTP/2
+
+The native server also speaks HTTP/2 (h2c) on the same port, when you turn it on with `http2: true`. See [HTTP/2](http2.md).
 
 ## WebSocket
 
@@ -19240,6 +20199,24 @@ where('status', Status.live.name)
 | `EnumCast<E>(E.values)` | an enum | text with the enum name |
 | `EnumCast<E>(E.values, byIndex: true)` | an enum | a number, the enum index |
 
+## Unknown enum values
+
+A row can hold a value that the enum does not have, like an old name `archived`, or an index out of range. One such row does not fail the query.
+
+- A nullable field reads it as `null`. The ORM logs one `[db]` warning for each table, column and value.
+- A field that can not be null throws a `StateError` that names the column and the stored value.
+
+To get a value of your own instead of `null`, give `unknown`. It works for a field that can not be null too:
+
+```dart
+@Column(cast: EnumCast(Status.values, unknown: Status.draft))
+Status status = Status.draft;
+```
+
+Saving the model does not overwrite the stored value. Setting the field back to the value it read (`null`, or the `unknown` value) does not change it either. To replace a bad stored value, set a real enum value.
+
+This is only for rows from the database. A value you give to `create()`, `firstOrNew()` or `updateOrCreate()` must be a name (or an index) of the enum, or it throws an `ArgumentError`.
+
 ## Custom casts
 
 If no built-in cast fits, write your own. Extend `Cast<T>`: `get()` gets the database value and returns the Dart value, and `set()` gets the Dart value and returns the value to save. The class needs a const constructor:
@@ -22111,6 +23088,20 @@ await Gate.authorize(user, 'delete', post);
 ```
 
 Each method must take `(User user)` or `(User user, Post post)`. A method with another signature fails at `Gate.policy`, so you see the mistake when the app starts.
+
+### Using the ability constants
+
+Use the `Ability` constants when you want the compiler to find a wrong ability name. `Ability` has the five usual names: `Ability.viewAny`, `Ability.view`, `Ability.create`, `Ability.update` and `Ability.delete`.
+
+```dart
+Map<String, Function> get abilities => <String, Function>{
+  Ability.update: update,
+};
+
+await Gate.allows(user, Ability.update, post);
+```
+
+Each constant is the same text as its name. Thus, `Ability.update` and `'update'` are the same ability.
 
 ## Authorizing in a controller
 
@@ -25720,13 +26711,13 @@ Source: https://dartondox.dev/latest/packages/mcp/
 
 # MCP server
 
-`dox_mcp` serves your app's tools to AI clients like Claude, ChatGPT and IDE agents, with the [Model Context Protocol](https://modelcontextprotocol.io) (MCP).
+`dox_mcp` serves the tools of your app to AI clients, for example Claude, ChatGPT, and IDE agents, with the [Model Context Protocol](https://modelcontextprotocol.io) (MCP).
 
-A tool is an action the AI can call, like "add an expense". You write the tool in Dart, and `dox_mcp` serves it from a normal Dox route over the Streamable HTTP transport.
+A tool is an action that the AI can call, for example "add an expense". You write the tool in Dart. `dox_mcp` serves it from a normal Dox route over the Streamable HTTP transport.
 
-- Tool arguments are `dox_validation` schemas. Clients see them as JSON Schema, and every call is checked before your code runs.
-- Session ids are signed with `APP_KEY`, so a session works on every isolate and after a restart. No store is needed.
-- Replies are plain JSON. No SSE stream is needed for tools.
+- Tool arguments are `dox_validation` schemas. Clients see them as JSON Schema. Dox validates each call before your code runs.
+- `APP_KEY` signs the session ids. Thus, a session works on all isolates and after a restart. You do not need a store.
+- Replies are plain JSON. Tools do not need an SSE stream.
 
 ## Setup
 
@@ -25736,17 +26727,22 @@ Run:
 dox add mcp
 ```
 
-It adds the package, `lib/config/mcp.dart` with an `McpServer`, and a sample tool in `lib/app/mcp/echo.tool.dart`. You add the route and the auth yourself. It never overwrites a file, so it is safe to run twice.
+The command adds the package, `lib/config/mcp.dart` with an `McpServer`, and a sample tool in `lib/app/mcp/echo.tool.dart`. You add the route and the auth yourself. The command does not overwrite a file. It is safe to run it again.
 
-To set it up by hand, add the package:
+To set up the package manually, add it:
 
 ```bash
 dart pub add dox_mcp
 ```
 
-## Writing tools
+## Write tools
 
-A tool extends `McpTool`. It has a `name`, a `description` for the model, an `input` schema, and a `call` method that does the work:
+A tool extends `McpTool`. A tool has these parts:
+
+- `name`: the name of the tool.
+- `description`: the text for the model.
+- `input`: the schema of the arguments.
+- `call`: the method that does the work.
 
 ```dart
 import 'package:dox_core/dox_core.dart';
@@ -25774,7 +26770,7 @@ class AddExpense extends McpTool {
 }
 ```
 
-If the arguments are wrong, the client gets a tool result with `isError: true` that lists each problem, so the model can fix the call. If your tool throws, the client also gets a tool result with `isError: true` and the error text.
+If the arguments are not correct, the client gets a tool result with `isError: true`. This result lists each problem, so that the model can correct the call. If your tool throws an error, the client also gets a tool result with `isError: true` and the error text.
 
 ### Small tools
 
@@ -25793,9 +26789,9 @@ McpTool.of(
 
 ### Tools that take a DTO
 
-If you already have a `@Dto` class, a tool can use it as its input. Extend `McpDtoTool<T>`. The rules of the DTO (like `@Length` and `@HexColor`) are written once, and `handle` gets the typed object, not a map.
+If you have a `@Dto` class, a tool can use it as its input. Extend `McpDtoTool<T>`. You write the rules of the DTO one time, for example `@Length` and `@HexColor`. The `handle` method gets the typed object, not a map.
 
-Use `@Describe` on a field to explain it to the model. It goes into the JSON Schema as `description`, and it does not change the checks:
+Use `@Describe` on a field to explain the field to the model. Dox puts this text in the JSON Schema as `description`. It does not change the validation:
 
 ```dart
 @Dto()
@@ -25831,15 +26827,15 @@ class CreateCategory extends McpDtoTool<NewCategory> {
 }
 ```
 
-The arguments are checked like a DTO in a controller, also with async rules like `@Unique` and `@Exists`. A bad call gets a text like this:
+Dox validates the arguments the same as a DTO in a controller. This includes async rules, for example `@Unique` and `@Exists`. A call that is not correct gets a text like this:
 
 ```text
 Input validation error: Invalid arguments for tool create_category: name: The name is required; color: The color must be a hex color like #1a2b3c
 ```
 
-## Serving the tools
+## Serve the tools
 
-Make an `McpServer` with your tools, and call `handle` from a route. The MCP route has no auth of its own, so you must check who calls first. Find the user (from a token, a header or the URL) and pass it as `auth`. The `scope` ties each session to that user:
+Make an `McpServer` with your tools, and call `handle` from a route. The MCP route has no auth. Thus, you must find the caller first. Get the user from a token, a header, or the URL, and give it as `auth`. The `scope` connects each session to that user:
 
 ```dart
 final McpServer mcp = McpServer(
@@ -25855,21 +26851,21 @@ Route.match(<String>['GET', 'POST', 'DELETE'], '/mcp/{token}', (DoxRequest req) 
 });
 ```
 
-In a tool, `context.authAs<User>()` gives this user back.
+In a tool, `context.authAs<User>()` gives this user.
 
-A token in the URL ends up in proxy logs. So prefer a header when your clients can send one. If you want clients to sign in by themselves, use [OAuth](#signing-in-with-oauth).
+Proxies write a token in the URL to their logs. Thus, use a header when your clients can send one. If you want clients to sign in without your help, use [OAuth](#sign-in-with-oauth).
 
-## Signing in with OAuth
+## Sign in with OAuth
 
-With `McpOAuth`, you give the client only the address, like `https://my.app/mcp`. The client finds the rest and signs the user in. This is the sign-in the MCP spec asks for: OAuth 2.1 with PKCE.
+With `McpOAuth`, you give the client only the address, for example `https://my.app/mcp`. The client finds the other data and signs in the user. The MCP spec asks for this sign-in: OAuth 2.1 with PKCE.
 
 `dox_mcp` does the OAuth part. Your app does three things:
 
-1. **Tokens.** Implement `McpOAuthTokens`. `issue` makes a token for a grant. `verify` gives what a token stands for (like a user), or `null`. You choose the table and how a token is revoked. Keep only a hash of the token.
-2. **The consent page.** Serve it at `<issuer>/oauth/authorize`, or set `authorizePage`. It reads `client_id`, `redirect_uri`, `state`, `code_challenge`, `code_challenge_method` and `resource` from the query. The person signs in there the way your app always does.
-3. **The answer.** Your page calls a route of your own, behind your own login. On yes, the route calls `oauth.approve(subject: ...)` and gives the page the address to send the browser to. On no, it calls `oauth.deny(...)`.
+1. **Tokens.** Implement `McpOAuthTokens`. `issue` makes a token for a grant. `verify` gives the subject of a token, for example a user, or `null`. You choose the table and how to revoke a token. Keep only a hash of the token.
+2. **The consent page.** Serve the page at `<issuer>/oauth/authorize`, or set `authorizePage`. The page reads `client_id`, `redirect_uri`, `state`, `code_challenge`, `code_challenge_method`, and `resource` from the query. The person signs in on this page with the usual login of your app.
+3. **The answer.** Your page calls a route of your app, behind your login. If the person agrees, the route calls `oauth.approve(subject: ...)`. Then the route gives the page the address for the browser. If the person refuses, the route calls `await oauth.denyClient(...)`.
 
-Then add the routes and check the token on the MCP route:
+Then add the routes, and verify the token on the MCP route:
 
 ```dart
 final McpOAuth oauth = McpOAuth(
@@ -25893,40 +26889,40 @@ Future<DoxResponse> handleMcp(DoxRequest req) async {
 }
 ```
 
-Call `oauth.routes()` in a router with no prefix, because clients look for `/.well-known/...` at the root of the host. The `codes` store must be shared by all isolates: a file store on one host, or Redis on many.
+Call `oauth.routes()` in a router with no prefix, because clients look for `/.well-known/...` at the root of the host. All isolates must share the `codes` store. Use a file store on one host, or Redis on many hosts.
 
-### Keeping the consent page safe
+### Keep the consent page safe
 
-The consent page decides who gets access, so keep these rules:
+The consent page controls who gets access. Obey these rules:
 
-- Put the answer route behind [CSRF protection](../security/csrf.md). Without it, another site can make a signed-in person say yes to a client without knowing it.
-- Use `oauth.checkClient(...)` to get the client for the page. It throws when the client or the redirect address is wrong. Then never send the browser anywhere.
-- Show the redirect host, so the person sees where the browser goes.
-- HTML-escape the client name before you print it. The client chose the name, so do not trust it.
+- Put the answer route behind [CSRF protection](../security/csrf.md). If you do not, a different site can make a signed-in person agree to a client. The person does not know about it.
+- Use `await oauth.verifyClient(...)` to get the client for the page. This method throws an error when the client or the redirect address is not correct. In that case, do not send the browser to any address.
+- Show `client.host` next to the client name, and show the redirect host. A client can choose any name, but not its host. Then the person sees who asks and where the browser goes.
+- HTML-escape the client name before you show it. The client chose the name, so do not trust it.
 
 There is no refresh token. To revoke a client, delete its token.
 
 ## Sessions
 
-`SignedMcpSessions` is the default. It makes ids like `<random>.<signature>`, signed with a key made from `APP_KEY`. So every isolate, and every server with the same `APP_KEY`, can check an id, and nothing is stored. A new `APP_KEY` ends every session, and clients start a new one by themselves.
+`SignedMcpSessions` is the default. It makes ids like `<random>.<signature>`. A key from `APP_KEY` signs each id. Thus, each isolate and each server with the same `APP_KEY` can verify an id, and Dox stores nothing. A new `APP_KEY` stops all sessions. Then clients start a new session automatically.
 
-Because nothing is stored, a signed id can not be ended. If you want `DELETE` to end a session, give a cache store that all isolates share (file or Redis, not memory):
+Dox stores nothing, so you cannot stop a signed id. If you want `DELETE` to stop a session, give a cache store that all isolates share. Use a file store or Redis, not memory:
 
 ```dart
 SignedMcpSessions(ended: Cache().store('redis'))
 ```
 
-For another kind of session, implement `McpSessions`.
+For a different type of session, implement `McpSessions`.
 
 ## Security
 
-- The MCP route has no auth of its own. Check who calls before `handle`. `McpOAuth` is one way to do it.
-- Set `allowedOrigins` when the server runs on a local or private network. It stops browser pages on other sites (DNS rebinding). A request with an `Origin` that is not in the list gets `403`.
+- The MCP route has no auth. Find the caller before `handle`. `McpOAuth` is one way to do this.
+- Set `allowedOrigins` when the server runs on a local or private network. This setting stops browser pages from other sites. This attack is DNS rebinding. If the `Origin` of a request is not in the list, the request gets `403`.
 - Keep tokens out of logs.
 
 ## Details
 
-This section is for special cases. Most apps do not need it.
+This section gives special cases. Most apps do not need it.
 
 ### What the server answers
 
@@ -25941,6 +26937,7 @@ This section is for special cases. Most apps do not need it.
 | `POST` with a body that is not valid JSON | `400` with the JSON-RPC error `-32700` |
 | `POST` with an empty batch, or a message that is not JSON-RPC 2.0 | `400` with the JSON-RPC error `-32600` |
 | `POST` with `initialize` in a batch with other messages | `400` with the JSON-RPC error `-32600`. Send `initialize` alone |
+| `POST` with a batch of more than 50 messages | `400` with the JSON-RPC error `-32600`. No message runs |
 | `POST` with an unsupported `MCP-Protocol-Version` header | `400` |
 | `POST` with another `Content-Type` than JSON | `415` |
 | Any request with an `Origin` header that is not in `allowedOrigins` | `403` |
@@ -25949,12 +26946,12 @@ This section is for special cases. Most apps do not need it.
 | `DELETE` with no session id | `400` |
 | `DELETE` with an unknown session id, or one of another `scope` | `404`. An ended id also gets `404` when there is an `ended` store |
 
-- Methods: `initialize`, `ping`, `tools/list`, `tools/call`. Others get `-32601 Method not found`.
-- An unknown tool is a JSON-RPC error (`-32602`).
-- `tools/list` sends the JSON Schema of a DTO tool (`toJsonSchema()`) as `inputSchema`.
+- Methods: `initialize`, `ping`, `tools/list`, `tools/call`. Other methods get `-32601 Method not found`.
+- An unknown tool gets a JSON-RPC error, `-32602`.
+- `tools/list` sends the JSON Schema of a DTO tool as `inputSchema`. This schema comes from `toJsonSchema()`.
 - `onToolError` gets the error of a tool that throws, for logs.
-- Protocol versions: `2025-11-25`, `2025-06-18`, `2025-03-26` and `2024-11-05`. A client that asks for another one gets the newest.
-- The session signature is HMAC-SHA256 of the random part and the `scope`. The key is made from `APP_KEY` with the label `dox:mcp`.
+- Protocol versions: `2025-11-25`, `2025-06-18`, `2025-03-26`, and `2024-11-05`. If a client asks for a different version, it gets the newest version.
+- The session signature is HMAC-SHA256 of the random part and the `scope`. Dox makes the key from `APP_KEY` with the label `dox:mcp`.
 
 ### OAuth routes
 
@@ -25967,12 +26964,853 @@ This section is for special cases. Most apps do not need it.
 | `POST /oauth/register` | Dynamic client registration. Nothing is stored. The `client_id` is the name and the redirect addresses, signed with `APP_KEY`. |
 | `POST /oauth/token` | Swaps a code for a token. The body is a form or JSON. The code works once, for `codeTtl` (1 minute). The client, the redirect address and the PKCE verifier must all match. An unknown `client_id` gets `401` with `invalid_client`. |
 
-- The discovery file gives `<issuer>/oauth/register` and `<issuer>/oauth/token` as full addresses. Under a router prefix the routes move but these addresses do not, so clients can not find them.
-- A redirect address must be `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]`. It has no `#fragment`. It has at most 2048 characters (`McpOAuth.maxRedirectUriLength`).
-- A `code_verifier` must be 43 to 128 characters of `A-Z a-z 0-9 - . _ ~` (RFC 7636). Other verifiers get `invalid_request`. A `code_challenge` must be 43 base64url characters.
-- Each code is taken under a lock, so two isolates can not both swap it.
-- These routes answer any origin (CORS `*`) and read no cookie. They skip the CORS list of the app.
-- `issue` may throw `McpOAuthException`, like `access_denied` when a person has too many clients. The client gets it from the token endpoint.
+- The discovery file gives `<issuer>/oauth/register` and `<issuer>/oauth/token` as full addresses. A router prefix moves the routes, but not these addresses. Then clients cannot find the routes.
+- A redirect address must use `https`, or `http` on `localhost`, `127.0.0.1`, or `[::1]`. It must not have a `#fragment`. Its maximum length is 2048 characters (`McpOAuth.maxRedirectUriLength`).
+- A `code_verifier` must have 43 to 128 characters from `A-Z a-z 0-9 - . _ ~`, as RFC 7636 says. Other verifiers get `invalid_request`. A `code_challenge` must have 43 base64url characters.
+- Dox takes each code under a lock. Thus, two isolates cannot both swap the same code.
+- These routes accept all origins, with CORS `*`, and read no cookie. They do not use the CORS list of the app.
+- `issue` can throw `McpOAuthException`, for example `access_denied` when a person has too many clients. The client gets this error from the token endpoint.
+
+
+---
+
+# GraphQL
+
+Source: https://dartondox.dev/latest/packages/graphql/
+
+# GraphQL
+
+`dox_graphql` makes a GraphQL API for your app from your models.
+
+GraphQL is an API with one URL. The client writes the fields that it wants, and it gets JSON with only those fields. One request can read a post, the user of the post, and its comments. To learn GraphQL, read [graphql.org/learn](https://graphql.org/learn/).
+
+## Quick start
+
+### Install
+
+```bash
+dox add graphql
+```
+
+The command adds the packages, `lib/config/graphql.dart`, and `lib/providers/graphql_provider.dart`. It does not overwrite a file.
+
+### Add a model to the API
+
+Put `@GraphQL()` on a model. Then add one annotation for each operation that a client can use:
+
+```dart title="lib/app/models/post/post.model.dart"
+import 'package:dox_graphql/dox_graphql.dart';
+import 'package:dox_orm/dox_orm.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+part 'post.model.g.dart';
+
+@DoxModel()
+@GraphQL()
+@GraphQLAll()
+@GraphQLFind()
+class Post extends PostGenerator {
+  @Column()
+  String? title;
+
+  @Column()
+  int? userId;
+
+  @BelongsTo(User)
+  User? user;
+}
+```
+
+The `id`, the columns, and the relations of the model are now fields that a client can ask for. `@GraphQLAll()` adds the `posts` query, and `@GraphQLFind()` adds the `post` query. An operation that has no annotation does not exist.
+
+`Post` has a relation to `User`. Thus, put `@GraphQL()` on `User` also.
+
+Then run the builder and start the app again. Do these two steps after each change on this page:
+
+```bash
+dart run build_runner build
+```
+
+### Run a query
+
+A **query** is a request that reads data. Open `http://localhost:3000/graphql` in a browser. In development, this URL shows GraphiQL. GraphiQL is a page where you write and run queries. Run this query:
+
+```graphql
+{
+  posts(limit: 10) {
+    title
+    user { name }
+  }
+}
+```
+
+The result has the same shape as the query:
+
+```json
+{ "data": { "posts": [{ "title": "Hello GraphQL", "user": { "name": "Ada" } }] } }
+```
+
+Dox loads the users of all ten posts with one database query.
+
+Your client sends the same query as a `POST` request to `/graphql`. The JSON body is `{"query": "..."}`.
+
+### Hide a field
+
+Some columns must not be visible to a client. Dox does not show the fields in the `hidden` list of the model. Thus, a password is never visible. To hide a different field, put `@GraphQLIgnore()` on the line above its `@Column()`.
+
+### Give a model only through a relation
+
+Sometimes a client must get a model only through a relation, for example `post.user`. Put only `@GraphQL()` on this model. Then the model has no queries and no mutations of its own.
+
+## Model annotations
+
+Each annotation adds one query or one mutation to the API. This model uses all of them:
+
+```dart title="lib/app/models/post/post.model.dart"
+@DoxModel()
+@GraphQL()
+@GraphQLAll()
+@GraphQLPaginate()
+@GraphQLFind()
+@GraphQLCreate(dto: PostInput)
+@GraphQLUpdate(dto: PostInput)
+@GraphQLDelete()
+class Post extends PostGenerator {}
+```
+
+| Annotation | GraphQL field |
+|---|---|
+| `@GraphQL()` | The `Post` type. No query and no mutation. |
+| `@GraphQLAll()` | `posts(limit, offset)` |
+| `@GraphQLPaginate()` | `posts(first, page)`, or `postsPaginate(first, page)` if the model also has `@GraphQLAll()` |
+| `@GraphQLFind()` | `post(id)` |
+| `@GraphQLCreate(dto:)` | `createPost(input)` |
+| `@GraphQLUpdate(dto:)` | `updatePost(id, input)` |
+| `@GraphQLDelete()` | `deletePost(id)` |
+
+Each annotation can have these options:
+
+| Option | Function |
+|---|---|
+| `name:` | A different name for the type or the field. |
+| `description:` | The text that GraphiQL shows. |
+| `guard: true` | A client must log in. See [Authentication](#authentication). |
+| `can:` | The policy must allow the user. `@GraphQL` does not have this option. See [Authorization](#authorization). |
+
+### @GraphQL
+
+Use it to make the model a type of the API. All other annotations on this page need it.
+
+```dart
+@GraphQL()
+```
+
+It also has `filter:`, which hides the rows that a user cannot read. See [Hide rows](#hide-rows).
+
+### @GraphQLAll
+
+Use it when a client must read a list with `limit` and `offset`. The default `limit` is `20`, and the maximum is `100`.
+
+```dart
+@GraphQLAll()
+```
+
+```graphql
+{ posts(limit: 10, offset: 20) { title } }
+```
+
+### @GraphQLPaginate
+
+Use it when a client shows pages and needs the total number of rows. See [Pagination](#pagination).
+
+```dart
+@GraphQLPaginate()
+```
+
+```graphql
+{ posts(first: 10, page: 2) { data { title } paginatorInfo { total } } }
+```
+
+### @GraphQLFind
+
+Use it when a client must read one row by its id. The result is `null` if no row has that id.
+
+```dart
+@GraphQLFind()
+```
+
+```graphql
+{ post(id: 1) { title } }
+```
+
+### @GraphQLCreate
+
+Use it to let a client add a row. The `dto:` class has the fields that the client can set. See [Create](#create).
+
+```dart
+@GraphQLCreate(dto: PostInput)
+```
+
+```graphql
+mutation { createPost(input: { title: "My second post" }) { id } }
+```
+
+### @GraphQLUpdate
+
+Use it to let a client change a row. It changes only the fields that the client sends. See [Update](#update).
+
+```dart
+@GraphQLUpdate(dto: PostInput)
+```
+
+```graphql
+mutation { updatePost(id: 1, input: { title: "A better title" }) { title } }
+```
+
+### @GraphQLDelete
+
+Use it to let a client remove a row. The result is `true`, or `false` if no row has that id. See [Delete](#delete).
+
+```dart
+@GraphQLDelete()
+```
+
+```graphql
+mutation { deletePost(id: 1) }
+```
+
+## Pagination
+
+Use `@GraphQLPaginate()` for a list with page numbers. The client sends `first` (the number of rows on a page) and `page`:
+
+```graphql
+{
+  posts(first: 10, page: 2) {
+    data {
+      title
+    }
+    paginatorInfo {
+      total
+      currentPage
+      lastPage
+      hasMorePages
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "posts": {
+      "data": [{ "title": "Hello GraphQL" }],
+      "paginatorInfo": { "total": 11, "currentPage": 2, "lastPage": 2, "hasMorePages": false }
+    }
+  }
+}
+```
+
+The default `first` is `20`, and the maximum is `100`. The default `page` is `1`.
+
+`data` has the rows of the page. `paginatorInfo` has these fields:
+
+| Field | Value |
+|---|---|
+| `total` | The number of rows on all pages. |
+| `count` | The number of rows on this page. |
+| `perPage` | The value of `first`. |
+| `currentPage` | The number of this page. |
+| `lastPage` | The number of the last page. |
+| `hasMorePages` | `true` if there is a page after this page. |
+| `firstItem` | The number of the first row of this page. The first row of page 1 is `1`. `null` on an empty page. |
+| `lastItem` | The number of the last row of this page. `null` on an empty page. |
+
+If the model has `@GraphQLAll()` and `@GraphQLPaginate()`, the list is `posts` and the paged list is `postsPaginate`. To set a different name, use `name:`:
+
+```dart
+@GraphQLPaginate(name: 'postPages')
+```
+
+## Write your own query
+
+Write your own query when the queries of the annotations are not sufficient, for example for a search or a top-ten list. Put `@GraphQLQuery()` on a method of a class in `lib/`. This method is a **resolver**. A resolver is your code that gives the result of the query.
+
+```dart title="lib/app/graphql/post.resolver.dart"
+import 'package:dox_graphql/dox_graphql.dart';
+import 'package:my_app/app/models/post/post.model.dart';
+import 'package:my_app/app/services/post.service.dart';
+
+class PostResolver {
+  PostResolver(this.postService);
+
+  final PostService postService;
+
+  @GraphQLQuery()
+  Future<List<Post>> trendingPosts({int limit = 10}) {
+    return postService.trending(limit);
+  }
+}
+```
+
+Run the builder and start the app again. The builder finds the class automatically. Dox gets the other data from the method:
+
+- The method name is the query name: `trendingPosts`.
+- The parameters are the values that a client can send. A parameter with a default value is optional.
+- The return type is the type that the client gets.
+- Dox gets the constructor parameters from the [container](../the-basic/dependency-injection.md).
+
+A client calls the query like this: `{ trendingPosts(limit: 3) { title } }`.
+
+### Send an error to the client
+
+To send your own message, throw a `GraphQLError`. For example: `throw GraphQLError('This post is not published yet');`.
+
+For all other errors, the client sees "Internal server error" in production. Dox sends the real error to the `ExceptionHandler` of your app.
+
+## Create, update, and delete
+
+A **mutation** is a request that changes data. Dox makes the create, update, and delete mutations of a model from `@GraphQLCreate`, `@GraphQLUpdate` and `@GraphQLDelete`.
+
+### Create
+
+Write a [DTO](../the-basic/dto.md) with the fields that a client can set:
+
+```dart title="lib/app/dtos/post_input/post_input.dto.dart"
+import 'package:dox_core/dox_core.dart';
+
+part 'post_input.dto.g.dart';
+
+@Dto()
+class PostInput {
+  PostInput({required this.title});
+
+  @MinLength(3, message: 'The title is too short')
+  final String title;
+}
+```
+
+Give the DTO to `@GraphQLCreate`. Then run the builder:
+
+```dart title="lib/app/models/post/post.model.dart"
+@DoxModel()
+@GraphQL()
+@GraphQLCreate(dto: PostInput)
+class Post extends PostGenerator {}
+```
+
+The API now has `createPost`:
+
+```graphql
+mutation {
+  createPost(input: { title: "My second post" }) { id title }
+}
+```
+
+A client can set only the fields of the DTO. Thus, a client cannot set a different column, for example `userId`.
+
+Dox applies the rules of the DTO before it saves the post. If the input is not correct, Dox saves nothing. The client gets the error `VALIDATION_FAILED`, with the message for each field in `extensions.fields`.
+
+### Set the owner of a new row
+
+Use `owner:` when each row belongs to the user that made it. Dox sets that column to the id of the logged-in user. Thus, a client must log in to create a post.
+
+```dart
+@GraphQLCreate(dto: PostInput, owner: 'userId')
+```
+
+The owner column must not be a field of the DTO. `updatePost` never changes it. `owner:` needs `AuthMiddleware()` in the config. See [Authentication](#authentication).
+
+### Update
+
+Give a DTO to `@GraphQLUpdate`. It can be the same DTO as for create:
+
+```dart
+@GraphQLUpdate(dto: PostInput, can: Ability.update, guard: true)
+```
+
+`updatePost` changes only the fields that the client sends. Dox applies only the rules of those fields. The result is `null` if no row has the id.
+
+Without `can:`, each client that can call `updatePost` can change each row. The builder shows a warning if `@GraphQLUpdate` has no `can:` and no `guard:`. See [update](#update_1).
+
+### Delete
+
+`@GraphQLDelete` needs no DTO:
+
+```dart
+@GraphQLDelete(can: Ability.delete, guard: true)
+```
+
+Without `can:`, each client that can call `deletePost` can delete each row. The builder shows a warning if `@GraphQLDelete` has no `can:` and no `guard:`. See [delete](#delete_1).
+
+### Write your own mutation
+
+Write your own mutation when one saved row is not sufficient. Put `@GraphQLMutation()` on a resolver method, and use a DTO for the input. Dox applies the rules of the DTO before your method runs.
+
+```dart title="lib/app/graphql/post.resolver.dart"
+@GraphQLMutation()
+Future<Post> importPost(PostInput input) {
+  return postService.import(input);
+}
+```
+
+## Authentication
+
+By default, all clients can call all queries and mutations. To make clients log in, use `AuthMiddleware` from `dox_auth` and `guard: true`. If your app does not have a login, set it up first with [`dox add auth`](../security/authentication.md).
+
+Add `AuthMiddleware()` to the config. Dox uses it to read the user:
+
+```dart title="lib/config/graphql.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:dox_graphql/dox_graphql.dart';
+import 'package:my_app/generated/schema.g.dart';
+
+GraphQLConfig graphqlConfig = GraphQLConfig(
+  schema: graphqlSchema,
+  middleware: <Object>[AuthMiddleware()],
+);
+```
+
+The middleware does not stop a request. All fields stay public until you add `guard: true`. The client sends its token in the `Authorization: Bearer <token>` header, as usual.
+
+### Make a query or mutation need a login
+
+Set `guard: true` on the annotation of each operation that a guest must not use:
+
+```dart title="lib/app/models/post/post.model.dart"
+@DoxModel()
+@GraphQL()
+@GraphQLAll()
+@GraphQLFind()
+@GraphQLCreate(dto: PostInput, guard: true)
+@GraphQLUpdate(dto: PostInput, guard: true)
+@GraphQLDelete(guard: true)
+class Post extends PostGenerator {}
+```
+
+Here, a guest can read posts, but only a logged-in user can change them.
+
+`guard: true` works the same on `@GraphQLQuery`, `@GraphQLMutation`, `@GraphQLField` and `@GraphQLResolveField`:
+
+```dart title="lib/app/graphql/post.resolver.dart"
+@GraphQLQuery(guard: true)
+Future<List<Post>> trendingPosts({int limit = 10}) {
+  return postService.trending(limit);
+}
+```
+
+If a guest asks for a guarded field, the guest gets the error `UNAUTHENTICATED` for that field. The other fields in the same request still give their data. To make this possible, each query, each mutation and each relation can be `null` in the schema.
+
+`guard: true` needs `AuthMiddleware()` in the config. If the config does not have it, the app stops at start and shows the name of the type or field.
+
+### Protect a model everywhere
+
+Write `@GraphQL(guard: true)` on a model that a guest must never see, for example `User`. Then each field that gives a user needs a login: its queries, its mutations, each relation such as `post.user`, and your own resolvers.
+
+```dart title="lib/app/models/user/user.model.dart"
+@DoxModel()
+@GraphQL(guard: true)
+@GraphQLFind()
+class User extends UserGenerator {}
+```
+
+### Read the logged-in user
+
+Add a `DoxGraphQLContext` parameter to a resolver method. The client does not send this value. Dox puts the current request in it:
+
+```dart title="lib/app/graphql/user.resolver.dart"
+@GraphQLQuery()
+Future<User?> me(DoxGraphQLContext context) {
+  return context.user<User>();
+}
+```
+
+`context.user<User>()` gives `null` for a guest.
+
+## Authorization
+
+A policy decides who can read or change a row. Authentication finds who the user is. The policy uses that user to allow or refuse each request.
+
+`guard: true` is only a login check. Use `can:` and `filter:` with a policy when the answer is different for each user or each row.
+
+### Write a policy
+
+A policy is a class with one method for each rule. The `abilities` map gives a name to each method. This name is the **ability**. `Ability` of `dox_auth` has the usual names: `viewAny`, `view`, `create`, `update` and `delete`.
+
+```dart title="lib/app/policies/post_policy.dart"
+import 'package:dox_auth/dox_auth.dart';
+import 'package:my_app/app/models/post/post.model.dart';
+import 'package:my_app/app/models/user/user.model.dart';
+
+class PostPolicy extends Policy<User, Post> {
+  bool update(User user, Post post) => post.userId == user.id;
+
+  @override
+  Map<String, Function> get abilities => <String, Function>{
+    Ability.update: update,
+  };
+}
+```
+
+Each section below adds one method to this policy. Add each new method to `abilities` also. To learn more about policies, read [Writing policies](../security/authorization.md#writing-policies).
+
+### Register the policy
+
+Register the policy in the `setup()` of a provider. `dox add graphql` made the GraphQL provider, so you can use it. Keep the `super.setup()` call:
+
+```dart title="lib/providers/graphql_provider.dart"
+class AppGraphQLProvider extends GraphQLProvider {
+  AppGraphQLProvider() : super(graphqlConfig);
+
+  @override
+  void setup() {
+    Gate.policy<Post>(PostPolicy());
+    super.setup();
+  }
+}
+```
+
+The config must have `AuthMiddleware()`. Without it, Dox cannot read the user, and each client is a guest.
+
+### Use it on a model
+
+Give an ability to an operation with `can:`. Dox asks the policy before the operation runs:
+
+```dart title="lib/app/models/post/post.model.dart"
+import 'package:dox_auth/dox_auth.dart';
+
+@DoxModel()
+@GraphQL(filter: Ability.view)
+@GraphQLAll(can: Ability.viewAny)
+@GraphQLPaginate(can: Ability.viewAny)
+@GraphQLFind(can: Ability.view)
+@GraphQLCreate(dto: PostInput, can: Ability.create, guard: true, owner: 'userId')
+@GraphQLUpdate(dto: PostInput, can: Ability.update, guard: true)
+@GraphQLDelete(can: Ability.delete, guard: true)
+class Post extends PostGenerator {
+  @Column()
+  String? title;
+
+  @Column()
+  String? status;
+
+  @Column()
+  int? userId;
+}
+```
+
+An operation with no `can:` does not ask the policy. Use only the checks that the model needs.
+
+| Annotation | The policy method gets |
+|---|---|
+| `@GraphQLAll(can:)`, `@GraphQLPaginate(can:)`, `@GraphQLCreate(can:)` | The user. |
+| `@GraphQLFind(can:)`, `@GraphQLUpdate(can:)`, `@GraphQLDelete(can:)` | The user and the row. |
+| `@GraphQL(filter:)` | The user and each row. |
+
+The first group gets no row. Thus, use `Ability.viewAny` on `@GraphQLAll` and `@GraphQLPaginate`, and `Ability.create` on `@GraphQLCreate`. Do not use `Ability.view` or `Ability.update` there.
+
+### viewAny
+
+Use `viewAny` when some users must not get lists of the model. Put it on `@GraphQLAll` and `@GraphQLPaginate`:
+
+```dart
+@GraphQLAll(can: Ability.viewAny)
+```
+
+```dart
+bool viewAny(User user) => user.banned != true;
+```
+
+A banned user sends this request:
+
+```graphql
+{
+  posts { title }
+  me { name }
+}
+```
+
+The `posts` field is `null`. The other fields keep their data:
+
+```json
+{ "data": { "posts": null, "me": { "name": "Ada" } } }
+```
+
+The `errors` list of the result has one error for `posts`. Its code is `FORBIDDEN`, in `extensions.code`.
+
+### view
+
+Use `view` when a user can read some rows and not others. Put it on `@GraphQLFind`:
+
+```dart
+@GraphQLFind(can: Ability.view)
+```
+
+Here, a user can read a published post and their own posts:
+
+```dart
+bool view(User user, Post post) {
+  return post.status == 'published' || post.userId == user.id;
+}
+```
+
+Post 2 is a draft of a different user:
+
+```graphql
+{ post(id: 2) { title } }
+```
+
+```json
+{ "data": { "post": null } }
+```
+
+The error code is `FORBIDDEN`.
+
+### Hide rows
+
+Use `filter:` on `@GraphQL` when a client must get only the rows that the user can read:
+
+```dart
+@GraphQL(filter: Ability.view)
+```
+
+Dox hides each row that the ability refuses, and gives no error. This applies to each field that gives the model:
+
+- The `posts` list and the paged list. Thus, a list can have fewer rows than `limit`.
+- A list relation, for example `user.posts`.
+- A single relation, for example `comment.post`. A refused row is `null`.
+- The `post(id)` query. A refused row is `null`, the same as an id that does not exist.
+- Your own queries, mutations and fields that return the model.
+- The result of `updatePost`. The row is saved, but the result is `null`.
+
+In a paged list, `total` and `lastPage` also count the hidden rows.
+
+The result of `createPost` is not filtered: the client gets back the row it sent.
+
+`filter:` does not decide who can change a row. `updatePost` and `deletePost` ask only their `can:`, so a user can change a hidden row when they have no `can:`. Give them a `can:`.
+
+A field can give a filtered model as `Post`, `Post?`, `List<Post>` or `List<Post>?`. Other shapes, like `List<List<Post>>` or `List<Post?>`, stop the build.
+
+To get `null` and no error from `post(id)`, use `filter:` and no `can:` on `@GraphQLFind`. With `can:`, a refused user gets `FORBIDDEN`.
+
+### create
+
+Use `create` when only some users can add a row. The method gets only the user, because no row exists yet:
+
+```dart
+@GraphQLCreate(dto: PostInput, can: Ability.create)
+```
+
+```dart
+bool create(User user) => user.verified == true;
+```
+
+A user that is not verified sends this request:
+
+```graphql
+mutation {
+  createPost(input: { title: "My first post" }) { id }
+}
+```
+
+```json
+{ "data": { "createPost": null } }
+```
+
+The error code is `FORBIDDEN`, and Dox saves nothing. Dox asks the policy first. It applies the rules of the DTO only for a user that the policy allows.
+
+### update
+
+Use `update` to decide who can change a row:
+
+```dart
+@GraphQLUpdate(dto: PostInput, can: Ability.update)
+```
+
+```dart
+bool update(User user, Post post) => post.userId == user.id;
+```
+
+Post 1 belongs to a different user:
+
+```graphql
+mutation {
+  updatePost(id: 1, input: { title: "A better title" }) { title }
+}
+```
+
+```json
+{ "data": { "updatePost": null } }
+```
+
+The error code is `FORBIDDEN`, and Dox writes nothing.
+
+If no row has the id, Dox asks the policy about an empty post. Thus, a refused user gets `FORBIDDEN` for each id. This is the same for `view` and `delete`.
+
+### delete
+
+Use `delete` to decide who can remove a row:
+
+```dart
+@GraphQLDelete(can: Ability.delete)
+```
+
+```dart
+bool delete(User user, Post post) => post.userId == user.id;
+```
+
+Post 1 belongs to a different user:
+
+```graphql
+mutation {
+  deletePost(id: 1)
+}
+```
+
+```json
+{ "data": { "deletePost": null } }
+```
+
+The error code is `FORBIDDEN`, and the post stays in the database. For the owner of the post, the result is `true`.
+
+### Add your own ability
+
+Use your own ability when the five names of `Ability` are not sufficient. Write the name as a constant on the policy:
+
+```dart title="lib/app/policies/post_policy.dart"
+class PostPolicy extends Policy<User, Post> {
+  static const String publish = 'publish';
+
+  bool canPublish(User user, Post post) => user.editor == true;
+
+  @override
+  Map<String, Function> get abilities => <String, Function>{
+    publish: canPublish,
+  };
+}
+```
+
+```dart
+@GraphQLUpdate(dto: PostInput, can: PostPolicy.publish)
+```
+
+### Fix an ability that the policy does not have
+
+When the app starts, Dox makes sure that the policy has each ability of `can:` and `filter:`. If one is missing, the app stops with an error that shows the available abilities:
+
+```text
+@GraphQLDelete(can: 'delete') on Post: PostPolicy has no ability 'delete'. Available: update.
+```
+
+Add the ability to the `abilities` map of the policy. If the error says that the model has no policy, register the policy in the `setup()` of a provider.
+
+### Let guests in
+
+A guest is a client that is not logged in. The first type of the policy decides what a guest gets.
+
+With `Policy<User, Post>`, your methods always get a user. Dox refuses each guest. Where a user gets `FORBIDDEN`, a guest gets the error `UNAUTHENTICATED`.
+
+With `Policy<User?, Post>`, a guest gets to your methods, and `user` is `null`. Use it when a guest can read some rows:
+
+```dart
+class PostPolicy extends Policy<User?, Post> {
+  bool view(User? user, Post post) {
+    if (post.status == 'published') return true;
+    return user != null && post.userId == user.id;
+  }
+
+  @override
+  Map<String, Function> get abilities => <String, Function>{Ability.view: view};
+}
+```
+
+Now a guest can read the published posts, and a user can also read their own drafts.
+
+To refuse guests on one operation of this model, add `guard: true` to that operation.
+
+### Your own resolvers
+
+`filter:` also hides rows in the result of your own `@GraphQLQuery`, `@GraphQLMutation`, `@GraphQLResolveField` or getter. `can:` works only on the operations of the model annotations. To refuse a user with an error in your own resolver, call [`Gate`](../security/authorization.md#checking-a-gate) yourself:
+
+```dart title="lib/app/graphql/post.resolver.dart"
+@GraphQLQuery()
+Future<Post?> latestPost(DoxGraphQLContext context) async {
+  Post? post = await postService.latest();
+  User? user = await context.user<User>();
+  if (post != null && await Gate.denies(user, Ability.view, post)) {
+    throw GraphQLAuth.forbidden();
+  }
+  return post;
+}
+```
+
+`GraphQLAuth.forbidden()` gives the same `FORBIDDEN` error as `can:`.
+
+## Configuration
+
+All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, for example `path: '/api/graphql'`. Each setting in the table has a default. Set only the settings that you want to change.
+
+| Setting | Default | What it does |
+|---|---|---|
+| `path` | `/graphql` | The URL of the API. |
+| `middleware` | none | Route middleware, like `AuthMiddleware()`. |
+| `graphiql` | on in development | The GraphiQL page. |
+| `introspection` | on in development | Lets tools like GraphiQL read the list of your types and fields. |
+| `showInternalErrors` | on in development | Sends the real text of an error to the client. |
+| `maxDepth` | `64` | How deep a query can nest fields. |
+| `maxFields` | `20000` | The most fields one query can ask for. |
+| `maxNodes` | `100000` | The most values one request can load. |
+| `maxRootFields` | `50` | The most top-level fields in one request. Each alias counts. |
+| `maxRelationRows` | `50000` | The most rows that one relation can load for all parent rows together. |
+
+"On in development" means on when `APP_ENV` is `development`. Thus, in production, GraphiQL is off, nobody can get a list of your fields, and error details stay on the server. You do not change anything for this.
+
+The `max` settings stop a very large query before it causes much work on your server. Set lower values when your API is open to the public.
+
+## Without the ORM
+
+If your app does not use models, install with `dox add graphql --no-orm`. Put `@GraphQL()` on a plain Dart class. Its public fields are the fields that a client can ask for. You write all the queries yourself:
+
+```dart title="lib/app/graphql/product.resolver.dart"
+import 'package:dox_graphql/dox_graphql.dart';
+import 'package:my_app/app/repositories/product.repository.dart';
+import 'package:my_app/app/repositories/shop.repository.dart';
+
+@GraphQL()
+class Product {
+  Product({required this.id, required this.name, required this.shopId});
+
+  final int id;
+  final String name;
+
+  @GraphQLIgnore()
+  final int shopId;
+}
+
+class ProductResolver {
+  ProductResolver(this.productRepository, this.shopRepository);
+
+  final ProductRepository productRepository;
+  final ShopRepository shopRepository;
+
+  @GraphQLQuery()
+  Future<List<Product>> products({int limit = 20}) {
+    return productRepository.latest(limit);
+  }
+
+  @GraphQLResolveField()
+  Future<Shop?> shop(Product product, DoxGraphQLContext context) {
+    DataLoader<int, Shop> shops = context.loader<int, Shop>(
+      'shops',
+      () => DataLoader<int, Shop>(shopRepository.findByIds),
+    );
+    return shops.load(product.shopId);
+  }
+}
+```
+
+`@GraphQLResolveField()` adds a field to the class of its first parameter. Thus, `Product` gets a `shop` field, and `Shop` also needs `@GraphQL()`.
+
+The `DataLoader` collects the shop ids of the full request. Thus, fifty products cause one shop query, not fifty queries. `findByIds` takes a `List<int>` and returns a `Future<List<Shop?>>`, in the same order as the ids.
 
 
 ---
@@ -28399,8 +30237,7 @@ This is `POST /api/posts`. You wrote no docs code for it:
     },
     "500": {"description": "Server error"}
   },
-  "security": [{"bearerAuth": []}],
-  "x-dox-middleware": ["LogMiddleware", "AuthMiddleware"]
+  "security": [{"bearerAuth": []}]
 }
 ```
 
@@ -28414,7 +30251,6 @@ Where each part comes from:
 | `401` and `bearerAuth` | `AuthMiddleware` on the route |
 | `422` | the route has a request class |
 | `200` with no body | `store` returns `DoxResponse`, so the builder can not see the body. Step 6 fixes this |
-| `x-dox-middleware` | the middleware of the route: the global `LogMiddleware` and `AuthMiddleware` |
 
 Other routes get error answers in the same way. The `Can` middleware or a `req.authorize(...)` call gives `401` and `403`. The `GuestMiddleware` and `ValidateSignature` middleware give `403`. A `req.validateSchema(...)` call gives `422`.
 
@@ -30155,6 +31991,8 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. |
 | `idleTimeout` | `Duration` | `Duration(seconds: 30)` | A keep-alive connection with no new request for this long is closed. Behind a load balancer, set it longer than the balancer's idle timeout. See [Behind a load balancer](../digging-deeper/deployment.md#behind-a-load-balancer). |
 | `maxConnections` | `int?` | `null` (no limit) | The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue until a connection closes. The whole app holds up to `maxConnections * totalIsolate`, so keep that below `ulimit -n`. |
+| `http2` | `bool` | `false` | The same port also speaks HTTP/2 over plain TCP (h2c). HTTP/1.1 keeps working. See [HTTP/2](../digging-deeper/http2.md). |
+| `maxConcurrentStreams` | `int` | `250` | The most open requests one HTTP/2 connection can have (1 or more). Used only when `http2` is `true`. |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
 | `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of your reverse proxies. Dox reads `X-Forwarded-For` (for `req.ip()`) and `X-Forwarded-Proto` (for `req.scheme()`) only from these. `['*']` trusts any direct client. |
 
@@ -32176,197 +34014,4 @@ These are printed to stderr. The connection or the request fails, but the app ke
 | `zsh: command not found: dox` | `$HOME/.pub-cache/bin` is not in `PATH`. | See [Troubleshooting](troubleshooting.md#dox-command-not-found-after-dart-pub-global-activate). |
 
 See [CLI](cli.md).
-
-
----
-
-# Changelog
-
-Source: https://dartondox.dev/latest/reference/changelog/
-
-# Changelog
-
-What changed in `dox_core`, newest first. Each version lists the changes you may notice in your app. The full list, with every detail, is in [`CHANGELOG.md`](https://github.com/dartondox/dox/blob/main/packages/dox-core/CHANGELOG.md).
-
-## 3.2.2
-
-### New
-
-- `Dox().compute(task)` runs heavy CPU work (a PDF, an image, a big JSON file) on a worker isolate. The server keeps answering other requests in the meantime. `AppConfig.computeWorkers` sets the number of workers (default 4).
-- Strict mode for development: `AppConfig(strict: StrictConfig(enabled: true))`. It warns when a route blocks the isolate too long, or when `Hash.make` runs in the web server. Off by default.
-- Log lines have a tag that says where they come from: `[request]`, `[server]`, `[error]` or `[app]`. Pass your own tag as the third argument: `Logger.info('done', null, 'billing')`.
-- `CoreFlags.rateLimitIpv6Prefix` counts an IPv6 client by its /64 prefix. Off by default.
-
-### Changed
-
-- `Hash.makeAsync` and `Hash.verifyAsync` use the `Dox().compute` workers. Before, each call started a new isolate.
-- The stderr warnings use the same tags. `dox: warning:` and `[dox]` are now `[server]` or `[request]`.
-
-### Fixed
-
-- Sessions with the `cache` driver on a `memory` store were kept per isolate, so users were logged out at random. They are now shared by all isolates.
-- A slow handler could lose its upload temp file when the client left early.
-- An error after a stream started (like server-sent events) wrote `Internal Server Error` into the stream. Now the stream just ends.
-- A cut multipart upload kept the request open for ever. Now it gets 400.
-- `AfterResponse` work could start before the handler ended, or never run after a sync throw.
-
-### Security
-
-- The `RateLimit` counter without Redis now keeps at most 100,000 clients, so many fake IPs can not fill the memory.
-
-### Performance
-
-- Faster and lighter requests: lazy request body, lazy cookie session, fewer header reads, a smaller JSON buffer, faster route matching and `RateLimit` on Redis in one round trip.
-
-## 3.2.1
-
-### New
-
-- `AppConfig.isDevelopment` is true when `APP_ENV` is `development`.
-- `Env.appEnv` gives `APP_ENV` in lower case.
-
-### Fixed
-
-- `Env.get` as the first env read of the app did not see `.env`. Now every env read loads `.env` first.
-- In `.env`, `KEY=#value` was read as empty. Now it keeps `#value`.
-- A value with only spaces now gives the default.
-
-### Security
-
-- An env error no longer prints the bad value, because it may be a secret.
-- The `APP_KEY` check refuses more public sample keys. If your key is one of them, run `dox key:generate`.
-
-## 3.2.0
-
-### Breaking
-
-- The JSON lines of `Logger` and `LogMiddleware` use standard log field names (Datadog). `level` is now `status`. `LogMiddleware` also renames `source_ip` to `network.client.ip` and `request_id` to `http.request_id`.
-- `Command`, `MigrationFile` and `DoxProvider` moved to `dox_annotation`. `dox_core` still exports them. Upgrade `dox_builder` together with `dox_core`.
-
-### New
-
-- `CoreFlags`: opt-in behaviors, all off by default. Pass them as `AppConfig(flags: ...)`. `CoreFlags.all()` turns on every flag. See [App config](app-config.md).
-- `CoreFlags.envExpand` lets `.env` values use `${OTHER}`. `export KEY=value` lines now work too.
-- `RateLimit(sliding: true)` uses a sliding window.
-- `AppConfig(htmlErrors: true)` sends an HTML error page to browsers. Errors stay JSON by default.
-- Providers get a `boot()` step that runs after every `setup()`.
-- `Dox().addGlobalMiddleware()` lets a provider add global middleware.
-- `Dox().isWebServer` is true only in the web server process.
-- `Dox().loadRoutes()` gives the app routes without a server. `dox route:list` uses it.
-- `Route.resource(..., parameter: 'photo')` names the item param.
-- `route()` and `Route.url()` take `absolute: true`, and put unknown params in the query string.
-- A cache store with `'encrypt': true` encrypts its values with `APP_KEY`.
-- `ServerTiming` middleware adds a `Server-Timing` header.
-- `AfterResponse.run(work)` runs work after the response is sent.
-- `session.regenerate(keepToken: true)` keeps the CSRF token.
-- `dox_core` exports the `JSON` helper.
-- An AI agent skill (`dox-core-guide`). Install it with `dart run skills@ get`.
-
-### Changed
-
-- `Logger` writes lines in batches, not one `print()` per line. Warnings and errors are written at once.
-- `LogMiddleware` writes through `Logger` and follows `LoggerConfig`.
-
-### Fixed
-
-- `Route.group` and the other route scopes now restore their state when the callback throws.
-- `Dox().stop()` could keep the process alive.
-
-## 3.1.3
-
-### New
-
-- `IsolateBus` sends a message to all isolates of the app, with no Redis.
-- `Dox().isolateCount` gives the number of running isolates.
-
-## 3.1.2
-
-### Changed
-
-- Uses `dox_validation` 3.1.2, so `@Describe('...')` works on DTO fields.
-
-## 3.1.1
-
-### New
-
-- `Hash.sha256(value)`, to store API keys and tokens as a hash. Not for passwords.
-- `ValidationException.issues` keeps every issue, so you can build your own 422 body.
-- `Cache().flexible` takes a null `stale`.
-- `RequestBody` and `BodyKind` are exported, to tell invalid JSON from no body.
-
-## 3.1.0
-
-### Breaking
-
-- Without Redis, `RateLimit` counts are shared by all isolates. Before, the real limit was `max` times the number of isolates. Raise `max` if you relied on that.
-- When two `Route.mount` prefixes match, the longest one wins. Before, the first one won.
-- Removed the unused `middlewareAndControllerHandler` and `getDoxRequest` helpers.
-
-### New
-
-- Routes: `Route.match`, `Route.any`, `Route.redirect`, `Route.permanentRedirect`, `Route.fallback` and `.where(param, regex)`.
-- `Route.staticFiles(prefix, folder)` serves CSS, JS and images, with `ETag`, `304` and Range support.
-- `MethodOverride` middleware, so an HTML form can send PUT, PATCH and DELETE.
-- Request helpers: `input` with dot keys and a default, `filled`, `exists`, `missing`, `except`, `boolean`, `integer`, `file`, `hasFile`, `bearerToken`, `path`, `fullUrl`, `pathIs` and `routeIs`.
-- `Crypt.encryptString` and `Crypt.decryptString`, with the `APP_KEY`.
-- `Hash.check`, the same as `Hash.verify`.
-- `Cache().many` and `Cache().putMany`.
-- `Route.mount(..., middleware: true)` runs the global middleware before the raw handler.
-- `SessionMiddleware().fromCookie(value)` loads a session with no request, for a Socket.IO login.
-- `package:dox_core/command.dart` lets a package add its own `dox` commands.
-- `AppConfig.idleTimeout` and `AppConfig.maxConnections`.
-- `Route.websocket(maxMessageSize:)`.
-- A warning in development when a middleware returns `null`.
-
-### Fixed
-
-- `res.withHeaders` dropped the headers set before it.
-- `res.header` added a second value instead of replacing one.
-- A mounted handler that threw left the client hanging.
-- `Route.mount('/admin')` also matched `/administrator`.
-- Static files added before `startServer()` worked only in one isolate.
-- Many smaller router, OpenAPI and session fixes.
-
-### Security
-
-- `.where` now checks a param again after `%` decoding. Before, `%2F` could slip `../` past it.
-- `req.pathIs()` now cleans the path like the router does, so `/admin//` can not skip a guard.
-- `back()` only follows a `Referer` of the same host. It was an open redirect.
-- WebSocket routes can check the `Origin` header: `Route.websocket(allowedOrigins: [...])`.
-
-## 3.0.2
-
-### Changed
-
-- A Redis cache store with no `prefix` uses `<app name>_cache:`. Your old cache keys are not found once after the update. Set `'prefix': 'dox_cache:'` to keep them.
-
-### New
-
-- Middleware: `RequestId`, `ETag`, `ValidateSignature` and `RequestTimeout`.
-- Signed urls: `Route.signedUrl(...)`.
-- `IDoxTerminableMiddleware` runs a step after the response is sent.
-- `Cache()` has `flexible` and `touch`.
-
-## 3.0.1
-
-### New
-
-- A path with routes, but not for the request method, gives `405` with an `Allow` header. Before, it gave `404`.
-- `abort(code, [message, headers])` for any status.
-- Bracket keys nest: `tags[]=a&tags[]=b` gives a list.
-- `AppConfig(previousKeys: [...])` reads cookies made with an old `APP_KEY`, so a new key does not log users out.
-
-### Fixed
-
-- Path params are now URL-decoded.
-- 5xx HTTP exceptions now reach `ExceptionHandler.report`.
-- `req.method` said `GET` for a HEAD request.
-
-### Performance
-
-- Encrypted cookies and sessions are about 100 times faster (AES-GCM in Rust).
-
-## 3.0.0
-
-The first stable release.
 
