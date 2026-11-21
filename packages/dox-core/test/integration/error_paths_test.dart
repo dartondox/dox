@@ -24,6 +24,15 @@ Future<void> rawNoWrite(DoxRequest req) async {
   throw StateError('before the head');
 }
 
+/// takes over, sends part of its answer, then throws
+Future<void> rawAfterWrite(DoxRequest req) async {
+  req.takeOverResponse();
+  HttpResponse res = req.httpRequest.response;
+  res.write('part');
+  await res.flush();
+  throw StateError('after the head');
+}
+
 class ErrRouter extends Router {
   @override
   void register() {
@@ -34,6 +43,7 @@ class ErrRouter extends Router {
       when: anyPost,
     );
     Route.get('raw-no-write', rawNoWrite);
+    Route.get('raw-after-write', rawAfterWrite);
   }
 }
 
@@ -93,6 +103,14 @@ void main() {
 
   test('takeOverResponse then a throw before any write gets a 500', () async {
     (await client.get('/raw-no-write')).expectStatus(500);
+    expect(errors.reported.single, isA<StateError>());
+  });
+
+  test('takeOverResponse then a throw after a write still ends', () async {
+    TestResponse res = await client
+        .get('/raw-after-write')
+        .timeout(const Duration(seconds: 5));
+    res.expectStatus(200).expectBody('part');
     expect(errors.reported.single, isA<StateError>());
   });
 }
