@@ -4,13 +4,11 @@ icon: lucide/network
 
 # gRPC
 
-The `dox_grpc` package lets your Dox app serve gRPC services on the same port as your HTTP routes.
+gRPC lets your services call each other with typed messages, on the same port as your HTTP routes.
 
-Use gRPC when your services send calls to each other. You write the calls one time in a `.proto` file. Each side then gets typed code from this file. gRPC also has streaming: a client and a server can send many messages in one call.
+Use gRPC when one service calls a different service. You write the calls one time in a `.proto` file, and each side gets typed code from this file. A client in any language can call your app.
 
-A client in any language can call `dox_grpc`, because it serves standard gRPC. Your Dox middleware runs before each call. Thus, you can use the same auth for your gRPC services and your HTTP routes.
-
-## Installation
+## Install
 
 Run the setup command in your app:
 
@@ -18,20 +16,9 @@ Run the setup command in your app:
 dox add grpc
 ```
 
-The command does these steps:
+The command adds the packages, a sample `protos/greeter.proto` file and `lib/routes/grpc.dart`. It also adds `APP_HTTP2=true` to `.env`. It does not overwrite a file.
 
-- It adds `dox_grpc`, `protobuf`, and `grpc` to `pubspec.yaml`. The generated code imports `protobuf` and `grpc`.
-- It writes a sample `protos/greeter.proto` file.
-- It writes `lib/routes/grpc.dart`. This router registers the [health check](#health-check).
-- It adds `APP_HTTP2=true` to `.env` and `.env.example`.
-
-The command does not overwrite a file. It is safe to run the command again. At the end, the command shows the steps that you must do.
-
-To add the package manually, run `dart pub add dox_grpc protobuf grpc`.
-
-### Turn on HTTP/2
-
-gRPC works only over HTTP/2, and [HTTP/2](http2.md) is off by default. Turn on HTTP/2 in the app config:
+gRPC works only over HTTP/2, and [HTTP/2](http2.md) is off by default. Turn it on in the app config:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -40,15 +27,11 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-The `APP_HTTP2` key in `.env` does not turn on HTTP/2 alone. To use this key, add a `bool? get appHttp2` getter to `AppEnv`. Then set `http2: env.appHttp2 ?? false` in the app config.
+Your HTTP routes continue to work on the same port. To use the `APP_HTTP2` key, see [Details](#details).
 
-Your HTTP routes continue to work on the same port.
+## Write the .proto file
 
-## Define a service
-
-### Write the .proto file
-
-A `.proto` file gives the calls of a service and the messages that the calls use. Put the file in the `protos/` folder:
+A `.proto` file gives the calls of a service and the messages that the calls use. The setup command wrote this sample file:
 
 ```proto title="protos/greeter.proto"
 syntax = "proto3";
@@ -57,9 +40,6 @@ package greeter;
 
 service Greeter {
   rpc SayHello (HelloRequest) returns (HelloReply);
-  rpc SayHelloMany (HelloRequest) returns (stream HelloReply);
-  rpc CollectNames (stream HelloRequest) returns (HelloReply);
-  rpc Chat (stream HelloRequest) returns (stream HelloReply);
 }
 
 message HelloRequest {
@@ -71,23 +51,25 @@ message HelloReply {
 }
 ```
 
-### Generate the Dart code
+## Generate the Dart code
 
-The `protoc` tool makes Dart code from the `.proto` file. Install `protoc`. For example, run `brew install protobuf`. Then install the Dart plugin of `protoc`. You do this step one time only:
+The `protoc` tool makes Dart code from the `.proto` file. Install `protoc` and its Dart plugin one time. Make sure that `~/.pub-cache/bin` is on your `PATH`:
 
 ```bash
+brew install protobuf
 dart pub global activate protoc_plugin
 ```
 
-Make sure that `~/.pub-cache/bin` is on your `PATH`. Then `protoc` can find the plugin. Generate the code:
+Then generate the code. Run these commands again after each change to the `.proto` file:
 
 ```bash
+mkdir -p lib/generated
 protoc --dart_out=grpc:lib/generated -Iprotos protos/greeter.proto
 ```
 
-This command writes the message classes and a `GreeterServiceBase` class to `lib/generated`. Each time you change the `.proto` file, run the command again.
+The commands write the message classes and a `GreeterServiceBase` class to `lib/generated`.
 
-### Write the service
+## Write the service
 
 Extend the generated base class. Each `rpc` in the `.proto` file is one method:
 
@@ -101,14 +83,14 @@ class GreeterService extends GreeterServiceBase {
   Future<HelloReply> sayHello(ServiceCall call, HelloRequest request) async {
     return HelloReply(message: 'Hello ${request.name}');
   }
-
-  // sayHelloMany, collectNames and chat: see "Call types"
 }
 ```
 
-## Register a service
+For calls that send many messages, see [Call types](#call-types).
 
-Call `Grpc.register` in a router that has no prefix:
+## Register the service
+
+A client can call a service only after you register it. Call `Grpc.register` in the router that the setup command wrote:
 
 ```dart title="lib/routes/grpc.dart"
 import 'package:dox_core/dox_core.dart';
@@ -119,25 +101,95 @@ import '../app/grpc/greeter_service.dart';
 class GrpcRouter extends Router {
   @override
   void register() {
+    Grpc.register(HealthService());
     Grpc.register(GreeterService());
   }
 }
 ```
 
-The router must not have a prefix. A gRPC client always calls the path `/<package.Service>/<Method>`, for example `/greeter.Greeter/SayHello`. A prefix changes this path, and then no client can find the service.
+Run `dart run build_runner build`, and start the app again. Then Dox finds the router.
 
-Do not use the `api` router, a `Route.group`, or a `Route.prefix`. If the path changes, Dox throws a `StateError` when the app starts.
+The router must not have a prefix, because a gRPC client always calls the path `/<package.Service>/<Method>`. Do not use the `api` router, a `Route.group`, or a `Route.prefix`. If the path changes, Dox throws a `StateError` when the app starts.
 
-You can now call the service. For example, use [grpcurl](https://github.com/fullstorydev/grpcurl):
+`HealthService` is the [health check](#health-check). Keep it as the first `Grpc.register` call.
+
+## Call the service
+
+Do a test call before you write a client. For example, use [grpcurl](https://github.com/fullstorydev/grpcurl):
 
 ```bash
 grpcurl -plaintext -import-path protos -proto greeter.proto \
   -d '{"name": "Ann"}' localhost:3000 greeter.Greeter/SayHello
 ```
 
+The reply is JSON:
+
+```json
+{ "message": "Hello Ann" }
+```
+
+Give the `.proto` file to grpcurl, because Dox does not have server reflection.
+
+## Add auth
+
+Most services must know the caller. Your Dox middleware runs before each call, so your gRPC services and your HTTP routes can use the same auth. Put the services that need a login in `Route.middleware`:
+
+```dart title="lib/routes/grpc.dart"
+import '../app/http/middleware/auth.middleware.dart'; // dox make:middleware auth
+
+class GrpcRouter extends Router {
+  @override
+  void register() {
+    Grpc.register(HealthService());
+
+    Route.middleware(<dynamic>[AuthMiddleware()], () {
+      Grpc.register(GreeterService());
+    });
+  }
+}
+```
+
+A gRPC client sends its token as metadata. The middleware reads the token the same as an HTTP header:
+
+```dart title="lib/app/http/middleware/auth.middleware.dart"
+class AuthMiddleware implements IDoxMiddleware {
+  @override
+  dynamic handle(IDoxRequest req) {
+    String token = Env.get<String>('API_TOKEN');
+    if (!Hash.equals(req.header('authorization') ?? '', 'Bearer $token')) {
+      throw HttpStatusException(401, message: 'Bad token');
+    }
+    return req;
+  }
+}
+```
+
+When a middleware throws an HTTP error, the client gets the related gRPC status and the message. For example, `401` becomes `UNAUTHENTICATED`. See [the full list](#http-errors-and-grpc-statuses).
+
+The health check stays out of `Route.middleware`, because a load balancer has no token.
+
+## What is supported
+
+- The four [call types](#call-types): unary, server streaming, client streaming and bidirectional streaming.
+- [Deadlines, cancel](#deadlines-and-cancelled-calls) and [metadata](#metadata).
+- [Errors](#return-errors) with a `GrpcStatus` and error details.
+- gzip and [limits for the message size](#options).
+- The standard [health check](#health-check).
+
+Dox does not have server reflection, gRPC-Web or TLS. For TLS, see [Deployment](#deployment).
+
 ## Call types
 
-gRPC has four types of calls. The position of `stream` in the `.proto` file sets the type.
+gRPC has four types of calls. The position of `stream` in the `.proto` file sets the type:
+
+```proto title="protos/greeter.proto"
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply);
+  rpc SayHelloMany (HelloRequest) returns (stream HelloReply);
+  rpc CollectNames (stream HelloRequest) returns (HelloReply);
+  rpc Chat (stream HelloRequest) returns (stream HelloReply);
+}
+```
 
 ### Unary calls
 
@@ -164,7 +216,7 @@ Stream<HelloReply> sayHelloMany(ServiceCall call, HelloRequest request) async* {
 }
 ```
 
-The `call.isCanceled` check stops the work when the client cancels the call or disconnects. See [Deadlines and cancelled calls](#deadlines-and-cancelled-calls).
+The `call.isCanceled` check stops the work when the client cancels the call or disconnects.
 
 ### Client streaming
 
@@ -199,7 +251,7 @@ Stream<HelloReply> chat(ServiceCall call, Stream<HelloRequest> request) async* {
 
 ## Return errors
 
-To stop a call with an error, throw a `GrpcException`. The first argument is a value of the `GrpcStatus` enum. This enum has all the gRPC status codes. The second argument is the message for the client:
+To stop a call with an error, throw a `GrpcException`. The first argument is a value of the `GrpcStatus` enum, which has all the gRPC status codes. The second argument is the message for the client:
 
 ```dart
 throw GrpcException(GrpcStatus.notFound, 'No user 5');
@@ -209,9 +261,29 @@ If your method throws a different error, the call stops with `INTERNAL`. Dox sen
 
 A call to a service or a method that does not exist gets `UNIMPLEMENTED`.
 
+### HTTP errors and gRPC statuses
+
+A middleware throws HTTP errors. Dox changes each HTTP error to a gRPC status:
+
+| HTTP error | gRPC status |
+| --- | --- |
+| 400, 422 | `INVALID_ARGUMENT` |
+| 401 | `UNAUTHENTICATED` |
+| 403 | `PERMISSION_DENIED` |
+| 404 | `NOT_FOUND` |
+| 408, 504 | `DEADLINE_EXCEEDED` |
+| 409 | `ABORTED` |
+| 413, 429 | `RESOURCE_EXHAUSTED` |
+| 501 | `UNIMPLEMENTED` |
+| 502, 503 | `UNAVAILABLE` |
+| other 4xx | `FAILED_PRECONDITION` |
+| other 5xx | `INTERNAL` |
+
+The client also gets the message of the error. Dox shows the message of a 5xx error only when `APP_ENV` is `development` or `local`.
+
 ## Metadata
 
-Metadata is the gRPC name for headers. The `call` argument gives you three maps:
+Metadata is the gRPC name for headers. Use it for data that is not in the messages, for example a language or a request ID. The `call` argument gives you three maps:
 
 - `call.clientMetadata`: the headers that the client sent.
 - `call.headers`: the headers that you send back. Set them before the first reply.
@@ -247,13 +319,11 @@ Stream<HelloReply> sayHelloMany(ServiceCall call, HelloRequest request) async* {
 
 `call.deadline` is the time of the deadline. It is `null` if the client did not set a deadline. When the client cancels a streaming call, the request stream also stops.
 
-## Middleware
+## Middleware for a full router
 
-Most services must know the caller. The middleware of the router runs before each call. Add your auth middleware there:
+When all the services of a router need the same middleware, set the `middleware` of the router. This is an alternative to `Route.middleware` in [Add auth](#add-auth):
 
 ```dart title="lib/routes/grpc.dart"
-import '../app/http/middleware/auth.middleware.dart'; // dox make:middleware auth
-
 class GrpcRouter extends Router {
   @override
   List<dynamic> get middleware => <dynamic>[AuthMiddleware()];
@@ -265,34 +335,23 @@ class GrpcRouter extends Router {
 }
 ```
 
-A gRPC client sends its token as metadata. The middleware reads the token the same as an HTTP header:
+Then move the [health check](#health-check) to a router that has no middleware:
 
-```dart title="lib/app/http/middleware/auth.middleware.dart"
-class AuthMiddleware implements IDoxMiddleware {
+```dart title="lib/routes/grpc_health_router.dart"
+import 'package:dox_core/dox_core.dart';
+import 'package:dox_grpc/dox_grpc.dart';
+
+class GrpcHealthRouter extends Router {
   @override
-  dynamic handle(IDoxRequest req) {
-    String token = Env.get<String>('API_TOKEN');
-    if (!Hash.equals(req.header('authorization') ?? '', 'Bearer $token')) {
-      throw HttpStatusException(401, message: 'Bad token');
-    }
-    return req;
+  void register() {
+    Grpc.register(HealthService());
   }
 }
 ```
 
-When a middleware throws an HTTP error, the client gets the related gRPC status and the message. For example, `401` becomes `UNAUTHENTICATED`. See [the full list](#http-errors-and-grpc-statuses).
+In the app config, put `GrpcHealthRouter()` in `routers` before the other gRPC routers. See [Routers and providers](../the-basic/dependency-injection.md#routers-and-providers).
 
-### Add middleware to some services
-
-If only some services of a router need a middleware, put them in `Route.middleware`:
-
-```dart
-Route.middleware(<dynamic>[AuthMiddleware()], () {
-  Grpc.register(GreeterService());
-});
-```
-
-The first `Grpc.register` call of your app must not be in `Route.middleware`. To obey this rule easily, register the [health check](#health-check) first.
+The first `Grpc.register` call of your app must not be in `Route.middleware`. If it is, Dox throws a `StateError` when the app starts.
 
 ## Options
 
@@ -310,7 +369,7 @@ Grpc.register(
 
 ### Set the maximum message size
 
-`maxReceiveMessageSize` is the maximum size of a request message, in bytes. `maxSendMessageSize` is the maximum size of a reply message. Both are 4 MiB by default. If a message is larger, the call stops with `RESOURCE_EXHAUSTED`.
+Change the limits when your messages are larger than 4 MiB. `maxReceiveMessageSize` is the maximum size of a request message, in bytes. `maxSendMessageSize` is the maximum size of a reply message. If a message is larger, the call stops with `RESOURCE_EXHAUSTED`.
 
 ```dart
 GrpcOptions(
@@ -321,7 +380,7 @@ GrpcOptions(
 
 ### Compress replies
 
-Set `gzipResponses` to compress replies with gzip for clients that accept gzip. It is off by default, because gzip uses CPU time for each message, and most gRPC messages are small. Turn it on when your replies are large and contain text:
+Turn on `gzipResponses` when your replies are large and contain text. Dox then compresses the replies with gzip for clients that accept gzip. It is off by default, because gzip uses CPU time for each message, and most gRPC messages are small:
 
 ```dart
 GrpcOptions(gzipResponses: true)
@@ -331,7 +390,7 @@ Dox always reads gzip requests, with or without this option.
 
 ### Stop idle calls
 
-A client can open a call and then not read the reply. Dox releases these calls: if no message goes in or out for 5 minutes, the call stops with `DEADLINE_EXCEEDED`. To change the time, set `idleTimeout`. To turn the limit off, set it to `null`:
+A client can open a call and then not read the reply. Dox stops such a call: if no message goes in or out for 5 minutes, the call gets `DEADLINE_EXCEEDED`. To change the time, set `idleTimeout`. To turn the limit off, set it to `null`:
 
 ```dart
 GrpcOptions(idleTimeout: Duration(minutes: 30))
@@ -344,25 +403,11 @@ Set `idleTimeout` longer than your slowest method, because the time also counts 
 
 Load balancers and Kubernetes ask a server for its health before they send calls to it. `HealthService` answers them. It is the standard `grpc.health.v1.Health` service, with `Check` and `Watch`.
 
-`dox add grpc` registers it in `lib/routes/grpc.dart`. Do not put the health service behind auth middleware, because a load balancer has no token. If your services need auth, register the health service in a separate router:
-
-```dart title="lib/routes/grpc_health_router.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_grpc/dox_grpc.dart';
-
-class GrpcHealthRouter extends Router {
-  @override
-  void register() {
-    Grpc.register(HealthService());
-  }
-}
-```
-
-The health service must be the first `Grpc.register` call of the app. In the app config, put this router in `routers` before the other gRPC routers. See [Routers and providers](../the-basic/dependency-injection.md#routers-and-providers).
+The setup command registers it in `lib/routes/grpc.dart`. Do not put the health check behind auth middleware, because a load balancer has no token.
 
 ### Set the status of a service
 
-The whole server has the empty name `''`. Its status at start is `SERVING`. To set the status of one service by its name, keep the `HealthService` object and call `setStatus`:
+The full server has the empty name `''`, and its status at start is `SERVING`. To set the status of one service by its name, keep the `HealthService` object and call `setStatus`:
 
 ```dart
 HealthService health = HealthService();
@@ -375,7 +420,7 @@ When the service cannot work, call `setStatus` again with `ServingStatus.NOT_SER
 
 ## Services and isolates
 
-Dox runs your app in many [isolates](isolate.md). Each isolate gets its own copy of your service. You cannot copy a database connection, a socket, or a `ReceivePort` to a different isolate. Thus, do not create these objects when you register the service.
+Dox runs your app in many [isolates](isolate.md), and each isolate gets its own copy of your service. You cannot copy a database connection, a socket, or a `ReceivePort` to a different isolate. Thus, do not create these objects when you register the service.
 
 Create them on the first call, inside the isolate that uses them:
 
@@ -469,31 +514,13 @@ For small calls, both servers stop at approximately 57,000 calls a second. This 
 
 This section gives special cases. Most apps do not need it.
 
-### HTTP errors and gRPC statuses
-
-| HTTP error | gRPC status |
-| --- | --- |
-| 400, 422 | `INVALID_ARGUMENT` |
-| 401 | `UNAUTHENTICATED` |
-| 403 | `PERMISSION_DENIED` |
-| 404 | `NOT_FOUND` |
-| 408, 504 | `DEADLINE_EXCEEDED` |
-| 409 | `ABORTED` |
-| 413, 429 | `RESOURCE_EXHAUSTED` |
-| 501 | `UNIMPLEMENTED` |
-| 502, 503 | `UNAVAILABLE` |
-| other 4xx | `FAILED_PRECONDITION` |
-| other 5xx | `INTERNAL` |
-
-Dox shows the message of a 5xx error only when `APP_ENV` is `development` or `local`.
-
-### Other cases
-
+- To add the package manually, run `dart pub add dox_grpc protobuf grpc`. The generated code imports `protobuf` and `grpc`.
+- The `APP_HTTP2` key in `.env` does not turn on HTTP/2 alone. Add a `bool? get appHttp2;` getter to `AppEnv`, and run `dart run build_runner build`. Then set `http2: env.appHttp2 ?? false` in the app config.
 - `GrpcException` takes a list of protobuf messages as a third argument. Dox sends them to the client as error details in `grpc-status-details-bin`.
 - A `GrpcError` from `package:grpc` works the same as a `GrpcException`.
 - `call.clientMetadata` does not contain the `grpc-*` headers.
 - A metadata value with a name that ends in `-bin` is base64 text. `GrpcWire.decodeBinary` gives its bytes. `GrpcWire.encodeBinary` makes a value from bytes.
 - `maxReceiveMessageSize` also applies to the size of a gzip message after Dox decompresses it.
+- The deadline of the client always works, also when `idleTimeout` is `null`.
 - gRPC routes skip the `RequestTimeout` middleware. Thus, Dox does not stop a long stream.
-- If the first `Grpc.register` call is in `Route.middleware`, Dox throws a `StateError` when the app starts.
 - `health.clearStatus(name)` removes the status of a service. A `Check` for a name with no status gets `NOT_FOUND`.
