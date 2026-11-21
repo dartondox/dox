@@ -56,7 +56,7 @@ dart run build_runner build
 A **query** is a request that reads data. Dox gives each model two automatic queries. For `Post`, the queries are:
 
 - `posts(limit, offset)`: a list of posts. The default `limit` is `20`, and the maximum is `100`. If the model has a policy with `view`, the list can have fewer rows than `limit` (see [Authorization](#authorization)).
-- `post(id)`: one post. The result is `null` if no post has that id.
+- `post(id)`: one post. The result is `null` if no post has that id. With a `view` rule, the result can be the error `FORBIDDEN` (see [view](#view)).
 
 Open `http://localhost:3000/graphql` in a browser. In development, this URL shows GraphiQL. GraphiQL is a page where you write and run queries. Run this query:
 
@@ -175,9 +175,9 @@ Dox applies the rules of the DTO before it saves the post. If the input is not c
 
 ### Update and delete
 
-Update and delete change a row that exists. Thus, Dox must know who can change the row. A policy gives this data. See [Authorization](#authorization).
+Update and delete change a row that exists. Thus, Dox must know who can change the row. A policy gives this data. Dox makes `updatePost` and `deletePost` only for a model with `dto:` and `policy:`. See [Authorization](#authorization).
 
-A model can also have `policy:` with no `dto:`. Then the model has the automatic queries, with the policy checks, and no mutations.
+`updatePost` changes only the fields that the client sends. Dox applies only the rules of those fields.
 
 ### Write your own mutation
 
@@ -211,9 +211,9 @@ Now each query, each mutation, and each relation, for example `post.user`, needs
 
 If a guest asks for a protected field, the guest gets the error `UNAUTHENTICATED` for that field. Public fields in the same request still give their data. To make this possible, each query, each mutation and each relation can be `null` in the schema. A field that can refuse a guest can be `null` too. In development, the GraphiQL page stays open, but it shows no data to a guest.
 
-### Make a field public
+### Make a query, mutation or field public
 
-Set `auth: false` on the fields that a guest can use:
+In GraphQL, a query is a field of the `Query` type, and a mutation is a field of the `Mutation` type. Thus, one setting makes each of them public. Set `auth: false` on the fields that a guest can use:
 
 ```dart title="lib/app/graphql/post.resolver.dart"
 @GraphQLQuery(auth: false)
@@ -249,20 +249,11 @@ Future<User?> me(DoxGraphQLContext context) {
 
 ## Authorization
 
-Authentication finds who the user is. Authorization finds if the user can read or change a row. Write a [policy](../security/authorization.md#writing-policies). Dox uses these methods of the policy, when the policy has them:
+A policy decides who can read or change a row. Authentication finds who the user is. The policy uses that user to allow or refuse each request.
 
-| Method | What it guards |
-|---|---|
-| `viewAny` | The list query, and each relation to the model. If it refuses, the field is `null` with the error `FORBIDDEN`. |
-| `view` | The `post(id)` query. In lists, Dox removes the rows that `view` refuses. A single relation, for example `comment.post`, is `null`. |
-| `create` | The create mutation. |
-| `update`, `delete` | The update and delete mutations. |
+### Write a policy
 
-Dox reads the names in `abilities`, not the names of your methods. If `abilities` has no `view`, Dox does not check `view`.
-
-These checks run only in the queries and mutations that Dox makes for a model. In your own `@GraphQLQuery`, `@ResolveField` or getter that returns a model, call [`Gate`](../security/authorization.md) yourself.
-
-This policy lets each user change only their own posts:
+A policy is a class with one method for each rule. The `abilities` map gives a name to each method. Dox reads these names: `viewAny`, `view`, `create`, `update` and `delete`.
 
 ```dart title="lib/app/policies/post_policy.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -271,38 +262,213 @@ import 'package:my_app/app/models/user/user.model.dart';
 
 class PostPolicy extends Policy<User, Post> {
   bool update(User user, Post post) => post.userId == user.id;
-  bool delete(User user, Post post) => post.userId == user.id;
 
   @override
   Map<String, Function> get abilities => <String, Function>{
     'update': update,
-    'delete': delete,
   };
 }
 ```
 
-Register the policy with `Gate.policy<Post>(PostPolicy());` in the [`setup()` of a provider](../security/authorization.md#registering-the-rules). Then give the policy to the model with `policy:`. Then run the builder:
+Dox checks only the names that are in `abilities`. This policy has no `view`. Thus, each user can read each post. Your method can have a different name, but the name in `abilities` must be one of the five names.
+
+Each section below adds one method to this policy. Add each new method to `abilities` also. To learn more about policies, read [Writing policies](../security/authorization.md#writing-policies).
+
+### Use it on a model
+
+Register the policy in the `setup()` of the GraphQL provider. `dox add graphql` made this provider. Keep the `super.setup()` call:
+
+```dart title="lib/providers/graphql_provider.dart"
+class AppGraphQLProvider extends GraphQLProvider {
+  AppGraphQLProvider() : super(graphqlConfig);
+
+  @override
+  void setup() {
+    Gate.policy<Post>(PostPolicy());
+    super.setup();
+  }
+}
+```
+
+Then give the policy to the model with `policy:`, and run the builder:
 
 ```dart title="lib/app/models/post/post.model.dart"
 @DoxModel()
 @GraphQLType(dto: CreatePostDto, policy: PostPolicy)
-class Post extends PostGenerator {}
+class Post extends PostGenerator {
+  @Column()
+  String? title;
+
+  @Column()
+  String? status;
+
+  @Column()
+  int? userId;
+}
 ```
 
-The API now has `updatePost` and `deletePost`:
+`dto:` is optional. Without `dto:`, the model has the automatic queries with the policy checks, and no mutations.
+
+### viewAny
+
+Use `viewAny` when some users must not get lists of the model. It guards the `posts` query and each relation that gives posts, for example `user.posts`.
+
+```dart
+bool viewAny(User user) => user.banned != true;
+```
+
+A banned user sends this request:
+
+```graphql
+{
+  posts { title }
+  me { name }
+}
+```
+
+The `posts` field is `null`. The other fields keep their data:
+
+```json
+{ "data": { "posts": null, "me": { "name": "Ada" } } }
+```
+
+The `errors` list of the result has one error for `posts`. Its code is `FORBIDDEN`, in `extensions.code`.
+
+### view
+
+Use `view` when a user can read some rows and not others. Here, a user can read a published post and their own posts:
+
+```dart
+bool view(User user, Post post) {
+  return post.status == 'published' || post.userId == user.id;
+}
+```
+
+Post 2 is a draft of a different user:
+
+```graphql
+{ post(id: 2) { title } }
+```
+
+```json
+{ "data": { "post": null } }
+```
+
+The error code is `FORBIDDEN`.
+
+In a list, Dox removes the rows that `view` refuses, and gives no error. This is true for the `posts` query and for a list relation, for example `user.posts`. A single relation to a refused row, for example `comment.post`, is `null` with no error.
+
+### create
+
+Use `create` when only some users can add a row. The method gets only the user, because no row exists yet:
+
+```dart
+bool create(User user) => user.verified == true;
+```
+
+A user that is not verified sends this request:
+
+```graphql
+mutation {
+  createPost(input: { title: "My first post" }) { id }
+}
+```
+
+```json
+{ "data": { "createPost": null } }
+```
+
+The error code is `FORBIDDEN`, and Dox saves nothing. Dox asks the policy first. It applies the rules of the DTO only for a user that the policy allows.
+
+### update
+
+Use `update` to decide who can change a row. The API has `updatePost` only when the model has `dto:` and `policy:`.
+
+```dart
+bool update(User user, Post post) => post.userId == user.id;
+```
+
+Post 1 belongs to a different user:
 
 ```graphql
 mutation {
   updatePost(id: 1, input: { title: "A better title" }) { title }
-  deletePost(id: 2)
 }
 ```
 
-For each call, Dox loads the row and asks the policy. If the policy refuses, Dox writes nothing, and the client gets the error `FORBIDDEN`. A guest gets the error `UNAUTHENTICATED` before Dox reads the database, because the policy needs a user (`Policy<User, Post>`). With `owner:`, a guest also gets this error first.
+```json
+{ "data": { "updatePost": null } }
+```
 
-If no row has the id, Dox asks the policy about an empty row. Thus a user that the policy refuses gets `FORBIDDEN` for each id, and cannot find which ids exist. If your policy allows an empty row (for example `!post.isPrivate`), the client can still find which ids exist.
+The error code is `FORBIDDEN`, and Dox writes nothing.
 
-`updatePost` changes only the fields that the client sends. Dox applies only the rules of those fields.
+If no row has the id, Dox asks the policy about an empty post. Thus, a refused user gets `FORBIDDEN` for each id. This is the same for `view` and `delete`.
+
+### delete
+
+Use `delete` to decide who can remove a row. The API has `deletePost` only when the model has `dto:` and `policy:`.
+
+```dart
+bool delete(User user, Post post) => post.userId == user.id;
+```
+
+Post 1 belongs to a different user:
+
+```graphql
+mutation {
+  deletePost(id: 1)
+}
+```
+
+```json
+{ "data": { "deletePost": null } }
+```
+
+The error code is `FORBIDDEN`, and the post stays in the database. For the owner of the post, the result is `true`.
+
+### Let guests in
+
+A guest is a client that is not logged in. The first type of the policy decides what a guest gets.
+
+With `Policy<User, Post>`, your methods always get a user. Dox refuses each guest. Where a user gets `FORBIDDEN`, a guest gets the error `UNAUTHENTICATED`.
+
+With `Policy<User?, Post>`, a guest gets to your methods, and `user` is `null`. Use it when a guest can read some rows:
+
+```dart
+class PostPolicy extends Policy<User?, Post> {
+  bool view(User? user, Post post) {
+    if (post.status == 'published') return true;
+    return user != null && post.userId == user.id;
+  }
+
+  @override
+  Map<String, Function> get abilities => <String, Function>{'view': view};
+}
+```
+
+Now a guest can read the published posts, and a user can also read their own drafts.
+
+If the config has `AuthMiddleware()`, the model also needs `auth: false`. See [Make a query, mutation or field public](#make-a-query-mutation-or-field-public).
+
+A model with `owner:` always needs a login for create, update and delete.
+
+### Your own resolvers
+
+The policy checks run only in the queries, mutations and relations that Dox makes for a model. In your own `@GraphQLQuery`, `@ResolveField` or getter that returns a model, call [`Gate`](../security/authorization.md#checking-a-gate) yourself:
+
+```dart title="lib/app/graphql/post.resolver.dart"
+@GraphQLQuery()
+Future<Post?> latestPost(DoxGraphQLContext context) async {
+  Post? post = await postService.latest();
+  User? user = await context.user<User>();
+  if (post != null && await Gate.denies(user, 'view', post)) {
+    throw GraphQLAuth.forbidden();
+  }
+  return post;
+}
+```
+
+`GraphQLAuth.forbidden()` gives the same `FORBIDDEN` error as the automatic checks.
 
 ## Configuration
 
