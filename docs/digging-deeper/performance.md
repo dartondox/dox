@@ -285,7 +285,11 @@ One find-by-id query, AOT build (`dart build cli`), database on the same machine
 
 ### Dart VM flags
 
-A bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64` or `128`) did not give a better p99. Over 5 runs the change was inside the noise, and memory did not move. So there is no flag to set, and Dox never sets VM flags for you. `DART_VM_OPTIONS` is read by the AOT binary from `dox build`, so you can try your own.
+A bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64` or `128`) did not give a better p99. Over 5 runs the change was inside the noise, and memory did not move. So there is no flag to set for speed, and Dox never sets VM flags for you. `DART_VM_OPTIONS` is read by the AOT binary from `dox build`, so you can try your own.
+
+One flag can decrease the peak memory. The Dart VM lets the old generation grow by a maximum of 140 MB before it collects garbage. When many requests wait at the same time, their objects move to the old generation, and the memory goes up and down in large steps. `DART_VM_OPTIONS=--old_gen_growth_rate=64` sets the maximum step to 32 MB. The value is a number of pages of 512 KB, and the default is 280.
+
+In a GraphQL test on Postgres (a list of 20 rows with a relation, 2 cores, 256 connections), the peak memory went from 213 MB to 105 MB. The requests each second went down by 2% to 5%. A high peak of this type is not a memory leak: the memory after the load is the same with the flag and without it. Use the flag when the memory limit of your container is small.
 
 ### How logs are written
 
