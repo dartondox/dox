@@ -604,9 +604,11 @@ Dox hides each row that the ability refuses, and gives no error. This applies to
 - A single relation, for example `comment.post`. A refused row is `null`.
 - The `post(id)` query. A refused row is `null`, the same as an id that does not exist.
 - Your own queries, mutations and fields that return the model.
-- The result of `createPost` and `updatePost`. The row is saved, but the result is `null`.
+- The result of `updatePost`. The row is saved, but the result is `null`.
 
 In a paged list, `total` and `lastPage` also count the hidden rows.
+
+The result of `createPost` is not filtered: the client gets back the row it sent.
 
 `filter:` does not decide who can change a row. `updatePost` and `deletePost` ask only their `can:`, so a user can change a hidden row when they have no `can:`. Give them a `can:`.
 
