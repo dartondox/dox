@@ -165,7 +165,7 @@ mutation {
 
 A client can set only the fields of the DTO. Thus, a client cannot set a different column, for example `userId`.
 
-To set `userId` to the logged-in user, add `owner:`. Then a client must log in to create a post.
+To set `userId` to the logged-in user, add `owner:`. Then a client must log in to create, update or delete a post.
 
 ```dart
 @GraphQLType(dto: CreatePostDto, owner: 'userId')
@@ -176,6 +176,8 @@ Dox applies the rules of the DTO before it saves the post. If the input is not c
 ### Update and delete
 
 Update and delete change a row that exists. Thus, Dox must know who can change the row. A policy gives this data. See [Authorization](#authorization).
+
+A model can also have `policy:` with no `dto:`. Then the model has the automatic queries, with the policy checks, and no mutations.
 
 ### Write your own mutation
 
@@ -207,7 +209,7 @@ GraphQLConfig graphqlConfig = GraphQLConfig(
 
 Now each query, each mutation, and each relation, for example `post.user`, needs a logged-in user. The client sends its token in the `Authorization: Bearer <token>` header, as usual.
 
-If a guest asks for a protected field, the guest gets the error `UNAUTHENTICATED` for that field. Public fields in the same request still give their data. In development, the GraphiQL page stays open, but it shows no data to a guest.
+If a guest asks for a protected field, the guest gets the error `UNAUTHENTICATED` for that field. Public fields in the same request still give their data. To make this possible, each query, each mutation and each relation can be `null` in the schema. A field that can refuse a guest can be `null` too. In development, the GraphiQL page stays open, but it shows no data to a guest.
 
 ### Make a field public
 
@@ -252,7 +254,7 @@ Authentication finds who the user is. Authorization finds if the user can read o
 | Method | What it guards |
 |---|---|
 | `viewAny` | The list query, and each relation to the model. If it refuses, the field is `null` with the error `FORBIDDEN`. |
-| `view` | The `post(id)` query. In lists and relations, Dox removes the rows that `view` refuses. |
+| `view` | The `post(id)` query. In lists, Dox removes the rows that `view` refuses. A single relation, for example `comment.post`, is `null`. |
 | `create` | The create mutation. |
 | `update`, `delete` | The update and delete mutations. |
 
@@ -279,7 +281,7 @@ class PostPolicy extends Policy<User, Post> {
 }
 ```
 
-Register the policy with `Gate.policy<Post>(PostPolicy());` in the [`setup()` of a provider](../security/authorization.md#registering-the-rules). Then give the policy to the model with `policy:`, next to `dto:`. Then run the builder:
+Register the policy with `Gate.policy<Post>(PostPolicy());` in the [`setup()` of a provider](../security/authorization.md#registering-the-rules). Then give the policy to the model with `policy:`. Then run the builder:
 
 ```dart title="lib/app/models/post/post.model.dart"
 @DoxModel()
@@ -296,7 +298,7 @@ mutation {
 }
 ```
 
-For each call, Dox loads the row and asks the policy. If the policy refuses, Dox writes nothing, and the client gets the error `FORBIDDEN`. A guest gets the error `UNAUTHENTICATED` before Dox reads the database, because the policy needs a user.
+For each call, Dox loads the row and asks the policy. If the policy refuses, Dox writes nothing, and the client gets the error `FORBIDDEN`. A guest gets the error `UNAUTHENTICATED` before Dox reads the database, because the policy needs a user (`Policy<User, Post>`). With `owner:`, a guest also gets this error first.
 
 If no row has the id, Dox asks the policy about an empty row. Thus a user that the policy refuses gets `FORBIDDEN` for each id, and cannot find which ids exist. If your policy allows an empty row (for example `!post.isPrivate`), the client can still find which ids exist.
 
