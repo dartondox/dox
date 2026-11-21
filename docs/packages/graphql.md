@@ -608,7 +608,9 @@ Dox hides each row that the ability refuses, and gives no error. This applies to
 
 In a paged list, `total` and `lastPage` also count the hidden rows.
 
-`filter:` does not decide who can change a row. `updatePost` and `deletePost` ask only their `can:`.
+`filter:` does not decide who can change a row. `updatePost` and `deletePost` ask only their `can:`, so a user can change a hidden row when they have no `can:`. Give them a `can:`.
+
+A field can give a filtered model as `Post`, `Post?`, `List<Post>` or `List<Post>?`. Other shapes, like `List<List<Post>>` or `List<Post?>`, stop the build.
 
 To get `null` and no error from `post(id)`, use `filter:` and no `can:` on `@GraphQLFind`. With `can:`, a refused user gets `FORBIDDEN`.
 
