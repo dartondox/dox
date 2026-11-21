@@ -7,10 +7,10 @@ categories:
   - Releases
 tags:
   - release
-slug: dox-3-2-4
+slug: dox-patch-release-2026-11-21
 ---
 
-# Dox 3.2.4: MCP 2026-07-28, new route options and many fixes
+# Dox patch release: 21 November 2026
 
 This release is patch versions only. It adds the MCP protocol `2026-07-28`, new route options in `dox_core`, and fixes in auth, ORM, validation, mail, Socket.IO and Redis. A few fixes refuse input that passed before, so read [Read before you update](#read-before-you-update).
 
