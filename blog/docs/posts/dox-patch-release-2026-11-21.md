@@ -1,0 +1,110 @@
+---
+date:
+  created: 2026-11-21
+authors:
+  - dox
+categories:
+  - Releases
+tags:
+  - release
+slug: dox-patch-release-2026-11-21
+---
+
+# Dox patch release: 21 November 2026
+
+This release is patch versions only. It adds the MCP protocol `2026-07-28`, new route options in `dox_core`, and fixes in auth, ORM, validation, mail, Socket.IO and Redis. A few fixes refuse input that passed before, so read [Read before you update](#read-before-you-update).
+
+<!-- more -->
+
+HTTP/2, gRPC and GraphQL are also new in this release. They have their own posts: [HTTP/2 and gRPC](http2-and-grpc.md) and [GraphQL](graphql.md).
+
+> **Key takeaways**
+>
+> - **MCP `2026-07-28`.** Old and new MCP clients work on the same route. A tool can ask the user a question during a call.
+> - **New route options.** `withoutMiddleware<T>()`, `renderErrorsWith()`, `Route.fallback(when:)` and `req.takeOverResponse()`.
+> - **Login fixes.** On MySQL, a number in a login field could match the wrong user. This is fixed.
+> - **Easy to update.** Patch versions only. Run `dart pub upgrade`, then check [Read before you update](#read-before-you-update).
+
+## Versions
+
+| Package | New version |
+| --- | --- |
+| `dox_core` | 3.2.4 |
+| `dox_cache` | 3.2.2 |
+| `dox_auth`, `dox_mcp`, `dox_mailer`, `dox_socketio` | 3.2.2 |
+| `dox_orm`, `dox_migration`, `dox_cache_database` | 3.2.3 |
+| `dox_openapi`, `dox_validation` | 3.2.1 |
+| `dox_inertia` | 3.2.3 |
+| `dox_http_native` | 3.2.2 |
+| `ioredis` | 3.2.2 |
+| `dox` CLI | 3.2.3 |
+| App template | v3.2.4 |
+
+No change: `dox_annotation`, `dox_builder`, `dox_queue`, `dox_queue_database`, `dox_scheduler`, `dox_storage`, `dox_view`, `dox_postgres_native` and `dox_mysql_native`.
+
+## How to update
+
+1. Get the new versions:
+
+    ```bash
+    dart pub upgrade
+    ```
+
+2. Update the CLI:
+
+    ```bash
+    dart pub global activate dox
+    ```
+
+3. Read [Read before you update](#read-before-you-update).
+
+## New
+
+### MCP 2026-07-28
+
+`dox_mcp` supports the MCP protocol `2026-07-28`, next to the older versions on the same route. Your app code does not change.
+
+- A `2026-07-28` client needs no `initialize` and no session.
+- A tool can ask the user a question during a call. Return `McpToolResult.inputRequired(...)` and read the answer with `context.answer(input)`. Inputs are `confirm`, `text`, `number`, `choice`, `form` and `url`.
+- OAuth client metadata documents (CIMD) are supported, as the new spec asks. `POST /oauth/register` still works for older clients.
+- The server writes a warning once when `allowedOrigins` is not set. Without it, any website can call the server from a browser.
+
+### Route options
+
+- `.withoutMiddleware<T>()` removes every middleware of type `T` from a route, also global and group middleware. For example, a long stream can skip a global `RequestTimeout`.
+- `.renderErrorsWith(renderer)` sends the errors of a route to your own renderer.
+- `Route.fallback(controller, when: check)` tries the fallback for any method, and it answers only when the check gives `true`.
+- `req.takeOverResponse()` tells Dox that the handler sends the response itself.
+
+### Other new features
+
+- `dox_auth`: `Ability.viewAny`, `view`, `create`, `update` and `delete` constants for policies.
+- `dox_orm`: `EnumCast(Status.values, unknown: Status.other)` gives a value for an unknown stored enum value.
+- `dox_inertia`: `dox inertia:install --ssr` writes the React SSR entry, and `dox inertia:start-ssr` starts the SSR server.
+- `dox_openapi`: a faster docs build for apps with many routes. 1000 routes took about 2.5 seconds before.
+
+## Fixes
+
+- **Login on MySQL.** A number in a login field, like `{"email": 0}`, matched almost any user, and the password was checked against the first one. Now the value goes into the query as text.
+- **Login on Postgres.** A login value that does not fit a number column gave a 500 error. Now it is a failed login.
+- **Unknown enum values.** One stored enum value that the enum does not have made the whole query fail. Now a nullable field reads it as `null`, and the ORM logs a warning. Saving the model does not overwrite the stored value.
+- **Cache keys.** A user key could hit an internal key. For example, `forget('lock:report')` freed the lock of `lock('report')`.
+- **Socket.IO.** An event packet with no data threw in the server. A very deep `auth` value could overflow the stack. A room name in `X-Socket-ID` made `toOthers` skip the whole room.
+- **Redis subscribers.** Four sets of subscriber-mode fixes in `ioredis`. For example, two `subscribe()` calls on the same channel now both get the messages, and `ping()` works in subscriber mode.
+- **CLI.** `seeders.dart` and `migrations.dart` no longer list `abstract` or `sealed` classes, so the app compiles.
+- **OpenAPI.** A `:` in a route path, like `/books:search`, shows as it is. It no longer becomes a param.
+
+## Read before you update
+
+- **Cache keys.** User keys that start with `lock:`, `tag:`, `flexible:created:` or `#` are stored under a new name. They miss the cache one time after the update.
+- **Mail addresses.** An email address with a character that is not ASCII, like `user@münchen.de`, now throws a `MailException`. Write the domain in punycode, like `user@xn--mnchen-3ya.de`. Display names and subjects can still be any text.
+- **Validation.** Some input that passed before now fails, because the old result was wrong:
+    - Dates and times that do not exist, like `2024-02-31` or `10:61`.
+    - `Infinity` in `v.num()`.
+    - Hex text like `"0x1F"` in `v.coerce.int()` and `v.coerce.num()`.
+    - A double above 2^53 in a DTO `int` field.
+- **Socket.IO depth.** Text packets are limited to 32 levels, the same as binary packets. Set `ServerOptions.maxDepth` to change this.
+- **OpenAPI.** The spec no longer has the `x-dox-middleware` extension, because it showed internal class names.
+- **ioredis.** `RedisConnection.patternListeners` is now `Map<String, List<RedisSubscriber>>`. Only code that reads this field directly must change.
+
+Full list: the CHANGELOG of each package.
