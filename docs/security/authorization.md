@@ -154,6 +154,20 @@ await Gate.authorize(user, 'delete', post);
 
 Each method must take `(User user)` or `(User user, Post post)`. A method with another signature fails at `Gate.policy`, so you see the mistake when the app starts.
 
+### Using the ability constants
+
+Use the `Ability` constants when you want the compiler to find a wrong ability name. `Ability` has the five usual names: `Ability.viewAny`, `Ability.view`, `Ability.create`, `Ability.update` and `Ability.delete`.
+
+```dart
+Map<String, Function> get abilities => <String, Function>{
+  Ability.update: update,
+};
+
+await Gate.allows(user, Ability.update, post);
+```
+
+Each constant is the same text as its name. Thus, `Ability.update` and `'update'` are the same ability.
+
 ## Authorizing in a controller
 
 In a controller, use `req.authorize`, `req.can` and `req.cannot`. They use the logged in user of `req.auth`, so put the route after `AuthMiddleware`:

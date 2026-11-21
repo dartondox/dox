@@ -20,7 +20,7 @@ The command adds the packages, `lib/config/graphql.dart`, and `lib/providers/gra
 
 ### Add a model to the API
 
-Put `@GraphQLType()` on a model:
+Put `@GraphQL()` on a model. Then add one annotation for each operation that a client can use:
 
 ```dart title="lib/app/models/post/post.model.dart"
 import 'package:dox_graphql/dox_graphql.dart';
@@ -30,7 +30,9 @@ import 'package:my_app/app/models/user/user.model.dart';
 part 'post.model.g.dart';
 
 @DoxModel()
-@GraphQLType()
+@GraphQL()
+@GraphQLAll()
+@GraphQLFind()
 class Post extends PostGenerator {
   @Column()
   String? title;
@@ -43,7 +45,9 @@ class Post extends PostGenerator {
 }
 ```
 
-The `id`, the columns, and the relations of the model are now fields that a client can ask for. `Post` has a relation to `User`. Thus, put `@GraphQLType()` on `User` also.
+The `id`, the columns, and the relations of the model are now fields that a client can ask for. `@GraphQLAll()` adds the `posts` query, and `@GraphQLFind()` adds the `post` query. An operation that has no annotation does not exist.
+
+`Post` has a relation to `User`. Thus, put `@GraphQL()` on `User` also.
 
 Then run the builder and start the app again. Do these two steps after each change on this page:
 
@@ -53,12 +57,7 @@ dart run build_runner build
 
 ### Run a query
 
-A **query** is a request that reads data. Dox gives each model two automatic queries. For `Post`, the queries are:
-
-- `posts(limit, offset)`: a list of posts. The default `limit` is `20`, and the maximum is `100`. If the model has a policy with `view`, the list can have fewer rows than `limit` (see [Authorization](#authorization)).
-- `post(id)`: one post. The result is `null` if no post has that id. With a `view` rule, the result can be the error `FORBIDDEN` (see [view](#view)).
-
-Open `http://localhost:3000/graphql` in a browser. In development, this URL shows GraphiQL. GraphiQL is a page where you write and run queries. Run this query:
+A **query** is a request that reads data. Open `http://localhost:3000/graphql` in a browser. In development, this URL shows GraphiQL. GraphiQL is a page where you write and run queries. Run this query:
 
 ```graphql
 {
@@ -83,15 +82,182 @@ Your client sends the same query as a `POST` request to `/graphql`. The JSON bod
 
 Some columns must not be visible to a client. Dox does not show the fields in the `hidden` list of the model. Thus, a password is never visible. To hide a different field, put `@GraphQLIgnore()` on the line above its `@Column()`.
 
-### Turn off the automatic queries
+### Give a model only through a relation
 
-Sometimes a client must get a model only through a relation, for example `post.user`. For this model, write `@GraphQLType(queries: false)`. Then the model does not get its own queries.
+Sometimes a client must get a model only through a relation, for example `post.user`. Put only `@GraphQL()` on this model. Then the model has no queries and no mutations of its own.
 
-To turn off the automatic queries and mutations of all models, set `autoResolvers: false` in the [configuration](#configuration).
+## Model annotations
+
+Each annotation adds one query or one mutation to the API. This model uses all of them:
+
+```dart title="lib/app/models/post/post.model.dart"
+@DoxModel()
+@GraphQL()
+@GraphQLAll()
+@GraphQLPaginate()
+@GraphQLFind()
+@GraphQLCreate(dto: PostInput)
+@GraphQLUpdate(dto: PostInput)
+@GraphQLDelete()
+class Post extends PostGenerator {}
+```
+
+| Annotation | GraphQL field |
+|---|---|
+| `@GraphQL()` | The `Post` type. No query and no mutation. |
+| `@GraphQLAll()` | `posts(limit, offset)` |
+| `@GraphQLPaginate()` | `posts(first, page)`, or `postsPaginate(first, page)` if the model also has `@GraphQLAll()` |
+| `@GraphQLFind()` | `post(id)` |
+| `@GraphQLCreate(dto:)` | `createPost(input)` |
+| `@GraphQLUpdate(dto:)` | `updatePost(id, input)` |
+| `@GraphQLDelete()` | `deletePost(id)` |
+
+Each annotation can have these options:
+
+| Option | Function |
+|---|---|
+| `name:` | A different name for the type or the field. |
+| `description:` | The text that GraphiQL shows. |
+| `guard: true` | A client must log in. See [Authentication](#authentication). |
+| `can:` | The policy must allow the user. `@GraphQL` does not have this option. See [Authorization](#authorization). |
+
+### @GraphQL
+
+Use it to make the model a type of the API. All other annotations on this page need it.
+
+```dart
+@GraphQL()
+```
+
+It also has `filter:`, which hides the rows that a user cannot read. See [Hide rows](#hide-rows).
+
+### @GraphQLAll
+
+Use it when a client must read a list with `limit` and `offset`. The default `limit` is `20`, and the maximum is `100`.
+
+```dart
+@GraphQLAll()
+```
+
+```graphql
+{ posts(limit: 10, offset: 20) { title } }
+```
+
+### @GraphQLPaginate
+
+Use it when a client shows pages and needs the total number of rows. See [Pagination](#pagination).
+
+```dart
+@GraphQLPaginate()
+```
+
+```graphql
+{ posts(first: 10, page: 2) { data { title } paginatorInfo { total } } }
+```
+
+### @GraphQLFind
+
+Use it when a client must read one row by its id. The result is `null` if no row has that id.
+
+```dart
+@GraphQLFind()
+```
+
+```graphql
+{ post(id: 1) { title } }
+```
+
+### @GraphQLCreate
+
+Use it to let a client add a row. The `dto:` class has the fields that the client can set. See [Create](#create).
+
+```dart
+@GraphQLCreate(dto: PostInput)
+```
+
+```graphql
+mutation { createPost(input: { title: "My second post" }) { id } }
+```
+
+### @GraphQLUpdate
+
+Use it to let a client change a row. It changes only the fields that the client sends. See [Update](#update).
+
+```dart
+@GraphQLUpdate(dto: PostInput)
+```
+
+```graphql
+mutation { updatePost(id: 1, input: { title: "A better title" }) { title } }
+```
+
+### @GraphQLDelete
+
+Use it to let a client remove a row. The result is `true`, or `false` if no row has that id. See [Delete](#delete).
+
+```dart
+@GraphQLDelete()
+```
+
+```graphql
+mutation { deletePost(id: 1) }
+```
+
+## Pagination
+
+Use `@GraphQLPaginate()` for a list with page numbers. The client sends `first` (the number of rows on a page) and `page`:
+
+```graphql
+{
+  posts(first: 10, page: 2) {
+    data {
+      title
+    }
+    paginatorInfo {
+      total
+      currentPage
+      lastPage
+      hasMorePages
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "posts": {
+      "data": [{ "title": "Hello GraphQL" }],
+      "paginatorInfo": { "total": 11, "currentPage": 2, "lastPage": 2, "hasMorePages": false }
+    }
+  }
+}
+```
+
+The default `first` is `20`, and the maximum is `100`. The default `page` is `1`.
+
+`data` has the rows of the page. `paginatorInfo` has these fields:
+
+| Field | Value |
+|---|---|
+| `total` | The number of rows on all pages. |
+| `count` | The number of rows on this page. |
+| `perPage` | The value of `first`. |
+| `currentPage` | The number of this page. |
+| `lastPage` | The number of the last page. |
+| `hasMorePages` | `true` if there is a page after this page. |
+| `firstItem` | The number of the first row of this page. The first row of page 1 is `1`. `null` on an empty page. |
+| `lastItem` | The number of the last row of this page. `null` on an empty page. |
+
+If the model has `@GraphQLAll()` and `@GraphQLPaginate()`, the list is `posts` and the paged list is `postsPaginate`. To set a different name, use `name:`:
+
+```dart
+@GraphQLPaginate(name: 'postPages')
+```
 
 ## Write your own query
 
-Write your own query when the automatic queries are not sufficient, for example for a search or a top-ten list. Put `@GraphQLQuery()` on a method of a class in `lib/`. This method is a **resolver**. A resolver is your code that gives the result of the query.
+Write your own query when the queries of the annotations are not sufficient, for example for a search or a top-ten list. Put `@GraphQLQuery()` on a method of a class in `lib/`. This method is a **resolver**. A resolver is your code that gives the result of the query.
 
 ```dart title="lib/app/graphql/post.resolver.dart"
 import 'package:dox_graphql/dox_graphql.dart';
@@ -127,31 +293,32 @@ For all other errors, the client sees "Internal server error" in production. Dox
 
 ## Create, update, and delete
 
-A **mutation** is a request that changes data. Dox can make the create, update, and delete mutations of a model for you.
+A **mutation** is a request that changes data. Dox makes the create, update, and delete mutations of a model from `@GraphQLCreate`, `@GraphQLUpdate` and `@GraphQLDelete`.
 
 ### Create
 
 Write a [DTO](../the-basic/dto.md) with the fields that a client can set:
 
-```dart title="lib/app/dtos/create_post/create_post.dto.dart"
+```dart title="lib/app/dtos/post_input/post_input.dto.dart"
 import 'package:dox_core/dox_core.dart';
 
-part 'create_post.dto.g.dart';
+part 'post_input.dto.g.dart';
 
 @Dto()
-class CreatePostDto {
-  CreatePostDto({required this.title});
+class PostInput {
+  PostInput({required this.title});
 
   @MinLength(3, message: 'The title is too short')
   final String title;
 }
 ```
 
-Give the DTO to the model with `dto:`. Then run the builder:
+Give the DTO to `@GraphQLCreate`. Then run the builder:
 
 ```dart title="lib/app/models/post/post.model.dart"
 @DoxModel()
-@GraphQLType(dto: CreatePostDto)
+@GraphQL()
+@GraphQLCreate(dto: PostInput)
 class Post extends PostGenerator {}
 ```
 
@@ -165,19 +332,39 @@ mutation {
 
 A client can set only the fields of the DTO. Thus, a client cannot set a different column, for example `userId`.
 
-To set `userId` to the logged-in user, add `owner:`. Then a client must log in to create, update or delete a post.
-
-```dart
-@GraphQLType(dto: CreatePostDto, owner: 'userId')
-```
-
 Dox applies the rules of the DTO before it saves the post. If the input is not correct, Dox saves nothing. The client gets the error `VALIDATION_FAILED`, with the message for each field in `extensions.fields`.
 
-### Update and delete
+### Set the owner of a new row
 
-Update and delete change a row that exists. Thus, Dox must know who can change the row. A policy gives this data. Dox makes `updatePost` and `deletePost` only for a model with `dto:` and `policy:`. See [Authorization](#authorization).
+Use `owner:` when each row belongs to the user that made it. Dox sets that column to the id of the logged-in user. Thus, a client must log in to create a post.
 
-`updatePost` changes only the fields that the client sends. Dox applies only the rules of those fields.
+```dart
+@GraphQLCreate(dto: PostInput, owner: 'userId')
+```
+
+The owner column must not be a field of the DTO. `updatePost` never changes it. `owner:` needs `AuthMiddleware()` in the config. See [Authentication](#authentication).
+
+### Update
+
+Give a DTO to `@GraphQLUpdate`. It can be the same DTO as for create:
+
+```dart
+@GraphQLUpdate(dto: PostInput, can: Ability.update, guard: true)
+```
+
+`updatePost` changes only the fields that the client sends. Dox applies only the rules of those fields. The result is `null` if no row has the id.
+
+Without `can:`, each client that can call `updatePost` can change each row. The builder shows a warning if `@GraphQLUpdate` has no `can:` and no `guard:`. See [update](#update_1).
+
+### Delete
+
+`@GraphQLDelete` needs no DTO:
+
+```dart
+@GraphQLDelete(can: Ability.delete, guard: true)
+```
+
+Without `can:`, each client that can call `deletePost` can delete each row. The builder shows a warning if `@GraphQLDelete` has no `can:` and no `guard:`. See [delete](#delete_1).
 
 ### Write your own mutation
 
@@ -185,16 +372,16 @@ Write your own mutation when one saved row is not sufficient. Put `@GraphQLMutat
 
 ```dart title="lib/app/graphql/post.resolver.dart"
 @GraphQLMutation()
-Future<Post> importPost(CreatePostDto input) {
+Future<Post> importPost(PostInput input) {
   return postService.import(input);
 }
 ```
 
 ## Authentication
 
-By default, all clients can call all queries and mutations. To make clients log in, use `AuthMiddleware` from `dox_auth`. If your app does not have a login, set it up first with [`dox add auth`](../security/authentication.md).
+By default, all clients can call all queries and mutations. To make clients log in, use `AuthMiddleware` from `dox_auth` and `guard: true`. If your app does not have a login, set it up first with [`dox add auth`](../security/authentication.md).
 
-Add `AuthMiddleware()` to the config:
+Add `AuthMiddleware()` to the config. Dox uses it to read the user:
 
 ```dart title="lib/config/graphql.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -207,32 +394,48 @@ GraphQLConfig graphqlConfig = GraphQLConfig(
 );
 ```
 
-Now each query, each mutation, and each relation, for example `post.user`, needs a logged-in user. The client sends its token in the `Authorization: Bearer <token>` header, as usual.
+The middleware does not stop a request. All fields stay public until you add `guard: true`. The client sends its token in the `Authorization: Bearer <token>` header, as usual.
 
-If a guest asks for a protected field, the guest gets the error `UNAUTHENTICATED` for that field. Public fields in the same request still give their data. To make this possible, each query, each mutation and each relation can be `null` in the schema. A field that can refuse a guest can be `null` too. In development, the GraphiQL page stays open, but it shows no data to a guest.
+### Make a query or mutation need a login
 
-### Make a query, mutation or field public
+Set `guard: true` on the annotation of each operation that a guest must not use:
 
-In GraphQL, a query is a field of the `Query` type, and a mutation is a field of the `Mutation` type. Thus, one setting makes each of them public. Set `auth: false` on the fields that a guest can use:
+```dart title="lib/app/models/post/post.model.dart"
+@DoxModel()
+@GraphQL()
+@GraphQLAll()
+@GraphQLFind()
+@GraphQLCreate(dto: PostInput, guard: true)
+@GraphQLUpdate(dto: PostInput, guard: true)
+@GraphQLDelete(guard: true)
+class Post extends PostGenerator {}
+```
+
+Here, a guest can read posts, but only a logged-in user can change them.
+
+`guard: true` works the same on `@GraphQLQuery`, `@GraphQLMutation`, `@GraphQLField` and `@GraphQLResolveField`:
 
 ```dart title="lib/app/graphql/post.resolver.dart"
-@GraphQLQuery(auth: false)
+@GraphQLQuery(guard: true)
 Future<List<Post>> trendingPosts({int limit = 10}) {
   return postService.trending(limit);
 }
 ```
 
-`auth: false` works the same on `@GraphQLMutation`.
+If a guest asks for a guarded field, the guest gets the error `UNAUTHENTICATED` for that field. The other fields in the same request still give their data. To make this possible, each query, each mutation and each relation can be `null` in the schema.
 
-On a model, `@GraphQLType(auth: false)` makes the model public everywhere. This includes its automatic queries and mutations, and all relations that give the model.
-
-A public query does not make the relations in it public. If `trendingPosts` is public, a guest gets the `title` of each post. But `user` in a post still needs a login. To make `user` public, set `auth: false` on `User` also.
+`guard: true` needs `AuthMiddleware()` in the config. If the config does not have it, the app stops at start and shows the name of the type or field.
 
 ### Protect a model everywhere
 
-Write `@GraphQLType(auth: true)` on a model that a guest must never see, for example `User`. Then each field that gives a user needs a login. This is also true in a public query.
+Write `@GraphQL(guard: true)` on a model that a guest must never see, for example `User`. Then each field that gives a user needs a login: its queries, its mutations, each relation such as `post.user`, and your own resolvers.
 
-`auth: true` needs `AuthMiddleware()` in the config. If the config does not have it, the app stops at start and shows the name of the type or field.
+```dart title="lib/app/models/user/user.model.dart"
+@DoxModel()
+@GraphQL(guard: true)
+@GraphQLFind()
+class User extends UserGenerator {}
+```
 
 ### Read the logged-in user
 
@@ -251,9 +454,11 @@ Future<User?> me(DoxGraphQLContext context) {
 
 A policy decides who can read or change a row. Authentication finds who the user is. The policy uses that user to allow or refuse each request.
 
+`guard: true` is only a login check. Use `can:` and `filter:` with a policy when the answer is different for each user or each row.
+
 ### Write a policy
 
-A policy is a class with one method for each rule. The `abilities` map gives a name to each method. Dox reads these names: `viewAny`, `view`, `create`, `update` and `delete`.
+A policy is a class with one method for each rule. The `abilities` map gives a name to each method. This name is the **ability**. `Ability` of `dox_auth` has the usual names: `viewAny`, `view`, `create`, `update` and `delete`.
 
 ```dart title="lib/app/policies/post_policy.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -265,18 +470,16 @@ class PostPolicy extends Policy<User, Post> {
 
   @override
   Map<String, Function> get abilities => <String, Function>{
-    'update': update,
+    Ability.update: update,
   };
 }
 ```
 
-Dox checks only the names that are in `abilities`. This policy has no `view`. Thus, each user can read each post. Your method can have a different name, but the name in `abilities` must be one of the five names.
-
 Each section below adds one method to this policy. Add each new method to `abilities` also. To learn more about policies, read [Writing policies](../security/authorization.md#writing-policies).
 
-### Use it on a model
+### Register the policy
 
-Register the policy in the `setup()` of the GraphQL provider. `dox add graphql` made this provider. Keep the `super.setup()` call:
+Register the policy in the `setup()` of a provider. `dox add graphql` made the GraphQL provider, so you can use it. Keep the `super.setup()` call:
 
 ```dart title="lib/providers/graphql_provider.dart"
 class AppGraphQLProvider extends GraphQLProvider {
@@ -290,11 +493,23 @@ class AppGraphQLProvider extends GraphQLProvider {
 }
 ```
 
-Then give the policy to the model with `policy:`, and run the builder:
+The config must have `AuthMiddleware()`. Without it, Dox cannot read the user, and each client is a guest.
+
+### Use it on a model
+
+Give an ability to an operation with `can:`. Dox asks the policy before the operation runs:
 
 ```dart title="lib/app/models/post/post.model.dart"
+import 'package:dox_auth/dox_auth.dart';
+
 @DoxModel()
-@GraphQLType(dto: CreatePostDto, policy: PostPolicy)
+@GraphQL(filter: Ability.view)
+@GraphQLAll(can: Ability.viewAny)
+@GraphQLPaginate(can: Ability.viewAny)
+@GraphQLFind(can: Ability.view)
+@GraphQLCreate(dto: PostInput, can: Ability.create, guard: true, owner: 'userId')
+@GraphQLUpdate(dto: PostInput, can: Ability.update, guard: true)
+@GraphQLDelete(can: Ability.delete, guard: true)
 class Post extends PostGenerator {
   @Column()
   String? title;
@@ -307,11 +522,23 @@ class Post extends PostGenerator {
 }
 ```
 
-`dto:` is optional. Without `dto:`, the model has the automatic queries with the policy checks, and no mutations.
+An operation with no `can:` does not ask the policy. Use only the checks that the model needs.
+
+| Annotation | The policy method gets |
+|---|---|
+| `@GraphQLAll(can:)`, `@GraphQLPaginate(can:)`, `@GraphQLCreate(can:)` | The user. |
+| `@GraphQLFind(can:)`, `@GraphQLUpdate(can:)`, `@GraphQLDelete(can:)` | The user and the row. |
+| `@GraphQL(filter:)` | The user and each row. |
+
+The first group gets no row. Thus, use `Ability.viewAny` on `@GraphQLAll` and `@GraphQLPaginate`, and `Ability.create` on `@GraphQLCreate`. Do not use `Ability.view` or `Ability.update` there.
 
 ### viewAny
 
-Use `viewAny` when some users must not get lists of the model. It guards the `posts` query and each relation that gives posts, for example `user.posts`.
+Use `viewAny` when some users must not get lists of the model. Put it on `@GraphQLAll` and `@GraphQLPaginate`:
+
+```dart
+@GraphQLAll(can: Ability.viewAny)
+```
 
 ```dart
 bool viewAny(User user) => user.banned != true;
@@ -336,7 +563,13 @@ The `errors` list of the result has one error for `posts`. Its code is `FORBIDDE
 
 ### view
 
-Use `view` when a user can read some rows and not others. Here, a user can read a published post and their own posts:
+Use `view` when a user can read some rows and not others. Put it on `@GraphQLFind`:
+
+```dart
+@GraphQLFind(can: Ability.view)
+```
+
+Here, a user can read a published post and their own posts:
 
 ```dart
 bool view(User user, Post post) {
@@ -356,11 +589,36 @@ Post 2 is a draft of a different user:
 
 The error code is `FORBIDDEN`.
 
-In a list, Dox removes the rows that `view` refuses, and gives no error. This is true for the `posts` query and for a list relation, for example `user.posts`. A single relation to a refused row, for example `comment.post`, is `null` with no error.
+### Hide rows
+
+Use `filter:` on `@GraphQL` when a client must get only the rows that the user can read:
+
+```dart
+@GraphQL(filter: Ability.view)
+```
+
+Dox hides each row that the ability refuses, and gives no error. This applies to each field that gives the model:
+
+- The `posts` list and the paged list. Thus, a list can have fewer rows than `limit`.
+- A list relation, for example `user.posts`.
+- A single relation, for example `comment.post`. A refused row is `null`.
+- The `post(id)` query. A refused row is `null`, the same as an id that does not exist.
+- Your own queries, mutations and fields that return the model.
+- The result of `createPost` and `updatePost`. The row is saved, but the result is `null`.
+
+In a paged list, `total` and `lastPage` also count the hidden rows.
+
+`filter:` does not decide who can change a row. `updatePost` and `deletePost` ask only their `can:`.
+
+To get `null` and no error from `post(id)`, use `filter:` and no `can:` on `@GraphQLFind`. With `can:`, a refused user gets `FORBIDDEN`.
 
 ### create
 
 Use `create` when only some users can add a row. The method gets only the user, because no row exists yet:
+
+```dart
+@GraphQLCreate(dto: PostInput, can: Ability.create)
+```
 
 ```dart
 bool create(User user) => user.verified == true;
@@ -382,7 +640,11 @@ The error code is `FORBIDDEN`, and Dox saves nothing. Dox asks the policy first.
 
 ### update
 
-Use `update` to decide who can change a row. The API has `updatePost` only when the model has `dto:` and `policy:`.
+Use `update` to decide who can change a row:
+
+```dart
+@GraphQLUpdate(dto: PostInput, can: Ability.update)
+```
 
 ```dart
 bool update(User user, Post post) => post.userId == user.id;
@@ -406,7 +668,11 @@ If no row has the id, Dox asks the policy about an empty post. Thus, a refused u
 
 ### delete
 
-Use `delete` to decide who can remove a row. The API has `deletePost` only when the model has `dto:` and `policy:`.
+Use `delete` to decide who can remove a row:
+
+```dart
+@GraphQLDelete(can: Ability.delete)
+```
 
 ```dart
 bool delete(User user, Post post) => post.userId == user.id;
@@ -426,6 +692,37 @@ mutation {
 
 The error code is `FORBIDDEN`, and the post stays in the database. For the owner of the post, the result is `true`.
 
+### Add your own ability
+
+Use your own ability when the five names of `Ability` are not sufficient. Write the name as a constant on the policy:
+
+```dart title="lib/app/policies/post_policy.dart"
+class PostPolicy extends Policy<User, Post> {
+  static const String publish = 'publish';
+
+  bool canPublish(User user, Post post) => user.editor == true;
+
+  @override
+  Map<String, Function> get abilities => <String, Function>{
+    publish: canPublish,
+  };
+}
+```
+
+```dart
+@GraphQLUpdate(dto: PostInput, can: PostPolicy.publish)
+```
+
+### Fix an ability that the policy does not have
+
+When the app starts, Dox makes sure that the policy has each ability of `can:` and `filter:`. If one is missing, the app stops with an error that shows the available abilities:
+
+```text
+@GraphQLDelete(can: 'delete') on Post: PostPolicy has no ability 'delete'. Available: update.
+```
+
+Add the ability to the `abilities` map of the policy. If the error says that the model has no policy, register the policy in the `setup()` of a provider.
+
 ### Let guests in
 
 A guest is a client that is not logged in. The first type of the policy decides what a guest gets.
@@ -442,33 +739,31 @@ class PostPolicy extends Policy<User?, Post> {
   }
 
   @override
-  Map<String, Function> get abilities => <String, Function>{'view': view};
+  Map<String, Function> get abilities => <String, Function>{Ability.view: view};
 }
 ```
 
 Now a guest can read the published posts, and a user can also read their own drafts.
 
-If the config has `AuthMiddleware()`, the model also needs `auth: false`. See [Make a query, mutation or field public](#make-a-query-mutation-or-field-public).
-
-A model with `owner:` always needs a login for create, update and delete.
+To refuse guests on one operation of this model, add `guard: true` to that operation.
 
 ### Your own resolvers
 
-The policy checks run only in the queries, mutations and relations that Dox makes for a model. In your own `@GraphQLQuery`, `@ResolveField` or getter that returns a model, call [`Gate`](../security/authorization.md#checking-a-gate) yourself:
+`filter:` also hides rows in the result of your own `@GraphQLQuery`, `@GraphQLMutation`, `@GraphQLResolveField` or getter. `can:` works only on the operations of the model annotations. To refuse a user with an error in your own resolver, call [`Gate`](../security/authorization.md#checking-a-gate) yourself:
 
 ```dart title="lib/app/graphql/post.resolver.dart"
 @GraphQLQuery()
 Future<Post?> latestPost(DoxGraphQLContext context) async {
   Post? post = await postService.latest();
   User? user = await context.user<User>();
-  if (post != null && await Gate.denies(user, 'view', post)) {
+  if (post != null && await Gate.denies(user, Ability.view, post)) {
     throw GraphQLAuth.forbidden();
   }
   return post;
 }
 ```
 
-`GraphQLAuth.forbidden()` gives the same `FORBIDDEN` error as the automatic checks.
+`GraphQLAuth.forbidden()` gives the same `FORBIDDEN` error as `can:`.
 
 ## Configuration
 
@@ -478,7 +773,6 @@ All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`, for exa
 |---|---|---|
 | `path` | `/graphql` | The URL of the API. |
 | `middleware` | none | Route middleware, like `AuthMiddleware()`. |
-| `autoResolvers` | `true` | `false` turns off the free queries and mutations of all models. |
 | `graphiql` | on in development | The GraphiQL page. |
 | `introspection` | on in development | Lets tools like GraphiQL read the list of your types and fields. |
 | `showInternalErrors` | on in development | Sends the real text of an error to the client. |
@@ -494,14 +788,14 @@ The `max` settings stop a very large query before it causes much work on your se
 
 ## Without the ORM
 
-If your app does not use models, install with `dox add graphql --no-orm`. Put `@GraphQLType()` on a plain Dart class. Its public fields are the fields that a client can ask for. You write all the queries yourself:
+If your app does not use models, install with `dox add graphql --no-orm`. Put `@GraphQL()` on a plain Dart class. Its public fields are the fields that a client can ask for. You write all the queries yourself:
 
 ```dart title="lib/app/graphql/product.resolver.dart"
 import 'package:dox_graphql/dox_graphql.dart';
 import 'package:my_app/app/repositories/product.repository.dart';
 import 'package:my_app/app/repositories/shop.repository.dart';
 
-@GraphQLType()
+@GraphQL()
 class Product {
   Product({required this.id, required this.name, required this.shopId});
 
@@ -523,7 +817,7 @@ class ProductResolver {
     return productRepository.latest(limit);
   }
 
-  @ResolveField()
+  @GraphQLResolveField()
   Future<Shop?> shop(Product product, DoxGraphQLContext context) {
     DataLoader<int, Shop> shops = context.loader<int, Shop>(
       'shops',
@@ -534,6 +828,6 @@ class ProductResolver {
 }
 ```
 
-`@ResolveField()` adds a field to the class of its first parameter. Thus, `Product` gets a `shop` field, and `Shop` also needs `@GraphQLType()`.
+`@GraphQLResolveField()` adds a field to the class of its first parameter. Thus, `Product` gets a `shop` field, and `Shop` also needs `@GraphQL()`.
 
 The `DataLoader` collects the shop ids of the full request. Thus, fifty products cause one shop query, not fifty queries. `findByIds` takes a `List<int>` and returns a `Future<List<Shop?>>`, in the same order as the ids.
