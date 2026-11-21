@@ -33,11 +33,7 @@ void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
 /// already sent, it only closes the response.
 void _plainError(HttpResponse res) {
   if (headSent(res)) {
-    try {
-      endResponse(res);
-    } catch (_) {
-      /// client already gone
-    }
+    _endQuietly(res);
     return;
   }
   try {
@@ -48,6 +44,11 @@ void _plainError(HttpResponse res) {
   } catch (_) {
     /// the head is already sent
   }
+  _endQuietly(res);
+}
+
+/// ends [res]. it may be closed already, or the client gone.
+void _endQuietly(HttpResponse res) {
   try {
     endResponse(res);
   } catch (_) {
@@ -95,13 +96,18 @@ dynamic renderError(HttpRequest req, Object error, StackTrace stackTrace) {
     /// status and headers can not change, and an error text would land
     /// inside the body. the error is reported, and the answer just ends.
     /// the same when the handler took over and started its answer.
-    if (headSent(req.response)) return null;
     if (responseTakenOver(req)) {
-      if (answerStarted(req.response)) return null;
+      /// took over, started its answer, then threw. Nothing else ends a
+      /// taken over answer, so end it here or the client waits forever.
+      if (answerStarted(req.response)) {
+        _endQuietly(req.response);
+        return null;
+      }
 
       /// took over, then threw before it wrote anything: Dox answers
       releaseTakeOver(req);
     }
+    if (headSent(req.response)) return null;
 
     /// the route renders its own errors (`Route.renderErrorsWith`)
     DoxRequest? doxReq = _renderersUsed ? _withRenderer[req] : null;
