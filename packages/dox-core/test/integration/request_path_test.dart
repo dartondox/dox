@@ -35,6 +35,20 @@ class PathRouter extends Router {
     // `.` is a regex mark: it matches any char, as before
     Route.get('api/a.b/{id}', (DoxRequest req) => 'dot ${req.param['id']}');
     Route.get('{lang}/about', (DoxRequest req) => 'about ${req.param['lang']}');
+    // a part with text and params in it
+    Route.get(
+      'mix/v{id}/{name}',
+      (DoxRequest req) => 'mix ${req.param['id']} ${req.param['name']}',
+    );
+    Route.get('mix/v{id}', (DoxRequest req) => 'version ${req.param['id']}');
+    Route.get(
+      'mix/{a}-{b}',
+      (DoxRequest req) => 'pair ${req.param['a']} ${req.param['b']}',
+    );
+    Route.get(
+      'mix/n{id}',
+      (DoxRequest req) => 'number ${req.param['id']}',
+    ).where('id', '[0-9]+');
     Route.post('types', (DoxRequest req) {
       seenTypes.add(HttpBody.contentTypeOf(req.httpHeaders));
       return req.body;
@@ -83,6 +97,22 @@ void main() {
 
     test('a route that starts with a param', () async {
       (await client.get('/en/about')).expectBody('about en');
+    });
+
+    test('a part with text and params gives each param its value', () async {
+      (await client.get('/mix/v5/bob')).expectBody('mix 5 bob');
+      (await client.get('/mix/v5')).expectBody('version 5');
+      (await client.get('/mix/x-y')).expectBody('pair x y');
+      (await client.get('/mix/x')).expectStatus(404);
+      (await client.get('/mix/n42')).expectBody('number 42');
+      (await client.get('/mix/nab')).expectStatus(404);
+      (await client.get('/mix/v%7Bid%7D')).expectBody('version {id}');
+      RouteData route = RouteData(
+        method: 'GET',
+        path: '/v{id}/{a}-{b?}/{rest*}',
+        controllers: <dynamic>[],
+      );
+      expect(route.paramNames, <String>['id', 'a', 'b', 'rest']);
     });
 
     test('matchPrefix', () {
