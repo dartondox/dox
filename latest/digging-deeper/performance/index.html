@@ -7453,7 +7453,7 @@ the database, JSON and your own code, so the gaps are smaller there. See
 <h3 id="2-cores">2 cores</h3>
 <div class="dox-bench">
 <p class="dox-bench__title">2 cores: ahead of Rust hyper and Bun</p>
-<p class="dox-bench__sub"><code>GET /</code>, 256 connections. Every server has one worker per core: Dox one isolate, Bun and Node one process, Go and Rust one thread.</p>
+<p class="dox-bench__sub"><code>GET /</code>, 256 connections. Every server has one worker per core: Dox and Relic one isolate, Bun and Node one process, Go and Rust one thread.</p>
 <div class="dox-bench__grid">
   <span></span><span></span>
   <span class="dox-bench__head">req/s</span>
@@ -7482,6 +7482,13 @@ the database, JSON and your own code, so the gaps are smaller there. See
     <span class="dox-bench__ram">40 MB</span>
   </div>
 <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Relic 2</strong><span>relic_native</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 75.5%"></span></span>
+    <span class="dox-bench__num">473,376<span class="dox-bench__vs">1.32× slower</span></span>
+    <span class="dox-bench__p99">1.7 ms</span>
+    <span class="dox-bench__ram">34 MB</span>
+  </div>
+<div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45.8%"></span></span>
     <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
@@ -7503,9 +7510,9 @@ the database, JSON and your own code, so the gaps are smaller there. See
     <span class="dox-bench__ram">75 MB</span>
   </div>
 </div>
-<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span></p>
+<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Relic 2.0 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span></p>
 </div>
-<p>The Dox numbers are from the 3.2 patch release (2026-11-16). The other servers are from the run before, on the same Mac. See <a href="#how-it-was-run">How it was run</a>.</p>
+<p>The Dox numbers are from the 3.2 patch release (2026-11-16). The Relic row is from 2026-11-22. The other servers are from the run before. All runs are on the same Mac. See <a href="#how-it-was-run">How it was run</a>.</p>
 <p>Requests per second on <code>GET /</code> at 64, 256 and 512 connections:</p>
 <table>
 <thead>
@@ -7550,6 +7557,14 @@ the database, JSON and your own code, so the gaps are smaller there. See
 <td style="text-align: right;">531,310</td>
 <td style="text-align: right;">1.00 ms</td>
 <td style="text-align: right;">40</td>
+</tr>
+<tr>
+<td>Relic 2 (<code>relic_native</code>)</td>
+<td style="text-align: right;">468,642</td>
+<td style="text-align: right;">473,376</td>
+<td style="text-align: right;">452,915</td>
+<td style="text-align: right;">1.70 ms</td>
+<td style="text-align: right;">34</td>
 </tr>
 <tr>
 <td>Node (<code>node:http</code>)</td>
@@ -7608,6 +7623,11 @@ the database, JSON and your own code, so the gaps are smaller there. See
 <td style="text-align: right;">498,518</td>
 </tr>
 <tr>
+<td>Relic 2</td>
+<td style="text-align: right;">433,758</td>
+<td style="text-align: right;">364,878</td>
+</tr>
+<tr>
 <td>Node</td>
 <td style="text-align: right;">274,067</td>
 <td style="text-align: right;">301,084</td>
@@ -7664,6 +7684,7 @@ has nothing to do. See <a href="../native-server/#how-it-works">Native server</a
 <li>Peak memory is the peak of the container (all workers).</li>
 <li>Dart 3.13.6, AOT build with <code>dart build cli</code> (this is what <code>dox build</code>
   does). <code>dox_core</code> and <code>dox_http_native</code> as released when these numbers were measured. The Dox rows were measured again on 2026-11-16 for the 3.2 patch release (same Mac, a new Docker VM). The other servers are from the run before. Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.</li>
+<li>Relic is <code>relic</code> 2.0.0 with <code>relic_native</code> 2.0.0, started with <code>serveNative()</code>. It was measured on 2026-11-22.</li>
 </ul>
 <h2 id="app-benchmark">App benchmark</h2>
 <p>A small real app, the same in each language: <code>GET /json</code> returns a map,
