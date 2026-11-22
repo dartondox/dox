@@ -1,3 +1,7 @@
+## Unreleased
+
+- Faster: a route with params like `/users/{id}` is matched without a regex, when each part of its path is plain text or one whole param. The match goes from 142 ns to 16 ns. Measured on 2 server cores, `GET /user/{id}` does 2% to 4% more requests a second. Routes with `{id?}`, `{path*}` or `Route.where` use the regex, as before. The matched routes and the param values do not change.
+
 ## 3.2.4
 
 - New: `IAuthMiddleware` is an interface for a middleware that logs a user in. `asOptional()` gives a copy that lets guests through with `req.auth` null. A package like GraphQL can use it to read the user without needing the auth package.

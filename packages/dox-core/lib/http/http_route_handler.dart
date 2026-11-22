@@ -342,6 +342,15 @@ RouteMatch? _getMatchRoute(String inputRoute, String method, String? domain) {
     /// first param can not match, so the regex is skipped.
     String? prefix = route.matchPrefix;
     if (prefix != null && !inputRoute.startsWith(prefix)) continue;
+
+    /// a route of plain parts and whole params needs no regex
+    if (route.hasSegments) {
+      List<String>? values = route.matchSegments(inputRoute);
+      if (values == null) continue;
+      Map<String, dynamic>? params = _paramsOf(route, values);
+      if (params == null) continue;
+      return (route: route, params: params);
+    }
     RegExpMatch? match = pattern.firstMatch(inputRoute);
     if (match != null) {
       Map<String, dynamic>? params = _decodeParams(route, match);
@@ -358,10 +367,18 @@ RouteMatch? _getMatchRoute(String inputRoute, String method, String? domain) {
 /// Also null when a decoded param no longer matches its `Route.where`
 /// regex (eg. `[^/]+` and `..%2F..` gives `../..`).
 Map<String, dynamic>? _decodeParams(RouteData route, RegExpMatch match) {
+  int count = route.paramNames.length;
+  return _paramsOf(route, <String?>[
+    for (int i = 1; i <= count; i++) match.group(i),
+  ]);
+}
+
+/// like [_decodeParams], for the param [values] in the order of the names.
+Map<String, dynamic>? _paramsOf(RouteData route, List<String?> values) {
   List<String> names = route.paramNames;
   Map<String, dynamic> params = <String, dynamic>{};
   for (int i = 0; i < names.length; i++) {
-    String? value = match.group(i + 1);
+    String? value = values[i];
     if (value != null && value.contains('%')) {
       try {
         value = Uri.decodeComponent(value);

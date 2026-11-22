@@ -95,6 +95,79 @@ void main() {
       expect(route('/a.b/{id}').matchPrefix, isNull);
       expect(route('/api/users').matchPrefix, isNull);
     });
+
+    test('hasSegments: only plain parts and whole required params', () {
+      RouteData route(String path) =>
+          RouteData(method: 'GET', path: path, controllers: <dynamic>[]);
+      expect(route('/users/{id}').hasSegments, isTrue);
+      expect(route('/{lang}/about').hasSegments, isTrue);
+      expect(route('/a/{b}/c/{d}').hasSegments, isTrue);
+      expect(route('/users').hasSegments, isFalse);
+      expect(route('/tags/{tag?}').hasSegments, isFalse);
+      expect(route('/files/{path*}').hasSegments, isFalse);
+      expect(route('/a.b/{id}').hasSegments, isFalse);
+      expect(route('/v{id}/x').hasSegments, isFalse);
+      expect(route('/{a}{b}').hasSegments, isFalse);
+      expect(route('/users/{id}/').hasSegments, isFalse);
+      expect(route('users/{id}').hasSegments, isFalse);
+      expect(
+        (route('/users/{id}')..where('id', '[0-9]+')).hasSegments,
+        isFalse,
+      );
+    });
+
+    test('matchSegments gives the same answer as the regex', () {
+      List<String> paths = <String>[
+        '/users/{id}',
+        '/{lang}/about',
+        '/{id}',
+        '/a/{b}/c/{d}',
+        '/api/v1/users/{user}/posts/{post}',
+        '/{a}/{b}/{c}',
+      ];
+      List<String> urls = <String>[
+        '/',
+        '/users',
+        '/users/5',
+        '/users/5/6',
+        '/users/a%20b',
+        '/users/ a\nb ',
+        '/Users/5',
+        '/usersx/5',
+        '/user/5',
+        '/en/about',
+        '/en/about/us',
+        '/en/abouts',
+        '/x',
+        '/a/1/c/2',
+        '/a/1/c',
+        '/a/1/d/2',
+        '/a/1/c/2/3',
+        '/api/v1/users/7/posts/9',
+        '/api/v1/users/7/posts',
+        '/api/v2/users/7/posts/9',
+        '/1/2/3',
+        '/1/2',
+        '/é/about',
+      ];
+      for (String path in paths) {
+        RouteData route = RouteData(
+          method: 'GET',
+          path: path,
+          controllers: <dynamic>[],
+        );
+        expect(route.hasSegments, isTrue, reason: path);
+        for (String url in urls) {
+          RegExpMatch? match = route.pattern!.firstMatch(url);
+          List<String?>? want = match == null
+              ? null
+              : <String?>[
+                  for (int i = 1; i <= match.groupCount; i++) match.group(i),
+                ];
+          expect(route.matchSegments(url), want, reason: '$path on $url');
+        }
+      }
+    });
   });
 
   group('content type', () {
