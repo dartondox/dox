@@ -138,6 +138,7 @@ class RouteData {
   }
 
   /// names of the params, eg. `['id']` for `/blog/{id}`.
+  /// A part can mix text and params: `/v{id}` and `/{a}-{b}`.
   /// `{path*}` matches the rest of the url, slashes too.
   /// `{id?}` is optional: `/blog` and `/blog/5` both match.
   List<String> get paramNames {
@@ -240,13 +241,11 @@ class RouteData {
   void _compile() {
     if (_compiledFor == path) return;
     _compiledFor = path;
+    // the names come from the same matches as the groups of the regex,
+    // so a part like `v{id}` or `{a}-{b}` gives each param its own value
     _paramNames = <String>[
-      for (String part in path.split('/'))
-        if (part.startsWith('{') && part.endsWith('}'))
-          part
-              .substring(1, part.length - 1)
-              .replaceAll('*', '')
-              .replaceAll('?', ''),
+      for (Match match in _param.allMatches(path))
+        match[0]!.replaceAll(_paramMarks, ''),
     ];
     _pattern = _paramNames.isEmpty
         ? null
@@ -296,7 +295,7 @@ class RouteData {
 
   static final RegExp _paramMarks = RegExp(r'[/{}*?]');
 
-  static final RegExp _param = RegExp(r'/?{[^/]+}');
+  static final RegExp _param = RegExp(r'/?{[^/{}]+}');
 
   static String _paramPattern(Match match) {
     String text = match[0]!;

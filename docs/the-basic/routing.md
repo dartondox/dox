@@ -141,6 +141,22 @@ class BlogController {
 
 `/blogs/abc` answers `404`, because `abc` is not an `int`. See [Controller: parameters](controller.md#parameters) for all the rules.
 
+### Param in a part with text
+
+A part of the path can have text and params together. Each param gets its own value:
+
+```dart
+Route.get('/v{version}/users/{id}', (DoxRequest req) {
+  return req.param['version']; // GET /v2/users/5 gives '2'
+});
+
+Route.get('/files/{name}-{size}', (DoxRequest req) {
+  return req.param['size']; // GET /files/logo-small gives 'small'
+});
+```
+
+A param takes as much text as it can. So for `/files/a-b-c`, `name` is `a-b` and `size` is `c`.
+
 ### Optional param
 
 A param with `?` can be missing. Use a nullable type for it:

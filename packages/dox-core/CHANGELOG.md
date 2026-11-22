@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: a route part can have text and params together, like `/v{id}/{name}`, `/v{id}` and `/{a}-{b}`. Before, `/v{id}/{name}` gave the value of `id` for `req.param['name']`, `/v{id}` matched only the text `/v{id}`, and `/{a}-{b}` was one param with the name `a}-{b`. Now each param has its own name and value. This changes the match of two rare routes: `/v{id}` now matches `/v5`, and `/{a}-{b}` matches `/x-y` but not `/x`.
 - Faster: a route with params like `/users/{id}` is matched without a regex, when each part of its path is plain text or one whole param. The match goes from 142 ns to 16 ns. Measured on 2 server cores, `GET /user/{id}` does 2% to 4% more requests a second. Routes with `{id?}`, `{path*}` or `Route.where` use the regex, as before. The matched routes and the param values do not change.
 
 ## 3.2.4
