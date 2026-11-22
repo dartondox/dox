@@ -81,6 +81,6 @@ Routes with `{id?}`, `{path*}` or `Route.where` use the regex, as before. The ma
 - **Two rare route matches change.** Examine your routes for a part that has text and a param together.
     - `/v{id}` now matches `/v5`. Before, it matched only the text `/v{id}`.
     - `/{a}-{b}` now matches `/x-y` but not `/x`. Before, it was one param with the name `a}-{b`.
-- **`dox_core` 3.2.5 needs `dox_http_native` 3.2.3.** `dart pub upgrade` gets it. The ABI version stays 10.
+- **`dox_core` 3.2.5 needs `dox_http_native` 3.2.3.** `dart pub upgrade` gets it.
 
 Full list: the CHANGELOG of each package.
