@@ -100,6 +100,13 @@ class BlogController {
     <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Relic 2</strong><span>relic_native</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 75.5%"></span></span>
+    <span class="dox-bench__num">473,376<span class="dox-bench__vs">1.32× slower</span></span>
+    <span class="dox-bench__p99">1.7 ms</span>
+    <span class="dox-bench__ram">34 MB</span>
+  </div>
+  <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45.8%"></span></span>
     <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
@@ -122,7 +129,7 @@ class BlogController {
   </div>
 </div>
 
-<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span><a href="digging-deeper/performance/#benchmark">All results</a></p>
+<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Relic 2.0 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span><a href="digging-deeper/performance/#benchmark">All results</a></p>
 
 </div>
 
