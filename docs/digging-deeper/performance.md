@@ -58,7 +58,7 @@ the database, JSON and your own code, so the gaps are smaller there. See
 <div class="dox-bench" markdown>
 
 <p class="dox-bench__title">2 cores: ahead of Rust hyper and Bun</p>
-<p class="dox-bench__sub"><code>GET /</code>, 256 connections. Every server has one worker per core: Dox one isolate, Bun and Node one process, Go and Rust one thread.</p>
+<p class="dox-bench__sub"><code>GET /</code>, 256 connections. Every server has one worker per core: Dox and Relic one isolate, Bun and Node one process, Go and Rust one thread.</p>
 
 <div class="dox-bench__grid">
   <span></span><span></span>
@@ -88,6 +88,13 @@ the database, JSON and your own code, so the gaps are smaller there. See
     <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Relic 2</strong><span>relic_native</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 75.5%"></span></span>
+    <span class="dox-bench__num">473,376<span class="dox-bench__vs">1.32× slower</span></span>
+    <span class="dox-bench__p99">1.7 ms</span>
+    <span class="dox-bench__ram">34 MB</span>
+  </div>
+  <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45.8%"></span></span>
     <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
@@ -110,11 +117,11 @@ the database, JSON and your own code, so the gaps are smaller there. See
   </div>
 </div>
 
-<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span></p>
+<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Relic 2.0 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span></p>
 
 </div>
 
-The Dox numbers are from the 3.2 patch release (2026-11-16). The other servers are from the run before, on the same Mac. See [How it was run](#how-it-was-run).
+The Dox numbers are from the 3.2 patch release (2026-11-16). The Relic row is from 2026-11-22. The other servers are from the run before. All runs are on the same Mac. See [How it was run](#how-it-was-run).
 
 Requests per second on `GET /` at 64, 256 and 512 connections:
 
@@ -124,6 +131,7 @@ Requests per second on `GET /` at 64, 256 and 512 connections:
 | Dox server only     | 557,115 | 678,781 | 696,043 | 2.9 ms     | 19      |
 | Rust (hyper)        | 499,734 | 585,658 | 560,181 | 0.71 ms    | 13      |
 | Bun (`Bun.serve`)   | 508,243 | 501,529 | 531,310 | 1.00 ms    | 40      |
+| Relic 2 (`relic_native`) | 468,642 | 473,376 | 452,915 | 1.70 ms | 34 |
 | Node (`node:http`)  | 252,866 | 286,847 | 296,257 | 1.70 ms    | 200     |
 | Go (`net/http`)     | 248,951 | 242,043 | 232,687 | 3.27 ms    | 36      |
 | `dart:io`           | 125,428 | 129,796 | 132,112 | 3.83 ms    | 75      |
@@ -136,6 +144,7 @@ The other two routes at 256 connections:
 | Dox server only   | 661,102         | 670,326      |
 | Rust (hyper)      | 564,411         | 569,313      |
 | Bun               | 482,328         | 498,518      |
+| Relic 2           | 433,758         | 364,878      |
 | Node              | 274,067         | 301,084      |
 | Go                | 230,845         | 231,050      |
 | `dart:io`         | 93,561          | 126,027      |
@@ -167,6 +176,7 @@ A profile with `perf` (4 server cores, 64 connections) shows the effect:
 - Peak memory is the peak of the container (all workers).
 - Dart 3.13.6, AOT build with `dart build cli` (this is what `dox build`
   does). `dox_core` and `dox_http_native` as released when these numbers were measured. The Dox rows were measured again on 2026-11-16 for the 3.2 patch release (same Mac, a new Docker VM). The other servers are from the run before. Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.
+- Relic is `relic` 2.0.0 with `relic_native` 2.0.0, started with `serveNative()`. It was measured on 2026-11-22.
 
 ## App benchmark
 
