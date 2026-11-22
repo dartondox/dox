@@ -139,6 +139,23 @@ void main() {
       );
     });
 
+    test('a part with text and params', () {
+      Route.get('v{id}/{name}', (DoxRequest req) {}).name('mix');
+      Route.get('files/{a}-{b}', (DoxRequest req) {}).name('pair');
+      expect(
+        Route.url('mix', params: <String, Object>{'id': 5, 'name': 'a b'}),
+        '/v5/a%20b',
+      );
+      expect(
+        Route.url('pair', params: <String, Object>{'a': 'x', 'b': 'y', 'c': 1}),
+        '/files/x-y?c=1',
+      );
+      expect(
+        () => Route.url('pair', params: <String, Object>{'a': 'x'}),
+        throwsArgumentError,
+      );
+    });
+
     test('absolute url from baseUrl or APP_URL', () {
       Route.get('users/{id}', (DoxRequest req) {}).name('users.show');
       expect(

@@ -578,33 +578,24 @@ class Route {
       throw ArgumentError.value(name, 'name', 'No route has this name');
     }
     Set<String> used = <String>{};
-    List<String> parts = <String>[];
-    for (String part in data.path.split('/')) {
-      if (!part.startsWith('{') || !part.endsWith('}')) {
-        parts.add(part);
-        continue;
-      }
-      bool rest = part.endsWith('*}');
-      bool optional = part.endsWith('?}');
-      String param = part
-          .substring(1, part.length - 1)
-          .replaceAll('*', '')
-          .replaceAll('?', '');
+    // every `{param}`, also in a part with text like `v{id}`
+    String path = data.path.replaceAllMapped(_urlParam, (Match match) {
+      String text = match[0]!;
+      String slash = text.startsWith('/') ? '/' : '';
+      String param = match[1]!.replaceAll('*', '').replaceAll('?', '');
       Object? value = params[param];
       used.add(param);
       if (value == null) {
-        if (optional) continue;
+        if (text.endsWith('?}')) return '';
         throw ArgumentError(
           'Route "$name" (${data.path}) needs the param "$param".',
         );
       }
-      parts.add(
-        rest
-            ? '$value'.split('/').map(Uri.encodeComponent).join('/')
-            : Uri.encodeComponent('$value'),
-      );
-    }
-    String path = parts.join('/');
+      if (text.endsWith('*}')) {
+        return slash + '$value'.split('/').map(Uri.encodeComponent).join('/');
+      }
+      return slash + Uri.encodeComponent('$value');
+    });
     if (path.isEmpty) path = '/';
     if (absolute) path = '${_baseUrl(baseUrl)}$path';
     Map<String, String> values = <String, String>{
@@ -618,6 +609,9 @@ class Route {
     if (values.isEmpty) return path;
     return '$path?${Uri(queryParameters: values).query}';
   }
+
+  /// a `{param}` of a route path, with the `/` before it
+  static final RegExp _urlParam = RegExp(r'/?{([^/{}]+)}');
 
   /// [baseUrl] or `APP_URL` of the env, with no `/` at the end
   static String _baseUrl(String? baseUrl) {

@@ -45,6 +45,10 @@ class PathRouter extends Router {
       'mix/{a}-{b}',
       (DoxRequest req) => 'pair ${req.param['a']} ${req.param['b']}',
     );
+    Route.get(
+      'mix/n{id}',
+      (DoxRequest req) => 'number ${req.param['id']}',
+    ).where('id', '[0-9]+');
     Route.post('types', (DoxRequest req) {
       seenTypes.add(HttpBody.contentTypeOf(req.httpHeaders));
       return req.body;
@@ -100,6 +104,8 @@ void main() {
       (await client.get('/mix/v5')).expectBody('version 5');
       (await client.get('/mix/x-y')).expectBody('pair x y');
       (await client.get('/mix/x')).expectStatus(404);
+      (await client.get('/mix/n42')).expectBody('number 42');
+      (await client.get('/mix/nab')).expectStatus(404);
       (await client.get('/mix/v%7Bid%7D')).expectBody('version {id}');
       RouteData route = RouteData(
         method: 'GET',
