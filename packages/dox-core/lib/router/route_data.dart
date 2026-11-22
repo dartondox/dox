@@ -145,7 +145,50 @@ class RouteData {
     return _paramNames;
   }
 
+  /// true when the route has params and every part between slashes is
+  /// plain text or one whole required param, like `/users/{id}/posts`.
+  /// Then [matchSegments] gives the same answer as [pattern], with no
+  /// regex. False for `{id?}`, `{path*}`, `Route.where`, a part like
+  /// `v{id}`, and text with regex marks in it (eg. `a.b`).
+  bool get hasSegments {
+    _compile();
+    return _segments != null;
+  }
+
+  /// The param values when [path] matches this route, in the order of
+  /// [paramNames]. Null when it does not match. Only for a route with
+  /// [hasSegments]: for other routes it gives null.
+  List<String>? matchSegments(String path) {
+    _compile();
+    List<String?>? want = _segments;
+    if (want == null || !path.startsWith('/')) return null;
+    List<String>? values;
+    int last = want.length - 1;
+    int at = 1; // after the first slash
+    int count = 0;
+    for (int i = 0; i <= last; i++) {
+      int end = path.indexOf('/', at);
+      // the url has more parts than the route, or fewer
+      if ((end == -1) != (i == last)) return null;
+      if (end == -1) end = path.length;
+      String? text = want[i];
+      if (text == null) {
+        if (end == at) return null; // a param is never empty
+        values ??= List<String>.filled(_paramNames.length, '');
+        values[count++] = path.substring(at, end);
+      } else if (end - at != text.length || !path.startsWith(text, at)) {
+        return null;
+      }
+      at = end + 1;
+    }
+    return values;
+  }
+
   RegExp? _pattern;
+
+  /// the parts of the path for [matchSegments]: the text, or null for a
+  /// param. Null when the route needs the regex.
+  List<String?>? _segments;
   List<String> _paramNames = const <String>[];
   String? _matchPrefix;
   String? _compiledFor;
@@ -216,6 +259,25 @@ class RouteData {
       String head = path.substring(0, first.start);
       if (head.length > 1 && !_regexMarks.hasMatch(head)) _matchPrefix = head;
     }
+    _segments = _pattern == null || wheres != null ? null : _segmentsOf(path);
+  }
+
+  /// the parts of [path] for [matchSegments], or null when a part is not
+  /// plain text or one whole required param.
+  static List<String?>? _segmentsOf(String path) {
+    if (!path.startsWith('/') || path != path.trim()) return null;
+    List<String?> segments = <String?>[];
+    for (String part in path.substring(1).split('/')) {
+      if (part.startsWith('{') && part.endsWith('}')) {
+        String name = part.substring(1, part.length - 1);
+        if (name.isEmpty || _regexMarks.hasMatch(name)) return null;
+        segments.add(null);
+      } else {
+        if (part.isEmpty || _regexMarks.hasMatch(part)) return null;
+        segments.add(part);
+      }
+    }
+    return segments;
   }
 
   /// text that means more than itself in a regex, eg. `.`
