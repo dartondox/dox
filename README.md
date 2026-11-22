@@ -137,7 +137,8 @@ class BlogController {
 
 ## Performance
 
-A full Dox app against plain servers in other languages. It uses the rules of
+A full Dox app against plain servers in other languages and against Relic 2.
+It uses the rules of
 [the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks):
 `GET /`, 2 CPU cores, 256 connections, `wrk`. Higher req/s is better.
 
@@ -146,6 +147,7 @@ A full Dox app against plain servers in other languages. It uses the rules of
 | **Dox** (full app) | **652,400** | 0.7 ms | 21 MB |
 | Rust (hyper) | 572,132 | 0.8 ms | 14 MB |
 | Bun (`Bun.serve`) | 504,672 | 1.0 ms | 40 MB |
+| Relic 2 (`relic_native`) | 471,005 | 0.7 ms | 40 MB |
 | Node (`node:http`) | 282,130 | 1.7 ms | 199 MB |
 | Go (`net/http`) | 237,146 | 3.3 ms | 36 MB |
 | Dart (`dart:io` HttpServer) | 124,996 | 4.8 ms | 56 MB |
