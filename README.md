@@ -143,12 +143,12 @@ A full Dox app against plain servers in other languages. It uses the rules of
 
 | Server | req/s | p99 | RAM |
 | --- | ---: | ---: | ---: |
-| **Dox** (full app) | **626,655** | 1.1 ms | 21 MB |
-| Rust (hyper) | 585,658 | 0.7 ms | 13 MB |
-| Bun (`Bun.serve`) | 501,529 | 1.0 ms | 40 MB |
-| Node (`node:http`) | 286,847 | 1.7 ms | 200 MB |
-| Go (`net/http`) | 242,043 | 3.3 ms | 36 MB |
-| Dart (`dart:io` HttpServer) | 129,796 | 3.8 ms | 75 MB |
+| **Dox** (full app) | **652,400** | 0.7 ms | 21 MB |
+| Rust (hyper) | 572,132 | 0.8 ms | 14 MB |
+| Bun (`Bun.serve`) | 504,672 | 1.0 ms | 40 MB |
+| Node (`node:http`) | 282,130 | 1.7 ms | 199 MB |
+| Go (`net/http`) | 237,146 | 3.3 ms | 36 MB |
+| Dart (`dart:io` HttpServer) | 124,996 | 4.8 ms | 56 MB |
 
 Read one row from Postgres (`GET /db`, same setup, Postgres 18):
 

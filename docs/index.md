@@ -80,51 +80,51 @@ class BlogController {
   <div class="dox-bench__row dox-bench__row--win">
     <span class="dox-bench__name"><strong>Dox</strong><span>native server</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">626,655<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">1.1 ms</span>
+    <span class="dox-bench__num">652,400<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
     <span class="dox-bench__ram">21 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 93.5%"></span></span>
-    <span class="dox-bench__num">585,658<span class="dox-bench__vs">1.07× slower</span></span>
-    <span class="dox-bench__p99">0.7 ms</span>
-    <span class="dox-bench__ram">13 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 87.7%"></span></span>
+    <span class="dox-bench__num">572,132<span class="dox-bench__vs">1.14× slower</span></span>
+    <span class="dox-bench__p99">0.8 ms</span>
+    <span class="dox-bench__ram">14 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 80%"></span></span>
-    <span class="dox-bench__num">501,529<span class="dox-bench__vs">1.25× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 77.4%"></span></span>
+    <span class="dox-bench__num">504,672<span class="dox-bench__vs">1.29× slower</span></span>
     <span class="dox-bench__p99">1.0 ms</span>
     <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Relic 2</strong><span>relic_native</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 75.5%"></span></span>
-    <span class="dox-bench__num">473,376<span class="dox-bench__vs">1.32× slower</span></span>
-    <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">34 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 72.2%"></span></span>
+    <span class="dox-bench__num">471,005<span class="dox-bench__vs">1.39× slower</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45.8%"></span></span>
-    <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.2%"></span></span>
+    <span class="dox-bench__num">282,130<span class="dox-bench__vs">2.3× slower</span></span>
     <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">200 MB</span>
+    <span class="dox-bench__ram">199 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 38.6%"></span></span>
-    <span class="dox-bench__num">242,043<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 36.3%"></span></span>
+    <span class="dox-bench__num">237,146<span class="dox-bench__vs">2.8× slower</span></span>
     <span class="dox-bench__p99">3.3 ms</span>
     <span class="dox-bench__ram">36 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20.7%"></span></span>
-    <span class="dox-bench__num">129,796<span class="dox-bench__vs">4.8× slower</span></span>
-    <span class="dox-bench__p99">3.8 ms</span>
-    <span class="dox-bench__ram">75 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 19.2%"></span></span>
+    <span class="dox-bench__num">124,996<span class="dox-bench__vs">5.2× slower</span></span>
+    <span class="dox-bench__p99">4.8 ms</span>
+    <span class="dox-bench__ram">56 MB</span>
   </div>
 </div>
 
