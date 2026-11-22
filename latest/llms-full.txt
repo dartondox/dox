@@ -27750,6 +27750,63 @@ class ProductResolver {
 
 The `DataLoader` collects the shop ids of the full request. Thus, fifty products cause one shop query, not fifty queries. `findByIds` takes a `List<int>` and returns a `Future<List<Shop?>>`, in the same order as the ids.
 
+## Performance
+
+The same GraphQL API in Dox and in Go, on Postgres. The Dox app uses the ORM with `@GraphQLAll` and `@GraphQLFind`. The Go apps use gqlgen, one with pgx and one with GORM, and a dataloader for the relation.
+
+<div class="dox-bench" markdown>
+
+<p class="dox-bench__title">2 cores: 20 rows, each with its related rows</p>
+<p class="dox-bench__sub"><code>{ worlds(limit: 20) { id randomNumber notes { id body } } }</code>, 256 connections. Requests per second, higher is better.</p>
+
+<div class="dox-bench__grid">
+  <span></span><span></span>
+  <span class="dox-bench__head">req/s</span>
+  <span class="dox-bench__head">p99</span>
+  <span class="dox-bench__head dox-bench__head--ram">RAM</span>
+
+  <div class="dox-bench__row dox-bench__row--win">
+    <span class="dox-bench__name"><strong>Dox</strong><span>ORM</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
+    <span class="dox-bench__num">5,990<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">84 ms</span>
+    <span class="dox-bench__ram">223 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Go</strong><span>gqlgen + pgx</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 65.4%"></span></span>
+    <span class="dox-bench__num">3,918<span class="dox-bench__vs">1.5× slower</span></span>
+    <span class="dox-bench__p99">79 ms</span>
+    <span class="dox-bench__ram">132 MB</span>
+  </div>
+  <div class="dox-bench__row">
+    <span class="dox-bench__name"><strong>Go</strong><span>gqlgen + GORM</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 61.5%"></span></span>
+    <span class="dox-bench__num">3,683<span class="dox-bench__vs">1.6× slower</span></span>
+    <span class="dox-bench__p99">221 ms</span>
+    <span class="dox-bench__ram">105 MB</span>
+  </div>
+</div>
+
+<p class="dox-bench__foot"><span>Dox · Go 1.26 · gqlgen 0.17 · Postgres 18 · 2 cores · 256 connections · wrk</span></p>
+
+</div>
+
+All three queries at 256 connections, requests per second:
+
+| Server               | One row by id | 20 rows | 20 rows with a relation | peak MB |
+| -------------------- | ------------: | ------: | ----------------------: | ------: |
+| Dox (ORM)            | 88,330        | 7,837   | 5,990                   | 223     |
+| Go (gqlgen + pgx)    | 27,870        | 7,618   | 3,918                   | 132     |
+| Go (gqlgen + GORM)   | 24,675        | 7,436   | 3,683                   | 105     |
+
+- On one row by id, Dox is 3.2 times as fast as Go with pgx.
+- On a list of 20 rows, all three are about the same. Postgres is the limit here.
+- On a list with a relation, Dox is 1.5 times as fast.
+- Dox uses more memory at the peak. After the load, its memory goes down again.
+
+How it was run: the same rig as the [benchmark](../digging-deeper/performance.md#how-it-was-run) of the server. The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4. Each server has 8 database connections. Each query runs for 15 seconds, three times. The numbers are the median.
+
 ## Details
 
 - **GET requests.** A client can also send a query as a `GET` request, with `query` in the URL. A mutation needs `POST`.
