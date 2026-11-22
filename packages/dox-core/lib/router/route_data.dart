@@ -157,10 +157,11 @@ class RouteData {
 
   /// The param values when [path] matches this route, in the order of
   /// [paramNames]. Null when it does not match. Only for a route with
-  /// [hasSegments]. [path] is a clean path: it starts with `/`, has no
-  /// `//` and does not end with `/`.
+  /// [hasSegments]: for other routes it gives null.
   List<String>? matchSegments(String path) {
-    List<String?> want = _segments!;
+    _compile();
+    List<String?>? want = _segments;
+    if (want == null || !path.startsWith('/')) return null;
     List<String>? values;
     int last = want.length - 1;
     int at = 1; // after the first slash

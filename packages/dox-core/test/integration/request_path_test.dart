@@ -114,6 +114,7 @@ void main() {
         (route('/users/{id}')..where('id', '[0-9]+')).hasSegments,
         isFalse,
       );
+      expect(route('/users').matchSegments('/users'), isNull);
     });
 
     test('matchSegments gives the same answer as the regex', () {
@@ -130,6 +131,13 @@ void main() {
         '/users',
         '/users/5',
         '/users/5/6',
+        '/users/5/',
+        '/users//5',
+        '/users/',
+        '/users/a%2Fb',
+        '/users/%ff',
+        'users/5',
+        '',
         '/users/a%20b',
         '/users/ a\nb ',
         '/Users/5',
