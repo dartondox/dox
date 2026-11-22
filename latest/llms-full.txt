@@ -84,51 +84,51 @@ class BlogController {
   <div class="dox-bench__row dox-bench__row--win">
     <span class="dox-bench__name"><strong>Dox</strong><span>native server</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">626,655<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">1.1 ms</span>
+    <span class="dox-bench__num">652,400<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
     <span class="dox-bench__ram">21 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 93.5%"></span></span>
-    <span class="dox-bench__num">585,658<span class="dox-bench__vs">1.07× slower</span></span>
-    <span class="dox-bench__p99">0.7 ms</span>
-    <span class="dox-bench__ram">13 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 87.7%"></span></span>
+    <span class="dox-bench__num">572,132<span class="dox-bench__vs">1.14× slower</span></span>
+    <span class="dox-bench__p99">0.8 ms</span>
+    <span class="dox-bench__ram">14 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 80%"></span></span>
-    <span class="dox-bench__num">501,529<span class="dox-bench__vs">1.25× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 77.4%"></span></span>
+    <span class="dox-bench__num">504,672<span class="dox-bench__vs">1.29× slower</span></span>
     <span class="dox-bench__p99">1.0 ms</span>
     <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Relic 2</strong><span>relic_native</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 75.5%"></span></span>
-    <span class="dox-bench__num">473,376<span class="dox-bench__vs">1.32× slower</span></span>
-    <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">34 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 72.2%"></span></span>
+    <span class="dox-bench__num">471,005<span class="dox-bench__vs">1.39× slower</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45.8%"></span></span>
-    <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.2%"></span></span>
+    <span class="dox-bench__num">282,130<span class="dox-bench__vs">2.3× slower</span></span>
     <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">200 MB</span>
+    <span class="dox-bench__ram">199 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 38.6%"></span></span>
-    <span class="dox-bench__num">242,043<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 36.3%"></span></span>
+    <span class="dox-bench__num">237,146<span class="dox-bench__vs">2.8× slower</span></span>
     <span class="dox-bench__p99">3.3 ms</span>
     <span class="dox-bench__ram">36 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20.7%"></span></span>
-    <span class="dox-bench__num">129,796<span class="dox-bench__vs">4.8× slower</span></span>
-    <span class="dox-bench__p99">3.8 ms</span>
-    <span class="dox-bench__ram">75 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 19.2%"></span></span>
+    <span class="dox-bench__num">124,996<span class="dox-bench__vs">5.2× slower</span></span>
+    <span class="dox-bench__p99">4.8 ms</span>
+    <span class="dox-bench__ram">56 MB</span>
   </div>
 </div>
 
@@ -3247,6 +3247,22 @@ class BlogController {
 ```
 
 `/blogs/abc` answers `404`, because `abc` is not an `int`. See [Controller: parameters](controller.md#parameters) for all the rules.
+
+### Param in a part with text
+
+A part of the path can have text and params together. Each param gets its own value:
+
+```dart
+Route.get('/v{version}/users/{id}', (DoxRequest req) {
+  return req.param['version']; // GET /v2/users/5 gives '2'
+});
+
+Route.get('/files/{name}-{size}', (DoxRequest req) {
+  return req.param['size']; // GET /files/logo-small gives 'small'
+});
+```
+
+A param takes as much text as it can. So for `/files/a-b-c`, `name` is `a-b` and `size` is `c`.
 
 ### Optional param
 
@@ -14581,51 +14597,51 @@ the database, JSON and your own code, so the gaps are smaller there. See
   <div class="dox-bench__row dox-bench__row--win">
     <span class="dox-bench__name"><strong>Dox</strong><span>full app</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">626,655<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">1.1 ms</span>
+    <span class="dox-bench__num">652,400<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
     <span class="dox-bench__ram">21 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 93.5%"></span></span>
-    <span class="dox-bench__num">585,658<span class="dox-bench__vs">1.07× slower</span></span>
-    <span class="dox-bench__p99">0.7 ms</span>
-    <span class="dox-bench__ram">13 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 87.7%"></span></span>
+    <span class="dox-bench__num">572,132<span class="dox-bench__vs">1.14× slower</span></span>
+    <span class="dox-bench__p99">0.8 ms</span>
+    <span class="dox-bench__ram">14 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 80%"></span></span>
-    <span class="dox-bench__num">501,529<span class="dox-bench__vs">1.25× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 77.4%"></span></span>
+    <span class="dox-bench__num">504,672<span class="dox-bench__vs">1.29× slower</span></span>
     <span class="dox-bench__p99">1.0 ms</span>
     <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Relic 2</strong><span>relic_native</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 75.5%"></span></span>
-    <span class="dox-bench__num">473,376<span class="dox-bench__vs">1.32× slower</span></span>
-    <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">34 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 72.2%"></span></span>
+    <span class="dox-bench__num">471,005<span class="dox-bench__vs">1.39× slower</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">40 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45.8%"></span></span>
-    <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.2%"></span></span>
+    <span class="dox-bench__num">282,130<span class="dox-bench__vs">2.3× slower</span></span>
     <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">200 MB</span>
+    <span class="dox-bench__ram">199 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 38.6%"></span></span>
-    <span class="dox-bench__num">242,043<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 36.3%"></span></span>
+    <span class="dox-bench__num">237,146<span class="dox-bench__vs">2.8× slower</span></span>
     <span class="dox-bench__p99">3.3 ms</span>
     <span class="dox-bench__ram">36 MB</span>
   </div>
   <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20.7%"></span></span>
-    <span class="dox-bench__num">129,796<span class="dox-bench__vs">4.8× slower</span></span>
-    <span class="dox-bench__p99">3.8 ms</span>
-    <span class="dox-bench__ram">75 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 19.2%"></span></span>
+    <span class="dox-bench__num">124,996<span class="dox-bench__vs">5.2× slower</span></span>
+    <span class="dox-bench__p99">4.8 ms</span>
+    <span class="dox-bench__ram">56 MB</span>
   </div>
 </div>
 
@@ -14633,33 +14649,33 @@ the database, JSON and your own code, so the gaps are smaller there. See
 
 </div>
 
-The Dox numbers are from the 3.2 patch release (2026-11-16). The Relic row is from 2026-11-22. The other servers are from the run before. All runs are on the same Mac. See [How it was run](#how-it-was-run).
+All the servers are from the same run on 2026-11-22. Each number is the median of 3 rounds. See [How it was run](#how-it-was-run).
 
 Requests per second on `GET /` at 64, 256 and 512 connections:
 
 | Server              | 64      | 256     | 512     | p99 at 256 | peak MB |
 | ------------------- | ------: | ------: | ------: | ---------: | ------: |
-| Dox                 | 521,583 | 626,655 | 649,990 | 1.14 ms    | 21      |
-| Dox server only     | 557,115 | 678,781 | 696,043 | 2.9 ms     | 19      |
-| Rust (hyper)        | 499,734 | 585,658 | 560,181 | 0.71 ms    | 13      |
-| Bun (`Bun.serve`)   | 508,243 | 501,529 | 531,310 | 1.00 ms    | 40      |
-| Relic 2 (`relic_native`) | 468,642 | 473,376 | 452,915 | 1.70 ms | 34 |
-| Node (`node:http`)  | 252,866 | 286,847 | 296,257 | 1.70 ms    | 200     |
-| Go (`net/http`)     | 248,951 | 242,043 | 232,687 | 3.27 ms    | 36      |
-| `dart:io`           | 125,428 | 129,796 | 132,112 | 3.83 ms    | 75      |
+| Dox                 | 541,489 | 652,400 | 669,691 | 0.74 ms    | 21      |
+| Dox server only     | 576,078 | 685,300 | 701,441 | 0.70 ms    | 20      |
+| Rust (hyper)        | 499,992 | 572,132 | 559,617 | 0.77 ms    | 14      |
+| Bun (`Bun.serve`)   | 496,865 | 504,672 | 521,648 | 1.02 ms    | 40      |
+| Relic 2 (`relic_native`) | 461,710 | 471,005 | 494,225 | 0.71 ms | 40 |
+| Node (`node:http`)  | 263,438 | 282,130 | 278,923 | 1.73 ms    | 199     |
+| Go (`net/http`)     | 245,400 | 237,146 | 230,919 | 3.32 ms    | 36      |
+| `dart:io`           | 115,790 | 124,996 | 132,746 | 4.82 ms    | 56      |
 
 The other two routes at 256 connections:
 
 | Server            | `GET /user/:id` | `POST /user` |
 | ----------------- | --------------: | -----------: |
-| Dox               | 552,170         | 555,397      |
-| Dox server only   | 661,102         | 670,326      |
-| Rust (hyper)      | 564,411         | 569,313      |
-| Bun               | 482,328         | 498,518      |
-| Relic 2           | 433,758         | 364,878      |
-| Node              | 274,067         | 301,084      |
-| Go                | 230,845         | 231,050      |
-| `dart:io`         | 93,561          | 126,027      |
+| Dox               | 582,861         | 576,435      |
+| Dox server only   | 666,149         | 676,363      |
+| Rust (hyper)      | 553,689         | 563,347      |
+| Bun               | 488,315         | 496,905      |
+| Relic 2           | 432,465         | 376,030      |
+| Node              | 268,959         | 291,521      |
+| Go                | 229,640         | 232,201      |
+| `dart:io`         | 94,084          | 124,623      |
 
 ### Why it is fast
 
@@ -14684,11 +14700,13 @@ A profile with `perf` (4 server cores, 64 connections) shows the effect:
   network, keep-alive.
 - wrk 4.1, 64, 256 and 512 connections, 5 seconds warm-up, then 15 seconds
   per route.
+- 3 rounds on 2026-11-22. In each round, every server runs one time. The
+  tables show the median of the 3 rounds.
 - Every server has as many workers as server CPUs.
 - Peak memory is the peak of the container (all workers).
-- Dart 3.13.6, AOT build with `dart build cli` (this is what `dox build`
-  does). `dox_core` and `dox_http_native` as released when these numbers were measured. The Dox rows were measured again on 2026-11-16 for the 3.2 patch release (same Mac, a new Docker VM). The other servers are from the run before. Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.
-- Relic is `relic` 2.0.0 with `relic_native` 2.0.0, started with `serveNative()`. It was measured on 2026-11-22.
+- Dart 3.13.7, AOT build with `dart build cli` (this is what `dox build`
+  does). `dox_core` and `dox_http_native` are the releases of 2026-11-22. Node 26.13, Bun 1.4.5, Go 1.26, Rust 1.99 with hyper 1.
+- Relic is `relic` 2.0.0 with `relic_native` 2.0.0, started with `serveNative()`.
 
 ## App benchmark
 

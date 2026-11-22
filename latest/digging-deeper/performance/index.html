@@ -7463,56 +7463,56 @@ the database, JSON and your own code, so the gaps are smaller there. See
   <div class="dox-bench__row dox-bench__row--win">
     <span class="dox-bench__name"><strong>Dox</strong><span>full app</span></span>
     <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 100%"></span></span>
-    <span class="dox-bench__num">626,655<span class="dox-bench__vs">fastest</span></span>
-    <span class="dox-bench__p99">1.1 ms</span>
+    <span class="dox-bench__num">652,400<span class="dox-bench__vs">fastest</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
     <span class="dox-bench__ram">21 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Rust</strong><span>hyper</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 93.5%"></span></span>
-    <span class="dox-bench__num">585,658<span class="dox-bench__vs">1.07× slower</span></span>
-    <span class="dox-bench__p99">0.7 ms</span>
-    <span class="dox-bench__ram">13 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 87.7%"></span></span>
+    <span class="dox-bench__num">572,132<span class="dox-bench__vs">1.14× slower</span></span>
+    <span class="dox-bench__p99">0.8 ms</span>
+    <span class="dox-bench__ram">14 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Bun</strong><span>Bun.serve</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 80%"></span></span>
-    <span class="dox-bench__num">501,529<span class="dox-bench__vs">1.25× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 77.4%"></span></span>
+    <span class="dox-bench__num">504,672<span class="dox-bench__vs">1.29× slower</span></span>
     <span class="dox-bench__p99">1.0 ms</span>
     <span class="dox-bench__ram">40 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Relic 2</strong><span>relic_native</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 75.5%"></span></span>
-    <span class="dox-bench__num">473,376<span class="dox-bench__vs">1.32× slower</span></span>
-    <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">34 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 72.2%"></span></span>
+    <span class="dox-bench__num">471,005<span class="dox-bench__vs">1.39× slower</span></span>
+    <span class="dox-bench__p99">0.7 ms</span>
+    <span class="dox-bench__ram">40 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Node</strong><span>node:http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 45.8%"></span></span>
-    <span class="dox-bench__num">286,847<span class="dox-bench__vs">2.2× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 43.2%"></span></span>
+    <span class="dox-bench__num">282,130<span class="dox-bench__vs">2.3× slower</span></span>
     <span class="dox-bench__p99">1.7 ms</span>
-    <span class="dox-bench__ram">200 MB</span>
+    <span class="dox-bench__ram">199 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>Go</strong><span>net/http</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 38.6%"></span></span>
-    <span class="dox-bench__num">242,043<span class="dox-bench__vs">2.6× slower</span></span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 36.3%"></span></span>
+    <span class="dox-bench__num">237,146<span class="dox-bench__vs">2.8× slower</span></span>
     <span class="dox-bench__p99">3.3 ms</span>
     <span class="dox-bench__ram">36 MB</span>
   </div>
 <div class="dox-bench__row">
     <span class="dox-bench__name"><strong>dart:io</strong><span>HttpServer</span></span>
-    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 20.7%"></span></span>
-    <span class="dox-bench__num">129,796<span class="dox-bench__vs">4.8× slower</span></span>
-    <span class="dox-bench__p99">3.8 ms</span>
-    <span class="dox-bench__ram">75 MB</span>
+    <span class="dox-bench__track"><span class="dox-bench__bar" style="--w: 19.2%"></span></span>
+    <span class="dox-bench__num">124,996<span class="dox-bench__vs">5.2× slower</span></span>
+    <span class="dox-bench__p99">4.8 ms</span>
+    <span class="dox-bench__ram">56 MB</span>
   </div>
 </div>
 <p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Relic 2.0 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span></p>
 </div>
-<p>The Dox numbers are from the 3.2 patch release (2026-11-16). The Relic row is from 2026-11-22. The other servers are from the run before. All runs are on the same Mac. See <a href="#how-it-was-run">How it was run</a>.</p>
+<p>All the servers are from the same run on 2026-11-22. Each number is the median of 3 rounds. See <a href="#how-it-was-run">How it was run</a>.</p>
 <p>Requests per second on <code>GET /</code> at 64, 256 and 512 connections:</p>
 <table>
 <thead>
@@ -7528,67 +7528,67 @@ the database, JSON and your own code, so the gaps are smaller there. See
 <tbody>
 <tr>
 <td>Dox</td>
-<td style="text-align: right;">521,583</td>
-<td style="text-align: right;">626,655</td>
-<td style="text-align: right;">649,990</td>
-<td style="text-align: right;">1.14 ms</td>
+<td style="text-align: right;">541,489</td>
+<td style="text-align: right;">652,400</td>
+<td style="text-align: right;">669,691</td>
+<td style="text-align: right;">0.74 ms</td>
 <td style="text-align: right;">21</td>
 </tr>
 <tr>
 <td>Dox server only</td>
-<td style="text-align: right;">557,115</td>
-<td style="text-align: right;">678,781</td>
-<td style="text-align: right;">696,043</td>
-<td style="text-align: right;">2.9 ms</td>
-<td style="text-align: right;">19</td>
+<td style="text-align: right;">576,078</td>
+<td style="text-align: right;">685,300</td>
+<td style="text-align: right;">701,441</td>
+<td style="text-align: right;">0.70 ms</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
 <td>Rust (hyper)</td>
-<td style="text-align: right;">499,734</td>
-<td style="text-align: right;">585,658</td>
-<td style="text-align: right;">560,181</td>
-<td style="text-align: right;">0.71 ms</td>
-<td style="text-align: right;">13</td>
+<td style="text-align: right;">499,992</td>
+<td style="text-align: right;">572,132</td>
+<td style="text-align: right;">559,617</td>
+<td style="text-align: right;">0.77 ms</td>
+<td style="text-align: right;">14</td>
 </tr>
 <tr>
 <td>Bun (<code>Bun.serve</code>)</td>
-<td style="text-align: right;">508,243</td>
-<td style="text-align: right;">501,529</td>
-<td style="text-align: right;">531,310</td>
-<td style="text-align: right;">1.00 ms</td>
+<td style="text-align: right;">496,865</td>
+<td style="text-align: right;">504,672</td>
+<td style="text-align: right;">521,648</td>
+<td style="text-align: right;">1.02 ms</td>
 <td style="text-align: right;">40</td>
 </tr>
 <tr>
 <td>Relic 2 (<code>relic_native</code>)</td>
-<td style="text-align: right;">468,642</td>
-<td style="text-align: right;">473,376</td>
-<td style="text-align: right;">452,915</td>
-<td style="text-align: right;">1.70 ms</td>
-<td style="text-align: right;">34</td>
+<td style="text-align: right;">461,710</td>
+<td style="text-align: right;">471,005</td>
+<td style="text-align: right;">494,225</td>
+<td style="text-align: right;">0.71 ms</td>
+<td style="text-align: right;">40</td>
 </tr>
 <tr>
 <td>Node (<code>node:http</code>)</td>
-<td style="text-align: right;">252,866</td>
-<td style="text-align: right;">286,847</td>
-<td style="text-align: right;">296,257</td>
-<td style="text-align: right;">1.70 ms</td>
-<td style="text-align: right;">200</td>
+<td style="text-align: right;">263,438</td>
+<td style="text-align: right;">282,130</td>
+<td style="text-align: right;">278,923</td>
+<td style="text-align: right;">1.73 ms</td>
+<td style="text-align: right;">199</td>
 </tr>
 <tr>
 <td>Go (<code>net/http</code>)</td>
-<td style="text-align: right;">248,951</td>
-<td style="text-align: right;">242,043</td>
-<td style="text-align: right;">232,687</td>
-<td style="text-align: right;">3.27 ms</td>
+<td style="text-align: right;">245,400</td>
+<td style="text-align: right;">237,146</td>
+<td style="text-align: right;">230,919</td>
+<td style="text-align: right;">3.32 ms</td>
 <td style="text-align: right;">36</td>
 </tr>
 <tr>
 <td><code>dart:io</code></td>
-<td style="text-align: right;">125,428</td>
-<td style="text-align: right;">129,796</td>
-<td style="text-align: right;">132,112</td>
-<td style="text-align: right;">3.83 ms</td>
-<td style="text-align: right;">75</td>
+<td style="text-align: right;">115,790</td>
+<td style="text-align: right;">124,996</td>
+<td style="text-align: right;">132,746</td>
+<td style="text-align: right;">4.82 ms</td>
+<td style="text-align: right;">56</td>
 </tr>
 </tbody>
 </table>
@@ -7604,43 +7604,43 @@ the database, JSON and your own code, so the gaps are smaller there. See
 <tbody>
 <tr>
 <td>Dox</td>
-<td style="text-align: right;">552,170</td>
-<td style="text-align: right;">555,397</td>
+<td style="text-align: right;">582,861</td>
+<td style="text-align: right;">576,435</td>
 </tr>
 <tr>
 <td>Dox server only</td>
-<td style="text-align: right;">661,102</td>
-<td style="text-align: right;">670,326</td>
+<td style="text-align: right;">666,149</td>
+<td style="text-align: right;">676,363</td>
 </tr>
 <tr>
 <td>Rust (hyper)</td>
-<td style="text-align: right;">564,411</td>
-<td style="text-align: right;">569,313</td>
+<td style="text-align: right;">553,689</td>
+<td style="text-align: right;">563,347</td>
 </tr>
 <tr>
 <td>Bun</td>
-<td style="text-align: right;">482,328</td>
-<td style="text-align: right;">498,518</td>
+<td style="text-align: right;">488,315</td>
+<td style="text-align: right;">496,905</td>
 </tr>
 <tr>
 <td>Relic 2</td>
-<td style="text-align: right;">433,758</td>
-<td style="text-align: right;">364,878</td>
+<td style="text-align: right;">432,465</td>
+<td style="text-align: right;">376,030</td>
 </tr>
 <tr>
 <td>Node</td>
-<td style="text-align: right;">274,067</td>
-<td style="text-align: right;">301,084</td>
+<td style="text-align: right;">268,959</td>
+<td style="text-align: right;">291,521</td>
 </tr>
 <tr>
 <td>Go</td>
-<td style="text-align: right;">230,845</td>
-<td style="text-align: right;">231,050</td>
+<td style="text-align: right;">229,640</td>
+<td style="text-align: right;">232,201</td>
 </tr>
 <tr>
 <td><code>dart:io</code></td>
-<td style="text-align: right;">93,561</td>
-<td style="text-align: right;">126,027</td>
+<td style="text-align: right;">94,084</td>
+<td style="text-align: right;">124,623</td>
 </tr>
 </tbody>
 </table>
@@ -7680,11 +7680,13 @@ has nothing to do. See <a href="../native-server/#how-it-works">Native server</a
   network, keep-alive.</li>
 <li>wrk 4.1, 64, 256 and 512 connections, 5 seconds warm-up, then 15 seconds
   per route.</li>
+<li>3 rounds on 2026-11-22. In each round, every server runs one time. The
+  tables show the median of the 3 rounds.</li>
 <li>Every server has as many workers as server CPUs.</li>
 <li>Peak memory is the peak of the container (all workers).</li>
-<li>Dart 3.13.6, AOT build with <code>dart build cli</code> (this is what <code>dox build</code>
-  does). <code>dox_core</code> and <code>dox_http_native</code> as released when these numbers were measured. The Dox rows were measured again on 2026-11-16 for the 3.2 patch release (same Mac, a new Docker VM). The other servers are from the run before. Node 26.12, Bun 1.4.4, Go 1.26, Rust 1.99 with hyper 1.</li>
-<li>Relic is <code>relic</code> 2.0.0 with <code>relic_native</code> 2.0.0, started with <code>serveNative()</code>. It was measured on 2026-11-22.</li>
+<li>Dart 3.13.7, AOT build with <code>dart build cli</code> (this is what <code>dox build</code>
+  does). <code>dox_core</code> and <code>dox_http_native</code> are the releases of 2026-11-22. Node 26.13, Bun 1.4.5, Go 1.26, Rust 1.99 with hyper 1.</li>
+<li>Relic is <code>relic</code> 2.0.0 with <code>relic_native</code> 2.0.0, started with <code>serveNative()</code>.</li>
 </ul>
 <h2 id="app-benchmark">App benchmark</h2>
 <p>A small real app, the same in each language: <code>GET /json</code> returns a map,
