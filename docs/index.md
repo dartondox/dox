@@ -69,7 +69,6 @@ class BlogController {
 
 <div class="dox-bench" markdown>
 
-<p class="dox-bench__title">Ahead of Rust hyper. 1.3× Bun. 2.2× Node. 4.9× plain Dart.</p>
 <p class="dox-bench__sub">A full Dox app answers <code>GET /</code>, with the rules of <a href="https://github.com/the-benchmarker/web-frameworks">the-benchmarker</a>. Requests per second on two CPU cores, higher is better.</p>
 
 <div class="dox-bench__grid">
