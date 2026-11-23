@@ -61,6 +61,7 @@ On Redis, plain ints stay plain, so `increment` still works.
 
 Values must be JSON types: `Map`, `List`, `String`, `num`, `bool`, `null`.
 The `memory` store lives in one isolate. Use `redis` when isolates or servers must share data.
+Use the `memory` store for local development and tests only. In production, use `file` on one server, or use `redis`.
 
 ## Documentation
 

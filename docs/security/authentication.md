@@ -1240,4 +1240,4 @@ The status codes: 401 means the user is not logged in. 403 means the user may no
 
 - [Authorization](authorization.md): decide what a user can do.
 - [JWT authentication](../guides/jwt-auth.md): register, login and logout, step by step.
-- [Step 5: Login with dox_auth](../tutorial/05-auth.md): auth in the tutorial app.
+- [Step 5: Authentication](../tutorial/05-auth.md): auth in the tutorial app.

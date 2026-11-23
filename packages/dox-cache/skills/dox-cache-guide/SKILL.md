@@ -26,6 +26,7 @@ Do not invent methods. The lists below are the real API.
 
 Dox runs one isolate per CPU core. Each isolate has its own `memory` store.
 A value you put in one isolate is missing in the others. Use `redis` when all isolates and servers must see it.
+Use the `memory` store for local development and tests only. In production, use `file` on one server, or use `redis`.
 
 ## Set up
 

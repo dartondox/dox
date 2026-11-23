@@ -2,7 +2,7 @@
 icon: lucide/key-round
 ---
 
-# Step 5: Login with dox_auth
+# Step 5: Authentication
 
 In this step you add register and login with a JWT token, so only a logged in user can create or change posts.
 
