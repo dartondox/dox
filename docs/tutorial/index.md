@@ -32,7 +32,7 @@ You do not need Docker or a database server. The app uses SQLite, which keeps th
 2. [Model and migration](02-model-and-migration.md)
 3. [Routes and controller](03-routes-and-controller.md)
 4. [Validation](04-validation.md)
-5. [Login with dox_auth](05-auth.md)
+5. [Authentication](05-auth.md)
 6. [Test](06-test.md)
 7. [Build and deploy](07-build-and-deploy.md)
 

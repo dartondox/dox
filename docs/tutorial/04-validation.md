@@ -174,4 +174,4 @@ curl -X PUT http://localhost:3000/api/posts/1 \
 
 ## Next steps
 
-- [Step 5: Login with dox_auth](05-auth.md): protect the write routes.
+- [Step 5: Authentication](05-auth.md): protect the write routes.

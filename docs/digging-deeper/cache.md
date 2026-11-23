@@ -38,6 +38,8 @@ A store uses one driver:
 
 Each isolate has its own memory store. If all isolates and servers must see the same data, use Redis or the database.
 
+Use the memory store for local development and tests only. In production, use the file store on one server, or use Redis or the database.
+
 ### Adding a Redis store
 
 Add a store in the config file. This example adds a Redis store:

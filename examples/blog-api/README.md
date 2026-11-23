@@ -10,7 +10,7 @@ It belongs to these docs pages:
 - [Step 2: Model and migration](../../docs/tutorial/02-model-and-migration.md)
 - [Step 3: Routes and controller](../../docs/tutorial/03-routes-and-controller.md)
 - [Step 4: Validation](../../docs/tutorial/04-validation.md)
-- [Step 5: Login with dox_auth](../../docs/tutorial/05-auth.md)
+- [Step 5: Authentication](../../docs/tutorial/05-auth.md)
 - [Step 6: Test](../../docs/tutorial/06-test.md)
 - [Step 7: Build and deploy](../../docs/tutorial/07-build-and-deploy.md)
 
