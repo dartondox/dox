@@ -8,7 +8,9 @@ The `dox_mailer` package sends email from your app with SMTP, Amazon SES, Azure,
 
 You write a `Message` and call `Mail.send()`, and a transport sends it. You pick the transport in a config file, so you can change providers with no code change. Slow emails can go through the [queue](queue.md), so the request does not wait.
 
-## Install
+## Setup
+
+### Install
 
 Add the package with the `dox` CLI. Add `--transport=smtp` (or `resend`, `mailgun`, `postmark`, `ses`) to pick a transport. `log` is the default:
 
@@ -23,8 +25,6 @@ If you want to set it up by hand, add the package and write the two files below 
 ```bash
 dart pub add dox_mailer
 ```
-
-## Setup
 
 ### Configuration
 
@@ -763,3 +763,9 @@ This section is for special cases. Most apps do not need it.
 
 - If an `onSent` hook throws, a queue worker does not try the job again, so the email is not sent twice. The other `onSent` hooks still run.
 - `Mail.clearHooks()` removes all hooks. Call it first in `setup()`, and in tests.
+
+## See also
+
+- [Notifications](notifications.md): send one message on many channels.
+- [Queue](queue.md): send mail in the background.
+- [Views](../the-basic/views.md): write the mail templates.

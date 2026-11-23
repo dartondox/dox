@@ -172,3 +172,8 @@ There are three ways to give the files to an agent:
 | How the agent gets it | automatically, when the task matches | you give it the link or the file |
 
 For daily work in your app, install the skills and keep `AGENTS.md`. Use `llms-full.txt` when you ask about Dox out of your project, or when your tool cannot read skills.
+
+## See also
+
+- [Installation](installation.md): create a project.
+- [MCP server](../packages/mcp.md): give AI clients tools from your own app.

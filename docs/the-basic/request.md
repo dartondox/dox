@@ -192,7 +192,7 @@ class ApiController {
 }
 ```
 
-`store()` comes from the [`dox_storage`](../packages/storage.md) package. Add it and import `package:dox_storage/dox_storage.dart`.
+`store()` comes from the [`dox_storage`](../digging-deeper/file-storage.md) package. Add it and import `package:dox_storage/dox_storage.dart`.
 
 !!! warning "Save the file before you return"
     A bigger upload is kept in a temp file, and the temp file is **deleted when the response is sent**.

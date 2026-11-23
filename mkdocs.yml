@@ -25,6 +25,8 @@ plugins:
         the-basic/installation.md: getting-started/installation.md
         others/contribute.md: community/contribute.md
         others/mascot.md: community/mascot.md
+        packages/cache.md: digging-deeper/cache.md
+        packages/storage.md: digging-deeper/file-storage.md
 extra_css:
   - assets/style.css
 extra_javascript:
@@ -213,8 +215,6 @@ nav:
   - Packages:
     - packages/validation.md
     - packages/openapi.md
-    - packages/storage.md
-    - packages/cache.md
     - packages/socketio.md
     - packages/pdf-lib.md
     - packages/pdfme.md

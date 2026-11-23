@@ -265,3 +265,8 @@ To pass your own values in a test, see [Testing](testing.md#test-the-env).
 - With `envExpand`, `.env.testing` also sees the keys of `.env`.
 - The first env read (like `Env.get()` or `env.appName`) loads `.env` with the flags of that moment. The file is not read again. If `Env.flags` was not set yet, `Dox().initialize` prints a warning.
 - The server isolates follow the main isolate, so you set nothing for them. When the flag is on in `AppConfig` but `.env` was read without it, Dox prints a warning at start, once in each isolate.
+
+## See also
+
+- [Environment variables](../reference/env.md): every env var that Dox reads.
+- [Environments](../guides/environments.md): dev, staging and production config.

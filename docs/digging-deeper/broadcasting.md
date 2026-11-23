@@ -12,7 +12,7 @@ Broadcasting is part of the `dox_socketio` package. It is off by default.
 
 ## Setup
 
-Do the [Socket.IO setup](../packages/socketio.md#in-a-dox-app) first. Then turn on broadcasting in the config:
+Do the [Socket.IO setup](../packages/socketio.md#setup) first. Then turn on broadcasting in the config:
 
 ```dart title="lib/config/socketio.dart"
 SocketIoConfig socketIoConfig = SocketIoConfig(

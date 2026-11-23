@@ -233,3 +233,9 @@ This table says what goes in each folder:
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 
 `build_runner` with `dox_builder` makes the generated files: the model classes, the DTO checks, the typed env class, the OpenAPI docs and the list of queue jobs.
+
+## See also
+
+- [Isolate](../digging-deeper/isolate.md): more on isolates.
+- [Providers](../digging-deeper/providers.md): code that runs when the app starts.
+- [Build a blog API](../tutorial/index.md): build a full app.

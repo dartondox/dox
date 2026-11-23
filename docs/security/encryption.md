@@ -8,7 +8,7 @@ icon: lucide/lock-keyhole
 
 Dox uses the same encryption for cookies and the `cookie` session driver, with your `APP_KEY`.
 
-## Configuration
+## Setup
 
 The key is the `APP_KEY` in `.env`. Make a new one with the CLI. It writes a random key of 32 letters and digits:
 

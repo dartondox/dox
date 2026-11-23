@@ -8,7 +8,7 @@ GraphQL makes an API for your app from your models. You add annotations to a mod
 
 A GraphQL API has one URL. The client writes the fields that it wants, and it gets JSON with only those fields. To learn GraphQL, read [graphql.org/learn](https://graphql.org/learn/).
 
-## Install
+## Setup
 
 Run the setup command in your app:
 
@@ -746,6 +746,12 @@ class ProductResolver {
 `@GraphQLResolveField()` adds a field to the class of its first parameter. Thus, `Product` gets a `shop` field, and `Shop` also needs `@GraphQL()`.
 
 The `DataLoader` collects the shop ids of the full request. Thus, fifty products cause one shop query, not fifty queries. `findByIds` takes a `List<int>` and returns a `Future<List<Shop?>>`, in the same order as the ids.
+
+A `DataLoader` also has these methods:
+
+- `loadMany(ids)` loads a list of keys in the same batch.
+- `prime(id, value)` puts a value in the loader, if the key is not there. Use it when you already have the row.
+- `clear(id)` and `clearAll()` remove values, for example after a change.
 
 ## Performance
 

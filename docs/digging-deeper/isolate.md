@@ -84,6 +84,29 @@ Dox copies the `AppConfig`, the providers and the routes you added before `start
 
 Because the config and providers are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Providers](providers.md).
 
+## Heavy CPU work
+
+Heavy CPU work in a request blocks every other request on the same isolate. So run it on a worker isolate with `Dox().compute`. The server answers other requests while the task runs:
+
+```dart
+Future<List<int>> renderPdf(Map<String, dynamic> data) {
+  return Dox().compute(() => buildPdf(data));
+}
+```
+
+The task runs in another isolate, so it can only use values that can go between isolates: numbers, strings, lists, maps and plain objects. It can not use the container, a database connection or a cache store. Read the data first, and pass it in. Make the task in a small top-level or static function.
+
+The tasks run on a pool of 4 workers. More tasks wait in line. To change the number, set `computeWorkers` in `AppConfig`:
+
+```dart
+AppConfig(
+  // ...
+  computeWorkers: 8,
+);
+```
+
+More workers than CPU cores do not make the work faster. An error of the task is thrown at the `await`, with its stack trace. `compute` also works with no server, like in a command, a test or a queue job.
+
 ## When an isolate crashes
 
 Dox keeps your app running when code fails:

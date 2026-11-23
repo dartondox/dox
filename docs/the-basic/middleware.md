@@ -390,3 +390,9 @@ This section is for special cases. Most apps do not need it.
 - A time you add named `total` or `handler` is sent as `app_total` or `app_handler`, so it does not change the built-in times.
 - If the answer already has a `Server-Timing` header, the times are added after it.
 - Without `ServerTiming`, or outside a request, `add` and `measure` do nothing. The cost is one small lookup.
+
+## See also
+
+- [Routing](routing.md): add middleware to routes and groups.
+- [Rate limiting](../security/rate-limiting.md): a ready middleware that limits requests.
+- [CORS](../security/cors.md): let other origins call your API.

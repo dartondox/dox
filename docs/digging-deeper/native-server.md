@@ -10,7 +10,7 @@ You do not need to set anything. Every app uses it, also an app with WebSocket o
 
 You do not need Rust. The package downloads a ready-built library for your system when you build the app.
 
-## Using it without Dox
+## Without Dox
 
 `dox_http_native` also works on its own, in any Dart app. Add the package:
 
@@ -187,3 +187,8 @@ The server runs on the thread of the isolate, in a loop:
 - A request body of 64 KB or more goes to Dart without a copy.
 - `compress: true` in `AppConfig` gzips on a helper thread. A streamed response is not compressed.
 - WebSocket: one turn reads at most 256 KB of one socket, so one busy client can not hold the isolate. While more than 256 KB waits to be sent to a client, the server stops reading its frames.
+
+## See also
+
+- [HTTP/2](http2.md): turn on HTTP/2.
+- [Performance](performance.md): the benchmark numbers.

@@ -130,9 +130,9 @@ Dox is split into packages, so you add only what you need:
 | `dox_builder`, `dox_annotation` | code generation for models, DTOs and the container |
 | `dox_validation` | [typed validation schemas](../packages/validation.md) |
 | `dox_openapi` | [OpenAPI docs](../packages/openapi.md) |
-| `dox_storage` | [file storage: local, S3](../packages/storage.md) |
-| `dox_cache` | [cache: memory, file, Redis](../packages/cache.md) |
-| `dox_cache_database` | [cache in a database table](../packages/cache.md#database-store) |
+| `dox_storage` | [file storage: local, S3](../digging-deeper/file-storage.md) |
+| `dox_cache` | [cache: memory, file, Redis](../digging-deeper/cache.md) |
+| `dox_cache_database` | [cache in a database table](../digging-deeper/cache.md#database-store) |
 | `dox_socketio` | [Socket.IO server](../packages/socketio.md) |
 | `dox_queue` | [background jobs](../digging-deeper/queue.md) |
 | `dox_queue_database` | [queue in a database table](../digging-deeper/queue.md#database-driver) |

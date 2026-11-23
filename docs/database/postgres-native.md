@@ -8,7 +8,7 @@ icon: lucide/database-zap
 
 You use it through your models and queries, and it needs no extra config. Rust ([tokio-postgres](https://docs.rs/tokio-postgres)) owns the connections and the pool, and each connection keeps its prepared statements.
 
-## Installation
+## Setup
 
 `dox_orm` already depends on `dox_postgres_native`, so you do not add it yourself. Add it only if you want to use `PgNativePool` without the ORM:
 

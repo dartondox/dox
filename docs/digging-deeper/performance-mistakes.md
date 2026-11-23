@@ -267,3 +267,9 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 ```text
 [db] Strict mode: table "orders" read 25000 rows into memory (the limit is 1000). Use paginate(), chunk(), lazy() or cursor() for big results.
 ```
+
+## See also
+
+- [Performance](performance.md): the benchmark numbers.
+- [Isolate](isolate.md): how Dox uses the CPU cores.
+- [Cache](cache.md): keep slow results.

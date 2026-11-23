@@ -1294,3 +1294,9 @@ class AddRotatedAtToAuthAccessTokens extends Migration {
 | `maxAttempts` | `5` | failed logins allowed per login field and ip |
 | `decay` | `Duration(minutes: 1)` | how long the count is kept, from the first failed login |
 | `store` | `null` | the cache store for the counts. `null` is the default app store |
+
+## See also
+
+- [Authorization](authorization.md): decide what a user can do.
+- [JWT authentication](../guides/jwt-auth.md): register, login and logout, step by step.
+- [Step 5: Login with dox_auth](../tutorial/05-auth.md): auth in the tutorial app.

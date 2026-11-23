@@ -95,6 +95,8 @@ int countPrimes(int limit) {
 
 Heavy CPU work blocks the requests, so run it on another thread. `Isolate.run` runs the function on a new isolate and sends the result back. Pass plain data in (an `int`, a `String`, bytes) and get plain data out. Save the result in the request isolate.
 
+If many requests do CPU work, `Dox().compute` is better. It uses a small pool of workers that stay, so it does not start a new isolate each time. See [Heavy CPU work](../digging-deeper/isolate.md#heavy-cpu-work).
+
 `primes` above waits for the result. If you do not want to wait, combine both patterns:
 
 ```dart

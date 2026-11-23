@@ -192,3 +192,7 @@ export PATH="$PATH":"$HOME/.pub-cache/bin"
 ```
 
 On Windows the folder is `%LOCALAPPDATA%\Pub\Cache\bin`.
+
+## See also
+
+- [Error index](errors.md): every message Dox prints or throws.

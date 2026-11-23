@@ -308,3 +308,8 @@ AuthConfig(defaultGuard: 'web', guards: guards, flags: const AuthFlags.all());
 - When a policy has no method for an ability, the gate with that name is used.
 - Policy methods are normal typed Dart methods, so you can also call them directly in a test.
 - The flags are part of `AuthConfig`, and `Auth.initialize` runs in every isolate, so every isolate gets the same flags.
+
+## See also
+
+- [Authentication](authentication.md): find out who the user is.
+- [Middleware](../the-basic/middleware.md): run a check before a route.

@@ -13,9 +13,11 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
 | `appKey` | `String` | required | Encrypts cookies and signs local storage URLs. It must be exactly 32 characters. Make one with `dox key:generate`. In production a bad key stops the app at start, see [`APP_ENV`](env.md#read-by-the-framework). |
+| `previousKeys` | `List<String>` | `[]` | Old app keys. Dox can still read data that was encrypted with them. New data uses `appKey` only. See [Rotating the key](../security/encryption.md#change-the-key-key-rotation). |
 | `serverPort` | `int` | `3000` | The port to listen on. When the env has no `APP_PORT` but has `PORT`, Dox uses `PORT` (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads `APP_HOST`. With neither, Dox listens on all interfaces (`::`). |
 | `totalIsolate` | `int?` | the CPUs the container allows | How many isolates (threads) serve HTTP, all on the same port. The default is the number of CPUs this process may use. It respects the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one. |
+| `computeWorkers` | `int` | `4` | How many worker isolates run `Dox().compute`, `Hash.makeAsync` and `Hash.verifyAsync`. All server isolates share one pool. It must be 1 or more. See [Heavy CPU work](../digging-deeper/isolate.md#heavy-cpu-work). |
 | `compress` | `bool` | `false` | gzip the responses. It costs CPU on every response, so let a proxy do it when you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
@@ -52,6 +54,7 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
 | `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#configuration). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
+| `strict` | `StrictConfig` | `StrictConfig()` (off) | Warnings for code that blocks the server, for development. `enabled` turns it on. `blockLimit` is how long code can block an isolate before a warning, 50 ms by default. See [Let Dox warn you](../digging-deeper/performance-mistakes.md#let-dox-warn-you). |
 | `flags` | `CoreFlags` | `CoreFlags()` (all off) | Opt-in core behaviors. See [Core flags](#core-flags). |
 
 ## Core flags

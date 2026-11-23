@@ -64,7 +64,7 @@ The `memory` store lives in one isolate. Use `redis` when isolates or servers mu
 
 ## Documentation
 
-- [Cache package](https://dartondox.dev/latest/packages/cache/)
+- [Cache package](https://dartondox.dev/latest/digging-deeper/cache/)
 - [Cache in a Dox app](https://dartondox.dev/latest/digging-deeper/cache/)
 - [API reference](https://pub.dev/documentation/dox_cache/latest/)
 

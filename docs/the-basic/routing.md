@@ -402,7 +402,7 @@ Only `GET` and `HEAD` requests read files, and only when no route matches. `..`,
 
 !!! warning
     Never save user uploads in this folder. An uploaded html or svg file would run its script on your site.
-    Use [`dox_storage`](../packages/storage.md) for uploads. It sends such files as downloads.
+    Use [`dox_storage`](../digging-deeper/file-storage.md) for uploads. It sends such files as downloads.
 
 ## Fallback route
 
@@ -444,7 +444,7 @@ Dox sends routes to every isolate. So `when` must be a top-level or static funct
 
 ## Serve storage files
 
-`Storage.route(path)` from the [`dox_storage`](../packages/storage.md) package serves the files of a storage disk at `GET <path>/{key*}`. By default only signed URLs work, and other requests get `403`:
+`Storage.route(path)` from the [`dox_storage`](../digging-deeper/file-storage.md) package serves the files of a storage disk at `GET <path>/{key*}`. By default only signed URLs work, and other requests get `403`:
 
 ```dart
 Storage.route('files');
@@ -550,3 +550,9 @@ This section is for special cases. Most apps do not need it.
 - The match uses the raw path. `%2F` stays encoded, so `/admin/secure%2Fx` goes to a mount at `/admin`. To protect a nested path, set `middleware: true` on the outer mount too.
 - With `middleware: true`, a middleware that gives a response (like `403`) stops the request. The body is not read for the middleware, so a CSRF token must come in a header.
 - With `middleware: true`, the handler sends the answer itself. So the part of a middleware that runs after `next` cannot change it, and cookies it adds then (the session cookie, `XSRF-TOKEN`) are not sent. Get the CSRF token from a normal route. A `terminate` step still runs. `RequestTimeout` does not run for a mount.
+
+## See also
+
+- [Controller](controller.md): put the route code in a class.
+- [Middleware](middleware.md): run code before and after a route.
+- [Request](request.md): read the input of a request.

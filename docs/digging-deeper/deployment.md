@@ -371,3 +371,11 @@ Socket.IO rooms then need a shared adapter (like Redis), because each process ha
 - `dox build` runs `build_runner` (when your app uses it), then `dart build cli --target bin/server.dart --output build`. It builds `bin/queue.dart` and `bin/schedule.dart` the same way, when they exist.
 - Do not use `dart compile exe`. `dox_orm` bundles SQLite with a build hook, and `dart compile exe` does not run build hooks, so it stops with an error. `dart build cli` is the same AOT compiler and runs the hooks.
 - With `trustedProxies: ['*']`, `req.ip()` is the right-most `X-Forwarded-For` hop, the one your proxy added.
+
+## See also
+
+- [Docker](../guides/docker.md): a full Docker setup.
+- [Deploy to a Linux server](../guides/deploy-vps.md): your own server with systemd and Caddy.
+- [Deploy to Fly.io](../guides/deploy-fly.md): Fly.io.
+- [Deploy to Google Cloud Run](../guides/deploy-cloud-run.md): Google Cloud Run.
+- [Production checklist](../reference/production-checklist.md): what to check before you deploy.

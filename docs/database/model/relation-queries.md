@@ -143,3 +143,8 @@ In the function, write the column without the table name: `name`, not `categorie
 - It works with `where()`, `count()`, `paginate()`, `withCount()` and the other query methods.
 - A name that is not a relation of the model throws an `ArgumentError`.
 - For a relation to the same table, the subquery gives the table its own name, so each row is not compared with itself.
+
+## See also
+
+- [Counting relations](counting-relations.md): count the related rows.
+- [HasMany](relationship/has-many.md): define the relation.

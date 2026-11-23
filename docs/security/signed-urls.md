@@ -81,3 +81,8 @@ if (!ValidateSignature.hasValidSignature(req)) {
 - URLs made with an old key still work when the old key is in `AppConfig.previousKeys`.
 - `signature` is a reserved query param. Any other param added to a signed URL makes it invalid.
 - The `Host` must match the host of `APP_URL`, with the same port.
+
+## See also
+
+- [File Storage](../digging-deeper/file-storage.md): signed URLs for files.
+- [Encryption](encryption.md): the app key that signs the URL.

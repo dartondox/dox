@@ -149,3 +149,8 @@ Future<void> main(List<String> args) async {
 
 - `migrate:fresh` and `migrate:refresh` are short names, so `dox migrate:fresh --seed` works too.
 - `migration:refresh --seed` undoes all migrations, runs them again, then runs `DatabaseSeeder`. `migration:run --seed` runs the new migrations, then `DatabaseSeeder`.
+
+## See also
+
+- [Factories](factories.md): make many rows fast.
+- [Testing with a database](../guides/testing-with-database.md): use the database in tests.

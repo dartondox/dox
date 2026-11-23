@@ -116,3 +116,8 @@ example.com {
 
 !!! note
     The proxy must see the real client IP. When there is a load balancer in front of the proxy, set the real IP module of the proxy first.
+
+## See also
+
+- [Deployment](../digging-deeper/deployment.md): build and run the app in production.
+- [Environments](../guides/environments.md): config and secrets for each environment.

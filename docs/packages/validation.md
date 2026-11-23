@@ -13,7 +13,7 @@ It has two parts:
 
 Both give all errors at once, and both give a JSON Schema for [OpenAPI](openapi.md).
 
-## In a Dox app
+## Setup
 
 `dox_core` uses `dox_validation` and exports it, so there is nothing to install. `import 'package:dox_core/dox_core.dart'` is all you need.
 
@@ -328,7 +328,7 @@ account.parse(<String, dynamic>{'type': 'person', 'vat_number': 'x'});
 
 ### Async checks
 
-If a check needs the database, use `refineAsync`. Then call `parseAsync()` or `safeParseAsync()`, because `parse()` throws a `StateError` when a schema has async checks:
+If a check needs the database, use `refineAsync`. `superRefineAsync` is the async form of `superRefine`. Then call `parseAsync()` or `safeParseAsync()`, because `parse()` throws a `StateError` when a schema has async checks:
 
 ```dart
 v.string().refineAsync(isFreeName, message: 'The name is taken');
@@ -471,3 +471,9 @@ class VerifierProvider extends DoxProvider {
 - `.bail()` counts for all rules of that schema, wherever it is in the chain. On `v.object()` or `v.list()`, each field and item keeps its own setting.
 - `excludeIf` does not skip when the other key is missing. `excludeUnless` treats a missing key as `null`, so it skips. Both work only on a field of `v.object()`, not on a top-level value, list item or `v.map()` value. Other rules that read the skipped key still see its raw input.
 - A per-call `MessageResolver` falls back to the built-in text, not the global text.
+
+## See also
+
+- [Validation](../the-basic/validation.md): check a request in a Dox app.
+- [Validation rules](../the-basic/validation-rules.md): every rule.
+- [Share code with Flutter](../guides/share-code-with-flutter.md): use the same DTOs in a Flutter app.

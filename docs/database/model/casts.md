@@ -104,3 +104,8 @@ A cast can take const arguments, like `EnumCast` does. The generator copies the 
 ## Details
 
 - A column with `beforeGet` does not use its cast.
+
+## See also
+
+- [Model](index.md): the model basics.
+- [Serializer](../../the-basic/serializer.md): set the JSON shape of a model.

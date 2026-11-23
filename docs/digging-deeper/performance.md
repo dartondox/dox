@@ -311,3 +311,8 @@ A bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64` or `128`
 - The argument types of each controller are read once at start, not on every request.
 - JSON and text responses are encoded once, straight to bytes, with `Content-Length` set.
 - The native server gzips on a Rust thread, and the gzipped body still gets a `Content-Length`.
+
+## See also
+
+- [Performance mistakes](performance-mistakes.md): the code that makes an app slow.
+- [Isolate](isolate.md): how Dox uses the CPU cores.

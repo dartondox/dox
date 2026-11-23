@@ -8,7 +8,7 @@ gRPC lets your services call each other with typed messages, on the same port as
 
 Use gRPC when one service calls a different service. You write the calls one time in a `.proto` file, and each side gets typed code from this file. A client in any language can call your app.
 
-## Install
+## Setup
 
 Run the setup command in your app:
 
@@ -524,3 +524,8 @@ This section gives special cases. Most apps do not need it.
 - The deadline of the client always works, also when `idleTimeout` is `null`.
 - gRPC routes skip the `RequestTimeout` middleware. Thus, Dox does not stop a long stream.
 - `health.clearStatus(name)` removes the status of a service. A `Check` for a name with no status gets `NOT_FOUND`.
+
+## See also
+
+- [HTTP/2](http2.md): gRPC runs on HTTP/2.
+- [Deployment](deployment.md): put a proxy in front.

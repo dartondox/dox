@@ -435,3 +435,7 @@ print(table.toSql(PostgresGrammar()));
 ```
 
 On SQLite, the changes that need a table rebuild (and `renameIndex`) only run on a database.
+
+## See also
+
+- [Migration](migration.md): write and run migrations.

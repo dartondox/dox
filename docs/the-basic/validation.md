@@ -362,3 +362,9 @@ This section is for special cases. Most apps do not need it.
 - `@Dto(attributes:)` needs one `build_runner` run.
 - With `laravelMessageKeys`, the full code is tried first at each step of the lookup, then the short name. So `'name.min_length'` wins over `'name.min'`. A key with a path still wins over a key with only a code: `'name.min'` wins over `'min_length'`.
 - Short names work in `@Dto(messages:)` and in a `MessageResolver`. A code that is already short (like `email` or `required`) needs nothing. With the flag on, a key `min` or `max` with no path fits text, list and file errors too, not only numbers.
+
+## See also
+
+- [DTOs](dto.md): the typed class that holds the input.
+- [Validation rules](validation-rules.md): every rule.
+- [Validation](../packages/validation.md): fluent schemas and use without Dox.

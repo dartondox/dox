@@ -304,3 +304,8 @@ void registerContainer(IocContainer c) {
   });
 }
 ```
+
+## See also
+
+- [Controller](controller.md): get services in a controller.
+- [Providers](../digging-deeper/providers.md): register services when the app starts.

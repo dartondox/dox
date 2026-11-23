@@ -9,7 +9,7 @@ Almost every web app keeps its data in a database. Dox gives you two ways to wor
 
 You can also run [transactions](transactions.md), and create and change tables with [migrations](migration.md) and the [schema builder](schema.md).
 
-## Installation
+## Setup
 
 A new app already has `dox_orm`. To add it to an app, run:
 
@@ -459,3 +459,9 @@ This section is for special cases. Most apps do not need it.
 - `insertMultiple` with rows that have different keys inserts the rows one by one, because SQLite has no `DEFAULT` in `VALUES`.
 - SQLite before 3.39 has no `RIGHT JOIN`.
 - With `background` on, queries, transactions, `:memory:` databases, the query listener and the slow query log work the same, and a SQL error is the same `SqliteException`. A database that does not open (for example a wrong folder) does not throw at startup. The error comes on the first query, and on every query after it.
+
+## See also
+
+- [Query Builder](query-builder.md): write queries.
+- [Model](model/index.md): work with rows as objects.
+- [Migration](migration.md): create and change tables.

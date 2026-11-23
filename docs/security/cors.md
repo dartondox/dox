@@ -89,3 +89,8 @@ Route.disabledCors(() {
 
 - For `methods`, `headers` and `exposeHeaders`, a list is joined with commas.
 - With an `origin` list, Dox also sends `Vary: Origin`, so caches know the answer depends on the origin. A list with `'*'` sends `*`.
+
+## See also
+
+- [CORS for a browser front-end](../guides/cors-for-spa.md): the setup for a React, Vue or Flutter web app.
+- [CSRF protection](csrf.md): protect forms that use cookies.

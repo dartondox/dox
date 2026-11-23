@@ -8,7 +8,7 @@ icon: lucide/calendar-clock
 
 You write the whole schedule in Dart, in one file, and each task is a plain function. One small process runs the schedule. A task runs only once per tick, even when many isolates or servers run the schedule.
 
-## Install
+## Setup
 
 Add the package with the `dox` CLI. A new app from `dox create` already has it:
 
@@ -531,3 +531,9 @@ This section is for special cases. Most apps do not need it.
 - After a timeout, the file and `onOutput` finish a bit later, after the failure hooks ran. An error there is lost.
 - A ping fails after 10 seconds (`ScheduledTask.pingTimeout`), or on a status of 400 or more. A URL that is not `http` or `https` throws an `ArgumentError` when the schedule is made.
 - The next run time in `list` checks the frequency, `between()` and `unlessBetween()`. It does not check `when()`, `skip()` and `environments()`.
+
+## See also
+
+- [Queue](queue.md): jobs that must not get lost.
+- [Background work](../guides/background-work.md): pick the right tool for work after the response.
+- [CLI](../reference/cli.md): the `schedule:*` commands.

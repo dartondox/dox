@@ -70,7 +70,7 @@ browser  --HTTP/2 + TLS-->  proxy  --h2c or HTTP/1.1-->  Dox
 
 For the Caddy and nginx config, see [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
 
-## Use the server without Dox
+## Without Dox
 
 If you use the [native server](native-server.md) without Dox, give the same two options to `NativeHttpServer.bind`:
 
@@ -154,3 +154,9 @@ With 4 isolates, HTTP/1.1 and HTTP/2 both do approximately 630,000 requests a se
 
 - Dox passes all 146 tests of the [h2spec](https://github.com/summerwind/h2spec) conformance suite in strict mode.
 - `maxConcurrentStreams` must be 1 or more. Dox uses it only when `http2` is `true`.
+
+## See also
+
+- [gRPC](grpc.md): gRPC services on the same server.
+- [Native server](native-server.md): the server below Dox.
+- [Deployment](deployment.md): put a proxy in front.

@@ -104,3 +104,8 @@ List<Country> countries = await Country().whereHas('posts', (QueryBuilder<dynami
 | `throughLocalKey` | the primary key of the middle model | The column in the middle table that `throughForeignKey` points to. |
 | `onQuery` | none | A static function that changes the query. |
 | `eager` | `false` | Load the relation on every query. |
+
+## See also
+
+- [HasMany](has-many.md): the direct relation.
+- [ManyToMany](many-to-many.md): a relation with a pivot table.

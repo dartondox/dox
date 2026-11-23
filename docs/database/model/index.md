@@ -652,3 +652,10 @@ All options go in `@DoxModel(...)`.
 
 - `create:model` is another name for `make:model`.
 - Computed values of loaded relations are in the nested JSON too. `toMap(original: true)` has no computed values.
+
+## See also
+
+- [HasMany](relationship/has-many.md): connect one model to many.
+- [Query scopes](scopes.md): keep a query you use often in the model.
+- [Model events](events.md): run code when a model is saved or deleted.
+- [Factories](../factories.md): make test rows.

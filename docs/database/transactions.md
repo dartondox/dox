@@ -222,3 +222,8 @@ This section is for special cases. Most apps do not need it.
 - Postgres does not allow a lock with `groupBy()`, `distinct()`, or on the nullable side of a left join. The database throws an error then.
 - Postgres and MySQL use a connection pool (size: `maxConnectionCount` in `extra`). A transaction uses one connection of the pool, and other queries use the other connections. SQLite has one connection per isolate.
 - When a model has more than one relation to load (`preload` or `eager`), the relation queries run at the same time outside a transaction. Inside a transaction they run one after another on its connection.
+
+## See also
+
+- [Query Builder](query-builder.md): the queries you run in a transaction.
+- [Read replicas](replicas.md): where a query goes when you have replicas.

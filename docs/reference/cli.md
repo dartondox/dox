@@ -520,6 +520,7 @@ See [Scheduler](../digging-deeper/scheduler.md) for the task methods, and [Queue
 | Command | Aliases | Category |
 | --- | --- | --- |
 | `create` | | Project |
+| `add` | | Project |
 | `serve` | `server`, `s` | Development |
 | `make:controller` | `create:controller` | Development |
 | `make:middleware` | `create:middleware` | Development |
@@ -553,6 +554,9 @@ See [Scheduler](../digging-deeper/scheduler.md) for the task methods, and [Queue
 | `queue:retry` | | Queue |
 | `queue:forget` | | Queue |
 | `queue:flush` | | Queue |
+| `queue:clear` | | Queue |
+| `queue:restart` | | Queue |
+| `queue:prune-failed` | | Queue |
 | `schedule:work` | | Schedule |
 | `schedule:run` | | Schedule |
 | `schedule:list` | | Schedule |
@@ -563,3 +567,8 @@ See [Scheduler](../digging-deeper/scheduler.md) for the task methods, and [Queue
 | `update` | | System |
 | `env:check` | | System |
 | `help` | `--help`, `-h` | System |
+
+## See also
+
+- [Dox CLI](../digging-deeper/dox-cli.md): a guide to the commands you use most.
+- [Package commands](../digging-deeper/package-commands.md): commands that come from a package.

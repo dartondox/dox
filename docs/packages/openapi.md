@@ -512,3 +512,8 @@ docs.route('GET', '/users/{id}',
 - `GuestMiddleware(redirectTo: ...)` shows a `403`, but the app sends a redirect. Add `@Response(403, ...)` to replace it.
 - `Can`, `GuestMiddleware` and `ValidateSignature` are found by class name. `Gate.authorize(...)` is found when `Gate` is the class of `dox_auth`.
 - At runtime, Dox matches each route to its docs by method name, HTTP method and the end of the path. Group prefixes do not matter. When two controllers have a method with the same name, name the class in the route, like `(LinkController c) => c.index`.
+
+## See also
+
+- [API docs with OpenAPI](../guides/api-docs-with-openapi.md): a docs page for your API, step by step.
+- [DTOs](../the-basic/dto.md): the classes that become schemas.

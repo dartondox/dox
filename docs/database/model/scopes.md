@@ -85,3 +85,8 @@ await Post().withoutGlobalScopes().find(1);
 - `save()`, `delete()` and `restore()` on a model object work on that one row. They do not use the global scopes.
 - A query write with `withoutGlobalScopes()` and no `where` throws a `StateError`.
 - Soft deletes are not a global scope. Use `withTrash()` for them.
+
+## See also
+
+- [Query Builder](../query-builder.md): the methods you can use in a scope.
+- [Model](index.md): the model basics.

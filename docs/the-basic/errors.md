@@ -144,3 +144,9 @@ String message = showErrors() ? '$error' : 'Server Error';
 - If `render` itself throws, Dox logs that error and sends the default answer. The client always gets a response.
 - Errors outside a request, like a future that nobody awaits or an error in the `shutdown()` of a provider, also go to `report`. The server keeps running.
 - The `responseHandler` of `AppConfig` still runs after `render`, so it sees error responses too. Use `render` to change errors, and `responseHandler` to change all responses.
+
+## See also
+
+- [HTTP exceptions](../reference/http-exceptions.md): the exception classes and their status codes.
+- [Custom errors](../guides/custom-errors.md): your own exceptions and one JSON shape, step by step.
+- [Error index](../reference/errors.md): every message Dox prints or throws.

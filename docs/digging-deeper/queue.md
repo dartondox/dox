@@ -918,7 +918,7 @@ dart run bin/queue.dart failed --connection=database
 - The in-process worker (`inProcess`) runs the jobs of the main connection only.
 - Two `database` connections on the same dox_orm connection share the `jobs` and `failed_jobs` tables. So give each one its own dox_orm connection.
 
-## Using the queue without Dox
+## Without Dox
 
 `dox_queue` also works in a plain Dart app. Add `build_runner` and `dox_builder`, so it writes `lib/generated/jobs.g.dart`:
 
@@ -1257,3 +1257,9 @@ UPDATE failed_jobs SET failed_at_utc = FROM_UNIXTIME(failed_at DIV 1000);
 ALTER TABLE failed_jobs DROP COLUMN failed_at;
 ALTER TABLE failed_jobs CHANGE failed_at_utc failed_at TIMESTAMP NOT NULL;
 ```
+
+## See also
+
+- [Background work](../guides/background-work.md): pick the right tool for work after the response.
+- [Scheduler](scheduler.md): run work on a timer.
+- [Mail](mail.md): queue an email.

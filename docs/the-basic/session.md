@@ -44,7 +44,7 @@ AppConfig appConfig = AppConfig(
 The `driver` option decides where the session data is kept. Dox has two drivers:
 
 - `cookie` (the default): all data is in the session cookie, encrypted with your `APP_KEY`. There is nothing to store on the server.
-- `cache`: the cookie only holds a random session id. The data lives in a [cache store](../packages/cache.md), such as `redis`.
+- `cache`: the cookie only holds a random session id. The data lives in a [cache store](../digging-deeper/cache.md), such as `redis`.
 
 If you run more than one server, use the `cache` driver with a shared store like `redis`, so all of them see the same sessions. See [Choosing a driver](#choosing-a-driver) for more.
 
@@ -193,7 +193,7 @@ The cache driver keeps the data in a cache store, and the cookie only holds an e
 Pick the store with the `store` option:
 
 - `redis` shares sessions between all isolates and servers. To set a command timeout or other Redis options, see [Redis options](../digging-deeper/cache.md#redis-options).
-- `database` also shares sessions, if you have no Redis. See [Database store](../packages/cache.md#database-store).
+- `database` also shares sessions, if you have no Redis. See [Database store](../digging-deeper/cache.md#database-store).
 - `memory` keeps sessions in the main isolate of this server. The other isolates read and write them there, so all isolates of one server see the same sessions. They are lost when the server stops, and each server has its own. Expired sessions are removed by the memory store. Good for tests and a single server.
 
 ```dart
@@ -237,3 +237,9 @@ You can also give a config to one middleware: `SessionMiddleware(SessionConfig(.
 - `regenerate(keepToken: true)` keeps the CSRF token, so forms open in other tabs keep working. Do not use it at login.
 - A request that wants JSON gets a `422` JSON answer instead of a redirect when validation fails.
 - Code with no request, like a Socket.IO login, can load the session from the raw cookie value with `await SessionMiddleware().fromCookie(value)`. Changes to it are not saved.
+
+## See also
+
+- [Cache](../digging-deeper/cache.md): the stores a session can use.
+- [CSRF protection](../security/csrf.md): protect forms that use the session.
+- [Authentication](../security/authentication.md): session login.

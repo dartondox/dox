@@ -497,7 +497,7 @@ Dox does not have these Laravel features yet:
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 
 What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
-[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
+[storage](../digging-deeper/file-storage.md), [cache](../digging-deeper/cache.md), [Socket.IO](../packages/socketio.md),
 [auth](../security/authentication.md), [queues](../digging-deeper/queue.md), the [scheduler](../digging-deeper/scheduler.md),
 [mail](../digging-deeper/mail.md), [views](../the-basic/views.md) and [Inertia](../the-basic/inertia.md).
 [Sessions](../the-basic/session.md) are in `dox_core`.

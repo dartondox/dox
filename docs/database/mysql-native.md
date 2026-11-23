@@ -8,7 +8,7 @@ icon: lucide/database-zap
 
 You use it through your models and queries, and it needs no extra config. Rust ([mysql_async](https://docs.rs/mysql_async)) owns the connections and the pool, and each connection keeps its prepared statements. It works with MySQL 8.4 (with the default `caching_sha2_password` login) and MariaDB 11.
 
-## Installation
+## Setup
 
 `dox_orm` already depends on `dox_mysql_native`, so you do not add it yourself. Add it only if you want to use `MysqlNativePool` without the ORM:
 

@@ -186,3 +186,9 @@ Some tips for a good install command:
 - `dox help` keeps the list in `.dart_tool/dox/commands.json`. If you change only a file that the commands library imports, `dox help` can show an old description. The command itself always runs the new code.
 - `MigrationFile().create` finds a migration with the same name and any time in its name. `dox migrate` writes `db/migration/migrations.dart` again before it runs, and makes `bin/migrate.dart` when it is missing.
 - An app inside a pub workspace works too, also when the `workspace:` list uses a glob like `apps/*`. `dox` finds the workspace root from `.dart_tool/pub/workspace_ref.json`.
+
+## See also
+
+- [Dox CLI](dox-cli.md): the commands of the CLI.
+- [Add a package](../getting-started/add-a-package.md): `dox add` runs the install command of a package.
+- [Providers](providers.md): set up a package when the app starts.

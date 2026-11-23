@@ -10,7 +10,7 @@ You do not write an API. A controller gives a page name and its props, and Inert
 
 The `dox_inertia` package is the server side of Inertia. Use it with Vite and the Inertia 3 client for your front-end (`@inertiajs/react`, `@inertiajs/vue3` or `@inertiajs/svelte`, version 3).
 
-## Install
+## Setup
 
 Add the package with the CLI:
 
@@ -665,3 +665,8 @@ This section is for special cases. Most apps do not need it.
 - Another root view works like the default one, with `@vite`, `@inertia` and `{{ key }}`.
 - History encryption keeps its key in the browser, in session storage. With no session, `clearHistory` only works when the same request renders a page with `inertia(...)`.
 - With SSR, head tags need a `</head>` tag (`</HEAD>` works too). A root view with no `</head>` gets no head tags. The SSR HTML holds the page data and the rendered `<div id="app">`.
+
+## See also
+
+- [Views](views.md): server templates with no front-end framework.
+- [Static files and SPA](../guides/static-files.md): serve the built front-end files.

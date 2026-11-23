@@ -8,7 +8,7 @@ icon: lucide/hard-drive
 
 You use the same methods for every disk. So you can keep files in a local folder in development and on S3 in production, and your code stays the same.
 
-It is in the [`dox_storage`](../packages/storage.md) package. A new project already has it.
+It is in the `dox_storage` package. A new project already has it. You can also use the package [without Dox](#without-dox).
 
 ```dart
 import 'package:dox_storage/dox_storage.dart';
@@ -84,6 +84,14 @@ class AppStorageProvider extends StorageProvider {
   AppStorageProvider() : super(storageConfig);
 }
 ```
+
+### Drivers
+
+| Driver | Use for | Signed download URL | Signed upload URL |
+| --- | --- | --- | --- |
+| `local` | a folder on the server | Yes (HMAC with your app key) | No |
+| `s3` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS (HMAC keys) | Yes (SigV4) | Yes (SigV4) |
+| `memory` | tests | fake URLs | fake URLs |
 
 ### The S3 disk
 
@@ -352,9 +360,146 @@ If you want visibility to be the file mode on a local disk, add `'permissions': 
 
 The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`. To change them, see [Custom file modes](#custom-file-modes). On Windows, `permissions` does nothing, because there is no `chmod`.
 
-## Full disk API
+## The disk API
 
-`Storage().use('s3')` returns the `dox_storage` `Disk`. It has more methods, like `listAll` with pages, `getMetaData`, `putStream`, `deleteAll` and write options. See [dox_storage](../packages/storage.md).
+`Storage()` has short methods for common work. For more control, get a `Disk` with `use`. With no name, you get the default disk:
+
+```dart
+Disk disk = Storage().use('s3');
+```
+
+### Write options
+
+The `put` method of a `Disk` writes to the exact key. You can set the content type and the visibility with `WriteOptions`:
+
+```dart
+await disk.put('a.json', '{}', options: WriteOptions(contentType: 'application/json', visibility: Visibility.public));
+```
+
+### Storing big files
+
+`putStream` writes a stream, so the file is not loaded into memory:
+
+```dart
+await disk.putStream('videos/big.mp4', File('big.mp4').openRead());
+```
+
+### Reading text and streams
+
+`getString` reads a file as text. For a big file, use `getStream`. Both throw `FileNotFoundException` when the file is missing:
+
+```dart
+String text = await disk.getString('notes/a.txt');
+
+Stream<List<int>> stream = await disk.getStream('videos/big.mp4');
+```
+
+### All metadata in one call
+
+`getMetaData` gives the size, content type, last change time and etag:
+
+```dart
+ObjectMetaData meta = await disk.getMetaData('avatars/1.png');
+```
+
+### Deleting many files
+
+`deleteAll` removes every file under a prefix. With `''` or no argument, it empties the disk:
+
+```dart
+await disk.deleteAll('avatars');
+```
+
+### Listing page by page
+
+For a big folder, read it one page at a time with `listAll`:
+
+```dart
+ListResult page = await disk.listAll('avatars', ListOptions(recursive: true, limit: 100));
+// next page: ListOptions(paginationToken: page.paginationToken)
+```
+
+### Signed URL options
+
+`getSignedUrl` takes `SignedUrlOptions`. `expiresIn` is 30 minutes when you do not set it. `contentDisposition` asks the server to send this header on download, like `attachment; filename="report.pdf"`. On S3, a signed URL can live 7 days at most:
+
+```dart
+String signed = await disk.getSignedUrl('avatars/1.png',
+    options: SignedUrlOptions(expiresIn: Duration(minutes: 10)));
+```
+
+### Signed upload URLs
+
+On S3, the browser can upload a file straight to the bucket with a signed upload URL. So the file does not pass through your app:
+
+```dart
+String upload = await disk.getSignedUploadUrl('avatars/2.png',
+    options: SignedUrlOptions(contentType: 'image/png'));
+```
+
+## S3-compatible services
+
+The examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are keys in the disk map: `endpoint`, `path_style`, `acl` and `batch_delete`. See [Configuration](#configuration).
+
+### Cloudflare R2
+
+Set `supportsAcl: false`, because R2 does not take ACL headers:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://<account-id>.r2.cloudflarestorage.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+);
+```
+
+### MinIO
+
+MinIO needs path style URLs, so set `forcePathStyle: true`:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'us-east-1',
+  endpoint: 'http://localhost:9000',
+  forcePathStyle: true,
+  accessKeyId: 'minioadmin',
+  secretAccessKey: 'minioadmin',
+);
+```
+
+### DigitalOcean Spaces
+
+Spaces works like S3. Put the region of your space in `region` and in the endpoint:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-space',
+  region: 'nyc3',
+  endpoint: 'https://nyc3.digitaloceanspaces.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+);
+```
+
+### Google Cloud Storage
+
+Set `supportsAcl: false` and `supportsBatchDelete: false`, because GCS does not take ACL headers or the S3 batch delete call:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://storage.googleapis.com',
+  accessKeyId: 'GOOG...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+  supportsBatchDelete: false,
+);
+```
 
 ## Custom drivers
 
@@ -369,6 +514,82 @@ await Storage().disk('dropbox').put('notes/a.txt', 'hello', exact: true);
 
 To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-storage).
 
+`Storage.manager.restoreAll()` removes all fakes in one call.
+
+A disk also has `assertExists` and `assertMissing`. They throw a `StateError` when the check fails:
+
+```dart
+Disk fake = Storage.manager.fake('s3');
+await fake.assertExists('avatars/1.png');
+await fake.assertMissing('avatars/old.png');
+```
+
+## Errors
+
+All errors extend `StorageException` and have the `key`.
+
+| Error | When |
+| --- | --- |
+| `FileNotFoundException` | the file does not exist |
+| `PermissionDeniedException` | file system permission error, or S3 403 |
+| `InvalidKeyException` | unsafe key |
+| `UnsupportedOperationException` | the driver can not do this |
+| `DriverException` | anything else. The first error is in `cause` |
+
+Keys are checked, so a user can not reach files outside the disk. `..`, absolute paths like `/etc/passwd` and null bytes throw `InvalidKeyException`. A local disk also checks that the path stays inside its root folder.
+
+## Without Dox
+
+`dox_storage` also works on its own:
+
+```bash
+dart pub add dox_storage
+```
+
+Make a `DriveManager` with your disks:
+
+```dart
+import 'dart:io';
+
+import 'package:dox_storage/dox_storage.dart';
+
+Map<String, String> env = Platform.environment;
+
+DriveManager drive = DriveManager(
+  defaultDisk: 'local',
+  disks: <String, DriverContract>{
+    'local': LocalDriver(LocalDriverConfig(
+      root: 'storage',
+      urlBase: 'https://app.test/uploads',
+      atomicWrites: true, // off by default
+      appKey: env['APP_KEY'], // signs local URLs
+    )),
+    's3': S3Driver(S3DriverConfig(
+      bucket: 'my-bucket',
+      region: 'us-east-1',
+      accessKeyId: env['AWS_ACCESS_KEY_ID']!,
+      secretAccessKey: env['AWS_SECRET_ACCESS_KEY']!,
+    )),
+  },
+);
+
+Disk disk = drive.use('s3'); // or drive.use() for the default disk
+```
+
+To add your own driver, call `drive.register('dropbox', DropboxDriver())`. `use()` throws `UnsupportedOperationException` when no disk has that name. For file permissions, pass `LocalDriverConfig(permissions: LocalPermissions())`.
+
+### Checking a local signed URL
+
+A local signed URL looks like `<urlBase>/<key>?expires=...&signature=...`. Without Dox, check it in the route that serves the file:
+
+```dart
+LocalDriver local = LocalDriver(localConfig);
+bool ok = local.verifySignedUrl(keyFromPath, req.uri.queryParameters);
+if (!ok) {
+  return response('Forbidden').statusCode(403);
+}
+```
+
 ## Details
 
 This section is for special cases. Most apps do not need it.
@@ -379,7 +600,7 @@ This section is for special cases. Most apps do not need it.
 
 ### S3 part size
 
-`multipartPartSize` is the size of one part of a big upload. It is a field of `S3DriverConfig`, not a key of the disk map. The default is 8 MiB. See [Storage](../packages/storage.md). S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
+`multipartPartSize` is the size of one part of a big upload. It is a field of `S3DriverConfig`, not a key of the disk map. The default is 8 MiB. S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
 
 ### Atomic writes
 
@@ -428,3 +649,12 @@ Each mode must be an int from 0 to 0x1ff (0777). Anything else, like the string 
 - `getVisibility` and `setVisibility` of a missing file answer `404`. With `'acl': false` on S3, `getVisibility` gives the disk `visibility`, also for a missing file.
 - On a local disk, a `copy` or `move` of a missing file makes no folders. A local `copy` writes a temp file and renames it. Listings hide that temp file.
 - Any `download` name is safe in the header. Quotes are escaped, a new line becomes `_`, and a name like `résumé.pdf` is also sent as `filename*=UTF-8''r%C3%A9sum%C3%A9.pdf`.
+- Keys are cleaned: `a//b/./c.txt` becomes `a/b/c.txt`, and `\` becomes `/`.
+- Atomic writes use temp files that end with `.dox-upload.tmp`. `listAll()` hides them.
+- On S3, `put` sends one request, so the limit is 5 GiB. `putStream` uses a multipart upload when the stream is bigger than `multipartPartSize`. Only one part is in memory at a time, and the limit is about 78 GiB. Raise `multipartPartSize` for bigger files. `copy` and `move` also have a limit of 5 GiB.
+
+## See also
+
+- [File upload](../guides/file-upload.md): a full upload route, from the DTO to the URL.
+- [Request](../the-basic/request.md): read an uploaded file.
+- [Static files and SPA](../guides/static-files.md): serve a folder.

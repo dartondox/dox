@@ -8,7 +8,7 @@ Views are HTML templates that Dox fills with your data and sends as the response
 
 Writing HTML in a controller gets messy fast. A view keeps the HTML in its own file, so the controller only gives the data. The `dox_view` package has the template engine. Templates are `.dox.html` files in `resources/views`.
 
-## Install
+## Setup
 
 Add the package with the CLI:
 
@@ -723,3 +723,8 @@ This section is for special cases. Most apps do not need it.
 
 - `@end...` names warn anywhere in a line. The other names warn only with the `(` right after the name, like `@foreach(...)`, or alone on their line. So a sentence like `the @foreach loop` does not warn.
 - Text in a `{{-- --}}` comment, in `@verbatim`, and a name with `@@` before it, do not warn. A name in an HTML comment, like `<!-- @endif -->`, does warn.
+
+## See also
+
+- [Inertia](inertia.md): pages with React, Vue or Svelte.
+- [Mail](../digging-deeper/mail.md): use a view as a mail template.

@@ -10,7 +10,7 @@ The official clients connect to it with no changes: `socket.io-client` (JavaScri
 
 In a Dox app, Socket.IO runs on the same port as your HTTP routes, at `/socket.io/`. It can also run on its own, see [Without Dox](#without-dox).
 
-## In a Dox app
+## Setup
 
 ### Install
 
@@ -535,3 +535,7 @@ SocketIoServer io = SocketIoServer(
 - `allowRequest` does not run again for the polling requests of an open session. A client that leaves while it runs still holds a `maxSessions` slot until the ping timeout. A browser client only sees a connect error, not the `403` or `503` body.
 - The Redis adapter reads msgpack and JSON, and writes msgpack. Long-polling with it needs sticky sessions too.
 - The emitter `key` must be the same as the adapter `key`. Both default to `socket.io`. Binary data (`Uint8List`, or `Buffer` in Node.js) arrives as binary.
+
+## See also
+
+- [Broadcasting](../digging-deeper/broadcasting.md): send server events to channels.

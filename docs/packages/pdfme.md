@@ -10,7 +10,7 @@ You design the template in the pdfme designer, then fill it with data on the ser
 
 The package is standalone. It does not need Dox, and Dox does not need it. It is built on [PDF Library](pdf-lib.md).
 
-## Install
+## Setup
 
 ```bash
 dart pub add dox_pdf_me
@@ -123,7 +123,7 @@ Future<void> main() async {
 }
 ```
 
-## Learn more
+## See also
 
 - [`dox_pdf_me` on pub.dev](https://pub.dev/packages/dox_pdf_me): schema types, tables, plugins, fonts and options, and how to build a template in Dart.
 - [Source on GitHub](https://github.com/dartondox/dox-pdf-lib)

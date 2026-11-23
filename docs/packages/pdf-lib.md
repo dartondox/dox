@@ -10,7 +10,7 @@ Create, load and edit PDF files in Dart with `dox_pdf_lib`, and send them from a
 
 The package is standalone. It does not need Dox, and Dox does not need it. To fill pdfme templates, see [pdfme](pdfme.md).
 
-## Install
+## Setup
 
 ```bash
 dart pub add dox_pdf_lib
@@ -123,7 +123,7 @@ Future<void> main() async {
 }
 ```
 
-## Learn more
+## See also
 
 - [`dox_pdf_lib` on pub.dev](https://pub.dev/packages/dox_pdf_lib): pages, forms, attachments, images, metadata and the full API.
 - [Source on GitHub](https://github.com/dartondox/dox-pdf-lib)

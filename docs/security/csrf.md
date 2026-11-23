@@ -86,3 +86,8 @@ Only skip paths that do not use the session login. A webhook should check its ow
 
 - An excluded path is not checked and gets no `XSRF-TOKEN` cookie.
 - `regenerate(keepToken: true)` keeps the token, so forms open in other tabs keep working. Do not use it at login, because a token from before the login would stay valid.
+
+## See also
+
+- [Session](../the-basic/session.md): the session that holds the token.
+- [CORS](cors.md): let other origins call your API.

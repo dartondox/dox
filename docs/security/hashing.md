@@ -79,3 +79,8 @@ Never use `Hash.sha256` for passwords. A password is short and can be guessed, s
 
 - The error text of a too long password does not hold the password, so it is safe in logs.
 - bcrypt is slow on purpose, so guessing is slow too. Do not hash in a loop on hot paths.
+
+## See also
+
+- [Encryption](encryption.md): hide data that you must read again.
+- [Authentication](authentication.md): login with hashed passwords.

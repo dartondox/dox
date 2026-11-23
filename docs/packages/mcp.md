@@ -263,3 +263,8 @@ This section gives special cases. Most apps do not need it.
 - Dox takes each code under a lock. Thus, two isolates cannot both swap the same code.
 - These routes accept all origins, with CORS `*`, and read no cookie. They do not use the CORS list of the app.
 - `issue` can throw `McpOAuthException`, for example `access_denied` when a person has too many clients. The client gets this error from the token endpoint.
+
+## See also
+
+- [Authentication](../security/authentication.md): users, tokens and login in a Dox app.
+- [AI agents](../getting-started/ai-agents.md): help an AI agent write Dox code.

@@ -1356,3 +1356,9 @@ This section is for special cases. Most apps do not need it.
 
 - A token that is cancelled already fails a new query at once.
 - A custom `DBDriver` must override `affectingStatement()`. It runs an `UPDATE`, `DELETE` or `INSERT` and returns the number of changed rows. `update()`, `delete()`, `increment()` and `upsert()` use it. The default throws an `UnsupportedError`.
+
+## See also
+
+- [Transactions](transactions.md): run many queries as one unit.
+- [Model](model/index.md): work with rows as objects.
+- [Pagination](../guides/pagination.md): a list route with pages.
