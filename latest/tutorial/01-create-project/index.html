@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -942,10 +944,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -5188,10 +5190,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5317,95 +5315,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7169,10 +7078,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -7196,60 +7105,53 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/01-create-project.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="step-1-create-the-project">Step 1: Create the project</h1>
 <p>In this step you make a new Dox project, start the dev server and call the first route.</p>
 <h2 id="1-make-the-project">1. Make the project</h2>
-<p>First install the <code>dox</code> command line tool. Then use it to make a project named <code>blog</code>:</p>
+<p>Install the <code>dox</code> command line tool, then make a project with the name blog:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dox<span class="w"> </span>create<span class="w"> </span>blog
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nb">cd</span><span class="w"> </span>blog
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>dart<span class="w"> </span>pub<span class="w"> </span>get
 </span></code></pre></div>
-<p><code>dox create</code> downloads the <a href="https://github.com/dartondox/dox-sample">dox-sample</a> template and names the package <code>blog</code>. So every import in this tutorial starts with <code>package:blog/</code>.</p>
+<p>The package name is blog, so each import in this tutorial starts with <code>package:blog/</code>.</p>
 <h2 id="2-look-at-the-database-settings">2. Look at the database settings</h2>
-<p>You do not need to change anything here. <code>dox create</code> made a <code>.env</code> file with a new random <code>APP_KEY</code>, and the template already uses SQLite:</p>
+<p>You do not change anything here. <code>dox create</code> made a <code>.env</code> file with a new random app key, and the template uses SQLite:</p>
 <div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">&lt;your new random key&gt;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="na">DB_CONNECTION</span><span class="o">=</span><span class="s">sqlite</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="na">DB_NAME</span><span class="o">=</span><span class="s">db/dox.sqlite</span>
 </span></code></pre></div>
-<p>Dox makes the file <code>db/dox.sqlite</code> at the first start. SQLite does not use the other <code>DB_*</code> lines. The app reads these keys through the typed class in <code>lib/config/env.dart</code>. See <a href="../../digging-deeper/env/">Environment variables</a>.</p>
-<div class="admonition note">
-<p class="admonition-title">The folder must exist</p>
-<p>Dox makes the database file when it is missing, but not its folder. If you set <code>DB_NAME=storage/blog.sqlite</code>, run <code>mkdir storage</code> first.</p>
-</div>
+<p>Dox makes the database file at the first start, but not its folder. If you set a path in a new folder, make the folder first. See <a href="../../digging-deeper/env/">Environment variables</a>.</p>
 <h2 id="3-start-the-server">3. Start the server</h2>
 <p>Start the dev server:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox<span class="w"> </span>s
 </span></code></pre></div>
-<p><code>dox s</code> runs the code generator and the server. When you save a file in <code>lib/app/</code>, it hot reloads your code. When you change routes, config or other start-up code, it restarts the server.</p>
-<p>The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see this log line:</p>
+<p>It runs the code generator and the server. It hot reloads your code in <code>lib/app/</code>, and it restarts the server when you change routes or config.</p>
+<p>The first start is slower, because it compiles the SQLite library and runs the migrations of the template. At the end you see this log line:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[server] Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
 <p>The number of isolates is the number of CPU cores on your machine.</p>
 <h2 id="check-it">Check it</h2>
-<p>Call the <code>ping</code> route from a second terminal:</p>
+<p>Call the ping route from a second terminal:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/ping
 </span></code></pre></div>
-<p>You should see:</p>
+<p>You see:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>HTTP/1.1 200 OK
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>content-type: text/plain; charset=utf-8
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>...
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>pong
 </span></code></pre></div>
-<p>The route is in <code>lib/routes/api.dart</code>. The <code>ApiRouter</code> has the prefix <code>api</code>, so <code>/ping</code> is served at <code>/api/ping</code>.</p>
-<h2 id="next">Next</h2>
-<p><a href="../02-model-and-migration/">Step 2: Model and migration</a></p>
+<p>The route is in <code>lib/routes/api.dart</code>. Its router has the prefix api, so <code>/ping</code> is at <code>/api/ping</code>.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../02-model-and-migration/">Step 2: Model and migration</a>: make the posts table and its model.</li>
+</ul>
 
 
 
@@ -7369,7 +7271,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

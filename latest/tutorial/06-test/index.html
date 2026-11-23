@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1143,10 +1145,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -5166,10 +5168,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5295,95 +5293,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7125,10 +7034,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -7152,18 +7061,13 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/06-test.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="step-6-test">Step 6: Test</h1>
 <p>In this step you write one HTTP test for the list route and run it.</p>
 <h2 id="1-write-the-test">1. Write the test</h2>
-<p>A test calls your routes like a real client, so you know they still work after a change. The template has <code>test/http_test.dart</code>. Replace it with this:</p>
+<p>A test calls your routes like a real client. Replace the template's <code>test/http_test.dart</code> with this:</p>
 <div class="language-dart highlight"><span class="filename">test/http_test.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/config/app.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/config/database.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/testing.dart'</span><span class="p">;</span>
@@ -7193,24 +7097,19 @@
 </span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">  </span><span class="p">});</span>
 </span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="p">}</span>
 </span></code></pre></div>
-<ul>
-<li><code>DoxTestClient.start</code> runs the app inside the test on a free port, so it does not clash with <code>dox s</code>.</li>
-<li>The test runs the migrations first, so it also works on an empty database.</li>
-<li><code>package:test</code> is already in the <code>dev_dependencies</code> of the template.</li>
-</ul>
+<p><code>DoxTestClient.start</code> runs the app in the test on a free port. The test runs the migrations first, so it also works on an empty database.</p>
 <h2 id="check-it">Check it</h2>
 <p>Run the test:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>test/http_test.dart
 </span></code></pre></div>
-<p>You should see:</p>
+<p>You see:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>00:01 +1: All tests passed!
 </span></code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">Use another database for tests</p>
-<p>The test reads <code>.env</code>, so it uses <code>db/dox.sqlite</code>. To keep test data out of it, make a <code>.env.testing</code> file with <code>DB_NAME=test.sqlite</code>. <code>dart test</code> reads it on top of <code>.env</code>.</p>
-</div>
-<h2 id="next">Next</h2>
-<p><a href="../07-build-and-deploy/">Step 7: Build and deploy</a></p>
+<p>The test reads <code>.env</code>, so it uses your dev database. To use another database, make a <code>.env.testing</code> file with <code>DB_NAME=test.sqlite</code>. The test reads it on top of <code>.env</code>.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../07-build-and-deploy/">Step 7: Build and deploy</a>: make a native binary and a Docker image.</li>
+</ul>
 
 
 
@@ -7330,7 +7229,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

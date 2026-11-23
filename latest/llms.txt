@@ -94,8 +94,6 @@ The full docs as one file: https://dartondox.dev/latest/llms-full.txt
 - [Signed URLs](https://dartondox.dev/latest/security/signed-urls/)
 - [Validation](https://dartondox.dev/latest/packages/validation/)
 - [OpenAPI](https://dartondox.dev/latest/packages/openapi/)
-- [Storage](https://dartondox.dev/latest/packages/storage/)
-- [Cache](https://dartondox.dev/latest/packages/cache/)
 - [Socket.IO](https://dartondox.dev/latest/packages/socketio/)
 - [PDF Library](https://dartondox.dev/latest/packages/pdf-lib/)
 - [pdfme](https://dartondox.dev/latest/packages/pdfme/)

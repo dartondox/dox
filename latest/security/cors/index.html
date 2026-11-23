@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -4820,9 +4822,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4830,6 +4833,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -4867,10 +4875,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -5190,10 +5198,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5319,95 +5323,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7135,9 +7050,10 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7145,6 +7061,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7182,10 +7103,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7209,19 +7130,14 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/security/cors.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="cors">CORS</h1>
 <p>CORS headers let a web page on another domain call your API.</p>
-<p>A browser blocks a request from <code>https://my.app</code> to <code>https://api.my.app</code> by default. The API must send CORS headers to allow it. Dox adds these headers from <code>CORSConfig</code>.</p>
+<p>A browser blocks a request from <code>https://my.app</code> to <code>https://api.my.app</code>, unless the API sends CORS headers. Dox adds these headers from <code>CORSConfig</code>.</p>
 <h2 id="setup">Setup</h2>
-<p>The config is in <code>lib/config/cors.dart</code>. A new app has this file with <code>enabled: false</code>, so it sends no CORS headers. Set <code>origin</code> to the URL of your front end, and set <code>enabled: true</code>:</p>
+<p>The config is in <code>lib/config/cors.dart</code>. A new app has it with <code>enabled: false</code>, so it sends no CORS headers. Set <code>origin</code> to the URL of your front end, and set <code>enabled: true</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/cors.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">CORSConfig</span><span class="w"> </span><span class="n">cors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CORSConfig</span><span class="p">(</span>
@@ -7234,15 +7150,15 @@
 </span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="m">600</span><span class="p">,</span>
 </span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Then pass it to <code>AppConfig</code>:</p>
+<p>Then give it to <code>AppConfig</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">cors:</span><span class="w"> </span><span class="n">cors</span><span class="p">,</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>You do not need an <code>OPTIONS</code> route. Dox answers the browser's preflight <code>OPTIONS</code> request with <code>204 No Content</code> and the CORS headers of the route the browser asks about.</p>
-<h2 id="options">Options</h2>
-<p>Each option sets one response header. All options except <code>enabled</code> are <code>null</code> by default, and a <code>null</code> option sends no header. So with no <code>origin</code>, the browser blocks pages on other domains.</p>
+<p>Dox answers the preflight OPTIONS request with 204 and the CORS headers of the route. You do not add an OPTIONS route.</p>
+<h3 id="options">Options</h3>
+<p>Each option sets one response header. An option that is not set sends no header. So with no <code>origin</code>, the browser blocks pages on other domains.</p>
 <table>
 <thead>
 <tr>
@@ -7255,52 +7171,55 @@
 <tr>
 <td><code>enabled</code></td>
 <td>-</td>
-<td><code>true</code> adds the headers to every route. Default: <code>true</code></td>
+<td>true adds the headers to every route. Default: true</td>
 </tr>
 <tr>
 <td><code>origin</code></td>
 <td><code>Access-Control-Allow-Origin</code></td>
-<td>one origin, a <code>List&lt;String&gt;</code> of origins, or <code>'*'</code> for all</td>
+<td>one origin, a list of origins, or <code>'*'</code> for all</td>
 </tr>
 <tr>
 <td><code>methods</code></td>
 <td><code>Access-Control-Allow-Methods</code></td>
-<td>a <code>List&lt;String&gt;</code> or a text like <code>'GET,POST'</code>. <code>'*'</code> allows all</td>
+<td>a list or a text like <code>'GET,POST'</code>. <code>'*'</code> allows all</td>
 </tr>
 <tr>
 <td><code>headers</code></td>
 <td><code>Access-Control-Allow-Headers</code></td>
-<td>a <code>List&lt;String&gt;</code> or a text. <code>'*'</code> allows all</td>
+<td>a list or a text. <code>'*'</code> allows all</td>
 </tr>
 <tr>
 <td><code>exposeHeaders</code></td>
 <td><code>Access-Control-Expose-Headers</code></td>
-<td>the response headers the page may read</td>
+<td>the response headers the page can read</td>
 </tr>
 <tr>
 <td><code>credentials</code></td>
 <td><code>Access-Control-Allow-Credentials</code></td>
-<td><code>true</code> lets the browser send cookies</td>
+<td>true lets the browser send cookies</td>
 </tr>
 <tr>
 <td><code>maxAge</code></td>
 <td><code>Access-Control-Max-Age</code></td>
-<td>how many seconds the browser keeps the preflight answer</td>
+<td>the seconds the browser keeps the preflight answer</td>
 </tr>
 </tbody>
 </table>
 <h2 id="allowing-more-than-one-origin">Allowing more than one origin</h2>
-<p>If your API has more than one front end, give <code>origin</code> a list. Do not put many origins in one text, because a text is sent as it is:</p>
+<p>Give <code>origin</code> a list. Do not put many origins in one text, because Dox sends a text as it is:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">CORSConfig</span><span class="w"> </span><span class="n">cors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CORSConfig</span><span class="p">(</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">origin:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://my.app'</span><span class="p">,</span><span class="w"> </span><span class="s1">'https://admin.my.app'</span><span class="p">],</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>The header accepts only one origin, so Dox checks the <code>Origin</code> header of the request. When the origin is in the list, Dox sends back that one origin. When it is not, Dox sends no header, and the browser blocks the call.</p>
+<p>Dox sends back the request origin when it is in the list, with <code>Vary: Origin</code>. For other origins it sends no header, and the browser blocks the call.</p>
 <h2 id="sending-cookies">Sending cookies</h2>
-<p>If the front end sends cookies, set <code>credentials: true</code>. Then do not use <code>origin: '*'</code>, because the browser blocks every call with cookies when the origin is <code>*</code>. Set <code>origin</code> to your real front end URL, or a list of URLs.</p>
-<p>A page on an allowed origin can send requests with the cookies of your users, so list only sites you trust.</p>
+<p>If the front end sends cookies, set <code>credentials: true</code> and set <code>origin</code> to your real front end URLs. The browser blocks every call with cookies when the origin is <code>'*'</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>A page on an allowed origin can send requests with the cookies of your users. List only sites that you trust.</p>
+</div>
 <h2 id="cors-for-some-routes">CORS for some routes</h2>
-<p><code>enabled</code> is the default for all routes. You can change it for a group of routes:</p>
+<p><code>enabled</code> is the default for all routes. Change it for a group of routes:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// CORS headers only on these routes (use with enabled: false)</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Route</span><span class="p">.</span><span class="n">enabledCors</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/public/posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">);</span>
@@ -7311,10 +7230,10 @@
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/webhooks/stripe'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">WebhookController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">handle</span><span class="p">);</span>
 </span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="p">});</span>
 </span></code></pre></div>
-<h2 id="details">Details</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>For <code>methods</code>, <code>headers</code> and <code>exposeHeaders</code>, a list is joined with commas.</li>
-<li>With an <code>origin</code> list, Dox also sends <code>Vary: Origin</code>, so caches know the answer depends on the origin. A list with <code>'*'</code> sends <code>*</code>.</li>
+<li><a href="../../guides/cors-for-spa/">CORS for a browser front-end</a>: the setup for a React, Vue or Flutter web app.</li>
+<li><a href="../csrf/">CSRF protection</a>: protect forms that use cookies.</li>
 </ul>
 
 
@@ -7435,7 +7354,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

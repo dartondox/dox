@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6875,10 +6784,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7215,10 +7124,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7242,22 +7151,17 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/http-exceptions.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="http-exceptions">HTTP exceptions</h1>
 <p>An HTTP exception stops a request and sends an error answer with the right status code, like <code>404</code> or <code>403</code>.</p>
-<p>Every HTTP exception extends <code>IHttpException</code>. It has three fields: the status <code>code</code>, a short <code>errorCode</code> like <code>not_found</code>, and a <code>message</code>. You can <code>throw</code> it, or <code>return</code> it from a middleware or a controller.</p>
+<p>Each HTTP exception extends <code>IHttpException</code>, with three fields: the status <code>code</code>, a short <code>errorCode</code> and a <code>message</code>. Throw it, or return it from a middleware or a controller.</p>
 <h2 id="throwing-an-exception">Throwing an exception</h2>
-<p>Throw one of the classes below when a request can not go on. For example, when a post does not exist:</p>
+<p>Throw one of the classes below when a request cannot continue:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Blog not found'</span><span class="p">);</span>
 </span></code></pre></div>
-<p>The client gets a JSON body with the <code>errorCode</code> and the <code>message</code>:</p>
+<p>The client gets a JSON body with the error code and the message:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>HTTP/1.1 404 Not Found
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>content-type: application/json
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -7307,7 +7211,7 @@
 <td><code>404</code></td>
 <td><code>not_found</code></td>
 <td><code>Not Found</code></td>
-<td>no route fits, a typed path param does not fit (<code>{id}</code> is not an <code>int</code>), or route model binding finds no row</td>
+<td>no route fits (message <code>&lt;METHOD&gt; &lt;path&gt; not found</code>), a typed path param does not fit (<code>{id}</code> is not an <code>int</code>), or route model binding finds no row</td>
 </tr>
 <tr>
 <td><code>MethodNotAllowedHttpException</code></td>
@@ -7315,7 +7219,7 @@
 <td><code>405</code></td>
 <td><code>method_not_allowed</code></td>
 <td><code>Method Not Allowed</code></td>
-<td>the path has routes, but not for this method. The <code>Allow</code> header lists the methods.</td>
+<td>the path has routes, but not for this method. The <code>Allow</code> header lists the methods, like <code>Allow: GET, POST, HEAD</code>.</td>
 </tr>
 <tr>
 <td><code>PayloadTooLargeException</code></td>
@@ -7347,7 +7251,7 @@
 <td><code>422</code></td>
 <td><code>validation_failed</code></td>
 <td><code>{}</code> (a <code>Map</code>)</td>
-<td>a DTO or <code>req.validate()</code> finds bad input</td>
+<td>a DTO, <code>req.validate()</code> or <code>schema.parse()</code> of <code>dox_validation</code> finds bad input</td>
 </tr>
 <tr>
 <td><code>TooManyRequestsException</code></td>
@@ -7376,14 +7280,15 @@
 </tbody>
 </table>
 <h2 id="any-status-abort-and-httpstatusexception">Any status: <code>abort</code> and <code>HttpStatusException</code></h2>
-<p>Sometimes you need a status that has no class. Use <code>abort(code)</code>. It stops the request and answers with that status:</p>
+<p>For a status with no class, use <code>abort(code)</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">post</span><span class="p">.</span><span class="n">userId</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">auth</span><span class="o">?</span><span class="p">.</span><span class="n">id</span><span class="p">())</span><span class="w"> </span><span class="n">abort</span><span class="p">(</span><span class="m">403</span><span class="p">);</span>
 </span></code></pre></div>
 <p>You can also pass a message:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">abort</span><span class="p">(</span><span class="m">404</span><span class="p">,</span><span class="w"> </span><span class="s1">'No post with this id'</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>abort</code> throws an <code>HttpStatusException</code>. Throw it yourself when you want to send headers too:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">HttpStatusException</span><span class="p">(</span><span class="m">503</span><span class="p">,</span><span class="w"> </span><span class="nl">headers:</span><span class="w"> </span><span class="p">{</span><span class="s1">'retry-after'</span><span class="o">:</span><span class="w"> </span><span class="s1">'60'</span><span class="p">});</span>
+<p><code>abort</code> throws an <code>HttpStatusException</code>. Throw it yourself to send headers too:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">HttpStatusException</span><span class="p">(</span><span class="m">503</span><span class="p">,</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="nl">headers:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'retry-after'</span><span class="o">:</span><span class="w"> </span><span class="s1">'60'</span><span class="p">});</span>
 </span></code></pre></div>
 <p>Common codes get a default <code>errorCode</code> and <code>message</code>, like <code>forbidden</code> and <code>Forbidden</code> for <code>403</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>HTTP/1.1 403 Forbidden
@@ -7393,11 +7298,10 @@
 </span></code></pre></div>
 <p>Other codes get <code>http_error</code> and <code>Error</code>.</p>
 <h2 id="what-the-client-gets">What the client gets</h2>
-<p>The status is the <code>code</code> of the exception. The body is sent as JSON with <code>Content-Type: application/json</code>.</p>
-<p>A text message gives <code>{"code": "&lt;errorCode&gt;", "message": "&lt;message&gt;"}</code>, as shown above.</p>
-<p>If you want your own JSON shape for one error, pass a <code>Map</code> as the message. It is sent as it is, with no <code>code</code> key:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'error'</span><span class="o">:</span><span class="w"> </span><span class="s1">'not_found'</span><span class="p">});</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="c1">// 404 {"error":"not_found"}</span>
+<p>The status is the code of the exception, and the body is JSON. A text message gives <code>{"code": "&lt;errorCode&gt;", "message": "&lt;message&gt;"}</code>. For your own JSON shape, give a map as the message:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">    </span><span class="nl">message:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'error'</span><span class="o">:</span><span class="w"> </span><span class="s1">'not_found'</span><span class="p">});</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c1">// 404 {"error":"not_found"}</span>
 </span></code></pre></div>
 <p>A <code>ValidationException</code> always has a map, with one entry per field:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>HTTP/1.1 422 Unprocessable Entity
@@ -7405,12 +7309,12 @@
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>{"email":"The email is not a valid email","name":"The name is required"}
 </span></code></pre></div>
-<p>A form post with a session (<code>SessionMiddleware</code>) does not get this JSON. Dox flashes the errors and the old input to the session and redirects back. See <a href="../../the-basic/session/#validation-errors-and-old-input">Session</a>.</p>
+<p>A form post with a session gets a redirect back, with the errors and the old input in the session. See <a href="../../the-basic/session/#validation-errors-and-old-input">Session</a>.</p>
 <h3 id="other-errors">Other errors</h3>
-<p>Any other <code>Exception</code> or <code>Error</code> gives <code>500</code> with <code>{"code": "server_error", "message": "Server Error"}</code>. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, the body is the error text instead, so you can see what went wrong.</p>
-<p>These errors go to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. An HTTP exception with a <code>5xx</code> code is reported too. One with a <code>4xx</code> code is not.</p>
+<p>Any other error gives 500 with <code>{"code": "server_error", "message": "Server Error"}</code>. When <code>APP_ENV</code> is development or local, the body is the error text.</p>
+<p>These errors go to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. An HTTP exception with a 5xx code also goes there.</p>
 <h2 id="making-your-own-exception">Making your own exception</h2>
-<p>If you need an error that Dox does not have, extend <code>IHttpException</code> and set the three fields in the constructor:</p>
+<p>Extend <code>IHttpException</code> and set the three fields in the constructor:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7427,13 +7331,12 @@
 </span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>To give every error of your app the same JSON shape, override <code>toResponse()</code>. It returns the body.</p>
-<p>More examples are on the <a href="../../the-basic/response/#errors">Response</a> page.</p>
-<h2 id="details">Details</h2>
+<p>To give each error the same JSON shape, override <code>toResponse()</code>. It returns the body.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>A path with no route answers <code>404</code> with the message <code>&lt;METHOD&gt; &lt;path&gt; not found</code>, like <code>{"code":"not_found","message":"GET /nothing not found"}</code>.</li>
-<li>When the path has routes for other methods, the answer is <code>405</code> with an <code>Allow</code> header, like <code>Allow: GET, POST, HEAD</code>. Your <code>responseHandler</code> sees both, so you can change their shape.</li>
-<li>A <code>ValidationException</code> from <code>dox_validation</code> (from <code>schema.parse()</code> in a controller) becomes the <code>422</code> <code>ValidationException</code> of <code>dox_core</code>, with the same errors.</li>
+<li><a href="../../the-basic/errors/">Error handling</a>: report and render errors.</li>
+<li><a href="../../the-basic/response/#errors">Response</a>: more error examples.</li>
+<li><a href="../errors/">Error index</a>: each message that Dox shows or throws.</li>
 </ul>
 
 
@@ -7554,7 +7457,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

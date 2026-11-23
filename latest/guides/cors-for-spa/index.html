@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6070,10 +5979,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7229,10 +7138,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7256,24 +7165,19 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/cors-for-spa.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="cors-for-a-browser-front-end">CORS for a browser front-end</h1>
 <p>Let a web app on another origin (<code>http://localhost:5173</code> in development, <code>https://my.app</code> in production) call your API.</p>
-<p>A browser blocks a page from calling an API on another origin, unless the API says it is allowed. CORS headers tell the browser which origins may call. You need this when your front-end and your API run on different hosts or ports.</p>
+<p>A browser blocks a call to an API on another origin. <strong>CORS</strong> headers tell the browser which origins may call.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Dox app.</li>
 <li>A front-end that runs on its own origin, like Vite, Next.js or Flutter web.</li>
 </ul>
 <h2 id="1-write-the-config">1. Write the config</h2>
-<p>A new app already has <code>lib/config/cors.dart</code>, but with <code>enabled: false</code>. Replace the whole file with this one:</p>
+<p>A new app has <code>lib/config/cors.dart</code> with <code>enabled: false</code>. Replace the whole file with this one:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/cors.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -7299,16 +7203,16 @@
 </span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="m">600</span><span class="p">,</span>
 </span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p">);</span>
 </span></code></pre></div>
-<p><code>AppConfig</code> in <code>lib/config/app.dart</code> already passes it on with <code>cors: cors</code>.</p>
+<p><code>AppConfig</code> in <code>lib/config/app.dart</code> already uses it with <code>cors: cors</code>.</p>
 <h2 id="2-set-the-origin-per-environment">2. Set the origin per environment</h2>
-<p>The front-end URL is different in each environment, so read it from a new key, <code>CORS_ORIGIN</code>. Add a getter for it to the <code>AppEnv</code> class:</p>
+<p>Read the front-end URL from a new key, <code>CORS_ORIGIN</code>. Add a getter for it to the <code>AppEnv</code> class:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">  </span><span class="c1">/// the front-end URL that may call the API</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">corsOrigin</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'http://localhost:5173'</span><span class="p">;</span>
 </span></code></pre></div>
-<p>Run <code>dart run build_runner build</code> to update <code>env.g.dart</code>. Then set the value in <code>.env</code>:</p>
+<p>Run <code>dart run build_runner build</code>. Then set the value in <code>.env</code>:</p>
 <div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="na">CORS_ORIGIN</span><span class="o">=</span><span class="s">http://localhost:5173</span>
 </span></code></pre></div>
-<p>In staging and production, set <code>CORS_ORIGIN</code> as a real environment variable, like <code>https://my.app</code>. The origin is the scheme, host and port only, with no path and no <code>/</code> at the end.</p>
+<p>In staging and production, set <code>CORS_ORIGIN</code> as an environment variable, like <code>https://my.app</code>. The origin is the scheme, host and port only, with no <code>/</code> at the end.</p>
 <h2 id="3-choose-credentials">3. Choose <code>credentials</code></h2>
 <p>The right <code>origin</code> and <code>credentials</code> depend on how the front-end logs in:</p>
 <table>
@@ -7323,26 +7227,23 @@
 <tr>
 <td>a token in <code>Authorization: Bearer</code> (see <a href="../jwt-auth/">JWT authentication</a>)</td>
 <td>your front-end URL</td>
-<td><code>false</code></td>
+<td>false</td>
 </tr>
 <tr>
 <td>cookies (<code>fetch(url, {credentials: 'include'})</code>)</td>
 <td>your front-end URL, never <code>*</code></td>
-<td><code>true</code></td>
+<td>true</td>
 </tr>
 <tr>
 <td>nothing, a public API</td>
 <td><code>'*'</code></td>
-<td><code>false</code></td>
+<td>false</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition note">
-<p class="admonition-title">Two or more front-ends</p>
-<p>Set <code>origin</code> to a list, like <code>['https://a.com', 'https://b.com']</code>. Dox sends back only the origin that matches the request. If none matches, the browser blocks the call.</p>
-</div>
+<p>For two or more front-ends, set <code>origin</code> to a list, like <code>['https://a.com', 'https://b.com']</code>.</p>
 <h2 id="check-it">Check it</h2>
-<p>Before a <code>POST</code> with JSON or a custom header, the browser first sends an <code>OPTIONS</code> request, called a preflight. Dox answers it by itself, so you do not need an <code>OPTIONS</code> route:</p>
+<p>Before a POST with JSON, the browser sends an OPTIONS request, the <strong>preflight</strong>. Dox answers it by itself:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>OPTIONS<span class="w"> </span>http://localhost:3000/api/users<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Origin: http://localhost:5173'</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Access-Control-Request-Method: POST'</span><span class="w"> </span><span class="se">\</span>
@@ -7357,7 +7258,8 @@
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>access-control-max-age: 600
 </span></code></pre></div>
 <p>A normal request gets the origin header too:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/ping<span class="w"> </span>-H<span class="w"> </span><span class="s1">'Origin: http://localhost:5173'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>access-control-allow-origin
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/ping<span class="w"> </span>-H<span class="w"> </span><span class="s1">'Origin: http://localhost:5173'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>access-control-allow-origin
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>access-control-allow-origin: http://localhost:5173
 </span></code></pre></div>
@@ -7390,15 +7292,15 @@
 </tbody>
 </table>
 <h2 id="turning-cors-off-for-some-routes">Turning CORS off for some routes</h2>
-<p>CORS only matters for browsers. A webhook from Stripe or a call from another server ignores these headers. So you can turn CORS off for such routes, to send fewer headers:</p>
+<p>A call from another server, like a Stripe webhook, does not use CORS. Turn CORS off for such routes:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">disabledCors</span><span class="p">(()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/webhooks/stripe'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">WebhookController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">handle</span><span class="p">);</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">});</span>
 </span></code></pre></div>
-<h2 id="see-also">See also</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><a href="../../security/cors/">CORS</a> for every option</li>
-<li><a href="../jwt-auth/">JWT authentication</a></li>
+<li><a href="../../security/cors/">CORS</a>: every option.</li>
+<li><a href="../jwt-auth/">JWT authentication</a>: log in with a token.</li>
 </ul>
 
 
@@ -7519,7 +7421,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1212,10 +1214,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-to-go-next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to go next
+        Next steps
       
     </span>
   </a>
@@ -5189,10 +5191,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5318,95 +5316,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7170,10 +7079,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-to-go-next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to go next
+        Next steps
       
     </span>
   </a>
@@ -7197,19 +7106,14 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/07-build-and-deploy.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="step-7-build-and-deploy">Step 7: Build and deploy</h1>
 <p>In this step you compile the app to one native binary, run it, and run it in Docker.</p>
 <div class="admonition warning">
-<p class="admonition-title">Never run production with <code>dox s</code> or <code>dart run</code></p>
-<p>They use the JIT compiler, which needs about 25 times more memory and starts slower. Build a native (AOT) binary for production.</p>
+<p class="admonition-title">Use a native binary in production</p>
+<p><code>dox s</code> and <code>dart run</code> use the JIT compiler. It uses approximately 25 times more memory and starts slower.</p>
 </div>
 <h2 id="1-build-the-binary">1. Build the binary</h2>
 <p>Build the app:</p>
@@ -7220,7 +7124,7 @@
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Generated: /.../blog/build/bundle/bin/server
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>[Dox] Built build/bundle. Run it with: cd build/bundle &amp;&amp; ./bin/server
 </span></code></pre></div>
-<p><code>dox build</code> runs the code generator, then <code>dart build cli</code>. You get a <code>build/bundle</code> folder with everything the app needs:</p>
+<p>It runs the code generator, then <code>dart build cli</code>. The <code>build/bundle</code> folder has all that the app needs:</p>
 <table>
 <thead>
 <tr>
@@ -7231,7 +7135,7 @@
 <tbody>
 <tr>
 <td><code>bin/server</code></td>
-<td>the binary, about 10 MB. It needs no Dart SDK.</td>
+<td>the binary, approximately 10 MB. It needs no Dart SDK.</td>
 </tr>
 <tr>
 <td><code>bin/queue</code></td>
@@ -7256,7 +7160,7 @@
 </tbody>
 </table>
 <h2 id="2-run-the-binary">2. Run the binary</h2>
-<p>The binary reads <code>.env</code> from the folder you start it in, so copy yours there first. The <code>db</code> folder for the SQLite file is already in <code>build/bundle</code>.</p>
+<p>The binary reads <code>.env</code> from the folder where you start it, so copy your file there:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>build/bundle
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>cp<span class="w"> </span>../../.env<span class="w"> </span>.env
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>./bin/server
@@ -7269,8 +7173,8 @@
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Migrated: 2026_10_22_205345_create_posts_table
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>... "message":"Server started at http://[::]:3000 with 8 isolate (native)" ...
 </span></code></pre></div>
-<p>The migrations run again, because <code>db/dox.sqlite</code> is a new file in <code>build/bundle</code>. The migration list is compiled into the binary, so you do not need the source code.</p>
-<p>On a server you can skip <code>.env</code> and set real environment variables instead. They win over <code>.env</code>.</p>
+<p>The migrations run again, because the bundle has a new database file. The binary has the migration list in it.</p>
+<p>On a server you can set real environment variables in place of <code>.env</code>. They win over <code>.env</code>.</p>
 <h2 id="check-it">Check it</h2>
 <p>Call the binary from a second terminal:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>http://localhost:3000/api/ping
@@ -7279,9 +7183,9 @@
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>pong
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>[]
 </span></code></pre></div>
-<p>The list is empty, because this is a new database file. Stop the server with <code>Ctrl+C</code>.</p>
+<p>The list is empty, because the database file is new. Stop the server with Ctrl+C.</p>
 <h2 id="3-docker">3. Docker</h2>
-<p>If you deploy with Docker, the project already has a <code>Dockerfile</code>. It builds the same bundle and copies it into an empty (<code>scratch</code>) image:</p>
+<p>The project has a <code>Dockerfile</code>. It builds the same bundle and copies it into an empty scratch image:</p>
 <div class="language-dockerfile highlight"><span class="filename">Dockerfile</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">FROM</span><span class="w"> </span><span class="s">dart:stable</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">build</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="c"># Resolve dependencies first, so this layer is cached.</span>
@@ -7298,18 +7202,18 @@
 </span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="c"># libraries in build/bundle/lib and the migrations in build/bundle/db.</span>
 </span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="c"># The queue worker and the scheduler run as their own processes:</span>
 </span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="c"># `/app/bin/queue work` and `/app/bin/schedule work`.</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="k">ARG</span><span class="w"> </span><span class="nv">DOX_VERSION</span><span class="o">=</span>^3.2.0
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="k">RUN</span><span class="w"> </span>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox<span class="w"> </span><span class="s2">"</span><span class="nv">$DOX_VERSION</span><span class="s2">"</span>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="k">RUN</span><span class="w"> </span>/root/.pub-cache/bin/dox<span class="w"> </span>build
-</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a>
-</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="c"># Lay out the final file tree:</span>
-</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="c"># /app/bin/server, /app/bin/queue, /app/bin/schedule, /app/lib (native</span>
-</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="c"># libraries), /app/db/migration, /app/storage and a writable /tmp</span>
-</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="c"># (uploads bigger than 1 MB are streamed to a temp file).</span>
-</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="k">RUN</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/out/app/storage<span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>chmod<span class="w"> </span><span class="m">1777</span><span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>build/bundle/.<span class="w"> </span>/out/app/<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">  </span>#<span class="w"> </span>the<span class="w"> </span>native<span class="w"> </span>HTTP<span class="w"> </span>server<span class="w"> </span><span class="o">(</span>Rust<span class="o">)</span><span class="w"> </span>needs<span class="w"> </span>libgcc_s,<span class="w"> </span>which<span class="w"> </span>/runtime/<span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>have
+</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="k">RUN</span><span class="w"> </span>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>dox
+</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="k">RUN</span><span class="w"> </span>/root/.pub-cache/bin/dox<span class="w"> </span>build
+</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a>
+</span><span id="__span-6-20"><a id="__codelineno-6-20" name="__codelineno-6-20" href="#__codelineno-6-20"></a><span class="c"># Lay out the final file tree:</span>
+</span><span id="__span-6-21"><a id="__codelineno-6-21" name="__codelineno-6-21" href="#__codelineno-6-21"></a><span class="c"># /app/bin/server, /app/bin/queue, /app/bin/schedule, /app/lib (native</span>
+</span><span id="__span-6-22"><a id="__codelineno-6-22" name="__codelineno-6-22" href="#__codelineno-6-22"></a><span class="c"># libraries), /app/db/migration, /app/storage and a writable /tmp</span>
+</span><span id="__span-6-23"><a id="__codelineno-6-23" name="__codelineno-6-23" href="#__codelineno-6-23"></a><span class="c"># (uploads bigger than 1 MB are streamed to a temp file).</span>
+</span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="k">RUN</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/out/app/storage<span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>chmod<span class="w"> </span><span class="m">1777</span><span class="w"> </span>/out/tmp<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-26"><a id="__codelineno-6-26" name="__codelineno-6-26" href="#__codelineno-6-26"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>build/bundle/.<span class="w"> </span>/out/app/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-6-27"><a id="__codelineno-6-27" name="__codelineno-6-27" href="#__codelineno-6-27"></a><span class="w">  </span>#<span class="w"> </span>the<span class="w"> </span>native<span class="w"> </span>HTTP<span class="w"> </span>server<span class="w"> </span><span class="o">(</span>Rust<span class="o">)</span><span class="w"> </span>needs<span class="w"> </span>libgcc_s,
+</span><span id="__span-6-28"><a id="__codelineno-6-28" name="__codelineno-6-28" href="#__codelineno-6-28"></a><span class="w">  </span>#<span class="w"> </span>which<span class="w"> </span>/runtime/<span class="w"> </span>does<span class="w"> </span>not<span class="w"> </span>have
 </span><span id="__span-6-29"><a id="__codelineno-6-29" name="__codelineno-6-29" href="#__codelineno-6-29"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">LIBGCC</span><span class="o">=</span><span class="k">$(</span>find<span class="w"> </span>/<span class="w"> </span>-name<span class="w"> </span>libgcc_s.so.1<span class="w"> </span>-path<span class="w"> </span><span class="s1">'*lib*'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="k">)</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-6-30"><a id="__codelineno-6-30" name="__codelineno-6-30" href="#__codelineno-6-30"></a><span class="w">  </span><span class="o">&amp;&amp;</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/out<span class="k">$(</span>dirname<span class="w"> </span><span class="nv">$LIBGCC</span><span class="k">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span><span class="nv">$LIBGCC</span><span class="w"> </span>/out<span class="nv">$LIBGCC</span>
 </span><span id="__span-6-31"><a id="__codelineno-6-31" name="__codelineno-6-31" href="#__codelineno-6-31"></a>
@@ -7325,7 +7229,7 @@
 </span><span id="__span-6-41"><a id="__codelineno-6-41" name="__codelineno-6-41" href="#__codelineno-6-41"></a><span class="k">EXPOSE</span><span class="w"> </span><span class="s">3000</span>
 </span><span id="__span-6-42"><a id="__codelineno-6-42" name="__codelineno-6-42" href="#__codelineno-6-42"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"/app/bin/server"</span><span class="p">]</span>
 </span></code></pre></div>
-<p>Build and run the image. The image has no <code>.env</code> file, so pass the config as environment variables. <code>APP_KEY</code> must be exactly 32 characters, or the app does not start.</p>
+<p>Build and run the image. The image has no <code>.env</code> file, so give the config as environment variables. The app key must have exactly 32 characters, or the app does not start:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>blog<span class="w"> </span>.
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>docker<span class="w"> </span>run<span class="w"> </span>-p<span class="w"> </span><span class="m">3000</span>:3000<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">APP_KEY</span><span class="o">=</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">16</span><span class="k">)</span><span class="w"> </span><span class="se">\</span>
@@ -7333,16 +7237,16 @@
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">DB_NAME</span><span class="o">=</span>storage/blog.sqlite<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span>blog
 </span></code></pre></div>
-<div class="admonition note">
+<div class="admonition warning">
 <p class="admonition-title">SQLite in Docker</p>
-<p>The database file lives inside the container, so it is lost when the container is removed. Mount a volume for it: <code>-v blog-data:/app/storage</code>. For a busy app, use Postgres or MySQL. See <a href="../../database/">Database</a>.</p>
+<p>The database file is in the container, so you lose it when you remove the container. Mount a volume for it: <code>-v blog-data:/app/storage</code>. For a busy app, use Postgres or MySQL. See <a href="../../database/">Database</a>.</p>
 </div>
-<h2 id="where-to-go-next">Where to go next</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
 <li><a href="../../digging-deeper/deployment/">Deployment</a>: HTTPS with a proxy, systemd, many machines.</li>
 <li><a href="../../database/model/">Model</a>: relationships and events.</li>
 <li><a href="../../the-basic/serializer/">Serializer</a>: change the JSON shape of a response.</li>
-<li><a href="../../security/authentication/">Authentication</a>: all options of <code>dox_auth</code>.</li>
+<li><a href="../../security/authentication/">Authentication</a>: all options of the auth package.</li>
 <li><a href="../../packages/openapi/">OpenAPI</a>: API docs from your routes and DTOs.</li>
 </ul>
 
@@ -7464,7 +7368,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

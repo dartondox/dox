@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -3934,28 +3936,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Setup
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-the-library-does-not-load" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When the library does not load
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3964,8 +3956,7 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#behind-a-proxy" class="md-nav__link">
@@ -3984,22 +3975,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-the-pool-without-the-orm" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using the pool without the ORM
+        When the library does not load
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Using the pool without the ORM">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handling errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Without Dox">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#transactions" class="md-nav__link">
+  <a href="#opening-a-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Transactions
+        Opening a pool
       
     </span>
   </a>
@@ -4011,6 +4035,28 @@
     <span class="md-ellipsis">
       
         Pool settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pool-from-a-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pool from a url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions
       
     </span>
   </a>
@@ -4039,61 +4085,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handling-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handling errors
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
+  <a href="#sharing-and-closing-a-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limits
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
+        Sharing and closing a pool
       
     </span>
   </a>
@@ -4102,6 +4098,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
   
 </li>
       
@@ -5300,10 +5307,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5429,95 +5432,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7237,28 +7151,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Setup
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-the-library-does-not-load" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When the library does not load
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7267,8 +7171,7 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#behind-a-proxy" class="md-nav__link">
@@ -7287,22 +7190,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-the-pool-without-the-orm" class="md-nav__link">
+  <a href="#when-the-library-does-not-load" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using the pool without the ORM
+        When the library does not load
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Using the pool without the ORM">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#handling-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Handling errors
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Without Dox">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#transactions" class="md-nav__link">
+  <a href="#opening-a-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Transactions
+        Opening a pool
       
     </span>
   </a>
@@ -7314,6 +7250,28 @@
     <span class="md-ellipsis">
       
         Pool settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pool-from-a-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pool from a url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions
       
     </span>
   </a>
@@ -7342,61 +7300,11 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#types" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handling-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handling errors
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
           <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
+  <a href="#sharing-and-closing-a-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Limits
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
+        Sharing and closing a pool
       
     </span>
   </a>
@@ -7405,6 +7313,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
   
 </li>
       
@@ -7425,35 +7344,19 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/database/mysql-native.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="native-mysql-driver">Native MySQL driver</h1>
 <p><code>dox_mysql_native</code> is the MySQL and MariaDB driver of the Dox ORM, written in Rust.</p>
-<p>You use it through your models and queries, and it needs no extra config. Rust (<a href="https://docs.rs/mysql_async">mysql_async</a>) owns the connections and the pool, and each connection keeps its prepared statements. It works with MySQL 8.4 (with the default <code>caching_sha2_password</code> login) and MariaDB 11.</p>
-<h2 id="installation">Installation</h2>
-<p><code>dox_orm</code> already depends on <code>dox_mysql_native</code>, so you do not add it yourself. Add it only if you want to use <code>MysqlNativePool</code> without the ORM:</p>
+<p>You use it through your models and queries. Rust (<a href="https://docs.rs/mysql_async">mysql_async</a>) owns the connections and the pool, and each connection keeps its prepared statements. It works with MySQL 8.4 and MariaDB 11.</p>
+<h2 id="setup">Setup</h2>
+<p><code>dox_orm</code> already depends on <code>dox_mysql_native</code>. Add it yourself only to use <code>MysqlNativePool</code> without the ORM:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_mysql_native
 </span></code></pre></div>
-<p>You do not need Rust, because the build hook downloads a ready-built library for your system. The package lives in its own repo: <a href="https://github.com/dartondox/dox-mysql-native">dartondox/dox-mysql-native</a>.</p>
-<h2 id="when-the-library-does-not-load">When the library does not load</h2>
-<p>MySQL has no other driver in Dox. So if the native library does not load, <code>SqlQueryBuilder.initializeWithDatabaseConfig</code> (and every other place that opens a MySQL connection) throws an <code>UnsupportedError</code> like this:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox_mysql_native did not load: &lt;reason&gt;.
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Dox needs it to talk to MySQL. Fix: run the app with `dart run` or `dart build cli`. ...
-</span></code></pre></div>
-<p>To fix it:</p>
-<ul>
-<li>Run the app with <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>, because they run the build hook. <code>dart compile exe</code> does not.</li>
-<li>Or install <a href="https://rustup.rs">Rust</a>. The build hook then builds the library from source.</li>
-<li>If you set <code>lib_path</code> in <code>pubspec.yaml</code>, check that the file is there and is built for your system.</li>
-</ul>
-<h2 id="options">Options</h2>
-<p>The driver reads the normal fields of the <code>ConnectionConfig</code> (<code>host</code>, <code>port</code>, <code>user</code>, <code>password</code>, <code>database</code>, <code>useSSL</code>) and these keys from <code>extra</code>:</p>
+<p>The build hook downloads a ready library for your system, so you do not need Rust. The package has its own repo: <a href="https://github.com/dartondox/dox-mysql-native">dartondox/dox-mysql-native</a>.</p>
+<h3 id="options">Options</h3>
+<p>The driver reads <code>host</code>, <code>port</code>, <code>user</code>, <code>password</code>, <code>database</code> and <code>useSSL</code> of the <code>ConnectionConfig</code>, and these keys from <code>extra</code>:</p>
 <table>
 <thead>
 <tr>
@@ -7465,184 +7368,193 @@
 <tbody>
 <tr>
 <td><code>maxConnectionCount</code></td>
-<td><code>10</code></td>
-<td>Most connections in the pool.</td>
+<td>10</td>
+<td>Most connections in the pool, for the whole process.</td>
 </tr>
 <tr>
 <td><code>requestTimeout</code></td>
 <td>300 s</td>
-<td>The longest wait for one request.</td>
+<td>The longest time for one request.</td>
 </tr>
 <tr>
 <td><code>maxConnectionAge</code></td>
 <td>12 hours</td>
-<td>A connection older than this is closed once it has no query.</td>
+<td>Close a connection older than this, when it has no query.</td>
 </tr>
 <tr>
 <td><code>idleTimeout</code></td>
 <td>12 hours</td>
-<td>A connection with no traffic for this long is closed.</td>
+<td>Close a connection with no traffic for this long.</td>
 </tr>
 <tr>
 <td><code>serverKill</code></td>
-<td><code>true</code></td>
-<td>Stop a cancelled or timed out query on the server with <code>KILL</code>.</td>
+<td>true</td>
+<td>Stop a cancelled or timed out query on the server with <code>KILL QUERY</code>.</td>
 </tr>
 <tr>
 <td><code>preparedStatementCacheSize</code></td>
-<td><code>100</code></td>
+<td>100</td>
 <td>Prepared statements kept per connection.</td>
 </tr>
 <tr>
 <td><code>verifyCertificate</code></td>
-<td><code>true</code></td>
-<td>With <code>useSSL</code>, TLS checks the server certificate. Set it to <code>false</code> only for a self-signed certificate in development.</td>
+<td>true</td>
+<td>With <code>useSSL</code>, check the server certificate. Set false only for a self-signed certificate in development.</td>
 </tr>
 </tbody>
 </table>
-<p>The pool settings are explained in <a href="../#pool-settings">Pool settings</a>.</p>
-<p>Isolates that open a pool with the same settings share one pool in Rust. So <code>maxConnectionCount</code> is for the whole process, not per isolate.</p>
+<p>See <a href="../#pool-settings">Pool settings</a>. The connection uses utf8mb4. A login with sha256_password does not work. The default caching_sha2_password and mysql_native_password work.</p>
 <h3 id="behind-a-proxy">Behind a proxy</h3>
-<p>When a query is cancelled or times out, the driver sends <code>KILL QUERY</code> on a new connection, so the server stops it. Behind a proxy or a load balancer, like ProxySQL or a cloud endpoint over many servers, that new connection may reach another server.</p>
-<p>The driver checks that both connections name the same server, and it sends no <code>KILL</code> (and prints a warning) if they do not. But behind a proxy with its own connection ids, like ProxySQL, you should set <code>serverKill</code> to <code>false</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'serverKill'</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">},</span>
+<p>A cancelled query gets a <code>KILL QUERY</code> on a new connection. Behind a proxy with its own connection ids, like ProxySQL, that connection can reach another server. Turn it off there:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'serverKill'</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">},</span>
 </span></code></pre></div>
-<p>Then a cancelled query fails in Dart at once, but it runs to its end on the server. A timed out query only has its socket closed.</p>
-<h2 id="using-the-pool-without-the-orm">Using the pool without the ORM</h2>
-<p>If you do not use the ORM, open a <code>MysqlNativePool</code> and run queries on it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'app'</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">);</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = ?'</span><span class="p">,</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">],</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="p">);</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
+<p>Then a cancelled query fails in Dart at once, but it runs to its end on the server. In <code>DATABASE_URL</code>, use <code>?serverKill=false</code>.</p>
+<h2 id="when-the-library-does-not-load">When the library does not load</h2>
+<p>If the native library does not load, <code>SqlQueryBuilder.initializeWithDatabaseConfig</code> throws an <code>UnsupportedError</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dox_mysql_native did not load: &lt;reason&gt;.
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Dox needs it to talk to MySQL. Fix: run the app with `dart run` or `dart build cli`. ...
 </span></code></pre></div>
-<p><code>parameters</code> is a list for <code>?</code>, or a map for <code>@name</code>. A write gives you the new id and the changed row count:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">'INSERT INTO users (name) VALUES (@name)'</span><span class="p">,</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">);</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">insertId</span><span class="p">);</span><span class="w"> </span><span class="c1">// the new AUTO_INCREMENT id</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">affectedRows</span><span class="p">);</span><span class="w"> </span><span class="c1">// 1</span>
-</span></code></pre></div>
-<h3 id="transactions">Transactions</h3>
-<p>A transaction runs on one connection, and its queries run in the order you send them. <code>execute</code> is like <code>query</code>, but the rows are not sent back to Dart:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'UPDATE users SET name = ?'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'Cy'</span><span class="p">],</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
-</span></code></pre></div>
-<h3 id="pool-settings">Pool settings</h3>
-<p>All pool settings are optional. Pass them to <code>MysqlNativePool.open</code>, with a <code>Duration</code> for each time:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'app'</span><span class="p">,</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nl">requestTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nl">maxConnectionAge:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="nl">serverKill:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>They work like the <a href="../#pool-settings">ORM pool settings</a>. In <code>MysqlNativePool.open</code>, <code>maxConnectionAge</code> has no limit by default. In the ORM config, the default is 12 hours.</p>
-<h3 id="cancelling-a-query">Cancelling a query</h3>
-<p>Sometimes a query takes too long and you want to stop it. Pass a <code>MysqlCancelToken</code> and call <code>cancel()</code>. <code>query</code>, <code>execute</code> and <code>stream</code> all take <code>cancelToken</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">MysqlCancelToken</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlCancelToken</span><span class="p">();</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">MysqlNativeResult</span><span class="o">&gt;</span><span class="w"> </span><span class="n">slow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'SELECT SLEEP(10)'</span><span class="p">,</span><span class="w"> </span><span class="nl">cancelToken:</span><span class="w"> </span><span class="n">token</span><span class="p">);</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">token</span><span class="p">.</span><span class="n">cancel</span><span class="p">();</span><span class="w"> </span><span class="c1">// slow fails with MysqlQueryCancelledException</span>
-</span></code></pre></div>
-<p>If the query has not started, it does not run. If it is running, the driver sends <code>KILL QUERY</code> so the server stops it (see <code>serverKill</code>). If it already ended, nothing changes. In the ORM, use <a href="../query-builder/#cancelling-a-query"><code>cancelWith()</code></a>.</p>
-<h3 id="streaming-rows">Streaming rows</h3>
-<p>For a big result, you do not want all rows in memory at once. <code>stream</code> gives the rows in chunks of up to <code>chunkSize</code> rows:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">await</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">chunk</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">stream</span><span class="p">(</span><span class="s1">'SELECT * FROM logs'</span><span class="p">,</span><span class="w"> </span><span class="nl">chunkSize:</span><span class="w"> </span><span class="m">1000</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">.</span><span class="n">rows</span><span class="p">.</span><span class="n">length</span><span class="p">);</span><span class="w"> </span><span class="c1">// up to 1000</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>Rust reads at most 2 chunks ahead of your listener, so a big result does not fill the memory. Stop listening (<code>break</code> in <code>await for</code>) to stop the query. Do not pause a stream for longer than the server's <code>net_write_timeout</code> (60 s by default), because the server then stops the connection. In the ORM, use <a href="../query-builder/#streaming-results"><code>cursor()</code></a>.</p>
+<p>To fix it:</p>
+<ul>
+<li>Run the app with <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>, because they run the build hook. <code>dart compile exe</code> does not.</li>
+<li>Or install <a href="https://rustup.rs">Rust</a>. The build hook then builds the library from source.</li>
+<li>If you set <code>lib_path</code> in <code>pubspec.yaml</code>, check that the file is there and fits your system.</li>
+</ul>
+<p><code>MysqlNativePool.isAvailable</code> tells you if the library loaded, and <code>MysqlNativePool.loadError</code> gives the reason.</p>
 <h2 id="types">Types</h2>
 <p>Rows come back with these Dart types:</p>
 <table>
 <thead>
 <tr>
-<th>MySQL / MariaDB</th>
+<th>MySQL, MariaDB</th>
 <th>Dart</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>TINYINT(1)</code> (<code>boolean()</code>)</td>
+<td>TINYINT(1) (<code>boolean()</code>)</td>
 <td><code>bool</code></td>
 </tr>
 <tr>
-<td><code>TINYINT</code>, <code>SMALLINT</code>, <code>INT</code>, <code>BIGINT</code>, <code>YEAR</code></td>
+<td>TINYINT, SMALLINT, INT, BIGINT, YEAR</td>
 <td><code>int</code></td>
 </tr>
 <tr>
-<td><code>FLOAT</code>, <code>DOUBLE</code>, <code>DECIMAL</code></td>
+<td>FLOAT, DOUBLE, DECIMAL</td>
 <td><code>double</code></td>
 </tr>
 <tr>
-<td><code>CHAR</code>, <code>VARCHAR</code>, <code>TEXT</code>, <code>ENUM</code></td>
+<td>CHAR, VARCHAR, TEXT, ENUM</td>
 <td><code>String</code></td>
 </tr>
 <tr>
-<td><code>DATE</code>, <code>DATETIME</code>, <code>TIMESTAMP</code></td>
+<td>DATE, DATETIME, TIMESTAMP</td>
 <td><code>DateTime</code> in UTC</td>
 </tr>
 <tr>
-<td><code>TIME</code></td>
-<td><code>String</code>, like <code>12:34:56</code></td>
+<td>TIME</td>
+<td><code>String</code>, like 12:34:56</td>
 </tr>
 <tr>
-<td><code>JSON</code></td>
+<td>JSON</td>
 <td>the decoded JSON value</td>
 </tr>
 <tr>
-<td><code>BLOB</code>, <code>BINARY</code>, <code>VARBINARY</code></td>
+<td>BLOB, BINARY, VARBINARY</td>
 <td><code>Uint8List</code></td>
 </tr>
 <tr>
-<td><code>NULL</code></td>
-<td><code>null</code></td>
+<td>NULL</td>
+<td>null</td>
 </tr>
 </tbody>
 </table>
-<p>MariaDB keeps <code>JSON</code> columns as <code>LONGTEXT</code>. So on MariaDB, <code>TEXT</code> that holds a JSON object or array comes back decoded.</p>
+<p>MariaDB keeps JSON columns as LONGTEXT. So on MariaDB, TEXT that holds a JSON object or array comes back decoded.</p>
 <h2 id="handling-errors">Handling errors</h2>
-<p>Every error throws <code>MysqlException</code>. For an error from the server, <code>code</code> is the MySQL error number, like <code>1062</code> for a duplicate key, so you can check for the error you expect:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">insert</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">email</span><span class="p">});</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">MysqlException</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1062</span><span class="p">)</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">'taken'</span><span class="p">);</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">}</span>
+<p>Every error throws a <code>MysqlException</code>. For a server error, <code>code</code> is the MySQL error number, like 1062 for a duplicate key:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">)</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">      </span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">email</span><span class="p">});</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">MysqlException</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1062</span><span class="p">)</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">'taken'</span><span class="p">);</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>sqlState</code> is the 5 letter SQLSTATE. For other errors, like the server is down, both <code>code</code> and <code>sqlState</code> are null. <code>MysqlException</code> comes from <code>package:dox_orm/dox_orm.dart</code>.</p>
-<h2 id="details">Details</h2>
-<p>This section is for special cases. Most apps do not need it.</p>
-<h3 id="limits">Limits</h3>
+<p><code>sqlState</code> is the 5 letter SQLSTATE. For other errors, like a down server, both are null. A cancelled query throws a <code>MysqlQueryCancelledException</code>. They come from <code>package:dox_orm/dox_orm.dart</code>.</p>
+<h2 id="without-dox">Without Dox</h2>
+<h3 id="opening-a-pool">Opening a pool</h3>
+<p><code>MysqlNativePool.open</code> opens a pool. <code>query</code> returns a <code>MysqlNativeResult</code> with <code>columns</code> and <code>rows</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'app'</span><span class="p">,</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">);</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = ?'</span><span class="p">,</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">],</span>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="p">);</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
+</span></code></pre></div>
+<p><code>parameters</code> is a list for <code>?</code>, or a map for <code>@name</code>. A write also gives the new id and the changed row count:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">insert</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="s1">'INSERT INTO users (name) VALUES (@name)'</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">);</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">insertId</span><span class="p">);</span><span class="w">     </span><span class="c1">// the new AUTO_INCREMENT id</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="n">print</span><span class="p">(</span><span class="n">insert</span><span class="p">.</span><span class="n">affectedRows</span><span class="p">);</span><span class="w"> </span><span class="c1">// 1</span>
+</span></code></pre></div>
+<h3 id="pool-settings">Pool settings</h3>
+<p><code>open</code> also takes <code>port</code> (3306), <code>maxConnections</code> (10), <code>secure</code> (TLS), <code>verifyCertificate</code>, <code>sslRootCert</code>, <code>statementCacheSize</code> (32), <code>requestTimeout</code>, <code>maxConnectionAge</code>, <code>idleTimeout</code> and <code>serverKill</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'root'</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'password'</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'app'</span><span class="p">,</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">  </span><span class="nl">secure:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nl">sslRootCert:</span><span class="w"> </span><span class="s1">'/etc/ssl/certs/db-ca.pem'</span><span class="p">,</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="nl">requestTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>A host that starts with <code>/</code> is a Unix socket file. Here <code>maxConnectionAge</code> has no limit by default.</p>
+<h3 id="pool-from-a-url">Pool from a url</h3>
+<p><code>MysqlNativePool.fromUrl</code> takes a url with the mysql_async options, like <code>?pool_max=20</code>. The kill option there is <code>server_kill</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">fromUrl</span><span class="p">(</span><span class="s1">'mysql://root:password@localhost:3306/app'</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="transactions">Transactions</h3>
+<p><code>begin</code> gives a transaction id. <code>execute</code> is like <code>query</code>, but it sends no rows back:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">'UPDATE users SET name = ?'</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'Cy'</span><span class="p">],</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
+</span></code></pre></div>
+<h3 id="cancelling-a-query">Cancelling a query</h3>
+<p>Pass a <code>MysqlCancelToken</code> to <code>query</code>, <code>execute</code> or <code>stream</code>, and call <code>cancel()</code>. <code>isCancelled</code> is true after it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">MysqlCancelToken</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlCancelToken</span><span class="p">();</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">MysqlNativeResult</span><span class="o">&gt;</span><span class="w"> </span><span class="n">slow</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'SELECT SLEEP(10)'</span><span class="p">,</span><span class="w"> </span><span class="nl">cancelToken:</span><span class="w"> </span><span class="n">token</span><span class="p">);</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="n">token</span><span class="p">.</span><span class="n">cancel</span><span class="p">();</span><span class="w"> </span><span class="c1">// slow fails with MysqlQueryCancelledException</span>
+</span></code></pre></div>
+<p>In the ORM, use <a href="../query-builder/#cancelling-a-query"><code>cancelWith()</code></a>.</p>
+<h3 id="streaming-rows">Streaming rows</h3>
+<p><code>stream</code> gives the rows in chunks of up to <code>chunkSize</code> rows. Rust reads at most 2 chunks ahead:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">MysqlNativeResult</span><span class="w"> </span><span class="n">chunk</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">    </span><span class="k">in</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">stream</span><span class="p">(</span><span class="s1">'SELECT * FROM logs'</span><span class="p">,</span><span class="w"> </span><span class="nl">chunkSize:</span><span class="w"> </span><span class="m">1000</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">.</span><span class="n">rows</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Stop the loop with <code>break</code> to stop the query. Do not pause a stream for longer than the <code>net_write_timeout</code> of the server (60 s by default). In the ORM, use <a href="../query-builder/#streaming-results"><code>cursor()</code></a>.</p>
+<h3 id="sharing-and-closing-a-pool">Sharing and closing a pool</h3>
+<p><code>pool.handle</code> works in every isolate of the process. Open the same pool there with <code>MysqlNativePool.fromHandle(handle)</code>. <code>close()</code> gives back one open, and the last close closes the pool:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">MysqlNativePool</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MysqlNativePool</span><span class="p">.</span><span class="n">fromHandle</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">handle</span><span class="p">);</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">pool</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>The <code>timeZone</code>, <code>collation</code>, <code>serverPublicKey</code> and <code>timeoutMs</code> keys are not read. The connection uses <code>utf8mb4</code>.</li>
-<li>A login with <code>sha256_password</code> (not the default) does not work. The default <code>caching_sha2_password</code> and <code>mysql_native_password</code> work.</li>
-</ul>
-<h3 id="other-cases">Other cases</h3>
-<ul>
-<li>A <code>driverFactory</code> on the connection wins over the native driver: the ORM uses your driver.</li>
-<li>You can give <code>driver.pool.handle</code> (an <code>int</code>) to another isolate and use <code>MysqlNativeDriver(MysqlNativePool.fromHandle(handle))</code> there. <code>MysqlNativeDriver</code> comes from <code>package:dox_orm/dox_orm.dart</code>.</li>
-<li>A <code>CREATE</code>, <code>ALTER</code>, <code>RENAME</code> or <code>DROP</code> makes every connection prepare its statements again. So run <code>CREATE TEMP TABLE</code> or <code>DROP</code> once at start up, not on every request.</li>
-<li><code>maxConnectionAge</code> is a real age, also for a busy connection. <code>idleTimeout</code> and <code>maxConnectionAge</code> never close a connection that runs a query.</li>
-<li>In the url of <code>MysqlNativePool.fromUrl</code>, the option is <code>server_kill</code>. In <code>DATABASE_URL</code> of the ORM, use <code>?serverKill=false</code>.</li>
-<li>With <code>serverKill</code> on, each connection reads the server name once after login (<code>@@server_uuid</code>, on MariaDB the hostname, port and <code>server_id</code>). This small query shows in the general log and the audit log of the server. Two servers with the same <code>server_uuid</code> (for example a copied data folder) still look like one server.</li>
-<li>The <code>KILL</code> connection counts for <code>max_user_connections</code>. A <code>KILL</code> that fails prints a warning on stderr.</li>
-<li>In a transaction, the next queries wait until the <code>KILL</code> has its answer, so it can only stop the cancelled query. When more queries wait on the same connection, the cancelled one runs to its end instead, and its rows are dropped. A connection that got a <code>KILL QUERY</code> closes once it has no query. Inside a transaction it stays, and the transaction goes on.</li>
-<li>A stream reads rows as they come, and a paused listener stops the reading. Stopping a stream sends <code>KILL QUERY</code> and closes the connection. Outside a transaction, a stream gets a connection of its own. Pass <code>transaction:</code> to stream inside a transaction.</li>
-<li>Speed: a find-by-id query takes about 65 µs alone, and about 10 µs each with 32 queries in flight (AOT build, local MySQL 8.4 or MariaDB 11, Apple M-series). See <a href="../../digging-deeper/performance/#database-drivers">Performance: database drivers</a>.</li>
-<li>If you see a problem, please <a href="https://github.com/dartondox/dox-mysql-native/issues">open an issue</a>.</li>
+<li><a href="../">Database</a>: connections and settings.</li>
+<li><a href="../postgres-native/">Native Postgres driver</a>: the Postgres driver.</li>
+<li><a href="../../digging-deeper/performance/#database-drivers">Performance: database drivers</a>: driver speed.</li>
 </ul>
 
 
@@ -7763,7 +7675,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

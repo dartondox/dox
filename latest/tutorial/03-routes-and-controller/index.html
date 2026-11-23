@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1032,10 +1034,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -5188,10 +5190,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5317,95 +5315,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7169,10 +7078,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -7196,11 +7105,6 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/03-routes-and-controller.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
@@ -7210,7 +7114,7 @@
 <p>A controller holds the code that answers a request. Make one for posts:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:controller<span class="w"> </span>Post<span class="w"> </span>-r
 </span></code></pre></div>
-<p><code>-r</code> makes a resource controller with the seven CRUD methods. You only need three of them now, so replace the file with this:</p>
+<p>The <code>-r</code> flag makes a resource controller with seven methods. You need three now, so replace the file with this:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/post.controller.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/models/post/post.model.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -7242,14 +7146,14 @@
 </span></code></pre></div>
 <p>What the code does:</p>
 <ul>
-<li><code>@Inject()</code> puts the controller in the container, so Dox can make it for you. The code generator adds it to <code>lib/generated/container.g.dart</code>, and a new project already uses that file. So you change nothing else.</li>
-<li>When a method returns a model or a list of models, Dox sends it as JSON.</li>
-<li><code>response(post).statusCode(201)</code> sets the status code.</li>
-<li><code>show(int id)</code> gets the <code>{id}</code> from the URL. <code>/api/posts/abc</code> answers <code>404</code>, because <code>abc</code> is not an <code>int</code>.</li>
-<li><code>req.input('title')</code> reads the input without any check. You add checks in <a href="../04-validation/">step 4</a>.</li>
+<li><code>@Inject()</code> puts the controller in the container. The code generator adds it to <code>lib/generated/container.g.dart</code>, and a new project uses that file.</li>
+<li>A model or a list of models goes back as JSON.</li>
+<li><code>statusCode</code> sets the status code.</li>
+<li><code>show(int id)</code> gets the id from the URL. A path like <code>/api/posts/abc</code> gets 404, because abc is not an integer.</li>
+<li><code>input</code> reads the input with no check. You add checks in <a href="../04-validation/">step 4</a>.</li>
 </ul>
 <h2 id="2-add-the-routes">2. Add the routes</h2>
-<p>Routes connect a URL to a controller method. Open <code>lib/routes/api.dart</code> and add <code>Route.resource</code>:</p>
+<p>Open <code>lib/routes/api.dart</code> and add <code>Route.resource</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/http/controllers/api.controller.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:blog/app/http/controllers/post.controller.dart'</span><span class="p">;</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7269,7 +7173,7 @@
 </span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>Route.resource</code> makes one route for each method the controller has:</p>
+<p>It makes one route for each method of the controller:</p>
 <table>
 <thead>
 <tr>
@@ -7296,19 +7200,19 @@
 </tr>
 </tbody>
 </table>
-<p>The controller has no <code>update</code> or <code>destroy</code> yet, so those routes are not made. You do not need to register the router anywhere, because Dox finds every <code>Router</code> class by itself.</p>
+<p>Dox finds each router class, so you do not register it.</p>
 <h2 id="3-start-the-server">3. Start the server</h2>
-<p>If the server is not running, start it:</p>
+<p>If the server is off, start it:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>dox<span class="w"> </span>s
 </span></code></pre></div>
-<p>If it is already running, it restarts by itself when you save a file.</p>
+<p>If it is on, it restarts when you save a file.</p>
 <h2 id="check-it">Check it</h2>
 <p>Make a post:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span>http://localhost:3000/api/posts<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>-H<span class="w"> </span><span class="s1">'Content-Type: application/json'</span><span class="w"> </span><span class="se">\</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"title":"Hello Dox","body":"My first post."}'</span>
 </span></code></pre></div>
-<p>You should get <code>201</code> and the new post:</p>
+<p>You get 201 and the new post:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>HTTP/1.1 201 Created
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>content-type: application/json; charset=utf-8
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>...
@@ -7325,7 +7229,7 @@
 </span></code></pre></div>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">{</span><span class="nt">"id"</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span><span class="nt">"title"</span><span class="p">:</span><span class="s2">"Hello Dox"</span><span class="p">,</span><span class="nt">"body"</span><span class="p">:</span><span class="s2">"My first post."</span><span class="p">,</span><span class="nt">"created_at"</span><span class="p">:</span><span class="s2">"2026-10-22T13:58:14.062215Z"</span><span class="p">,</span><span class="nt">"updated_at"</span><span class="p">:</span><span class="s2">"2026-10-22T13:58:14.062215Z"</span><span class="p">}</span>
 </span></code></pre></div>
-<p>Ask for a post that does not exist. You should get <code>404</code>:</p>
+<p>Ask for a post that does not exist. You get 404:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/api/posts/99
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>HTTP/1.1 404 Not Found
@@ -7333,8 +7237,10 @@
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
 </span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>{"code":"not_found","message":"Not Found"}
 </span></code></pre></div>
-<h2 id="next">Next</h2>
-<p><a href="../04-validation/">Step 4: Validation</a></p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../04-validation/">Step 4: Validation</a>: check the input of a post.</li>
+</ul>
 
 
 
@@ -7454,7 +7360,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

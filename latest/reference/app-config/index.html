@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6762,6 +6671,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7344,6 +7264,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7361,17 +7292,12 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/app-config.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="app-config">App config</h1>
 <p>This page lists every field of <code>AppConfig</code>, with its type, its default and what it does.</p>
-<p><code>AppConfig</code> is the one object you give to <code>Dox().initialize()</code>. It lives in <code>lib/config/app.dart</code>. Every field has a default except <code>appKey</code>, so you only set what you want to change. A full example is at the <a href="#full-example">end of the page</a>.</p>
+<p>You give <code>AppConfig</code> to <code>Dox().initialize()</code> in <code>lib/config/app.dart</code>. Each field has a default except <code>appKey</code>. See the <a href="#full-example">full example</a>.</p>
 <h2 id="server">Server</h2>
 <table>
 <thead>
@@ -7390,6 +7316,12 @@
 <td>Encrypts cookies and signs local storage URLs. It must be exactly 32 characters. Make one with <code>dox key:generate</code>. In production a bad key stops the app at start, see <a href="../env/#read-by-the-framework"><code>APP_ENV</code></a>.</td>
 </tr>
 <tr>
+<td><code>previousKeys</code></td>
+<td><code>List&lt;String&gt;</code></td>
+<td><code>[]</code></td>
+<td>Old app keys. Dox can still read data that was encrypted with them. New data uses <code>appKey</code> only. See <a href="../../security/encryption/#change-the-key-key-rotation">Rotating the key</a>.</td>
+</tr>
+<tr>
 <td><code>serverPort</code></td>
 <td><code>int</code></td>
 <td><code>3000</code></td>
@@ -7405,13 +7337,19 @@
 <td><code>totalIsolate</code></td>
 <td><code>int?</code></td>
 <td>the CPUs the container allows</td>
-<td>How many isolates (threads) serve HTTP, all on the same port. The default is the number of CPUs this process may use. It respects the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one.</td>
+<td>How many isolates serve HTTP, all on the same port. The default is the number of CPUs this process can use, with the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one.</td>
+</tr>
+<tr>
+<td><code>computeWorkers</code></td>
+<td><code>int</code></td>
+<td><code>AppConfig.defaultComputeWorkers</code> (4)</td>
+<td>How many worker isolates run <code>Dox().compute</code>, <code>Hash.makeAsync</code> and <code>Hash.verifyAsync</code>, in one pool for the process. It must be 1 or more. See <a href="../../digging-deeper/isolate/#heavy-cpu-work">Heavy CPU work</a>.</td>
 </tr>
 <tr>
 <td><code>compress</code></td>
 <td><code>bool</code></td>
 <td><code>false</code></td>
-<td>gzip the responses. It costs CPU on every response, so let a proxy do it when you have one.</td>
+<td>gzip the responses, but not streamed responses. It costs CPU on each response, so let a proxy do it if you have one.</td>
 </tr>
 <tr>
 <td><code>maxBodySize</code></td>
@@ -7441,7 +7379,7 @@
 <td><code>maxConnections</code></td>
 <td><code>int?</code></td>
 <td><code>null</code> (no limit)</td>
-<td>The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue until a connection closes. The whole app holds up to <code>maxConnections * totalIsolate</code>, so keep that below <code>ulimit -n</code>.</td>
+<td>The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue. The app holds up to <code>maxConnections * totalIsolate</code>, so keep that below <code>ulimit -n</code>.</td>
 </tr>
 <tr>
 <td><code>http2</code></td>
@@ -7465,7 +7403,13 @@
 <td><code>trustedProxies</code></td>
 <td><code>List&lt;String&gt;</code></td>
 <td><code>[]</code></td>
-<td>IPs or CIDR ranges of your reverse proxies. Dox reads <code>X-Forwarded-For</code> (for <code>req.ip()</code>) and <code>X-Forwarded-Proto</code> (for <code>req.scheme()</code>) only from these. <code>['*']</code> trusts any direct client.</td>
+<td>IPs or CIDR ranges of your reverse proxies. Dox reads <code>X-Forwarded-For</code> (for <code>req.ip()</code>) and <code>X-Forwarded-Proto</code> (for <code>req.scheme()</code>) only from these. <code>['*']</code> trusts any direct client, but only the last hop. Use it only when the app port is not open to the outside.</td>
+</tr>
+<tr>
+<td><code>isDevelopment</code></td>
+<td><code>bool</code> (getter)</td>
+<td></td>
+<td>True when <code>APP_ENV</code> is development. It reads the env at each call, so it works before the server starts. Use it in config, like a database <code>debug</code> flag.</td>
 </tr>
 </tbody>
 </table>
@@ -7544,7 +7488,7 @@
 <td><code>webSocketAllowedOrigins</code></td>
 <td><code>List&lt;String&gt;?</code></td>
 <td><code>null</code> (no check)</td>
-<td>Checks the <code>Origin</code> of every <code>Route.websocket</code> route. Only the same host and the listed sites, like <code>https://app.example.com</code>, can open a socket. Others get <code>403</code>. <code>[]</code> means the same host only. With <code>null</code>, any website can open a socket with the user's cookies, and Dox prints a warning at start.</td>
+<td>Checks the <code>Origin</code> of each <code>Route.websocket</code> route. Only the same host and the listed sites, like <code>https://app.example.com</code>, can open a socket. Others get <code>403</code>. <code>[]</code> means the same host only. With <code>null</code>, any website can open a socket with the cookies of the user. The <code>allowedOrigins</code> of a route wins.</td>
 </tr>
 </tbody>
 </table>
@@ -7590,6 +7534,12 @@
 <td><code>/docs</code>, <code>/openapi.json</code> and <code>/openapi.yaml</code>. See <a href="#openapiconfig">OpenApiConfig</a>.</td>
 </tr>
 <tr>
+<td><code>strict</code></td>
+<td><code>StrictConfig</code></td>
+<td><code>StrictConfig()</code> (off)</td>
+<td>Warnings for code that blocks the server, for development. <code>enabled</code> turns it on. <code>blockLimit</code> is how long code can block an isolate before a warning, <code>StrictConfig.defaultBlockLimit</code> (50 ms) by default. See <a href="../../digging-deeper/performance-mistakes/#let-dox-warn-you">Let Dox warn you</a>.</td>
+</tr>
+<tr>
 <td><code>flags</code></td>
 <td><code>CoreFlags</code></td>
 <td><code>CoreFlags()</code> (all off)</td>
@@ -7598,7 +7548,7 @@
 </tbody>
 </table>
 <h2 id="core-flags">Core flags</h2>
-<p><code>CoreFlags</code> turns on extra behaviors. Every flag is off by default, so you turn on only the ones you want:</p>
+<p><code>CoreFlags</code> turns on extra behaviors. Each flag is off by default:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">CoreFlags</span><span class="p">(</span><span class="nl">onlyPresent:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">cookieDefaults:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
@@ -7659,7 +7609,7 @@
 </table>
 <p>The cache has its own flag class, <code>CacheFlags</code>, in <a href="#cacheconfig"><code>CacheConfig</code></a>.</p>
 <h2 id="corsconfig">CORSConfig</h2>
-<p>A value can be a <code>String</code> (<code>'*'</code> or a comma list) or a <code>List&lt;String&gt;</code>. A <code>null</code> value sends no header. Because every value is <code>null</code> by default, you must set at least <code>origin</code>.</p>
+<p>A value can be a string (<code>'*'</code> or a comma list) or a list of strings. A null value sends no header, so set at least <code>origin</code>.</p>
 <table>
 <thead>
 <tr>
@@ -7704,7 +7654,7 @@
 <td><code>credentials</code></td>
 <td><code>bool?</code></td>
 <td><code>null</code></td>
-<td><code>Access-Control-Allow-Credentials</code></td>
+<td><code>Access-Control-Allow-Credentials</code>. Browsers refuse it with origin <code>'*'</code>, so list your sites in <code>origin</code>.</td>
 </tr>
 <tr>
 <td><code>maxAge</code></td>
@@ -7747,11 +7697,11 @@
 <td><code>level</code></td>
 <td><code>String</code></td>
 <td><code>'info'</code></td>
-<td>The lowest level to print: <code>debug</code>, <code>info</code>, <code>warn</code> or <code>error</code>.</td>
+<td>The lowest level to print: <code>debug</code>, <code>info</code>, <code>warn</code> or <code>error</code>. <code>success</code> counts as info, and <code>danger</code> as error.</td>
 </tr>
 </tbody>
 </table>
-<p>Your own lines get the tag <code>[app]</code>. To use another tag, pass it as the third argument. <code>log</code>, <code>info</code>, <code>warn</code>, <code>success</code> and <code>danger</code> all take it:</p>
+<p>Your own lines get the tag <code>[app]</code>. To use another tag, give it as the third argument of <code>log</code>, <code>info</code>, <code>warn</code>, <code>success</code> or <code>danger</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Logger</span><span class="p">.</span><span class="n">info</span><span class="p">(</span><span class="s1">'invoice sent'</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="s1">'billing'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>In JSON mode the tag is the <code>source</code> field. Plain warnings on stderr use the same tags.</p>
@@ -7783,6 +7733,12 @@
 <td><code>CacheFlags</code></td>
 <td><code>CacheFlags()</code> (all off)</td>
 <td>Opt-in cache behaviors. See below.</td>
+</tr>
+<tr>
+<td><code>encrypter</code></td>
+<td><code>CacheEncrypter?</code></td>
+<td><code>null</code></td>
+<td>Encrypts stores with <code>'encrypt': true</code>. Dox sets it. You need it only <a href="../../digging-deeper/cache/#encryption-without-dox">without Dox</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -7824,14 +7780,21 @@
 <td><code>driver</code></td>
 <td><code>String</code></td>
 <td>required</td>
-<td><code>file</code>, <code>memory</code>, <code>redis</code> or <code>null</code></td>
+<td><code>file</code>, <code>memory</code>, <code>redis</code>, <code>database</code> or <code>null</code></td>
 </tr>
 <tr>
 <td>all</td>
 <td><code>prefix</code></td>
 <td><code>String</code></td>
-<td><code>dox_cache:</code></td>
-<td>Text in front of every key.</td>
+<td><code>dox_cache:</code> (<code>&lt;app name&gt;_cache:</code> on Redis)</td>
+<td>Text in front of each key.</td>
+</tr>
+<tr>
+<td><code>file</code>, <code>redis</code>, <code>database</code></td>
+<td><code>encrypt</code></td>
+<td><code>bool</code></td>
+<td><code>false</code></td>
+<td>Encrypt the values with the app key.</td>
 </tr>
 <tr>
 <td><code>file</code></td>
@@ -7909,6 +7872,27 @@
 <td><code>int</code></td>
 <td><code>10</code></td>
 <td>Most connections per store.</td>
+</tr>
+<tr>
+<td><code>redis</code></td>
+<td><code>max_value_bytes</code></td>
+<td><code>int</code></td>
+<td>no limit</td>
+<td>Biggest value in bytes.</td>
+</tr>
+<tr>
+<td><code>redis</code></td>
+<td><code>options</code></td>
+<td><code>RedisOptions</code></td>
+<td>none</td>
+<td>All client options. See <a href="../../digging-deeper/cache/#redis-options">Redis options</a>.</td>
+</tr>
+<tr>
+<td><code>database</code></td>
+<td><code>table</code>, <code>connection</code>, <code>prune_interval</code></td>
+<td></td>
+<td></td>
+<td>See <a href="../../digging-deeper/cache/#database-store">Database store</a>.</td>
 </tr>
 </tbody>
 </table>
@@ -8800,7 +8784,7 @@
 </span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">  </span><span class="nl">maxAge:</span><span class="w"> </span><span class="m">90</span><span class="p">,</span>
 </span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Do not use <code>origin: '*'</code> together with <code>credentials: true</code>, because the browser refuses that pair and the call fails. <code>'*'</code> is fine for a public API without credentials.</p>
+<p>Do not use <code>origin: '*'</code> with <code>credentials: true</code>, because the browser refuses that pair.</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
@@ -8820,7 +8804,13 @@
 </span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>A new project also has <code>lib/config/storage.dart</code>, <code>queue.dart</code> and <code>schedule.dart</code>, with a provider for each in <code>lib/providers/</code>. See <a href="../../digging-deeper/file-storage/">File storage</a>, <a href="../../digging-deeper/queue/">Queue</a> and <a href="../../digging-deeper/scheduler/">Scheduler</a>.</p>
-<p>A new project has no <code>openapi.dart</code>, <code>socketio.dart</code> or auth provider. You add them when you need them. See <a href="../../packages/openapi/">OpenAPI</a>, <a href="../../packages/socketio/">Socket.IO</a> and <a href="../../security/authentication/">Authentication</a>.</p>
+<p>A new project has no <code>openapi.dart</code>, <code>socketio.dart</code> or auth provider. See <a href="../../packages/openapi/">OpenAPI</a>, <a href="../../packages/socketio/">Socket.IO</a> and <a href="../../security/authentication/">Authentication</a>.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../env/">Environment variables</a>: the env keys that fill the config.</li>
+<li><a href="../../the-basic/dependency-injection/">Dependency injection</a>: the container, routers and providers.</li>
+<li><a href="../../digging-deeper/deployment/">Deployment</a>: the server settings in production.</li>
+</ul>
 
 
 
@@ -8940,7 +8930,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A session keeps data for one browser across many requests, so you can remember things like the logged in user or a shopping cart.">
+        <meta name="description" content="A session keeps data for one browser across many requests, like the logged in user or a shopping cart.">
       
       
       
@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -81,7 +83,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Session | Dox">
-  <meta property="og:description" content="A session keeps data for one browser across many requests, so you can remember things like the logged in user or a shopping cart.">
+  <meta property="og:description" content="A session keeps data for one browser across many requests, like the logged in user or a shopping cart.">
   <meta property="og:url" content="https://dartondox.dev/latest/the-basic/session/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +92,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Session | Dox">
-  <meta name="twitter:description" content="A session keeps data for one browser across many requests, so you can remember things like the logged in user or a shopping cart.">
+  <meta name="twitter:description" content="A session keeps data for one browser across many requests, like the logged in user or a shopping cart.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1907,6 +1909,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drivers
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -1988,6 +2001,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Flash data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keeping-flash-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keeping flash data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -2013,6 +2043,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#csrf-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSRF token
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#validation-errors-and-old-input" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2021,36 +2062,14 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-a-driver" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choosing a driver
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Choosing a driver">
+    <nav class="md-nav" aria-label="Validation errors and old input">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#the-cookie-driver" class="md-nav__link">
+  <a href="#flash-errors-yourself" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The cookie driver
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#the-cache-driver" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The cache driver
+        Flash errors yourself
       
     </span>
   </a>
@@ -2059,6 +2078,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session without a request
+      
+    </span>
+  </a>
   
 </li>
       
@@ -2074,41 +2104,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#all-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        All options
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5357,10 +5359,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5486,95 +5484,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7316,6 +7225,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#drivers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drivers
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7397,6 +7317,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Flash data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#keeping-flash-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Keeping flash data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -7422,6 +7359,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#csrf-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CSRF token
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#validation-errors-and-old-input" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7430,36 +7378,14 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#choosing-a-driver" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Choosing a driver
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Choosing a driver">
+    <nav class="md-nav" aria-label="Validation errors and old input">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#the-cookie-driver" class="md-nav__link">
+  <a href="#flash-errors-yourself" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The cookie driver
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#the-cache-driver" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The cache driver
+        Flash errors yourself
       
     </span>
   </a>
@@ -7468,6 +7394,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-cases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Session without a request
+      
+    </span>
+  </a>
   
 </li>
       
@@ -7483,41 +7420,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#all-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        All options
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7538,151 +7447,32 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/the-basic/session.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="session">Session</h1>
-<p>A session keeps data for one browser across many requests, so you can remember things like the logged in user or a shopping cart.</p>
-<p>HTTP is stateless: each request knows nothing about the one before it. A session fixes this. Dox gives every browser a session cookie and keeps the data for that cookie between requests.</p>
-<p>You need a session for web pages with forms and logins. An API that uses tokens does not need one.</p>
+<p>A session keeps data for one browser across many requests, like the logged in user or a shopping cart.</p>
+<p>Dox gives every browser a session cookie and keeps the data for that cookie. Web pages with forms and logins need a session. An API with tokens does not.</p>
 <h2 id="setup">Setup</h2>
-<p>Add <code>SessionMiddleware</code> to <code>globalMiddleware</code>. Because session forms also need CSRF protection, add <a href="../../security/csrf/"><code>CsrfMiddleware</code></a> right after it:</p>
+<p>Add <code>SessionMiddleware</code> to <code>globalMiddleware</code>. Session forms also need <a href="../../security/csrf/">CSRF protection</a>, so add <code>CsrfMiddleware</code> after it:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">SessionMiddleware</span><span class="p">(),</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">CsrfMiddleware</span><span class="p">(</span><span class="nl">except:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'/api/*'</span><span class="p">]),</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p">],</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="p">);</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Now every request has <code>req.session</code>. You can also add the middleware to only some routers or routes. If a route has no session middleware, using <code>req.session</code> there throws an error.</p>
+<p>Now every request has <code>req.session</code>. On a route with no session middleware, <code>req.session</code> throws.</p>
 <h3 id="configuration">Configuration</h3>
-<p>Set <code>session</code> in the app config. Every option has a default, so you only set the ones you want to change:</p>
+<p>Set <code>session</code> in the app config. Set only the options you want to change:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">session:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">SessionConfig</span><span class="p">(</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'cache'</span><span class="p">,</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="nl">store:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">,</span>
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="nl">lifetime:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">hours:</span><span class="w"> </span><span class="m">2</span><span class="p">),</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">);</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>The <code>driver</code> option decides where the session data is kept. Dox has two drivers:</p>
-<ul>
-<li><code>cookie</code> (the default): all data is in the session cookie, encrypted with your <code>APP_KEY</code>. There is nothing to store on the server.</li>
-<li><code>cache</code>: the cookie only holds a random session id. The data lives in a <a href="../../packages/cache/">cache store</a>, such as <code>redis</code>.</li>
-</ul>
-<p>If you run more than one server, use the <code>cache</code> driver with a shared store like <code>redis</code>, so all of them see the same sessions. See <a href="#choosing-a-driver">Choosing a driver</a> for more.</p>
-<h2 id="retrieving-data">Retrieving data</h2>
-<p>Use <code>get</code> to read a value. The second argument is the default, which you get when the key is not in the session:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[]);</span>
-</span></code></pre></div>
-<h3 id="retrieving-all-data">Retrieving all data</h3>
-<p>The <code>all</code> method returns a copy of all session data:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">all</span><span class="p">();</span>
-</span></code></pre></div>
-<h3 id="checking-if-a-value-exists">Checking if a value exists</h3>
-<p>The <code>has</code> method returns <code>true</code> when the key is in the session and its value is not <code>null</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">has</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
-</span></code></pre></div>
-<h2 id="storing-data">Storing data</h2>
-<p>Use <code>put</code> to store a value:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]);</span>
-</span></code></pre></div>
-<p>Values must be JSON types: <code>Map</code>, <code>List</code>, <code>String</code>, <code>num</code>, <code>bool</code> or <code>null</code>. This is because the session is saved as JSON.</p>
-<h3 id="retrieving-and-deleting-a-value">Retrieving and deleting a value</h3>
-<p>The <code>pull</code> method reads a value and removes it in one step:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">dynamic</span><span class="w"> </span><span class="n">cart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">pull</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
-</span></code></pre></div>
-<h2 id="flash-data">Flash data</h2>
-<p>Sometimes you want to keep a value only for the next request. For example, after you save a form you redirect, and the next page shows "The post is saved". Use the <code>flash</code> method for this:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="c1">// ... save the post</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">flash</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="s1">'The post is saved'</span><span class="p">);</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">);</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">});</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'message'</span><span class="p">);</span><span class="w"> </span><span class="c1">// 'The post is saved'</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="p">});</span>
-</span></code></pre></div>
-<p>Flash data is there for the current request and the next one. Then Dox removes it.</p>
-<p>If you need the flash data for one more request, use <code>reflash</code>. To keep only some keys, use <code>keep</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">reflash</span><span class="p">();</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">keep</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]);</span>
-</span></code></pre></div>
-<h2 id="deleting-data">Deleting data</h2>
-<p>The <code>forget</code> method removes one value. The <code>flush</code> method removes all data:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">forget</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
-</span></code></pre></div>
-<h2 id="regenerating-the-session-id">Regenerating the session ID</h2>
-<p>You should give the user a new session id when they log in. This stops a <a href="https://owasp.org/www-community/attacks/Session_fixation">session fixation</a> attack, where someone makes a user log in with a session id the attacker already knows.</p>
-<p>Use the <code>regenerate</code> method after login. It gives a new session id and a new CSRF token, and it keeps the data:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">regenerate</span><span class="p">();</span>
-</span></code></pre></div>
-<p>On logout, use <code>invalidate</code>. It removes all data and gives a new session id:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">invalidate</span><span class="p">();</span>
-</span></code></pre></div>
-<p>If you use <a href="../../security/authentication/#session-login-for-web-pages">session login</a> from <code>dox_auth</code>, it does both for you.</p>
-<h2 id="validation-errors-and-old-input">Validation errors and old input</h2>
-<p>When a form post fails <a href="../validation/">validation</a> on a route with a session, Dox redirects back to the form for you. It also flashes two things, so the form can show them:</p>
-<ul>
-<li>the errors, like <code>{'email': 'The email is not a valid email'}</code></li>
-<li>the old input, so the user does not have to type it again (password fields and files are never kept)</li>
-</ul>
-<p>Read them on the form page:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/register'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">errors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">errors</span><span class="p">;</span><span class="w"> </span><span class="c1">// empty when there are none</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">old</span><span class="p">(</span><span class="s1">'email'</span><span class="p">);</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="p">});</span>
-</span></code></pre></div>
-<p>You can also do this yourself. <code>flashErrors</code> flashes the errors and the input, and <code>back</code> redirects to the page the request came from:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">flashErrors</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'The email is taken'</span><span class="p">},</span><span class="w"> </span><span class="nl">input:</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">all</span><span class="p">());</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="k">return</span><span class="w"> </span><span class="n">back</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
-</span></code></pre></div>
-<h2 id="choosing-a-driver">Choosing a driver</h2>
-<h3 id="the-cookie-driver">The cookie driver</h3>
-<p>The cookie driver is the default because it needs no server storage. The data is encrypted with AES-GCM and your <code>APP_KEY</code>, so the browser can not read or change it.</p>
-<p>It has two limits:</p>
-<ul>
-<li>A cookie can hold about 4 KB. If the session gets bigger, you get an error. So keep the data small: store an id, not a whole object.</li>
-<li>An old copy of the cookie still works after logout, until the session <code>lifetime</code> ends. This is because the server keeps nothing it could delete.</li>
-</ul>
-<p>If either limit is a problem, use the cache driver.</p>
-<h3 id="the-cache-driver">The cache driver</h3>
-<p>The cache driver keeps the data in a cache store, and the cookie only holds an encrypted session id. On logout the data is deleted, so old cookies stop working.</p>
-<p>Pick the store with the <code>store</code> option:</p>
-<ul>
-<li><code>redis</code> shares sessions between all isolates and servers. To set a command timeout or other Redis options, see <a href="../../digging-deeper/cache/#redis-options">Redis options</a>.</li>
-<li><code>database</code> also shares sessions, if you have no Redis. See <a href="../../packages/cache/#database-store">Database store</a>.</li>
-<li><code>memory</code> keeps sessions in the main isolate of this server. The other isolates read and write them there, so all isolates of one server see the same sessions. They are lost when the server stops, and each server has its own. Expired sessions are removed by the memory store. Good for tests and a single server.</li>
-</ul>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">SessionConfig</span><span class="p">(</span><span class="nl">driver:</span><span class="w"> </span><span class="s1">'cache'</span><span class="p">,</span><span class="w"> </span><span class="nl">store:</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">)</span>
-</span></code></pre></div>
-<h2 id="testing">Testing</h2>
-<p><code>client.withSession()</code> gives a test client that keeps cookies like a browser. It also sends the CSRF token back, so <code>CsrfMiddleware</code> lets its posts in:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">DoxTestClient</span><span class="w"> </span><span class="n">browser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">withSession</span><span class="p">();</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">browser</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/cart/add?id=1'</span><span class="p">);</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">browser</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/cart'</span><span class="p">)).</span><span class="n">expectJson</span><span class="p">(</span><span class="n">isNotEmpty</span><span class="p">);</span>
-</span></code></pre></div>
-<p>See <a href="../../digging-deeper/testing/#keep-a-session-cookies-and-csrf">Testing: keep a session</a>.</p>
-<h2 id="details">Details</h2>
-<p>This section is for special cases. Most apps do not need it.</p>
-<h3 id="all-options">All options</h3>
 <table>
 <thead>
 <tr>
@@ -7694,13 +7484,13 @@
 <tbody>
 <tr>
 <td><code>driver</code></td>
-<td><code>cookie</code></td>
-<td><code>cookie</code> or <code>cache</code>.</td>
+<td>cookie</td>
+<td>cookie or cache. See <a href="#drivers">Drivers</a>.</td>
 </tr>
 <tr>
 <td><code>store</code></td>
-<td><code>null</code></td>
-<td>The cache store for the <code>cache</code> driver, like <code>redis</code>, <code>memory</code> or <code>file</code>. <code>null</code> uses the default store of <code>AppConfig.cache</code>.</td>
+<td>null</td>
+<td>The cache store for the cache driver, like redis. null uses the default store.</td>
 </tr>
 <tr>
 <td><code>cookie</code></td>
@@ -7710,41 +7500,128 @@
 <tr>
 <td><code>lifetime</code></td>
 <td>2 hours</td>
-<td>The session ends after this long with no use. The cookie driver keeps the save time inside the encrypted cookie, so a copied old cookie also stops working after this time.</td>
+<td>The session ends after this time with no use.</td>
 </tr>
 <tr>
 <td><code>path</code></td>
 <td><code>/</code></td>
-<td><code>Path</code> of the cookie.</td>
+<td>The path of the cookie.</td>
 </tr>
 <tr>
 <td><code>domain</code></td>
-<td><code>null</code></td>
-<td><code>Domain</code> of the cookie. <code>null</code> means only the host that set it.</td>
+<td>null</td>
+<td>The domain of the cookie. null means only the host that set it.</td>
 </tr>
 <tr>
 <td><code>httpOnly</code></td>
-<td><code>true</code></td>
+<td>true</td>
 <td>Page scripts can not read the cookie.</td>
 </tr>
 <tr>
 <td><code>secure</code></td>
-<td><code>null</code></td>
-<td><code>null</code> sets <code>Secure</code> when the request came over https.</td>
+<td>null</td>
+<td>null sets <code>Secure</code> when the request came over https.</td>
 </tr>
 <tr>
 <td><code>sameSite</code></td>
-<td><code>SameSite.lax</code></td>
-<td><code>SameSite</code> of the cookie (from <code>dart:io</code>).</td>
+<td>lax</td>
+<td>The <code>SameSite</code> of the cookie.</td>
 </tr>
 </tbody>
 </table>
-<p>You can also give a config to one middleware: <code>SessionMiddleware(SessionConfig(...))</code>.</p>
-<h3 id="other-cases">Other cases</h3>
+<p>To give one middleware its own config, use <code>SessionMiddleware(SessionConfig(...))</code>.</p>
+<h3 id="drivers">Drivers</h3>
+<p>The <strong>driver</strong> decides where the data is kept:</p>
 <ul>
-<li><code>regenerate(keepToken: true)</code> keeps the CSRF token, so forms open in other tabs keep working. Do not use it at login.</li>
-<li>A request that wants JSON gets a <code>422</code> JSON answer instead of a redirect when validation fails.</li>
-<li>Code with no request, like a Socket.IO login, can load the session from the raw cookie value with <code>await SessionMiddleware().fromCookie(value)</code>. Changes to it are not saved.</li>
+<li>cookie: all data is in the cookie, encrypted with your <code>APP_KEY</code>. A cookie holds about 4 KB, so store an id, not a full object. An old copy of the cookie works until the lifetime ends, also after logout.</li>
+<li>cache: the cookie holds only a session id, and the data is in a <a href="../../digging-deeper/cache/">cache store</a>. On logout the data is deleted.</li>
+</ul>
+<p>For more than one server, use the cache driver with a shared store like redis or <a href="../../digging-deeper/cache/#database-store">database</a>. The memory store is shared by the isolates of one server only, and it is lost when the server stops.</p>
+<h2 id="retrieving-data">Retrieving data</h2>
+<p>Read a value. The second argument is the default for a missing key:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">cart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[]);</span>
+</span></code></pre></div>
+<h3 id="retrieving-all-data">Retrieving all data</h3>
+<p>Get a copy of all session data:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">all</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="checking-if-a-value-exists">Checking if a value exists</h3>
+<p><code>has</code> gives true when the key is in the session and its value is not null:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">has</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="storing-data">Storing data</h2>
+<p>Store a value. It must be a JSON type: a map, a list, a string, a number, a bool or null:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]);</span>
+</span></code></pre></div>
+<h3 id="retrieving-and-deleting-a-value">Retrieving and deleting a value</h3>
+<p>Read a value and remove it in one step:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">dynamic</span><span class="w"> </span><span class="n">cart</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">pull</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="flash-data">Flash data</h2>
+<p><strong>Flash data</strong> stays for the current request and the next one, like a "saved" message after a redirect:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">flash</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="s1">'The post is saved'</span><span class="p">);</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">return</span><span class="w"> </span><span class="n">redirect</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">);</span>
+</span></code></pre></div>
+<p>On the next page, <code>req.session.get('message')</code> gives the text.</p>
+<h3 id="keeping-flash-data">Keeping flash data</h3>
+<p>Keep all flash data for one more request, or only some keys:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">reflash</span><span class="p">();</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">keep</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'message'</span><span class="p">]);</span>
+</span></code></pre></div>
+<h2 id="deleting-data">Deleting data</h2>
+<p>Remove one value, or all data:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">forget</span><span class="p">(</span><span class="s1">'cart'</span><span class="p">);</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="regenerating-the-session-id">Regenerating the session ID</h2>
+<p>Give the user a new session id at login. This stops a <a href="https://owasp.org/www-community/attacks/Session_fixation">session fixation</a> attack. It also gives a new CSRF token and keeps the data:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">regenerate</span><span class="p">();</span>
+</span></code></pre></div>
+<p><code>regenerate(keepToken: true)</code> keeps the CSRF token, for forms in other tabs. Do not use it at login.</p>
+<p>At logout, remove all data and get a new id:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">invalidate</span><span class="p">();</span>
+</span></code></pre></div>
+<p><a href="../../security/authentication/#session-login-for-web-pages">Session login</a> from <code>dox_auth</code> does both for you.</p>
+<h2 id="csrf-token">CSRF token</h2>
+<p>Read the CSRF token of the session. It is made on first use:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">token</span><span class="p">;</span>
+</span></code></pre></div>
+<p>See <a href="../../security/csrf/">CSRF protection</a>.</p>
+<h2 id="validation-errors-and-old-input">Validation errors and old input</h2>
+<p>When a form post fails <a href="../validation/">validation</a>, Dox redirects back to the form. It flashes the errors and the old input. Password fields and files are never kept:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/register'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">errors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">errors</span><span class="p">;</span><span class="w"> </span><span class="c1">// empty when none</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">old</span><span class="p">(</span><span class="s1">'email'</span><span class="p">);</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>A request that wants JSON gets a 422 JSON answer instead.</p>
+<h3 id="flash-errors-yourself">Flash errors yourself</h3>
+<p>Flash errors and input, then go back to the page the request came from:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">.</span><span class="n">flashErrors</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'The email is taken'</span><span class="p">},</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="nl">input:</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">all</span><span class="p">());</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="k">return</span><span class="w"> </span><span class="n">back</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="other-cases">Session without a request</h2>
+<p>Code with no request, like a Socket.IO login, loads the session from the raw cookie value. Changes to it are not saved:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Session</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">SessionMiddleware</span><span class="p">().</span><span class="n">fromCookie</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">session</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'auth_web'</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="testing">Testing</h2>
+<p><code>client.withSession()</code> gives a test client that keeps cookies like a browser. It also sends the CSRF token:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">DoxTestClient</span><span class="w"> </span><span class="n">browser</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="n">withSession</span><span class="p">();</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">browser</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/cart/add?id=1'</span><span class="p">);</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">browser</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/cart'</span><span class="p">)).</span><span class="n">expectJson</span><span class="p">(</span><span class="n">isNotEmpty</span><span class="p">);</span>
+</span></code></pre></div>
+<p>See <a href="../../digging-deeper/testing/#keep-a-session-cookies-and-csrf">Testing: keep a session</a>.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../../digging-deeper/cache/">Cache</a>: the stores a session can use.</li>
+<li><a href="../../security/csrf/">CSRF protection</a>: protect forms that use the session.</li>
+<li><a href="../../security/authentication/">Authentication</a>: session login.</li>
 </ul>
 
 
@@ -7865,7 +7742,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

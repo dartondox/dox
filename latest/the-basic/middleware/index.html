@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1828,15 +1830,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#defining-middleware" class="md-nav__link">
+  <a href="#making-a-middleware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Defining middleware
+        Making a middleware
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Defining middleware">
+    <nav class="md-nav" aria-label="Making a middleware">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -1912,6 +1914,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#global-middleware-from-a-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global middleware from a package
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#skip-a-middleware-on-one-route" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1962,10 +1975,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#from-any-code-with-afterresponse" class="md-nav__link">
+  <a href="#from-any-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        From any code, with AfterResponse
+        From any code
       
     </span>
   </a>
@@ -2051,6 +2064,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#log-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#more-middleware" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2067,41 +2091,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#logmiddleware" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LogMiddleware
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5401,10 +5397,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5530,95 +5522,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7338,15 +7241,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#defining-middleware" class="md-nav__link">
+  <a href="#making-a-middleware" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Defining middleware
+        Making a middleware
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Defining middleware">
+    <nav class="md-nav" aria-label="Making a middleware">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7422,6 +7325,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#global-middleware-from-a-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Global middleware from a package
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#skip-a-middleware-on-one-route" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7472,10 +7386,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#from-any-code-with-afterresponse" class="md-nav__link">
+  <a href="#from-any-code" class="md-nav__link">
     <span class="md-ellipsis">
       
-        From any code, with AfterResponse
+        From any code
       
     </span>
   </a>
@@ -7561,6 +7475,17 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#log-requests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log requests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#more-middleware" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7577,41 +7502,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#logmiddleware" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        LogMiddleware
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7632,18 +7529,12 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/the-basic/middleware.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="middleware">Middleware</h1>
 <p>Middleware is code that runs before the controller, and if you want, after it too.</p>
-<p>Use it for checks like login, logging or rate limits, or to change the response. For example, an auth middleware checks the user. If the user is not logged in, it sends an error, and the controller never runs.</p>
-<h2 id="defining-middleware">Defining middleware</h2>
+<h2 id="making-a-middleware">Making a middleware</h2>
 <p>Make a middleware with the CLI:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:middleware<span class="w"> </span>Logger
 </span></code></pre></div>
@@ -7658,34 +7549,27 @@
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>handle</code> takes an <code>IDoxRequest</code>, not a <code>DoxRequest</code>. It can be <code>async</code>, and Dox waits for it. A middleware does one of these:</p>
-<ul>
-<li><strong>Return the request.</strong> Dox goes on to the next middleware, then to the controller.</li>
-<li><strong>Return something else</strong> (a <code>String</code>, a <code>Map</code>, a <code>response(...)</code>). Dox sends it as the response. The controller does not run.</li>
-<li><strong>Throw an exception</strong>, like <code>NotFoundHttpException()</code>. Dox sends the error response. See <a href="../response/#errors">Response: errors</a>.</li>
-</ul>
+<p><code>handle</code> can be async. Return the request to go on. Return any other value to send it as the response, or throw an exception to send an error. Then the controller does not run.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Do not forget <code>return req</code>. A middleware that returns <code>null</code> ends the request with an empty <code>200</code>, and the controller does not run.
-When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, Dox prints a warning the first time a middleware does this.</p>
+<p>Do not forget <code>return req</code>. A middleware that returns null ends the request with an empty 200.</p>
 </div>
 <h3 id="function-middleware">Function middleware</h3>
-<p>A function that takes a <code>DoxRequest</code> also works as middleware. This one checks an API key:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/api_key.middleware.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kt">dynamic</span><span class="w"> </span><span class="n">apiKeyMiddleware</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">apiKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'API_KEY'</span><span class="p">);</span>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">given</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Api-Key'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">apiKey</span><span class="p">.</span><span class="n">isEmpty</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">Hash</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">apiKey</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Unauthorized'</span><span class="p">}).</span><span class="n">statusCode</span><span class="p">(</span><span class="m">401</span><span class="p">);</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">req</span><span class="p">;</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="p">}</span>
+<p>A function that takes a <code>DoxRequest</code> also works as middleware:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/api_key.middleware.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">dynamic</span><span class="w"> </span><span class="n">apiKeyMiddleware</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">apiKey</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'API_KEY'</span><span class="p">);</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">given</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Api-Key'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">apiKey</span><span class="p">.</span><span class="n">isEmpty</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">Hash</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">given</span><span class="p">,</span><span class="w"> </span><span class="n">apiKey</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'message'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Unauthorized'</span><span class="p">})</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">        </span><span class="p">.</span><span class="n">statusCode</span><span class="p">(</span><span class="m">401</span><span class="p">);</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">req</span><span class="p">;</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The key comes from the <code>API_KEY</code> env variable, not from the code. Use <code>Hash.equals</code> and not <code>==</code> to compare secrets. It takes the same time for every wrong key, so the time does not tell an attacker how much of the key was right.</p>
+<p>Compare secrets with <code>Hash.equals</code>, not <code>==</code>, so the time does not tell an attacker how much of the key was right.</p>
 <h2 id="registering-middleware">Registering middleware</h2>
 <h3 id="on-a-route">On a route</h3>
-<p>Put the middleware in a list before the controller. They run from left to right, and you can mix class and function middleware:</p>
+<p>Put the middleware in a list before the controller. They run from left to right:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/ping'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">LoggerMiddleware</span><span class="p">(),</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="n">apiKeyMiddleware</span><span class="p">,</span>
@@ -7693,37 +7577,34 @@ When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, Dox
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">]);</span>
 </span></code></pre></div>
 <h3 id="on-a-group-of-routes">On a group of routes</h3>
-<p>Use <code>Route.middleware</code> to run a middleware for many routes:</p>
+<p>Run a middleware for many routes:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">middleware</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">LoggerMiddleware</span><span class="p">()],</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/me'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">AuthController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">me</span><span class="p">);</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/logout'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">AuthController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">logout</span><span class="p">);</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">});</span>
 </span></code></pre></div>
 <h3 id="on-a-router">On a router</h3>
-<p>For all routes of one router, set its <code>middleware</code> list:</p>
+<p>Run a middleware for all routes of one router:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">prefix</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'api'</span><span class="p">;</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">LoggerMiddleware</span><span class="p">()];</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">LoggerMiddleware</span><span class="p">()];</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">    </span><span class="c1">// every route here runs LoggerMiddleware</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="p">}</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">    </span><span class="c1">// every route here runs LoggerMiddleware</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="global-middleware">Global middleware</h3>
-<p>For all routes, set <code>globalMiddleware</code> in the app config:</p>
+<p>Run a middleware for all routes:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">    </span><span class="n">LogMiddleware</span><span class="p">(</span><span class="nl">enabled:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appEnv</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'production'</span><span class="p">),</span>
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="p">],</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">);</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>A package can add global middleware from the <code>setup()</code> of its provider, with <code>Dox().addGlobalMiddleware(...)</code>. It runs before the app's <code>globalMiddleware</code>:</p>
+<h3 id="global-middleware-from-a-package">Global middleware from a package</h3>
+<p>A package adds a global middleware in the <code>setup()</code> of its provider. It runs before the global middleware of the app:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AuditProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
@@ -7731,37 +7612,32 @@ When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, Dox
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>A second add of the same middleware is skipped, so use a top-level function or a const instance.</p>
 <h3 id="skip-a-middleware-on-one-route">Skip a middleware on one route</h3>
-<p>Some routes do not fit a global middleware. For example, a long stream should not end with <code>RequestTimeout</code>. <code>.withoutMiddleware&lt;T&gt;()</code> takes every middleware of type <code>T</code> out of the route, also global, router and group middleware:</p>
+<p>Take every middleware of a type out of one route, also a global one:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/events'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">EventController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">stream</span><span class="p">)</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withoutMiddleware</span><span class="o">&lt;</span><span class="n">RequestTimeout</span><span class="o">&gt;</span><span class="p">();</span>
 </span></code></pre></div>
-<p>It takes out <code>T</code> and any subtype of <code>T</code>. So <code>withoutMiddleware&lt;IDoxNextMiddleware&gt;()</code> takes out every middleware that uses <code>next</code>. Use a specific type. The route is also left out of the OpenAPI docs of that middleware, for example its security.</p>
+<p>It also takes out the subtypes of the type, so use a specific type.</p>
 <h3 id="the-order">The order</h3>
-<p>Middleware runs in this order: package middleware from providers, then the app's global middleware, then router middleware, then group middleware, then route middleware. If one returns a value or throws, the rest do not run:</p>
+<p>Middleware runs in this order. If one returns a value or throws, the rest do not run:</p>
 <pre class="mermaid"><code>flowchart LR
-    G["Global"] --&gt; R["Router"] --&gt; P["Group"] --&gt; T["Route"] --&gt; C["Controller"]</code></pre>
+    K["Package"] --&gt; G["Global"] --&gt; R["Router"] --&gt; P["Group"] --&gt; T["Route"] --&gt; C["Controller"]</code></pre>
 <h2 id="run-code-after-the-controller">Run code after the controller</h2>
-<p>Sometimes you want to change the response after the controller made it. For this, a middleware can get a <code>next</code> function. <code>await next()</code> runs the rest of the middleware and the controller, and gives you the response. Change it, then return it:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/see_other.middleware.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="c1">/// a redirect after a form post becomes 303, so the browser does a GET</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SeeOtherMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxNextMiddleware</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">Next</span><span class="w"> </span><span class="n">next</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="c1">// before the controller</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">next</span><span class="p">();</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="c1">// after the controller</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">res</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">302</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">method</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'GET'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">      </span><span class="n">res</span><span class="p">.</span><span class="n">statusCode</span><span class="p">(</span><span class="m">303</span><span class="p">);</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">;</span>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="p">}</span>
+<p>Implement <code>IDoxNextMiddleware</code> to change the response. <code>await next()</code> runs the rest of the middleware and the controller:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/see_other.middleware.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SeeOtherMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxNextMiddleware</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">Next</span><span class="w"> </span><span class="n">next</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">next</span><span class="p">();</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">res</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">302</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">method</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'GET'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">      </span><span class="n">res</span><span class="p">.</span><span class="n">statusCode</span><span class="p">(</span><span class="m">303</span><span class="p">);</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">res</span><span class="p">;</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The response from <code>next()</code> is always a <code>DoxResponse</code>, so you can use all its methods, like <code>statusCode(...)</code> and <code>header(...)</code>. Read the status with <code>res.status</code> (<code>null</code> means 200) and the headers with <code>res.headers</code>.</p>
-<p>If the controller throws an error, <code>next()</code> does not throw. It gives the error response from the <a href="../errors/">ExceptionHandler</a>, like a <code>404</code> or a <code>422</code>. So the code after <code>next()</code> always runs. To stop early, return a response and do not call <code>next()</code>.</p>
-<p>A function works too. It takes the request and <code>next</code>:</p>
+<p>If the controller throws, <code>next()</code> gives the error response from the <a href="../errors/">ExceptionHandler</a>, so the code after it always runs.</p>
+<p>A function works too:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">DoxResponse</span><span class="o">&gt;</span><span class="w"> </span><span class="n">timerMiddleware</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">Next</span><span class="w"> </span><span class="n">next</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="n">Stopwatch</span><span class="w"> </span><span class="n">watch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Stopwatch</span><span class="p">()..</span><span class="n">start</span><span class="p">();</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">next</span><span class="p">();</span>
@@ -7769,149 +7645,142 @@ When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, Dox
 </span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="run-code-after-the-answer-is-sent">Run code after the answer is sent</h2>
-<p>Some work should not make the client wait, like logs, metrics or cleanup. A middleware can do it in a <code>terminate</code> method, which runs after the answer has gone to the client. Implement <code>IDoxTerminableMiddleware</code>:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/metrics.middleware.dart</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">MetricsMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="p">,</span><span class="w"> </span><span class="n">IDoxTerminableMiddleware</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="kt">dynamic</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">IDoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">req</span><span class="p">;</span><span class="w"> </span><span class="c1">// before the controller</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">terminate</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="c1">// the answer is already sent</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">req</span><span class="p">.</span><span class="n">method</span><span class="si">}</span><span class="s1"> </span><span class="si">${</span><span class="n">req</span><span class="p">.</span><span class="n">uri</span><span class="p">.</span><span class="n">path</span><span class="si">}</span><span class="s1"> </span><span class="si">${</span><span class="n">res</span><span class="p">.</span><span class="n">status</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="p">}</span>
+<p>Implement <code>IDoxTerminableMiddleware</code> for work that must not make the client wait, like logs or metrics:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/metrics.middleware.dart</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">MetricsMiddleware</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">    </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="p">,</span><span class="w"> </span><span class="n">IDoxTerminableMiddleware</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="kt">dynamic</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">IDoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">req</span><span class="p">;</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">terminate</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="n">DoxResponse</span><span class="w"> </span><span class="n">res</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">    </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">req</span><span class="p">.</span><span class="n">method</span><span class="si">}</span><span class="s1"> </span><span class="si">${</span><span class="n">req</span><span class="p">.</span><span class="n">uri</span><span class="p">.</span><span class="n">path</span><span class="si">}</span><span class="s1"> </span><span class="si">${</span><span class="n">res</span><span class="p">.</span><span class="n">status</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>res.status</code> is the status that was sent, also for an error answer. <code>terminate</code> can be <code>async</code>. An error in it goes to <code>ExceptionHandler.report</code>, and it never changes the answer.</p>
-<h3 id="from-any-code-with-afterresponse">From any code, with <code>AfterResponse</code></h3>
-<p>A middleware must be on the route. If you want to add work after the answer from any code (a controller, a service, a package), use <code>AfterResponse</code>. The code does not need the request.</p>
-<p>It is off by default. Turn it on in the <code>setup()</code> of a provider. <code>setup()</code> runs in every isolate, so each isolate turns it on:</p>
+<p>An error in <code>terminate</code> goes to <code>ExceptionHandler.report</code>. It never changes the answer.</p>
+<h3 id="from-any-code">From any code</h3>
+<p><code>AfterResponse</code> adds work after the answer from a controller, a service or a package. Turn it on in the <code>setup()</code> of a provider:</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/app_provider.dart</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@override</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="n">AfterResponse</span><span class="p">.</span><span class="n">enable</span><span class="p">();</span>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Then add work anywhere in the request:</p>
+<p>Then add work anywhere in the request. The work runs in the order you add it:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">AfterResponse</span><span class="p">.</span><span class="n">run</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">mailer</span><span class="p">.</span><span class="n">sendWelcome</span><span class="p">(</span><span class="n">user</span><span class="p">));</span>
 </span></code></pre></div>
-<p>The work runs after the answer is sent, one after the other. An error in it goes to <code>ExceptionHandler.report</code>, so it never reaches the client.</p>
-<p>A request that adds no work costs almost nothing. The list of work is made on the first <code>run</code>.</p>
-<p>The work is not saved anywhere. When the server stops, work that did not run yet is lost. So use a <a href="../../digging-deeper/queue/">queue</a> for work that must run. To run a queue job this way, see <code>dispatchAfterResponse()</code> in <a href="../../digging-deeper/queue/#dispatching-jobs">Queue</a>.</p>
+<p>Work that did not run yet is lost when the server stops. For work that must run, use a <a href="../../digging-deeper/queue/#dispatching-jobs">queue</a>.</p>
+<p><code>AfterResponse.disable()</code> turns it off again, for tests. <code>AfterResponse.enabled</code> tells if it is on.</p>
 <h2 id="built-in-middleware">Built-in middleware</h2>
 <h3 id="request-id">Request id</h3>
-<p>When you look for one request in your logs, an id helps. <code>RequestId</code> gives each request an id. It is sent back in the <code>X-Request-Id</code> header, and you can read it as <code>req.requestId</code>:</p>
+<p><code>RequestId</code> gives each request an id. It is sent in the <code>X-Request-Id</code> header, and you read it as <code>req.requestId</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">RequestId</span><span class="p">(),</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">LogMiddleware</span><span class="p">(</span><span class="nl">enabled:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="n">LogMiddleware</span><span class="p">(),</span>
 </span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="p">],</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">);</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Put <code>RequestId</code> before <code>LogMiddleware</code>, so each log line gets <code>http.request_id</code>. The default <code>ExceptionHandler.report</code> prints the id with the error. In your own <code>report</code>, read <code>ExceptionHandler.requestId</code>.</p>
-<p>When the client (or a proxy) sends a safe <code>X-Request-Id</code>, Dox keeps it. Else it makes a new one. <code>RequestId(trustClient: false)</code> always makes a new one.</p>
+<p>Put it before <code>LogMiddleware</code>, so each log line gets the id. Dox keeps a safe id from the client. <code>RequestId(trustClient: false)</code> always makes a new one.</p>
+<p>To make an id yourself, call <code>RequestId.make()</code>. It gives 32 hex characters.</p>
 <h3 id="etag-and-304-not-modified">ETag and 304 Not Modified</h3>
-<p>If a client asks for the same data again and nothing changed, you can save bandwidth. <code>ETag</code> adds an <code>ETag</code> header to GET and HEAD answers. When the client sends the same ETag back in <code>If-None-Match</code>, Dox answers <code>304 Not Modified</code> with no body:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="k">const</span><span class="w"> </span><span class="n">ETag</span><span class="p">(),</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">]);</span>
+<p><code>ETag</code> answers 304 with no body when the client already has the same data:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/posts'</span><span class="p">,</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="k">const</span><span class="w"> </span><span class="n">ETag</span><span class="p">(),</span><span class="w"> </span><span class="p">(</span><span class="n">PostController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">index</span><span class="p">]);</span>
 </span></code></pre></div>
-<p>It works on <code>200</code> answers with a body in memory: a <code>String</code>, a <code>Map</code>, a <code>List</code> or a model. Files and streams are not touched. The controller still runs, so a <code>304</code> saves bandwidth, not server time.</p>
+<p>It works on 200 answers with a body in memory. The controller still runs, so it saves bandwidth, not server time.</p>
+<p>To make a weak ETag yourself, use <code>ETag.of(bytes)</code>. <code>ETag.matches(ifNoneMatch, tag)</code> tells if the header of the client has the tag.</p>
 <h3 id="request-timeout">Request timeout</h3>
-<p>A slow route should not keep the client waiting forever. <code>.timeout</code> answers <code>503 Service Unavailable</code> when the middleware after it and the controller take too long:</p>
+<p>Answer 503 when the route takes too long:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/report'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">ReportController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">)</span>
 </span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">    </span><span class="p">.</span><span class="n">timeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">));</span>
 </span></code></pre></div>
-<p>This is the same as the <code>RequestTimeout</code> middleware. For every route, add <code>RequestTimeout(...)</code> to <code>globalMiddleware</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/report'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="n">RequestTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">)),</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="p">(</span><span class="n">ReportController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">,</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="p">]);</span>
+<p>For every route, add the <code>RequestTimeout</code> middleware to <code>globalMiddleware</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">RequestTimeout</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">))</span>
 </span></code></pre></div>
-<p>The answer is the normal error JSON:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"request_timeout"</span><span class="p">,</span><span class="w"> </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"The request took too long"</span><span class="p">}</span>
-</span></code></pre></div>
-<p>Dart can not stop a running Future, so the controller keeps running in the background. Its late result is dropped, so nothing is sent twice.</p>
-<p>A global <code>RequestTimeout</code> also ends long streams. To keep it off one route, see <a href="#skip-a-middleware-on-one-route">Skip a middleware on one route</a>.</p>
+<p>Dart can not stop a running Future, so the controller keeps running and its late result is dropped. A global timeout also ends long streams. See <a href="#skip-a-middleware-on-one-route">Skip a middleware on one route</a>.</p>
 <h3 id="server-timing">Server timing</h3>
-<p>When a page is slow, you want to see where the time goes. <code>ServerTiming</code> adds a <code>Server-Timing</code> header, and the browser dev tools show it in the Network tab, under Timing:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_ENV'</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'development'</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ServerTiming</span><span class="p">(),</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="p">],</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">);</span>
+<p><code>ServerTiming</code> adds a <code>Server-Timing</code> header. The browser dev tools show it in the Network tab:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nl">globalMiddleware:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'APP_ENV'</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'development'</span><span class="p">)</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ServerTiming</span><span class="p">(),</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Development or trusted clients only</p>
-<p>The header tells every client how long your code takes. An attacker can use that, for example to guess if an email has an account. <code>ServerTiming</code> is off unless you add it. Turn it on in development, or only for clients you trust.</p>
+<p>The header tells every client how long your code takes. An attacker can use it, for example to guess if an email has an account.</p>
 </div>
-<p>It always sends two times, in milliseconds. <code>handler</code> is the time in the controller. <code>total</code> is the time of the middleware after <code>ServerTiming</code> and the controller.</p>
-<p>To add your own time to the current request, use <code>add</code>. You do not pass the request:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">ServerTiming</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'db'</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">milliseconds:</span><span class="w"> </span><span class="m">4</span><span class="p">));</span>
+<p>It sends the time in the controller as <code>handler</code> and the full time as <code>total</code>. Add your own time to the current request:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">ServerTiming</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'db'</span><span class="p">,</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">milliseconds:</span><span class="w"> </span><span class="m">4</span><span class="p">));</span>
 </span></code></pre></div>
-<p><code>measure</code> runs a function and adds the time it took, also when it throws:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">html</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">ServerTiming</span><span class="p">.</span><span class="n">measure</span><span class="p">(</span><span class="s1">'render'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">view</span><span class="p">.</span><span class="n">render</span><span class="p">());</span>
+<p>Run a function and add the time it took:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">html</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">ServerTiming</span><span class="p">.</span><span class="n">measure</span><span class="p">(</span><span class="s1">'render'</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">view</span><span class="p">.</span><span class="n">render</span><span class="p">());</span>
 </span></code></pre></div>
-<p>The header looks like this:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>Server-Timing: db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02
+<p>The header then looks like this. A name you add again adds up, with a count:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>Server-Timing: db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02
 </span></code></pre></div>
-<p>When you <code>add</code> the same name again, the times are added together, and the text shows the count, like <code>"3 calls"</code>. Pass <code>description:</code> to set your own text.</p>
 <h4 id="timing-database-queries">Timing database queries</h4>
-<p>To add the time of every database query, listen to the queries once, in <code>setup()</code> of a provider. The listener runs inside the request that made the query, so <code>add</code> finds that request:</p>
-<div class="language-dart highlight"><span class="filename">lib/providers/query_timing_provider.dart</span><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span><span class="w"> </span><span class="c1">// SqlQueryBuilder and QueryEvent</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">onQuery</span><span class="p">(</span><span class="n">QueryEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">  </span><span class="n">ServerTiming</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'db'</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">time</span><span class="p">);</span>
-</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="p">}</span>
-</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>
-</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="c1">/// Dox finds every DoxProvider class,</span>
-</span><span id="__span-23-9"><a id="__codelineno-23-9" name="__codelineno-23-9" href="#__codelineno-23-9"></a><span class="c1">/// see lib/generated/container.g.dart.</span>
-</span><span id="__span-23-10"><a id="__codelineno-23-10" name="__codelineno-23-10" href="#__codelineno-23-10"></a><span class="kd">class</span><span class="w"> </span><span class="nc">QueryTimingProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-23-11"><a id="__codelineno-23-11" name="__codelineno-23-11" href="#__codelineno-23-11"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-23-12"><a id="__codelineno-23-12" name="__codelineno-23-12" href="#__codelineno-23-12"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-23-13"><a id="__codelineno-23-13" name="__codelineno-23-13" href="#__codelineno-23-13"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">().</span><span class="n">listen</span><span class="p">(</span><span class="n">onQuery</span><span class="p">);</span>
-</span><span id="__span-23-14"><a id="__codelineno-23-14" name="__codelineno-23-14" href="#__codelineno-23-14"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-23-15"><a id="__codelineno-23-15" name="__codelineno-23-15" href="#__codelineno-23-15"></a><span class="p">}</span>
+<p>Add the time of every query in the <code>setup()</code> of a provider:</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/query_timing_provider.dart</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="kt">void</span><span class="w"> </span><span class="n">onQuery</span><span class="p">(</span><span class="n">QueryEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="n">ServerTiming</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'db'</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">time</span><span class="p">);</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">}</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="kd">class</span><span class="w"> </span><span class="nc">QueryTimingProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">().</span><span class="n">listen</span><span class="p">(</span><span class="n">onQuery</span><span class="p">);</span>
+</span><span id="__span-22-11"><a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-22-12"><a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The header then shows the total query time and the count, like <code>db;dur=4.10;desc="3 calls"</code>. See <a href="../../database/#listen-to-queries">Listen to queries</a>.</p>
-<p>Each <code>listen</code> call adds the listener again. If <code>setup()</code> runs a second time (for example in tests), each query is counted twice. Call <code>SqlQueryBuilder().removeListener(onQuery)</code> first, or when you are done.</p>
+<p>See <a href="../../database/#listen-to-queries">Listen to queries</a>.</p>
+<h3 id="log-requests">Log requests</h3>
+<p><code>LogMiddleware</code> logs one line for each request. It follows the logger config. These are its options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>enabled</code></td>
+<td>false turns the request logs off. Not set: follow the logger.</td>
+</tr>
+<tr>
+<td><code>withHeader</code></td>
+<td>true also logs the headers.</td>
+</tr>
+<tr>
+<td><code>redact</code></td>
+<td>Fields and headers whose name has one of these words are logged as <code>[REDACTED]</code>. Default: <code>LogMiddleware.defaultRedact</code> (password, secret, token, cookie and more).</td>
+</tr>
+<tr>
+<td><code>filter</code></td>
+<td>A function that changes the line before it is logged.</td>
+</tr>
+</tbody>
+</table>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">LogMiddleware</span><span class="p">(</span><span class="nl">withHeader:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">redact:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'password'</span><span class="p">,</span><span class="w"> </span><span class="s1">'pin'</span><span class="p">])</span>
+</span></code></pre></div>
 <h3 id="more-middleware">More middleware</h3>
-<p>Dox has more middleware on other pages:</p>
+<p>Other pages have more middleware:</p>
 <ul>
-<li><code>LogMiddleware</code> from <code>dox_core</code> logs one line per request. See <a href="#logmiddleware">Details</a> for its options.</li>
-<li><code>AuthMiddleware</code> from <code>dox_auth</code> checks the JWT token. <code>AuthMiddleware(optional: true)</code> lets guests through too. <code>GuestMiddleware</code> lets only guests through, for login pages. See <a href="../../security/authentication/">Authentication</a>.</li>
-<li><code>RateLimit</code> answers <code>429</code> when a client sends too many requests. See <a href="../../security/rate-limiting/">Rate limiting</a>.</li>
-<li><code>SecurityHeaders</code> adds safe headers like <code>X-Frame-Options</code> to every answer. See <a href="../../security/security-headers/">Security headers</a>.</li>
+<li><code>AuthMiddleware</code> and <code>GuestMiddleware</code> check the login. See <a href="../../security/authentication/">Authentication</a>.</li>
+<li><code>RateLimit</code> answers 429 for too many requests. See <a href="../../security/rate-limiting/">Rate limiting</a>.</li>
+<li><code>SecurityHeaders</code> adds safe headers. See <a href="../../security/security-headers/">Security headers</a>.</li>
 <li><code>SessionMiddleware</code> gives each request a session. See <a href="../session/">Session</a>.</li>
 <li><code>CsrfMiddleware</code> stops cross site request forgery. See <a href="../../security/csrf/">CSRF protection</a>.</li>
-<li><code>ValidateSignature</code> checks signed urls. See <a href="../../security/signed-urls/">Signed URLs</a>.</li>
-<li><code>MethodOverride</code> lets HTML forms send <code>PUT</code>, <code>PATCH</code> and <code>DELETE</code>. See <a href="../routing/#forms-with-put-patch-and-delete">Routing</a>.</li>
+<li><code>ValidateSignature</code> checks signed URLs. See <a href="../../security/signed-urls/">Signed URLs</a>.</li>
+<li><code>MethodOverride</code> lets HTML forms send PUT, PATCH and DELETE. See <a href="../routing/#forms-with-put-patch-and-delete">Routing</a>.</li>
 </ul>
-<h2 id="details">Details</h2>
-<p>This section is for special cases. Most apps do not need it.</p>
-<h3 id="logmiddleware">LogMiddleware</h3>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>It follows <code>LoggerConfig</code>: <code>enabled</code>, <code>level</code> and <code>prettyPrint</code>. If the logger is off, <code>LogMiddleware(enabled: true)</code> does not turn logs on. <code>enabled: false</code> turns only the request logs off. Leave it unset to follow the logger.</li>
-<li>With <code>prettyPrint</code> it prints colored text that starts with <code>[request]</code>, like <code>[request] GET /users =&gt; {...}</code>. Without it, it prints one JSON line with <code>status</code>, <code>source</code> (<code>request</code>), <code>message</code>, <code>network.client.ip</code>, <code>http.method</code>, <code>http.url</code>, <code>http.request_id</code> and <code>payload</code>.</li>
-<li>The <code>filter</code> can change <code>status</code>, <code>message</code> and the other fields. It can not change <code>timestamp</code> or <code>logger</code>, because <code>Logger</code> sets them.</li>
-<li>Headers are logged only with <code>withHeader: true</code>.</li>
-<li>Body fields and headers whose name has a word like <code>password</code>, <code>secret</code>, <code>token</code>, <code>authorization</code>, <code>cookie</code> or <code>api_key</code> in it (upper or lower case) are logged as <code>[REDACTED]</code>. Change the list with <code>redact:</code>.</li>
-<li>The new project turns it off when <code>APP_ENV</code> is <code>production</code>.</li>
-</ul>
-<h3 id="other-cases">Other cases</h3>
-<ul>
-<li>A route with no <code>next</code> or <code>terminate</code> middleware pays nothing extra for these features.</li>
-<li>A class can implement only <code>IDoxTerminableMiddleware</code>, with no <code>handle</code>.</li>
-<li><code>AfterResponse</code> work runs in the order it was added. The next one starts only when the one before it ends, so work that never ends blocks the rest for that request. Outside a request, or when it is off, the work runs soon, after the current code.</li>
-<li><code>Dox().addGlobalMiddleware</code> skips a second add of the same middleware. The list is cleared at each start, before the providers run, so add it from <code>setup()</code>. Use a top-level function or a <code>const</code> instance. <code>dox route:list</code> does not run providers, so it does not show this middleware.</li>
-<li>A safe <code>X-Request-Id</code> is 1 to 128 characters of <code>A-Z a-z 0-9 . _ -</code>. A new id is 32 hex characters.</li>
-<li><code>ETag</code> skips an answer that already has an <code>ETag</code> header or <code>Cache-Control: no-store</code>. The ETag is weak (<code>W/"..."</code>), made from a fast 64-bit hash of the body. It is not a secure hash.</li>
-<li><code>RequestTimeout</code> sends <code>503</code>, not <code>504</code>, because <code>504 Gateway Timeout</code> is what a proxy sends. <code>503</code> says the app itself gave up.</li>
-<li><code>ServerTiming</code> names may only have letters, digits and <code>!#$%&amp;'*+-.^_`|~</code>. Other characters become <code>_</code>, and an empty name is ignored. One answer keeps at most 32 names, plus <code>handler</code> and <code>total</code>.</li>
-<li>A time you add named <code>total</code> or <code>handler</code> is sent as <code>app_total</code> or <code>app_handler</code>, so it does not change the built-in times.</li>
-<li>If the answer already has a <code>Server-Timing</code> header, the times are added after it.</li>
-<li>Without <code>ServerTiming</code>, or outside a request, <code>add</code> and <code>measure</code> do nothing. The cost is one small lookup.</li>
+<li><a href="../routing/">Routing</a>: add middleware to routes and groups.</li>
+<li><a href="../../security/rate-limiting/">Rate limiting</a>: limit the requests of a client.</li>
+<li><a href="../../security/cors/">CORS</a>: let other origins call your API.</li>
 </ul>
 
 
@@ -8032,7 +7901,7 @@ When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, Dox
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

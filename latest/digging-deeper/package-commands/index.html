@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A package can add its own dox commands.">
+        <meta name="description" content="A package or an app can add its own dox commands, and the dox CLI finds them by itself.">
       
       
       
@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -81,7 +83,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Package commands | Dox">
-  <meta property="og:description" content="A package can add its own dox commands.">
+  <meta property="og:description" content="A package or an app can add its own dox commands, and the dox CLI finds them by itself.">
   <meta property="og:url" content="https://dartondox.dev/latest/digging-deeper/package-commands/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +92,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Package commands | Dox">
-  <meta name="twitter:description" content="A package can add its own dox commands.">
+  <meta name="twitter:description" content="A package or an app can add its own dox commands, and the dox CLI finds them by itself.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -3149,10 +3151,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-a-package-command" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using a package command
+        Setup
       
     </span>
   </a>
@@ -3221,6 +3223,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#name-clashes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Name clashes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#failing-a-command" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3254,41 +3267,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#name-clashes-and-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Name clashes and errors
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5266,10 +5251,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5395,95 +5376,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7203,10 +7095,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-a-package-command" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using a package command
+        Setup
       
     </span>
   </a>
@@ -7275,6 +7167,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#name-clashes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Name clashes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#failing-a-command" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7308,41 +7211,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#name-clashes-and-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Name clashes and errors
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7363,27 +7238,21 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/package-commands.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="package-commands">Package commands</h1>
-<p>A package can add its own <code>dox</code> commands.</p>
-<p>Your app can add its own commands too. You do not write a <code>bin</code> file, and you do not register anything, because the <code>dox</code> CLI finds the commands by itself. For example, <code>dox queue:table</code> comes from the <code>dox_queue_database</code> package, and <code>dox auth:tokens-table</code> comes from the <code>dox_auth</code> package.</p>
-<h2 id="using-a-package-command">Using a package command</h2>
-<p>Add the package and run <code>dart pub get</code>. Then run the command:</p>
+<p>A package or an app can add its own <code>dox</code> commands, and the <code>dox</code> CLI finds them by itself.</p>
+<h2 id="setup">Setup</h2>
+<p>Add the package and run its command. For example, <code>dox queue:table</code> comes from the <code>dox_queue_database</code> package:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_queue_database
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dox<span class="w"> </span>queue:table
 </span></code></pre></div>
 <p><code>dox help</code> lists the commands of each package, under the package name.</p>
 <h2 id="add-a-command-to-your-package">Add a command to your package</h2>
-<p>A package command needs three things: the command class, a list of commands, and a key in <code>pubspec.yaml</code>.</p>
+<p>A package command needs three things: the command class, a list of commands and a key in <code>pubspec.yaml</code>.</p>
 <h3 id="1-write-the-command">1. Write the command</h3>
-<p>A command extends <code>Command</code> from <code>package:dox_core/command.dart</code>. The <code>run</code> method gets the words after the command name as <code>args</code>:</p>
+<p>A command extends <code>Command</code> from <code>package:dox_core/command.dart</code>. The <code>run</code> method gets the words after the command name:</p>
 <div class="language-dart highlight"><span class="filename">lib/src/commands/hello_command.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/command.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">HelloCommand</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Command</span><span class="w"> </span><span class="p">{</span>
@@ -7403,8 +7272,7 @@
 </span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>So <code>dox hello:say Ann</code> calls <code>run(['Ann'])</code>.</p>
-<p>A package that does not use <code>dox_core</code> imports <code>package:dox_annotation/command.dart</code> instead.</p>
+<p>So <code>dox hello:say Ann</code> calls <code>run(['Ann'])</code>. A package with no <code>dox_core</code> dependency imports <code>package:dox_annotation/command.dart</code>.</p>
 <h3 id="2-list-the-commands">2. List the commands</h3>
 <p>Make one library with a top-level <code>commands</code> list:</p>
 <div class="language-dart highlight"><span class="filename">lib/commands.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/command.dart'</span><span class="p">;</span>
@@ -7418,69 +7286,75 @@
 <div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">dox</span><span class="p">:</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">commands</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">package:my_package/commands.dart</span>
 </span></code></pre></div>
-<p>That is all. An app that depends on your package now has <code>dox hello:say</code>.</p>
+<p>An app that depends on your package now has <code>dox hello:say</code>.</p>
 <h2 id="add-a-command-to-your-app">Add a command to your app</h2>
-<p>It works the same way. The easy way is <code>dox make:command</code>:</p>
+<p><code>dox make:command</code> writes the command, adds it to <code>lib/app/commands/commands.dart</code> and sets the <code>dox: commands:</code> key:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dox<span class="w"> </span>make:command<span class="w"> </span>send_report
 </span></code></pre></div>
-<p>It writes <code>lib/app/commands/send_report_command.dart</code>, adds the command to <code>lib/app/commands/commands.dart</code>, and sets the <code>dox: commands:</code> key in your <code>pubspec.yaml</code>. The command name is <code>app:send-report</code>. See <a href="../../reference/cli/#dox-makecommand"><code>dox make:command</code></a>.</p>
-<p>If you write it by hand, put the command in <code>lib/</code> of your app and add the key to the app's own <code>pubspec.yaml</code>:</p>
-<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">dox</span><span class="p">:</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">commands</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">package:my_app/commands.dart</span>
-</span></code></pre></div>
+<p>The command name is <code>app:send-report</code>. See <a href="../../reference/cli/#dox-makecommand"><code>dox make:command</code></a>.</p>
+<h2 id="name-clashes">Name clashes</h2>
+<p>A built-in command always wins over a package command with the same name. When two packages have a command with the same name, <code>dox &lt;name&gt;</code> prints an error with both package names.</p>
 <h2 id="failing-a-command">Failing a command</h2>
-<p>When <code>run</code> ends, <code>dox</code> exits with code 0. If something went wrong, set <code>exitCode</code> from <code>dart:io</code>, or throw:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span>
+<p>Set <code>exitCode</code> from <code>dart:io</code>, or throw. The exit code of the command is the exit code of <code>dox</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span>
 </span></code></pre></div>
-<p>A thrown error is printed with its stack trace, and the exit code is 1. The exit code of the command is the exit code of <code>dox</code>, so scripts and CI see it.</p>
+<p>A thrown error prints its stack trace and gives exit code 1.</p>
 <h2 id="writing-a-migration">Writing a migration</h2>
-<p>Some packages need a table, so their command adds a migration file. Use <code>MigrationFile</code> for this. The file gets the same name as <code>dox make:migration</code> makes, like <code>2026_10_21_120000_create_queue_tables.dart</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MigrationFile</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="s1">'create_queue_tables'</span><span class="p">,</span><span class="w"> </span><span class="k">source</span><span class="p">);</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">path</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'A create_queue_tables migration is already in db/migration.'</span><span class="p">);</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="p">}</span>
+<p><code>MigrationFile().create</code> writes a migration with the same file name format as <code>dox make:migration</code>. It returns null and writes nothing when a migration with this name is already there:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MigrationFile</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="s1">'create_queue_tables'</span><span class="p">,</span><span class="w"> </span><span class="k">source</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">path</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'A create_queue_tables migration is already in db/migration.'</span><span class="p">);</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="n">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>create</code> returns <code>null</code> and writes nothing when a migration with this name is already there. The next <code>dox migrate</code> runs the new file.</p>
+<p><code>MigrationFile().exists(name)</code> only tells you if the migration is there. The next <code>dox migrate</code> runs the new file.</p>
 <h2 id="ship-an-install-command">Ship an install command</h2>
-<p><code>dox add &lt;x&gt;</code> adds the package <code>dox_x</code>, then runs its <code>&lt;x&gt;:install</code> command. So if your package needs setup (config files, <code>.env</code> keys, a provider), ship an <code>&lt;x&gt;:install</code> command.</p>
-<p>Use <code>Installer</code> from <code>package:dox_annotation/install.dart</code>. Each step is safe to run twice, because it never overwrites a file and never adds a key twice:</p>
-<div class="language-dart highlight"><span class="filename">lib/src/commands/hello_install_command.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_annotation/command.dart'</span><span class="p">;</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_annotation/install.dart'</span><span class="p">;</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">HelloInstallCommand</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Command</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'hello:install'</span><span class="p">;</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'Set up dox_hello in this app'</span><span class="p">;</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">run</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">    </span><span class="n">Installer</span><span class="w"> </span><span class="n">installer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Installer</span><span class="p">();</span>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">installer</span><span class="p">.</span><span class="n">appName</span><span class="p">;</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">writeFile</span><span class="p">(</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="s1">'lib/config/hello.dart'</span><span class="p">,</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">      </span><span class="s2">"import 'package:</span><span class="si">$</span><span class="n">app</span><span class="s2">/config/env.dart';</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">    </span><span class="p">);</span>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">addEnvGetter</span><span class="p">(</span><span class="s2">"String get helloName =&gt; 'world';"</span><span class="p">);</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">addEnv</span><span class="p">(</span><span class="s1">'HELLO_NAME'</span><span class="p">,</span><span class="w"> </span><span class="s1">'world'</span><span class="p">);</span>
-</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">installer</span><span class="p">.</span><span class="n">buildRunner</span><span class="p">();</span>
-</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">printSummary</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Restart the server.'</span><span class="p">]);</span>
-</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="p">}</span>
+<p><code>dox add &lt;x&gt;</code> adds the package <code>dox_x</code>, then runs its <code>&lt;x&gt;:install</code> command. If your package needs config files, env keys or a provider, ship an <code>&lt;x&gt;:install</code> command.</p>
+<p><code>Installer</code> from <code>package:dox_annotation/install.dart</code> does the steps. A step never overwrites a file and never adds a key twice, so it is safe to run twice:</p>
+<div class="language-dart highlight"><span class="filename">lib/src/commands/hello_install_command.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_annotation/command.dart'</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_annotation/install.dart'</span><span class="p">;</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">HelloInstallCommand</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Command</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'hello:install'</span><span class="p">;</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'Set up dox_hello in this app'</span><span class="p">;</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-7-12"><a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">run</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-13"><a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a><span class="w">    </span><span class="n">Installer</span><span class="w"> </span><span class="n">installer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Installer</span><span class="p">();</span>
+</span><span id="__span-7-14"><a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">installer</span><span class="p">.</span><span class="n">appName</span><span class="p">;</span>
+</span><span id="__span-7-15"><a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">writeFile</span><span class="p">(</span>
+</span><span id="__span-7-16"><a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a><span class="w">      </span><span class="s1">'lib/config/hello.dart'</span><span class="p">,</span>
+</span><span id="__span-7-17"><a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a><span class="w">      </span><span class="s2">"import 'package:</span><span class="si">$</span><span class="n">app</span><span class="s2">/config/env.dart';</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+</span><span id="__span-7-18"><a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a><span class="w">    </span><span class="p">);</span>
+</span><span id="__span-7-19"><a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">addEnvGetter</span><span class="p">(</span><span class="s2">"String get helloName =&gt; 'world';"</span><span class="p">);</span>
+</span><span id="__span-7-20"><a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">addEnv</span><span class="p">(</span><span class="s1">'HELLO_NAME'</span><span class="p">,</span><span class="w"> </span><span class="s1">'world'</span><span class="p">);</span>
+</span><span id="__span-7-21"><a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">installer</span><span class="p">.</span><span class="n">buildRunner</span><span class="p">();</span>
+</span><span id="__span-7-22"><a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a><span class="w">    </span><span class="n">installer</span><span class="p">.</span><span class="n">printSummary</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Restart the server.'</span><span class="p">]);</span>
+</span><span id="__span-7-23"><a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-7-24"><a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a><span class="p">}</span>
 </span></code></pre></div>
 <table>
 <thead>
 <tr>
-<th>Method</th>
+<th>Member</th>
 <th>What it does</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td><code>Installer(root: dir)</code></td>
+<td>Works in the folder <code>dir</code>. The default is the current folder.</td>
+</tr>
+<tr>
+<td><code>appName</code></td>
+<td>The <code>name</code> of the app <code>pubspec.yaml</code>, for <code>package:&lt;app&gt;/...</code> imports.</td>
+</tr>
+<tr>
 <td><code>writeFile(path, content)</code></td>
-<td>Writes the file only when it is not there.</td>
+<td>Writes the file only when it is not there. Returns true when it wrote it.</td>
 </tr>
 <tr>
 <td><code>makeFolder(path)</code></td>
@@ -7488,11 +7362,15 @@
 </tr>
 <tr>
 <td><code>addEnv(key, value)</code></td>
-<td>Adds <code>KEY=value</code> to <code>.env.example</code> and <code>.env</code> when the key is missing. A key that is there is never changed.</td>
+<td>Adds <code>KEY=value</code> to <code>.env.example</code> and <code>.env</code> when the key is missing.</td>
 </tr>
 <tr>
 <td><code>addEnvGetter(getter)</code></td>
-<td>Adds a getter to <code>AppEnv</code> in <code>lib/config/env.dart</code> when the class has no member with that name. When it can not find the class, it changes nothing and prints a hint.</td>
+<td>Adds a getter to <code>AppEnv</code> in <code>lib/config/env.dart</code> when the class has no member with that name.</td>
+</tr>
+<tr>
+<td><code>hasDependency(package)</code></td>
+<td>True when the app <code>pubspec.yaml</code> has the package.</td>
 </tr>
 <tr>
 <td><code>addDependency(package, dev: false)</code></td>
@@ -7507,35 +7385,25 @@
 <td>Adds your own line to the summary, like <code>added    hooks to pubspec.yaml</code>.</td>
 </tr>
 <tr>
+<td><code>lines</code></td>
+<td>The lines of the summary.</td>
+</tr>
+<tr>
+<td><code>ok</code></td>
+<td>False when a step failed.</td>
+</tr>
+<tr>
 <td><code>printSummary(nextSteps)</code></td>
 <td>Prints what was done and the next steps. Sets exit code 1 when a step failed.</td>
 </tr>
 </tbody>
 </table>
-<p>Some tips for a good install command:</p>
+<p>Read the options from <code>args</code>, like <code>--driver=postgres</code>, and give a good default, so <code>dox add &lt;x&gt;</code> works with no options. <code>dox_orm</code> has an example: <code>orm:install</code>.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>Read the options from <code>args</code>, like <code>--driver=postgres</code>. Give a good default, so <code>dox add &lt;x&gt;</code> with no options works.</li>
-<li>Test it on an app made without your package. Run it twice and check that nothing changes the second time.</li>
-<li>Add <code>dox add &lt;x&gt;</code> to the skill of your package (<code>skills/&lt;name&gt;/SKILL.md</code>), so AI agents set it up the same way.</li>
-</ul>
-<p><code>dox_orm</code> has an example: <code>orm:install</code>.</p>
-<h2 id="details">Details</h2>
-<h3 id="name-clashes-and-errors">Name clashes and errors</h3>
-<ul>
-<li>A built-in command always wins. If a package has a command with the same name as a built-in one, <code>dox</code> runs the built-in one, and <code>dox help</code> marks the package command as not used.</li>
-<li>If two packages have a command with the same name, <code>dox &lt;name&gt;</code> prints an error with both package names and exits with code 1.</li>
-<li>A bad <code>dox: commands:</code> key (not a library of the package, or a missing file) prints a warning with the package name. The commands of the other packages still work.</li>
-<li>The key path may use only letters, digits, <code>_</code>, <code>-</code>, <code>.</code> and <code>/</code>, and no <code>..</code>.</li>
-<li>An unknown command prints <code>Could not find a command named "&lt;name&gt;"</code>, with a hint about the <code>dox: commands:</code> key.</li>
-</ul>
-<h3 id="how-it-works">How it works</h3>
-<ul>
-<li><code>dox &lt;name&gt;</code> first looks for a built-in command. Then it reads <code>.dart_tool/package_config.json</code> and the <code>dox: commands:</code> key of each package and of the app.</li>
-<li>It writes <code>.dart_tool/dox/commands.dart</code>, which imports each commands library, and runs it with <code>dart run</code>. So the command code is always the newest.</li>
-<li>It writes that file again only when <code>.dart_tool/package_config.json</code> or a <code>pubspec.yaml</code> changes. If a package had a warning, <code>dox</code> looks again on the next run.</li>
-<li><code>dox help</code> keeps the list in <code>.dart_tool/dox/commands.json</code>. If you change only a file that the commands library imports, <code>dox help</code> can show an old description. The command itself always runs the new code.</li>
-<li><code>MigrationFile().create</code> finds a migration with the same name and any time in its name. <code>dox migrate</code> writes <code>db/migration/migrations.dart</code> again before it runs, and makes <code>bin/migrate.dart</code> when it is missing.</li>
-<li>An app inside a pub workspace works too, also when the <code>workspace:</code> list uses a glob like <code>apps/*</code>. <code>dox</code> finds the workspace root from <code>.dart_tool/pub/workspace_ref.json</code>.</li>
+<li><a href="../dox-cli/">Dox CLI</a>: the commands of the CLI.</li>
+<li><a href="../../getting-started/add-a-package/">Add a package</a>: <code>dox add</code> runs the install command of a package.</li>
+<li><a href="../providers/">Providers</a>: set up a package when the app starts.</li>
 </ul>
 
 
@@ -7656,7 +7524,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

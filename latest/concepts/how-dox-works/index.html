@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="This page explains what happens inside Dox when a request comes in, how isolates work and what each folder of an app is for.">
+        <meta name="description" content="This page shows the path of a request, how isolates work and what each folder of an app is for.">
       
       
       
@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -81,7 +83,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="How Dox works | Dox">
-  <meta property="og:description" content="This page explains what happens inside Dox when a request comes in, how isolates work and what each folder of an app is for.">
+  <meta property="og:description" content="This page shows the path of a request, how isolates work and what each folder of an app is for.">
   <meta property="og:url" content="https://dartondox.dev/latest/concepts/how-dox-works/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +92,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="How Dox works | Dox">
-  <meta name="twitter:description" content="This page explains what happens inside Dox when a request comes in, how isolates work and what each folder of an app is for.">
+  <meta name="twitter:description" content="This page shows the path of a request, how isolates work and what each folder of an app is for.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -1423,6 +1425,17 @@
     <span class="md-ellipsis">
       
         The layout of a Dox app
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
       
     </span>
   </a>
@@ -5265,10 +5278,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5394,95 +5403,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7323,6 +7243,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7340,43 +7271,32 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/concepts/how-dox-works.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="how-dox-works">How Dox works</h1>
-<p>This page explains what happens inside Dox when a request comes in, how isolates work and what each folder of an app is for.</p>
-<p>You do not need this page to build an app. Read it when you want to know why Dox behaves the way it does, for example why a static value is not shared, or where an error status comes from.</p>
+<p>This page shows the path of a request, how isolates work and what each folder of an app is for.</p>
 <h2 id="the-life-of-a-request">The life of a request</h2>
-<p>In short, every request takes the same path. The pages in "The basics" follow this order:</p>
+<p>Each request takes the same path. The pages in "The basics" follow this order:</p>
 <pre class="mermaid"><code>flowchart LR
     A["Route"] --&gt; B["Middleware"] --&gt; C["DTO"] --&gt; D["Controller"] --&gt; E["View"] --&gt; F["Response"]</code></pre>
 <p><a href="../../the-basic/routing/">Routing</a> → <a href="../../the-basic/middleware/">Middleware</a> → <a href="../../the-basic/dto/">DTOs</a> → <a href="../../the-basic/controller/">Controller</a> → <a href="../../the-basic/views/">Views</a> → <a href="../../the-basic/response/">Response</a></p>
-<p>The rest of this section shows each step in detail.</p>
-<p>Dox has two parts that work together:</p>
-<ul>
-<li>A native server (<code>dox_http_native</code>). It owns the sockets and parses HTTP.</li>
-<li>Your app, written in Dart. Routes, middleware, DTOs, controllers and the ORM all run here.</li>
-</ul>
+<p>Dox has two parts. The native server (<code>dox_http_native</code>) owns the sockets and parses HTTP. Your Dart app runs the routes, middleware, DTOs, controllers and the ORM.</p>
 <p>A request goes through these steps:</p>
 <ol>
-<li>The native server accepts the connection and parses the request line, the headers and the body. If the request is broken, it answers <code>400</code>. Headers over 16 KB get <code>431</code>, and a body over the size limit gets <code>413</code>. Dart never sees these requests.</li>
-<li>The native server hands the requests to Dart in a batch, so one message holds many requests.</li>
-<li>Dart finds the route by the method, the <code>Host</code> (for domain routes) and the path. If no route matches, the answer is <code>404</code>. A CORS preflight (<code>OPTIONS</code>) gets <code>204</code>.</li>
+<li>The native server parses the request. A broken request gets 400, headers over 16 KB get 431, and a body over the size limit gets 413.</li>
+<li>The native server gives the requests to Dart in a batch.</li>
+<li>Dart finds the route by the method, the host and the path. No match gets 404. A CORS preflight gets 204.</li>
 <li>Dart adds the CORS headers of the route.</li>
-<li>Dart reads the body, but only when the request has a <code>Content-Type</code>.</li>
-<li>Dart runs the middleware of the route in this order: global, router, group, route. A middleware returns the request to go on. If it returns anything else, that is sent as the response and the controller does not run.</li>
-<li>Dart fills the controller parameters. Path params are converted first, and a value that does not fit its type (<code>abc</code> for <code>int id</code>) gets <code>404</code>. Then the DTO is read and checked. Bad input gets <code>422</code>, a body that is not JSON gets <code>400</code>, and a content type Dox can not read gets <code>415</code>.</li>
+<li>Dart reads the body, if the request has a content type.</li>
+<li>Dart runs the middleware in this order: global, router, group, route. If a middleware returns a value that is not the request, Dart sends that value as the response.</li>
+<li>Dart fills the controller parameters. A path param that does not fit its type gets 404. Bad DTO input gets 422, a body that is not JSON gets 400, and an unknown content type gets 415.</li>
 <li>The controller runs and returns a value.</li>
-<li>If you set a <code>responseHandler</code> in <code>AppConfig</code>, it runs now. It can change every response.</li>
-<li>Dox turns the value into the response: a <code>String</code> is text, a <code>Map</code> or model is JSON, and a <code>File</code> is streamed.</li>
-<li>Dart sends the answers of the batch back to the native server in one call, and it writes the bytes to the socket.</li>
+<li>The <code>responseHandler</code> of <code>AppConfig</code> runs, if you set one.</li>
+<li>Dox makes the response: a string is text, a map or model is JSON, and a file is streamed.</li>
+<li>Dart gives the answers of the batch back to the native server, which writes them to the socket.</li>
 </ol>
-<p>If a step throws, Dox catches the error. An <code>IHttpException</code> (like <code>NotFoundHttpException</code>) gives its own status. Any other error gives <code>500</code> and goes to the <code>report</code> method of the <code>ExceptionHandler</code> in <code>AppConfig</code>.</p>
+<p>If a step throws, Dox catches the error. An <code>IHttpException</code> gives its own status. Any other error gives 500 and goes to the <code>report</code> method of your <code>ExceptionHandler</code>.</p>
 <pre class="mermaid"><code>sequenceDiagram
     participant C as Client
     participant R as Native server
@@ -7397,12 +7317,8 @@
     D-&gt;&gt;D: responseHandler, build the response
     D-&gt;&gt;R: batch of answers (one call)
     R-&gt;&gt;C: bytes</code></pre>
-<div class="admonition note">
-<p class="admonition-title">No reflection</p>
-<p>Dox reads the parameter types of every controller once, at start. It does not use <code>dart:mirrors</code>, and DTOs come from a generated list (<code>lib/generated/dtos.g.dart</code>). This is why <code>dox build</code> can make a native (AOT) binary.</p>
-</div>
+<p>Dox uses no reflection. DTOs come from a generated list, so <code>dox build</code> can make a native binary.</p>
 <h3 id="where-things-are-decided">Where things are decided</h3>
-<p>When you want to change what happens to a request, this table shows where to look:</p>
 <table>
 <thead>
 <tr>
@@ -7425,7 +7341,7 @@
 <tr>
 <td>Input</td>
 <td>a <code>@Dto</code> class in <code>lib/app/dtos/&lt;name&gt;/</code></td>
-<td>what the controller gets, or <code>422</code></td>
+<td>what the controller gets, or 422</td>
 </tr>
 <tr>
 <td>Output</td>
@@ -7439,12 +7355,10 @@
 </tr>
 </tbody>
 </table>
-<p>See <a href="../../the-basic/routing/">Routing</a>, <a href="../../the-basic/middleware/">Middleware</a>,
-<a href="../../the-basic/validation/">Validation</a> and <a href="../../the-basic/response/">Response</a>.</p>
 <h2 id="isolates">Isolates</h2>
-<p>Dart runs code on isolates. An isolate is like a thread, but it has its own memory. Dox starts one isolate per CPU the process may use (it respects the container cpuset and CPU quota), and every isolate runs the full app. This is how one Dox process uses all cores.</p>
+<p>An <strong>isolate</strong> is like a thread with its own memory. Dox starts one isolate for each CPU that the process can use, also in a container, and each isolate runs the full app.</p>
 <h3 id="one-port-many-isolates">One port, many isolates</h3>
-<p>Every isolate runs its own HTTP server on the same port, and the operating system spreads the connections between them:</p>
+<p>Each isolate runs its own HTTP server on the same port:</p>
 <table>
 <thead>
 <tr>
@@ -7467,43 +7381,35 @@
 </tr>
 </tbody>
 </table>
-<p>Each isolate does its socket work on its own thread. See <a href="../../digging-deeper/native-server/#how-it-works">Native server</a>.</p>
+<p>See <a href="../../digging-deeper/native-server/#how-it-works">Native server</a>.</p>
 <h3 id="what-each-isolate-gets">What each isolate gets</h3>
-<p>Before Dox starts an isolate, it copies three things to it:</p>
-<ul>
-<li>the <code>AppConfig</code>,</li>
-<li>the list of providers,</li>
-<li>the routes and route binders (<code>Route.bind</code>) you added before <code>startServer()</code>.</li>
-</ul>
-<p>Then each isolate does these steps once:</p>
+<p>Dox copies the <code>AppConfig</code>, the providers, and the routes and binders that you added before <code>startServer()</code> to each isolate. Then each isolate does these steps one time:</p>
 <ol>
-<li>It runs <code>setup()</code> of every provider, in list order. This is where a database pool is opened.</li>
+<li>It runs <code>setup()</code> of each provider, in list order.</li>
 <li>It registers the routes of your routers.</li>
-<li>It reads the parameter types of every controller.</li>
+<li>It reads the parameter types of each controller.</li>
 <li>It starts its HTTP server.</li>
 </ol>
-<p>Nothing in this list runs per request.</p>
-<p>Because the config and the providers are copied, they must not hold open sockets or pools. Open these in <code>setup()</code> instead. See <a href="../../digging-deeper/providers/">Providers</a>.</p>
+<p>The config and the providers are copied, so they must not hold open sockets or pools. Open them in <code>setup()</code>. See <a href="../../digging-deeper/providers/">Providers</a>.</p>
 <h3 id="each-isolate-has-its-own-memory">Each isolate has its own memory</h3>
-<p>Isolates do not share memory, so you must keep this in mind when you store state:</p>
+<p>Isolates do not share memory:</p>
 <ul>
-<li>A static value or a singleton exists once per isolate. A change in one isolate is not seen in the others.</li>
-<li>The <code>memory</code> cache store is per isolate. Use the <code>redis</code> store to share cache data.</li>
-<li>To share data between isolates, use the database, Redis or files.</li>
+<li>A static value or a singleton exists one time in each isolate.</li>
+<li>The memory cache store is per isolate. Use the Redis store to share cache data.</li>
+<li>To share data, use the database, Redis or files.</li>
 </ul>
-<p><code>Dox().isolateId</code> tells you which isolate runs the code. The first one is <code>1</code>.</p>
+<p><code>Dox().isolateId</code> gives the isolate that runs the code. The first one is 1.</p>
 <h3 id="when-an-isolate-crashes">When an isolate crashes</h3>
-<p>Dox tries hard to keep isolates alive:</p>
 <ul>
-<li>An error in a request is caught. Dox answers <code>500</code> and keeps going.</li>
-<li>An async error outside a request is caught and passed to the <code>ExceptionHandler</code>, and the isolate keeps running.</li>
-<li>If a worker isolate still dies, Dox prints <code>[server] isolate N exited, restarting</code> and starts a new one after 1 second.</li>
-<li>If the first (main) isolate dies, the process exits with a non-zero code. So in production, use a supervisor (Docker <code>restart:</code>, systemd <code>Restart=always</code>) to start it again.</li>
+<li>An error in a request gets 500, and the isolate continues.</li>
+<li>An async error outside a request goes to the <code>ExceptionHandler</code>, and the isolate continues.</li>
+<li>If a worker isolate stops, Dox starts a new one after 1 second.</li>
+<li>If the main isolate stops, the process exits with an error code. In production, use a supervisor to start it again, like Docker <code>restart:</code> or systemd <code>Restart=always</code>.</li>
 </ul>
 <h3 id="how-many-isolates">How many isolates</h3>
-<p>To change the number, set <code>totalIsolate</code> in <code>AppConfig</code> or <code>APP_TOTAL_ISOLATE</code> in <code>.env</code>. <code>Dox().totalIsolate(2)</code> before <code>startServer()</code> wins over the config. Use <code>1</code> in tests. See <a href="../../digging-deeper/isolate/">Isolate</a>.</p>
+<p>Set <code>totalIsolate</code> in <code>AppConfig</code> or <code>APP_TOTAL_ISOLATE</code> in <code>.env</code>. <code>Dox().totalIsolate(2)</code> before <code>startServer()</code> wins over the config. See <a href="../../digging-deeper/isolate/">Isolate</a>.</p>
 <h2 id="where-the-database-pools-live">Where the database pools live</h2>
-<p>The ORM is started in a provider (<code>ORMProvider</code>). Every isolate runs <code>setup()</code>, so every isolate asks for a pool. But the native drivers live outside Dart, and there, isolates that open the same settings get the same pool:</p>
+<p>Each isolate runs <code>setup()</code> of the ORM provider, so each isolate asks for a pool. The native drivers give isolates with the same settings the same pool:</p>
 <table>
 <thead>
 <tr>
@@ -7530,10 +7436,9 @@
 </tr>
 </tbody>
 </table>
-<p>So for Postgres and MySQL, the app opens at most <code>maxConnectionCount</code> connections, for any number of isolates. You choose the pool size. Set it below the <code>max_connections</code> of the database. The pool closes when the last isolate that uses it closes it. See <a href="../../database/postgres-native/#options">Native Postgres driver</a>.</p>
-<p>Postgres and MySQL have only the native drivers. If the native library does not load, the app stops with an error that says why and how to fix it. See <a href="../../database/">Database</a>.</p>
+<p>So for Postgres and MySQL, the app opens at most <code>maxConnectionCount</code> connections for all isolates. Set it below the max_connections of the database. See <a href="../../database/postgres-native/#options">Native Postgres driver</a>.</p>
 <h2 id="the-layout-of-a-dox-app">The layout of a Dox app</h2>
-<p><code>dox create my_app</code> copies the <a href="https://github.com/dartondox/dox-sample">dox-sample</a> template. Each folder has one job, so you always know where a new file goes:</p>
+<p><code>dox create my_app</code> copies the <a href="https://github.com/dartondox/dox-sample">dox-sample</a> template:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>my_app/
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>├── bin/
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>│   ├── server.dart          # starts the app
@@ -7564,7 +7469,7 @@
 </span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│   ├── routes/
 </span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│   │   ├── api.dart             # ApiRouter, prefix `api`
 </span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│   │   └── web.dart             # WebRouter
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│   ├── providers/               # one DoxProvider per file, runs in every isolate
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│   ├── providers/               # one DoxProvider per file
 </span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│   │   ├── orm_provider.dart        # opens the database
 </span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│   │   ├── queue_provider.dart
 </span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>│   │   ├── schedule_provider.dart
@@ -7574,20 +7479,13 @@
 </span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│       ├── jobs.g.dart          # the list of queue jobs
 </span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│       └── openapi.g.dart       # the OpenAPI docs
 </span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>├── test/
-</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>├── .env                         # local settings, not in git. `dox create` makes it
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>├── .env                         # local settings, not in git
 </span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>├── .env.example
 </span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>├── Dockerfile
 </span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>├── docker-compose.yml
 </span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>└── pubspec.yaml
 </span></code></pre></div>
-<p>Some folders are added later, by the <code>dox make:*</code> commands, when you first need them:</p>
-<ul>
-<li><code>dox make:dto</code> adds <code>lib/app/dtos/&lt;name&gt;/&lt;name&gt;.dto.dart</code>. Then <code>build_runner</code> writes <code>lib/generated/dtos.g.dart</code>, the list of DTOs.</li>
-<li><code>dox make:middleware</code> adds <code>lib/app/http/middleware/</code>.</li>
-<li><code>dox make:serializer</code> adds <code>lib/app/serializers/</code>.</li>
-</ul>
-<p>The app makes <code>storage/</code> when it first writes files (the local disk, the file cache, uploads).</p>
-<p>This table says what goes in each folder:</p>
+<p>The <code>dox make:*</code> commands add more folders when you need them, like <code>lib/app/dtos/</code>, <code>lib/app/http/middleware/</code> and <code>lib/app/serializers/</code>. The app makes <code>storage/</code> when it first writes files.</p>
 <table>
 <thead>
 <tr>
@@ -7598,19 +7496,19 @@
 <tbody>
 <tr>
 <td><code>bin/</code></td>
-<td><code>server.dart</code> calls <code>Dox().initialize(appConfig)</code>, runs the migrations, then <code>Dox().startServer()</code>. The other files are the entry points that the <code>dox migration:*</code>, <code>db:seed</code>, <code>queue:*</code> and <code>schedule:*</code> commands run.</td>
+<td><code>server.dart</code> calls <code>Dox().initialize(appConfig)</code>, runs the migrations, then <code>Dox().startServer()</code>. The other files are the entry points of the <code>dox migration:*</code>, <code>db:seed</code>, <code>queue:*</code> and <code>schedule:*</code> commands.</td>
 </tr>
 <tr>
 <td><code>db/</code></td>
-<td>Your migrations, factories and seeders. Dart migrations are listed in <code>db/migration/migrations.dart</code>, which the CLI writes.</td>
+<td>Your migrations, factories and seeders. The CLI writes the list of Dart migrations in <code>db/migration/migrations.dart</code>.</td>
 </tr>
 <tr>
 <td><code>lib/app/http/</code></td>
-<td>Everything about HTTP: controllers and middleware.</td>
+<td>Controllers and middleware.</td>
 </tr>
 <tr>
 <td><code>lib/app/serializers/</code></td>
-<td>Serializers. They are not only for HTTP: MCP and websocket use them too.</td>
+<td>Serializers. MCP and WebSocket code also use them.</td>
 </tr>
 <tr>
 <td><code>lib/app/dtos/</code></td>
@@ -7622,7 +7520,7 @@
 </tr>
 <tr>
 <td><code>lib/app/models/</code></td>
-<td>One folder per model. <code>build_runner</code> writes the <code>.g.dart</code> file next to it.</td>
+<td>One folder per model, with its generated file.</td>
 </tr>
 <tr>
 <td><code>lib/config/</code></td>
@@ -7630,15 +7528,15 @@
 </tr>
 <tr>
 <td><code>lib/routes/</code></td>
-<td>One <code>Router</code> class per file. Dox finds each router by itself.</td>
+<td>One <code>Router</code> class per file. Dox finds each router.</td>
 </tr>
 <tr>
 <td><code>lib/providers/</code></td>
-<td>Classes that extend <code>DoxProvider</code>. Their <code>setup()</code> runs in every isolate. Dox finds each provider by itself.</td>
+<td>Classes that extend <code>DoxProvider</code>. Their <code>setup()</code> runs in each isolate. Dox finds each provider.</td>
 </tr>
 <tr>
 <td><code>lib/generated/</code></td>
-<td>Generated files. Do not edit them. Run <code>dox build_runner:build</code> to make them again.</td>
+<td>Generated files. Run <code>dox build_runner:build</code> to make them again.</td>
 </tr>
 <tr>
 <td><code>storage/</code></td>
@@ -7646,7 +7544,12 @@
 </tr>
 </tbody>
 </table>
-<p><code>build_runner</code> with <code>dox_builder</code> makes the generated files: the model classes, the DTO checks, the typed env class, the OpenAPI docs and the list of queue jobs.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../../digging-deeper/isolate/">Isolate</a>: more on isolates.</li>
+<li><a href="../../digging-deeper/providers/">Providers</a>: code that runs when the app starts.</li>
+<li><a href="../../tutorial/">Build a blog API</a>: build a full app.</li>
+</ul>
 
 
 
@@ -7766,7 +7669,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -5811,21 +5720,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7283,21 +7181,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7321,23 +7208,18 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/file-upload.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="file-upload">File upload</h1>
 <p>Accept an image from a form, check its size and type, save it to a disk, and return its URL.</p>
-<p>You should never trust an uploaded file: it can be too big, or it can be a different type than its name says. So this guide checks the file in a <a href="../../the-basic/dto/">DTO</a> first, and only then saves it.</p>
+<p>An uploaded file can be too big, or of a different type than its name says. So this guide checks the file in a <a href="../../the-basic/dto/">DTO</a> first, and then saves it.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Dox app (<code>dox create my_app</code>). A new app has the <code>dox_storage</code> package, <code>lib/config/storage.dart</code> and <code>lib/providers/storage_provider.dart</code>.</li>
 </ul>
 <h2 id="1-set-up-the-disk">1. Set up the disk</h2>
-<p>The <code>local</code> disk of a new app saves files in the <code>storage</code> folder. Give the disk a <code>url</code>, because <code>Storage().url()</code> uses it to build the public URL of a file:</p>
+<p>Give the <code>local</code> disk a <code>url</code>. <code>Storage().url()</code> uses it to make the public URL of a file:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/storage.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
@@ -7354,12 +7236,12 @@
 </span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="p">},</span>
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="p">);</span>
 </span></code></pre></div>
-<p><code>APP_URL</code> is a new key, so add a getter for it to the <code>AppEnv</code> class:</p>
+<p>Add a getter for the new <code>APP_URL</code> key to the <code>AppEnv</code> class:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">  </span><span class="c1">/// the public URL of this app, used in file links</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appUrl</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'http://localhost:3000'</span><span class="p">;</span>
 </span></code></pre></div>
-<p>Run <code>dart run build_runner build</code> to update <code>env.g.dart</code>. Then add <code>APP_URL=http://localhost:3000</code> to your <code>.env</code>.</p>
-<p>The provider of a new app sets up the disks. You do not need to change it:</p>
+<p>Run <code>dart run build_runner build</code>. Then add <code>APP_URL=http://localhost:3000</code> to your <code>.env</code>.</p>
+<p>The provider of a new app sets up the disks. Keep it as it is:</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/storage_provider.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/storage.dart'</span><span class="p">;</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
@@ -7368,7 +7250,7 @@
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="2-write-the-dto">2. Write the DTO</h2>
-<p>The DTO checks the file before your controller runs. If the check fails, Dox answers <code>422</code> and the controller never sees the file.</p>
+<p>The DTO checks the file before the controller runs. A failed check answers 422:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/dtos/upload_image/upload_image.dto.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'upload_image.dto.g.dart'</span><span class="p">;</span>
@@ -7386,9 +7268,9 @@
 </span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">UploadImage</span><span class="o">&gt;</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$UploadImageDto</span><span class="p">;</span>
 </span><span id="__span-3-16"><a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>If you want other file types, use <code>@Mimes(&lt;String&gt;['pdf', 'docx'])</code> in place of <code>@Image()</code>.</p>
+<p>For other file types, use <code>@Mimes(&lt;String&gt;['pdf', 'docx'])</code> in place of <code>@Image()</code>.</p>
 <h2 id="3-write-the-controller">3. Write the controller</h2>
-<p>The controller saves the file with <code>putFile</code> and returns its path and URL. <code>putFile</code> gives the file a new UUID name, and on the local disk it does not read the whole file into memory.</p>
+<p>Save the file with <code>putFile</code>, and return its path and URL. <code>putFile</code> gives the file a new UUID name:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/upload.controller.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/dtos/upload_image/upload_image.dto.dart'</span><span class="p">;</span>
@@ -7406,11 +7288,11 @@
 </span></code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Save the file before you return</p>
-<p>Dox deletes the uploaded temp file when the response is sent.
-So call <code>putFile</code>, <code>store</code> or <code>moveTo</code> inside the controller, not later.</p>
+<p>Dox deletes the uploaded temp file when it sends the response.
+So call <code>putFile</code>, <code>store</code> or <code>moveTo</code> in the controller, not later.</p>
 </div>
 <h2 id="4-add-the-routes">4. Add the routes</h2>
-<p>You need two routes. One route takes the upload, and <code>Storage.route</code> serves the saved files at <code>GET /files/{key*}</code>:</p>
+<p>One route takes the upload. <code>Storage.route</code> serves the saved files at <code>/files/{key*}</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/http/controllers/upload.controller.dart'</span><span class="p">;</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
@@ -7441,9 +7323,9 @@ So call <code>putFile</code>, <code>store</code> or <code>moveTo</code> inside t
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>signed: false</code> makes every file public. If the files are private, leave it out, so the route serves only signed URLs. Then use <code>Storage().signedUrl(path)</code> in place of <code>Storage().url(path)</code>.</p>
+<p><code>signed: false</code> makes every file public. For private files, leave it out and use <code>Storage().signedUrl(path)</code> in place of <code>Storage().url(path)</code>.</p>
 <h2 id="5-register-the-dtos">5. Register the DTOs</h2>
-<p>Dox finds a DTO in the <code>dtos</code> list of <code>AppConfig</code>. <code>build_runner</code> writes this list to <code>lib/generated/dtos.g.dart</code>. You add it only once, so skip this step if your <code>app.dart</code> already has <code>dtos: dtos</code>.</p>
+<p>Add the <code>dtos</code> list that <code>build_runner</code> writes. Skip this step if your <code>app.dart</code> already has <code>dtos: dtos</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/generated/dtos.g.dart'</span><span class="p">;</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
@@ -7452,6 +7334,7 @@ So call <code>putFile</code>, <code>store</code> or <code>moveTo</code> inside t
 </span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="6-build-and-run">6. Build and run</h2>
+<p>Build the code and start the server:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w"> </span>--delete-conflicting-outputs
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>dox<span class="w"> </span>serve
 </span></code></pre></div>
@@ -7459,28 +7342,25 @@ So call <code>putFile</code>, <code>store</code> or <code>moveTo</code> inside t
 <p>Upload a PNG:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>curl<span class="w"> </span>-F<span class="w"> </span><span class="nv">image</span><span class="o">=</span>@photo.png<span class="w"> </span>http://localhost:3000/api/upload
 </span></code></pre></div>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span><span class="nt">"path"</span><span class="p">:</span><span class="s2">"/images/074aa0d0-ce21-11f1-938a-57265e28c4a3.png"</span><span class="p">,</span><span class="nt">"url"</span><span class="p">:</span><span class="s2">"http://localhost:3000/files/images/074aa0d0-ce21-11f1-938a-57265e28c4a3.png"</span><span class="p">}</span>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="p">{</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">"path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/images/074aa0d0-ce21-11f1-938a-57265e28c4a3.png"</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nt">"url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"http://localhost:3000/files/images/074aa0d0-ce21-11f1-938a-57265e28c4a3.png"</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Open the <code>url</code> in the browser. The image shows.</p>
-<p>Now upload a text file. You get <code>422</code>:</p>
+<p>Open the URL in the browser. The image shows.</p>
+<p>Now upload a text file. You get 422:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>curl<span class="w"> </span>-F<span class="w"> </span><span class="nv">image</span><span class="o">=</span>@notes.txt<span class="w"> </span>http://localhost:3000/api/upload
 </span></code></pre></div>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="p">{</span><span class="nt">"image"</span><span class="p">:</span><span class="s2">"The image must be an image"</span><span class="p">}</span>
 </span></code></pre></div>
-<p>If you send no file at all, you also get <code>422</code>, with <code>{"image":"The image is required"}</code>.</p>
+<p>With no file, you also get 422, with <code>{"image":"The image is required"}</code>.</p>
 <h2 id="bigger-files">Bigger files</h2>
-<p>A <code>multipart/form-data</code> body can be 100 MB by default. If you need more, change it in <code>AppConfig(maxMultipartSize: ...)</code>. Set the same limit in your proxy too (<code>client_max_body_size</code> in nginx).</p>
-<h2 id="details">Details</h2>
+<p>A multipart body can be 100 MB by default. To change the limit, set <code>maxMultipartSize</code> in <code>AppConfig</code>. Set the same limit in your proxy too, like <code>client_max_body_size</code> in nginx.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><code>@Image()</code> reads the first bytes of the file to find the real type. It does not trust the file name.</li>
-<li>A file bigger than 1 MB is written to a temp file while it arrives. That is the file Dox deletes after the response.</li>
-<li>On the local disk, <code>putFile</code> moves the temp file. With <code>permissions</code> on, it streams the file in place of a move.</li>
-</ul>
-<h2 id="see-also">See also</h2>
-<ul>
-<li><a href="../../the-basic/request/#form-data-file">Request: form data</a> for <code>RequestFile</code></li>
-<li><a href="../../the-basic/validation-rules/#files">Validation rules: files</a> for <code>@Image</code>, <code>@Mimes</code>, <code>@MimeTypes</code>, <code>@MaxSize</code>, <code>@MinSize</code>, <code>@Dimensions</code></li>
-<li><a href="../../digging-deeper/file-storage/">File storage</a> for S3 and signed URLs</li>
+<li><a href="../../the-basic/request/#form-data-file">Request: form data</a>: read a <code>RequestFile</code>.</li>
+<li><a href="../../the-basic/validation-rules/#files">Validation rules: files</a>: all the file rules.</li>
+<li><a href="../../digging-deeper/file-storage/">File storage</a>: S3 and signed URLs.</li>
 </ul>
 
 
@@ -7601,7 +7481,7 @@ So call <code>putFile</code>, <code>store</code> or <code>moveTo</code> inside t
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

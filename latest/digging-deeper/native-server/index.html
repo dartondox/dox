@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Dox runs on a native HTTP server from the package dox_http_native.">
+        <meta name="description" content="Dox runs on a native HTTP server from the package dox_http_native: Rust owns the sockets and parses HTTP, and all your code stays in Dart.">
       
       
       
@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -81,7 +83,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Native server | Dox">
-  <meta property="og:description" content="Dox runs on a native HTTP server from the package dox_http_native.">
+  <meta property="og:description" content="Dox runs on a native HTTP server from the package dox_http_native: Rust owns the sockets and parses HTTP, and all your code stays in Dart.">
   <meta property="og:url" content="https://dartondox.dev/latest/digging-deeper/native-server/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +92,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Native server | Dox">
-  <meta name="twitter:description" content="Dox runs on a native HTTP server from the package dox_http_native.">
+  <meta name="twitter:description" content="Dox runs on a native HTTP server from the package dox_http_native: Rust owns the sockets and parses HTTP, and all your code stays in Dart.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -3242,13 +3244,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-it-without-dox" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using it without Dox
+        Setup
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3294,6 +3313,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#finding-lost-clients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding lost clients
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3304,6 +3340,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Streaming a response">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-the-response-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking the response state
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3330,6 +3383,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Without Dox">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking the library
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stopping-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stopping the server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encrypting-with-aes-gcm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypting with AES-GCM
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#working-on-the-native-code" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3341,41 +3455,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limits
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5262,10 +5348,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5391,95 +5473,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7199,13 +7192,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#using-it-without-dox" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using it without Dox
+        Setup
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#limits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limits
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7251,6 +7261,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="WebSocket">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#finding-lost-clients" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding lost clients
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -7261,6 +7288,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Streaming a response">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-the-response-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking the response state
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7287,6 +7331,67 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How it works
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Without Dox">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-the-library" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking the library
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stopping-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stopping the server
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encrypting-with-aes-gcm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encrypting with AES-GCM
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#working-on-the-native-code" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7298,41 +7403,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#how-it-works" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How it works
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#limits" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Limits
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7353,146 +7430,198 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/native-server.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="native-server">Native server</h1>
-<p>Dox runs on a native HTTP server from the package <code>dox_http_native</code>.</p>
-<p>You do not need to set anything. Every app uses it, also an app with WebSocket or Socket.IO routes. Rust owns the sockets and parses HTTP, but all your code stays in Dart: routes, controllers, DTOs, middleware and the ORM. It gets about 5 times more requests than the <code>dart:io</code> server on one or two cores. See <a href="../performance/">Performance</a>.</p>
-<p>You do not need Rust. The package downloads a ready-built library for your system when you build the app.</p>
-<h2 id="using-it-without-dox">Using it without Dox</h2>
-<p><code>dox_http_native</code> also works on its own, in any Dart app. Add the package:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_http_native
-</span></code></pre></div>
-<p>Then bind a server and listen for requests. The API is the same as the <code>dart:io</code> <code>HttpServer</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_http_native/dox_http_native.dart'</span><span class="p">;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="n">NativeHttpServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span><span class="m">3000</span><span class="p">);</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'Hello World'</span><span class="p">);</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="p">});</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>With no address, the server listens on all interfaces. To listen on one host, pass <code>address</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span><span class="m">3000</span><span class="p">,</span><span class="w"> </span><span class="nl">address:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">);</span>
-</span></code></pre></div>
-<p>If the port is open to the internet, set <code>maxConnections</code>. At the limit, the server stops accepting new connections until one closes. There is no limit by default:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span><span class="m">3000</span><span class="p">,</span><span class="w"> </span><span class="nl">maxConnections:</span><span class="w"> </span><span class="m">10000</span><span class="p">);</span>
-</span></code></pre></div>
-<p><code>close()</code> waits for open requests. <code>close(force: true)</code> closes every connection at once.</p>
-<p>The rest of this page is the same with or without Dox.</p>
+<p>Dox runs on a native HTTP server from the package <code>dox_http_native</code>: Rust owns the sockets and parses HTTP, and all your code stays in Dart.</p>
+<h2 id="setup">Setup</h2>
+<p>Every Dox app uses the native server, and you do not need Rust. The package gets a ready-built library for your system when you build the app. See <a href="../performance/">Performance</a> for the numbers.</p>
+<p>Build with <code>dox build</code> or <code>dart build cli</code>. <code>dart compile exe</code> does not run build hooks, so the app has no library. See <a href="../deployment/">Deployment</a>.</p>
+<h3 id="limits">Limits</h3>
+<table>
+<thead>
+<tr>
+<th>Limit</th>
+<th>Value</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request line and headers</td>
+<td>16 KB</td>
+<td>431</td>
+</tr>
+<tr>
+<td>Body</td>
+<td><code>maxBodySize</code> (10 MB)</td>
+<td>413</td>
+</tr>
+<tr>
+<td>Multipart form</td>
+<td><code>maxMultipartSize</code> (100 MB)</td>
+<td>413</td>
+</tr>
+<tr>
+<td>No body bytes for</td>
+<td><code>bodyTimeout</code> (120 seconds)</td>
+<td>408</td>
+</tr>
+<tr>
+<td>Request head arrives in</td>
+<td><code>idleTimeout</code> (30 seconds)</td>
+<td>connection closed</td>
+</tr>
+<tr>
+<td>Keep-alive connection with no request</td>
+<td><code>idleTimeout</code> (30 seconds)</td>
+<td>connection closed</td>
+</tr>
+<tr>
+<td>Both <code>Content-Length</code> and chunked</td>
+<td>-</td>
+<td>400</td>
+</tr>
+<tr>
+<td>Transfer encoding other than chunked</td>
+<td>-</td>
+<td>501</td>
+</tr>
+</tbody>
+</table>
+<p>These are the defaults of <code>AppConfig</code>, where you can change them. See <a href="../../reference/app-config/">App config</a>.</p>
 <h2 id="writing-handlers">Writing handlers</h2>
-<p>Because the server has the same API as <code>dart:io</code>, <code>req.httpRequest</code>, <code>HttpResponse</code> and code written for <code>dart:io</code> keep working.</p>
-<p>Each isolate runs the server on its own thread. So a slow synchronous handler holds all the sockets of its isolate until it is done. <code>await</code> is fine, because it gives the isolate back.</p>
+<p>The server has the same API as the <code>dart:io</code> <code>HttpServer</code>, so code for <code>dart:io</code> keeps working. Each isolate runs the server on its own thread, so a slow synchronous handler blocks all the sockets of its isolate. An <code>await</code> gives the isolate back.</p>
 <h2 id="when-the-library-does-not-load">When the library does not load</h2>
-<p>If the native library can not load, Dox stops at start, before any isolate runs. The error says why and how to fix it:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
+<p>Dox stops at start and the error says why and how to fix it:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 </span></code></pre></div>
-<p><code>&lt;reason&gt;</code> is for example <code>native library ABI 8, expected 9</code>. This means the library on disk is from another version of the package. See <a href="../../reference/troubleshooting/#the-native-http-library-did-not-load">Troubleshooting</a>.</p>
-<p>You must build with <code>dox build</code> or <code>dart build cli</code>, because <code>dart compile exe</code> does not run build hooks, so it has no library. See <a href="../deployment/">Deployment</a>.</p>
+<p>A reason like <code>native library ABI 8, expected 9</code> means the library on disk is from another version of the package. See <a href="../../reference/troubleshooting/#the-native-http-library-did-not-load">Troubleshooting</a>.</p>
 <h2 id="http2">HTTP/2</h2>
-<p>The native server also speaks HTTP/2 (h2c) on the same port, when you turn it on with <code>http2: true</code>. See <a href="../http2/">HTTP/2</a>.</p>
+<p>The native server also speaks HTTP/2 (h2c) on the same port, with <code>http2: true</code>. See <a href="../http2/">HTTP/2</a>.</p>
 <h2 id="websocket">WebSocket</h2>
-<p>Rust also does the WebSocket upgrade and the WebSocket protocol. Your route, middleware and the <code>Origin</code> check run first, like for any request. If they give a normal answer (like <code>403</code>), the upgrade is refused.</p>
-<p>In your own code, use <code>NativeWebSocket.upgrade(request)</code>. It gives a <code>dart:io</code> <code>WebSocket</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">WebSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeWebSocket</span><span class="p">.</span><span class="n">upgrade</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
+<p><code>NativeWebSocket.upgrade(request)</code> gives a <code>dart:io</code> <code>WebSocket</code>. Your route, middleware and the <code>Origin</code> check run first, and a normal answer (like 403) refuses the upgrade:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">NativeWebSocket</span><span class="p">.</span><span class="n">isUpgradeRequest</span><span class="p">(</span><span class="n">request</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="n">WebSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeWebSocket</span><span class="p">.</span><span class="n">upgrade</span><span class="p">(</span><span class="n">request</span><span class="p">,</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">      </span><span class="nl">protocol:</span><span class="w"> </span><span class="s1">'chat'</span><span class="p">,</span><span class="w"> </span><span class="nl">maxMessageSize:</span><span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">);</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>A message over the size limit closes the socket with code <code>1009</code>. Set the limit with <code>maxMessageSize</code> of <code>NativeWebSocket.upgrade</code>. Socket.IO uses <code>maxHttpBufferSize</code>.</p>
-<p>To find clients that vanished with no close (like a phone that lost its network), set <code>pingInterval</code>. When the client sent nothing for that long, the server sends a ping. When it still sends nothing for one more interval, the socket closes with <code>1001</code>. It is off by default:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">socket</span><span class="p">.</span><span class="n">pingInterval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">);</span>
+<p>A message over <code>maxMessageSize</code> (16 MB by default) closes the socket with code 1009. On a graceful stop, every open socket gets code 1001.</p>
+<h3 id="finding-lost-clients">Finding lost clients</h3>
+<p>Set <code>pingInterval</code> to find clients that vanished with no close, like a phone that lost its network. When the client stays quiet for two intervals, the socket closes with 1001:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">socket</span><span class="p">.</span><span class="n">pingInterval</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">);</span>
 </span></code></pre></div>
-<p>On a graceful stop (SIGTERM), every open WebSocket gets close code <code>1001</code>.</p>
 <h2 id="streaming-a-response">Streaming a response</h2>
-<p>To send a body in parts, like server-sent events, write with <code>add()</code> and call <code>flush()</code>. The first <code>flush()</code> sends the status, the headers and the bytes so far. Later writes go out at once:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">server</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">contentType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ContentType</span><span class="p">(</span><span class="s1">'text'</span><span class="p">,</span><span class="w"> </span><span class="s1">'event-stream'</span><span class="p">);</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">utf8</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'data: hello</span><span class="se">\n\n</span><span class="s1">'</span><span class="p">));</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="p">});</span>
+<p>Write with <code>add()</code> and call <code>flush()</code>. The first <code>flush()</code> sends the status, the headers and the bytes so far:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">server</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">headers</span><span class="p">.</span><span class="n">contentType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ContentType</span><span class="p">(</span><span class="s1">'text'</span><span class="p">,</span><span class="w"> </span><span class="s1">'event-stream'</span><span class="p">);</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">utf8</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">'data: hello</span><span class="se">\n\n</span><span class="s1">'</span><span class="p">));</span>
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">flush</span><span class="p">();</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">});</span>
 </span></code></pre></div>
-<p><code>NativeResponse.headSent</code> is <code>true</code> once the status and headers went out. After that, an error page can not be sent any more. The response can only end. <code>req.response</code> is an <code>HttpResponse</code>, so cast it to read the flag:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">sent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">NativeResponse</span><span class="p">).</span><span class="n">headSent</span><span class="p">;</span>
+<p>A streamed response with a <code>contentLength</code> must send exactly that many bytes, or <code>add()</code> or <code>close()</code> fails.</p>
+<h3 id="checking-the-response-state">Checking the response state</h3>
+<p>Cast <code>req.response</code> to <code>NativeResponse</code> to read its state. <code>headSent</code> is true when the status and headers went out, so no error page can go out after it. <code>isGone</code> is true when the client left, and <code>gone</code> completes when it leaves:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">NativeResponse</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">NativeResponse</span><span class="p">;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">sent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">headSent</span><span class="p">;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kt">bool</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">isGone</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">Future</span><span class="p">.</span><span class="n">any</span><span class="p">(</span><span class="o">&lt;</span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;&gt;</span><span class="p">[</span><span class="n">res</span><span class="p">.</span><span class="n">gone</span><span class="p">,</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">done</span><span class="p">]);</span>
 </span></code></pre></div>
+<p><code>gone</code> never completes for a response that ends normally, so always race it against <code>done</code> or a timeout.</p>
 <h2 id="security-notes">Security notes</h2>
 <ul>
-<li>On the internet, run it behind a reverse proxy like Caddy or nginx. The proxy does HTTPS, buffers slow clients and caps connections.</li>
+<li>On the internet, run the app behind a reverse proxy like Caddy or nginx. The proxy does HTTPS and buffers slow clients.</li>
 <li>Set <code>maxConnections</code> when the app port is open to the internet.</li>
-<li>Another process of the same OS user can bind the same port. So do not run untrusted code as the user of the app.</li>
+<li>Another process of the same OS user can bind the same port. Do not run untrusted code as the user of the app.</li>
 <li><code>req.uri</code> resolves <code>..</code> in the path. Never build a file path from the raw path. Use the storage helpers.</li>
 </ul>
 <h2 id="where-the-library-comes-from">Where the library comes from</h2>
-<p>The build hook of <code>dox_http_native</code> (<code>hook/build.dart</code>) picks the first one that works:</p>
+<p>The build hook of <code>dox_http_native</code> uses the first one that works:</p>
 <ol>
 <li>
-<p>A path you give in the root <code>pubspec.yaml</code> of your app:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">hooks</span><span class="p">:</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
+<p>A path in the root <code>pubspec.yaml</code> of your app:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">dox_http_native</span><span class="p">:</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">      </span><span class="nt">lib_path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/path/to/libdox_http_native.so</span>
 </span></code></pre></div>
 </li>
 <li>
-<p>A local build in <code>native/target/release</code> of the package (for work on the package itself).</p>
+<p>A local build in <code>native/target/release</code> of the package.</p>
 </li>
 <li>The ready-built library from the GitHub release, checked with sha256. There are builds for macOS (arm64, x64), Linux (x64, arm64) and Windows (x64).</li>
 <li>A build from source with <code>cargo</code>, when Rust is installed.</li>
 </ol>
-<p>For a git or path dependency, step 4 comes before step 3, because the source can be newer than the release.</p>
-<p>When none works, the app still builds, but it stops at start with the error above. Install Rust and run it again, so step 4 works.</p>
-<h2 id="working-on-the-native-code">Working on the native code</h2>
-<p><code>dox_http_native</code> lives in its own repo: <a href="https://github.com/dartondox/dox-http-native">dartondox/dox-http-native</a>. The Rust code is in its <code>native</code> folder:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nb">cd</span><span class="w"> </span>dox-http-native/native
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>cargo<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
-</span></code></pre></div>
-<p>To use your local copy in the Dox repo, or to release the package, see <a href="../../community/contribute/#native-packages">Contribute</a>.</p>
-<h2 id="details">Details</h2>
-<h3 id="how-it-works">How it works</h3>
+<p>For a git or path dependency, step 4 comes before step 3. When none works, the app stops at start with the error above.</p>
+<h2 id="how-it-works">How it works</h2>
 <p>The server runs on the thread of the isolate, in a loop:</p>
 <ol>
 <li>Dart calls Rust (one FFI call).</li>
 <li>Rust writes the answers of the last batch, reads the sockets and parses the new requests. It gives them back to Dart as one batch.</li>
-<li>
-<p>Dart runs your handlers and calls Rust again with their answers.</p>
-</li>
-<li>
-<p>Under load there is no other thread, so a request never waits for a thread to wake up. When the isolate has nothing to do, a small helper thread watches the sockets and wakes the isolate once when a request comes.</p>
-</li>
-<li>A second helper thread does gzip, only with <code>compress: true</code>. Under load both helper threads sleep.</li>
-<li>The loop gives the event loop a turn after a few batches, so timers and database answers still run on time.</li>
-<li>Each isolate runs its own server on the same port. See <a href="../isolate/">Isolate</a>. The OS spreads connections, not requests, so a keep-alive connection stays on one isolate. A few busy connections (like from one proxy) can keep some isolates idle, so use more connections than isolates.</li>
-<li>WebSocket: Rust sends the <code>101</code> answer, answers pings, does the close handshake, checks that text is UTF-8 and checks the size of each frame. Dart gets whole messages in the same batches as requests.</li>
-<li>Compression (permessage-deflate) is never agreed, because a small compressed message could grow very big in memory.</li>
+<li>Dart runs your handlers and calls Rust again with their answers.</li>
 </ol>
-<h3 id="limits">Limits</h3>
+<p>When the isolate has nothing to do, a small helper thread watches the sockets and wakes it. The OS spreads connections, not requests, between the <a href="../isolate/">isolates</a>. So a few busy connections (like from one proxy) can keep some isolates idle. Use more connections than isolates.</p>
+<h2 id="without-dox">Without Dox</h2>
+<p><code>dox_http_native</code> also works on its own, in any Dart app:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_http_native
+</span></code></pre></div>
+<p>Bind a server and listen for requests, like with the <code>dart:io</code> <code>HttpServer</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_http_native/dox_http_native.dart'</span><span class="p">;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="n">NativeHttpServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span><span class="m">3000</span><span class="p">);</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="n">server</span><span class="p">.</span><span class="n">listen</span><span class="p">((</span><span class="n">HttpRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">    </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'Hello World'</span><span class="p">);</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">response</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-7-11"><a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>With no address, the server listens on all interfaces. These are the options of <code>bind</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="m">3000</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">address:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nl">maxConnections:</span><span class="w"> </span><span class="m">10000</span><span class="p">,</span><span class="w"> </span><span class="c1">// no limit by default</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nl">maxBodySize:</span><span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nl">maxMultipartSize:</span><span class="w"> </span><span class="m">50</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="nl">bodyTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">120</span><span class="p">),</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="nl">http2:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// see HTTP/2</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>At <code>maxConnections</code>, the server stops accepting until a connection closes. Behind a load balancer, set <code>idleTimeout</code> longer than the idle timeout of the balancer, or clients can get 502.</p>
+<h3 id="checking-the-library">Checking the library</h3>
+<p><code>NativeHttpServer.isAvailable</code> is true when the native library loads. <code>loadError</code> says why it did not, and <code>ensureAvailable()</code> throws that error:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">isAvailable</span><span class="p">)</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">loadError</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="stopping-the-server">Stopping the server</h3>
+<p><code>close()</code> waits for open requests. <code>close(force: true)</code> closes every connection at once. <code>isOpen</code> is false after the close:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">server</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="encrypting-with-aes-gcm">Encrypting with AES-GCM</h3>
+<p><code>AesGcm</code> does AES-256-GCM in Rust. Dox uses it for encrypted cookies. The key is 32 bytes, and <code>open</code> gives null when the data or the <code>aad</code> is wrong:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">sealed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AesGcm</span><span class="p">.</span><span class="n">seal</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">plain</span><span class="p">,</span><span class="w"> </span><span class="n">aad</span><span class="p">);</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">Uint8List</span><span class="o">?</span><span class="w"> </span><span class="n">plain2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AesGcm</span><span class="p">.</span><span class="n">open</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="w"> </span><span class="n">sealed</span><span class="p">,</span><span class="w"> </span><span class="n">aad</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="working-on-the-native-code">Working on the native code</h2>
+<p><code>dox_http_native</code> lives in its own repo: <a href="https://github.com/dartondox/dox-http-native">dartondox/dox-http-native</a>. The Rust code is in its <code>native</code> folder:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nb">cd</span><span class="w"> </span>dox-http-native/native
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>cargo<span class="w"> </span>build<span class="w"> </span>--release<span class="w">   </span><span class="c1"># the hook uses this build from now on</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>cargo<span class="w"> </span><span class="nb">test</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="nb">cd</span><span class="w"> </span>..<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
+</span></code></pre></div>
+<p>To use your local copy in the Dox repo, see <a href="../../community/contribute/#native-packages">Contribute</a>.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>The request line plus headers can be at most 16 KB. Bigger gets <code>431</code>. A bad request gets <code>400</code>.</li>
-<li>A multipart form over <code>maxMultipartSize</code>, or any other body over <code>maxBodySize</code>, gets <code>413</code> from Rust. With <code>Expect: 100-continue</code>, the <code>413</code> comes before the body is sent. Else Rust reads and drops the body first, so the client sees the <code>413</code>.</li>
-<li>A client that sends no body bytes for 120 seconds gets <code>408</code>. A slow but steady upload is fine.</li>
-<li>Accepted sockets get TCP keep-alive. After 60 seconds with no traffic, the OS checks the client every 10 seconds, and a client that misses 6 checks (about 2 minutes) is closed. A live client always answers.</li>
-<li>A client that closed its side while the handler has not answered is closed when nothing was written for <code>idleTimeout</code> (30 seconds by default). Set it with the <code>idleTimeout</code> argument of <code>NativeHttpServer.bind</code>. In a Dox app, set <code>AppConfig.idleTimeout</code>.</li>
-<li>A request head must arrive within 30 seconds. A keep-alive connection with no request for 30 seconds is closed. A client that does not read its answer for 30 seconds is cut off.</li>
-<li>A request with both <code>Content-Length</code> and <code>Transfer-Encoding: chunked</code> gets <code>400</code>. A transfer encoding other than <code>chunked</code> gets <code>501</code>.</li>
-<li>At most 64 requests of one connection wait for an answer, and at most 1 MB of answers waits to be sent. Then the server stops reading that connection until the answers go out.</li>
-<li>A streamed response with a <code>contentLength</code> must send exactly that many bytes. <code>add()</code> throws when the body passes it, and <code>close()</code> fails when it is shorter.</li>
-<li>A streamed response over 64 KB goes out in parts, and at most 1 MB of it waits in memory. Dart reads more of a file only when the client has read what was sent, and stops when the client leaves.</li>
-<li>A request body of 64 KB or more goes to Dart without a copy.</li>
-<li><code>compress: true</code> in <code>AppConfig</code> gzips on a helper thread. A streamed response is not compressed.</li>
-<li>WebSocket: one turn reads at most 256 KB of one socket, so one busy client can not hold the isolate. While more than 256 KB waits to be sent to a client, the server stops reading its frames.</li>
+<li><a href="../http2/">HTTP/2</a>: turn on HTTP/2.</li>
+<li><a href="../performance/">Performance</a>: the benchmark numbers.</li>
+<li><a href="../isolate/">Isolate</a>: one server per CPU core.</li>
 </ul>
 
 
@@ -7613,7 +7742,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

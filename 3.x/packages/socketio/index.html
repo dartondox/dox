@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://dartondox.dev/latest/packages/socketio/">
       
       
-        <link rel="prev" href="../cache/">
+        <link rel="prev" href="../openapi/">
       
       
         <link rel="next" href="../pdf-lib/">
@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5058,10 +5060,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5205,95 +5203,6 @@
                 
   
   
-  
-  
-    <li class="md-nav__item">
-      <a href="../storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
     
   
   
@@ -5399,15 +5308,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#in-a-dox-app" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In a Dox app
+        Setup
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="In a Dox app">
+    <nav class="md-nav" aria-label="Setup">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -5422,21 +5331,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#set-it-up-by-hand" class="md-nav__link">
+  <a href="#1-add-the-package" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set it up by hand
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#1-install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Install
+        1. Add the package
       
     </span>
   </a>
@@ -5492,6 +5390,17 @@
     <span class="md-ellipsis">
       
         6. Connect a client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
       
     </span>
   </a>
@@ -5565,6 +5474,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#the-state-of-a-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The state of a socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leaving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaving
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -5587,6 +5518,45 @@
     <span class="md-ellipsis">
       
         With dox_auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protecting-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protecting the server
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Protecting the server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allowed-origins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed origins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allow-requests-and-limit-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allow requests and limit sessions
       
     </span>
   </a>
@@ -5671,56 +5641,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Options
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#waiting-for-acks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Waiting for acks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#allowed-origins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Allowed origins
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#allow-requests-and-limit-sessions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Allow requests and limit sessions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#without-dox" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5732,10 +5652,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7408,15 +7328,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#in-a-dox-app" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        In a Dox app
+        Setup
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="In a Dox app">
+    <nav class="md-nav" aria-label="Setup">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7431,21 +7351,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#set-it-up-by-hand" class="md-nav__link">
+  <a href="#1-add-the-package" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Set it up by hand
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#1-install" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Install
+        1. Add the package
       
     </span>
   </a>
@@ -7501,6 +7410,17 @@
     <span class="md-ellipsis">
       
         6. Connect a client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
       
     </span>
   </a>
@@ -7574,6 +7494,28 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#the-state-of-a-socket" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The state of a socket
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#leaving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Leaving
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7596,6 +7538,45 @@
     <span class="md-ellipsis">
       
         With dox_auth
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#protecting-the-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Protecting the server
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Protecting the server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#allowed-origins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allowed origins
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#allow-requests-and-limit-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Allow requests and limit sessions
       
     </span>
   </a>
@@ -7680,56 +7661,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Options
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#waiting-for-acks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Waiting for acks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#allowed-origins" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Allowed origins
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#allow-requests-and-limit-sessions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Allow requests and limit sessions
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#without-dox" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7741,10 +7672,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7768,27 +7699,19 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/packages/socketio.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="socketio">Socket.IO</h1>
 <p><code>dox_socketio</code> is a Socket.IO v4 server for Dart, and it is the way to do realtime in Dox.</p>
-<p>The official clients connect to it with no changes: <code>socket.io-client</code> (JavaScript v4) and the Dart <code>socket_io_client</code> package. It has acks, rooms, namespaces, binary data and long-polling.</p>
-<p>In a Dox app, Socket.IO runs on the same port as your HTTP routes, at <code>/socket.io/</code>. It can also run on its own, see <a href="#without-dox">Without Dox</a>.</p>
-<h2 id="in-a-dox-app">In a Dox app</h2>
+<p>The official clients connect to it with no changes: <code>socket.io-client</code> (JavaScript v4) and the Dart <code>socket_io_client</code> package. It has acks, rooms, namespaces, binary data and long-polling. In a Dox app, it runs on the same port as your HTTP routes, at <code>/socket.io/</code>. For a plain WebSocket with no Socket.IO protocol, use <code>Route.websocket</code> of <a href="../../the-basic/routing/#websocket-routes">routing</a>.</p>
+<h2 id="setup">Setup</h2>
 <h3 id="install">Install</h3>
-<p>The quick way is the CLI:</p>
+<p>The quick way is the CLI. It adds the package, the provider, the config and the env key (steps 1, 2, 3 and 5 below). It never overwrites a file:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>add<span class="w"> </span>socketio
 </span></code></pre></div>
-<p>It adds the package, the provider, the config and the env key (steps 1, 2, 3 and 5 below). It never overwrites a file, so it is safe to run twice. Then write a namespace (step 4) and connect a client (step 6). Add <code>--broadcasting</code> to also turn on <a href="../../digging-deeper/broadcasting/">broadcasting</a>.</p>
-<h3 id="set-it-up-by-hand">Set it up by hand</h3>
-<p>If you do not use <code>dox add socketio</code>, do all the steps below.</p>
-<h3 id="1-install">1. Install</h3>
+<p>Then write a namespace (step 4) and connect a client (step 6). Add <code>--broadcasting</code> to also turn on <a href="../../digging-deeper/broadcasting/">broadcasting</a>. Without the CLI, do all the steps.</p>
+<h3 id="1-add-the-package">1. Add the package</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_socketio
 </span></code></pre></div>
 <h3 id="2-the-provider">2. The provider</h3>
@@ -7801,7 +7724,7 @@
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="3-the-config">3. The config</h3>
-<p>The config says which namespaces to serve:</p>
+<p>The config lists the namespaces to serve:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/socketio.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/socket/chat.namespace.dart'</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
@@ -7822,7 +7745,7 @@
 <tbody>
 <tr>
 <td><code>enabled</code></td>
-<td><code>true</code></td>
+<td>true</td>
 <td>serve Socket.IO at <code>options.path</code></td>
 </tr>
 <tr>
@@ -7837,13 +7760,13 @@
 </tr>
 <tr>
 <td><code>adapter</code></td>
-<td><code>null</code></td>
+<td>none</td>
 <td>makes one adapter in each isolate, see <a href="#many-isolates">Many isolates</a></td>
 </tr>
 </tbody>
 </table>
 <h3 id="4-a-namespace">4. A namespace</h3>
-<p>A namespace handles the events of one path, like <code>/chat</code>:</p>
+<p>A <strong>namespace</strong> handles the events of one path, like <code>/chat</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/socket/chat.namespace.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ChatNamespace</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">NamespaceHandler</span><span class="w"> </span><span class="p">{</span>
@@ -7858,10 +7781,11 @@
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>
 </span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onMessage</span><span class="p">(</span><span class="n">SocketEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">socket</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">);</span><span class="w"> </span><span class="c1">// everyone in lobby but me</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="s1">'sent'</span><span class="p">);</span><span class="w"> </span><span class="c1">// answer the client callback</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="p">}</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">    </span><span class="c1">// everyone in lobby but me</span>
+</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">socket</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
+</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="s1">'sent'</span><span class="p">);</span><span class="w"> </span><span class="c1">// answer the client callback</span>
+</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="5-turn-it-on">5. Turn it on</h3>
 <p>Add a getter for the <code>SOCKETIO_ENABLED</code> key to <code>lib/config/env.dart</code>:</p>
@@ -7872,313 +7796,27 @@
 </span></code></pre></div>
 <p>Then run <code>dart run build_runner build</code> and <code>dox serve</code>.</p>
 <h3 id="6-connect-a-client">6. Connect a client</h3>
+<p>Use <code>transports: ['websocket']</code>, because long-polling does not work with many isolates. See <a href="#many-isolates">Many isolates</a>:</p>
 <div class="language-js highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">io</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'socket.io-client'</span><span class="p">;</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">io</span><span class="p">(</span><span class="s1">'http://localhost:3000/chat'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">transports</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'websocket'</span><span class="p">]</span><span class="w"> </span><span class="p">});</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'welcome'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">id</span><span class="p">));</span>
 </span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">answer</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">answer</span><span class="p">));</span><span class="w"> </span><span class="c1">// 'sent'</span>
 </span></code></pre></div>
-<p>Use <code>transports: ['websocket']</code>, because long-polling does not work with many isolates. See <a href="#many-isolates">Many isolates</a>.</p>
 <p>Requests to <code>/socket.io/</code> go to Socket.IO before the router, so route middleware does not run for them. To log users in, see <a href="#log-in-a-socket">Log in a socket</a>.</p>
-<h2 id="namespaces">Namespaces</h2>
-<p>A namespace is a class, so its dependencies come in through the constructor:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ChatNamespace</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">NamespaceHandler</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="n">ChatNamespace</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">messages</span><span class="p">);</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">MessageService</span><span class="w"> </span><span class="n">messages</span><span class="p">;</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'/chat'</span><span class="p">;</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
-</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onConnection</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">    </span><span class="n">socket</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="n">onMessage</span><span class="p">);</span>
-</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
-</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onMessage</span><span class="p">(</span><span class="n">SocketEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="n">messages</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">));</span>
-</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="p">}</span>
-</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
-</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="c1">// in lib/config/socketio.dart</span>
-</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="nl">namespaces:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">NamespaceHandler</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ChatNamespace</span><span class="p">(</span><span class="n">MessageService</span><span class="p">())],</span>
-</span></code></pre></div>
-<h3 id="namespace-middleware">Namespace middleware</h3>
-<p>Sometimes you want to check a client before it joins. Add a middleware to the namespace. When it throws a <code>SocketIoException</code>, the client gets <code>connect_error</code> with the message and the data:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@override</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="p">[</span><span class="n">checkToken</span><span class="p">];</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">checkToken</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">socket</span><span class="p">.</span><span class="n">handshake</span><span class="p">.</span><span class="n">auth</span><span class="p">[</span><span class="s1">'token'</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">SocketIoException</span><span class="p">(</span><span class="s1">'unauthorized'</span><span class="p">,</span><span class="w"> </span><span class="nl">data:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'reason'</span><span class="o">:</span><span class="w"> </span><span class="s1">'bad token'</span><span class="p">});</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>Any other error is written to stderr, and the client only gets <code>{"message": "Internal error"}</code>. So private text, like SQL, never reaches the client.</p>
-<h2 id="sending-events">Sending events</h2>
-<h3 id="sending-from-a-controller-or-a-service">Sending from a controller or a service</h3>
-<p><code>SocketIoProvider.server</code> is the Socket.IO server of this isolate:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">SocketIoProvider</span><span class="p">.</span><span class="n">server</span><span class="o">?</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
-</span></code></pre></div>
-<p>From a queue job or another program, use the <a href="#emit-from-other-programs">emitter</a>.</p>
-<h3 id="common-methods">Common methods</h3>
-<p>The API follows the Node.js server. This table shows the few places where Dart is different:</p>
-<table>
-<thead>
-<tr>
-<th>Node.js</th>
-<th>Dart</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>socket.on('e', (a, cb) =&gt; ...)</code></td>
-<td><code>socket.on('e', (SocketEvent e) =&gt; ...)</code>, then <code>e.data</code>, <code>e.args</code>, <code>e.ack(x)</code></td>
-</tr>
-<tr>
-<td><code>socket.emit('e', a, b)</code></td>
-<td><code>socket.emit('e', a)</code> or <code>socket.emitArgs('e', [a, b])</code></td>
-</tr>
-<tr>
-<td><code>await socket.timeout(5000).emitWithAck('e', a)</code></td>
-<td><code>await socket.emitWithAck('e', a, timeout: Duration(seconds: 5))</code></td>
-</tr>
-<tr>
-<td><code>socket.join(r)</code> / <code>socket.leave(r)</code></td>
-<td>the same</td>
-</tr>
-<tr>
-<td><code>socket.to(r).emit(...)</code></td>
-<td>the same</td>
-</tr>
-<tr>
-<td><code>socket.broadcast.emit(...)</code></td>
-<td>the same</td>
-</tr>
-<tr>
-<td><code>io.to(r).except(x).emit(...)</code></td>
-<td>the same</td>
-</tr>
-<tr>
-<td><code>io.of('/chat')</code>, <code>io.use(fn)</code></td>
-<td>the same</td>
-</tr>
-<tr>
-<td><code>socket.handshake</code></td>
-<td><code>.headers</code>, <code>.query</code>, <code>.auth</code>, <code>.address</code>, <code>.token</code>, <code>.cookie(name)</code>, <code>.session()</code></td>
-</tr>
-<tr>
-<td><code>socket.data</code></td>
-<td><code>socket.data</code> (a <code>Map</code>)</td>
-</tr>
-<tr>
-<td><code>await io.in(r).fetchSockets()</code></td>
-<td><code>await io.to(r).fetchSockets()</code> (all servers)</td>
-</tr>
-<tr>
-<td><code>await io.timeout(5000).emitWithAck('e', a)</code></td>
-<td><code>await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)</code></td>
-</tr>
-<tr>
-<td><code>io.serverSideEmit('e', a)</code></td>
-<td><code>await io.serverSideEmit('e', [a])</code></td>
-</tr>
-<tr>
-<td><code>io.on('e', (a, cb) =&gt; ...)</code> (from other servers)</td>
-<td><code>io.onServerSideEmit('e', (ServerSideEvent e) =&gt; ...)</code>, then <code>e.data</code>, <code>e.ack(x)</code></td>
-</tr>
-</tbody>
-</table>
-<p>To send binary data, send a <code>Uint8List</code>. It can be anywhere in lists and maps. The <code>disconnecting</code> and <code>disconnect</code> events give the reason in <code>event.data</code>, like <code>transport close</code>.</p>
-<h2 id="log-in-a-socket">Log in a socket</h2>
-<p>Socket.IO gets its requests before the router, so route middleware like session and auth does not run. Use <code>SocketAuth</code> as a namespace middleware instead. Your function gets the handshake and returns the user, or <code>null</code>:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/socket/chat.namespace.dart</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ChatNamespace</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">NamespaceHandler</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'/chat'</span><span class="p">;</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="p">[</span><span class="n">SocketAuth</span><span class="p">(</span><span class="n">findUser</span><span class="p">).</span><span class="n">handle</span><span class="p">];</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>
-</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">findUser</span><span class="p">(</span><span class="n">Handshake</span><span class="w"> </span><span class="n">handshake</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="w">    </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handshake</span><span class="p">.</span><span class="n">token</span><span class="p">;</span>
-</span><span id="__span-11-10"><a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">token</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-</span><span id="__span-11-11"><a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'api_token'</span><span class="p">,</span><span class="w"> </span><span class="n">token</span><span class="p">).</span><span class="n">getFirst</span><span class="p">();</span>
-</span><span id="__span-11-12"><a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-11-13"><a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>
-</span><span id="__span-11-14"><a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-11-15"><a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onConnection</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-11-16"><a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="n">user</span><span class="o">!</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">User</span><span class="p">;</span>
-</span><span id="__span-11-17"><a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="w">    </span><span class="n">socket</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s1">'user:</span><span class="si">${</span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-11-18"><a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-11-19"><a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>The client sends the token in <code>auth</code>. Browsers can not set headers on a websocket, so use <code>auth</code> and not a header:</p>
-<div class="language-js highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">io</span><span class="p">(</span><span class="s1">'http://localhost:3000/chat'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nx">transports</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'websocket'</span><span class="p">],</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nx">auth</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">token</span><span class="o">:</span><span class="w"> </span><span class="s1">'the-user-token'</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">});</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'connect_error'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">));</span><span class="w"> </span><span class="c1">// 'Unauthorized'</span>
-</span></code></pre></div>
-<p>When the function returns a user, it is kept in <code>socket.user</code>. When it returns <code>null</code>, the client gets a <code>connect_error</code> with the message <code>Unauthorized</code>, and <code>onConnection</code> does not run.</p>
-<p>The handshake gives you these helpers:</p>
-<ul>
-<li><code>handshake.token</code> is <code>auth.token</code> from the client, else the <code>Authorization: Bearer</code> header.</li>
-<li><code>handshake.cookie('name')</code> reads a cookie and decrypts it with the <code>APP_KEY</code>. Use <code>decrypt: false</code> for a plain cookie.</li>
-<li><code>await handshake.session()</code> gives the Dox session of the client, from its session cookie.</li>
-</ul>
-<h3 id="with-dox_auth">With dox_auth</h3>
-<p><a href="../../security/authentication/#check-a-login-with-no-request">dox_auth</a> can check a JWT or the web login session for you:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">static</span><span class="w"> </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">findUser</span><span class="p">(</span><span class="n">Handshake</span><span class="w"> </span><span class="n">handshake</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="c1">// an API client or a mobile app sends a JWT</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handshake</span><span class="p">.</span><span class="n">token</span><span class="p">;</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">token</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Auth</span><span class="p">(</span><span class="nl">guard:</span><span class="w"> </span><span class="s1">'api'</span><span class="p">).</span><span class="n">userFromToken</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span><span class="c1">// a browser that logged in on a web page sends the session cookie</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="n">Session</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">handshake</span><span class="p">.</span><span class="n">session</span><span class="p">();</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Auth</span><span class="p">(</span><span class="nl">guard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">).</span><span class="n">userFromSession</span><span class="p">(</span><span class="n">session</span><span class="p">);</span>
-</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="p">}</span>
-</span></code></pre></div>
-<p><code>userFromToken</code> runs the same checks as <code>AuthMiddleware</code>, so a bad, expired or revoked token gives <code>null</code>. <code>handshake.session()</code> runs the same checks as <code>SessionMiddleware</code>.</p>
-<p>The session is read once, when the socket connects. A logout later does not close the socket, so call <code>socket.disconnect()</code> yourself if you need that.</p>
-<div class="admonition warning">
-<p class="admonition-title">Cookie login needs <code>allowedOrigins</code></p>
-<p>A browser sends its cookies on a websocket from any website. So if you log users in with a cookie, set <a href="#allowed-origins"><code>allowedOrigins</code></a> to your own sites. Without it, another website can open a socket as your user.</p>
-</div>
-<h2 id="many-isolates">Many isolates</h2>
-<p>Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server. A client is connected to one of them.</p>
-<p>With many isolates, the provider uses the <code>IsolateAdapter</code> by default. It sends each broadcast to the other isolates of the process, so it reaches every client. <code>socketsJoin</code>, <code>fetchSockets</code>, <code>serverSideEmit</code> and broadcast acks work across isolates too. You need no Redis for this.</p>
-<table>
-<thead>
-<tr>
-<th>Adapter</th>
-<th>Reaches</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>InMemoryAdapter</code> (one isolate)</td>
-<td>the clients of this isolate</td>
-</tr>
-<tr>
-<td><code>IsolateAdapter</code> (many isolates, the default)</td>
-<td>the clients of every isolate of this process</td>
-</tr>
-<tr>
-<td><code>RedisAdapter</code></td>
-<td>the clients of every isolate of every server</td>
-</tr>
-</tbody>
-</table>
-<p>Clients should connect with websocket only. One websocket stays on one isolate, but long-polling sends many requests that can reach different isolates. Long-polling only works with <code>totalIsolate: 1</code>, or with sticky sessions in front of many single-isolate servers.</p>
-<p>Add each namespace in the config, so it is added in every isolate. A namespace that only one isolate adds with <code>io.of('/x')</code> gets no answer from the others, so <code>fetchSockets</code> and <code>serverSideEmitWithAck</code> wait 5 seconds and throw.</p>
-<h2 id="many-servers-redis-adapter">Many servers: Redis adapter</h2>
-<p>If you run more than one server process, or Dox next to Node.js servers, use the Redis adapter. Then a broadcast on one server reaches the clients of all servers.</p>
-<p>Add the <code>ioredis</code> package:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>ioredis
-</span></code></pre></div>
-<p>Then make the adapter in each isolate with a factory, because a Redis connection can not be sent to another isolate:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/socketio.dart</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:ioredis/ioredis.dart'</span><span class="p">;</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/socket/chat.namespace.dart'</span><span class="p">;</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="n">SocketIoConfig</span><span class="w"> </span><span class="n">socketIoConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoConfig</span><span class="p">(</span>
-</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="nl">enabled:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">socketioEnabled</span><span class="p">,</span>
-</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="w">  </span><span class="nl">namespaces:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">NamespaceHandler</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ChatNamespace</span><span class="p">()],</span>
-</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RedisSocketAdapterFactory</span><span class="p">(),</span>
-</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="p">);</span>
-</span><span id="__span-15-11"><a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a>
-</span><span id="__span-15-12"><a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="c1">/// makes the Redis adapter inside each isolate.</span>
-</span><span id="__span-15-13"><a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a><span class="c1">/// A Redis connection can not be sent to another isolate.</span>
-</span><span id="__span-15-14"><a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="kd">class</span><span class="w"> </span><span class="nc">RedisSocketAdapterFactory</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SocketAdapterFactory</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-15"><a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">RedisSocketAdapterFactory</span><span class="p">();</span>
-</span><span id="__span-15-16"><a id="__codelineno-15-16" name="__codelineno-15-16" href="#__codelineno-15-16"></a>
-</span><span id="__span-15-17"><a id="__codelineno-15-17" name="__codelineno-15-17" href="#__codelineno-15-17"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-15-18"><a id="__codelineno-15-18" name="__codelineno-15-18" href="#__codelineno-15-18"></a><span class="w">  </span><span class="n">Adapter</span><span class="w"> </span><span class="n">create</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-19"><a id="__codelineno-15-19" name="__codelineno-15-19" href="#__codelineno-15-19"></a><span class="w">    </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">();</span><span class="w"> </span><span class="c1">// 127.0.0.1:6379. Or Redis(RedisOptions(host: ..., port: ...))</span>
-</span><span id="__span-15-20"><a id="__codelineno-15-20" name="__codelineno-15-20" href="#__codelineno-15-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">);</span>
-</span><span id="__span-15-21"><a id="__codelineno-15-21" name="__codelineno-15-21" href="#__codelineno-15-21"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-15-22"><a id="__codelineno-15-22" name="__codelineno-15-22" href="#__codelineno-15-22"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>The subscriber needs its own connection, because a Redis connection in subscribe mode can not run other commands.</p>
-<p>The adapter uses the format of <code>@socket.io/redis-adapter</code>, so Node.js servers with that adapter can share one Redis with Dox servers. If your Node.js servers use a JSON parser, set <code>format: RedisFormat.json</code>.</p>
-<h3 id="acting-on-all-servers">Acting on all servers</h3>
-<p>With the Redis adapter, these methods work on the sockets of all servers:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="c1">// sockets of every server. Sockets of this server are `Socket`s.</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">RemoteSocket</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sockets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">fetchSockets</span><span class="p">();</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">RemoteSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sockets</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]);</span>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="p">}</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">);</span>
-</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
-</span></code></pre></div>
-<p>To get one ack from each client on all servers, set a timeout:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="p">.</span><span class="n">timeout</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">5</span><span class="p">))</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="p">.</span><span class="n">emitWithAck</span><span class="p">(</span><span class="s1">'ping'</span><span class="p">,</span><span class="w"> </span><span class="s1">'are you there?'</span><span class="p">);</span>
-</span></code></pre></div>
-<p><code>fetchSockets</code> throws a <code>TimeoutException</code> when a server does not answer within <code>requestsTimeout</code> (5 seconds by default).</p>
-<h3 id="events-between-servers">Events between servers</h3>
-<p>Sometimes the servers need to tell each other something, like "reload the config". <code>serverSideEmit</code> sends an event to the other servers. Clients do not get it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="c1">// on every server</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">io</span><span class="p">.</span><span class="n">onServerSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">ServerSideEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="n">reloadConfig</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="s1">'done'</span><span class="p">);</span><span class="w"> </span><span class="c1">// only when the sender waits for an answer</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="p">});</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>
-</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="c1">// on one server</span>
-</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
-</span></code></pre></div>
-<p>To wait for one answer from each other server, use <code>serverSideEmitWithAck</code>. When a server does not answer in time, it throws an <code>AckTimeoutException</code>, and its <code>responses</code> holds the answers that came back:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmitWithAck</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
-</span></code></pre></div>
-<h2 id="emit-from-other-programs">Emit from other programs</h2>
-<p>Sometimes you want to send an event from a queue worker, a cron job or a service in another language. An emitter does this without a Socket.IO server. It writes to Redis, and every server with the Redis adapter sends the event to its clients:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:ioredis/ioredis.dart'</span><span class="p">;</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">  </span><span class="n">SocketIoEmitter</span><span class="w"> </span><span class="n">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoEmitter</span><span class="p">(</span><span class="n">redis</span><span class="p">);</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>
-</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">});</span><span class="w"> </span><span class="c1">// all clients of `/`</span>
-</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">except</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi room1'</span><span class="p">);</span>
-</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'vip'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for vip'</span><span class="p">);</span>
-</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>
-</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">);</span><span class="w"> </span><span class="c1">// sockets in room1 join room3</span>
-</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">).</span><span class="n">socketsLeave</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">);</span>
-</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
-</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>
-</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
-</span><span id="__span-20-17"><a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>The emitter does not wait for an answer, so it can not know if a client got the event.</p>
-<p>The emitters of other languages use the same format, so they work too. For example, Node.js with <a href="https://www.npmjs.com/package/@socket.io/redis-emitter"><code>@socket.io/redis-emitter</code></a>:</p>
-<div class="language-js highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Emitter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@socket.io/redis-emitter'</span><span class="p">;</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">;</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createClient</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis://127.0.0.1:6379'</span><span class="w"> </span><span class="p">});</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Emitter</span><span class="p">(</span><span class="nx">redis</span><span class="p">);</span>
-</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="nx">emitter</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="w"> </span><span class="p">});</span>
-</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="nx">emitter</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for everyone in /chat'</span><span class="p">);</span>
-</span></code></pre></div>
-<h2 id="broadcasting">Broadcasting</h2>
-<p>To send events to public, private and presence channels, see <a href="../../digging-deeper/broadcasting/">Broadcasting</a>.</p>
-<h2 id="options">Options</h2>
-<p>Pass <code>ServerOptions</code> as <code>options</code> to <code>SocketIoConfig</code> in a Dox app, or to <code>SocketIoServer</code> without Dox:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">SocketIoServer</span><span class="p">(</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">ServerOptions</span><span class="p">(</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/socket.io/'</span><span class="p">,</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">    </span><span class="nl">pingInterval:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">25</span><span class="p">),</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">    </span><span class="nl">pingTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">    </span><span class="nl">maxHttpBufferSize:</span><span class="w"> </span><span class="m">1000000</span><span class="p">,</span>
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">    </span><span class="nl">transports:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'polling'</span><span class="p">,</span><span class="w"> </span><span class="s1">'websocket'</span><span class="p">],</span>
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="nl">cors:</span><span class="w"> </span><span class="n">CorsOptions</span><span class="p">(</span><span class="nl">origins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://my.app'</span><span class="p">],</span><span class="w"> </span><span class="nl">credentials:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
-</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="p">);</span>
+<h3 id="options">Options</h3>
+<p>Give <code>ServerOptions</code> as <code>options</code> to <code>SocketIoConfig</code>, or to <code>SocketIoServer</code> without Dox:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">SocketIoServer</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">ServerOptions</span><span class="p">(</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="nl">path:</span><span class="w"> </span><span class="s1">'/socket.io/'</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="nl">pingInterval:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">25</span><span class="p">),</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">    </span><span class="nl">pingTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="nl">maxHttpBufferSize:</span><span class="w"> </span><span class="m">1000000</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">    </span><span class="nl">transports:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'polling'</span><span class="p">,</span><span class="w"> </span><span class="s1">'websocket'</span><span class="p">],</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="nl">cors:</span><span class="w"> </span><span class="n">CorsOptions</span><span class="p">(</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">        </span><span class="nl">origins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://my.app'</span><span class="p">],</span><span class="w"> </span><span class="nl">credentials:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="p">);</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -8207,7 +7845,7 @@
 <tr>
 <td><code>upgradeTimeout</code></td>
 <td>10 s</td>
-<td>how long an upgrade from polling to websocket may take</td>
+<td>how long an upgrade from polling to websocket can take</td>
 </tr>
 <tr>
 <td><code>connectTimeout</code></td>
@@ -8217,12 +7855,12 @@
 <tr>
 <td><code>maxHttpBufferSize</code></td>
 <td>1,000,000 bytes</td>
-<td>the biggest message. A bigger websocket message closes the connection</td>
+<td>the biggest message. A bigger websocket message closes the connection with code 1009</td>
 </tr>
 <tr>
 <td><code>maxAttachments</code></td>
 <td><code>10</code></td>
-<td>the most binary parts in one packet</td>
+<td>the most binary parts in one packet. More closes the client</td>
 </tr>
 <tr>
 <td><code>transports</code></td>
@@ -8231,116 +7869,412 @@
 </tr>
 <tr>
 <td><code>allowUpgrades</code></td>
-<td><code>true</code></td>
+<td>true</td>
 <td>let polling clients move to websocket</td>
 </tr>
 <tr>
 <td><code>cors</code></td>
-<td><code>null</code></td>
+<td>none</td>
 <td>CORS headers for polling requests. With a list of origins, it also checks the origin of websockets</td>
 </tr>
 <tr>
 <td><code>allowedOrigins</code></td>
-<td><code>null</code></td>
-<td>the sites that may connect, see <a href="#allowed-origins">Allowed origins</a></td>
+<td>none</td>
+<td>the sites that can connect, see <a href="#allowed-origins">Allowed origins</a></td>
 </tr>
 <tr>
 <td><code>allowRequest</code></td>
-<td><code>null</code></td>
+<td>none</td>
 <td>accepts or refuses each request, see <a href="#allow-requests-and-limit-sessions">Allow requests and limit sessions</a></td>
 </tr>
 <tr>
 <td><code>maxSessions</code></td>
-<td><code>null</code></td>
+<td>none</td>
 <td>the most open sessions per isolate. Set it in production</td>
 </tr>
 <tr>
 <td><code>maxAttachmentBytes</code></td>
-<td><code>null</code></td>
+<td>none</td>
 <td>the most bytes of all binary parts of one packet. A bigger packet closes the client</td>
 </tr>
 <tr>
 <td><code>maxAuthSize</code></td>
-<td><code>null</code></td>
-<td>the most bytes of the <code>auth</code> payload of a connect. A bigger one gets <code>connect_error</code> (<code>auth payload too large</code>)</td>
+<td>none</td>
+<td>the most bytes of the <code>auth</code> payload. A bigger one gets <code>connect_error</code> (<code>auth payload too large</code>)</td>
 </tr>
 <tr>
 <td><code>maxWriteBufferSize</code></td>
-<td><code>null</code></td>
-<td>the most bytes kept for a client that does not read, like a polling client that stopped. Above it, the session closes</td>
+<td>none</td>
+<td>the most bytes kept for a client that does not read. Above it, the session closes</td>
 </tr>
 <tr>
 <td><code>ackTimeout</code></td>
-<td><code>null</code></td>
-<td>the default timeout of <code>emitWithAck</code>. With <code>null</code>, it waits until the client answers or leaves</td>
+<td>none</td>
+<td>the default timeout of <code>emitWithAck</code>. With none, it waits until the client answers or leaves</td>
 </tr>
 </tbody>
 </table>
-<h3 id="waiting-for-acks">Waiting for acks</h3>
-<p><code>socket.waitingAcks</code> is the number of acks a socket still waits for. Use it to see a client that never answers:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">waiting</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="n">waitingAcks</span><span class="p">;</span>
+<p>On a plain <code>dart:io</code> server, the full message is read before the size check, so also set a size limit in your proxy.</p>
+<h2 id="namespaces">Namespaces</h2>
+<p>A namespace is a class, so its dependencies come in through the constructor:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ChatNamespace</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">NamespaceHandler</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="n">ChatNamespace</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="n">messages</span><span class="p">);</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">MessageService</span><span class="w"> </span><span class="n">messages</span><span class="p">;</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'/chat'</span><span class="p">;</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onConnection</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">    </span><span class="n">socket</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'message'</span><span class="p">,</span><span class="w"> </span><span class="n">onMessage</span><span class="p">);</span>
+</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onMessage</span><span class="p">(</span><span class="n">SocketEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="n">messages</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">));</span>
+</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a><span class="p">}</span>
+</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>
+</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="c1">// in lib/config/socketio.dart</span>
+</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="nl">namespaces:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">NamespaceHandler</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ChatNamespace</span><span class="p">(</span><span class="n">MessageService</span><span class="p">())],</span>
 </span></code></pre></div>
+<h3 id="namespace-middleware">Namespace middleware</h3>
+<p>A middleware checks a client before it joins. When it throws a <code>SocketIoException</code>, the client gets <code>connect_error</code> with the message and the data:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@override</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="p">[</span><span class="n">checkToken</span><span class="p">];</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kt">void</span><span class="w"> </span><span class="n">checkToken</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">socket</span><span class="p">.</span><span class="n">handshake</span><span class="p">.</span><span class="n">auth</span><span class="p">[</span><span class="s1">'token'</span><span class="p">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">SocketIoException</span><span class="p">(</span><span class="s1">'unauthorized'</span><span class="p">,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">        </span><span class="nl">data:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'reason'</span><span class="o">:</span><span class="w"> </span><span class="s1">'bad token'</span><span class="p">});</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Any other error goes to stderr, and the client gets only <code>{"message": "Internal error"}</code>.</p>
+<h2 id="sending-events">Sending events</h2>
+<h3 id="sending-from-a-controller-or-a-service">Sending from a controller or a service</h3>
+<p><code>SocketIoProvider.server</code> is the Socket.IO server of this isolate:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">SocketIoProvider</span><span class="p">.</span><span class="n">server</span><span class="o">?</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="p">);</span>
+</span></code></pre></div>
+<p>From a queue job or another program, use the <a href="#emit-from-other-programs">emitter</a>.</p>
+<h3 id="common-methods">Common methods</h3>
+<p>The API follows the Node.js server. This table shows where Dart is different:</p>
+<table>
+<thead>
+<tr>
+<th>Node.js</th>
+<th>Dart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>socket.on('e', (a, cb) =&gt; ...)</code></td>
+<td><code>socket.on('e', (SocketEvent e) =&gt; ...)</code>, then <code>e.data</code>, <code>e.args</code>, <code>e.ack(x)</code></td>
+</tr>
+<tr>
+<td><code>socket.emit('e', a, b)</code></td>
+<td><code>socket.emit('e', a)</code> or <code>socket.emitArgs('e', [a, b])</code></td>
+</tr>
+<tr>
+<td><code>await socket.timeout(5000).emitWithAck('e', a)</code></td>
+<td><code>await socket.emitWithAck('e', a, timeout: Duration(seconds: 5))</code></td>
+</tr>
+<tr>
+<td><code>socket.join(r)</code>, <code>socket.leave(r)</code></td>
+<td>the same</td>
+</tr>
+<tr>
+<td><code>socket.to(r).emit(...)</code>, <code>socket.except(r)</code></td>
+<td>the same</td>
+</tr>
+<tr>
+<td><code>socket.broadcast.emit(...)</code></td>
+<td>the same</td>
+</tr>
+<tr>
+<td><code>io.to(r).except(x).emit(...)</code></td>
+<td>the same</td>
+</tr>
+<tr>
+<td><code>io.of('/chat')</code>, <code>io.use(fn)</code></td>
+<td>the same</td>
+</tr>
+<tr>
+<td><code>io.local.emit(...)</code></td>
+<td>the same: only sockets of this server</td>
+</tr>
+<tr>
+<td><code>socket.handshake</code></td>
+<td><code>.headers</code>, <code>.query</code>, <code>.auth</code>, <code>.address</code>, <code>.url</code>, <code>.secure</code>, <code>.time</code>, <code>.token</code>, <code>.cookie(name)</code>, <code>.session()</code></td>
+</tr>
+<tr>
+<td><code>socket.data</code></td>
+<td><code>socket.data</code> (a map). Keep it JSON, because other servers get a copy</td>
+</tr>
+<tr>
+<td><code>await io.in(r).fetchSockets()</code></td>
+<td><code>await io.to(r).fetchSockets()</code> (all servers)</td>
+</tr>
+<tr>
+<td><code>await io.timeout(5000).emitWithAck('e', a)</code></td>
+<td><code>await io.timeout(Duration(seconds: 5)).emitWithAck('e', a)</code></td>
+</tr>
+<tr>
+<td><code>io.serverSideEmit('e', a)</code></td>
+<td><code>await io.serverSideEmit('e', [a])</code></td>
+</tr>
+<tr>
+<td><code>io.on('e', (a, cb) =&gt; ...)</code> (from other servers)</td>
+<td><code>io.onServerSideEmit('e', (ServerSideEvent e) =&gt; ...)</code>, then <code>e.data</code>, <code>e.ack(x)</code></td>
+</tr>
+</tbody>
+</table>
+<p>To send binary data, send a <code>Uint8List</code>. It can be anywhere in lists and maps. An event with many values uses <code>emitArgs</code>, <code>emitArgsWithAck</code> and <code>e.ackArgs([a, b])</code>. <code>e.hasAck</code> is true when the client waits for an answer.</p>
+<h3 id="the-state-of-a-socket">The state of a socket</h3>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">socket</span><span class="p">.</span><span class="n">connected</span><span class="p">;</span><span class="w">   </span><span class="c1">// true while connected</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">socket</span><span class="p">.</span><span class="n">transport</span><span class="p">;</span><span class="w">   </span><span class="c1">// 'polling' or 'websocket'</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">socket</span><span class="p">.</span><span class="n">rooms</span><span class="p">;</span><span class="w">       </span><span class="c1">// the rooms of the socket</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">socket</span><span class="p">.</span><span class="n">waitingAcks</span><span class="p">;</span><span class="w"> </span><span class="c1">// acks it still waits for</span>
+</span></code></pre></div>
+<p>To stop a handler, call <code>socket.off('message', onMessage)</code>. With no handler, all handlers of the event go. <code>nsp.offServerSideEmit</code> does the same for server events.</p>
+<h3 id="leaving">Leaving</h3>
+<p>The <code>disconnecting</code> and <code>disconnect</code> events give the reason in <code>event.data</code>, like <code>transport close</code>. To close a socket from the server, call <code>disconnect</code>. <code>disconnect(true)</code> also closes the connection under it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">socket</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'disconnect'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">SocketEvent</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="n">data</span><span class="p">));</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">socket</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="log-in-a-socket">Log in a socket</h2>
+<p>Route middleware, like session and auth, does not run for Socket.IO. Use <code>SocketAuth</code> as a namespace middleware. Your function gets the handshake and returns the user, or null:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/socket/chat.namespace.dart</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ChatNamespace</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">NamespaceHandler</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'/chat'</span><span class="p">;</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span>
+</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="w">      </span><span class="o">&lt;</span><span class="n">Middleware</span><span class="o">&gt;</span><span class="p">[</span><span class="n">SocketAuth</span><span class="p">(</span><span class="n">findUser</span><span class="p">).</span><span class="n">handle</span><span class="p">];</span>
+</span><span id="__span-14-8"><a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
+</span><span id="__span-14-9"><a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">findUser</span><span class="p">(</span><span class="n">Handshake</span><span class="w"> </span><span class="n">handshake</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-10"><a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="w">    </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handshake</span><span class="p">.</span><span class="n">token</span><span class="p">;</span>
+</span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">token</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+</span><span id="__span-14-12"><a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'api_token'</span><span class="p">,</span><span class="w"> </span><span class="n">token</span><span class="p">).</span><span class="n">getFirst</span><span class="p">();</span>
+</span><span id="__span-14-13"><a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-14-14"><a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>
+</span><span id="__span-14-15"><a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-14-16"><a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">onConnection</span><span class="p">(</span><span class="n">Socket</span><span class="w"> </span><span class="n">socket</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-17"><a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="n">user</span><span class="o">!</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">User</span><span class="p">;</span>
+</span><span id="__span-14-18"><a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a><span class="w">    </span><span class="n">socket</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="s1">'user:</span><span class="si">${</span><span class="n">user</span><span class="p">.</span><span class="n">id</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-14-19"><a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-14-20"><a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The client sends the token in <code>auth</code>, because browsers can not set headers on a websocket:</p>
+<div class="language-js highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">const</span><span class="w"> </span><span class="nx">socket</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">io</span><span class="p">(</span><span class="s1">'http://localhost:3000/chat'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nx">transports</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">'websocket'</span><span class="p">],</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nx">auth</span><span class="o">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">token</span><span class="o">:</span><span class="w"> </span><span class="s1">'the-user-token'</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">});</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'connect_error'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="nx">err</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">));</span><span class="w"> </span><span class="c1">// 'Unauthorized'</span>
+</span></code></pre></div>
+<p>A returned user is kept in <code>socket.user</code>, on this server only. When the function returns null, the client gets <code>connect_error</code> with the message <code>Unauthorized</code>, and <code>onConnection</code> does not run. <code>SocketAuth(findUser, message: '...')</code> changes the message.</p>
+<p>The handshake has these helpers:</p>
+<ul>
+<li><code>handshake.token</code> is <code>auth.token</code> from the client, else the <code>Authorization: Bearer</code> header.</li>
+<li><code>handshake.cookie('name')</code> reads a cookie and decrypts it with <code>APP_KEY</code>. Use <code>decrypt: false</code> for a plain cookie.</li>
+<li><code>await handshake.session()</code> gives the Dox session of the client. It uses <code>AppConfig.session</code>, or the <code>SessionConfig</code> you give. Changes are not saved.</li>
+</ul>
+<h3 id="with-dox_auth">With dox_auth</h3>
+<p><a href="../../security/authentication/#check-a-login-with-no-request">dox_auth</a> can check a JWT or the web login session:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">static</span><span class="w"> </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">findUser</span><span class="p">(</span><span class="n">Handshake</span><span class="w"> </span><span class="n">handshake</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="c1">// an API client or a mobile app sends a JWT</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">handshake</span><span class="p">.</span><span class="n">token</span><span class="p">;</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">token</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Auth</span><span class="p">(</span><span class="nl">guard:</span><span class="w"> </span><span class="s1">'api'</span><span class="p">).</span><span class="n">userFromToken</span><span class="p">(</span><span class="n">token</span><span class="p">);</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="c1">// a browser that logged in on a web page sends the session cookie</span>
+</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="w">  </span><span class="n">Session</span><span class="w"> </span><span class="n">session</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">handshake</span><span class="p">.</span><span class="n">session</span><span class="p">();</span>
+</span><span id="__span-16-8"><a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Auth</span><span class="p">(</span><span class="nl">guard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">).</span><span class="n">userFromSession</span><span class="p">(</span><span class="n">session</span><span class="p">);</span>
+</span><span id="__span-16-9"><a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>A bad, expired or revoked token gives null. The session is read one time, when the socket connects, so call <code>socket.disconnect()</code> yourself after a logout. With <code>userCacheTtl</code> in <code>dox_auth</code>, a banned user can connect until the cache time ends, unless <code>forgetUser</code> runs. With the cookie session driver, an old session cookie works after logout until the <code>lifetime</code> ends.</p>
+<div class="admonition warning">
+<p class="admonition-title">Cookie login needs <code>allowedOrigins</code></p>
+<p>A browser sends its cookies on a websocket from any website. If you log users in with a cookie, set <a href="#allowed-origins"><code>allowedOrigins</code></a> to your own sites. Else another website can open a socket as your user.</p>
+</div>
+<h2 id="protecting-the-server">Protecting the server</h2>
 <h3 id="allowed-origins">Allowed origins</h3>
-<p><code>allowedOrigins</code> says which websites may open a socket. You should set it when you log users in with cookies:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">ServerOptions</span><span class="p">(</span><span class="nl">allowedOrigins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://app.example.com'</span><span class="p">]);</span>
+<p><code>allowedOrigins</code> sets the websites that can open a socket. Set it when you log users in with cookies:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">ServerOptions</span><span class="p">(</span><span class="nl">allowedOrigins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'https://app.example.com'</span><span class="p">]);</span>
 </span></code></pre></div>
 <ul>
-<li><code>null</code> (the default): no extra check. Dox logs a warning at start.</li>
+<li>None (the default): no extra check. Dox logs a warning at start.</li>
 <li><code>[]</code>: only pages of the same host can connect.</li>
 <li>A list of sites: the same host and those sites can connect.</li>
 <li><code>['*']</code>: every site can connect.</li>
 </ul>
-<p>Other sites get 403. A client with no <code>Origin</code> header (not a browser) is always allowed.</p>
+<p>Other sites get 403. A client with no <code>Origin</code> header (not a browser) can always connect. <code>cors</code> with <code>*</code> in <code>origins</code>, or no <code>cors</code>, allows websockets from any origin. <code>*</code> with <code>credentials: true</code> throws an <code>ArgumentError</code>.</p>
 <h3 id="allow-requests-and-limit-sessions">Allow requests and limit sessions</h3>
-<p><code>allowRequest</code> runs for every handshake and every websocket upgrade. It gets an <code>EngineRequest</code> with the headers, query and address, and returns <code>true</code> or <code>false</code>. <code>maxSessions</code> is the most open sessions:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/socketio.dart</span><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">SocketIoConfig</span><span class="w"> </span><span class="n">socketIoConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoConfig</span><span class="p">(</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">ServerOptions</span><span class="p">(</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">    </span><span class="nl">allowRequest:</span><span class="w"> </span><span class="p">(</span><span class="n">EngineRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">query</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">,</span>
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">    </span><span class="nl">maxSessions:</span><span class="w"> </span><span class="m">10000</span><span class="p">,</span>
-</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="p">);</span>
+<p><code>allowRequest</code> runs for every handshake and every websocket upgrade. It gets an <code>EngineRequest</code> with the headers, query and address, and returns true or false. <code>maxSessions</code> is the most open sessions:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/socketio.dart</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">SocketIoConfig</span><span class="w"> </span><span class="n">socketIoConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoConfig</span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">ServerOptions</span><span class="p">(</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">    </span><span class="nl">allowRequest:</span><span class="w"> </span><span class="p">(</span><span class="n">EngineRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">query</span><span class="p">[</span><span class="s1">'key'</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">,</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="nl">maxSessions:</span><span class="w"> </span><span class="m">10000</span><span class="p">,</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>When <code>allowRequest</code> gives <code>false</code> or throws, the client gets <code>403</code>. At the limit, a new handshake gets <code>503</code> and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times <code>maxSessions</code>. Without <code>maxSessions</code>, every GET request makes a session that lives about 45 seconds, so Dox logs one warning at start.</p>
+<p>When <code>allowRequest</code> gives false or throws, the client gets 403. At the limit, a new handshake gets 503, and open sessions keep working. The count is per isolate, so with 4 isolates the app allows 4 times <code>maxSessions</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Without <code>maxSessions</code>, every GET request makes a session that lives about 45 seconds. Set it in production.</p>
+</div>
+<h2 id="many-isolates">Many isolates</h2>
+<p>Dox runs one isolate per CPU core, and each isolate has its own Socket.IO server. With many isolates, the provider uses the <code>IsolateAdapter</code>. It sends each broadcast, <code>socketsJoin</code>, <code>fetchSockets</code>, <code>serverSideEmit</code> and broadcast ack to the other isolates of the process:</p>
+<table>
+<thead>
+<tr>
+<th>Adapter</th>
+<th>Reaches</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InMemoryAdapter</code> (one isolate)</td>
+<td>the clients of this isolate</td>
+</tr>
+<tr>
+<td><code>IsolateAdapter</code> (many isolates, the default)</td>
+<td>the clients of every isolate of this process</td>
+</tr>
+<tr>
+<td><code>RedisAdapter</code></td>
+<td>the clients of every isolate of every server</td>
+</tr>
+</tbody>
+</table>
+<p>Clients must connect with websocket only. Long-polling sends many requests that can reach different isolates. It works only with <code>totalIsolate: 1</code>, or with sticky sessions in front of many single-isolate servers.</p>
+<p>Add each namespace in the config, so every isolate adds it. A namespace that only one isolate adds with <code>io.of('/x')</code> gets no answer from the others, so <code>fetchSockets</code> and <code>serverSideEmitWithAck</code> wait 5 seconds and throw.</p>
+<h2 id="many-servers-redis-adapter">Many servers: Redis adapter</h2>
+<p>With many server processes, or Dox next to Node.js servers, use the Redis adapter. A broadcast on one server then reaches the clients of all servers. Add the <code>ioredis</code> package:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>ioredis
+</span></code></pre></div>
+<p>Make the adapter in each isolate with a factory, because a Redis connection can not go to another isolate:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/socketio.dart</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:ioredis/ioredis.dart'</span><span class="p">;</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/socket/chat.namespace.dart'</span><span class="p">;</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="n">SocketIoConfig</span><span class="w"> </span><span class="n">socketIoConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoConfig</span><span class="p">(</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">  </span><span class="nl">enabled:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">socketioEnabled</span><span class="p">,</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">  </span><span class="nl">namespaces:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">NamespaceHandler</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ChatNamespace</span><span class="p">()],</span>
+</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">RedisSocketAdapterFactory</span><span class="p">(),</span>
+</span><span id="__span-20-10"><a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a><span class="p">);</span>
+</span><span id="__span-20-11"><a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>
+</span><span id="__span-20-12"><a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a><span class="c1">/// makes the Redis adapter inside each isolate.</span>
+</span><span id="__span-20-13"><a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a><span class="kd">class</span><span class="w"> </span><span class="nc">RedisSocketAdapterFactory</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SocketAdapterFactory</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-20-14"><a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">RedisSocketAdapterFactory</span><span class="p">();</span>
+</span><span id="__span-20-15"><a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>
+</span><span id="__span-20-16"><a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-20-17"><a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a><span class="w">  </span><span class="n">Adapter</span><span class="w"> </span><span class="n">create</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-20-18"><a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a><span class="w">    </span><span class="c1">// 127.0.0.1:6379. Or Redis(RedisOptions(host: ..., port: ...))</span>
+</span><span id="__span-20-19"><a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a><span class="w">    </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">();</span>
+</span><span id="__span-20-20"><a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">);</span>
+</span><span id="__span-20-21"><a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-20-22"><a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The subscriber needs its own connection, because a connection in subscribe mode can not run other commands.</p>
+<p>The adapter uses the format of <code>@socket.io/redis-adapter</code>, so Node.js servers with that adapter can share one Redis with Dox. If your Node.js servers use a JSON parser, set <code>format: RedisFormat.json</code>. Long-polling with this adapter also needs sticky sessions.</p>
+<h3 id="acting-on-all-servers">Acting on all servers</h3>
+<p>With the Redis adapter, these methods work on the sockets of all servers:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="c1">// sockets of every server. Sockets of this server are `Socket`s.</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">RemoteSocket</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sockets</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">fetchSockets</span><span class="p">();</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">RemoteSocket</span><span class="w"> </span><span class="n">socket</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sockets</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="n">socket</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="n">socket</span><span class="p">.</span><span class="n">data</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]);</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="p">}</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">);</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">).</span><span class="n">socketsLeave</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">);</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
+</span></code></pre></div>
+<p>A <code>RemoteSocket</code> also has <code>join</code>, <code>leave</code> and <code>disconnect</code>. <code>fetchSockets</code> throws a <code>TimeoutException</code> when a server does not answer in <code>requestsTimeout</code> (5 seconds by default).</p>
+<p>To get one ack from each client on all servers, set a timeout:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">    </span><span class="p">.</span><span class="n">timeout</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">5</span><span class="p">))</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="p">.</span><span class="n">emitWithAck</span><span class="p">(</span><span class="s1">'ping'</span><span class="p">,</span><span class="w"> </span><span class="s1">'are you there?'</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="events-between-servers">Events between servers</h3>
+<p><code>serverSideEmit</code> sends an event to the other servers, like "reload the config". Clients do not get it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1">// on every server</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">io</span><span class="p">.</span><span class="n">onServerSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">ServerSideEvent</span><span class="w"> </span><span class="n">event</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="n">reloadConfig</span><span class="p">(</span><span class="n">event</span><span class="p">.</span><span class="n">data</span><span class="p">);</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span><span class="n">event</span><span class="p">.</span><span class="n">ack</span><span class="p">(</span><span class="s1">'done'</span><span class="p">);</span><span class="w"> </span><span class="c1">// only when the sender waits for an answer</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="p">});</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>
+</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a><span class="c1">// on one server</span>
+</span><span id="__span-23-8"><a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
+</span></code></pre></div>
+<p>To wait for one answer from each other server, use <code>serverSideEmitWithAck</code>. When a server does not answer in time, it throws an <code>AckTimeoutException</code>, and its <code>responses</code> holds the answers that came back:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">answers</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">serverSideEmitWithAck</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
+</span></code></pre></div>
+<h2 id="emit-from-other-programs">Emit from other programs</h2>
+<p>An <strong>emitter</strong> sends an event with no Socket.IO server, for example from a queue worker or a cron job. It writes to Redis, and every server with the Redis adapter sends the event to its clients:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:ioredis/ioredis.dart'</span><span class="p">;</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">  </span><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">  </span><span class="n">SocketIoEmitter</span><span class="w"> </span><span class="n">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoEmitter</span><span class="p">(</span><span class="n">redis</span><span class="p">);</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">  </span><span class="c1">// all clients of `/`</span>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">});</span>
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">except</span><span class="p">(</span><span class="s1">'room2'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hi room1'</span><span class="p">);</span>
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="n">to</span><span class="p">(</span><span class="s1">'vip'</span><span class="p">).</span><span class="n">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for vip'</span><span class="p">);</span>
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a>
+</span><span id="__span-25-13"><a id="__codelineno-25-13" name="__codelineno-25-13" href="#__codelineno-25-13"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="n">socketsJoin</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">);</span>
+</span><span id="__span-25-14"><a id="__codelineno-25-14" name="__codelineno-25-14" href="#__codelineno-25-14"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'room3'</span><span class="p">).</span><span class="n">socketsLeave</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">);</span>
+</span><span id="__span-25-15"><a id="__codelineno-25-15" name="__codelineno-25-15" href="#__codelineno-25-15"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">to</span><span class="p">(</span><span class="s1">'banned'</span><span class="p">).</span><span class="n">disconnectSockets</span><span class="p">();</span>
+</span><span id="__span-25-16"><a id="__codelineno-25-16" name="__codelineno-25-16" href="#__codelineno-25-16"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">emitter</span><span class="p">.</span><span class="n">serverSideEmit</span><span class="p">(</span><span class="s1">'reload-config'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">[</span><span class="s1">'v2'</span><span class="p">]);</span>
+</span><span id="__span-25-17"><a id="__codelineno-25-17" name="__codelineno-25-17" href="#__codelineno-25-17"></a>
+</span><span id="__span-25-18"><a id="__codelineno-25-18" name="__codelineno-25-18" href="#__codelineno-25-18"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">disconnect</span><span class="p">();</span>
+</span><span id="__span-25-19"><a id="__codelineno-25-19" name="__codelineno-25-19" href="#__codelineno-25-19"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The emitter does not wait for an answer. Its <code>key</code> must be the same as the adapter <code>key</code>. Both default to <code>socket.io</code>.</p>
+<p>The emitters of other languages use the same format. For example, Node.js with <a href="https://www.npmjs.com/package/@socket.io/redis-emitter"><code>@socket.io/redis-emitter</code></a>:</p>
+<div class="language-js highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">Emitter</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'@socket.io/redis-emitter'</span><span class="p">;</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createClient</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">'redis'</span><span class="p">;</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="kd">const</span><span class="w"> </span><span class="nx">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createClient</span><span class="p">({</span><span class="w"> </span><span class="nx">url</span><span class="o">:</span><span class="w"> </span><span class="s1">'redis://127.0.0.1:6379'</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="k">await</span><span class="w"> </span><span class="nx">redis</span><span class="p">.</span><span class="nx">connect</span><span class="p">();</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="kd">const</span><span class="w"> </span><span class="nx">emitter</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nx">Emitter</span><span class="p">(</span><span class="nx">redis</span><span class="p">);</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="nx">emitter</span><span class="p">.</span><span class="nx">to</span><span class="p">(</span><span class="s1">'room1'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'news'</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">title</span><span class="o">:</span><span class="w"> </span><span class="s1">'hello'</span><span class="w"> </span><span class="p">});</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="nx">emitter</span><span class="p">.</span><span class="k">of</span><span class="p">(</span><span class="s1">'/chat'</span><span class="p">).</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'notice'</span><span class="p">,</span><span class="w"> </span><span class="s1">'for everyone in /chat'</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="broadcasting">Broadcasting</h2>
+<p>To send events to public, private and presence channels, see <a href="../../digging-deeper/broadcasting/">Broadcasting</a>.</p>
 <h2 id="without-dox">Without Dox</h2>
-<p><code>dox_socketio</code> also runs on its own, with no Dox app:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">();</span>
-</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span><span class="n">io</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">ChatNamespace</span><span class="p">());</span>
-</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">listen</span><span class="p">(</span><span class="m">3001</span><span class="p">);</span>
-</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="p">}</span>
+<p><code>dox_socketio</code> also runs with no Dox app:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_socketio/dox_socketio.dart'</span><span class="p">;</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">();</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">  </span><span class="n">io</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">ChatNamespace</span><span class="p">());</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">io</span><span class="p">.</span><span class="n">listen</span><span class="p">(</span><span class="m">3001</span><span class="p">);</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <ul>
 <li><code>io.listen(port)</code> starts a native server on its own port. Run it in its own small program, like <code>bin/socket.dart</code>, behind the same proxy as the HTTP server.</li>
 <li><code>io.attach(httpServer)</code> uses a server you already have: a <code>NativeHttpServer</code> or a <code>dart:io</code> one.</li>
 <li>In your own server, call <code>io.handle(request)</code> when <code>io.matches(request)</code> is true.</li>
-<li><code>io.on('connection', (Socket socket) {...})</code> handles the default namespace <code>/</code> with no class.</li>
+<li><code>io.on('connection', (Socket socket) {...})</code> handles the default namespace <code>/</code> with no class. <code>io.sockets</code> is that namespace.</li>
 <li><code>io.use(SocketAuth(findUser).handle)</code> logs users in on the default namespace.</li>
+<li><code>await io.close()</code> disconnects everyone and stops the server.</li>
 </ul>
-<p>To use the Redis adapter, pass it to the server:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">(</span>
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">),</span>
-</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="p">);</span>
+<p>To use the Redis adapter, give it to the server:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">Redis</span><span class="w"> </span><span class="n">redis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Redis</span><span class="p">(</span><span class="n">RedisOptions</span><span class="p">(</span><span class="nl">host:</span><span class="w"> </span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="nl">port:</span><span class="w"> </span><span class="m">6379</span><span class="p">));</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">SocketIoServer</span><span class="w"> </span><span class="n">io</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SocketIoServer</span><span class="p">(</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="nl">adapter:</span><span class="w"> </span><span class="n">RedisAdapter</span><span class="p">(</span><span class="nl">subscriber:</span><span class="w"> </span><span class="n">redis</span><span class="p">.</span><span class="n">duplicate</span><span class="p">(),</span><span class="w"> </span><span class="nl">publisher:</span><span class="w"> </span><span class="n">redis</span><span class="p">),</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<h2 id="details">Details</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>With no provider, or with <code>enabled: false</code>, there is no extra work per request.</li>
-<li>Need a plain WebSocket with no Socket.IO protocol? <code>Route.websocket(path, handler)</code> in <code>dox_core</code> gives you the raw socket.</li>
-<li>Dox logs a hint at startup when it runs many isolates and polling is allowed.</li>
-<li>A client that a middleware refuses is closed after <code>connectTimeout</code>, unless it joins another namespace.</li>
-<li><code>socket.user</code> stays on this server. <code>fetchSockets()</code> on other servers does not get it.</li>
-<li><code>SocketAuth(findUser, message: '...')</code> changes the <code>Unauthorized</code> message.</li>
-<li><code>handshake.session()</code> uses <code>AppConfig.session</code>. Pass another <code>SessionConfig</code> like <code>handshake.session(config)</code>. The session is read only, so changes are not saved. It prints a warning once when <code>allowedOrigins</code> is <code>null</code> or has <code>'*'</code>.</li>
-<li>With <code>userCacheTtl</code> on in <code>dox_auth</code>, a deleted or banned user can still connect until the cache time ends, unless <code>forgetUser</code> runs.</li>
-<li>With the <code>cookie</code> session driver, an old copy of the session cookie still works after logout until the <code>lifetime</code> ends. Use the <code>cache</code> driver if a logout must stop old cookies.</li>
-<li><code>cors</code> with <code>*</code> in <code>origins</code>, or <code>cors: null</code>, allows websockets from any origin. <code>*</code> with <code>credentials: true</code> throws an <code>ArgumentError</code>.</li>
-<li>Websocket compression is off. A message bigger than <code>maxHttpBufferSize</code> closes with code 1009. On a plain <code>dart:io</code> server, the whole message is read before the size check, so also set a size limit in your proxy.</li>
-<li>A packet with more than <code>maxAttachments</code> binary parts closes that client.</li>
-<li><code>allowRequest</code> does not run again for the polling requests of an open session. A client that leaves while it runs still holds a <code>maxSessions</code> slot until the ping timeout. A browser client only sees a connect error, not the <code>403</code> or <code>503</code> body.</li>
-<li>The Redis adapter reads msgpack and JSON, and writes msgpack. Long-polling with it needs sticky sessions too.</li>
-<li>The emitter <code>key</code> must be the same as the adapter <code>key</code>. Both default to <code>socket.io</code>. Binary data (<code>Uint8List</code>, or <code>Buffer</code> in Node.js) arrives as binary.</li>
+<li><a href="../../digging-deeper/broadcasting/">Broadcasting</a>: send server events to channels.</li>
+<li><a href="../../security/authentication/">Authentication</a>: log users in.</li>
 </ul>
 
 
@@ -8384,7 +8318,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../cache/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Cache">
+          <a href="../openapi/" class="md-footer__link md-footer__link--prev" aria-label="Previous: OpenAPI">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -8394,7 +8328,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Cache
+                OpenAPI
               </div>
             </div>
           </a>
@@ -8461,7 +8395,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

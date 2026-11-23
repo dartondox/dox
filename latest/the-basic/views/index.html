@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -2204,15 +2206,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Setup
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install">
+    <nav class="md-nav" aria-label="Setup">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -2220,6 +2222,17 @@
     <span class="md-ellipsis">
       
         Set it up by hand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config
       
     </span>
   </a>
@@ -2239,6 +2252,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Rendering views">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rendering-to-a-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendering to a string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2366,28 +2396,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#auth" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Auth
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#verbatim" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verbatim
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#attributes-from-conditions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2488,10 +2496,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#csrf-and-method-fields" class="md-nav__link">
+  <a href="#method-fields" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CSRF and method fields
+        Method fields
       
     </span>
   </a>
@@ -2530,17 +2538,6 @@
     <span class="md-ellipsis">
       
         Your own tags
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Config
       
     </span>
   </a>
@@ -2592,85 +2589,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#when-a-tag-is-text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When a tag is text
+        Testing
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#partials-loops-and-components" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Partials, loops and components
+        Next steps
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sections-and-stacks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sections and stacks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#forms_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Forms
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#globals-json-and-directives" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Globals, JSON and directives
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#which-names-warn" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which names warn
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5594,10 +5530,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5723,95 +5655,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7531,15 +7374,15 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Setup
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Install">
+    <nav class="md-nav" aria-label="Setup">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7547,6 +7390,17 @@
     <span class="md-ellipsis">
       
         Set it up by hand
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Config
       
     </span>
   </a>
@@ -7566,6 +7420,23 @@
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Rendering views">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rendering-to-a-string" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rendering to a string
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7693,28 +7564,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#auth" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Auth
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#verbatim" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verbatim
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#attributes-from-conditions" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7815,10 +7664,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#csrf-and-method-fields" class="md-nav__link">
+  <a href="#method-fields" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CSRF and method fields
+        Method fields
       
     </span>
   </a>
@@ -7857,17 +7706,6 @@
     <span class="md-ellipsis">
       
         Your own tags
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#config" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Config
       
     </span>
   </a>
@@ -7919,85 +7757,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#testing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#when-a-tag-is-text" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When a tag is text
+        Testing
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#partials-loops-and-components" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Partials, loops and components
+        Next steps
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#sections-and-stacks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sections and stacks
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#forms_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Forms
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#globals-json-and-directives" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Globals, JSON and directives
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#which-names-warn" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Which names warn
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -8018,24 +7795,18 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/the-basic/views.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="views">Views</h1>
 <p>Views are HTML templates that Dox fills with your data and sends as the response.</p>
-<p>Writing HTML in a controller gets messy fast. A view keeps the HTML in its own file, so the controller only gives the data. The <code>dox_view</code> package has the template engine. Templates are <code>.dox.html</code> files in <code>resources/views</code>.</p>
-<h2 id="install">Install</h2>
-<p>Add the package with the CLI:</p>
+<p>The <code>dox_view</code> package has the template engine. Templates are <code>.dox.html</code> files in <code>resources/views</code>.</p>
+<h2 id="setup">Setup</h2>
+<p>Add the package with the CLI. It adds the package, the provider, the <code>resources/views</code> folder and a sample view:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>add<span class="w"> </span>view
 </span></code></pre></div>
-<p>It adds the package, the provider, the <code>resources/views</code> folder and a sample view. It never overwrites a file, so it is safe to run twice.</p>
 <h3 id="set-it-up-by-hand">Set it up by hand</h3>
-<p>If you do not use <code>dox add</code>, add the package yourself:</p>
+<p>Add the package:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_view
 </span></code></pre></div>
 <p>Add the provider in <code>lib/</code>, so every isolate sets up the engine:</p>
@@ -8045,9 +7816,68 @@
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="n">AppViewProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">());</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>To make a view file, run <code>dox make:view emails/welcome</code>. It writes <code>resources/views/emails/welcome.dox.html</code>. See <a href="../../reference/cli/#dox-makeview"><code>dox make:view</code></a>.</p>
+<p>To make a view file, run <code>dox make:view emails/welcome</code>. See <a href="../../reference/cli/#dox-makeview"><code>dox make:view</code></a>.</p>
+<h3 id="config">Config</h3>
+<p>Set the options in <code>ViewConfig</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td><code>resources/views</code></td>
+<td>the folder of the templates</td>
+</tr>
+<tr>
+<td><code>extension</code></td>
+<td><code>.dox.html</code></td>
+<td>the file extension</td>
+</tr>
+<tr>
+<td><code>cache</code></td>
+<td>on, but off when <code>APP_ENV</code> is development or local</td>
+<td>keep parsed templates in memory. With the cache off, a changed template shows on the next request.</td>
+</tr>
+<tr>
+<td><code>globals</code></td>
+<td>empty</td>
+<td>variables for every template. See <a href="#globals">Globals</a>.</td>
+</tr>
+<tr>
+<td><code>directives</code></td>
+<td>empty</td>
+<td>your own tags, by name. See <a href="#your-own-tags">Your own tags</a>.</td>
+</tr>
+<tr>
+<td><code>strictVariables</code></td>
+<td>false</td>
+<td>a variable that does not exist throws. See <a href="#strict-options">Strict options</a>.</td>
+</tr>
+<tr>
+<td><code>stringZeroIsFalse</code></td>
+<td>false</td>
+<td>the text '0' is false in a condition</td>
+</tr>
+<tr>
+<td><code>bladeOutput</code></td>
+<td>false</td>
+<td>print true as 1, false as nothing and 10.0 as 10</td>
+</tr>
+<tr>
+<td><code>bladeWarnings</code></td>
+<td>true</td>
+<td>warn about tag names of other template engines. See <a href="#unknown-tag-warnings">Unknown tag warnings</a>.</td>
+</tr>
+</tbody>
+</table>
+<p>To set up the engine with no provider, call <code>View.configure(config)</code>.</p>
 <h2 id="rendering-views">Rendering views</h2>
-<p><code>view()</code> renders a template and sends it as HTML. Leave out the <code>.dox.html</code> extension:</p>
+<p>Render a template and send it as HTML. Leave out the <code>.dox.html</code> extension:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">DoxResponse</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">view</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="s1">'users/show'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="s1">'user'</span><span class="o">:</span><span class="w"> </span><span class="n">user</span><span class="p">,</span>
@@ -8058,44 +7888,39 @@
 <p>This renders <code>resources/views/users/show.dox.html</code>:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>{{ user.name }}<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>If you need the HTML as a string, for example for an email, use <code>View.render()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">html</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">View</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="s1">'emails/welcome'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">});</span>
+<h3 id="rendering-to-a-string">Rendering to a string</h3>
+<p>Get the HTML as a string, for example for an email:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">html</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">    </span><span class="n">View</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="s1">'emails/welcome'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">});</span>
 </span></code></pre></div>
+<p><code>View.engine.exists('emails/welcome')</code> tells if a template is there.</p>
 <h2 id="displaying-data">Displaying data</h2>
-<p><code>{{ }}</code> prints a value. It escapes HTML, so a user can not add a <code>&lt;script&gt;</code> tag to your page:</p>
+<p><code>{{ }}</code> prints a value. It escapes HTML, so a user can not add a script tag to your page:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello {{ user.name }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <p><code>{{{ }}}</code> prints a value with no escape. Use it only for HTML you trust:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">&lt;</span><span class="nt">article</span><span class="p">&gt;</span>{{{ post.html }}}<span class="p">&lt;/</span><span class="nt">article</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p><code>null</code> prints nothing, and a variable that does not exist prints nothing too. <code>true</code> prints <code>true</code>, <code>false</code> prints <code>false</code>, and <code>10.0</code> prints <code>10.0</code>. The <code>bladeOutput</code> and <code>strictVariables</code> options change this. See <a href="#strict-options">Strict options</a>.</p>
+<p>A null value and a variable that does not exist print nothing.</p>
 <h3 id="comments">Comments</h3>
 <p>A comment is not in the output:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>{{-- only you see this --}}
 </span></code></pre></div>
 <p>To print <code>{{</code> or a tag as text, put <code>@</code> before it: <code>@{{ name }}</code> prints <code>{{ name }}</code>, and <code>@@if</code> prints <code>@if</code>.</p>
 <h3 id="stay-safe">Stay safe</h3>
-<p><code>{{ }}</code> escapes HTML, but it does not make every place in a page safe. Follow these three rules:</p>
+<p><code>{{ }}</code> escapes HTML, but that does not make every place in a page safe:</p>
 <ul>
-<li><strong>Always quote attributes.</strong> Write <code>href="{{ url }}"</code>, not <code>href={{ url }}</code>.
-  Without quotes, a space in the value starts a new attribute, like <code>onclick=...</code>.</li>
-<li><strong>Check URLs from users.</strong> <code>href="{{ url }}"</code> does not block a <code>javascript:</code> URL.
-  A click on <code>javascript:alert(1)</code> runs the code.
-  Allow only <code>http://</code> and <code>https://</code> URLs (or your own paths) before you print them.</li>
-<li><strong><code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> are not safe for <code>{{ }}</code>.</strong> Inside them, <code>{{ }}</code> only escapes HTML.
-  It does not make a value safe for JavaScript or CSS.
-  Do not print user data there with <code>{{ }}</code>. In a <code>&lt;script&gt;</code>, use <code>@json</code>. See <a href="#json-for-javascript">JSON for JavaScript</a>.
-  Or put the value in a quoted <code>data-</code> attribute, and read it in your script.</li>
+<li>Always quote attributes. Write <code>href="{{ url }}"</code>, not <code>href={{ url }}</code>.</li>
+<li>Check URLs from users. <code>href="{{ url }}"</code> does not block a <code>javascript:</code> URL, so allow only http and https URLs.</li>
+<li>Do not print user data inside a script or style tag with <code>{{ }}</code>. Use <a href="#json-for-javascript"><code>@json</code></a>, or a quoted <code>data-</code> attribute.</li>
 </ul>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"{{ profile.website }}"</span><span class="p">&gt;</span>Website<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>  {{-- only after you check it is http or https --}}
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"app"</span> <span class="na">data-user-name</span><span class="o">=</span><span class="s">"{{ user.name }}"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'app'</span><span class="p">).</span><span class="nx">dataset</span><span class="p">.</span><span class="nx">userName</span><span class="p">;</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"app"</span> <span class="na">data-user-name</span><span class="o">=</span><span class="s">"{{ user.name }}"</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">'app'</span><span class="p">).</span><span class="nx">dataset</span><span class="p">.</span><span class="nx">userName</span><span class="p">;</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
 </span></code></pre></div>
 <h2 id="expressions">Expressions</h2>
-<p>Inside <code>{{ }}</code> and tags, you can use these expressions:</p>
+<p>Use these expressions inside <code>{{ }}</code> and tags:</p>
 <table>
 <thead>
 <tr>
@@ -8134,17 +7959,16 @@
 </tr>
 </tbody>
 </table>
-<p><code>+</code> joins text: <code>{{ 'Hi ' + name }}</code>. Fields work on maps, and on objects with a <code>toJson()</code> method, like Dox models.</p>
-<p>Some methods work too:</p>
+<p><code>+</code> joins text. Fields work on maps, and on objects with a <code>toJson()</code> method, like Dox models. These methods work too:</p>
 <ul>
-<li>Lists, maps and text have <code>length</code>, <code>isEmpty</code> and <code>isNotEmpty</code>.</li>
-<li>Lists also have <code>first</code>, <code>last</code>, <code>contains()</code>, <code>join()</code> and <code>indexOf()</code>.</li>
-<li>Text has <code>toUpperCase()</code>, <code>toLowerCase()</code>, <code>trim()</code>, <code>contains()</code>, <code>startsWith()</code>, <code>endsWith()</code>, <code>split()</code>, <code>replaceAll()</code>, <code>substring()</code> and <code>indexOf()</code>.</li>
-<li>Numbers have <code>toStringAsFixed()</code>, <code>round()</code>, <code>floor()</code>, <code>ceil()</code> and <code>abs()</code>.</li>
+<li>Lists, maps and text: <code>length</code>, <code>isEmpty</code>, <code>isNotEmpty</code>.</li>
+<li>Lists: <code>first</code>, <code>last</code>, <code>contains()</code>, <code>join()</code>, <code>indexOf()</code>.</li>
+<li>Text: <code>toUpperCase()</code>, <code>toLowerCase()</code>, <code>trim()</code>, <code>contains()</code>, <code>startsWith()</code>, <code>endsWith()</code>, <code>split()</code>, <code>replaceAll()</code>, <code>substring()</code>, <code>indexOf()</code>.</li>
+<li>Numbers: <code>toStringAsFixed()</code>, <code>round()</code>, <code>floor()</code>, <code>ceil()</code>, <code>abs()</code>.</li>
 </ul>
-<p>In <code>@if</code> and <code>?:</code>, these values are false: <code>null</code>, <code>false</code>, <code>0</code>, <code>''</code>, an empty list and an empty map. With the <code>stringZeroIsFalse</code> option, the text <code>'0'</code> is false too. See <a href="#strict-options">Strict options</a>.</p>
+<p>In a condition, these values are false: null, false, 0, an empty string, an empty list and an empty map.</p>
 <h2 id="conditions">Conditions</h2>
-<p>Use <code>@if</code>, <code>@elseif</code> and <code>@else</code> to show a part only in some cases. Close it with <code>@end</code>:</p>
+<p>Show a part only in some cases. Close it with <code>@end</code>:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>@if(user.isAdmin)
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/admin"</span><span class="p">&gt;</span>Admin<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>@elseif(user.isEditor)
@@ -8154,9 +7978,9 @@
 </span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>@end
 </span></code></pre></div>
 <p><code>@unless(x)</code> is <code>@if(!x)</code>. A tag alone on its line leaves no empty line in the output.</p>
-<p>A tag can not come right after a letter or a digit, so <code>me@mail.com</code> stays text. Put a space before the tag, or use <code>{{ on ? 'active' : '' }}</code>.</p>
+<p>A tag right after a letter or a digit stays text, so <code>me@mail.com</code> is safe. Put a space before the tag, or use <code>{{ on ? 'active' : '' }}</code>.</p>
 <h2 id="loops">Loops</h2>
-<p>Use <code>@each</code> to print a list. The <code>@else</code> part shows when the list is empty:</p>
+<p>Print a list. The <code>@else</code> part shows when the list is empty:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>  @each(user in users)
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>{{ user.name }}<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
@@ -8165,7 +7989,7 @@
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>  @end
 </span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>If you need the index too, or the key of a map, use two names:</p>
+<p>Use two names to get the index, or the key of a map:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>@each((user, index) in users)
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>  {{ index + 1 }}. {{ user.name }}
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>@end
@@ -8175,7 +7999,7 @@
 </span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>@end
 </span></code></pre></div>
 <h3 id="the-loop-variable">The loop variable</h3>
-<p><code>$loop</code> tells you where the loop is. For example, to put a comma after every item but the last:</p>
+<p><code>$loop</code> tells you where the loop is:</p>
 <div class="language-html highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>@each(tag in tags)
 </span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>  {{ tag }}{{ $loop.last ? '' : ', ' }}
 </span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>@end
@@ -8214,11 +8038,11 @@
 </tr>
 <tr>
 <td><code>$loop.even</code></td>
-<td>true when <code>iteration</code> is even: the 2nd, 4th, ... round</td>
+<td>true in the 2nd, 4th, ... round</td>
 </tr>
 <tr>
 <td><code>$loop.odd</code></td>
-<td>true when <code>iteration</code> is odd: the 1st, 3rd, ... round</td>
+<td>true in the 1st, 3rd, ... round</td>
 </tr>
 <tr>
 <td><code>$loop.depth</code></td>
@@ -8226,39 +8050,31 @@
 </tr>
 <tr>
 <td><code>$loop.parent</code></td>
-<td>the <code>$loop</code> of the loop around this one. <code>null</code> when there is none.</td>
+<td>the <code>$loop</code> of the outer loop, or null</td>
 </tr>
 </tbody>
 </table>
-<p>In a loop inside a loop, <code>$loop.parent</code> reads the outer loop:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>@each(row in rows)
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>  @each(cell in row)
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>    <span class="p">&lt;</span><span class="nt">td</span> <span class="na">class</span><span class="o">=</span><span class="s">"{{ $loop.parent.odd ? 'light' : 'dark' }}"</span><span class="p">&gt;</span>{{ cell }}<span class="p">&lt;/</span><span class="nt">td</span><span class="p">&gt;</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>  @end
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>@end
-</span></code></pre></div>
 <h2 id="variables">Variables</h2>
-<p><code>@let</code> makes a variable, and <code>@assign</code> changes it:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>@let(total = 0)
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>@each(item in cart)
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>  @assign(total = total + item.price)
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>@end
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a>Total: {{ total }}
+<p>Make a variable with <code>@let</code>, and change it with <code>@assign</code>:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>@let(total = 0)
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>@each(item in cart)
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>  @assign(total = total + item.price)
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>@end
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>Total: {{ total }}
 </span></code></pre></div>
 <h2 id="partials">Partials</h2>
-<p>Some parts are the same on many pages, like a nav bar. <code>@include</code> puts another template in this one, and it sees the same variables:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>@include('partials/nav')
+<p>Put another template in this one. It sees the same variables:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>@include('partials/nav')
 </span></code></pre></div>
-<p>To give it more variables, pass a map as the second argument:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>@include('partials/card', { title: 'Profile', user: post.author })
+<p>Pass a map to give it more variables, only for this include:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>@include('partials/card', { title: 'Profile', user: post.author })
 </span></code></pre></div>
-<p>On the same name, the map wins. The map is only for this include, so the page does not see it after the include.</p>
-<p>To include a template only when a condition is true, use <code>@includeIf</code> or <code>@includeWhen</code>. The two tags do the same. The condition is the first argument, the template name is the second, and the map is the third:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>@includeIf(user, 'partials/account')
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>@includeWhen(user.isAdmin, 'partials/admin', { level: 2 })
+<p>Include a template only when a condition is true. <code>@includeIf</code> and <code>@includeWhen</code> are the same:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>@includeIf(user, 'partials/account')
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>@includeWhen(user.isAdmin, 'partials/admin', { level: 2 })
 </span></code></pre></div>
 <h2 id="more-tags">More tags</h2>
-<p>Dox has more tags for common cases. Close a block tag with <code>@end</code>. <code>@else</code> works in all of them, but not in <code>@once</code> and <code>@verbatim</code>.</p>
+<p>Close a block tag with <code>@end</code>. <code>@else</code> works in all of them, but not in <code>@once</code> and <code>@verbatim</code>:</p>
 <table>
 <thead>
 <tr>
@@ -8269,11 +8085,11 @@
 <tbody>
 <tr>
 <td><code>@isset(user.phone) ... @end</code></td>
-<td>shows when the value is not <code>null</code>. A field of <code>null</code> is not an error here.</td>
+<td>shows when the value is not null</td>
 </tr>
 <tr>
 <td><code>@empty(items) ... @end</code></td>
-<td>shows when the value is false: <code>null</code>, <code>false</code>, <code>0</code>, <code>''</code>, an empty list or map. With <code>stringZeroIsFalse</code>, <code>'0'</code> too.</td>
+<td>shows when the value is false</td>
 </tr>
 <tr>
 <td><code>@auth ... @end</code></td>
@@ -8285,19 +8101,19 @@
 </tr>
 <tr>
 <td><code>@env('local') ... @end</code></td>
-<td>shows when <code>APP_ENV</code> is this value. A list works too: <code>@env(['local', 'staging'])</code>. Case does not matter.</td>
+<td>shows when <code>APP_ENV</code> is this value. A list works too: <code>@env(['local', 'staging'])</code>.</td>
 </tr>
 <tr>
 <td><code>@production ... @end</code></td>
-<td>shows when <code>APP_ENV</code> is <code>production</code></td>
+<td>shows when <code>APP_ENV</code> is production</td>
 </tr>
 <tr>
 <td><code>@once ... @end</code></td>
-<td>shows only the first time in one render, for example a <code>&lt;script&gt;</code> in a component</td>
+<td>shows only the first time in one render, for example a script in a component</td>
 </tr>
 <tr>
 <td><code>@verbatim ... @end</code></td>
-<td>prints the text as it is: no <code>{{ }}</code> and no tags run inside it</td>
+<td>prints the text as it is, for JavaScript frameworks that also use <code>{{ }}</code>. The text can not have <code>@end</code>.</td>
 </tr>
 <tr>
 <td><code>@extends('layouts/app')</code></td>
@@ -8333,146 +8149,120 @@
 </tr>
 <tr>
 <td><code>@error('email') ... @end</code></td>
-<td>shows when the field has a validation error. See <a href="#forms">Forms</a>.</td>
+<td>shows when the field has a validation error</td>
 </tr>
 <tr>
 <td><code>@json(value)</code></td>
 <td>the value as JSON. See <a href="#json-for-javascript">JSON for JavaScript</a>.</td>
 </tr>
-<tr>
-<td><code>@includeWhen(condition, 'name')</code></td>
-<td>includes a template when the condition is true. See <a href="#partials">Partials</a>.</td>
-</tr>
-<tr>
-<td><code>@datetime(...)</code></td>
-<td>a tag of your app. See <a href="#your-own-tags">Your own tags</a>.</td>
-</tr>
 </tbody>
 </table>
-<p>Put <code>@auth</code>, <code>@guest</code>, <code>@production</code>, <code>@once</code> and <code>@verbatim</code> alone on their line. In the middle of text, like <code>@once upon a time</code>, they stay text.</p>
-<h3 id="auth">Auth</h3>
-<p><code>@auth</code> shows its body when the user is logged in, and <code>@guest</code> when not:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>@auth
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/logout"</span><span class="p">&gt;</span>Log out<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>@else
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"/login"</span><span class="p">&gt;</span>Log in<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>@end
-</span></code></pre></div>
-<p>They use the <code>req.auth</code> that <code>view()</code> gets. In <code>View.render</code> there is no request, so <code>@guest</code> shows.</p>
-<h3 id="verbatim">Verbatim</h3>
-<p>Some JavaScript frameworks also use <code>{{ }}</code>. <code>@verbatim</code> prints its text as it is, so Dox does not run it. It ends at the first <code>@end</code>, so the text inside can not have <code>@end</code>:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>@verbatim
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>  <span class="p">&lt;</span><span class="nt">div</span> <span class="na">id</span><span class="o">=</span><span class="s">"app"</span><span class="p">&gt;</span>{{ message }}<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>@end
-</span></code></pre></div>
+<p>Put <code>@auth</code>, <code>@guest</code>, <code>@production</code>, <code>@once</code> and <code>@verbatim</code> alone on their line. In <code>View.render</code> there is no request, so <code>@guest</code> shows.</p>
 <h3 id="attributes-from-conditions">Attributes from conditions</h3>
-<p>These tags print an HTML attribute when a condition is true:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">&lt;</span><span class="nt">a</span> <span class="err">@</span><span class="na">class</span><span class="err">(['</span><span class="na">link</span><span class="err">',</span> <span class="err">{</span> <span class="na">active:</span> <span class="na">isActive</span><span class="err">,</span> <span class="na">muted:</span> <span class="err">!</span><span class="na">isActive</span> <span class="err">}])</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"checkbox"</span> <span class="na">name</span><span class="o">=</span><span class="s">"news"</span> <span class="err">@</span><span class="na">checked</span><span class="err">(</span><span class="na">user</span><span class="err">.</span><span class="na">news</span><span class="err">)</span><span class="p">&gt;</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">"en"</span> <span class="err">@</span><span class="na">selected</span><span class="err">(</span><span class="na">lang </span><span class="o">=</span><span class="s">=</span> <span class="err">'</span><span class="na">en</span><span class="err">')</span><span class="p">&gt;</span>English<span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="err">@</span><span class="na">disabled</span><span class="err">(</span><span class="na">saving</span><span class="err">)</span><span class="p">&gt;</span>Save<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<p>Print an HTML attribute when a condition is true:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="p">&lt;</span><span class="nt">a</span> <span class="err">@</span><span class="na">class</span><span class="err">(['</span><span class="na">link</span><span class="err">',</span> <span class="err">{</span> <span class="na">active:</span> <span class="na">isActive</span><span class="err">,</span> <span class="na">muted:</span> <span class="err">!</span><span class="na">isActive</span> <span class="err">}])</span><span class="p">&gt;</span>Home<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">"checkbox"</span> <span class="na">name</span><span class="o">=</span><span class="s">"news"</span> <span class="err">@</span><span class="na">checked</span><span class="err">(</span><span class="na">user</span><span class="err">.</span><span class="na">news</span><span class="err">)</span><span class="p">&gt;</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">"en"</span> <span class="err">@</span><span class="na">selected</span><span class="err">(</span><span class="na">lang </span><span class="o">=</span><span class="s">=</span> <span class="err">'</span><span class="na">en</span><span class="err">')</span><span class="p">&gt;</span>English<span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="err">@</span><span class="na">disabled</span><span class="err">(</span><span class="na">saving</span><span class="err">)</span><span class="p">&gt;</span>Save<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p><code>@class</code> takes text, a map of class name to a condition, or a list of these. It prints <code>class="..."</code> with the names whose condition is true. <code>@checked</code>, <code>@selected</code> and <code>@disabled</code> print the attribute name when the value is true.</p>
+<p><code>@class</code> takes text, a map of class name to a condition, or a list of these.</p>
 <h2 id="layouts-and-components">Layouts and components</h2>
-<p>A component is a template with its own props and slots. You can use one for the page layout, so every page has the same head and header:</p>
-<div class="language-html highlight"><span class="filename">resources/views/layouts/main.dox.html</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ title ?? 'My app' }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>    <span class="p">&lt;</span><span class="nt">header</span><span class="p">&gt;</span>{{ $slots.header }}<span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
-</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>    <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>{{ $slots.main }}<span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
-</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+<p>A <strong>component</strong> is a template with its own props and slots. Use one for the page layout:</p>
+<div class="language-html highlight"><span class="filename">resources/views/layouts/main.dox.html</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>{{ title ?? 'My app' }}<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>    <span class="p">&lt;</span><span class="nt">header</span><span class="p">&gt;</span>{{ $slots.header }}<span class="p">&lt;/</span><span class="nt">header</span><span class="p">&gt;</span>
+</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>    <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>{{ $slots.main }}<span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span><span id="__span-19-10"><a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>A page then puts its content in the component:</p>
-<div class="language-html highlight"><span class="filename">resources/views/home.dox.html</span><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>@component('layouts/main', { title: 'Home' })
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>  @slot('header')
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Welcome<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>  @end
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
-</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello {{ user.name }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-</span><span id="__span-23-7"><a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>@end
+<p>A page puts its content in the component:</p>
+<div class="language-html highlight"><span class="filename">resources/views/home.dox.html</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>@component('layouts/main', { title: 'Home' })
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>  @slot('header')
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Welcome<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>  @end
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello {{ user.name }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>@end
 </span></code></pre></div>
 <ul>
-<li>The second argument is the props. In the component they are variables (<code>title</code>), and also <code>$props.title</code>.</li>
-<li><code>@slot('name') ... @end</code> fills a named slot. Everything else goes into <code>$slots.main</code>. <code>$slot</code> is the same as <code>$slots.main</code>.</li>
-<li>A slot is HTML, so <code>{{ }}</code> does not escape it again.</li>
-<li>A component does not see the variables of the page. It only sees its props, <code>$props</code>, <code>$slots</code>, <code>$slot</code>, <code>$attributes</code>, the globals and the request helpers of <code>view()</code> (see <a href="#forms">Forms</a>).</li>
+<li>The second argument is the props. In the component they are variables, and also <code>$props.title</code>.</li>
+<li><code>@slot('name') ... @end</code> fills a named slot. All other content goes into <code>$slots.main</code>, which is also <code>$slot</code>.</li>
+<li>A component does not see the variables of the page. It sees its props, the slots, <code>$attributes</code>, the globals and the <a href="#forms">form helpers</a>.</li>
 </ul>
 <p><code>@!component(...)</code> is a component with no body and no <code>@end</code>.</p>
 <h3 id="components-as-tags">Components as tags</h3>
 <p>A template in <code>resources/views/components/</code> is also a tag with its name. A <code>.</code> in the tag is a folder:</p>
-<div class="language-html highlight"><span class="filename">resources/views/components/button.dox.html</span><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">"btn btn-{{ type ?? 'primary' }}"</span><span class="p">&gt;</span>{{ $slots.main }}<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<div class="language-html highlight"><span class="filename">resources/views/components/button.dox.html</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">"btn btn-{{ type ?? 'primary' }}"</span><span class="p">&gt;</span>{{ $slots.main }}<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>Then use the tag:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>@button({ type: 'danger' })
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>  Delete
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>@end
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>
-</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>@!form.input({ name: 'email' })   {{-- components/form/input.dox.html --}}
+<div class="language-html highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>@button({ type: 'danger' })
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>  Delete
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>@end
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>@!form.input({ name: 'email' })   {{-- components/form/input.dox.html --}}
 </span></code></pre></div>
 <h3 id="attributes">Attributes</h3>
-<p>Often a component should pass its props on as HTML attributes, like <code>id</code> or <code>type</code>. <code>$attributes</code> has the props as HTML attributes, and <code>{{ $attributes }}</code> prints them, like <code>id="save" title="Save"</code>. The values are escaped.</p>
-<p><code>$attributes.merge({ ... })</code> adds default attributes. A prop wins over a default, but <code>class</code> is joined:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="err">{{</span> <span class="err">$</span><span class="na">attributes</span><span class="err">.</span><span class="na">merge</span><span class="err">({</span> <span class="na">class:</span> <span class="err">'</span><span class="na">btn</span><span class="err">',</span> <span class="na">type:</span> <span class="err">'</span><span class="na">button</span><span class="err">'</span> <span class="err">})</span> <span class="err">}}</span><span class="p">&gt;</span>{{ $slot }}<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+<p><code>{{ $attributes }}</code> prints the props as escaped HTML attributes, like <code>id="save" title="Save"</code>. <code>merge</code> adds defaults. A prop wins, but <code>class</code> is joined:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="err">{{</span> <span class="err">$</span><span class="na">attributes</span><span class="err">.</span><span class="na">merge</span><span class="err">({</span> <span class="na">class:</span> <span class="err">'</span><span class="na">btn</span><span class="err">',</span> <span class="na">type:</span> <span class="err">'</span><span class="na">button</span><span class="err">'</span> <span class="err">})</span> <span class="err">}}</span><span class="p">&gt;</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>  {{ $slot }}
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>@button({ class: 'btn-big', type: 'submit' })
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>  Save
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>@end
+<div class="language-html highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>@button({ class: 'btn-big', type: 'submit' })
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>  Save
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>@end
 </span></code></pre></div>
 <p>This prints <code>&lt;button class="btn btn-big" type="submit"&gt;</code>.</p>
-<p>Only text, numbers and <code>true</code> are attributes. <code>true</code> prints the name alone, like <code>hidden</code>. <code>null</code>, <code>false</code>, lists, maps and objects are left out. You can still read any prop, like <code>$attributes.type</code>.</p>
-<p><code>$attributes</code> keeps any attribute name, like <code>onclick</code>. So do not pass a map from the user as the props of a component.</p>
-<h2 id="layouts-with-sections">Layouts with sections</h2>
-<p>A page can also name its layout with <code>@extends</code>. The page fills sections, and the layout prints them with <code>@yield</code>:</p>
-<div class="language-html highlight"><span class="filename">resources/views/layouts/app.dox.html</span><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>@yield('title', 'My app')<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
-</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>    <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>@yield('content')<span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
-</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
-</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+<p>Leave out props that are only for the logic of the component with <code>except</code>. It can go before <code>merge</code>:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="p">&lt;</span><span class="nt">button</span> <span class="err">{{</span> <span class="err">$</span><span class="na">attributes</span><span class="err">.</span><span class="na">except</span><span class="err">(['</span><span class="na">variant</span><span class="err">']).</span><span class="na">merge</span><span class="err">({</span> <span class="na">class:</span> <span class="err">'</span><span class="na">btn</span><span class="err">'</span> <span class="err">})</span> <span class="err">}}</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<div class="language-html highlight"><span class="filename">resources/views/home.dox.html</span><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>@extends('layouts/app')
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>
-</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>@section('title', 'Home')
-</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>
-</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>@section('content')
-</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello {{ user.name }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-</span><span id="__span-29-7"><a id="__codelineno-29-7" name="__codelineno-29-7" href="#__codelineno-29-7"></a>@end
+<p>Only text, numbers and true are attributes, and true prints the name alone. <code>$attributes</code> keeps any attribute name, like <code>onclick</code>, so do not pass a map from the user as props.</p>
+<h2 id="layouts-with-sections">Layouts with sections</h2>
+<p>A page can name its layout with <code>@extends</code>. The page fills sections, and the layout prints them with <code>@yield</code>:</p>
+<div class="language-html highlight"><span class="filename">resources/views/layouts/app.dox.html</span><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="cp">&lt;!DOCTYPE html&gt;</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>  <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>    <span class="p">&lt;</span><span class="nt">title</span><span class="p">&gt;</span>@yield('title', 'My app')<span class="p">&lt;/</span><span class="nt">title</span><span class="p">&gt;</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>  <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>  <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>    <span class="p">&lt;</span><span class="nt">main</span><span class="p">&gt;</span>@yield('content')<span class="p">&lt;/</span><span class="nt">main</span><span class="p">&gt;</span>
+</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>  <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></code></pre></div>
+<div class="language-html highlight"><span class="filename">resources/views/home.dox.html</span><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>@extends('layouts/app')
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>@section('title', 'Home')
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>@section('content')
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Hello {{ user.name }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>@end
 </span></code></pre></div>
 <ul>
-<li><code>@extends</code> must be the first thing in the template. A template can have only one.</li>
-<li><code>@section('name') ... @end</code> fills a section. The short form <code>@section('title', 'Home')</code> takes a value, which is escaped like <code>{{ }}</code>.</li>
-<li><code>@yield('title', 'My app')</code> prints the second value when the page has no such section.</li>
+<li><code>@extends</code> must be the first thing in the template.</li>
 <li>Only the sections reach the layout. Text outside a section is not printed.</li>
-<li>A section and the layout both see the variables of the page.</li>
-<li>A layout can extend another layout. When a page and its layout fill the same section, the page wins.</li>
+<li>A layout can extend another layout. When both fill the same section, the page wins.</li>
 </ul>
 <p>Use <code>@extends</code> for the page layout. Use a component when you need props or more than one copy on a page.</p>
 <h2 id="stacks">Stacks</h2>
-<p>Sometimes a page or a component needs its own script or style in the layout's <code>&lt;head&gt;</code>. A stack collects HTML from many templates and prints it in one place. The layout prints the stack with <code>@stack</code>:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>  @stack('styles')
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
-</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>  @yield('content')
-</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>  @stack('scripts')
-</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<p>A <strong>stack</strong> collects HTML from many templates and prints it in one place, like scripts in the head. The layout prints it:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>  @stack('styles')
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>  @yield('content')
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>  @stack('scripts')
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>A page or a component adds to it with <code>@push</code>:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>@push('scripts')
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/js/chart.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>@end
+<p>A page, an include or a component adds to it:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>@push('scripts')
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">"/js/chart.js"</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>@end
 </span></code></pre></div>
-<p><code>@push</code> adds to the end of the stack, and <code>@prepend</code> adds to the start. A push works from the page, its layout, an <code>@include</code> and a component. <code>@stack</code> can come before the <code>@push</code>, and it still prints every push.</p>
-<p>Put <code>@once</code> inside <code>@push</code> in a component, so the script is added one time only.</p>
+<p><code>@prepend</code> adds to the start. Put <code>@once</code> inside <code>@push</code> in a component, so the script is added one time only.</p>
 <h2 id="forms">Forms</h2>
-<p>Forms need a CSRF token, the old input and the validation errors. With <code>SessionMiddleware</code>, <code>view()</code> adds these to every template:</p>
+<p>With <code>SessionMiddleware</code>, <code>view()</code> adds these to every template, also to components and layouts:</p>
 <table>
 <thead>
 <tr>
@@ -8501,159 +8291,100 @@
 <td><code>session('key')</code></td>
 <td>a value from the session</td>
 </tr>
+<tr>
+<td><code>request.path</code>, <code>request.method</code>, <code>request.query</code></td>
+<td>the current request (also with no session)</td>
+</tr>
 </tbody>
 </table>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">"POST"</span> <span class="na">action</span><span class="o">=</span><span class="s">"/register"</span><span class="p">&gt;</span>
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>  {{ csrfField() }}
-</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">"email"</span> <span class="na">value</span><span class="o">=</span><span class="s">"{{ old('email') }}"</span><span class="p">&gt;</span>
-</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a>  @error('email')
-</span><span id="__span-32-5"><a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"error"</span><span class="p">&gt;</span>{{ message }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-</span><span id="__span-32-6"><a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>  @end
-</span><span id="__span-32-7"><a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a>  <span class="p">&lt;</span><span class="nt">button</span><span class="p">&gt;</span>Register<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</span><span id="__span-32-8"><a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">"POST"</span> <span class="na">action</span><span class="o">=</span><span class="s">"/register"</span><span class="p">&gt;</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>  @csrf
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">"email"</span> <span class="na">value</span><span class="o">=</span><span class="s">"{{ old('email') }}"</span><span class="p">&gt;</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>  @error('email')
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a>    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">"error"</span><span class="p">&gt;</span>{{ message }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a>  @end
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a>  <span class="p">&lt;</span><span class="nt">button</span><span class="p">&gt;</span>Register<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </span></code></pre></div>
+<p>With no session, <code>@csrf</code> throws a <code>ViewException</code>.</p>
 <h3 id="validation-errors">Validation errors</h3>
-<p><code>@error('field') ... @end</code> shows its body when <code>errors</code> has a message for the field. Inside the body, <code>message</code> is that message. With no error for the field, the <code>@else</code> part is printed instead, if there is one.</p>
-<p>A name with dots, like <code>@error('user.email')</code>, works for nested fields. The name can also be a variable, like <code>@error(name)</code> in an input component.</p>
-<h3 id="csrf-and-method-fields">CSRF and method fields</h3>
-<p><code>@csrf</code> prints the same hidden field as <code>csrfField()</code>. Put it alone on its line.</p>
-<p>A browser form can only send GET and POST. For a PUT, PATCH or DELETE route, send a POST and add <code>@method</code>. It prints the hidden <code>_method</code> field that the <a href="../routing/#forms-with-put-patch-and-delete"><code>MethodOverride</code></a> middleware reads:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">"POST"</span> <span class="na">action</span><span class="o">=</span><span class="s">"/posts/{{ post.id }}"</span><span class="p">&gt;</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>  @csrf
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>  @method('PUT')
-</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a>  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">"title"</span> <span class="na">value</span><span class="o">=</span><span class="s">"{{ post.title }}"</span><span class="p">&gt;</span>
-</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>  <span class="p">&lt;</span><span class="nt">button</span><span class="p">&gt;</span>Save<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
-</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+<p><code>@error('field')</code> shows its body when the field has an error. Inside it, <code>message</code> is the error. A dotted name, like <code>@error('user.email')</code>, works for nested fields, and the name can be a variable.</p>
+<h3 id="method-fields">Method fields</h3>
+<p>For a PUT, PATCH or DELETE route, send a POST with <code>@method</code>. The <a href="../routing/#forms-with-put-patch-and-delete"><code>MethodOverride</code></a> middleware reads it:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="p">&lt;</span><span class="nt">form</span> <span class="na">method</span><span class="o">=</span><span class="s">"POST"</span> <span class="na">action</span><span class="o">=</span><span class="s">"/posts/{{ post.id }}"</span><span class="p">&gt;</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>  @csrf
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>  @method('PUT')
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">name</span><span class="o">=</span><span class="s">"title"</span> <span class="na">value</span><span class="o">=</span><span class="s">"{{ post.title }}"</span><span class="p">&gt;</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>  <span class="p">&lt;</span><span class="nt">button</span><span class="p">&gt;</span>Save<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>This prints <code>&lt;input type="hidden" name="_token" value="..."&gt;</code> and <code>&lt;input type="hidden" name="_method" value="PUT"&gt;</code>.</p>
-<p>Every template from <code>view()</code> also has <code>request.path</code>, <code>request.method</code> and <code>request.query</code>. Components and layouts see all of these too, so a layout can use <code>request.path</code> and a form component can use <code>csrfField()</code>.</p>
 <h2 id="globals">Globals</h2>
-<p>Some values are needed in every template, like the app name. Globals are variables and functions that every template can use. <code>route()</code> is there by default:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">(</span><span class="nl">globals:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">{</span><span class="s1">'appName'</span><span class="o">:</span><span class="w"> </span><span class="s1">'My app'</span><span class="p">});</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>
-</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'year'</span><span class="p">,</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">year</span><span class="p">);</span>
-</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'money'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">num</span><span class="w"> </span><span class="n">cents</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cents</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="m">100</span><span class="p">).</span><span class="n">toStringAsFixed</span><span class="p">(</span><span class="m">2</span><span class="p">));</span>
+<p>A <strong>global</strong> is a variable or a function that every template can use. <code>route()</code> is there by default:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">(</span><span class="nl">globals:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">{</span><span class="s1">'appName'</span><span class="o">:</span><span class="w"> </span><span class="s1">'My app'</span><span class="p">});</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'year'</span><span class="p">,</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">year</span><span class="p">);</span>
+</span><span id="__span-32-4"><a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'money'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">num</span><span class="w"> </span><span class="n">cents</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="n">cents</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="m">100</span><span class="p">).</span><span class="n">toStringAsFixed</span><span class="p">(</span><span class="m">2</span><span class="p">));</span>
 </span></code></pre></div>
-<p>Then use them in any template:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>{{ appName }} {{ year }}<span class="p">&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
-</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">"{{ route('users.show', { id: user.id }) }}"</span><span class="p">&gt;</span>Profile<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
-</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ money(order.total) }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="p">&lt;</span><span class="nt">footer</span><span class="p">&gt;</span>{{ appName }} {{ year }}<span class="p">&lt;/</span><span class="nt">footer</span><span class="p">&gt;</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>{{ money(order.total) }}<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>Each isolate has its own engine. So add globals in your provider, after <code>super.setup()</code>. Then every isolate gets them:</p>
-<div class="language-dart highlight"><span class="filename">lib/providers/view_provider.dart</span><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppViewProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ViewProvider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">  </span><span class="n">AppViewProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">());</span>
-</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a>
-</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-36-6"><a id="__codelineno-36-6" name="__codelineno-36-6" href="#__codelineno-36-6"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">setup</span><span class="p">();</span>
-</span><span id="__span-36-7"><a id="__codelineno-36-7" name="__codelineno-36-7" href="#__codelineno-36-7"></a><span class="w">    </span><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'year'</span><span class="p">,</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">year</span><span class="p">);</span>
-</span><span id="__span-36-8"><a id="__codelineno-36-8" name="__codelineno-36-8" href="#__codelineno-36-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-36-9"><a id="__codelineno-36-9" name="__codelineno-36-9" href="#__codelineno-36-9"></a><span class="p">}</span>
+<p>Each isolate has its own engine, so add globals in your provider, after <code>super.setup()</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/view_provider.dart</span><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppViewProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ViewProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">  </span><span class="n">AppViewProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">());</span>
+</span><span id="__span-34-3"><a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>
+</span><span id="__span-34-4"><a id="__codelineno-34-4" name="__codelineno-34-4" href="#__codelineno-34-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-34-5"><a id="__codelineno-34-5" name="__codelineno-34-5" href="#__codelineno-34-5"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-34-6"><a id="__codelineno-34-6" name="__codelineno-34-6" href="#__codelineno-34-6"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">setup</span><span class="p">();</span>
+</span><span id="__span-34-7"><a id="__codelineno-34-7" name="__codelineno-34-7" href="#__codelineno-34-7"></a><span class="w">    </span><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'year'</span><span class="p">,</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">now</span><span class="p">().</span><span class="n">year</span><span class="p">);</span>
+</span><span id="__span-34-8"><a id="__codelineno-34-8" name="__codelineno-34-8" href="#__codelineno-34-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-34-9"><a id="__codelineno-34-9" name="__codelineno-34-9" href="#__codelineno-34-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>If a global holds HTML, make it a <code>SafeString</code>. It is printed with no escape:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'logo'</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">SafeString</span><span class="p">(</span><span class="s1">'&lt;img src="/logo.svg" alt="Logo"&gt;'</span><span class="p">));</span>
+<p>A global that holds HTML must be a <code>SafeString</code>, so it is printed with no escape:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">View</span><span class="p">.</span><span class="n">global</span><span class="p">(</span><span class="s1">'logo'</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">SafeString</span><span class="p">(</span><span class="s1">'&lt;img src="/logo.svg" alt="Logo"&gt;'</span><span class="p">));</span>
 </span></code></pre></div>
+<p>To escape text yourself in Dart, use <code>escapeHtml(text)</code>.</p>
 <h2 id="json-for-javascript">JSON for JavaScript</h2>
-<p>Sometimes your JavaScript needs data from the server. <code>@json(value)</code> prints a value as JSON:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
-</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">@</span><span class="nx">json</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
-</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
-</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a>
-</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="p">&lt;</span><span class="nt">div</span> <span class="na">data-tags</span><span class="o">=</span><span class="s">'@json(tags)'</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<p>Print a value as JSON. The output is safe in a script block and in an attribute in single quotes:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">@</span><span class="nx">json</span><span class="p">(</span><span class="nx">user</span><span class="p">);</span>
+</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a>
+</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="p">&lt;</span><span class="nt">div</span> <span class="na">data-tags</span><span class="o">=</span><span class="s">'@json(tags)'</span><span class="p">&gt;&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>Maps, lists, text, numbers, <code>true</code>, <code>false</code> and <code>null</code> work. An object with a <code>toJson()</code> method works too, like a Dox model.</p>
-<p>The output is safe in two places: inside a <code>&lt;script&gt;</code> block, and inside an attribute in single quotes. Do not put it in an attribute in double quotes, because JSON has <code>"</code> in it, and that ends the attribute.</p>
-<p><code>json(value)</code> does the same as a function. Use it where you need an expression:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>@!chart({ points: json(points) })
+<p>Do not use it in an attribute in double quotes, because the JSON has <code>"</code> in it. A value that can not be JSON, like a <code>DateTime</code>, throws a <code>ViewException</code>.</p>
+<p><code>json(value)</code> does the same in an expression, and <code>SafeString.json(value)</code> does it in Dart:</p>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>@!chart({ points: json(points) })
 </span></code></pre></div>
-<p>In Dart, <code>SafeString.json(value)</code> gives the same text.</p>
 <h2 id="your-own-tags">Your own tags</h2>
-<p>If you print the same thing in many places, like a date format, you can add your own tag. A directive is a tag that your app adds. Write a class with a <code>render</code> method. It gets the values between <code>(</code> and <code>)</code>, and gives the text to print:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">DateTimeDirective</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">ViewDirective</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">  </span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">render</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="n">Scope</span><span class="w"> </span><span class="n">scope</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">    </span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">[</span><span class="m">0</span><span class="p">];</span>
-</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="w">    </span><span class="n">DateTime</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">DateTime</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">'</span><span class="si">$</span><span class="n">value</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-40-6"><a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">time</span><span class="p">.</span><span class="n">day</span><span class="si">}</span><span class="s1">/</span><span class="si">${</span><span class="n">time</span><span class="p">.</span><span class="n">month</span><span class="si">}</span><span class="s1">/</span><span class="si">${</span><span class="n">time</span><span class="p">.</span><span class="n">year</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
-</span><span id="__span-40-7"><a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-40-8"><a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a><span class="p">}</span>
-</span><span id="__span-40-9"><a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a>
-</span><span id="__span-40-10"><a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="n">View</span><span class="p">.</span><span class="n">directive</span><span class="p">(</span><span class="s1">'datetime'</span><span class="p">,</span><span class="w"> </span><span class="n">DateTimeDirective</span><span class="p">());</span>
+<p>A <strong>directive</strong> is a tag that your app adds. Its <code>render</code> method gets the values between the brackets, and gives the text to print:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">DateTimeDirective</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">ViewDirective</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">  </span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">render</span><span class="p">(</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">args</span><span class="p">,</span><span class="w"> </span><span class="n">Scope</span><span class="w"> </span><span class="n">scope</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">    </span><span class="kt">Object</span><span class="o">?</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">[</span><span class="m">0</span><span class="p">];</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">    </span><span class="n">DateTime</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="n">DateTime</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">DateTime</span><span class="p">.</span><span class="n">parse</span><span class="p">(</span><span class="s1">'</span><span class="si">$</span><span class="n">value</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">time</span><span class="p">.</span><span class="n">day</span><span class="si">}</span><span class="s1">/</span><span class="si">${</span><span class="n">time</span><span class="p">.</span><span class="n">month</span><span class="si">}</span><span class="s1">/</span><span class="si">${</span><span class="n">time</span><span class="p">.</span><span class="n">year</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
+</span><span id="__span-38-7"><a id="__codelineno-38-7" name="__codelineno-38-7" href="#__codelineno-38-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-38-8"><a id="__codelineno-38-8" name="__codelineno-38-8" href="#__codelineno-38-8"></a><span class="p">}</span>
+</span><span id="__span-38-9"><a id="__codelineno-38-9" name="__codelineno-38-9" href="#__codelineno-38-9"></a>
+</span><span id="__span-38-10"><a id="__codelineno-38-10" name="__codelineno-38-10" href="#__codelineno-38-10"></a><span class="n">View</span><span class="p">.</span><span class="n">directive</span><span class="p">(</span><span class="s1">'datetime'</span><span class="p">,</span><span class="w"> </span><span class="n">DateTimeDirective</span><span class="p">());</span>
 </span></code></pre></div>
-<p>Then use it in a template:</p>
-<div class="language-html highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="p">&lt;</span><span class="nt">time</span><span class="p">&gt;</span>@datetime(post.createdAt)<span class="p">&lt;/</span><span class="nt">time</span><span class="p">&gt;</span>
+<div class="language-html highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="p">&lt;</span><span class="nt">time</span><span class="p">&gt;</span>@datetime(post.createdAt)<span class="p">&lt;/</span><span class="nt">time</span><span class="p">&gt;</span>
 </span></code></pre></div>
-<p>The text is escaped, like <code>{{ }}</code>. Give a <code>SafeString</code> to print HTML as it is. <code>scope.lookup('name')</code> reads a variable of the template. A directive has no body and no <code>@end</code>.</p>
-<p>Each isolate has its own engine. So add directives in your provider, after <code>super.setup()</code>, like globals. You can also give them in the config: <code>ViewConfig(directives: &lt;String, ViewDirective&gt;{'datetime': DateTimeDirective()})</code>.</p>
-<h2 id="config">Config</h2>
-<p>Set the options in <code>ViewConfig</code>:</p>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Default</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>path</code></td>
-<td><code>resources/views</code></td>
-<td>the folder of the templates</td>
-</tr>
-<tr>
-<td><code>extension</code></td>
-<td><code>.dox.html</code></td>
-<td>the file extension</td>
-</tr>
-<tr>
-<td><code>cache</code></td>
-<td>on, but off when <code>APP_ENV</code> is <code>development</code> or <code>local</code></td>
-<td>keep parsed templates in memory</td>
-</tr>
-<tr>
-<td><code>globals</code></td>
-<td><code>{}</code></td>
-<td>variables for every template</td>
-</tr>
-<tr>
-<td><code>directives</code></td>
-<td><code>{}</code></td>
-<td>your own tags, by name</td>
-</tr>
-<tr>
-<td><code>strictVariables</code></td>
-<td><code>false</code></td>
-<td>a variable that does not exist throws a <code>ViewException</code>. See <a href="#strict-options">Strict options</a>.</td>
-</tr>
-<tr>
-<td><code>stringZeroIsFalse</code></td>
-<td><code>false</code></td>
-<td>the text <code>'0'</code> is false in a condition</td>
-</tr>
-<tr>
-<td><code>bladeOutput</code></td>
-<td><code>false</code></td>
-<td>print <code>true</code> as <code>1</code>, <code>false</code> as nothing and <code>10.0</code> as <code>10</code></td>
-</tr>
-<tr>
-<td><code>bladeWarnings</code></td>
-<td><code>true</code></td>
-<td>warn about tag names from other template engines that are not Dox tags. See <a href="#unknown-tag-warnings">Unknown tag warnings</a>.</td>
-</tr>
-</tbody>
-</table>
-<p>With the cache off, a changed template shows on the next request, with no restart.</p>
+<p>The text is escaped. Give a <code>SafeString</code> to print HTML. <code>scope.lookup('name')</code> reads a variable, and <code>scope.has('name')</code> tells if it is there. Add directives in your provider like globals, or in <code>ViewConfig(directives: ...)</code>.</p>
 <h2 id="strict-options">Strict options</h2>
-<p>These three options are off by default. Turn each one on in <code>ViewConfig</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">(</span>
-</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">  </span><span class="nl">strictVariables:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-42-3"><a id="__codelineno-42-3" name="__codelineno-42-3" href="#__codelineno-42-3"></a><span class="w">  </span><span class="nl">stringZeroIsFalse:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-42-4"><a id="__codelineno-42-4" name="__codelineno-42-4" href="#__codelineno-42-4"></a><span class="w">  </span><span class="nl">bladeOutput:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-42-5"><a id="__codelineno-42-5" name="__codelineno-42-5" href="#__codelineno-42-5"></a><span class="p">);</span>
+<p>These three options are off by default. Turn them on in <code>ViewConfig</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="k">const</span><span class="w"> </span><span class="n">ViewConfig</span><span class="p">(</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">  </span><span class="nl">strictVariables:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">  </span><span class="nl">stringZeroIsFalse:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">  </span><span class="nl">bladeOutput:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a><span class="p">);</span>
 </span></code></pre></div>
-<p><strong><code>strictVariables</code></strong>: a variable that does not exist throws a <code>ViewException</code>. The message has the name of the variable, the template and the line. So a typo like <code>{{ titel }}</code> shows as an error, not as an empty spot on the page. When it is off, a variable that does not exist prints nothing.</p>
-<p>A variable that is there with the value <code>null</code> is fine. These ways to read a variable that may not exist never throw:</p>
+<ul>
+<li><code>strictVariables</code>: a variable that does not exist throws a <code>ViewException</code> with the name, the template and the line. So a typo like <code>{{ titel }}</code> shows as an error.</li>
+<li><code>stringZeroIsFalse</code>: the text '0' is false in a condition. Other text, like '00', is still true.</li>
+<li><code>bladeOutput</code>: <code>{{ }}</code> prints true as 1, false as nothing, and 10.0 as 10.</li>
+</ul>
+<p>With <code>strictVariables</code>, these ways to read a variable that may not exist never throw:</p>
 <table>
 <thead>
 <tr>
@@ -8672,7 +8403,7 @@
 </tr>
 <tr>
 <td><code>{{ user ?? 'Guest' }}</code></td>
-<td><code>Guest</code></td>
+<td>Guest</td>
 </tr>
 <tr>
 <td><code>{{ user?.name }}</code></td>
@@ -8680,12 +8411,10 @@
 </tr>
 </tbody>
 </table>
-<p>The rule covers the variable on the left of <code>??</code> and <code>?.</code>. In <code>{{ a ?? b ?? 'x' }}</code>, both <code>a</code> and <code>b</code> can be missing. <code>{{ user.name ?? 'Guest' }}</code> still throws when <code>user</code> does not exist: write <code>{{ user?.name ?? 'Guest' }}</code>.</p>
-<p><strong><code>stringZeroIsFalse</code></strong>: the text <code>'0'</code> is false in <code>@if</code>, <code>@unless</code>, <code>@empty</code>, <code>?:</code>, <code>&amp;&amp;</code>, <code>||</code>, <code>!</code>, <code>@class</code>, <code>@checked</code>, <code>@selected</code>, <code>@disabled</code>, <code>@includeIf</code> and <code>@includeWhen</code>. Other text, like <code>'0.0'</code> or <code>'00'</code>, is still true. When it is off, <code>'0'</code> is true, like any text that is not empty.</p>
-<p><strong><code>bladeOutput</code></strong>: <code>{{ }}</code> and <code>{{{ }}}</code> print <code>true</code> as <code>1</code>, <code>false</code> as nothing, and a number with no fraction, like <code>10.0</code>, as <code>10</code>. The values of <code>@yield</code>, <code>@section</code> and <code>@method</code>, and the numbers in <code>$attributes</code>, are printed the same way. Joining text with <code>+</code> does not change: <code>{{ 'a' + true }}</code> is still <code>atrue</code>. When it is off, <code>true</code> prints <code>true</code>, <code>false</code> prints <code>false</code>, and <code>10.0</code> prints <code>10.0</code>.</p>
+<p><code>{{ user.name ?? 'Guest' }}</code> still throws when <code>user</code> does not exist. Write <code>{{ user?.name ?? 'Guest' }}</code>.</p>
 <h2 id="unknown-tag-warnings">Unknown tag warnings</h2>
-<p>Some tag names from other template engines, like <code>@foreach</code>, are not Dox tags. Dox prints them as plain text. To help you find them, Dox writes a warning to <code>stderr</code> when it reads a template that has one:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>dox_view: warning: posts/index:12 "@foreach" is not a Dox tag. Use "@each(item in items) ... @end".
+<p>Some tag names of other template engines, like <code>@foreach</code>, are not Dox tags. Dox prints them as text, and writes one warning to stderr:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>dox_view: warning: posts/index:12 "@foreach" is not a Dox tag. Use "@each(item in items) ... @end".
 </span></code></pre></div>
 <table>
 <thead>
@@ -8725,63 +8454,27 @@
 </tr>
 </tbody>
 </table>
-<p>The output of the template does not change. The warning is only a hint, and each one is written one time. <code>ViewConfig(bladeWarnings: false)</code> turns the warnings off.</p>
+<p><code>ViewConfig(bladeWarnings: false)</code> turns the warnings off.</p>
 <h2 id="errors">Errors</h2>
-<p>A syntax error, or an error in an expression, throws a <code>ViewException</code>. The message has the template name and the line:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>ViewException: expected ")" but found the end (in "users/show", line 12)
+<p>A syntax error, or an error in an expression, throws a <code>ViewException</code> with the template name and the line:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>ViewException: expected ")" but found the end (in "users/show", line 12)
 </span></code></pre></div>
 <h2 id="prettier">Prettier</h2>
-<p>Prettier formats <code>.html</code> files, and it does not know the <code>@</code> tags. Add this line to <code>.prettierignore</code>:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>*.dox.html
+<p>Prettier does not know the <code>@</code> tags. Add this line to <code>.prettierignore</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>*.dox.html
 </span></code></pre></div>
-<h2 id="details">Details</h2>
-<p>This section is for special cases. Most apps do not need it.</p>
-<h3 id="when-a-tag-is-text">When a tag is text</h3>
+<h2 id="testing">Testing</h2>
+<p>Render templates from a map, with no files:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="n">ViewEngine</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ViewEngine</span><span class="p">(</span><span class="n">MemoryTemplateLoader</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="w">  </span><span class="s1">'hello'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Hello {{ name }}'</span><span class="p">,</span>
+</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="p">}));</span>
+</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>
+</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a><span class="n">engine</span><span class="p">.</span><span class="n">render</span><span class="p">(</span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">});</span><span class="w"> </span><span class="c1">// Hello Ann</span>
+</span></code></pre></div>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>A tag can not come right after a letter or a digit. Write <code>on @else off</code>, not <code>on@else off</code>. <code>L@yield('s')</code> also stays text.</li>
-<li><code>@extends</code>, <code>@section</code>, <code>@yield</code>, <code>@stack</code>, <code>@push</code>, <code>@prepend</code>, <code>@method</code>, <code>@error</code>, <code>@json</code>, <code>@includeWhen</code> and your own directives need <code>( )</code>. With no <code>( )</code>, like <code>@section</code> in a sentence, they stay text.</li>
-<li>With no space before the <code>(</code>, like <code>@empty(items)</code> or <code>@json(user)</code>, a tag is always a tag.</li>
-<li>With a space before the <code>(</code>, in the middle of a line, it is a tag only when its args are one valid expression (one or two for <code>@section</code> and <code>@yield</code>). So <code>see @class (see docs)</code> stays text.</li>
-<li>With a space, alone on its line, it is a tag even when its args are not valid, unless a rule below says it stays text. Then the args give an error.</li>
-<li>A tag with a body, like <code>@isset</code>, <code>@empty</code>, <code>@env</code>, <code>@section</code> and <code>@push</code>, also needs its own <code>@end</code> after it. The <code>@end</code> of a block around it does not count. So <code>@empty (none)</code> stays text, also alone on its line.</li>
-<li><code>@extends</code>, <code>@section</code>, <code>@yield</code>, <code>@stack</code>, <code>@push</code>, <code>@prepend</code>, <code>@method</code> and <code>@error</code> with a space also need text in quotes as the first argument. So <code>git @push (force)</code> stays text, but <code>@yield ('title')</code> is a tag. If such a tag stays text, its <code>@end</code> gives the error "@end has no matching tag before it".</li>
-<li><code>@json</code> and <code>@includeWhen</code> are never tags with a space. So <code>the @json (format)</code> stays text.</li>
-<li>When <code>resources/views/components/</code> has a template with the same name as a tag or a directive, like <code>class.dox.html</code>, the component wins.</li>
-</ul>
-<h3 id="partials-loops-and-components">Partials, loops and components</h3>
-<ul>
-<li><code>@include</code> with a second argument that is not a map throws a <code>ViewException</code>.</li>
-<li>A loop in an <code>@include</code> counts the loop around the <code>@include</code> as its parent. A loop in a component starts at depth 1.</li>
-<li><code>$slot</code> and <code>$slots.main</code> are always there. They are empty when the component has no body.</li>
-<li>In <code>$attributes</code>, a number prints like <code>{{ }}</code>: <code>1.0</code> is <code>title="1.0"</code>, or <code>title="1"</code> with <code>bladeOutput</code>.</li>
-</ul>
-<h3 id="sections-and-stacks">Sections and stacks</h3>
-<ul>
-<li>In a page with <code>@extends</code>, <code>@let</code> and <code>@push</code> outside a section still work. The <code>@yield</code> default value is escaped too.</li>
-<li>The names of sections and stacks must be plain text in quotes, like <code>'title'</code>.</li>
-<li>The first <code>@section</code> with a name wins. So a <code>@section</code> inside <code>@each</code> keeps only the first round.</li>
-<li>A <code>@yield('s')</code> that comes before the <code>@section('s')</code> in the same file prints nothing.</li>
-<li>An <code>@include</code> or a component with its own <code>@extends</code> prints its layout in place. It shares the section names with the page.</li>
-<li>The pushes are printed in the order they run. A page with <code>@extends</code> runs before its layout.</li>
-</ul>
-<h3 id="forms_1">Forms</h3>
-<ul>
-<li>If your app has a global named <code>errors</code>, the global shows when the request has no validation errors. When there are validation errors, they win over the global.</li>
-<li>When the value in <code>errors</code> is a list, <code>message</code> is its first item.</li>
-<li>With no session, and in <code>View.render</code>, there are no errors, so the <code>@error</code> body is not printed. It does not throw. With no session, <code>@csrf</code> throws a <code>ViewException</code>.</li>
-<li><code>@error('user.email')</code> reads the key <code>'user.email'</code> of <code>errors</code> first. That is how the validator names a nested field. When there is no such key, it reads <code>email</code> inside <code>user</code>.</li>
-<li><code>message</code> is only there inside the <code>@error</code> body. After <code>@end</code>, a <code>message</code> variable of your page has its own value again.</li>
-</ul>
-<h3 id="globals-json-and-directives">Globals, JSON and directives</h3>
-<ul>
-<li>You can add globals before or after <code>View.configure()</code>. The engine keeps them. When a name is in both, the value in <code>ViewConfig.globals</code> wins.</li>
-<li><code>@json</code> writes <code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code>, <code>'</code> and the line separators U+2028 and U+2029 as <code>\uXXXX</code>, so a value can not close the <code>&lt;script&gt;</code> block or the attribute. A value that can not be JSON, like a <code>DateTime</code> or an object with no <code>toJson()</code>, throws a <code>ViewException</code>. <code>{{ json(value) }}</code> does not escape the text again.</li>
-<li>A directive that returns <code>null</code> prints nothing. Its name can have letters, digits and <code>_</code>. The name of a built-in tag, like <code>if</code>, <code>section</code> or <code>json</code>, throws a <code>ViewException</code>.</li>
-</ul>
-<h3 id="which-names-warn">Which names warn</h3>
-<ul>
-<li><code>@end...</code> names warn anywhere in a line. The other names warn only with the <code>(</code> right after the name, like <code>@foreach(...)</code>, or alone on their line. So a sentence like <code>the @foreach loop</code> does not warn.</li>
-<li>Text in a <code>{{-- --}}</code> comment, in <code>@verbatim</code>, and a name with <code>@@</code> before it, do not warn. A name in an HTML comment, like <code>&lt;!-- @endif --&gt;</code>, does warn.</li>
+<li><a href="../inertia/">Inertia</a>: pages with React, Vue or Svelte.</li>
+<li><a href="../../digging-deeper/mail/">Mail</a>: use a view as a mail template.</li>
 </ul>
 
 
@@ -8902,7 +8595,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

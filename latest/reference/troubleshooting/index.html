@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7007,6 +6916,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7265,6 +7185,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7282,19 +7213,13 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/troubleshooting.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="troubleshooting">Troubleshooting</h1>
 <p>This page lists known problems, with the text you see, the cause and the fix.</p>
-<p>For short errors, search the <a href="../errors/">Error index</a>.</p>
 <h2 id="the-native-http-library-did-not-load">The native HTTP library did not load</h2>
-<p><strong>Symptom.</strong> The app stops at start with this error:</p>
+<p>Symptom: The app stops at start with this error:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Unsupported operation: dox_http_native did not load: &lt;reason&gt;.
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
 </span></code></pre></div>
@@ -7305,14 +7230,14 @@
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>dox_http_native: sha256 of dox_http_native-&lt;os&gt;-&lt;arch&gt;.&lt;ext&gt; does not match
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>dox_http_native: cargo build failed
 </span></code></pre></div>
-<p><strong>Cause.</strong> The package could not find, download or build its native library. Common reasons:</p>
+<p>Cause: The package could not find, download or build its native library. Common reasons:</p>
 <ul>
 <li>There was no internet during <code>dart pub get</code>, or there is no ready build for your OS and CPU. Ready builds exist for macOS arm64 and x64, Linux x64 and arm64, and Windows x64.</li>
 <li>Rust is not installed, so the library can not be built from source.</li>
 <li>You compiled with <code>dart compile exe</code>. It does not run build hooks, so the binary has no native library.</li>
-<li>The <code>&lt;reason&gt;</code> is <code>native library ABI &lt;x&gt;, expected &lt;y&gt;</code>. This means the library on disk is from another version of the package.</li>
+<li>The reason is <code>native library ABI &lt;x&gt;, expected &lt;y&gt;</code>: the library on disk is from another version of the package.</li>
 </ul>
-<p><strong>Fix.</strong> Pick one:</p>
+<p>Fix: Pick one:</p>
 <ol>
 <li>Install Rust with <a href="https://rustup.rs">rustup</a> and run <code>dart pub get</code> again. Dox then builds the library with <code>cargo</code>.</li>
 <li>If the reason is an ABI mismatch and you set <code>lib_path</code>, rebuild that library: run <code>cargo build --release</code> in the <code>native</code> folder of the <code>dox-http-native</code> repo.</li>
@@ -7335,28 +7260,28 @@
 <p>The fix is the same as above, with the <code>dox-postgres-native</code> or <code>dox-mysql-native</code> repo.</p>
 <p>See <a href="../../digging-deeper/native-server/">Native server</a>, <a href="../../database/postgres-native/">Postgres native</a> and <a href="../../database/mysql-native/">MySQL native</a>.</p>
 <h2 id="port-already-in-use">Port already in use</h2>
-<p><strong>Symptom.</strong> At start:</p>
+<p>Symptom: At start:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>SocketException: dox_http_native: bind failed (&lt;code&gt;) (OS Error: errno = &lt;errno&gt;), port = 3000
 </span></code></pre></div>
 <p>The <code>errno</code> is <code>48</code> on macOS and <code>98</code> on Linux.</p>
-<p><strong>Cause.</strong> Another process listens on the port. Often it is an old <code>bin/server.dart</code> that <code>dox serve</code> did not stop, or a second copy of the app.</p>
-<p><strong>Fix.</strong> Find and stop the process, or use another port.</p>
+<p>Cause: Another process listens on the port, like an old <code>bin/server.dart</code> or a second copy of the app.</p>
+<p>Fix: Find and stop the process, or use another port:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>lsof<span class="w"> </span>-i<span class="w"> </span>:3000<span class="w">          </span><span class="c1"># macOS and Linux: who has the port</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="nb">kill</span><span class="w"> </span>&lt;pid&gt;
 </span></code></pre></div>
-<p>Or set <code>APP_PORT=3001</code> in <code>.env</code> (a new project reads it into <code>serverPort</code>).</p>
+<p>Or set <code>APP_PORT=3001</code> in <code>.env</code>.</p>
 <h2 id="build_runner-conflicting-outputs">build_runner: conflicting outputs</h2>
-<p><strong>Symptom.</strong> <code>dox build_runner:build</code>, <code>dox serve</code> or <code>dox build</code> stops with a build_runner message that starts with <code>Conflicting outputs were detected</code>, and names files like <code>lib/generated/dtos.g.dart</code> or <code>lib/app/models/user/user.model.g.dart</code>.</p>
-<p><strong>Cause.</strong> The generated <code>.g.dart</code> files are on disk, but <code>.dart_tool/build</code> does not know them. This happens after a <code>git clone</code> with committed <code>.g.dart</code> files, after deleting <code>.dart_tool</code>, or after a Dart SDK update.</p>
-<p><strong>Fix.</strong> Delete the build cache and build again:</p>
+<p>Symptom: <code>dox build_runner:build</code>, <code>dox serve</code> or <code>dox build</code> stops with a build_runner message that starts with <code>Conflicting outputs were detected</code>, and names files like <code>lib/generated/dtos.g.dart</code> or <code>lib/app/models/user/user.model.g.dart</code>.</p>
+<p>Cause: The generated <code>.g.dart</code> files are on disk, but <code>.dart_tool/build</code> does not know them. This happens after a <code>git clone</code> with committed <code>.g.dart</code> files, after deleting <code>.dart_tool</code>, or after a Dart SDK update.</p>
+<p>Fix: Delete the build cache and build again:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>rm<span class="w"> </span>-rf<span class="w"> </span>.dart_tool/build
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
 <p>If that is not enough, delete the <code>.g.dart</code> files that the message names, and build again.</p>
 <h2 id="ambiguous-import-uuid-name-or-schema">Ambiguous import: <code>Uuid</code>, <code>Name</code> or <code>Schema</code></h2>
-<p><strong>Symptom.</strong> The analyzer or the build says a name like <code>Uuid</code>, <code>Name</code>, <code>Range</code>, <code>Image</code> or <code>Schema</code> is an "ambiguous import".</p>
-<p><strong>Cause.</strong> <code>dox_core</code> exports the validation rules (<code>Uuid</code>, <code>Name</code>, <code>Range</code>, <code>Image</code>, ...) and the <code>Schema</code> class. Another import has a class with the same name, like <code>package:uuid</code>. <code>dox_orm</code> also has a <code>Schema</code> class.</p>
-<p><strong>Fix.</strong> Hide the name you do not use in that file:</p>
+<p>Symptom: The analyzer or the build says a name like <code>Uuid</code>, <code>Name</code>, <code>Range</code>, <code>Image</code> or <code>Schema</code> is an "ambiguous import".</p>
+<p>Cause: <code>dox_core</code> exports the validation rules (<code>Uuid</code>, <code>Name</code>, <code>Range</code>, <code>Image</code>, ...) and the <code>Schema</code> class. Another import has a class with the same name, like <code>package:uuid</code>. <code>dox_orm</code> also has a <code>Schema</code> class.</p>
+<p>Fix: Hide the name you do not use in that file:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="w"> </span><span class="k">hide</span><span class="w"> </span><span class="n">Uuid</span><span class="p">;</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="w"> </span><span class="k">hide</span><span class="w"> </span><span class="n">Schema</span><span class="p">;</span>
 </span></code></pre></div>
@@ -7368,19 +7293,19 @@
 </span></code></pre></div>
 <p>When a value must have <code>#</code> in it (a space, then <code>#</code>), put the value in quotes. The quotes are removed.</p>
 <h2 id="hashmake-throws-on-a-long-password"><code>Hash.make</code> throws on a long password</h2>
-<p><strong>Symptom.</strong> Saving a user, or registering, gives a <code>500</code>. The log shows:</p>
+<p>Symptom: Saving a user, or registering, gives a <code>500</code>. The log shows:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.
 </span></code></pre></div>
-<p><strong>Cause.</strong> <code>Hash.make()</code> and <code>Hash.makeAsync()</code> use bcrypt. bcrypt takes at most 72 bytes, so Dox throws an <code>ArgumentError</code> for a longer password. The error text does not hold the password.</p>
-<p><strong>Fix.</strong> Refuse long passwords in your DTO, before you hash them:</p>
+<p>Cause: <code>Hash.make()</code> and <code>Hash.makeAsync()</code> use bcrypt, which takes at most 72 bytes. So Dox throws an <code>ArgumentError</code> for a longer password.</p>
+<p>Fix: Refuse long passwords in your DTO, before you hash them:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nd">@MaxLength</span><span class="p">(</span><span class="m">72</span><span class="p">)</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">password</span><span class="p">;</span>
 </span></code></pre></div>
 <p><code>@MaxLength</code> counts characters, not bytes, so a password with non-ASCII characters can still be over 72 bytes. See <a href="../../security/hashing/">Hashing</a>.</p>
 <h2 id="mysql-8-login-fails">MySQL 8 login fails</h2>
-<p><strong>Symptom.</strong> The connection to MySQL 8 is refused at login, while the same user works from the <code>mysql</code> client. Often the user was made with the default <code>caching_sha2_password</code> plugin.</p>
-<p><strong>Cause.</strong> <code>caching_sha2_password</code> needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.</p>
-<p><strong>Fix.</strong> The Dox MySQL driver supports <code>caching_sha2_password</code>. Check these settings on the connection in <code>lib/config/database.dart</code>:</p>
+<p>Symptom: The connection to MySQL 8 is refused at login, while the same user works from the <code>mysql</code> client. Often the user was made with the default <code>caching_sha2_password</code> plugin.</p>
+<p>Cause: <code>caching_sha2_password</code> needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.</p>
+<p>Fix: The Dox MySQL driver supports this plugin. Check these settings of the connection in <code>lib/config/database.dart</code>:</p>
 <table>
 <thead>
 <tr>
@@ -7407,25 +7332,30 @@
 <div class="language-sql highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">ALTER</span><span class="w"> </span><span class="k">USER</span><span class="w"> </span><span class="s1">'app'</span><span class="o">@</span><span class="s1">'%'</span><span class="w"> </span><span class="n">IDENTIFIED</span><span class="w"> </span><span class="k">WITH</span><span class="w"> </span><span class="n">mysql_native_password</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="s1">'secret'</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="sqlite-the-database-file">SQLite: the database file</h2>
-<p><strong>Symptom.</strong> An <code>SqliteException</code> with <code>unable to open database file</code>, or an empty database after <code>dox build</code>.</p>
-<p><strong>Cause.</strong> A relative path is relative to the folder you start the app from. After <code>dox build</code> you run the app from <code>build/bundle</code>, so the default <code>DB_NAME=db/dox.sqlite</code> becomes <code>build/bundle/db/dox.sqlite</code>. <code>dox build</code> does not copy your SQLite files, so that database starts empty. Also, SQLite makes a missing file, but not a missing folder.</p>
-<p><strong>Fix.</strong></p>
+<p>Symptom: An <code>SqliteException</code> with <code>unable to open database file</code>, or an empty database after <code>dox build</code>.</p>
+<p>Cause: A relative path starts from the folder where you start the app. After <code>dox build</code> you run the app from <code>build/bundle</code>, where the database is a new empty file. Also, SQLite makes a missing file, but not a missing folder.</p>
+<p>Fix:</p>
 <ul>
 <li>Use an absolute path, or make the folder first.</li>
-<li>Set it with <code>DB_NAME</code> (a new project reads it): <code>DB_NAME=/var/lib/my_app/dox.sqlite</code>.</li>
+<li>Set it with <code>DB_NAME</code>, like <code>DB_NAME=/var/lib/my_app/dox.sqlite</code>.</li>
 <li>Migrations read <code>DB_DATABASE</code> or <code>DB_NAME</code> as the path too, so use the same value.</li>
 <li>Do not use <code>:memory:</code> with more than one isolate. Each isolate gets its own empty database.</li>
 </ul>
 <h2 id="dox-command-not-found-after-dart-pub-global-activate"><code>dox: command not found</code> after <code>dart pub global activate</code></h2>
-<p><strong>Symptom.</strong></p>
+<p>Symptom:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>zsh: command not found: dox
 </span></code></pre></div>
 <p>right after <code>dart pub global activate dox</code>.</p>
-<p><strong>Cause.</strong> <code>dart pub global activate</code> puts the <code>dox</code> script in <code>$HOME/.pub-cache/bin</code>. That folder is not in your <code>PATH</code>.</p>
-<p><strong>Fix.</strong> Add it to your shell profile and open a new terminal:</p>
+<p>Cause: The <code>dox</code> script is in <code>$HOME/.pub-cache/bin</code>, and that folder is not in your path.</p>
+<p>Fix: Add it to your shell profile and open a new terminal:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$PATH</span><span class="s2">"</span>:<span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.pub-cache/bin"</span>
 </span></code></pre></div>
 <p>On Windows the folder is <code>%LOCALAPPDATA%\Pub\Cache\bin</code>.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../errors/">Error index</a>: each message that Dox shows or throws.</li>
+<li><a href="../production-checklist/">Production checklist</a>: what to check before you deploy.</li>
+</ul>
 
 
 
@@ -7545,7 +7475,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

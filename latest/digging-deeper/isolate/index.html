@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -3028,10 +3030,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#setting-the-number-of-isolates" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setting the number of isolates
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-the-number-in-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting the number in code
       
     </span>
   </a>
@@ -3043,6 +3056,17 @@
     <span class="md-ellipsis">
       
         Each isolate has its own memory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finding-the-current-isolate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding the current isolate
       
     </span>
   </a>
@@ -3072,6 +3096,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#heavy-cpu-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heavy CPU work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#when-an-isolate-crashes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3083,10 +3118,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -5200,10 +5235,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5329,95 +5360,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7137,10 +7079,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#setting-the-number-of-isolates" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Setting the number of isolates
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setting-the-number-in-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setting the number in code
       
     </span>
   </a>
@@ -7152,6 +7105,17 @@
     <span class="md-ellipsis">
       
         Each isolate has its own memory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finding-the-current-isolate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finding the current isolate
       
     </span>
   </a>
@@ -7181,6 +7145,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#heavy-cpu-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Heavy CPU work
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#when-an-isolate-crashes" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7192,10 +7167,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7219,17 +7194,12 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/isolate.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="isolate">Isolate</h1>
 <p>Dox runs your app on many isolates (threads) at once, so it can use every CPU core.</p>
-<p>Each isolate runs its own <a href="../native-server/">native server</a> on the same port, and the operating system spreads the connections between them. You write your app once, and Dox starts a copy of it in every isolate.</p>
+<p>Each isolate runs its own <a href="../native-server/">native server</a> on the same port, and the operating system spreads the connections between them:</p>
 <pre class="mermaid"><code>flowchart TD
     OS["Port 3000&lt;br&gt;the OS spreads the connections"] --&gt; A1["Rust acceptor"]
     OS --&gt; A2["Rust acceptor"]
@@ -7239,63 +7209,66 @@
     A3 --&gt; I3["Isolate N&lt;br&gt;own memory cache"]
     I2 -. "crash: started again after 1 second" .-&gt; I2
     I1 -. "crash: the process exits" .-&gt; S["Supervisor restarts the process&lt;br&gt;Docker, systemd"]</code></pre>
-<p>With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See <a href="../../concepts/how-dox-works/#where-the-database-pools-live">How Dox works</a>.</p>
-<h2 id="setting-the-number-of-isolates">Setting the number of isolates</h2>
-<p>By default Dox starts one isolate per CPU the process may use. In a container, this respects the cpuset and the CPU quota (<code>--cpuset-cpus</code>, <code>--cpus</code>, Kubernetes limits). A quota rounds up: 1.5 CPUs gives 2 isolates. You may want fewer when the same machine also runs the database or other heavy work.</p>
-<p>Set <code>totalIsolate</code> in the app config. A new app reads it from <code>APP_TOTAL_ISOLATE</code>:</p>
+<h2 id="setup">Setup</h2>
+<p>Dox starts one isolate per CPU the process may use. In a container, it uses the CPU limit, and a quota rounds up: 1.5 CPUs gives 2 isolates. On Windows only one isolate serves HTTP.</p>
+<p>To change the number, set <code>totalIsolate</code> in the app config. A new app reads it from <code>APP_TOTAL_ISOLATE</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">totalIsolate:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appTotalIsolate</span><span class="p">,</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>You can also set it in code, before <code>startServer()</code>. This wins over the config:</p>
+<h2 id="setting-the-number-in-code">Setting the number in code</h2>
+<p>Call <code>Dox().totalIsolate()</code> before <code>startServer()</code>. It wins over the config:</p>
 <div class="language-dart highlight"><span class="filename">bin/server.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">Dox</span><span class="p">().</span><span class="n">totalIsolate</span><span class="p">(</span><span class="m">2</span><span class="p">);</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">startServer</span><span class="p">();</span>
 </span></code></pre></div>
 <h2 id="each-isolate-has-its-own-memory">Each isolate has its own memory</h2>
-<p>Isolates do not share memory. This matters when you keep state in your code:</p>
-<ul>
-<li>A static value or a singleton exists once <strong>per isolate</strong>. If you change it in one isolate, the others do not see it.</li>
-<li>The <code>memory</code> cache store is per isolate. See <a href="../cache/">Cache</a>.</li>
-<li>To share data between isolates or servers, use a database, Redis or files.</li>
-</ul>
-<p>If you need to know which isolate runs your code, use <code>Dox().isolateId</code>. The first isolate is <code>1</code>:</p>
+<p>A static value, a singleton and the <code>memory</code> cache store exist one time per isolate. To share data between isolates or servers, use a database, Redis or files.</p>
+<h2 id="finding-the-current-isolate">Finding the current isolate</h2>
+<p><code>Dox().isolateId</code> is the id of the isolate that runs your code. The first isolate is 1. <code>Dox().isolateCount</code> is the number of running isolates:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">isolateId</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">isolateCount</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="sending-a-message-to-the-other-isolates">Sending a message to the other isolates</h2>
-<p>Sometimes one isolate needs to tell the others that something changed, for example "forget this cache key". Use <code>IsolateBus</code> for this. It sends a message from one isolate to all the others in the same process.</p>
-<p>Listen on a channel in a provider's <code>setup()</code>, and publish from anywhere:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">IsolateBus</span><span class="p">.</span><span class="n">instance</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">listen</span><span class="p">(</span><span class="n">onMessage</span><span class="p">);</span><span class="w"> </span><span class="c1">// in a provider's setup()</span>
+<p><code>IsolateBus</code> sends a message from one isolate to all the other isolates in the same process. Listen in the <code>setup()</code> of a provider, and publish from anywhere:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">IsolateBus</span><span class="p">.</span><span class="n">instance</span><span class="p">.</span><span class="kd">on</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">listen</span><span class="p">(</span><span class="n">onMessage</span><span class="p">);</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">IsolateBus</span><span class="p">.</span><span class="n">instance</span><span class="p">.</span><span class="n">publish</span><span class="p">(</span><span class="s1">'users'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'changed'</span><span class="p">,</span><span class="w"> </span><span class="m">42</span><span class="p">]);</span>
 </span></code></pre></div>
-<p>A listener only gets the messages of its own channel, and an isolate never gets its own message. A message must be something a <code>SendPort</code> can send: null, bool, num, String, typed data, and lists and maps of those.</p>
-<p>The bus works inside one process only. For many servers, use Redis. Socket.IO uses the bus to share broadcasts, see <a href="../../packages/socketio/#many-isolates">Socket.IO</a>.</p>
+<p>An isolate never gets its own message, and a listener gets only the messages sent after it started to listen. A message must be a value a <code>SendPort</code> can send, or <code>publish</code> throws an <code>ArgumentError</code>.</p>
+<p><code>IsolateBus.instance.size</code> is the number of isolates that listen, this one included. For many servers, use Redis. <a href="../../packages/socketio/#many-isolates">Socket.IO</a> uses the bus to share broadcasts.</p>
 <h2 id="what-each-isolate-does-at-start">What each isolate does at start</h2>
-<p>Dox copies the <code>AppConfig</code>, the providers and the routes you added before <code>startServer()</code> to each new isolate. Then every isolate:</p>
+<p>Dox copies the <code>AppConfig</code>, the providers and the routes to each new isolate. Then every isolate:</p>
 <ol>
-<li>runs <code>setup()</code> of each provider (for example, it opens the database pool),</li>
+<li>runs <code>setup()</code> of each provider,</li>
 <li>registers the routes of your routers,</li>
-<li>reads the parameter types of each controller once,</li>
+<li>reads the parameter types of each controller one time,</li>
 <li>runs <code>boot()</code> of each provider,</li>
 <li>starts its HTTP server.</li>
 </ol>
-<p>Because the config and providers are copied, they must not hold open sockets or database pools. Open these in <code>setup()</code>. See <a href="../providers/">Providers</a>.</p>
+<p>So the config and the providers must not hold open sockets or database pools. Open them in <code>setup()</code>. See <a href="../providers/">Providers</a>.</p>
+<h2 id="heavy-cpu-work">Heavy CPU work</h2>
+<p>Heavy CPU work in a request blocks every other request on the same isolate. Run it on a worker isolate with <code>Dox().compute</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">renderPdf</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">compute</span><span class="p">(()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">buildPdf</span><span class="p">(</span><span class="n">data</span><span class="p">));</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The task can use only values that can go between isolates: numbers, strings, lists, maps and plain objects. It can not use the container, a database connection or a cache store, so read the data first and pass it in. Make the task in a small top-level or static function.</p>
+<p>The tasks run on a pool of 4 workers, and more tasks wait in line. Set <code>computeWorkers</code> to change the number:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">computeWorkers:</span><span class="w"> </span><span class="m">8</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>An error of the task is thrown at the <code>await</code>. <code>compute</code> also works with no server, like in a command, a test or a queue job.</p>
 <h2 id="when-an-isolate-crashes">When an isolate crashes</h2>
-<p>Dox keeps your app running when code fails:</p>
+<p>An error in a request gives a 500, and an async error outside a request goes to the <a href="../../the-basic/errors/">exception handler</a>. If a worker isolate dies, Dox starts a new one after 1 second.</p>
+<p>If the first isolate dies, the process exits with a non-zero code. Let a supervisor start it again, like Docker <code>restart:</code> or systemd <code>Restart=always</code>. See <a href="../deployment/#keep-it-running">Deployment</a>.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>An error in a request is caught. Dox sends a <code>500</code> and keeps going.</li>
-<li>An async error outside a request (for example a future that nobody awaits) is passed to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. The isolate keeps running.</li>
-<li>If a worker isolate still dies, Dox prints <code>[server] isolate N exited, restarting</code> to stderr and starts a new isolate after 1 second.</li>
-</ul>
-<p>If the first (main) isolate dies, the process exits with a non-zero code. So let a supervisor start it again, like Docker <code>restart:</code> or systemd <code>Restart=always</code>. See <a href="../deployment/#keep-it-running">Deployment</a>.</p>
-<h2 id="details">Details</h2>
-<ul>
-<li>Linux gives each isolate its own socket (<code>SO_REUSEPORT</code>). On macOS the isolates share one socket. On Windows only one isolate serves HTTP.</li>
-<li><code>Dox().isolateCount</code> is the number of running isolates. <code>IsolateBus.instance.size</code> is the number of isolates that listen on the bus, this one included. <code>size</code> can be old for a short time after an isolate joins or leaves.</li>
-<li><code>publish</code> throws an <code>ArgumentError</code> for a value a <code>SendPort</code> can not send, and then no isolate gets the message. In the main isolate it only throws when another isolate listens.</li>
-<li><code>publish</code> never waits. A slow listener keeps the messages in a queue in its memory.</li>
-<li>A message only reaches the isolates that listen at that moment. An isolate that calls <code>on()</code> later does not get older messages.</li>
+<li><a href="../providers/">Providers</a>: code that runs in each isolate at start.</li>
+<li><a href="../native-server/">Native server</a>: the HTTP server in each isolate.</li>
+<li><a href="../deployment/">Deployment</a>: run the app on a server.</li>
 </ul>
 
 
@@ -7416,7 +7389,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

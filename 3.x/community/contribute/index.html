@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1745,19 +1747,19 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#new-major-version" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        New major version
+        Next steps
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5339,10 +5341,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5468,95 +5466,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7464,19 +7373,19 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#new-major-version" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        New major version
+        Next steps
       
     </span>
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7497,38 +7406,32 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/community/contribute.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="contribute">Contribute</h1>
 <p>This page shows how to work on Dox: set up the repo, run the tests, release packages and update the docs.</p>
-<p>To send a change, fork the repo and open a pull request. The first part of this page is all you need for that. The release parts are for maintainers.</p>
+<p>To send a change, fork the repo and open a pull request. The release parts are for maintainers.</p>
 <h2 id="setting-up-local-development">Setting up local development</h2>
 <h3 id="1-clone-the-repo">1. Clone the repo</h3>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>git@github.com:dartondox/dox.git
 </span></code></pre></div>
 <h3 id="2-install-melos">2. Install melos</h3>
-<p>The repo is a <a href="https://dart.dev/tools/pub/workspaces">Dart pub workspace</a>, and melos runs the commands for all packages. Its config is in the root <code>pubspec.yaml</code>, under <code>melos:</code>. You need Dart 3.13 or newer.</p>
+<p>The repo is a <a href="https://dart.dev/tools/pub/workspaces">Dart pub workspace</a>. Melos runs the commands for all packages, with its config in the root <code>pubspec.yaml</code>. You need Dart 3.13 or newer.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>melos
 </span></code></pre></div>
 <h3 id="3-run-melos-bootstrap">3. Run melos bootstrap</h3>
-<p>This runs one <code>dart pub get</code> at the root and links all local packages, so there is one <code>pubspec.lock</code> for the whole repo.</p>
+<p>This gets the packages at the root and links all local packages:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>melos<span class="w"> </span>bs
 </span></code></pre></div>
 <h3 id="4-run-the-tests-and-checks">4. Run the tests and checks</h3>
-<p>Run these before you open a pull request. They are the same checks CI runs:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Run all tests.</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="c1"># Use `melos run test`. `melos test` is a built-in melos command.</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>melos<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="c1"># Analyze and check format (same as CI)</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>melos<span class="w"> </span>run<span class="w"> </span>analyze
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>melos<span class="w"> </span>run<span class="w"> </span>format_check
+<p>Run the checks of CI before you open a pull request:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Run all tests (not `melos test`, a built-in melos command)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>melos<span class="w"> </span>run<span class="w"> </span><span class="nb">test</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Analyze and check format (same as CI)</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>melos<span class="w"> </span>run<span class="w"> </span>analyze
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>melos<span class="w"> </span>run<span class="w"> </span>format_check
 </span></code></pre></div>
 <h3 id="if-the-project-does-not-run">If the project does not run</h3>
 <p>If <code>melos bs</code> fails or the packages do not resolve, start clean:</p>
@@ -7538,17 +7441,16 @@
 <li>Run <code>melos bs</code> again.</li>
 </ol>
 <h2 id="release-maintainers">Release (maintainers)</h2>
-<p>The <code>Release</code> GitHub workflow (<code>.github/workflows/publish.yaml</code>) publishes one package to pub.dev. Each package has its own version and its own tag, in the form <code>&lt;package&gt;-v&lt;version&gt;</code>. The workflow uses pub.dev automated publishing, so it needs no token or secret.</p>
+<p>The Release workflow (<code>.github/workflows/publish.yaml</code>) publishes one package to pub.dev with automated publishing. Each package has its own version and its own tag, in the form <code>&lt;package&gt;-v&lt;version&gt;</code>.</p>
 <h3 id="steps">Steps</h3>
 <p>The full guide is <a href="https://github.com/dartondox/dox/blob/main/RELEASING.md">RELEASING.md</a> in the repo. In short, for each package that changed:</p>
 <ol>
-<li>Run <code>bin/bump.sh &lt;package&gt; &lt;version&gt;</code>. It sets the version of that package only. If the package needs a newer sibling, raise that constraint by hand. Then close the <code>## Unreleased</code> section of its <code>CHANGELOG.md</code>.</li>
+<li>Run <code>bin/bump.sh &lt;package&gt; &lt;version&gt;</code>. It sets the version of that package only. Raise the constraint of a newer sibling by hand. Then close the Unreleased section of its <code>CHANGELOG.md</code>.</li>
 <li>Merge the release PR, then push the tag <code>&lt;package&gt;-v&lt;version&gt;</code>. This publishes that package to pub.dev. Release in dependency order: <code>dox_annotation</code>, <code>dox_cache</code>, <code>dox_builder</code>, <code>dox_core</code>.</li>
 <li>Release the matching <code>dox-sample</code> template.</li>
 </ol>
-<p>A builder-only fix needs a <code>dox_builder</code> release only. It does not need a <code>dox_core</code> release.</p>
-<p>The native packages (<code>dox_http_native</code>, <code>dox_postgres_native</code>, <code>dox_mysql_native</code>) are not in this repo. See <a href="#native-packages">Native packages</a> below. <code>dox_orm</code>, <code>dox_migration</code>, <code>dox_socketio</code>, <code>dox_storage</code>, <code>dox_queue</code>, <code>dox_queue_database</code>, <code>dox_scheduler</code>, <code>dox_inertia</code>, <code>dox_view</code> and <code>dox_mailer</code> are not in this repo either. See <a href="#packages-in-other-repos">Packages in other repos</a>.</p>
-<p><strong>New package only:</strong> a new package must first exist on pub.dev, so publish its first version by hand with <code>dart pub publish</code>. Then turn on pub.dev automated publishing for it. See <a href="#one-time-setup">One-time setup</a>.</p>
+<p>A fix in the builder needs only a <code>dox_builder</code> release. Many packages are in other repos. See <a href="#packages-in-other-repos">Packages in other repos</a> and <a href="#native-packages">Native packages</a>.</p>
+<p>For a new package, publish the first version by hand with <code>dart pub publish</code>. Then turn on automated publishing for it. See <a href="#one-time-setup">One-time setup</a>.</p>
 <h3 id="what-the-workflow-does">What the workflow does</h3>
 <ol>
 <li>It reads the package name and the version from the tag. It stops with an error for an unknown package or a bad version.</li>
@@ -7556,12 +7458,12 @@
 <li>It runs the tests, and they must pass. Then it checks that the sibling packages it needs are on pub.dev. If not, it stops with "release <dep> first".</li>
 <li>It checks that one package with a dry run, then publishes it.</li>
 </ol>
-<p>A tag for a version that is already on pub.dev is skipped. So if a run fails, fix the problem and click "Re-run jobs".</p>
+<p>The workflow skips a version that is already on pub.dev. So if a run fails, fix the problem and click "Re-run jobs".</p>
 <p>To see the packages in publish order on your machine:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>python3<span class="w"> </span>bin/publish_order.py
 </span></code></pre></div>
 <h3 id="dry-run">Dry run</h3>
-<p>If you want to check a release without publishing, open Actions &gt; Release &gt; "Run workflow" and pick one package, or <code>all</code>. It runs <code>dart pub publish --dry-run</code> and publishes nothing. Warnings, like a missing CHANGELOG entry, show in yellow and do not fail the run.</p>
+<p>To check a release with no publish, open Actions &gt; Release &gt; "Run workflow" and pick one package, or all. It runs <code>dart pub publish --dry-run</code>. Warnings show in yellow and do not fail the run.</p>
 <h3 id="one-time-setup">One-time setup</h3>
 <p>Do this once for each published package, and for every new package before its first tag. <code>python3 bin/publish_order.py</code> lists the packages.</p>
 <p>On pub.dev:</p>
@@ -7633,7 +7535,7 @@
 </tr>
 </tbody>
 </table>
-<p>The packages in this repo use them from pub.dev. <code>dox_core</code> uses <code>dox_openapi</code> and <code>dox_validation</code>. The database tests (Postgres, MySQL, MariaDB, SQLite) run in <code>dox-orm</code>. CI in this repo tests against their newest code: it runs <code>ci/clone-siblings.sh</code>, then <code>ci/use-siblings.sh</code>.</p>
+<p>The packages in this repo use them from pub.dev. <code>dox_core</code> uses <code>dox_openapi</code> and <code>dox_validation</code>. The database tests run in dox-orm. CI in this repo tests with their newest code: it runs <code>ci/clone-siblings.sh</code>, then <code>ci/use-siblings.sh</code>.</p>
 <p>To work on one of them and Dox together:</p>
 <ol>
 <li>Clone the repos next to the Dox repo, like <code>../dox-orm</code>. <code>ci/clone-siblings.sh</code> clones <code>dox-orm</code>, <code>dox-auth</code>, <code>dox-openapi</code>, <code>dox-validation</code>, <code>dox-socketio</code>, <code>dox-storage</code>, <code>dox-queue</code>, <code>dox-scheduler</code> and <code>dox-cli</code>.
@@ -7651,8 +7553,7 @@
 <p>Run <code>dart pub get</code>.</p>
 </li>
 </ol>
-<p>The apps in <code>examples/</code> already use these clones (their <code>pubspec_overrides.yaml</code>), so clone them before you run an example.
-In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>../dox/packages/...</code> uses your local Dox packages.</p>
+<p>The apps in <code>examples/</code> use these clones, so clone them before you run an example. In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>../dox/packages/...</code> uses your local Dox packages.</p>
 <p>Each of these repos has its own version. To release one, push a <code>v&lt;version&gt;</code> tag in that repo.</p>
 <h2 id="native-packages">Native packages</h2>
 <p>The three native packages live in their own repos:</p>
@@ -7678,7 +7579,7 @@ In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>..
 </tr>
 </tbody>
 </table>
-<p>Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox. You only need these steps if you change a native package.</p>
+<p>Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox.</p>
 <p>To work on a native package and Dox together:</p>
 <ol>
 <li>Clone the package next to the Dox repo, like <code>../dox-http-native</code>.</li>
@@ -7705,12 +7606,12 @@ In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>..
 </thead>
 <tbody>
 <tr>
-<td><code>/3.x/...</code></td>
-<td>3.x docs, built from <code>main</code></td>
+<td><code>/&lt;version&gt;/...</code></td>
+<td>the docs of one version, built from <code>main</code></td>
 </tr>
 <tr>
 <td><code>/latest/...</code></td>
-<td>a copy of the newest version (now 3.x)</td>
+<td>a copy of the newest version</td>
 </tr>
 <tr>
 <td><code>/</code></td>
@@ -7728,8 +7629,7 @@ In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>..
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>.venv/bin/mkdocs<span class="w"> </span>serve<span class="w">           </span><span class="c1"># live preview of this branch</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>.venv/bin/mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">  </span><span class="c1"># the same build as CI. Broken links fail.</span>
 </span></code></pre></div>
-<p><code>hooks/docs_hooks.py</code> runs during the build. It writes <code>llms.txt</code> and <code>llms-full.txt</code>.</p>
-<p>Every pull request that changes the docs runs the <code>Docs check</code> workflow (<code>.github/workflows/docs-check.yaml</code>). It has three checks:</p>
+<p>The build hook <code>hooks/docs_hooks.py</code> writes <code>llms.txt</code> and <code>llms-full.txt</code>. Each pull request that changes the docs runs the Docs check workflow, with three checks:</p>
 <ul>
 <li><code>mkdocs build --strict</code></li>
 <li>a spell check: <code>codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore</code></li>
@@ -7737,13 +7637,16 @@ In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>..
 </ul>
 <h3 id="deploy">Deploy</h3>
 <ul>
-<li>3.x deploys with each release. The <code>Docs</code> workflow (<code>.github/workflows/docs.yaml</code>) runs on a <code>dox_core-v&lt;version&gt;</code> tag, the same tag that publishes <code>dox_core</code>, and runs <code>mike deploy --update-aliases 3.x latest</code>. So docs for a feature that is not released yet stay off the site.</li>
-<li>If you want to deploy the docs only (a typo fix, or the docs of a package from another repo that was just released), push a <code>docs-v&lt;version&gt;</code> tag on <code>main</code>, like <code>git tag docs-v3.0.1-1 &amp;&amp; git push origin docs-v3.0.1-1</code>. It publishes no package and runs no tests.</li>
-<li>After each deploy, the workflow writes small redirect pages for the old root links, the root <code>index.html</code>, a <code>404.html</code> and the <code>CNAME</code> file. So <code>dartondox.dev</code> and old links keep working.</li>
-<li>The workflow pushes with the built-in <code>GITHUB_TOKEN</code>. This works because <code>gh-pages</code> is not a protected branch.</li>
+<li>The docs deploy with each release. The <code>Docs</code> workflow (<code>.github/workflows/docs.yaml</code>) runs on a <code>dox_core-v&lt;version&gt;</code> tag, the same tag that publishes <code>dox_core</code>, and runs <code>mike deploy</code>. So docs for a feature that is not released yet stay off the site.</li>
+<li>To deploy the docs only, push a <code>docs-v&lt;version&gt;</code> tag on <code>main</code>. It publishes no package and runs no tests.</li>
+<li>After each deploy, the workflow writes the redirect pages, the root <code>index.html</code>, a <code>404.html</code> and the <code>CNAME</code> file.</li>
+<li>The workflow pushes with the built-in <code>GITHUB_TOKEN</code>, so <code>gh-pages</code> must not be a protected branch.</li>
 </ul>
-<h3 id="new-major-version">New major version</h3>
-<p>When 4.x starts, deploy it with <code>mike deploy --update-aliases 4.x latest</code>. Keep a <code>v3.x</code> branch and add <code>3.x</code> to the workflow input, so 3.x can still be fixed.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../../concepts/status-and-roadmap/">Status and roadmap</a>: the state and the tests of each package.</li>
+<li><a href="../showcase/">Showcase</a>: apps built with Dox.</li>
+</ul>
 
 
 
@@ -7863,7 +7766,7 @@ In the other repo, a <code>pubspec_overrides.yaml</code> that points to <code>..
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

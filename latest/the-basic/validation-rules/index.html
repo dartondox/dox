@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -2257,6 +2259,17 @@
     <span class="md-ellipsis">
       
         What the generator checks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
       
     </span>
   </a>
@@ -5323,10 +5336,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5452,95 +5461,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7457,6 +7377,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7474,24 +7405,18 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/the-basic/validation-rules.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="validation-rules">Validation rules</h1>
 <p>This page lists every annotation you can put on a <code>@Dto</code> field, with its error code and default message.</p>
-<p>Use it to look up a rule. To learn how DTOs work, read <a href="../validation/">Validation</a> first.</p>
-<p>How to read the tables:</p>
+<p>To learn how DTOs work, read <a href="../validation/">Validation</a> first. How to read the tables:</p>
 <ul>
-<li><strong>Code</strong> is the error code. Use it in <code>@Dto(messages: ...)</code> and in a <code>MessageResolver</code>.</li>
-<li><strong>Message</strong> is the default English text. <code>{field}</code> is the last key of the path.</li>
+<li>Code is the error code. Use it in <code>@Dto(messages: ...)</code> and in a <code>MessageResolver</code>.</li>
+<li>Message is the default English text. <code>{field}</code> is the last key of the path.</li>
 <li>Every annotation also takes <code>message:</code>. It wins over every other message.</li>
 <li>All limits include the limit itself, unless the table says "exclusive".</li>
-<li>On a <code>List&lt;T&gt;</code> field, a value rule checks each item. Only the list rules check the list itself.</li>
+<li>On a list field, a value rule checks each item. Only the list rules check the list itself.</li>
 </ul>
 <h2 id="type-errors">Type errors</h2>
 <p>You get these errors when a value does not fit the field type. They have no annotation.</p>
@@ -7506,7 +7431,7 @@
 <tbody>
 <tr>
 <td><code>required</code></td>
-<td>a required field is missing, <code>null</code>, or <code>""</code></td>
+<td>a required field is missing, null, or ""</td>
 <td><code>The {field} is required</code></td>
 </tr>
 <tr>
@@ -7562,7 +7487,7 @@
 </tbody>
 </table>
 <h2 id="text">Text</h2>
-<p>Use these rules on <code>String</code> fields (and <code>List&lt;String&gt;</code> items):</p>
+<p>Use these rules on string fields and string list items:</p>
 <table>
 <thead>
 <tr>
@@ -7678,19 +7603,17 @@
 </tbody>
 </table>
 <ul>
-<li><code>@Length</code> has <code>min:</code> and <code>max:</code>. Both are optional, but you must give one.
-  With only <code>min:</code> it acts like <code>@MinLength</code>, with only <code>max:</code> like <code>@MaxLength</code>.</li>
-<li>Length counts characters (Unicode code points). <code>é</code> counts as 1.</li>
-<li><code>@Url()</code> needs <code>http</code> or <code>https</code> and a host.</li>
-<li><code>@Uuid()</code> takes any version. Upper or lower case.</li>
-<li><code>@Ulid()</code> takes 26 Crockford base32 characters, upper or lower case. The first one is <code>0</code> to <code>7</code>.</li>
-<li><code>@Regex(pattern, {message})</code> must match the <strong>whole</strong> value. You do not need <code>^</code> and <code>$</code>.
-  The regex is checked when the generator runs. A bad regex stops the build.</li>
-<li><code>@Alpha()</code>, <code>@AlphaNumeric()</code> and <code>@AlphaDash()</code> use ASCII letters <code>a-z</code>, <code>A-Z</code>. <code>@AlphaDash()</code> also allows digits <code>0-9</code>, <code>-</code> and <code>_</code>.</li>
-<li><code>@In</code> and <code>@NotIn</code> compare exactly (case matters).</li>
+<li><code>@Length</code> needs <code>min:</code>, <code>max:</code> or both. With one of them, it acts like <code>@MinLength</code> or <code>@MaxLength</code>.</li>
+<li>Length counts characters (Unicode code points), so é counts as 1.</li>
+<li><code>@Url()</code> needs http or https and a host.</li>
+<li><code>@Uuid()</code> takes any version, in upper or lower case.</li>
+<li><code>@Ulid()</code> takes 26 Crockford base32 characters, in upper or lower case. The first one is 0 to 7.</li>
+<li><code>@Regex</code> must match the full value, so you do not need <code>^</code> and <code>$</code>. A bad regex stops the build.</li>
+<li>The alpha rules use the ASCII letters a-z and A-Z. <code>@AlphaDash()</code> also allows the digits 0-9, <code>-</code> and <code>_</code>.</li>
+<li><code>@In</code> and <code>@NotIn</code> compare exactly, and case matters.</li>
 </ul>
 <h2 id="more-text-rules">More text rules</h2>
-<p>These are also for <code>String</code> fields:</p>
+<p>These are also for string fields:</p>
 <table>
 <thead>
 <tr>
@@ -7740,26 +7663,22 @@
 </tbody>
 </table>
 <ul>
-<li><code>@HexColor()</code> takes <code>#</code> and 6 hex digits, in any case. <code>@HexColor(short: true)</code> also takes 3 digits, like <code>#abc</code>.</li>
-<li><code>@Digits</code> and <code>@DigitsBetween</code> take only <code>0-9</code>. No sign, no dot. Use a <code>String</code> field, so leading zeros stay.</li>
+<li><code>@HexColor()</code> takes # and 6 hex digits, in any case. With <code>short: true</code> it also takes 3 digits, like #abc.</li>
+<li><code>@Digits</code> and <code>@DigitsBetween</code> take only 0-9, with no sign and no dot. Use a string field, so leading zeros stay.</li>
 <li><code>@DateFormatted</code> uses these letters:
-  day <code>d</code>, <code>j</code>, <code>D</code> (<code>Mon</code>), <code>l</code> (<code>Monday</code>), <code>N</code>, <code>w</code>, <code>S</code> (<code>st</code>), <code>z</code>;
-  month <code>m</code>, <code>n</code>, <code>M</code> (<code>Jan</code>), <code>F</code> (<code>January</code>), <code>t</code>;
+  day <code>d</code>, <code>j</code>, <code>D</code> (Mon), <code>l</code> (Monday), <code>N</code>, <code>w</code>, <code>S</code> (st), <code>z</code>;
+  month <code>m</code>, <code>n</code>, <code>M</code> (Jan), <code>F</code> (January), <code>t</code>;
   year <code>Y</code>, <code>y</code>, <code>L</code>;
   time <code>a</code>, <code>A</code>, <code>g</code>, <code>h</code>, <code>G</code>, <code>H</code>, <code>i</code>, <code>s</code>, <code>v</code>, <code>u</code>;
   time zone <code>e</code>, <code>T</code>, <code>P</code>, <code>p</code>, <code>O</code>, <code>Z</code>, <code>I</code>;
   full <code>U</code>, <code>c</code>, <code>r</code>.
-  Put <code>\</code> before a letter to use it as text, like <code>Y-m-d\TH:i</code>. Any other letter stops the build (and throws an <code>ArgumentError</code> in <code>v.string().dateFormat()</code>). Other characters must be there as they are.
-  <code>j</code>, <code>n</code>, <code>g</code>, <code>G</code>, <code>z</code> and <code>U</code> take no leading zero: <code>j/n/Y</code> rejects <code>01/02/2024</code>.
-  <code>e</code> and <code>T</code> take any name that looks like a time zone. They do not check that it is a real one.
-  The date must exist: <code>2023-02-29</code> fails. Names need the case shown (<code>Jan</code>, not <code>jan</code>). A day name must fit the date. The field stays a <code>String</code>. Use a <code>DateTime</code> field for ISO 8601 dates.</li>
-<li><code>@Password</code> options: <code>min</code> (default 8), <code>letters</code>, <code>mixedCase</code> (one upper and one lower case letter), <code>numbers</code>, <code>symbols</code>. They are all off by default.
-  Letters, numbers and symbols are Unicode, so <code>é</code> is a letter. <code>{rules}</code> lists the options you set, like <code>at least 8 characters, one number, and one symbol</code>, or <code>at least 8 characters and one number</code>.
-  It does not check leaked passwords.</li>
+  Put <code>\</code> before a letter to use it as text, like <code>Y-m-d\TH:i</code>. Any other letter stops the build. Other characters must be there as they are.
+  <code>j</code>, <code>n</code>, <code>g</code>, <code>G</code>, <code>z</code> and <code>U</code> take no leading zero, so <code>j/n/Y</code> rejects 01/02/2024.
+  The date must exist, so 2023-02-29 fails. Names need the case shown (Jan, not jan), and a day name must fit the date. The field stays a string. Use a <code>DateTime</code> field for ISO 8601 dates.</li>
+<li><code>@Password</code> options: <code>min</code> (default 8), <code>letters</code>, <code>mixedCase</code> (one upper and one lower case letter), <code>numbers</code> and <code>symbols</code>. The others are off by default. Letters, numbers and symbols are Unicode. <code>{rules}</code> lists the options you set, like "at least 8 characters and one number".</li>
 </ul>
 <h2 id="other-fields">Other fields</h2>
-<p>Sometimes a field depends on another field. For example, a password must match its confirmation, or a VAT number is required only for a company. These rules read another key of the same object.</p>
-<p>The other key is the input key, like <code>account_type</code>, not the Dart name <code>accountType</code>. If you give the Dart name of a field with another key, the build stops.</p>
+<p>These rules read another key of the same object, like a password and its confirmation. Give the input key, like <code>account_type</code>, not the Dart name. A Dart name stops the build.</p>
 <table>
 <thead>
 <tr>
@@ -7837,26 +7756,20 @@
 </tbody>
 </table>
 <ul>
-<li><code>@Confirmed</code> and <code>@Same</code> compare the raw input of both keys, so <code>@Trim</code> does not change the compare.</li>
-<li><code>@Confirmed()</code> on <code>password</code> needs the key <code>password_confirmation</code> with the same value. The error is on <code>password</code>. Use <code>@Confirmed(other: 'password_again')</code> for another key.
-  The DTO does not need a field for the confirmation key.</li>
-<li>Text and numbers match by text, both ways: <code>1234</code> matches <code>"1234"</code>, and <code>"1234"</code> matches <code>1234</code>.</li>
-<li><code>@RequiredIf</code> and <code>@RequiredWith</code> work on a nullable field, a <code>Maybe</code> field or a field with a default. On an always-required field the build stops.</li>
-<li><code>@RequiredIf('type', ['company', 'shop'])</code> takes a list: any of the values makes the field required. <code>"true"</code> matches <code>true</code>, <code>"1"</code> matches <code>1</code>. An enum value matches its name: <code>@RequiredIf('role', Role.admin)</code> matches <code>"admin"</code>.</li>
-<li><code>@RequiredWith(['phone', 'email'])</code>: the field is required when any of the keys is there and not empty.</li>
-<li><code>@RequiredUnless('type', 'guest')</code> makes the field required unless <code>type</code> is <code>guest</code>. A missing <code>type</code> counts as <code>null</code>, so the field is required then. It takes a list of values like <code>@RequiredIf</code>.</li>
-<li><code>@RequiredWithout(['email'])</code>: the field is required when any of the keys is missing or empty. <code>@RequiredWithoutAll(['email', 'phone'])</code>: when all of them are missing or empty.</li>
-<li><code>@RequiredUnless</code>, <code>@RequiredWithout</code> and <code>@RequiredWithoutAll</code> follow the same rules as <code>@RequiredIf</code>: a nullable, <code>Maybe</code> or default field, and input keys.</li>
-<li><code>@Different('old_password')</code> needs a value that is not the same as the other key. It compares the raw input like <code>@Same</code>. A missing other key passes.</li>
-<li><code>@ProhibitedIf('type', 'guest')</code> means: when <code>type</code> is <code>guest</code>, the field must be missing or empty. Empty is <code>null</code>, blank text, an empty list or an empty map. <code>0</code> and <code>false</code> fail. This is not the same as <code>@Prohibited()</code>, which fails on <code>null</code> and <code>[]</code>. It reads <code>type</code> and matches like <code>@RequiredIf</code>.</li>
-<li><code>@GreaterThanField</code>, <code>@GreaterThanOrEqualField</code>, <code>@LessThanField</code> and <code>@LessThanOrEqualField</code> compare a value with another field. They are for <code>int</code>, <code>double</code> and <code>num</code> fields. They read the raw input of the other key: a number, or number text from a form. A missing other key (or one that is not a number) fails.
-  <code>{min}</code> and <code>{max}</code> in the message are the other key. They use the codes of <code>@GreaterThan</code>, <code>@Min</code>, <code>@LessThan</code> and <code>@Max</code>.</li>
-<li>On a <code>List&lt;T&gt;</code> field, <code>@Different</code> checks the whole list, not each item. The field compare rules do not fit a list.</li>
-<li>Missing means: not there, <code>null</code>, blank text, an empty list or an empty map.</li>
-<li>They run in step 1, with the other "required" checks. <code>@Confirmed</code> and <code>@Same</code> run in step 2.</li>
+<li><code>@Confirmed()</code> on <code>password</code> needs the key <code>password_confirmation</code> with the same value. The error is on <code>password</code>. Use <code>@Confirmed(other: 'password_again')</code> for another key. The DTO needs no field for the confirmation key.</li>
+<li><code>@Confirmed</code>, <code>@Same</code> and <code>@Different</code> compare the raw input of both keys, so <code>@Trim</code> does not change the compare. A missing other key passes <code>@Different</code>.</li>
+<li>Text and numbers match by text, so 1234 matches "1234".</li>
+<li>The required rules work on a nullable field, a <code>Maybe</code> field or a field with a default. On an always-required field the build stops.</li>
+<li><code>@RequiredIf</code> and <code>@RequiredUnless</code> also take a list of values, like <code>@RequiredIf('type', ['company', 'shop'])</code>. An enum value matches its name: <code>@RequiredIf('role', Role.admin)</code> matches "admin".</li>
+<li><code>@RequiredWith</code>: the field is required when any of the keys has a value. <code>@RequiredWithout</code>: when any of the keys is missing. <code>@RequiredWithoutAll</code>: when all of them are missing.</li>
+<li><code>@RequiredUnless</code>: a missing other key counts as null, so the field is required then.</li>
+<li><code>@ProhibitedIf</code>: when the other key matches, the field must be missing or empty. 0 and false fail.</li>
+<li>The field compare rules (<code>@GreaterThanField</code> and the others) are for number fields. A missing other key, or one that is not a number, fails. <code>{min}</code> and <code>{max}</code> in the message are the other key.</li>
+<li>On a list field, <code>@Different</code> checks the full list. The field compare rules do not fit a list.</li>
+<li>Missing means: not there, null, blank text, an empty list or an empty map.</li>
 </ul>
 <h2 id="present-or-missing">Present or missing</h2>
-<p>Use these rules to check if a key is sent and has a value:</p>
+<p>These rules check if a key is sent and has a value:</p>
 <table>
 <thead>
 <tr>
@@ -7894,12 +7807,11 @@
 </tbody>
 </table>
 <ul>
-<li><code>@Filled()</code>: a missing key passes. A key that is sent must have a value: not <code>null</code>, not blank text, not an empty list.</li>
-<li><code>@Present()</code>: the key must be sent. Its value may be <code>null</code> or empty.</li>
-<li><code>@Filled()</code> and <code>@Present()</code> are for a nullable, <code>Maybe</code> or default field, like <code>@RequiredIf</code>. They run in step 1.</li>
-<li><code>@Prohibited()</code>: the key must be missing, or blank text like <code>""</code> or <code>"  "</code>. Any other sent value fails, also <code>null</code>, <code>[]</code>, <code>{}</code>, <code>0</code> and <code>false</code>. It reads the raw input, so it runs before the type check, in step 1. It is for a nullable, <code>Maybe</code> or default field.</li>
-<li><code>@Accepted()</code> takes <code>true</code>, <code>1</code>, <code>"1"</code>, <code>"true"</code>, <code>"yes"</code> and <code>"on"</code>. <code>@Declined()</code> takes <code>false</code>, <code>0</code>, <code>"0"</code>, <code>"false"</code>, <code>"no"</code> and <code>"off"</code>. The text is case sensitive.
-  Use them on a <code>bool</code> field with no default. Then a missing value fails with <code>required</code>. In a form, <code>yes</code> and <code>on</code> turn into <code>true</code> first. In a JSON body a <code>bool</code> field takes only <code>true</code> and <code>false</code>, unless the DTO has <code>@Dto(coerce: true)</code>.</li>
+<li><code>@Filled()</code>: a missing key passes. A sent key must have a value: not null, not blank text, not an empty list.</li>
+<li><code>@Present()</code>: the key must be sent. Its value can be null or empty.</li>
+<li><code>@Prohibited()</code>: the key must be missing, or blank text. Any other value fails, also null, <code>[]</code>, <code>{}</code>, 0 and false.</li>
+<li><code>@Filled</code>, <code>@Present</code> and <code>@Prohibited</code> are for a nullable, <code>Maybe</code> or default field.</li>
+<li><code>@Accepted()</code> takes true, 1, "1", "true", "yes" and "on". <code>@Declined()</code> takes false, 0, "0", "false", "no" and "off". The text is case sensitive. Use them on a bool field with no default. In a JSON body a bool field takes only true and false, unless the DTO has <code>@Dto(coerce: true)</code>.</li>
 </ul>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@Accepted</span><span class="p">()</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="n">terms</span><span class="p">;</span>
@@ -7908,7 +7820,7 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">note</span><span class="p">;</span><span class="w"> </span><span class="c1">// the key must be there, null is fine</span>
 </span></code></pre></div>
 <h2 id="skip-a-field">Skip a field</h2>
-<p>Sometimes a field only matters for some input. For example, a VAT number is only for a company. These rules skip the field for the other cases:</p>
+<p>These rules skip a field for some input, like a VAT number that is only for a company:</p>
 <table>
 <thead>
 <tr>
@@ -7919,20 +7831,20 @@
 <tbody>
 <tr>
 <td><code>@ExcludeIf('type', 'person')</code></td>
-<td>when <code>type</code> is <code>person</code>, the field is skipped</td>
+<td>when <code>type</code> is person, the field is skipped</td>
 </tr>
 <tr>
 <td><code>@ExcludeUnless('type', 'company')</code></td>
-<td>unless <code>type</code> is <code>company</code>, the field is skipped</td>
+<td>unless <code>type</code> is company, the field is skipped</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>A skipped field is not read and not checked. It gets its default, <code>null</code> or <code>Maybe.missing()</code>, as if it was not sent. The field is left out of the validated data.</li>
-<li>They read the raw input of the other key, and match like <code>@RequiredIf</code> (also with a list of values).</li>
-<li><code>@ExcludeIf</code>: a missing other key does not skip. <code>@ExcludeUnless</code>: a missing other key counts as <code>null</code>, so the field is skipped.</li>
-<li>They are for a nullable, <code>Maybe</code> or default field. On an always-required field the build stops.</li>
-<li>The fluent schemas have <code>.excludeIf()</code> and <code>.excludeUnless()</code>. There the key is left out of the output. See <a href="../../packages/validation/#skip-a-field">Skip a field</a>.</li>
+<li>A skipped field gets its default, null or <code>Maybe.missing()</code>, as if it was not sent.</li>
+<li>They match like <code>@RequiredIf</code>, also with a list of values.</li>
+<li><code>@ExcludeIf</code>: a missing other key does not skip. <code>@ExcludeUnless</code>: a missing other key counts as null, so the field is skipped.</li>
+<li>They are for a nullable, <code>Maybe</code> or default field.</li>
+<li>Fluent schemas have <code>.excludeIf()</code> and <code>.excludeUnless()</code>. See <a href="../../packages/validation/#skip-a-field">Skip a field</a>.</li>
 </ul>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">type</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
@@ -7941,8 +7853,7 @@
 </span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">vatNumber</span><span class="p">;</span><span class="w"> </span><span class="c1">// not checked for a person</span>
 </span></code></pre></div>
 <h2 id="change-text">Change text</h2>
-<p>These change the value before the rules run. For example, <code>@Trim</code> removes the spaces a user typed by mistake.</p>
-<p>They always run in this order, wherever you put them: <code>@Trim</code>, then <code>@Lowercase</code> or <code>@Uppercase</code>, then the "empty string is missing" check.</p>
+<p>These change the value before the rules run. They always run in this order: <code>@Trim</code>, then <code>@Lowercase</code> or <code>@Uppercase</code>, then the "empty string is missing" check.</p>
 <table>
 <thead>
 <tr>
@@ -7965,13 +7876,12 @@
 </tr>
 <tr>
 <td><code>@AllowEmpty()</code></td>
-<td>keeps <code>""</code> as a value. Without it, <code>""</code> counts as missing.</td>
+<td>keeps "" as a value. Without it, "" counts as missing.</td>
 </tr>
 </tbody>
 </table>
-<p>They have no error and no JSON Schema output. <code>@Lowercase()</code> and <code>@Uppercase()</code> together stop the build.</p>
+<p><code>@Lowercase()</code> and <code>@Uppercase()</code> together stop the build.</p>
 <h2 id="bad-value-to-default">Bad value to default</h2>
-<p>Sometimes a bad value should just give the default, like <code>page=abc</code> in a list page:</p>
 <table>
 <thead>
 <tr>
@@ -7982,17 +7892,17 @@
 <tbody>
 <tr>
 <td><code>@OrDefault()</code></td>
-<td>a bad value gives the default of the field (or <code>null</code>, or <code>Maybe.missing()</code>), not an error.</td>
+<td>a bad value gives the default of the field (or null, or <code>Maybe.missing()</code>), not an error.</td>
 </tr>
 </tbody>
 </table>
 <ul>
 <li>It drops type errors and the errors of the normal rules of the field.</li>
-<li>Errors from async rules (<code>@Unique</code>, <code>@Exists</code>, your <code>AsyncRule</code>) and from <code>validate()</code> are not dropped. They still give <code>422</code>.</li>
-<li>The field needs a default, a nullable type or a <code>Maybe</code> type. Else the build stops.</li>
+<li>Errors from async rules and from <code>validate()</code> still give 422.</li>
+<li>The field needs a default, a nullable type or a <code>Maybe</code> type.</li>
 </ul>
 <h2 id="numbers">Numbers</h2>
-<p>Use these rules on <code>int</code>, <code>double</code> and <code>num</code> fields (and list items):</p>
+<p>Use these rules on <code>int</code>, <code>double</code> and <code>num</code> fields and list items:</p>
 <table>
 <thead>
 <tr>
@@ -8053,9 +7963,9 @@
 </tr>
 </tbody>
 </table>
-<p>The values are <code>num</code>. <code>@Min(1.5)</code> on an <code>int</code> field stops the build. <code>@Range</code> checks that a number is between two values.</p>
+<p><code>@Min(1.5)</code> on an <code>int</code> field stops the build.</p>
 <h2 id="lists">Lists</h2>
-<p>Use these rules on <code>List&lt;T&gt;</code> fields. They check the list, not the items:</p>
+<p>Use these rules on list fields. They check the list, not the items:</p>
 <table>
 <thead>
 <tr>
@@ -8086,7 +7996,7 @@
 </tr>
 </tbody>
 </table>
-<p><code>@UniqueItems()</code> works for <code>String</code>, numbers, <code>bool</code>, enums and <code>DateTime</code>. On a list of DTOs it stops the build.</p>
+<p><code>@UniqueItems()</code> works for strings, numbers, bools, enums and dates. On a list of DTOs it stops the build.</p>
 <h2 id="dates">Dates</h2>
 <p>Use these rules on <code>DateTime</code> fields:</p>
 <table>
@@ -8126,16 +8036,13 @@
 </tbody>
 </table>
 <ul>
-<li>The value is one of:<ul>
-<li>an ISO 8601 date, like <code>'2000-01-01'</code>,</li>
-<li>a word: <code>'now'</code> (the time of the request), <code>'today'</code>, <code>'tomorrow'</code> or <code>'yesterday'</code>. These are in UTC, and <code>'today'</code> is the start of the day,</li>
-<li>the input key of another <code>DateTime</code> field of the same DTO, like <code>'start_date'</code>.</li>
+<li>The value is one of these:<ul>
+<li>an ISO 8601 date, like '2000-01-01',</li>
+<li>a word: 'now' (the time of the request), 'today', 'tomorrow' or 'yesterday'. These are in UTC, and 'today' is the start of the day,</li>
+<li>the input key of another date field of the same DTO, like 'start_date'. When that field has no value, the check passes.</li>
 </ul>
 </li>
-<li>With another field, the check uses its converted value. When that field has no value, the check passes.</li>
-<li>A text that is not a date, a word or a <code>DateTime</code> field stops the build.</li>
-<li><code>@After</code> and <code>@Before</code> are exclusive: <code>@After('2000-01-01')</code> does not accept <code>2000-01-01T00:00:00Z</code>. <code>@AfterOrEqual</code> and <code>@BeforeOrEqual</code> accept the same time.</li>
-<li>Words and other fields need one <code>build_runner</code> run.</li>
+<li><code>@After</code> and <code>@Before</code> are exclusive. <code>@AfterOrEqual</code> and <code>@BeforeOrEqual</code> accept the same time.</li>
 </ul>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">final</span><span class="w"> </span><span class="n">DateTime</span><span class="w"> </span><span class="n">startDate</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
@@ -8194,37 +8101,21 @@
 </tbody>
 </table>
 <ul>
-<li><code>@MaxSize</code> and <code>@MinSize</code> units: <code>B</code>, <code>KB</code>, <code>MB</code>, <code>GB</code>. <code>1KB</code> = 1024 bytes. A bad size text stops the build.</li>
-<li><code>@Mimes</code> takes file extensions. Dox finds the real type from the first bytes of the file.
-  The file name extension must not name another type, or a type a browser runs (like <code>html</code> or <code>svg</code>).
-  So <code>x.html</code> with GIF bytes does not pass. An empty or unknown extension is fine.
-  For zip based types (like <code>docx</code> or <code>xlsx</code>), the file name extension must match too.
-  For types without a byte signature (like <code>txt</code> or <code>csv</code>), it uses the file name extension.</li>
-<li><code>@Image()</code> is <code>@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])</code>. No <code>svg</code>.</li>
-<li><code>@MimeTypes</code> takes MIME types. Dox turns each one into file extensions, then checks the real bytes like <code>@Mimes</code>.
-  It does not trust the content type the client sent.
-  <code>image/*</code> means: jpg, jpeg, png, gif, webp, bmp, tif, tiff, ico, heic, heif, avif and psd. No <code>svg</code>.
-  This is wider than <code>@Image()</code>, and browsers can not show most of the extra types.
-  For images that browsers can show, use <code>@Image()</code> or list the MIME types.
-  Write <code>image/jpeg</code>, not <code>image/jpg</code>. <code>image/jpg</code> is not a real MIME type, so it never matches.
-  An unknown MIME type never matches.</li>
-<li><code>@Dimensions</code> checks the width and height in pixels. Limits: <code>width</code>, <code>height</code> (exact), <code>minWidth</code>, <code>maxWidth</code>, <code>minHeight</code>, <code>maxHeight</code> and <code>ratio</code> (width / height, like <code>3 / 2</code>).
-  Give at least one limit, or the build stops.
-  It reads only the image header of PNG, GIF, WebP and JPEG files, never the whole file.
-  Any other file, or a broken or cut short header, fails.
-  For a JPEG over 1 MB, Dox reads the first 128 KB. A JPEG with more photo metadata than that before its size fails.
-  A <code>ratio</code> passes when it is off by less than one pixel.</li>
-<li>The JSON Schema of a file is <code>{"type": "string", "format": "binary"}</code>, plus the keys above.</li>
+<li>Size units are B, KB, MB and GB. 1KB is 1024 bytes.</li>
+<li><code>@Mimes</code> takes file extensions. Dox finds the real type from the first bytes of the file. The file name extension must not name another type, or a type a browser runs (like html or svg). For zip types (like docx), the extension must match too. For types with no byte signature (like txt or csv), Dox uses the extension.</li>
+<li><code>@Image()</code> is <code>@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])</code>, with no svg.</li>
+<li><code>@MimeTypes</code> takes MIME types and checks the real bytes like <code>@Mimes</code>. <code>image/*</code> means jpg, jpeg, png, gif, webp, bmp, tif, tiff, ico, heic, heif, avif and psd. Browsers can not show most of these, so for web images use <code>@Image()</code>. Write <code>image/jpeg</code>: <code>image/jpg</code> never matches.</li>
+<li><code>@Dimensions</code> limits: <code>width</code>, <code>height</code> (exact), <code>minWidth</code>, <code>maxWidth</code>, <code>minHeight</code>, <code>maxHeight</code> and <code>ratio</code> (width / height). It reads the header of PNG, GIF, WebP and JPEG files. Any other file fails. A ratio passes when it is off by less than one pixel.</li>
 </ul>
-<p>With fluent schemas, the same rules are on <code>v.file()</code>. Sizes there are in bytes, not text:</p>
+<p>With fluent schemas, use <code>v.file()</code>. Sizes there are in bytes:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">v</span><span class="p">.</span><span class="n">file</span><span class="p">()</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">.</span><span class="n">maxSize</span><span class="p">(</span><span class="m">2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">)</span><span class="w"> </span><span class="c1">// 2 MB</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="n">mimeTypes</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'image/jpeg'</span><span class="p">,</span><span class="w"> </span><span class="s1">'image/png'</span><span class="p">])</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="p">.</span><span class="n">dimensions</span><span class="p">(</span><span class="nl">minWidth:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="nl">maxWidth:</span><span class="w"> </span><span class="m">2000</span><span class="p">);</span>
 </span></code></pre></div>
-<p>The fluent methods are <code>maxSize(bytes)</code>, <code>minSize(bytes)</code>, <code>mimes(types)</code>, <code>mimeTypes(types)</code>, <code>dimensions(...)</code>, <code>image()</code> and <code>extensions(types)</code>.</p>
+<p>The fluent methods are <code>maxSize</code>, <code>minSize</code>, <code>mimes</code>, <code>mimeTypes</code>, <code>dimensions</code>, <code>image</code> and <code>extensions</code>.</p>
 <h2 id="database">Database</h2>
-<p>These rules come from <code>dox_orm</code>. They read the database, so they run after all other checks passed:</p>
+<p>These rules come from <code>dox_orm</code>. They run after all other checks pass:</p>
 <table>
 <thead>
 <tr>
@@ -8247,15 +8138,13 @@
 </tbody>
 </table>
 <ul>
-<li><code>@Unique</code> column default: the input key. <code>@Exists</code> column default: <code>id</code>.</li>
-<li>They read the table, not the model. So soft-deleted rows count too.</li>
-<li><code>ignoreParam: 'id'</code> skips the row where <code>ignoreColumn</code> (default <code>id</code>) equals the path param <code>{id}</code>.</li>
-<li>They add nothing to the JSON Schema.</li>
+<li>The default column of <code>@Unique</code> is the input key. The default column of <code>@Exists</code> is id.</li>
+<li>They read the table, not the model, so soft-deleted rows count too.</li>
+<li><code>ignoreParam: 'id'</code> skips the row where <code>ignoreColumn</code> (default id) equals the path param <code>{id}</code>.</li>
 </ul>
-<p>See <a href="../validation/#database-rules-unique-and-exists">Database rules</a>.</p>
-<p>In a fluent schema, use <code>v.string().unique('users', column: 'email')</code> and <code>v.int().exists('teams')</code>. See <a href="../../packages/validation/#more-rules">Fluent schemas</a>.</p>
+<p>See <a href="../validation/#database-rules-unique-and-exists">Database rules</a>. In a fluent schema, use <code>v.string().unique('users', column: 'email')</code> and <code>v.int().exists('teams')</code>. See <a href="../../packages/validation/#more-rules">Fluent schemas</a>.</p>
 <h2 id="keys-and-dto-options">Keys and DTO options</h2>
-<p>These options change how the whole DTO reads its input:</p>
+<p>These options change how the full DTO reads its input:</p>
 <table>
 <thead>
 <tr>
@@ -8266,7 +8155,7 @@
 <tbody>
 <tr>
 <td><code>@Name('emailAddress')</code></td>
-<td>the input key for this field. Default: the field name in snake_case.</td>
+<td>the input key for this field. Default: the field name in snake case.</td>
 </tr>
 <tr>
 <td><code>@Dto()</code></td>
@@ -8278,58 +8167,55 @@
 </tr>
 <tr>
 <td><code>@Dto(keyCase: KeyCase.field)</code></td>
-<td>keys: <code>KeyCase.snake</code> (default) or <code>KeyCase.field</code> (the Dart name as is).</td>
+<td>keys: <code>KeyCase.snake</code> (default) or <code>KeyCase.field</code> (the Dart name as it is).</td>
 </tr>
 <tr>
 <td><code>@Dto(strict: true)</code></td>
-<td>unknown keys are errors. Default <code>false</code>: they are dropped.</td>
+<td>unknown keys are errors. Default false: they are dropped.</td>
 </tr>
 <tr>
 <td><code>@Dto(emptyStringsToNull: true)</code></td>
-<td><code>""</code> is read as <code>null</code>, not as missing. Default <code>false</code>.</td>
+<td>"" is read as null, not as missing. Default false.</td>
 </tr>
 <tr>
 <td><code>@Dto(trim: true)</code></td>
-<td>trims every <code>String</code> field and text item, like <code>@Trim()</code> on each. Default <code>false</code>.</td>
+<td>trims every string field and text item, like <code>@Trim()</code> on each. Default false.</td>
 </tr>
 <tr>
 <td><code>@Dto(coerce: true)</code></td>
-<td>a JSON body may send text for numbers and bools, like a form. Default <code>false</code>.</td>
+<td>a JSON body can send text for numbers and bools, like a form. Default false.</td>
 </tr>
 <tr>
 <td><code>@Dto(messages: {...})</code></td>
-<td>messages by <code>code</code> or <code>key.code</code>. A dotted path like <code>address.city.required</code> or <code>tags.*.required</code> works too. A short rule name works too, like <code>name.min</code>. See <a href="../validation/#short-rule-names-in-message-keys">Short rule names</a>.</td>
+<td>messages by code or <code>key.code</code>. A dotted path like <code>address.city.required</code> or <code>tags.*.required</code> works too. See <a href="../validation/#short-rule-names-in-message-keys">Short rule names</a>.</td>
 </tr>
 <tr>
 <td><code>@Dto(attributes: {...})</code></td>
-<td>the names shown for <code>{field}</code>, by key, like <code>{'first_name': 'first name'}</code>. See <a href="../validation/#names-for-field">Names for <code>{field}</code></a>.</td>
+<td>the names shown for <code>{field}</code>, by key. See <a href="../validation/#names-for-field">Names for field</a>.</td>
 </tr>
 <tr>
 <td><code>@Describe('...')</code></td>
-<td>on a field: a short text for the <code>description</code> of the field in the JSON Schema. It does not change the checks.</td>
+<td>on a field: the description of the field in the JSON Schema.</td>
 </tr>
 </tbody>
 </table>
-<p>A <code>///</code> doc comment on a field becomes its <code>description</code> in the JSON Schema.
-<code>@Describe</code> wins over the <code>///</code> comment. Use it when the text is for API users and MCP clients, not for the code.
-The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Describe</span><span class="p">(</span><span class="s1">'Category ID (see list_categories).'</span><span class="p">)</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">categoryId</span><span class="p">;</span>
+<p>A nested DTO uses its own <code>trim</code> and <code>coerce</code>. A <code>///</code> doc comment on a field also becomes its description. <code>@Describe</code> wins over it. The OpenAPI docs and MCP tools show it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@Describe</span><span class="p">(</span><span class="s1">'Category ID (see list_categories).'</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">categoryId</span><span class="p">;</span>
 </span></code></pre></div>
 <h2 id="types-in-detail">Types in detail</h2>
-<p>This is how each field type reads input. The short table is in <a href="../dto/#field-types">Types</a>.</p>
+<p>This is how each field type reads input. The short table is in <a href="../dto/#field-types">Field types</a>.</p>
 <ul>
-<li><strong>JSON is strict.</strong> In a JSON body, <code>"18"</code> is not an <code>int</code>. You get the error <code>integer</code>. With <code>@Dto(coerce: true)</code>, JSON is read like form text for <code>int</code>, <code>double</code>, <code>num</code> and <code>bool</code>, and a <code>bool</code> also takes <code>1</code> and <code>0</code>.</li>
-<li><strong>Query and form data are text.</strong> Dox turns the text into the field type first. If it can not, you get the type error.</li>
-<li><code>int</code> takes <code>18</code> or <code>18.0</code>, never a fraction. <code>"4.5"</code> or <code>4.5</code> gives <code>integer</code>.</li>
-<li><code>bool</code> in text takes <code>true</code>, <code>1</code>, <code>yes</code>, <code>on</code> and <code>false</code>, <code>0</code>, <code>no</code>, <code>off</code> (any case).</li>
-<li><code>DateTime</code> takes <code>2024-01-31</code> or <code>2024-01-31T10:00:00Z</code>. A value without a time zone is read as UTC.
-  The result is always UTC (<code>isUtc == true</code>). A number (timestamp) is not allowed.</li>
-<li>An <code>enum</code> matches the Dart name exactly. <code>"Admin"</code> does not match <code>Role.admin</code>. Custom wire values (like <code>"ADMIN"</code>) are not supported.</li>
-<li><code>Object?</code> and <code>dynamic</code> take any value. They are not checked.</li>
+<li>JSON is strict. In a JSON body, "18" is not an integer, and you get the error <code>integer</code>. With <code>@Dto(coerce: true)</code>, JSON is read like form text for numbers and bools, and a bool also takes 1 and 0.</li>
+<li>Query and form data are text. Dox changes the text into the field type first.</li>
+<li><code>int</code> takes 18 or 18.0, never a fraction.</li>
+<li><code>bool</code> in text takes true, 1, yes, on and false, 0, no, off, in any case.</li>
+<li><code>DateTime</code> takes 2024-01-31 or 2024-01-31T10:00:00Z. A value with no time zone is read as UTC, and the result is always UTC. A timestamp number is not allowed.</li>
+<li>An enum matches the Dart name exactly, so "Admin" does not match <code>Role.admin</code>.</li>
+<li><code>Object?</code> and <code>dynamic</code> take any value, with no check.</li>
 <li><code>Map&lt;String, dynamic&gt;</code> must be an object. Its values are not checked.</li>
-<li>In query and form data, one value for a <code>List&lt;T&gt;</code> field gives a list with one item.</li>
-<li>In bracket keys, list indexes are sorted and packed: <code>items[3]</code> alone gives a list with one item.</li>
-<li>In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives <code>422</code> with the key <code>_root</code>.</li>
+<li>In query and form data, one value for a list field gives a list with one item. Bracket indexes are sorted and packed, so <code>items[3]</code> alone gives a list with one item.</li>
+<li>In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives 422 with the key <code>_root</code>.</li>
 </ul>
 <h2 id="body-types">Body types</h2>
 <p>The content type of the body decides how Dox reads it:</p>
@@ -8351,46 +8237,47 @@ The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
 </tr>
 <tr>
 <td>any other content type</td>
-<td><code>415 Unsupported Media Type</code></td>
+<td>415 Unsupported Media Type</td>
 </tr>
 <tr>
 <td>JSON that is not valid</td>
-<td><code>400 Bad Request</code></td>
+<td>400 Bad Request</td>
 </tr>
 <tr>
 <td>JSON that is not an object (like <code>[1, 2]</code>)</td>
-<td><code>422</code> with the key <code>_root</code></td>
+<td>422 with the key <code>_root</code></td>
 </tr>
 </tbody>
 </table>
 <h2 id="the-order-of-checks">The order of checks</h2>
 <p>Dox checks the input in four steps:</p>
 <ol>
-<li>Read the input and convert types. Change text (<code>@Trim</code>, <code>@Lowercase</code>, <code>@Uppercase</code>). Find missing required fields.</li>
-<li>The field rules, top to bottom. The first rule that fails stops the other rules of that field. So there is no <code>@Bail</code>. A fluent schema runs all rules, unless you add <code>.bail()</code>. See <a href="../../packages/validation/#stop-at-the-first-error">Stop at the first error</a>.</li>
-<li>The <code>validate()</code> method (nested DTOs first, then the parent).</li>
+<li>Read the input and convert types. Change text (<code>@Trim</code>, <code>@Lowercase</code>, <code>@Uppercase</code>). Find missing required fields and run the rules that read other keys, except <code>@Confirmed</code> and <code>@Same</code>.</li>
+<li>The field rules, top to bottom. The first rule that fails stops the other rules of that field. A fluent schema runs all rules, unless you add <code>.bail()</code>. See <a href="../../packages/validation/#stop-at-the-first-error">Stop at the first error</a>.</li>
+<li>The <code>validate()</code> method, nested DTOs first.</li>
 <li>Async rules (<code>@Unique</code>, <code>@Exists</code>, your <code>AsyncRule</code>), one at a time, in field order.</li>
 </ol>
-<p>Each step runs only when the step before it had no errors. So the database is never asked about input that is already wrong.</p>
-<ul>
-<li>Steps 1 and 2 run per DTO. So one answer can have a type error in <code>address</code> and a rule error in <code>items.1</code>.</li>
-<li>Inside one step, Dox collects the errors of all fields.</li>
-<li>A default value is not checked by the field rules. Async rules check the final value.</li>
-</ul>
+<p>Each step runs only when the step before it had no errors, so the database never gets input that is already wrong. Inside one step, Dox collects the errors of all fields.</p>
 <h2 id="what-the-generator-checks">What the generator checks</h2>
 <p>The build stops with a clear error when:</p>
 <ul>
-<li>a field is not <code>final</code>, or is not a parameter of the unnamed constructor,</li>
-<li>a field type is not supported (see <a href="../dto/#field-types">Types</a>),</li>
+<li>a field is not final, or is not a parameter of the unnamed constructor,</li>
+<li>a field type is not supported (see <a href="../dto/#field-types">Field types</a>),</li>
 <li>a rule does not fit the field type (like <code>@Email()</code> on an <code>int</code>),</li>
 <li>a <code>Maybe&lt;T&gt;</code> field has no <code>const Maybe.missing()</code> default,</li>
-<li><code>@RequiredIf</code>, <code>@RequiredWith</code>, <code>@RequiredUnless</code>, <code>@RequiredWithout</code>, <code>@RequiredWithoutAll</code>, <code>@Filled</code>, <code>@Present</code>, <code>@Prohibited</code>, <code>@ProhibitedIf</code>, <code>@ExcludeIf</code> or <code>@ExcludeUnless</code> is on a field that is always required,</li>
-<li><code>@OrDefault()</code> is on a field that is always required (no default, not nullable and not a <code>Maybe</code>),</li>
-<li>a rule that reads another key (like <code>@RequiredIf</code>, <code>@Same</code>, <code>@Different</code>, <code>@ExcludeIf</code> or <code>@GreaterThanField</code>) names a Dart field (like <code>accountType</code>) instead of its input key (<code>account_type</code>),</li>
-<li><code>@After</code>, <code>@Before</code>, <code>@AfterOrEqual</code> or <code>@BeforeOrEqual</code> has a text that is not a date, a word or another <code>DateTime</code> field,</li>
+<li>a required, present, prohibited or exclude rule, or <code>@OrDefault()</code>, is on a field that is always required,</li>
+<li>a rule that reads another key names a Dart field (like <code>accountType</code>) instead of its input key (<code>account_type</code>),</li>
+<li>a date rule has a text that is not a date, a word or another date field,</li>
 <li><code>@DateFormatted</code> has a letter it does not know,</li>
+<li><code>@Regex</code> has a bad pattern, or a size text is bad,</li>
 <li>two <code>@Dto</code> classes in the app have the same name,</li>
 <li>the class is generic, or extends another class (other than <code>Object</code>).</li>
+</ul>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../validation/">Validation</a>: messages, custom rules and checks across fields.</li>
+<li><a href="../dto/">DTOs</a>: make and use a DTO.</li>
+<li><a href="../../packages/validation/">Validation package</a>: fluent schemas.</li>
 </ul>
 
 
@@ -8511,7 +8398,7 @@ The OpenAPI docs and MCP tools (<code>McpDtoTool</code>) show it.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6058,10 +5967,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7297,10 +7206,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7324,32 +7233,26 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/static-files.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="static-files-and-spa">Static files and SPA</h1>
 <p>Serve a folder of files, or a single page app (React, Vue, Flutter web), from the Dox app, with the right cache headers.</p>
-<p>If your front-end is small, you can serve it from the same Dox app as your API. Then you have one server to run and no CORS setup.</p>
+<p>With the front-end in the same app as your API, you have one server to run and no CORS setup.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Dox app.</li>
 <li>A <code>public</code> folder with the built front-end (<code>index.html</code>, <code>assets/...</code>).</li>
-<li>For the storage way and the controller below: the <code>dox_storage</code> package, with its provider. See <a href="../../digging-deeper/file-storage/#configuration">File storage</a>.</li>
+<li>For the storage disk and the controller below: the <code>dox_storage</code> package, with its provider. See <a href="../../digging-deeper/file-storage/#configuration">File storage</a>.</li>
 </ul>
 <h2 id="serve-a-folder-one-line">Serve a folder: one line</h2>
-<p>If you only need to serve the files of a folder, <code>Route.staticFiles</code> does it in one line. Add it in <code>register()</code> of <code>WebRouter</code>:</p>
+<p><code>Route.staticFiles</code> serves the files of a folder. Add it in <code>register()</code> of <code>WebRouter</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">staticFiles</span><span class="p">(</span><span class="s1">'/'</span><span class="p">,</span><span class="w"> </span><span class="s1">'public'</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Now <code>GET /app.js</code> sends <code>public/app.js</code> with the right <code>Content-Type</code>. If a route and a file have the same path, the route wins. A missing file answers <code>404</code>.</p>
-<p>The browser gets <code>304</code> when it already has the file, because Dox sends <code>ETag</code> and <code>Last-Modified</code>. If you want a <code>Cache-Control</code> header too, add <code>maxAge:</code>. See <a href="../../the-basic/routing/#serve-static-files">Routing: serve static files</a> for all the rules.</p>
-<p>For a single page app, add <code>Route.fallback</code>, so every URL with no route and no file gets <code>index.html</code>. See <a href="../../the-basic/routing/#fallback-route">Routing: fallback route</a>.</p>
+<p>Now <code>/app.js</code> sends <code>public/app.js</code>. A route wins over a file with the same path. For a <code>Cache-Control</code> header, add <code>maxAge</code>. See <a href="../../the-basic/routing/#serve-static-files">Routing: serve static files</a>.</p>
+<p>For a single page app, add a <a href="../../the-basic/routing/#fallback-route">fallback route</a> that sends <code>index.html</code>.</p>
 <h3 id="or-serve-a-storage-disk">Or serve a storage disk</h3>
-<p>You can also serve the folder as a storage disk. <code>Storage.route</code> serves every file of a disk. First add a <code>public</code> disk for the folder in <code>lib/config/storage.dart</code>:</p>
+<p><code>Storage.route</code> serves every file of a disk. First add a <code>public</code> disk for the folder:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/storage.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">StorageConfig</span><span class="w"> </span><span class="n">storageConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">StorageConfig</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">defaultDisk:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">storageDisk</span><span class="p">,</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">disks:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span>
@@ -7360,19 +7263,19 @@
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="p">},</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Then add the route in <code>register()</code> of <code>WebRouter</code>. <code>Storage</code> comes from <code>package:dox_storage/dox_storage.dart</code>.</p>
-<div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'static'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// GET /static/{key*}</span>
+<p>Then add the route in <code>register()</code> of <code>WebRouter</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1">// GET /static/{key*}</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'static'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Now <code>GET /static/app.js</code> sends <code>public/app.js</code> with the right <code>Content-Type</code>. A missing file answers <code>404</code>. The disk rejects <code>..</code> in the path, so a client can not read files outside <code>public</code>.</p>
-<p>This is enough for a few files, but it sends no <code>Cache-Control</code> header. For an SPA, read on.</p>
+<p>Now <code>/static/app.js</code> sends <code>public/app.js</code>. This route sends no <code>Cache-Control</code> header.</p>
 <h2 id="serve-an-spa">Serve an SPA</h2>
-<p>An SPA needs two things, and a small controller gives you both:</p>
+<p>A single page app (SPA) needs two things:</p>
 <ul>
 <li><code>index.html</code> for every URL the SPA router handles, with no cache.</li>
 <li>The built assets with a long cache. Build tools put a hash in the file name (<code>app.3f9c2b.js</code>), so a new build has new names.</li>
 </ul>
 <h3 id="1-write-the-controller">1. Write the controller</h3>
-<p>The controller has one method for the assets and one for <code>index.html</code>:</p>
+<p>Write one method for the assets and one for <code>index.html</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/static.controller.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7400,9 +7303,9 @@
 </span><span id="__span-3-25"><a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-3-26"><a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>cache(duration)</code> sets <code>Cache-Control: max-age=&lt;seconds&gt;</code>. <code>Duration.zero</code> gives <code>max-age=0</code>, so the browser asks again each time.</p>
+<p><code>cache(duration)</code> sets <code>Cache-Control: max-age=&lt;seconds&gt;</code>.</p>
 <h3 id="2-add-the-routes">2. Add the routes</h3>
-<p>The catch-all route must come <strong>last</strong>, because it matches every URL. So put the API router before the web router in <code>AppConfig</code>:</p>
+<p>The catch-all route matches every URL, so it must come last. Put the API router before the web router in <code>AppConfig</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/http/controllers/static.controller.dart'</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
@@ -7419,6 +7322,7 @@
 </span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">}</span>
 </span></code></pre></div>
+<p>Set the order of the routers:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="c1">/// the SPA catch-all route is in WebRouter, so it must come last.</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="c1">/// Listed routers come first, in this order.</span>
@@ -7426,7 +7330,7 @@
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Keep the route for <code>/</code> too, because <code>/{path*}</code> does not match the start page.</p>
+<p>Keep the route for <code>/</code>, because <code>/{path*}</code> does not match the start page.</p>
 <h3 id="3-put-the-build-in-public">3. Put the build in <code>public</code></h3>
 <p>Build the front-end and copy the files to <code>public</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># React (Vite)</span>
@@ -7435,7 +7339,7 @@
 </span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="c1"># Flutter web</span>
 </span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>flutter<span class="w"> </span>build<span class="w"> </span>web<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cp<span class="w"> </span>-r<span class="w"> </span>build/web/.<span class="w"> </span>public/
 </span></code></pre></div>
-<p>Vite puts the files in <code>assets/</code>. Flutter web puts them next to <code>index.html</code>. For Flutter, change the asset route to match, or serve everything with <code>Storage.route</code> and give <code>index.html</code> the catch-all.</p>
+<p>Flutter web puts the files next to <code>index.html</code>, not in <code>assets/</code>. So for Flutter, change the asset route to match.</p>
 <h2 id="check-it">Check it</h2>
 <p>The start page comes with no cache:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>curl<span class="w"> </span>-i<span class="w"> </span>http://localhost:3000/
@@ -7452,16 +7356,14 @@
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>cache-control: max-age=31536000
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>content-type: text/javascript
 </span></code></pre></div>
-<p><code>GET /assets/nope.js</code> answers <code>404</code>. <code>GET /assets/..%2Fpubspec.yaml</code> answers <code>404</code> too.
-<code>GET /api/nothing</code> answers <code>404</code>, not the page.</p>
+<p><code>/assets/nope.js</code>, <code>/assets/..%2Fpubspec.yaml</code> and <code>/api/nothing</code> answer 404.</p>
 <h2 id="in-production">In production</h2>
-<p>Put a proxy in front of Dox, and let it do gzip. See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment</a>.</p>
-<p>For a big site, serve <code>public</code> from the proxy or a CDN, and keep Dox for the API only.</p>
-<h2 id="see-also">See also</h2>
+<p>Put a <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">proxy</a> in front of Dox, and let it do gzip. For a big site, serve <code>public</code> from the proxy or a CDN.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><a href="../../the-basic/routing/#serve-storage-files">Routing: serve storage files</a></li>
-<li><a href="../../the-basic/response/#files-and-big-responses">Response: files and big responses</a></li>
-<li><a href="../../digging-deeper/file-storage/">File storage</a></li>
+<li><a href="../../the-basic/routing/#serve-storage-files">Routing: serve storage files</a>: all the options of <code>Storage.route</code>.</li>
+<li><a href="../../the-basic/response/#files-and-big-responses">Response: files and big responses</a>: send a file.</li>
+<li><a href="../../digging-deeper/file-storage/">File storage</a>: disks and drivers.</li>
 </ul>
 
 
@@ -7582,7 +7484,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

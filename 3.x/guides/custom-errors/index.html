@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -5927,10 +5836,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7228,10 +7137,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7255,23 +7164,18 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/custom-errors.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="custom-errors">Custom errors</h1>
 <p>Give your app its own exception classes, send every error in one JSON shape, and log the unexpected ones.</p>
-<p>A client is easier to write when every error has the same shape. You also want to know when something breaks on the server, without showing the details to the client.</p>
+<p>A client is easier to write when every error has the same shape.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Dox app.</li>
 </ul>
 <h2 id="how-dox-handles-an-error">How Dox handles an error</h2>
-<p>First, see what Dox does when a controller or a middleware throws:</p>
+<p>This is what Dox does when a controller or a middleware throws:</p>
 <table>
 <thead>
 <tr>
@@ -7284,24 +7188,24 @@
 <tr>
 <td>an <code>IHttpException</code>, like <code>NotFoundHttpException</code></td>
 <td>its <code>code</code></td>
-<td>sends <code>{"code": ..., "message": ...}</code>. Does <strong>not</strong> call <code>report</code></td>
+<td>sends <code>{"code": ..., "message": ...}</code></td>
 </tr>
 <tr>
 <td>a validation error (bad DTO input)</td>
-<td><code>422</code></td>
-<td>sends the field errors: <code>{"field": "message"}</code>. Does not call <code>report</code></td>
+<td>422</td>
+<td>sends the field errors: <code>{"field": "message"}</code></td>
 </tr>
 <tr>
-<td>any other <code>Exception</code> or <code>Error</code></td>
-<td><code>500</code></td>
-<td>sends <code>{"code":"server_error","message":"Server Error"}</code>. When <code>APP_ENV</code> is <code>development</code> or <code>local</code>, it sends the error text. Calls <code>report</code></td>
+<td>any other exception or error</td>
+<td>500</td>
+<td>sends <code>{"code":"server_error","message":"Server Error"}</code>, or the error text when <code>APP_ENV</code> is development or local. Calls <code>report</code></td>
 </tr>
 </tbody>
 </table>
-<p><code>report</code> is a method of the <a href="../../the-basic/errors/">exception handler</a>. Every response goes through the <code>responseHandler</code> of <code>AppConfig</code> last, so this guide sets the error shape there.</p>
+<p><code>report</code> is a method of the <a href="../../the-basic/errors/">exception handler</a>. The <code>responseHandler</code> of <code>AppConfig</code> sees every response last, so this guide sets the error shape there.</p>
 <h2 id="1-write-your-own-exceptions">1. Write your own exceptions</h2>
 <p>For a quick error, use <code>abort(403)</code> or <code>abort(409, 'The email is taken')</code>. See <a href="../../reference/http-exceptions/#any-status-abort-and-httpstatusexception">HTTP exceptions</a>.</p>
-<p>If you throw the same error in many places, write a class for it. Extend <code>IHttpException</code>, and set <code>code</code> (the HTTP status), <code>errorCode</code> (a short text for the client) and <code>message</code>:</p>
+<p>For an error you throw in many places, extend <code>IHttpException</code>. Set <code>code</code> (the HTTP status), <code>errorCode</code> (a short text for the client) and <code>message</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/exceptions/app_exception.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7334,20 +7238,21 @@
 </span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">  </span><span class="c1">/// DELETE /api/users/{id}</span>
 </span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">destroy</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">ForbiddenHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'The first user can not be deleted'</span><span class="p">);</span>
-</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>
-</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">    </span><span class="c1">/// 0 rows: the user was deleted after show() found it</span>
-</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">delete</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'User </span><span class="si">$</span><span class="n">id</span><span class="s1"> not found'</span><span class="p">);</span>
-</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'deleted'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">};</span>
-</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="p">}</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">ForbiddenHttpException</span><span class="p">(</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">          </span><span class="nl">message:</span><span class="w"> </span><span class="s1">'The first user can not be deleted'</span><span class="p">);</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">    </span><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">show</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">    </span><span class="c1">/// 0 rows: the user was deleted after show() found it</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">delete</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">NotFoundHttpException</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'User </span><span class="si">$</span><span class="n">id</span><span class="s1"> not found'</span><span class="p">);</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">bool</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'deleted'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">};</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="2-one-json-shape-for-every-error">2. One JSON shape for every error</h2>
-<p>The response handler sees every response before it is sent. For an error, the content is the exception object, so you can turn it into your shape here:</p>
+<p>For an error, the content of the response is the exception. Turn it into your shape in the response handler:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/response_handler.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7395,9 +7300,9 @@
 </span><span id="__span-2-45"><a id="__codelineno-2-45" name="__codelineno-2-45" href="#__codelineno-2-45"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-46"><a id="__codelineno-2-46" name="__codelineno-2-46" href="#__codelineno-2-46"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The last <code>if</code> gives a <code>500</code> your shape too, in every environment. Without it, the client gets the default body, which in <code>development</code> or <code>local</code> is the error text. That text can show a SQL query or a file path.</p>
+<p>The last <code>if</code> gives a 500 your shape in every environment. Without it, development and local send the error text, which can show a SQL query or a file path.</p>
 <h2 id="3-log-unexpected-errors">3. Log unexpected errors</h2>
-<p>You want to know about unexpected errors, so log them. The <code>report</code> method of the exception handler runs for every <code>500</code>, and for errors outside a request, like a future nobody awaited or a timer:</p>
+<p><code>report</code> runs for every 500, and for errors outside a request, like a timer. Log the error there:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/error_handler.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7448,27 +7353,27 @@
 <tbody>
 <tr>
 <td><code>GET /api/users/999</code></td>
-<td><code>404</code></td>
+<td>404</td>
 <td><code>{"error":{"code":"not_found","message":"User 999 not found"}}</code></td>
 </tr>
 <tr>
 <td><code>GET /api/users/abc</code></td>
-<td><code>404</code></td>
+<td>404</td>
 <td><code>{"error":{"code":"not_found","message":"Not Found"}}</code></td>
 </tr>
 <tr>
 <td><code>DELETE /api/users/1</code></td>
-<td><code>403</code></td>
+<td>403</td>
 <td><code>{"error":{"code":"forbidden","message":"The first user can not be deleted"}}</code></td>
 </tr>
 <tr>
 <td><code>POST /api/auth/register</code> with <code>{}</code></td>
-<td><code>422</code></td>
+<td>422</td>
 <td><code>{"error":{"code":"validation_failed","message":"The input is not valid"},"errors":{"name":"The name is required", ...}}</code></td>
 </tr>
 <tr>
 <td><code>GET /api/boom</code></td>
-<td><code>500</code></td>
+<td>500</td>
 <td><code>{"error":{"code":"server_error","message":"Something went wrong"}}</code></td>
 </tr>
 </tbody>
@@ -7477,18 +7382,14 @@
 <div class="language-json highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="p">{</span><span class="nt">"timestamp"</span><span class="p">:</span><span class="s2">"2026-10-22T14:01:12.000Z"</span><span class="p">,</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"error"</span><span class="p">,</span><span class="nt">"message"</span><span class="p">:</span><span class="s2">"Bad state: boom"</span><span class="p">,</span><span class="nt">"error"</span><span class="p">:{</span><span class="nt">"stack"</span><span class="p">:</span><span class="s2">"#0  ApiRouter.register.&lt;anonymous closure&gt; (package:my_app/routes/api.dart:41:44) ..."</span><span class="p">},</span><span class="nt">"source"</span><span class="p">:</span><span class="s2">"error"</span><span class="p">}</span>
 </span></code></pre></div>
 <p>Remove the <code>/boom</code> route when you are done.</p>
-<div class="admonition note">
-<p class="admonition-title">A URL with no route</p>
-<p>A URL that matches no route is a <code>NotFoundHttpException</code>. It goes through the response handler too, so it gets the same JSON shape:
-<code>{"error":{"code":"not_found","message":"GET /nothing not found"}}</code>.</p>
-</div>
-<h2 id="see-also">See also</h2>
+<p>A URL with no route gets the same shape: <code>{"error":{"code":"not_found","message":"GET /nothing not found"}}</code>.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><a href="../../the-basic/errors/">Error handling</a> for <code>report</code> and <code>render</code></li>
-<li><a href="../../the-basic/response/#errors">Response: errors</a> for the built-in exceptions</li>
-<li><a href="../../the-basic/response/#change-every-response">Response: change every response</a></li>
-<li><a href="../../the-basic/validation/#the-error-response">Validation: the error response</a></li>
-<li><a href="../../digging-deeper/isolate/#when-an-isolate-crashes">Isolate: when an isolate crashes</a></li>
+<li><a href="../../the-basic/errors/">Error handling</a>: <code>report</code> and <code>render</code>.</li>
+<li><a href="../../the-basic/response/#errors">Response: errors</a>: the built-in exceptions.</li>
+<li><a href="../../the-basic/response/#change-every-response">Response: change every response</a>: the response handler.</li>
+<li><a href="../../the-basic/validation/#the-error-response">Validation: the error response</a>: the 422 body.</li>
+<li><a href="../../digging-deeper/isolate/#when-an-isolate-crashes">Isolate: when an isolate crashes</a>: errors outside a request.</li>
 </ul>
 
 
@@ -7609,7 +7510,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

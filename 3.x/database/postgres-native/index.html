@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -3887,13 +3889,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Setup
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -3937,10 +3956,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
+  <a href="#values-and-types" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Options
+        Values and types
       
     </span>
   </a>
@@ -3948,22 +3967,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-the-pool-without-the-orm" class="md-nav__link">
+  <a href="#handling-errors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using the pool without the ORM
+        Handling errors
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Using the pool without the ORM">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Without Dox">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#transactions" class="md-nav__link">
+  <a href="#opening-a-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Transactions
+        Opening a pool
       
     </span>
   </a>
@@ -3975,6 +4005,28 @@
     <span class="md-ellipsis">
       
         Pool settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pool-from-a-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pool from a url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions
       
     </span>
   </a>
@@ -4003,38 +4055,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sharing-and-closing-a-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharing and closing a pool
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#values-and-types" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Values and types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handling-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handling errors
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Details
+        Next steps
       
     </span>
   </a>
@@ -5283,10 +5324,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5412,95 +5449,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7220,13 +7168,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Setup
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7270,10 +7235,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
+  <a href="#values-and-types" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Options
+        Values and types
       
     </span>
   </a>
@@ -7281,22 +7246,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-the-pool-without-the-orm" class="md-nav__link">
+  <a href="#handling-errors" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Using the pool without the ORM
+        Handling errors
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Using the pool without the ORM">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#without-dox" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Without Dox
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Without Dox">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#transactions" class="md-nav__link">
+  <a href="#opening-a-pool" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Transactions
+        Opening a pool
       
     </span>
   </a>
@@ -7308,6 +7284,28 @@
     <span class="md-ellipsis">
       
         Pool settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pool-from-a-url" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pool from a url
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transactions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transactions
       
     </span>
   </a>
@@ -7336,38 +7334,27 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#sharing-and-closing-a-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sharing and closing a pool
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#values-and-types" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Values and types
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#handling-errors" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Handling errors
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7391,38 +7378,92 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/database/postgres-native.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="native-postgres-driver">Native Postgres driver</h1>
 <p><code>dox_postgres_native</code> is the Postgres driver of the Dox ORM, written in Rust.</p>
-<p>You use it through your models and queries, and it needs no extra config. Rust (<a href="https://docs.rs/tokio-postgres">tokio-postgres</a>) owns the connections and the pool, and each connection keeps its prepared statements.</p>
-<h2 id="installation">Installation</h2>
-<p><code>dox_orm</code> already depends on <code>dox_postgres_native</code>, so you do not add it yourself. Add it only if you want to use <code>PgNativePool</code> without the ORM:</p>
+<p>You use it through your models and queries. Rust (<a href="https://docs.rs/tokio-postgres">tokio-postgres</a>) owns the connections and the pool, and each connection keeps its prepared statements.</p>
+<h2 id="setup">Setup</h2>
+<p><code>dox_orm</code> already depends on <code>dox_postgres_native</code>. Add it yourself only to use <code>PgNativePool</code> without the ORM:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_postgres_native
 </span></code></pre></div>
-<p>You do not need Rust, because the build hook downloads a ready-built library for your system. The package lives in its own repo: <a href="https://github.com/dartondox/dox-postgres-native">dartondox/dox-postgres-native</a>.</p>
+<p>The build hook downloads a ready library for your system, so you do not need Rust. The package has its own repo: <a href="https://github.com/dartondox/dox-postgres-native">dartondox/dox-postgres-native</a>.</p>
+<h3 id="options">Options</h3>
+<p>The driver reads these keys from <code>extra</code> of the <code>ConnectionConfig</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxConnectionCount</code></td>
+<td>10</td>
+<td>Most connections in the pool, for the whole process.</td>
+</tr>
+<tr>
+<td><code>requestTimeout</code></td>
+<td>300 s</td>
+<td>The longest time for one request.</td>
+</tr>
+<tr>
+<td><code>maxConnectionAge</code></td>
+<td>no limit</td>
+<td>Close a connection older than this, when it has no query.</td>
+</tr>
+<tr>
+<td><code>idleTimeout</code></td>
+<td>no limit</td>
+<td>Close a free connection not used for this long.</td>
+</tr>
+<tr>
+<td><code>sslMode</code></td>
+<td>disable</td>
+<td>TLS mode, see <a href="#tls">TLS</a>.</td>
+</tr>
+<tr>
+<td><code>sslRootCert</code></td>
+<td>none</td>
+<td>PEM file with the CA certificates for verify-ca and verify-full.</td>
+</tr>
+<tr>
+<td><code>sslWarning</code></td>
+<td>true</td>
+<td>false hides the warning for mode require.</td>
+</tr>
+<tr>
+<td><code>timeZone</code></td>
+<td>UTC</td>
+<td>Time zone of the session.</td>
+</tr>
+<tr>
+<td><code>applicationName</code></td>
+<td>none</td>
+<td>Name of the app in <code>pg_stat_activity</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../#pool-settings">Pool settings</a>. Isolates with the same settings share one pool.</p>
 <h2 id="when-the-library-does-not-load">When the library does not load</h2>
-<p>Postgres has no other driver in Dox. So if the native library does not load, <code>SqlQueryBuilder.initializeWithDatabaseConfig</code> (and every other place that opens a Postgres connection) throws an <code>UnsupportedError</code> like this:</p>
+<p>If the native library does not load, <code>SqlQueryBuilder.initializeWithDatabaseConfig</code> throws an <code>UnsupportedError</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dox_postgres_native did not load: &lt;reason&gt;.
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Dox needs it to talk to Postgres. Fix: run the app with `dart run` or `dart build cli`. ...
 </span></code></pre></div>
-<p>The reason tells you what went wrong, for example that there is no library for your system. To fix it:</p>
+<p>To fix it:</p>
 <ul>
 <li>Run the app with <code>dart run</code>, <code>dart test</code> or <code>dart build cli</code>, because they run the build hook. <code>dart compile exe</code> does not.</li>
 <li>Or install <a href="https://rustup.rs">Rust</a>. The build hook then builds the library from source.</li>
-<li>If you set <code>lib_path</code> in <code>pubspec.yaml</code>, check that the file is there and is built for your system.</li>
+<li>If you set <code>lib_path</code> in <code>pubspec.yaml</code>, check that the file is there and fits your system.</li>
 </ul>
 <h2 id="tls">TLS</h2>
-<p>You should use TLS when the database is on another machine, so nobody on the network can read the data. Set the mode with <code>extra['sslMode']</code>, with <code>useSSL</code>, or with <code>sslmode</code> in <code>DATABASE_URL</code>:</p>
+<p>Use TLS when the database is on another machine. Set the mode with <code>extra['sslMode']</code>, <code>useSSL</code>, or <code>sslmode</code> in <code>DATABASE_URL</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">ConnectionConfig</span><span class="p">(</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1">// ... host, user, password, database as before</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="c1">// ... host, user, password, database</span>
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'sslMode'</span><span class="o">:</span><span class="w"> </span><span class="s1">'verify-full'</span><span class="p">},</span>
 </span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">),</span>
@@ -7436,159 +7477,45 @@
 </thead>
 <tbody>
 <tr>
-<td><code>disable</code></td>
+<td>disable</td>
 <td>No TLS. The default.</td>
 </tr>
 <tr>
-<td><code>prefer</code></td>
+<td>prefer</td>
 <td>TLS when the server has it. No certificate check.</td>
 </tr>
 <tr>
-<td><code>require</code></td>
+<td>require</td>
 <td>TLS. No certificate check, like libpq. <code>useSSL: true</code> gives this mode.</td>
 </tr>
 <tr>
-<td><code>verify-ca</code></td>
+<td>verify-ca</td>
 <td>TLS. The certificate is checked, the host name is not.</td>
 </tr>
 <tr>
-<td><code>verify-full</code></td>
+<td>verify-full</td>
 <td>TLS. The certificate and the host name are checked.</td>
 </tr>
 </tbody>
 </table>
-<p>Use <code>verify-full</code> if your host supports it. In mode <code>require</code>, Dox prints a warning (once per isolate), because the server certificate is not checked. To hide it, set <code>extra['sslWarning']</code> to <code>false</code>, or add <code>sslWarning=false</code> to <code>DATABASE_URL</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Mode require does not check the server certificate. Use verify-full when your host supports it. Dox prints one warning per isolate for require.</p>
+</div>
 <h3 id="trusting-your-own-ca">Trusting your own CA</h3>
-<p>By default, <code>verify-ca</code> and <code>verify-full</code> trust the Mozilla roots and the roots of the system. If your database uses another CA (for example the CA bundle of your cloud database, or a self-signed CA in development), give the path of a PEM file in <code>extra['sslRootCert']</code>:</p>
+<p>verify-ca and verify-full trust the Mozilla roots and the roots of the system. For another CA, give a PEM file in <code>extra['sslRootCert']</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="s1">'sslMode'</span><span class="o">:</span><span class="w"> </span><span class="s1">'verify-full'</span><span class="p">,</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="s1">'sslRootCert'</span><span class="o">:</span><span class="w"> </span><span class="s1">'/etc/ssl/certs/db-ca.pem'</span><span class="p">,</span>
 </span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="p">},</span>
 </span></code></pre></div>
-<p>Or use <code>sslrootcert</code> in the url:</p>
+<p>In the url, use <code>sslrootcert</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://app:secret@db.example.com/blog?sslmode<span class="o">=</span>verify-full<span class="p">&amp;</span><span class="nv">sslrootcert</span><span class="o">=</span>/etc/ssl/certs/db-ca.pem
 </span></code></pre></div>
-<p>Then <code>verify-ca</code> and <code>verify-full</code> trust only the certificates in that file. <code>prefer</code> and <code>require</code> do not use it. A missing file, or a file with no valid certificate, throws <code>PgException</code> when the pool opens.</p>
-<h2 id="options">Options</h2>
-<p>The driver reads these keys from <code>extra</code> of the <code>ConnectionConfig</code>:</p>
-<table>
-<thead>
-<tr>
-<th>Key</th>
-<th>Default</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>maxConnectionCount</code></td>
-<td><code>10</code></td>
-<td>Most connections in the pool, for the whole process.</td>
-</tr>
-<tr>
-<td><code>requestTimeout</code></td>
-<td>300 s</td>
-<td>The longest wait for one request.</td>
-</tr>
-<tr>
-<td><code>maxConnectionAge</code></td>
-<td>no limit</td>
-<td>A connection older than this is closed once it has no query.</td>
-</tr>
-<tr>
-<td><code>idleTimeout</code></td>
-<td>no limit</td>
-<td>A free connection not used for this long is closed.</td>
-</tr>
-<tr>
-<td><code>sslMode</code></td>
-<td><code>disable</code></td>
-<td>TLS mode, see <a href="#tls">TLS</a>.</td>
-</tr>
-<tr>
-<td><code>sslRootCert</code></td>
-<td>none</td>
-<td>Path of a PEM file with the CA certificates to trust for <code>verify-ca</code> and <code>verify-full</code>, see <a href="#tls">TLS</a>.</td>
-</tr>
-<tr>
-<td><code>timeZone</code></td>
-<td><code>UTC</code></td>
-<td>Time zone of the session.</td>
-</tr>
-<tr>
-<td><code>applicationName</code></td>
-<td>none</td>
-<td>Name of the app in <code>pg_stat_activity</code>.</td>
-</tr>
-</tbody>
-</table>
-<p>The pool settings are explained in <a href="../#pool-settings">Pool settings</a>.</p>
-<p>Isolates that open a pool with the same settings share one pool in Rust. So <code>maxConnectionCount</code> is for the whole process, not per isolate.</p>
-<h2 id="using-the-pool-without-the-orm">Using the pool without the ORM</h2>
-<p>If you do not use the ORM, open a <code>PgNativePool</code> and run queries on it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">);</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = @id'</span><span class="p">,</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">);</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
-</span></code></pre></div>
-<p><code>parameters</code> is a map for <code>@name</code>, or a list for <code>$1, $2</code>. To make a pool from a url, use <code>PgNativePool.fromUrl('postgres://user:pass@host:5432/db?sslmode=require')</code>.</p>
-<h3 id="transactions">Transactions</h3>
-<p>A transaction runs on one connection, and its queries run in the order you send them:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'UPDATE users SET name = @n'</span><span class="p">,</span><span class="w"> </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'n'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
-</span></code></pre></div>
-<h3 id="pool-settings">Pool settings</h3>
-<p>All pool settings are optional. Pass them to <code>PgNativePool.open</code>. <code>fromUrl</code> takes the same three:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="nl">requestTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="nl">maxConnectionAge:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
-</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span>
-</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>They work like the <a href="../#pool-settings">ORM pool settings</a>. When a request goes over <code>requestTimeout</code>, it fails with a <code>PgException</code> that says <code>timeout</code>, and a CancelRequest stops the query on the server.</p>
-<h3 id="cancelling-a-query">Cancelling a query</h3>
-<p>Sometimes a query takes too long and you want to stop it. Pass a <code>PgCancelToken</code> and call <code>cancel()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">PgCancelToken</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgCancelToken</span><span class="p">();</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">PgNativeResult</span><span class="o">&gt;</span><span class="w"> </span><span class="n">slow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'SELECT pg_sleep(60)'</span><span class="p">,</span><span class="w"> </span><span class="nl">cancelToken:</span><span class="w"> </span><span class="n">token</span><span class="p">);</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">token</span><span class="p">.</span><span class="n">cancel</span><span class="p">();</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">slow</span><span class="p">;</span>
-</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">PgQueryCancelledException</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'stopped'</span><span class="p">);</span>
-</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>If the query has not started, it does not run. If it is running, the driver sends a Postgres CancelRequest and the future fails with <code>PgQueryCancelledException</code>. If it already ended, you keep the result.</p>
-<p>In a transaction, a cancelled query is an error, so Postgres aborts the transaction. Roll it back then. In the ORM, use <a href="../query-builder/#cancelling-a-query"><code>cancelWith()</code></a>.</p>
-<h3 id="streaming-rows">Streaming rows</h3>
-<p>For a big result, you do not want all rows in memory at once. <code>stream</code> gives the rows in chunks. Each chunk is a <code>PgNativeResult</code> with up to <code>chunkSize</code> rows (default 1000):</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">await</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">chunk</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">stream</span><span class="p">(</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="s1">'SELECT * FROM events WHERE day = @day'</span><span class="p">,</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'day'</span><span class="o">:</span><span class="w"> </span><span class="s1">'2026-01-01'</span><span class="p">},</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nl">chunkSize:</span><span class="w"> </span><span class="m">500</span><span class="p">,</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">chunk</span><span class="p">.</span><span class="n">rows</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">    </span><span class="c1">// ...</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>The driver asks for the next chunk only when your listener is ready, so only about two chunks are in memory, even for millions of rows. Stop listening (<code>break</code> in <code>await for</code>) to stop the query. In the ORM, use <a href="../query-builder/#streaming-results"><code>cursor()</code></a>.</p>
+<p>Then only the certificates in that file are trusted. A missing or bad file throws a <code>PgException</code> when the pool opens.</p>
 <h2 id="values-and-types">Values and types</h2>
-<p>You send plain Dart values: <code>null</code>, <code>bool</code>, <code>int</code>, <code>double</code>, <code>String</code>, <code>DateTime</code>, <code>Duration</code> (an interval), <code>Uint8List</code> (bytea), <code>Map</code> (json) and <code>List</code> (an array, for example for <code>int4[]</code>). The server picks the type. If it can not, add a cast in the SQL, like <code>@id::int8</code>.</p>
-<p>A <code>List</code> is an array, not json. On insert and update the ORM sends a <code>List</code> as json text, so a <code>List</code> in a json column works. With the pool alone, send <code>jsonEncode(list)</code> for a json column.</p>
-<p>Rows come back with these Dart types:</p>
+<p>Send plain Dart values: null, a bool, an <code>int</code>, a <code>double</code>, a <code>String</code>, a <code>DateTime</code>, a <code>Duration</code> (interval), a <code>Uint8List</code> (bytea), a <code>Map</code> (json) or a <code>List</code> (an array). If the server can not pick the type, add a cast, like <code>@id::int8</code>.</p>
+<p>The ORM sends a <code>List</code> as json text on insert and update. With the pool alone, send <code>jsonEncode(list)</code> for a json column.</p>
 <table>
 <thead>
 <tr>
@@ -7598,51 +7525,51 @@
 </thead>
 <tbody>
 <tr>
-<td><code>int2</code>, <code>int4</code>, <code>int8</code></td>
+<td>int2, int4, int8</td>
 <td><code>int</code></td>
 </tr>
 <tr>
-<td><code>float4</code>, <code>float8</code></td>
+<td>float4, float8</td>
 <td><code>double</code></td>
 </tr>
 <tr>
-<td><code>numeric</code></td>
+<td>numeric</td>
 <td><code>String</code></td>
 </tr>
 <tr>
-<td><code>text</code>, <code>varchar</code>, <code>char</code></td>
+<td>text, varchar, char</td>
 <td><code>String</code></td>
 </tr>
 <tr>
-<td><code>bool</code></td>
+<td>bool</td>
 <td><code>bool</code></td>
 </tr>
 <tr>
-<td><code>timestamp</code>, <code>timestamptz</code>, <code>date</code></td>
+<td>timestamp, timestamptz, date</td>
 <td><code>DateTime</code> in UTC</td>
 </tr>
 <tr>
-<td><code>infinity</code> dates</td>
-<td>the text <code>'infinity'</code> or <code>'-infinity'</code></td>
+<td>infinity dates</td>
+<td>the text 'infinity' or '-infinity'</td>
 </tr>
 <tr>
-<td><code>time</code></td>
-<td><code>String</code>, like <code>'13:45:01.5'</code></td>
+<td>time</td>
+<td><code>String</code>, like '13:45:01.5'</td>
 </tr>
 <tr>
-<td><code>interval</code></td>
+<td>interval</td>
 <td><code>Duration</code> (a month is 30 days)</td>
 </tr>
 <tr>
-<td><code>json</code>, <code>jsonb</code></td>
+<td>json, jsonb</td>
 <td>the decoded JSON value</td>
 </tr>
 <tr>
-<td><code>uuid</code></td>
+<td>uuid</td>
 <td><code>String</code></td>
 </tr>
 <tr>
-<td><code>bytea</code></td>
+<td>bytea</td>
 <td><code>Uint8List</code></td>
 </tr>
 <tr>
@@ -7650,35 +7577,101 @@
 <td><code>List</code></td>
 </tr>
 <tr>
-<td><code>NULL</code></td>
-<td><code>null</code></td>
+<td>NULL</td>
+<td>null</td>
 </tr>
 </tbody>
 </table>
-<p>Other types come back as <code>Uint8List</code>.</p>
+<p>Other types come back as a <code>Uint8List</code>.</p>
 <h2 id="handling-errors">Handling errors</h2>
-<p>A server error throws <code>PgServerException</code>. Its <code>code</code> is the SQLSTATE, like <code>23505</code> for a unique violation, so you can check for the error you expect:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">).</span><span class="n">insert</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">email</span><span class="p">});</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">PgServerException</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'23505'</span><span class="p">)</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">'taken: </span><span class="si">${</span><span class="n">error</span><span class="p">.</span><span class="n">constraint</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">}</span>
+<p>A server error throws a <code>PgServerException</code>. Its <code>code</code> is the SQLSTATE, like 23505 for a unique violation:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'users'</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">      </span><span class="p">.</span><span class="n">insert</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">email</span><span class="p">});</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">PgServerException</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">error</span><span class="p">.</span><span class="n">code</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'23505'</span><span class="p">)</span><span class="w"> </span><span class="n">print</span><span class="p">(</span><span class="s1">'taken: </span><span class="si">${</span><span class="n">error</span><span class="p">.</span><span class="n">constraint</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>PgServerException</code> also has <code>severity</code> and <code>message</code>, and <code>detail</code>, <code>hint</code>, <code>schema</code>, <code>table</code>, <code>column</code> and <code>constraint</code> when the server sends them.</p>
-<p>Other errors, like the server is down, a TLS error or a timeout, throw <code>PgException</code>. A query stopped with a cancel token throws <code>PgQueryCancelledException</code>, which is a <code>PgException</code>. All of them come from <code>package:dox_orm/dox_orm.dart</code>.</p>
-<h2 id="details">Details</h2>
-<p>This section is for special cases. Most apps do not need it.</p>
+<p>It also has <code>severity</code> and <code>message</code>, and <code>detail</code>, <code>hint</code>, <code>schema</code>, <code>table</code>, <code>column</code> and <code>constraint</code> when the server sends them.</p>
+<p>Other errors, like a down server, TLS or a timeout, throw a <code>PgException</code>. A cancelled query throws a <code>PgQueryCancelledException</code>, which is a <code>PgException</code>. All of them come from <code>package:dox_orm/dox_orm.dart</code>.</p>
+<h2 id="without-dox">Without Dox</h2>
+<h3 id="opening-a-pool">Opening a pool</h3>
+<p><code>PgNativePool.open</code> opens a pool. <code>query</code> runs SQL and returns a <code>PgNativeResult</code> with <code>columns</code> and <code>rows</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="p">);</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="s1">'SELECT id, name FROM users WHERE id = @id'</span><span class="p">,</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="p">);</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">rows</span><span class="p">);</span><span class="w"> </span><span class="c1">// [{id: 1, name: Ada}]</span>
+</span></code></pre></div>
+<p><code>parameters</code> is a map for <code>@name</code>, or a list for <code>$1, $2</code>. A host that starts with <code>/</code> is a Unix socket folder.</p>
+<h3 id="pool-settings">Pool settings</h3>
+<p><code>open</code> also takes <code>port</code> (5432), <code>maxConnections</code> (10), <code>timeZone</code>, <code>applicationName</code>, <code>sslMode</code>, <code>sslRootCert</code>, <code>requestTimeout</code>, <code>maxConnectionAge</code> and <code>idleTimeout</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">open</span><span class="p">(</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nl">host:</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">,</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nl">user:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nl">password:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">,</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">  </span><span class="nl">maxConnections:</span><span class="w"> </span><span class="m">20</span><span class="p">,</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="nl">requestTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a><span class="w">  </span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>A request over <code>requestTimeout</code> fails with a timeout <code>PgException</code>.</p>
+<h3 id="pool-from-a-url">Pool from a url</h3>
+<p><code>PgNativePool.fromUrl</code> reads sslmode, sslrootcert and application_name from the url:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">fromUrl</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span><span class="s1">'postgres://user:pass@host:5432/db?sslmode=require'</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="transactions">Transactions</h3>
+<p><code>begin</code> gives a transaction id. Pass it as <code>transaction</code> to each query:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">tx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">begin</span><span class="p">();</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'UPDATE users SET name = @n'</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'n'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">},</span><span class="w"> </span><span class="nl">transaction:</span><span class="w"> </span><span class="n">tx</span><span class="p">);</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">commit</span><span class="p">(</span><span class="n">tx</span><span class="p">);</span><span class="w"> </span><span class="c1">// or pool.rollback(tx)</span>
+</span></code></pre></div>
+<h3 id="cancelling-a-query">Cancelling a query</h3>
+<p>Pass a <code>PgCancelToken</code> and call <code>cancel()</code>. <code>isCancelled</code> is true after it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">PgCancelToken</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgCancelToken</span><span class="p">();</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">PgNativeResult</span><span class="o">&gt;</span><span class="w"> </span><span class="n">slow</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="n">pool</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'SELECT pg_sleep(60)'</span><span class="p">,</span><span class="w"> </span><span class="nl">cancelToken:</span><span class="w"> </span><span class="n">token</span><span class="p">);</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">token</span><span class="p">.</span><span class="n">cancel</span><span class="p">();</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">slow</span><span class="p">;</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">}</span><span class="w"> </span><span class="kd">on</span><span class="w"> </span><span class="n">PgQueryCancelledException</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'stopped'</span><span class="p">);</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>In a transaction, a cancelled query aborts the transaction, so roll it back. In the ORM, use <a href="../query-builder/#cancelling-a-query"><code>cancelWith()</code></a>.</p>
+<h3 id="streaming-rows">Streaming rows</h3>
+<p><code>stream</code> gives the rows in chunks of up to <code>chunkSize</code> rows, 1000 by default. About two chunks are in memory at a time:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">await</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">PgNativeResult</span><span class="w"> </span><span class="n">chunk</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">pool</span><span class="p">.</span><span class="n">stream</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="s1">'SELECT * FROM events WHERE day = @day'</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nl">parameters:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'day'</span><span class="o">:</span><span class="w"> </span><span class="s1">'2026-01-01'</span><span class="p">},</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nl">chunkSize:</span><span class="w"> </span><span class="m">500</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">chunk</span><span class="p">.</span><span class="n">rows</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="c1">// ...</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Stop the loop with <code>break</code> to stop the query. In the ORM, use <a href="../query-builder/#streaming-results"><code>cursor()</code></a>.</p>
+<h3 id="sharing-and-closing-a-pool">Sharing and closing a pool</h3>
+<p><code>pool.handle</code> is an <code>int</code> that works in every isolate of the process. Open the same pool there with <code>PgNativePool.fromHandle(handle)</code>. <code>close()</code> gives back one open, and the last close closes the pool:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">PgNativePool</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PgNativePool</span><span class="p">.</span><span class="n">fromHandle</span><span class="p">(</span><span class="n">pool</span><span class="p">.</span><span class="n">handle</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">pool</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>A <code>driverFactory</code> on the connection wins over the native driver: the ORM uses your driver.</li>
-<li>The pool closes when the last isolate closes it. You can give <code>driver.pool.handle</code> (an <code>int</code>) to another isolate and use <code>PostgresNativeDriver(PgNativePool.fromHandle(handle))</code> there. <code>PostgresNativeDriver</code> comes from <code>package:dox_orm/dox_orm.dart</code>.</li>
-<li>Isolates share one pool only when all settings are the same.</li>
-<li>Each connection keeps up to 512 prepared statements. When it is full, it drops the one used longest ago.</li>
-<li>A <code>CREATE</code>, <code>ALTER</code> or <code>DROP</code> makes every connection prepare its statements again. So run <code>CREATE TEMP TABLE</code> or <code>DROP</code> once at start up, not on every request.</li>
-<li><code>maxConnectionAge</code> also helps to follow a DNS change after a failover. A connection is never closed while a query or a transaction uses it.</li>
-<li>A query with a cancel token gets a connection for itself, so the cancel can not stop another query. One token can stop many queries. Use it in the isolate that made it. The CancelRequest goes in plain text on a new connection, like libpq before Postgres 17.</li>
-<li>A stream runs on a server-side portal and starts when you listen. It holds one connection until it ends, and a paused listener that waits longer than <code>requestTimeout</code> fails with a timeout. <code>cancelToken</code> stops it too, and then the stream fails with <code>PgQueryCancelledException</code>. An error comes as a stream error, then the stream ends. It works in a transaction (<code>transaction: tx</code>), and other queries of that transaction wait until the stream ends.</li>
-<li>Speed: a find-by-id query takes about 60 µs alone, and about 12.5 µs each with 64 queries in flight (AOT build, local Postgres 14, Apple M-series). See <a href="../../digging-deeper/performance/#database-drivers">Performance: database drivers</a>.</li>
-<li>If you see a problem, please <a href="https://github.com/dartondox/dox-postgres-native/issues">open an issue</a>.</li>
+<li><a href="../">Database</a>: connections and settings.</li>
+<li><a href="../mysql-native/">Native MySQL driver</a>: the MySQL driver.</li>
+<li><a href="../../digging-deeper/performance/#database-drivers">Performance: database drivers</a>: driver speed.</li>
 </ul>
 
 
@@ -7799,7 +7792,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

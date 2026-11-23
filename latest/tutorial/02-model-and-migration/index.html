@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1009,10 +1011,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -5210,10 +5212,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5339,95 +5337,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7213,10 +7122,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next
+        Next steps
       
     </span>
   </a>
@@ -7240,19 +7149,14 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/tutorial/02-model-and-migration.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="step-2-model-and-migration">Step 2: Model and migration</h1>
-<p>In this step you make the <code>posts</code> table with a migration, and a <code>Post</code> model to read and write it.</p>
+<p>In this step you make the posts table with a migration, and a <code>Post</code> model to read and write it.</p>
 <h2 id="1-make-the-model-and-the-migration">1. Make the model and the migration</h2>
-<p>Stop <code>dox s</code> first with <code>Ctrl+C</code>. You need to do this because <code>dox s</code> restarts the server when a new file appears, and the server runs new migrations at start. So it would run the new migration before you add the columns.</p>
-<p>Now make the model and its migration:</p>
+<p>Stop <code>dox s</code> first with Ctrl+C. The server runs new migrations when it starts, so it would run the migration before you add the columns.</p>
+<p>Make the model and its migration:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Post<span class="w"> </span>-m
 </span></code></pre></div>
 <p>This makes two files and updates one:</p>
@@ -7278,9 +7182,8 @@
 </tr>
 </tbody>
 </table>
-<p>The <code>dox migration:*</code> commands run <code>bin/migrate.dart</code>, which the template already has.</p>
 <h2 id="2-add-the-columns-to-the-migration">2. Add the columns to the migration</h2>
-<p>A new migration has no columns yet. Open the new file in <code>db/migration</code> and add <code>title</code> and <code>body</code>:</p>
+<p>Open the new file in <code>db/migration</code> and add a title and a body:</p>
 <div class="language-dart highlight"><span class="filename">db/migration/2026_10_22_205345_create_posts_table.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1">// ignore_for_file: file_names</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_migration/dox_migration.dart'</span><span class="p">;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -7301,12 +7204,9 @@
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="p">}</span>
 </span></code></pre></div>
-<ul>
-<li><code>table.id()</code> makes an auto increment primary key.</li>
-<li><code>table.timestamps()</code> makes <code>created_at</code> and <code>updated_at</code>. The model fills them for you.</li>
-</ul>
+<p><code>table.id()</code> makes an auto increment primary key. <code>table.timestamps()</code> makes the created_at and updated_at columns, and the model fills them.</p>
 <h2 id="3-add-the-fields-to-the-model">3. Add the fields to the model</h2>
-<p>The model needs one field for each column you added:</p>
+<p>Add one field for each new column:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/models/post/post.model.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'post.model.g.dart'</span><span class="p">;</span>
@@ -7323,9 +7223,9 @@
 </span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">body</span><span class="p">;</span>
 </span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Every column field is nullable, because a new <code>Post()</code> has no values yet. You do not declare <code>id</code>, <code>createdAt</code> and <code>updatedAt</code>, because they come from <code>PostGenerator</code>.</p>
+<p>Each field is nullable, because a new <code>Post()</code> has no values. The id and the timestamps come from <code>PostGenerator</code>.</p>
 <h2 id="4-see-how-migrations-run">4. See how migrations run</h2>
-<p>You do not need to change anything here. The template's <code>bin/server.dart</code> already runs the migrations before the server starts:</p>
+<p>You do not change anything here. The template's <code>bin/server.dart</code> runs the migrations before the server starts:</p>
 <div class="language-dart highlight"><span class="filename">bin/server.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../db/migration/migrations.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="kt">void</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
@@ -7341,33 +7241,32 @@
 </span></code></pre></div>
 <p>This also works in the native binary of <a href="../07-build-and-deploy/">step 7</a>.</p>
 <h2 id="5-run-the-migration-and-the-generator">5. Run the migration and the generator</h2>
-<p>Run the new migration now:</p>
+<p>Run the new migration:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>dox<span class="w"> </span>migration:run
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Migrating: 2026_10_22_205345_create_posts_table
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Migrated: 2026_10_22_205345_create_posts_table
 </span></code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">The migration ran too early?</p>
-<p>If <code>dox s</code> was still running, the <code>posts</code> table may already exist without <code>title</code> and <code>body</code>. Run <code>dox migration:rollback</code>, then <code>dox migration:run</code> again.</p>
-</div>
-<p>The model also needs its generated file <code>post.model.g.dart</code>. <code>dox s</code> makes it while it runs. If <code>dox s</code> is not running, run the generator once:</p>
+<p>If <code>dox s</code> was still on, the table can exist without the new columns. Then run <code>dox migration:rollback</code> and <code>dox migration:run</code> again.</p>
+<p>The model also needs its generated file. <code>dox s</code> makes it, so if the server is off, run the generator one time:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
 <h2 id="check-it">Check it</h2>
 <p>See which migrations ran:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>dox<span class="w"> </span>migration:status
 </span></code></pre></div>
-<p>You should see:</p>
+<p>You see:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>Migration                                 Batch  Status
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>2023_07_16_131937700_create_users_table   1      Ran
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>2026_10_25_000000000_create_queue_tables  1      Ran
 </span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>2026_10_22_205345_create_posts_table      2      Ran
 </span></code></pre></div>
-<p>The first two come with the template. The server ran them at the first start in step 1.</p>
-<p>Now start the server again with <code>dox s</code>.</p>
-<h2 id="next">Next</h2>
-<p><a href="../03-routes-and-controller/">Step 3: Routes and controller</a></p>
+<p>The first two come with the template. The server ran them in step 1.</p>
+<p>Start the server again with <code>dox s</code>.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../03-routes-and-controller/">Step 3: Routes and controller</a>: add the post routes.</li>
+</ul>
 
 
 
@@ -7487,7 +7386,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

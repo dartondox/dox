@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6145,21 +6054,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7304,21 +7202,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7342,17 +7229,12 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/environments.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="environments">Environments</h1>
 <p>Run the same app in development, staging and production with different config, and keep secrets out of git and out of the image.</p>
-<p>Your app needs different values in each place it runs: another database, another log format, another front-end URL. You should not put these values, and above all your secrets, in the code. So Dox reads them from the environment.</p>
+<p>Each place needs other values, like another database or front-end URL. Dox reads them from the environment, not from the code.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Dox app.</li>
@@ -7364,9 +7246,9 @@
 <li>A real environment variable (from the shell, Docker or systemd). This one wins.</li>
 <li>The <code>.env</code> file in the folder where the app starts.</li>
 </ol>
-<p>So use a <code>.env</code> file on your machine, and real environment variables on a server. On a server the <code>.env</code> file is optional.</p>
+<p>So use a <code>.env</code> file on your machine, and real environment variables on a server.</p>
 <h2 id="1-the-typed-env-class">1. The typed env class</h2>
-<p>A new project already has <code>lib/config/env.dart</code>. Its <code>AppEnv</code> class lists every key, with its type and its default. In this guides app, <code>corsOrigin</code> and <code>appUrl</code> are added keys. The rest comes with a new project.</p>
+<p>The <code>AppEnv</code> class in <code>lib/config/env.dart</code> lists every key, with its type and its default. This guides app adds <code>corsOrigin</code> and <code>appUrl</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'env.g.dart'</span><span class="p">;</span>
@@ -7375,79 +7257,81 @@
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1">/// -------------------------------</span>
 </span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1">/// Each getter reads one key: `appName` reads `APP_NAME`.</span>
 </span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="c1">/// A getter body is the default. A nullable getter is optional.</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1">/// Other getters are required: the app stops at startup when one is missing.</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1">/// Run `dart run build_runner build` after you change this class.</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="nd">@DoxEnv</span><span class="p">()</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">AppEnv</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="c1">/// reads and checks every key once</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">AppEnv</span><span class="w"> </span><span class="n">load</span><span class="p">([</span><span class="n">EnvReader</span><span class="o">?</span><span class="w"> </span><span class="n">reader</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">_$AppEnv</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">reader</span><span class="p">);</span>
-</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'dox'</span><span class="p">;</span>
-</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>
-</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">  </span><span class="c1">/// development, staging or production. Not set: production.</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appEnv</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'production'</span><span class="p">;</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appPort</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="m">3000</span><span class="p">;</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>
-</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="w">  </span><span class="c1">/// required: used to sign tokens and encrypt cookies</span>
-</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appKey</span><span class="p">;</span>
-</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>
-</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">  </span><span class="c1">/// isolates (threads) of the HTTP server. Null: one per CPU the process may use.</span>
-</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">  </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appTotalIsolate</span><span class="p">;</span>
-</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>
-</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">logLevel</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'info'</span><span class="p">;</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="c1">/// Other getters are required: the app stops at startup when one is</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1">/// missing.</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="c1">/// Run `dart run build_runner build` after you change this class.</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="nd">@DoxEnv</span><span class="p">()</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="kd">abstract</span><span class="w"> </span><span class="kd">class</span><span class="w"> </span><span class="nc">AppEnv</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="w">  </span><span class="c1">/// reads and checks every key once</span>
+</span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">AppEnv</span><span class="w"> </span><span class="n">load</span><span class="p">([</span><span class="n">EnvReader</span><span class="o">?</span><span class="w"> </span><span class="n">reader</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">_$AppEnv</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">reader</span><span class="p">);</span>
+</span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>
+</span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'dox'</span><span class="p">;</span>
+</span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">  </span><span class="c1">/// development, staging or production. Not set: production.</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appEnv</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'production'</span><span class="p">;</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>
+</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">  </span><span class="kt">int</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appPort</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="m">3000</span><span class="p">;</span>
+</span><span id="__span-0-25"><a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>
+</span><span id="__span-0-26"><a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">  </span><span class="c1">/// required: used to sign tokens and encrypt cookies</span>
+</span><span id="__span-0-27"><a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appKey</span><span class="p">;</span>
+</span><span id="__span-0-28"><a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>
+</span><span id="__span-0-29"><a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="w">  </span><span class="c1">/// isolates (threads) of the HTTP server.</span>
+</span><span id="__span-0-30"><a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">  </span><span class="c1">/// Null: one per CPU the process may use.</span>
+</span><span id="__span-0-31"><a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="w">  </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appTotalIsolate</span><span class="p">;</span>
 </span><span id="__span-0-32"><a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>
-</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">  </span><span class="c1">/// memory, file or redis</span>
-</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">cacheStore</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'file'</span><span class="p">;</span>
-</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>
-</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">  </span><span class="c1">/// local, s3 or memory</span>
-</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">storageDisk</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'local'</span><span class="p">;</span>
-</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>
-</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">  </span><span class="c1">/// sqlite, postgres or mysql</span>
-</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbConnection</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'sqlite'</span><span class="p">;</span>
-</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>
-</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="w">  </span><span class="c1">/// the database name. For SQLite: the file path.</span>
-</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'db/dox.sqlite'</span><span class="p">;</span>
-</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>
-</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbHost</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">;</span>
+</span><span id="__span-0-33"><a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">logLevel</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'info'</span><span class="p">;</span>
+</span><span id="__span-0-34"><a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>
+</span><span id="__span-0-35"><a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a><span class="w">  </span><span class="c1">/// memory, file or redis</span>
+</span><span id="__span-0-36"><a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">cacheStore</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'file'</span><span class="p">;</span>
+</span><span id="__span-0-37"><a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>
+</span><span id="__span-0-38"><a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a><span class="w">  </span><span class="c1">/// local, s3 or memory</span>
+</span><span id="__span-0-39"><a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">storageDisk</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'local'</span><span class="p">;</span>
+</span><span id="__span-0-40"><a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>
+</span><span id="__span-0-41"><a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a><span class="w">  </span><span class="c1">/// sqlite, postgres or mysql</span>
+</span><span id="__span-0-42"><a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbConnection</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'sqlite'</span><span class="p">;</span>
+</span><span id="__span-0-43"><a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>
+</span><span id="__span-0-44"><a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a><span class="w">  </span><span class="c1">/// the database name. For SQLite: the file path.</span>
+</span><span id="__span-0-45"><a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'db/dox.sqlite'</span><span class="p">;</span>
 </span><span id="__span-0-46"><a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>
-</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a><span class="w">  </span><span class="c1">/// null: 5432 for Postgres, 3306 for MySQL</span>
-</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a><span class="w">  </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbPort</span><span class="p">;</span>
-</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>
-</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbUsername</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">;</span>
+</span><span id="__span-0-47"><a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbHost</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">;</span>
+</span><span id="__span-0-48"><a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>
+</span><span id="__span-0-49"><a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a><span class="w">  </span><span class="c1">/// null: 5432 for Postgres, 3306 for MySQL</span>
+</span><span id="__span-0-50"><a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a><span class="w">  </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbPort</span><span class="p">;</span>
 </span><span id="__span-0-51"><a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>
-</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbPassword</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+</span><span id="__span-0-52"><a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbUsername</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'postgres'</span><span class="p">;</span>
 </span><span id="__span-0-53"><a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>
-</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a><span class="w">  </span><span class="c1">/// the front-end URL that may call the API</span>
-</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">corsOrigin</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'http://localhost:5173'</span><span class="p">;</span>
-</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>
-</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a><span class="w">  </span><span class="c1">/// the public URL of this app, used in file links</span>
-</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appUrl</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'http://localhost:3000'</span><span class="p">;</span>
-</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a><span class="p">}</span>
-</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>
-</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a><span class="c1">/// The env of the app. Read and checked once, on first use.</span>
-</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a><span class="kd">final</span><span class="w"> </span><span class="n">AppEnv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppEnv</span><span class="p">.</span><span class="n">load</span><span class="p">();</span>
+</span><span id="__span-0-54"><a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">dbPassword</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+</span><span id="__span-0-55"><a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>
+</span><span id="__span-0-56"><a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a><span class="w">  </span><span class="c1">/// the front-end URL that may call the API</span>
+</span><span id="__span-0-57"><a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">corsOrigin</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'http://localhost:5173'</span><span class="p">;</span>
+</span><span id="__span-0-58"><a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>
+</span><span id="__span-0-59"><a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a><span class="w">  </span><span class="c1">/// the public URL of this app, used in file links</span>
+</span><span id="__span-0-60"><a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">appUrl</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'http://localhost:3000'</span><span class="p">;</span>
+</span><span id="__span-0-61"><a id="__codelineno-0-61" name="__codelineno-0-61" href="#__codelineno-0-61"></a><span class="p">}</span>
+</span><span id="__span-0-62"><a id="__codelineno-0-62" name="__codelineno-0-62" href="#__codelineno-0-62"></a>
+</span><span id="__span-0-63"><a id="__codelineno-0-63" name="__codelineno-0-63" href="#__codelineno-0-63"></a><span class="c1">/// The env of the app. Read and checked once, on first use.</span>
+</span><span id="__span-0-64"><a id="__codelineno-0-64" name="__codelineno-0-64" href="#__codelineno-0-64"></a><span class="kd">final</span><span class="w"> </span><span class="n">AppEnv</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppEnv</span><span class="p">.</span><span class="n">load</span><span class="p">();</span>
 </span></code></pre></div>
-<p>Each getter reads the key with the same name in UPPER_SNAKE case, so <code>dbPort</code> reads <code>DB_PORT</code>. The getter decides if the key is needed:</p>
+<p>Each getter reads its name in upper snake case, so <code>dbPort</code> reads <code>DB_PORT</code>:</p>
 <ul>
 <li>A getter with a body has a default: <code>int get appPort =&gt; 3000;</code>.</li>
-<li>A nullable getter with no body is optional: <code>int? get dbPort;</code> is <code>null</code> when the key is not set.</li>
+<li>A nullable getter with no body is optional: <code>int? get dbPort;</code> is null when the key is not set.</li>
 <li>Any other getter with no body is required: <code>String get appKey;</code>.</li>
 </ul>
-<p>If a required key is missing, the app stops at start and lists all the problems. <code>build_runner</code> makes the part file <code>env.g.dart</code>.</p>
+<p>If a required key is missing, the app stops at start and lists all the problems.</p>
 <h2 id="2-add-a-key">2. Add a key</h2>
-<p>When your app needs a new value, add a getter for it. For example, if the app needs a mail host, add this getter to <code>AppEnv</code>:</p>
+<p>For a new value, add a getter to <code>AppEnv</code>, like this mail host:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="w">  </span><span class="c1">/// the SMTP server for mails</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">mailHost</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'localhost'</span><span class="p">;</span>
 </span></code></pre></div>
 <p>Then run <code>build_runner</code> again:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build<span class="w"> </span>--delete-conflicting-outputs
 </span></code></pre></div>
-<p>Now <code>env.mailHost</code> reads <code>MAIL_HOST</code>. Add <code>MAIL_HOST</code> to <code>.env.example</code> too, so other developers know the key exists.</p>
+<p>Now <code>env.mailHost</code> reads <code>MAIL_HOST</code>. Add the key to <code>.env.example</code> too.</p>
 <h2 id="3-use-it-in-the-config-files">3. Use it in the config files</h2>
-<p>The config files read the typed getters. If a setting must differ per environment, base it on <code>APP_ENV</code>, like <code>prettyPrint</code> and <code>debug</code> here:</p>
+<p>The config files read the typed getters. For a setting that changes per environment, use <code>APP_ENV</code>, like <code>prettyPrint</code> and <code>debug</code> here. Development is an <code>APP_ENV</code> of development, local, test or testing. Any other value is production:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/logger.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
@@ -7455,12 +7339,14 @@
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appName</span><span class="p">,</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nl">enabled:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nl">level:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">logLevel</span><span class="p">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="c1">// colors on your machine, one JSON line per log in staging and production.</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="c1">// Env.appEnv, not appConfig.isDevelopment: appConfig is built from</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="c1">// this logger, so reading appConfig here would loop.</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="nl">prettyPrint:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="n">appEnv</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'development'</span><span class="p">,</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">);</span>
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span><span class="c1">// colors on your machine, one JSON line per log in staging and</span>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="c1">// production.</span>
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="c1">// Env.appEnv, not appConfig.isDevelopment: appConfig is built from</span>
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="c1">// this logger, so reading appConfig here would loop.</span>
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="nl">prettyPrint:</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="n">appEnv</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'development'</span><span class="p">,</span>
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">);</span>
 </span></code></pre></div>
+<p>The database prints every query in development only:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
@@ -7487,7 +7373,7 @@
 </span><span id="__span-4-24"><a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="4-write-the-env-files">4. Write the env files</h2>
-<p>You should commit <code>.env.example</code>, because it shows every key with a safe value. Never commit <code>.env</code>, because it holds your real secrets.</p>
+<p>Commit <code>.env.example</code> with every key and a safe value. Never commit <code>.env</code>, because it holds your real secrets:</p>
 <div class="language-ini highlight"><span class="filename">.env.example</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="na">APP_NAME</span><span class="o">=</span><span class="s">my_app</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="na">APP_ENV</span><span class="o">=</span><span class="s">development</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span>
@@ -7514,7 +7400,7 @@
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>.env.*
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>!.env.example
 </span></code></pre></div>
-<p>This is where the values live in each environment:</p>
+<p>The values live in a different place in each environment:</p>
 <table>
 <thead>
 <tr>
@@ -7527,31 +7413,31 @@
 <tr>
 <td>your machine</td>
 <td><code>.env</code></td>
-<td><code>development</code></td>
+<td>development</td>
 </tr>
 <tr>
 <td>staging</td>
 <td>real env variables (compose <code>environment:</code>, a secrets manager)</td>
-<td><code>staging</code></td>
+<td>staging</td>
 </tr>
 <tr>
 <td>production</td>
 <td>real env variables</td>
-<td><code>production</code></td>
+<td>production</td>
 </tr>
 </tbody>
 </table>
-<p>On a server you can also keep a <code>.env</code> file next to the binary, outside git, with <code>chmod 600</code>. systemd reads it with <code>EnvironmentFile=</code>. See <a href="../../digging-deeper/deployment/#keep-it-running">Deployment</a>.</p>
+<p>On a server you can also keep a <code>.env</code> file next to the binary, with <code>chmod 600</code>. See <a href="../../digging-deeper/deployment/#keep-it-running">Deployment</a>.</p>
 <h2 id="5-app_key">5. <code>APP_KEY</code></h2>
-<p><code>APP_KEY</code> is your most important secret, because it encrypts cookies and signs JWT tokens and local signed URLs.</p>
+<p><code>APP_KEY</code> is your most important secret. It encrypts cookies and signs JWT tokens and local signed URLs.</p>
 <ul>
 <li>Make one key per environment with <code>dox key:generate</code>. Never share the production key with staging.</li>
-<li>The key must be exactly 32 characters. <code>dox key:generate</code> makes a key of the right length.</li>
-<li>In production a bad key stops the app at start. A bad key is empty, not 32 characters, or a public sample key. In development the app only logs a warning.</li>
-<li>If you change the key, every cookie, token and signed URL stops working, so every user is logged out. Plan it.</li>
+<li>The key must be exactly 32 characters.</li>
+<li>In production a bad key stops the app at start. A bad key is empty, not 32 characters, or a public sample key.</li>
+<li>A new key stops every cookie, token and signed URL, so every user is logged out.</li>
 </ul>
 <h2 id="6-check-the-env-before-a-deploy">6. Check the env before a deploy</h2>
-<p>You want to find a missing key before the deploy, not after it. <code>dox env:check</code> loads <code>AppEnv</code> with the real environment and <code>.env</code>, and prints every missing or bad key. If there is a problem, it exits with code 1, so CI stops.</p>
+<p><code>dox env:check</code> prints every missing or bad key. On a problem it exits with code 1, so CI stops:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>dox<span class="w"> </span>env:check
 </span></code></pre></div>
 <h2 id="check-it">Check it</h2>
@@ -7565,9 +7451,9 @@
 <p>Now start it as staging on another port. The real variables win over <code>.env</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nv">APP_ENV</span><span class="o">=</span>staging<span class="w"> </span><span class="nv">APP_PORT</span><span class="o">=</span><span class="m">4000</span><span class="w"> </span>dart<span class="w"> </span>run<span class="w"> </span>bin/server.dart
 </span></code></pre></div>
-<p>The app listens on <code>4000</code>. <code>env.appEnv</code> is <code>'staging'</code>, and <code>appConfig.isDevelopment</code> is <code>false</code>.</p>
+<p>The app listens on port 4000. <code>env.appEnv</code> is staging, and <code>appConfig.isDevelopment</code> is false.</p>
 <h2 id="things-that-differ-per-environment">Things that differ per environment</h2>
-<p>These are the settings that most apps change between environments:</p>
+<p>Most apps change these settings between environments:</p>
 <table>
 <thead>
 <tr>
@@ -7579,17 +7465,17 @@
 <tbody>
 <tr>
 <td><code>prettyPrint</code> of the logger</td>
-<td><code>true</code></td>
-<td><code>false</code> (one JSON line per log)</td>
+<td>true</td>
+<td>false (one JSON line per log)</td>
 </tr>
 <tr>
 <td><code>debug</code> of the database</td>
-<td><code>true</code></td>
-<td><code>false</code></td>
+<td>true</td>
+<td>false</td>
 </tr>
 <tr>
 <td><code>totalIsolate</code></td>
-<td><code>1</code> or <code>2</code> is enough</td>
+<td>1 or 2 is enough</td>
 <td>one per core (the default)</td>
 </tr>
 <tr>
@@ -7604,15 +7490,11 @@
 </tr>
 </tbody>
 </table>
-<h2 id="details">Details</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>"Development" means an <code>APP_ENV</code> of <code>development</code>, <code>local</code>, <code>test</code> or <code>testing</code>. Any other value, or no value, counts as production.</li>
-</ul>
-<h2 id="see-also">See also</h2>
-<ul>
-<li><a href="../../digging-deeper/env/">Environment variables</a> for all types and rules of the typed env class</li>
-<li><a href="../docker/">Docker</a></li>
-<li><a href="../../digging-deeper/deployment/">Deployment</a></li>
+<li><a href="../../digging-deeper/env/">Environment variables</a>: all the types and rules of the env class.</li>
+<li><a href="../docker/">Docker</a>: set the env in a container.</li>
+<li><a href="../../digging-deeper/deployment/">Deployment</a>: run the app on a server.</li>
 </ul>
 
 
@@ -7733,7 +7615,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

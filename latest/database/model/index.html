@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5062,10 +5064,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5191,95 +5189,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6999,13 +6908,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#generating-models" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Generating models
+        Setup
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7076,6 +7002,17 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#using-another-connection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Using another connection
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7109,6 +7046,17 @@
     <span class="md-ellipsis">
       
         Refreshing models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reloading-relations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reloading relations
       
     </span>
   </a>
@@ -7155,10 +7103,32 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#checking-if-a-row-exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking if a row exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#creating-from-a-map" class="md-nav__link">
     <span class="md-ellipsis">
       
         Creating from a map
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#updating-from-a-map" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updating from a map
       
     </span>
   </a>
@@ -7265,6 +7235,39 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#reading-soft-deleted-rows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading soft deleted rows
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restoring-soft-deleted-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Restoring soft deleted models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deleting-for-good" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deleting for good
+      
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -7322,10 +7325,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#preloading-nested-relations" class="md-nav__link">
+  <a href="#preloading-relations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Preloading nested relations
+        Preloading relations
       
     </span>
   </a>
@@ -7337,6 +7340,17 @@
     <span class="md-ellipsis">
       
         Filtering a preload
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#loading-a-relation-on-a-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading a relation on a model
       
     </span>
   </a>
@@ -7371,107 +7385,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#methods-on-other-pages" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#all-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        All options
+        Methods on other pages
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#saving" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Saving
+        Next steps
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#mass-assignment_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mass assignment
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#increment-touch-and-replicate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Increment, touch and replicate
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#rows-with-no-primary-key" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Rows with no primary key
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#refreshing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Refreshing
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#relations-after-a-reload" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Relations after a reload
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7492,447 +7423,24 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/database/model/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="model">Model</h1>
 <p>A model is a Dart class for one database table, used to read, create, change and delete its rows.</p>
-<p>Each model maps to one table, and each object of the model is one row. A model also has all the <a href="../query-builder/">query builder</a> methods, so you can query the table through it.</p>
-<h2 id="generating-models">Generating models</h2>
+<p>Each object of the model is one row. A model also has all the <a href="../query-builder/">query builder</a> methods, so you can query the table through it.</p>
+<h2 id="setup">Setup</h2>
 <p>Use <code>make:model</code> to make a new model. The <code>-m</code> option also makes a migration for the table:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w">      </span><span class="c1"># only the model</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">   </span><span class="c1"># the model and a migration for the table `blogs`</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-a<span class="w">   </span><span class="c1"># the model, a migration, a factory, a seeder and a resource controller</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-m<span class="w">   </span><span class="c1"># the model and a migration for the table blogs</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>dox<span class="w"> </span>make:model<span class="w"> </span>Blog<span class="w"> </span>-a<span class="w">   </span><span class="c1"># also a migration, factory, seeder, controller</span>
 </span></code></pre></div>
-<p>This makes <code>lib/app/models/blog/blog.model.dart</code>. Other options are <code>-c</code> (controller), <code>-r</code> (resource controller), <code>--api</code> (resource controller without <code>create</code> and <code>edit</code>), <code>-f</code> (factory) and <code>-s</code> (seeder). You can join them, like <code>-mfs</code>. See the <a href="../../reference/cli/#dox-makemodel">CLI reference</a>.</p>
-<p>A model uses a generated class (<code>BlogGenerator</code>), so you must run the generator after you make or change a model:</p>
+<p>This makes <code>lib/app/models/blog/blog.model.dart</code>. For the other options, see the <a href="../../reference/cli/#dox-makemodel">CLI reference</a>.</p>
+<p>A model uses a generated class, so run the generator after you make or change a model. Use <code>watch</code> in place of <code>build</code> to run it on each save:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>dart<span class="w"> </span>run<span class="w"> </span>build_runner<span class="w"> </span>build
 </span></code></pre></div>
-<p>If you want it to run again each time you save a file, use <code>dart run build_runner watch</code>.</p>
-<h2 id="defining-models">Defining models</h2>
-<p>A model is a class with <code>@DoxModel()</code>. Each <code>@Column()</code> field is one column of the table:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/models/blog/blog.model.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'blog.model.g.dart'</span><span class="p">;</span><span class="w"> </span><span class="c1">// (1)!</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nd">@DoxModel</span><span class="p">()</span><span class="w"> </span><span class="c1">// (2)!</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// (3)!</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span><span class="w"> </span><span class="c1">// (4)!</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">beforeSave:</span><span class="w"> </span><span class="n">makeSlug</span><span class="p">)</span><span class="w"> </span><span class="c1">// (5)!</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">slug</span><span class="p">;</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">status</span><span class="p">;</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'body'</span><span class="p">)</span><span class="w"> </span><span class="c1">// (6)!</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">description</span><span class="p">;</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'user_id'</span><span class="p">)</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">  </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="n">userId</span><span class="p">;</span>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">makeSlug</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">map</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span><span class="o">?</span><span class="p">.</span><span class="n">toString</span><span class="p">().</span><span class="n">toLowerCase</span><span class="p">().</span><span class="n">replaceAll</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span><span class="w"> </span><span class="s1">'-'</span><span class="p">);</span>
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="p">}</span>
-</span></code></pre></div>
-<ol>
-<li><code>build_runner</code> writes this file. It holds the generated <code>BlogGenerator</code> class.</li>
-<li>Marks the class as a model. The options, like <code>table</code> and <code>softDelete</code>, go here.</li>
-<li>The generated class gives the model <code>id</code>, <code>createdAt</code> and <code>updatedAt</code>, and the query builder methods.</li>
-<li>The column name is the field name in snake_case. Digits stay as they are: <code>address2</code> is <code>address2</code>.</li>
-<li><code>beforeSave</code> runs this static function before a save. See <a href="#changing-values-on-save-and-read">Changing values on save and read</a>.</li>
-<li>Use <code>name</code> when the column name is not the snake_case of the field. The name is used exactly as written.</li>
-</ol>
-<p>Make every column field nullable (<code>String?</code>, <code>int?</code>), because a new model has no values yet.</p>
-<h3 id="table-names">Table names</h3>
-<p>The default table name is the class name in snake_case and singular: <code>Blog</code> uses <code>blog</code>, and <code>BlogPost</code> uses <code>blog_post</code>. With the <a href="../#orm-flags"><code>pluralTableNames</code> flag</a> it is plural. If your table has another name, set <code>table</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">table:</span><span class="w"> </span><span class="s1">'blogs'</span><span class="p">)</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{}</span>
-</span></code></pre></div>
-<p><code>dox make:model Blog</code> always sets <code>table: 'blogs'</code> for you, and the migration from <code>-m</code> uses the same table.</p>
-<h3 id="primary-keys">Primary keys</h3>
-<p>The primary key is <code>id</code> by default. If your key has another name, set <code>primaryKey</code>. The field name is the key in camelCase, so <code>blog_id</code> becomes <code>blogId</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">primaryKey:</span><span class="w"> </span><span class="s1">'uid'</span><span class="p">)</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{}</span>
-</span></code></pre></div>
-<p>The key field is <code>int?</code> by default. If your key is a UUID string, set <code>primaryKeyType</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">primaryKey:</span><span class="w"> </span><span class="s1">'uuid'</span><span class="p">,</span><span class="w"> </span><span class="nl">primaryKeyType:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Device</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DeviceGenerator</span><span class="w"> </span><span class="p">{}</span>
-</span></code></pre></div>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Device</span><span class="w"> </span><span class="n">device</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Device</span><span class="p">();</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">device</span><span class="p">.</span><span class="n">uuid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'0b6f2c1e-1a2b-4c3d-8e9f-001122334455'</span><span class="p">;</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">device</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// insert</span>
-</span></code></pre></div>
-<p><code>save()</code> inserts a new model, even when you set the key yourself.</p>
-<h3 id="timestamps">Timestamps</h3>
-<p><code>save()</code> sets <code>created_at</code> and <code>updated_at</code> to the current UTC time. You read them with <code>blog.createdAt</code> and <code>blog.updatedAt</code>. If your columns have other names, set them:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">createdAt:</span><span class="w"> </span><span class="s1">'created'</span><span class="p">,</span><span class="w"> </span><span class="nl">updatedAt:</span><span class="w"> </span><span class="s1">'modified'</span><span class="p">)</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{}</span>
-</span></code></pre></div>
-<p>If the table has no timestamp columns, turn them off. To turn off only one, set it to <code>null</code>, like <code>@DoxModel(updatedAt: null)</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">timestamps:</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Setting</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SettingGenerator</span><span class="w"> </span><span class="p">{}</span>
-</span></code></pre></div>
-<h3 id="column-types">Column types</h3>
-<p>The field type tells Dox how to read the value:</p>
-<table>
-<thead>
-<tr>
-<th>Field type</th>
-<th>Column</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>String?</code></td>
-<td>text, varchar</td>
-</tr>
-<tr>
-<td><code>int?</code></td>
-<td>integer types</td>
-</tr>
-<tr>
-<td><code>double?</code></td>
-<td>float, double. MySQL also gives <code>DECIMAL</code> as <code>double</code>. Postgres gives <code>numeric</code> as <code>String</code>.</td>
-</tr>
-<tr>
-<td><code>bool?</code></td>
-<td>boolean, or a number like <code>tinyint</code> (0 is false)</td>
-</tr>
-<tr>
-<td><code>DateTime?</code></td>
-<td>date, datetime, timestamp</td>
-</tr>
-<tr>
-<td><code>Map&lt;String, dynamic&gt;?</code> or <code>List&lt;dynamic&gt;?</code></td>
-<td>JSON</td>
-</tr>
-<tr>
-<td>an enum, like <code>Status?</code></td>
-<td>text with the enum name</td>
-</tr>
-</tbody>
-</table>
-<p>For other types, use a <a href="casts/">cast</a>.</p>
-<h3 id="changing-values-on-save-and-read">Changing values on save and read</h3>
-<p>Sometimes a column needs a small change when you save or read it. <code>beforeSave</code> and <code>beforeGet</code> take a static function of the model. The function gets a map and returns the value:</p>
-<ul>
-<li><code>beforeSave</code> gets the model values (column name =&gt; value) and returns the value to save.</li>
-<li><code>beforeGet</code> gets the row from the database and returns the value for the field.</li>
-</ul>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="c1">// beforeSave: make the slug from the title</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">beforeSave:</span><span class="w"> </span><span class="n">makeSlug</span><span class="p">)</span>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">slug</span><span class="p">;</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="c1">// beforeGet: old rows have no status, show them as draft</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">beforeGet:</span><span class="w"> </span><span class="n">readStatus</span><span class="p">)</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">status</span><span class="p">;</span>
-</span><span id="__span-9-13"><a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
-</span><span id="__span-9-14"><a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">makeSlug</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-15"><a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">map</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span><span class="o">?</span><span class="p">.</span><span class="n">toString</span><span class="p">().</span><span class="n">toLowerCase</span><span class="p">().</span><span class="n">replaceAll</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span><span class="w"> </span><span class="s1">'-'</span><span class="p">);</span>
-</span><span id="__span-9-16"><a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-9-17"><a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>
-</span><span id="__span-9-18"><a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">readStatus</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-19"><a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">map</span><span class="p">[</span><span class="s1">'status'</span><span class="p">]</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">;</span>
-</span><span id="__span-9-20"><a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-9-21"><a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a><span class="p">}</span>
-</span></code></pre></div>
-<h2 id="retrieving-models">Retrieving models</h2>
-<p>A model has all the <a href="../query-builder/">query builder</a> methods, so you read rows with them:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="starting-a-new-query">Starting a new query</h3>
-<p>A model object keeps the parts of its query (<code>where</code>, <code>orderBy</code>, ...). If you want to start another query from it, use <code>query()</code>. It gives a new, empty model:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="c1">// a new query, without the where above</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">query</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'deleted'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<h3 id="refreshing-models">Refreshing models</h3>
-<p>Sometimes the row changed in the database after you read it. <code>refresh()</code> reads the row again into this model, and loads its relations again. <code>fresh()</code> gives a new model of the row and leaves this one as it is:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">refresh</span><span class="p">();</span><span class="w">          </span><span class="c1">// this model now has the values of the table</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">fresh</span><span class="p">();</span><span class="w"> </span><span class="c1">// a new model, or null when the row is gone</span>
-</span></code></pre></div>
-<h2 id="inserting-and-updating-models">Inserting and updating models</h2>
-<h3 id="inserts">Inserts</h3>
-<p>To add a row, make a new model, set its fields and call <code>save()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'My first blog'</span><span class="p">;</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="n">print</span><span class="p">(</span><span class="n">blog</span><span class="p">.</span><span class="n">id</span><span class="p">);</span><span class="w"> </span><span class="c1">// the new id</span>
-</span></code></pre></div>
-<p>Fields that are <code>null</code> are not sent, so the database default is used.</p>
-<h3 id="updates">Updates</h3>
-<p><code>save()</code> also updates a model that was read from the table or saved before. Only the fields that changed are sent:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'New title'</span><span class="p">;</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span></code></pre></div>
-<p>To clear a column, set the field to <code>null</code> and save:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// status is now NULL in the database</span>
-</span></code></pre></div>
-<p><code>model.exists</code> tells you if <code>save()</code> will insert or update. <code>save()</code> returns <code>false</code> when a <a href="events/">model event</a> cancels it.</p>
-<h3 id="creating-from-a-map">Creating from a map</h3>
-<p><code>create()</code> makes a new row from a map and returns the model as it is in the table. The model needs <code>fillable</code>, see <a href="#mass-assignment">Mass assignment</a>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'My first blog'</span><span class="p">,</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="s1">'status'</span><span class="o">:</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">,</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">});</span>
-</span></code></pre></div>
-<p><code>create()</code> works like <code>save()</code> on a new model: it saves only the <code>@Column</code> fields, runs <code>beforeSave</code>, sets the timestamps and fires the <a href="events/">model events</a>.</p>
-<p>To change some columns of a loaded model from a map, use <code>blog.update(&lt;String, dynamic&gt;{...})</code>. It changes only that row and sets <code>updated_at</code>, but it fires no model events.</p>
-<h3 id="mass-assignment">Mass assignment</h3>
-<p><code>create()</code>, <code>insert()</code>, <code>update()</code>, <code>upsert()</code> and the find or create methods take their keys from a map. If they took every key, <code>User().create(req.body)</code> with <code>{"is_admin": 1}</code> would make an admin. So a model is guarded by default, and you must say which keys may come from a map:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="c1">// only these keys are taken from a map</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">fillable</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'email'</span><span class="p">];</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="c1">// or: every key but these is taken from a map</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">guarded</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'is_admin'</span><span class="p">];</span>
-</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="p">}</span>
-</span></code></pre></div>
-<ul>
-<li>With <code>fillable</code>, other keys are dropped.</li>
-<li>A model with no <code>fillable</code> (and the default <code>guarded</code>) throws a <code>MassAssignmentException</code> when it gets a map with keys.</li>
-<li>Fields you set in code and save with <code>save()</code> are always saved.</li>
-</ul>
-<p>If you want to take every key, set <code>guarded</code> to an empty list. This is not safe with user input:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@override</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">guarded</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[];</span>
-</span></code></pre></div>
-<h4 id="skip-the-fillable-check">Skip the fillable check</h4>
-<p>Sometimes your own code must set a guarded column, like <code>is_admin</code>. These methods ignore <code>fillable</code> and <code>guarded</code>, so never pass user input like <code>req.body</code> to them.</p>
-<p><code>forceCreate()</code> creates a row with every key of the map:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">User</span><span class="w"> </span><span class="n">admin</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">forceCreate</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">,</span><span class="w"> </span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
-</span></code></pre></div>
-<p><code>forceUpdate()</code> updates the rows of a query with every key of the map:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">).</span><span class="n">forceUpdate</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
-</span></code></pre></div>
-<p><code>forceFill()</code> sets fields on a model. It does not save, so call <code>save()</code> after it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="o">!</span><span class="p">.</span><span class="n">forceFill</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}).</span><span class="n">save</span><span class="p">();</span>
-</span></code></pre></div>
-<p><code>Model.unguarded()</code> turns the check off for everything inside the callback. Other requests that run at the same time still use <code>fillable</code>. Await everything inside the callback, because work that finishes later also runs with the check off:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Model</span><span class="p">.</span><span class="n">unguarded</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">,</span><span class="w"> </span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">).</span><span class="n">update</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="p">});</span>
-</span></code></pre></div>
-<h3 id="find-or-create">Find or create</h3>
-<p>Sometimes you want a row if it exists, and a new one if it does not. These methods find a row by the first map. When there is no row, they use both maps.</p>
-<p><code>firstOrCreate()</code> finds the row, or creates it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">firstOrCreate</span><span class="p">(</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">},</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">},</span>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="p">);</span>
-</span></code></pre></div>
-<p><code>firstOrNew()</code> finds the row, or makes a new model that is not saved yet:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">User</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">firstOrNew</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'bob@example.com'</span><span class="p">});</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">other</span><span class="p">.</span><span class="n">exists</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">other</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="p">}</span>
-</span></code></pre></div>
-<p><code>updateOrCreate()</code> updates the row, or creates it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">User</span><span class="w"> </span><span class="n">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">updateOrCreate</span><span class="p">(</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">},</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann Lee'</span><span class="p">},</span>
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="p">);</span>
-</span></code></pre></div>
-<p><code>firstOrCreate()</code> and <code>updateOrCreate()</code> fire the <a href="events/">model events</a>. <code>firstOrNew()</code> does not save, so no event fires. See also the <a href="../query-builder/#finding-or-creating-a-row">query builder</a>.</p>
-<h3 id="incrementing-and-decrementing">Incrementing and decrementing</h3>
-<p>If you want to add to a number column, like a view count, use <code>increment()</code> and <code>decrement()</code>. They change the column in one query, and the model field gets the new value too:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">increment</span><span class="p">(</span><span class="s1">'views'</span><span class="p">);</span><span class="w">      </span><span class="c1">// views + 1</span>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">increment</span><span class="p">(</span><span class="s1">'views'</span><span class="p">,</span><span class="w"> </span><span class="m">5</span><span class="p">);</span><span class="w">    </span><span class="c1">// views + 5</span>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">decrement</span><span class="p">(</span><span class="s1">'views'</span><span class="p">);</span><span class="w">       </span><span class="c1">// views - 1</span>
-</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="n">print</span><span class="p">(</span><span class="n">blog</span><span class="p">.</span><span class="n">views</span><span class="p">);</span>
-</span></code></pre></div>
-<p>They return the number of changed rows. They fire no model events and do not set <code>updated_at</code>.</p>
-<h3 id="touch-and-replicate">Touch and replicate</h3>
-<p><code>touch()</code> sets <code>updated_at</code> to now. Give a column name to set another column. It fires the save events, and <code>touchQuietly()</code> does the same with no events:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">touch</span><span class="p">();</span><span class="w">               </span><span class="c1">// updated_at = now</span>
-</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">touch</span><span class="p">(</span><span class="s1">'published_at'</span><span class="p">);</span><span class="w">  </span><span class="c1">// published_at = now</span>
-</span></code></pre></div>
-<p><code>replicate()</code> makes an unsaved copy of a model. It has no primary key and no timestamps, so <code>save()</code> inserts a new row. Relations are not copied:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">Blog</span><span class="w"> </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">replicate</span><span class="p">()..</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Copy of </span><span class="si">${</span><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">copy</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span></code></pre></div>
-<p>If you do not want some columns in the copy, list them. They are set to <code>null</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">replicate</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'slug'</span><span class="p">]);</span>
-</span></code></pre></div>
-<h3 id="checking-changed-columns">Checking changed columns</h3>
-<p>Sometimes you need to know what changed before or after a save. A model tracks this. The names are column names, like <code>user_id</code>, not the Dart field names:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'New title'</span><span class="p">;</span>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="n">blog</span><span class="p">.</span><span class="n">isDirty</span><span class="p">();</span><span class="w">                     </span><span class="c1">// true</span>
-</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="n">blog</span><span class="p">.</span><span class="n">isDirty</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span><span class="w">              </span><span class="c1">// true</span>
-</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="n">blog</span><span class="p">.</span><span class="n">isDirty</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'body'</span><span class="p">]);</span><span class="w">     </span><span class="c1">// false</span>
-</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="n">blog</span><span class="p">.</span><span class="n">isClean</span><span class="p">(</span><span class="s1">'body'</span><span class="p">);</span><span class="w">               </span><span class="c1">// true</span>
-</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="n">blog</span><span class="p">.</span><span class="n">getDirty</span><span class="p">();</span><span class="w">                    </span><span class="c1">// {title: New title}</span>
-</span><span id="__span-30-9"><a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="n">blog</span><span class="p">.</span><span class="n">getOriginal</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span><span class="w">          </span><span class="c1">// the old title</span>
-</span></code></pre></div>
-<p>After a save, <code>wasChanged()</code> and <code>getChanges()</code> tell you what the last save changed:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">wasChanged</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span><span class="w">           </span><span class="c1">// true</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="n">blog</span><span class="p">.</span><span class="n">getChanges</span><span class="p">();</span><span class="w">                  </span><span class="c1">// {title: New title, updated_at: ...}</span>
-</span></code></pre></div>
-<h2 id="deleting-models">Deleting models</h2>
-<p>Call <code>delete()</code> on a model to delete its row. It returns the number of deleted rows: <code>1</code>, or <code>0</code> when the row was not there or a <a href="events/">model event</a> cancelled it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span><span class="w"> </span><span class="c1">// deletes only this record</span>
-</span></code></pre></div>
-<p>A model with no primary key value throws a <code>StateError</code> and runs no query, so <code>Blog().delete()</code> can not delete every row by mistake. To delete the rows of a query, add a <code>where</code>, like <code>Blog().where('status', 'draft').delete()</code>. A <a href="scopes/#global-scopes">global scope</a> counts as a <code>where</code>. To delete every row on purpose, see <a href="../query-builder/#writing-every-row">write every row</a>.</p>
-<h3 id="soft-deleting">Soft deleting</h3>
-<p>Sometimes you want to keep deleted rows, so you can bring them back later. Turn on <code>softDelete</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">softDelete:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{}</span>
-</span></code></pre></div>
-<p>The table needs a nullable <code>deleted_at</code> column. In a migration, add <code>table.softDeletes();</code>.</p>
-<p>Now <code>delete()</code> sets <code>deleted_at</code> to the current time and keeps the row. Queries leave out soft deleted rows. Use <code>withTrash()</code> to get them too, or <code>onlyTrashed()</code> to get only them.</p>
-<p><code>trashed()</code> tells you if a model is soft deleted, and <code>restore()</code> brings it back:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">trashed</span><span class="p">())</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">restore</span><span class="p">();</span>
-</span></code></pre></div>
-<p>To really remove a soft deleted row, use <code>forceDelete()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">trashed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">trashed</span><span class="o">?</span><span class="p">.</span><span class="n">forceDelete</span><span class="p">();</span><span class="w"> </span><span class="c1">// deletes the row, also with softDelete</span>
-</span></code></pre></div>
-<h2 id="converting-to-a-map-or-json">Converting to a map or JSON</h2>
-<p><code>toMap()</code> gives all columns and computed values. <code>toJson()</code> gives the same without hidden fields:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>
-</span><span id="__span-36-3"><a id="__codelineno-36-3" name="__codelineno-36-3" href="#__codelineno-36-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toMap</span><span class="p">();</span><span class="w">  </span><span class="c1">// all columns and computed values</span>
-</span><span id="__span-36-4"><a id="__codelineno-36-4" name="__codelineno-36-4" href="#__codelineno-36-4"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span><span class="w"> </span><span class="c1">// the same, without hidden fields</span>
-</span><span id="__span-36-5"><a id="__codelineno-36-5" name="__codelineno-36-5" href="#__codelineno-36-5"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;?</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="o">?</span><span class="p">.</span><span class="n">toMap</span><span class="p">(</span><span class="nl">original:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="c1">// the raw database row</span>
-</span></code></pre></div>
-<p><code>jsonEncode(blog)</code> uses <code>toJson()</code>, so you can return a model, or a list of models, from a controller.</p>
-<h3 id="hide-fields">Hide fields</h3>
-<p>You should never send fields like a password to the client. Put them in <code>hidden</code>, and <code>toJson()</code> leaves them out. Use the column names:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-37-4"><a id="__codelineno-37-4" name="__codelineno-37-4" href="#__codelineno-37-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">hidden</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'password'</span><span class="p">,</span><span class="w"> </span><span class="s1">'remember_token'</span><span class="p">];</span>
-</span><span id="__span-37-5"><a id="__codelineno-37-5" name="__codelineno-37-5" href="#__codelineno-37-5"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>If you prefer a list of the fields to keep, use <code>visibleFields</code>. When it is empty (the default), every field is kept:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="nd">@override</span>
-</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">visibleFields</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'name'</span><span class="p">];</span>
-</span></code></pre></div>
-<p>To change this for one model, or for a list of models, use <code>makeHidden()</code> and <code>makeVisible()</code>. <code>makeVisible()</code> also shows a field that is in <code>hidden</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="k">return</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">makeVisible</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'email'</span><span class="p">]).</span><span class="n">toJson</span><span class="p">();</span>
-</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="k">return</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="n">makeHidden</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'phone'</span><span class="p">]);</span>
-</span></code></pre></div>
-<h3 id="computed-values">Computed values</h3>
-<p>Sometimes you want a value in the JSON that is not a column, like a full name. Add <code>@Computed()</code> to a getter, then run <code>dart run build_runner build</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'first_name'</span><span class="p">)</span>
-</span><span id="__span-40-4"><a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">firstName</span><span class="p">;</span>
-</span><span id="__span-40-5"><a id="__codelineno-40-5" name="__codelineno-40-5" href="#__codelineno-40-5"></a>
-</span><span id="__span-40-6"><a id="__codelineno-40-6" name="__codelineno-40-6" href="#__codelineno-40-6"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'last_name'</span><span class="p">)</span>
-</span><span id="__span-40-7"><a id="__codelineno-40-7" name="__codelineno-40-7" href="#__codelineno-40-7"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">lastName</span><span class="p">;</span>
-</span><span id="__span-40-8"><a id="__codelineno-40-8" name="__codelineno-40-8" href="#__codelineno-40-8"></a>
-</span><span id="__span-40-9"><a id="__codelineno-40-9" name="__codelineno-40-9" href="#__codelineno-40-9"></a><span class="w">  </span><span class="nd">@Computed</span><span class="p">()</span><span class="w"> </span><span class="c1">// json key: full_name</span>
-</span><span id="__span-40-10"><a id="__codelineno-40-10" name="__codelineno-40-10" href="#__codelineno-40-10"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">fullName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">firstName</span><span class="s1"> </span><span class="si">$</span><span class="n">lastName</span><span class="s1">'</span><span class="p">;</span>
-</span><span id="__span-40-11"><a id="__codelineno-40-11" name="__codelineno-40-11" href="#__codelineno-40-11"></a>
-</span><span id="__span-40-12"><a id="__codelineno-40-12" name="__codelineno-40-12" href="#__codelineno-40-12"></a><span class="w">  </span><span class="nd">@Computed</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'initials'</span><span class="p">)</span><span class="w"> </span><span class="c1">// custom json key</span>
-</span><span id="__span-40-13"><a id="__codelineno-40-13" name="__codelineno-40-13" href="#__codelineno-40-13"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">shortName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">firstName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}${</span><span class="n">lastName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
-</span><span id="__span-40-14"><a id="__codelineno-40-14" name="__codelineno-40-14" href="#__codelineno-40-14"></a><span class="p">}</span>
-</span></code></pre></div>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="n">print</span><span class="p">(</span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">toJson</span><span class="p">());</span>
-</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="c1">// {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}</span>
-</span></code></pre></div>
-<p>The key is the getter name in snake_case, or the <code>name</code> you give. A computed value is never read from or written to the database. <code>hidden</code> also hides it, by its json key. The getter runs each time <code>toJson()</code> or <code>toMap()</code> is called, so keep it fast.</p>
-<h2 id="relationships">Relationships</h2>
-<p>A model can load related models. See <a href="relationship/has-one/">HasOne</a>, <a href="relationship/has-many/">HasMany</a>, <a href="relationship/belongs-to/">BelongsTo</a>, <a href="relationship/many-to-many/">ManyToMany</a>, <a href="relationship/through/">HasManyThrough</a> and <a href="relationship/polymorphic/">Polymorphic</a>.</p>
-<p>The relationship pages use these tables:</p>
-<pre class="mermaid"><code>erDiagram
-    user ||--o| user_info : "HasOne"
-    user ||--o{ post : "HasMany"
-    user ||--o{ comment : "BelongsTo, from comment"
-    artist ||--o{ artist_song : "ManyToMany"
-    song ||--o{ artist_song : "ManyToMany"
-    user {
-        int id PK
-        string name
-    }
-    user_info {
-        int id PK
-        int user_id FK
-        string address
-    }
-    post {
-        int id PK
-        int user_id FK
-        string title
-    }
-    comment {
-        int id PK
-        int user_id FK
-        string content
-    }
-    artist_song {
-        int id PK
-        int artist_id FK
-        int song_id FK
-    }</code></pre>
-<h3 id="preloading-nested-relations">Preloading nested relations</h3>
-<p>A dot path also loads the relations of the loaded rows. It runs one query for each level:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts.comments'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<h3 id="filtering-a-preload">Filtering a preload</h3>
-<p>If you want only some related rows, give a callback. It adds conditions to the query of the relation. With a dot path, it is for the last relation:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'published'</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
-</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="c1">// all posts, and only the approved comments of each post</span>
-</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts.comments'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'approved'</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
-</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<h3 id="saving-through-a-relation">Saving through a relation</h3>
-<p>These methods save a related model and set the foreign key for you. They work with <code>@HasMany</code>, <code>@HasOne</code>, <code>@MorphMany</code> and <code>@MorphOne</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">))</span><span class="o">!</span><span class="p">;</span>
-</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="n">Comment</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">createRelated</span><span class="o">&lt;</span><span class="n">Comment</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'body'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hi'</span><span class="p">});</span>
-</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">saveRelated</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">,</span><span class="w"> </span><span class="n">Comment</span><span class="p">()..</span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'hi'</span><span class="p">);</span>
-</span><span id="__span-45-4"><a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">saveManyRelated</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Comment</span><span class="o">&gt;</span><span class="p">[</span><span class="n">c1</span><span class="p">,</span><span class="w"> </span><span class="n">c2</span><span class="p">]);</span>
-</span></code></pre></div>
-<p><code>createRelated()</code> uses <code>create()</code>, so <code>fillable</code>, events and timestamps work. The foreign key does not need to be in <code>fillable</code>.</p>
-<p>For a <code>@BelongsTo</code>, <code>comment.associate('blog', blog)</code> sets the key and <code>comment.dissociate('blog')</code> sets it to <code>null</code>. Call <code>save()</code> after them.</p>
-<h2 id="debugging-queries">Debugging queries</h2>
-<p>If you want to see the SQL of a model, use <code>debug(true)</code>. It prints the SQL in the terminal:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
-</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">debug</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
-</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">;</span>
-</span><span id="__span-46-4"><a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span></code></pre></div>
-<h2 id="details">Details</h2>
-<p>This section is for special cases. Most apps do not need it.</p>
-<h3 id="all-options">All options</h3>
-<p>All options go in <code>@DoxModel(...)</code>.</p>
+<h3 id="model-options">Model options</h3>
+<p>All options go in <code>@DoxModel(...)</code>:</p>
 <table>
 <thead>
 <tr>
@@ -7960,17 +7468,17 @@
 <tr>
 <td><code>createdAt</code></td>
 <td><code>'created_at'</code></td>
-<td>The column that keeps the create time.</td>
+<td>The column that keeps the create time. null turns it off.</td>
 </tr>
 <tr>
 <td><code>updatedAt</code></td>
 <td><code>'updated_at'</code></td>
-<td>The column that keeps the last update time.</td>
+<td>The column that keeps the last update time. null turns it off.</td>
 </tr>
 <tr>
 <td><code>timestamps</code></td>
 <td><code>true</code></td>
-<td><code>false</code> turns off <code>createdAt</code> and <code>updatedAt</code>.</td>
+<td>false turns off <code>createdAt</code> and <code>updatedAt</code>.</td>
 </tr>
 <tr>
 <td><code>softDelete</code></td>
@@ -7979,42 +7487,388 @@
 </tr>
 </tbody>
 </table>
-<h3 id="saving">Saving</h3>
+<h2 id="defining-models">Defining models</h2>
+<p>A model is a class with <code>@DoxModel()</code>. Each <code>@Column()</code> field is one column of the table:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/models/blog/blog.model.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'blog.model.g.dart'</span><span class="p">;</span><span class="w"> </span><span class="c1">// (1)!</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nd">@DoxModel</span><span class="p">()</span><span class="w"> </span><span class="c1">// (2)!</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="c1">// (3)!</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span><span class="w"> </span><span class="c1">// (4)!</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'body'</span><span class="p">)</span><span class="w"> </span><span class="c1">// (5)!</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">description</span><span class="p">;</span>
+</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'user_id'</span><span class="p">)</span>
+</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">  </span><span class="kt">int</span><span class="o">?</span><span class="w"> </span><span class="n">userId</span><span class="p">;</span>
+</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">}</span>
+</span></code></pre></div>
+<ol>
+<li><code>build_runner</code> writes this file. It holds the generated <code>BlogGenerator</code> class.</li>
+<li>Marks the class as a model. See <a href="#model-options">Model options</a>.</li>
+<li>The generated class gives the model <code>id</code>, <code>createdAt</code> and <code>updatedAt</code>, and the query builder methods.</li>
+<li>The column name is the field name in snake_case.</li>
+<li>Use <code>name</code> when the column name is not the snake_case of the field.</li>
+</ol>
+<p>Make every column field nullable, because a new model has no values yet.</p>
+<h3 id="table-names">Table names</h3>
+<p>The default table name is the class name in snake_case: <code>BlogPost</code> uses <code>blog_post</code>. Set <code>table</code> for another name:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">table:</span><span class="w"> </span><span class="s1">'blogs'</span><span class="p">)</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{}</span>
+</span></code></pre></div>
+<p><code>dox make:model Blog</code> sets <code>table: 'blogs'</code> for you. With the <a href="../#orm-flags"><code>pluralTableNames</code> flag</a>, the default name is plural.</p>
+<h3 id="primary-keys">Primary keys</h3>
+<p>Set <code>primaryKey</code> for a key with another name, and <code>primaryKeyType</code> for a key that is not an integer:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">primaryKey:</span><span class="w"> </span><span class="s1">'uuid'</span><span class="p">,</span><span class="w"> </span><span class="nl">primaryKeyType:</span><span class="w"> </span><span class="kt">String</span><span class="p">)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Device</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DeviceGenerator</span><span class="w"> </span><span class="p">{}</span>
+</span></code></pre></div>
+<p>The field name is the key in camelCase. <code>save()</code> inserts a new model, also when you set the key yourself.</p>
+<h3 id="timestamps">Timestamps</h3>
+<p><code>save()</code> sets <code>created_at</code> and <code>updated_at</code> to the current UTC time. Set other column names, or turn them off:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">createdAt:</span><span class="w"> </span><span class="s1">'created'</span><span class="p">,</span><span class="w"> </span><span class="nl">updatedAt:</span><span class="w"> </span><span class="s1">'modified'</span><span class="p">)</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{}</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">timestamps:</span><span class="w"> </span><span class="kc">false</span><span class="p">)</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Setting</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SettingGenerator</span><span class="w"> </span><span class="p">{}</span>
+</span></code></pre></div>
+<h3 id="column-types">Column types</h3>
+<p>The field type tells Dox how to read the value:</p>
+<table>
+<thead>
+<tr>
+<th>Field type</th>
+<th>Column</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>String?</code></td>
+<td>text, varchar</td>
+</tr>
+<tr>
+<td><code>int?</code></td>
+<td>integer types</td>
+</tr>
+<tr>
+<td><code>double?</code></td>
+<td>float, double. MySQL also gives decimal as a double. Postgres gives numeric as a string.</td>
+</tr>
+<tr>
+<td><code>bool?</code></td>
+<td>boolean, or a number like tinyint (0 is false)</td>
+</tr>
+<tr>
+<td><code>DateTime?</code></td>
+<td>date, datetime, timestamp</td>
+</tr>
+<tr>
+<td><code>Map&lt;String, dynamic&gt;?</code> or <code>List&lt;dynamic&gt;?</code></td>
+<td>JSON</td>
+</tr>
+<tr>
+<td>an enum, like <code>Status?</code></td>
+<td>text with the enum name</td>
+</tr>
+</tbody>
+</table>
+<p>For other types, use a <a href="casts/">cast</a>.</p>
+<h3 id="changing-values-on-save-and-read">Changing values on save and read</h3>
+<p><code>beforeSave</code> and <code>beforeGet</code> take a static function of the model. The function gets a map of the values and returns the new value:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@Column</span><span class="p">(</span><span class="nl">beforeSave:</span><span class="w"> </span><span class="n">makeSlug</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">slug</span><span class="p">;</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="nd">@Column</span><span class="p">(</span><span class="nl">beforeGet:</span><span class="w"> </span><span class="n">readStatus</span><span class="p">)</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">status</span><span class="p">;</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="kd">static</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">makeSlug</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">map</span><span class="p">[</span><span class="s1">'title'</span><span class="p">]</span><span class="o">?</span><span class="p">.</span><span class="n">toString</span><span class="p">().</span><span class="n">toLowerCase</span><span class="p">().</span><span class="n">replaceAll</span><span class="p">(</span><span class="s1">' '</span><span class="p">,</span><span class="w"> </span><span class="s1">'-'</span><span class="p">);</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">}</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="kd">static</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">readStatus</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">map</span><span class="p">[</span><span class="s1">'status'</span><span class="p">]</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">;</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>beforeSave</code> gets the model values by column name. <code>beforeGet</code> gets the row from the database.</p>
+<h3 id="using-another-connection">Using another connection</h3>
+<p>Use a named connection for the query, and for the save and delete of its models:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">()..</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">);</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="retrieving-models">Retrieving models</h2>
+<p>Use the <a href="../query-builder/">query builder</a> methods to read rows:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">drafts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="starting-a-new-query">Starting a new query</h3>
+<p>A model object keeps the parts of its query. <code>query()</code> gives a new, empty model to start another query:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'active'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">deleted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">query</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'deleted'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="refreshing-models">Refreshing models</h3>
+<p><code>refresh()</code> reads the row again into this model, with its relations. <code>fresh()</code> gives a new model and keeps this one as it is:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">refresh</span><span class="p">();</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">fresh</span><span class="p">();</span><span class="w"> </span><span class="c1">// null when the row is gone</span>
+</span></code></pre></div>
+<p>Both read the row by its primary key. They also find a soft deleted row.</p>
+<h3 id="reloading-relations">Reloading relations</h3>
+<p><code>reload()</code> loads the relations of the model again, for example after a save:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">reload</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="inserting-and-updating-models">Inserting and updating models</h2>
+<h3 id="inserts">Inserts</h3>
+<p>Make a new model, set its fields and call <code>save()</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">();</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'My first blog'</span><span class="p">;</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">print</span><span class="p">(</span><span class="n">blog</span><span class="p">.</span><span class="n">id</span><span class="p">);</span><span class="w"> </span><span class="c1">// the new id</span>
+</span></code></pre></div>
+<p>Null fields are not sent, so the database default is used.</p>
+<h3 id="updates">Updates</h3>
+<p><code>save()</code> on a model from the table updates it. It sends only the fields that changed:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'New title'</span><span class="p">;</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">found</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span></code></pre></div>
+<p>To clear a column, set the field to null and save. A map or list field is always sent, because it can change in place.</p>
+<p><code>save()</code> returns false when a <a href="events/">model event</a> cancels it. <code>saveQuietly()</code> saves with no events.</p>
+<h3 id="checking-if-a-row-exists">Checking if a row exists</h3>
+<p><code>exists</code> is true when the model is in the table. <code>wasRecentlyCreated</code> is true after a save inserted the row:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">firstOrCreate</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">email</span><span class="p">});</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">user</span><span class="p">.</span><span class="n">wasRecentlyCreated</span><span class="p">)</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">sendWelcomeMail</span><span class="p">(</span><span class="n">user</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="creating-from-a-map">Creating from a map</h3>
+<p><code>create()</code> makes a new row from a map and returns the model. The model needs <code>fillable</code>, see <a href="#mass-assignment">Mass assignment</a>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">created</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'My first blog'</span><span class="p">,</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="s1">'status'</span><span class="o">:</span><span class="w"> </span><span class="s1">'draft'</span><span class="p">,</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">});</span>
+</span></code></pre></div>
+<p>It works like <code>save()</code> on a new model, with the events. A null key is not sent, unless the <a href="../#orm-flags"><code>createWritesNull</code> flag</a> is on. <code>insert()</code> on a model does the same as <code>create()</code>.</p>
+<h3 id="updating-from-a-map">Updating from a map</h3>
+<p><code>update()</code> on a model from the table changes only that row and sets <code>updated_at</code>. It fires no model events:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">update</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'status'</span><span class="o">:</span><span class="w"> </span><span class="s1">'live'</span><span class="p">});</span>
+</span></code></pre></div>
+<h3 id="mass-assignment">Mass assignment</h3>
+<p><code>create()</code>, <code>insert()</code>, <code>update()</code>, <code>upsert()</code> and the find or create methods take their keys from a map. So a model is guarded by default. List the keys that may come from a map:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="c1">// only these keys are taken from a map</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">fillable</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'email'</span><span class="p">];</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">  </span><span class="c1">// or: every key but these is taken from a map</span>
+</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">guarded</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'is_admin'</span><span class="p">];</span>
+</span><span id="__span-17-10"><a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>With <code>fillable</code>, other keys are dropped. A model with no <code>fillable</code> and the default <code>guarded</code> throws a <code>MassAssignmentException</code> for a map with keys. Fields you set in code are always saved.</p>
+<p>To take every key, set <code>guarded</code> to an empty list. This is not safe with user input:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@override</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">guarded</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[];</span>
+</span></code></pre></div>
+<h4 id="skip-the-fillable-check">Skip the fillable check</h4>
+<p>These methods ignore <code>fillable</code> and <code>guarded</code>. Never pass user input, like <code>req.body</code>, to them:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">forceCreate</span><span class="p">(</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">,</span><span class="w"> </span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">where</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">)</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">    </span><span class="p">.</span><span class="n">forceUpdate</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">forceFill</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">}).</span><span class="n">save</span><span class="p">();</span>
+</span></code></pre></div>
+<p><code>forceFill()</code> sets the fields and does not save. Model events that fire inside <code>forceCreate()</code> and <code>forceUpdate()</code> also skip the check.</p>
+<p><code>Model.unguarded()</code> turns the check off for everything inside the callback. Await all work inside it, because work that ends later also runs with the check off:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Model</span><span class="p">.</span><span class="n">unguarded</span><span class="p">(()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">create</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Bob'</span><span class="p">,</span><span class="w"> </span><span class="s1">'is_admin'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">});</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="p">});</span>
+</span></code></pre></div>
+<p><code>Model.isUnguarded</code> is true inside the callback.</p>
+<h3 id="find-or-create">Find or create</h3>
+<p>These methods find a row by the first map. When there is no row, they use both maps:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">firstOrCreate</span><span class="p">(</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">},</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann'</span><span class="p">},</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="p">);</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="n">User</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">firstOrNew</span><span class="p">(</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'bob@example.com'</span><span class="p">});</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="n">User</span><span class="w"> </span><span class="n">updated</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">updateOrCreate</span><span class="p">(</span>
+</span><span id="__span-21-10"><a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="s1">'ann@example.com'</span><span class="p">},</span>
+</span><span id="__span-21-11"><a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a><span class="w">  </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'name'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Ann Lee'</span><span class="p">},</span>
+</span><span id="__span-21-12"><a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a><span class="p">);</span>
+</span></code></pre></div>
+<p><code>firstOrNew()</code> does not save the new model. See the <a href="../query-builder/#finding-or-creating-a-row">query builder</a>.</p>
+<h3 id="incrementing-and-decrementing">Incrementing and decrementing</h3>
+<p>Add to or take from a number column in one query. The field gets the new value too:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">increment</span><span class="p">(</span><span class="s1">'views'</span><span class="p">);</span><span class="w">      </span><span class="c1">// views + 1</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">increment</span><span class="p">(</span><span class="s1">'views'</span><span class="p">,</span><span class="w"> </span><span class="m">5</span><span class="p">);</span><span class="w">   </span><span class="c1">// views + 5</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">decrement</span><span class="p">(</span><span class="s1">'views'</span><span class="p">);</span><span class="w">      </span><span class="c1">// views - 1</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">increment</span><span class="p">(</span><span class="s1">'views'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'status'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hot'</span><span class="p">});</span>
+</span></code></pre></div>
+<p>The third argument sets other columns. They fire no model events and do not set <code>updated_at</code>, unless the <a href="../#orm-flags"><code>incrementFiresEvents</code> flag</a> is on.</p>
+<h3 id="touch-and-replicate">Touch and replicate</h3>
+<p><code>touch()</code> sets <code>updated_at</code>, or the column you give, to now. It fires the save events. <code>touchQuietly()</code> fires none:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">touch</span><span class="p">();</span><span class="w">               </span><span class="c1">// updated_at = now</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">touch</span><span class="p">(</span><span class="s1">'published_at'</span><span class="p">);</span><span class="w"> </span><span class="c1">// published_at = now</span>
+</span></code></pre></div>
+<p><code>replicate()</code> makes an unsaved copy with no primary key and no timestamps. List the columns to leave out:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">replicate</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'slug'</span><span class="p">])..</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Copy'</span><span class="p">;</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">copy</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span></code></pre></div>
+<p>Relations are not copied. The copy of a soft deleted model is soft deleted too.</p>
+<h3 id="checking-changed-columns">Checking changed columns</h3>
+<p>These methods tell you what changed before or after a save. The names are column names, like <code>user_id</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'New title'</span><span class="p">;</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">blog</span><span class="p">.</span><span class="n">isDirty</span><span class="p">();</span><span class="w">             </span><span class="c1">// true</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">blog</span><span class="p">.</span><span class="n">isDirty</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span><span class="w">      </span><span class="c1">// true</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="n">blog</span><span class="p">.</span><span class="n">isClean</span><span class="p">(</span><span class="s1">'body'</span><span class="p">);</span><span class="w">       </span><span class="c1">// true</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="n">blog</span><span class="p">.</span><span class="n">getDirty</span><span class="p">();</span><span class="w">            </span><span class="c1">// {title: New title}</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="n">blog</span><span class="p">.</span><span class="n">getOriginal</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span><span class="w">  </span><span class="c1">// the old title</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="n">blog</span><span class="p">.</span><span class="n">wasChanged</span><span class="p">(</span><span class="s1">'title'</span><span class="p">);</span><span class="w">   </span><span class="c1">// true</span>
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="n">blog</span><span class="p">.</span><span class="n">getChanges</span><span class="p">();</span><span class="w">          </span><span class="c1">// {title: New title, updated_at: ...}</span>
+</span></code></pre></div>
+<p><code>isDirty()</code>, <code>isClean()</code> and <code>wasChanged()</code> also take a list of names.</p>
+<h2 id="deleting-models">Deleting models</h2>
+<p><code>delete()</code> deletes the row of the model. It returns 1, or 0 when the row was not there or a <a href="events/">model event</a> cancelled it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">delete</span><span class="p">();</span>
+</span></code></pre></div>
+<p>A model with no primary key value throws a <code>StateError</code>, so <code>Blog().delete()</code> can not delete every row. To delete the rows of a query, add a <code>where</code>. A <a href="scopes/#global-scopes">global scope</a> counts as a <code>where</code>. See <a href="../query-builder/#writing-every-row">writing every row</a>.</p>
+<h3 id="soft-deleting">Soft deleting</h3>
+<p>A <strong>soft delete</strong> keeps the row and sets its <code>deleted_at</code>. Turn it on with <code>softDelete</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="nd">@DoxModel</span><span class="p">(</span><span class="nl">softDelete:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Blog</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BlogGenerator</span><span class="w"> </span><span class="p">{}</span>
+</span></code></pre></div>
+<p>The table needs a nullable <code>deleted_at</code> column. In a migration, add <code>table.softDeletes();</code>. Queries then leave out soft deleted rows.</p>
+<h3 id="reading-soft-deleted-rows">Reading soft deleted rows</h3>
+<p><code>withTrash()</code> also gets the soft deleted rows. <code>onlyTrashed()</code> gets only them:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Blog</span><span class="o">&gt;</span><span class="w"> </span><span class="n">trashed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">onlyTrashed</span><span class="p">().</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="restoring-soft-deleted-models">Restoring soft deleted models</h3>
+<p><code>trashed()</code> tells you if a model is soft deleted. <code>restore()</code> brings it back:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">withTrash</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">blog</span><span class="o">!</span><span class="p">.</span><span class="n">trashed</span><span class="p">())</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">restore</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="deleting-for-good">Deleting for good</h3>
+<p><code>forceDelete()</code> deletes the row, also on a soft delete model:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">forceDelete</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="converting-to-a-map-or-json">Converting to a map or JSON</h2>
+<p><code>toMap()</code> gives all columns and computed values. <code>toJson()</code> gives the same without hidden fields:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">map</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">toMap</span><span class="p">();</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">toMap</span><span class="p">(</span><span class="nl">original:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="c1">// the raw row</span>
+</span></code></pre></div>
+<p><code>jsonEncode(blog)</code> uses <code>toJson()</code>, so a controller can return a model or a list of models.</p>
+<h3 id="hide-fields">Hide fields</h3>
+<p>Put fields like a password in <code>hidden</code>, and <code>toJson()</code> leaves them out. Use the column names:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="nd">@override</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">hidden</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'password'</span><span class="p">,</span><span class="w"> </span><span class="s1">'remember_token'</span><span class="p">];</span>
+</span></code></pre></div>
+<p>To keep only some fields, list them in <code>visibleFields</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="nd">@override</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">visibleFields</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'name'</span><span class="p">];</span>
+</span></code></pre></div>
+<p>For one model or a list of models, use <code>makeHidden()</code> and <code>makeVisible()</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">return</span><span class="w"> </span><span class="n">user</span><span class="p">.</span><span class="n">makeVisible</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'email'</span><span class="p">]).</span><span class="n">toJson</span><span class="p">();</span>
+</span><span id="__span-34-2"><a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="k">return</span><span class="w"> </span><span class="n">users</span><span class="p">.</span><span class="n">makeHidden</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'phone'</span><span class="p">]);</span>
+</span></code></pre></div>
+<h3 id="computed-values">Computed values</h3>
+<p>A <strong>computed value</strong> is a getter in the JSON that is not a column. Add <code>@Computed()</code>, then run the generator:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="nd">@Computed</span><span class="p">()</span><span class="w"> </span><span class="c1">// json key: full_name</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">fullName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">$</span><span class="n">firstName</span><span class="s1"> </span><span class="si">$</span><span class="n">lastName</span><span class="s1">'</span><span class="p">;</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a>
+</span><span id="__span-35-4"><a id="__codelineno-35-4" name="__codelineno-35-4" href="#__codelineno-35-4"></a><span class="nd">@Computed</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'initials'</span><span class="p">)</span><span class="w"> </span><span class="c1">// custom json key</span>
+</span><span id="__span-35-5"><a id="__codelineno-35-5" name="__codelineno-35-5" href="#__codelineno-35-5"></a><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">shortName</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'</span><span class="si">${</span><span class="n">firstName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}${</span><span class="n">lastName</span><span class="o">?</span><span class="p">[</span><span class="m">0</span><span class="p">]</span><span class="si">}</span><span class="s1">'</span><span class="p">;</span>
+</span></code></pre></div>
+<p>The getter runs each time <code>toJson()</code> or <code>toMap()</code> runs, so keep it fast. <code>hidden</code> hides it by its json key.</p>
+<h2 id="relationships">Relationships</h2>
+<p>A model can load related models. See <a href="relationship/has-one/">HasOne</a>, <a href="relationship/has-many/">HasMany</a>, <a href="relationship/belongs-to/">BelongsTo</a>, <a href="relationship/many-to-many/">ManyToMany</a>, <a href="relationship/through/">HasManyThrough</a> and <a href="relationship/polymorphic/">Polymorphic</a>.</p>
+<h3 id="preloading-relations">Preloading relations</h3>
+<p><code>preload()</code> loads a relation for all rows of a query. A dot path also loads the relations of the loaded rows:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="n">Blog</span><span class="o">?</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Blog</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts.comments'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="filtering-a-preload">Filtering a preload</h3>
+<p>Give a callback to load only some related rows. With a dot path, it is for the last relation:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-37-2"><a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'published'</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-37-3"><a id="__codelineno-37-3" name="__codelineno-37-3" href="#__codelineno-37-3"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<h3 id="loading-a-relation-on-a-model">Loading a relation on a model</h3>
+<p><code>$getRelation()</code> loads a relation into its field. <code>related()</code> gives a query for the related rows:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">$getRelation</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">);</span>
+</span><span id="__span-38-2"><a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Comment</span><span class="o">&gt;</span><span class="w"> </span><span class="n">recent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span>
+</span><span id="__span-38-3"><a id="__codelineno-38-3" name="__codelineno-38-3" href="#__codelineno-38-3"></a><span class="w">        </span><span class="p">.</span><span class="n">related</span><span class="o">&lt;</span><span class="n">Comment</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">)</span>
+</span><span id="__span-38-4"><a id="__codelineno-38-4" name="__codelineno-38-4" href="#__codelineno-38-4"></a><span class="w">        </span><span class="o">?</span><span class="p">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'id'</span><span class="p">,</span><span class="w"> </span><span class="s1">'desc'</span><span class="p">)</span>
+</span><span id="__span-38-5"><a id="__codelineno-38-5" name="__codelineno-38-5" href="#__codelineno-38-5"></a><span class="w">        </span><span class="p">.</span><span class="kd">get</span><span class="p">()</span><span class="w"> </span><span class="o">??</span>
+</span><span id="__span-38-6"><a id="__codelineno-38-6" name="__codelineno-38-6" href="#__codelineno-38-6"></a><span class="w">    </span><span class="o">&lt;</span><span class="n">Comment</span><span class="o">&gt;</span><span class="p">[];</span>
+</span></code></pre></div>
+<h3 id="saving-through-a-relation">Saving through a relation</h3>
+<p>These methods save a related model and set the foreign key. They work with <code>@HasMany</code>, <code>@HasOne</code>, <code>@MorphMany</code> and <code>@MorphOne</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="n">Comment</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">createRelated</span><span class="o">&lt;</span><span class="n">Comment</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">,</span>
+</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'body'</span><span class="o">:</span><span class="w"> </span><span class="s1">'hi'</span><span class="p">});</span>
+</span><span id="__span-39-3"><a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">saveRelated</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">,</span><span class="w"> </span><span class="n">Comment</span><span class="p">()..</span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'hi'</span><span class="p">);</span>
+</span><span id="__span-39-4"><a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">saveManyRelated</span><span class="p">(</span><span class="s1">'comments'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Comment</span><span class="o">&gt;</span><span class="p">[</span><span class="n">c1</span><span class="p">,</span><span class="w"> </span><span class="n">c2</span><span class="p">]);</span>
+</span></code></pre></div>
+<p><code>createRelated()</code> uses <code>create()</code>, but the foreign key does not need to be in <code>fillable</code>. For a <code>@BelongsTo</code>, use <code>associate()</code> and <code>dissociate()</code>. See <a href="relationship/belongs-to/#saving-related-models">BelongsTo</a>.</p>
+<h2 id="debugging-queries">Debugging queries</h2>
+<p><code>debug(true)</code> prints the SQL of the model in the terminal:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">()..</span><span class="n">debug</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'John Wick'</span><span class="p">;</span>
+</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="methods-on-other-pages">Methods on other pages</h2>
+<table>
+<thead>
+<tr>
+<th>Methods</th>
+<th>Page</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Model.observe()</code>, <code>Model.forgetObservers()</code>, <code>Model.withoutEvents()</code></td>
+<td><a href="events/">Model events</a></td>
+</tr>
+<tr>
+<td><code>withCount()</code>, <code>withSum()</code>, <code>withAvg()</code>, <code>withMin()</code>, <code>withMax()</code>, <code>withExists()</code>, <code>countOf()</code>, <code>aggregate()</code></td>
+<td><a href="counting-relations/">Counting relations</a></td>
+</tr>
+<tr>
+<td><code>whereHas()</code>, <code>orWhereHas()</code>, <code>whereDoesntHave()</code>, <code>orWhereDoesntHave()</code>, <code>has()</code></td>
+<td><a href="relation-queries/">Query by relations</a></td>
+</tr>
+<tr>
+<td><code>withoutGlobalScope()</code>, <code>withoutGlobalScopes()</code></td>
+<td><a href="scopes/">Query scopes</a></td>
+</tr>
+<tr>
+<td><code>associate()</code>, <code>dissociate()</code></td>
+<td><a href="relationship/belongs-to/">BelongsTo</a></td>
+</tr>
+<tr>
+<td><code>attach()</code>, <code>detach()</code>, <code>sync()</code>, <code>syncWithoutDetaching()</code>, <code>toggle()</code>, <code>updateExistingPivot()</code>, <code>pivot</code></td>
+<td><a href="relationship/many-to-many/">ManyToMany</a></td>
+</tr>
+<tr>
+<td><code>Model.morphMap()</code>, <code>Model.morphTypeOf()</code>, <code>Model.morphModel()</code></td>
+<td><a href="relationship/polymorphic/">Polymorphic</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><code>create()</code> can write <code>NULL</code> for a key that is <code>null</code> in the map, with the <a href="../#orm-flags"><code>createWritesNull</code> flag</a>.</li>
-<li>On update, a field is compared to its value from the last load or save. A <code>Map</code> or <code>List</code> field is always sent, because it can change in place.</li>
-<li>On update, a field is set to <code>NULL</code> only when it had a value before. Fields that were not loaded, for example with <code>select()</code>, are not changed.</li>
-<li>When nothing changed, <code>save()</code> runs no query and <code>updated_at</code> stays as it is. It still fires <code>updating</code> and <code>updated</code>, unless the <a href="../#orm-flags"><code>skipCleanUpdateEvents</code> flag</a> is on.</li>
-<li>When you set <code>updatedAt</code> yourself, <code>save()</code> keeps your value.</li>
-<li><code>getChanges()</code> and <code>wasChanged()</code> also count <code>update()</code>, <code>increment()</code>, <code>decrement()</code>, <code>touch()</code>, <code>restore()</code> and a soft delete on the model as a save.</li>
-<li>A soft delete and <code>restore()</code> also set <code>updated_at</code> when the model has timestamps.</li>
-</ul>
-<h3 id="mass-assignment_1">Mass assignment</h3>
-<ul>
-<li><code>forceFill()</code> skips a key that is not a column. A value of the wrong type throws an <code>ArgumentError</code>.</li>
-<li><code>Model.unguarded()</code> also covers timers, futures that are not awaited and stream listeners that start inside the callback.</li>
-<li>A query <code>update()</code> keeps the check, so <code>update(req.body)</code> stays safe.</li>
-<li>Model events that fire inside <code>forceCreate()</code> and <code>forceUpdate()</code> also run with the check off. So a <code>create()</code> or <code>update()</code> inside such a hook skips <code>fillable</code> too.</li>
-</ul>
-<h3 id="increment-touch-and-replicate">Increment, touch and replicate</h3>
-<ul>
-<li>A third argument to <code>increment()</code> sets other columns in the same query: <code>increment('views', 1, &lt;String, dynamic&gt;{'status': 'hot'})</code>. Keys that <code>fillable</code> and <code>guarded</code> do not allow are dropped.</li>
-<li><code>touch()</code> returns the number of changed rows. It returns <code>0</code> when the model has no <code>updated_at</code> column and you give no column, or when a hook throws <code>CancelModelEvent</code>.</li>
-<li><code>replicate()</code> copies <code>deleted_at</code>, so a copy of a soft deleted model is soft deleted too. A column in its list that can not be <code>null</code>, or that is not a column, throws an <code>ArgumentError</code>.</li>
-</ul>
-<h3 id="rows-with-no-primary-key">Rows with no primary key</h3>
-<p><code>update()</code>, <code>increment()</code>, <code>decrement()</code>, <code>touch()</code> and <code>delete()</code> on a model with no primary key value and no <code>where</code> throw a <code>StateError</code>. This happens on a model that was never saved, or that was read without its key.</p>
-<h3 id="refreshing">Refreshing</h3>
-<ul>
-<li><code>refresh()</code> and <code>fresh()</code> read by primary key from the write database. They find a soft deleted row too, and skip global scopes.</li>
-<li><code>refresh()</code> throws a <code>StateError</code> on a model that is not in the table, and a <code>ModelNotFoundException</code> when the row is gone.</li>
-</ul>
-<h3 id="relations-after-a-reload">Relations after a reload</h3>
-<p><code>await user.reload()</code> and a preload set the relation fields again, also when there is no related row. A to-one field that can be <code>null</code> becomes <code>null</code>. A to-many field becomes <code>[]</code>. A to-one field that can not be <code>null</code> keeps its old value.</p>
-<h3 id="other-cases">Other cases</h3>
-<ul>
-<li><code>create:model</code> is another name for <code>make:model</code>.</li>
-<li>Computed values of loaded relations are in the nested JSON too. <code>toMap(original: true)</code> has no computed values.</li>
+<li><a href="relationship/has-many/">HasMany</a>: connect one model to many.</li>
+<li><a href="scopes/">Query scopes</a>: keep a query you use often in the model.</li>
+<li><a href="events/">Model events</a>: run code when a model is saved or deleted.</li>
+<li><a href="../factories/">Factories</a>: make test rows.</li>
 </ul>
 
 
@@ -8135,7 +7989,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

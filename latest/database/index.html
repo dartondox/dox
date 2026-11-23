@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../assets/style.css">
     
@@ -5061,10 +5063,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5190,95 +5188,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6998,17 +6907,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Setup
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#supported-databases" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7016,6 +6926,11 @@
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7030,6 +6945,17 @@
   
     <nav class="md-nav" aria-label="Configuration">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#connection-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection options
+      
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#environment-values" class="md-nav__link">
@@ -7080,6 +7006,17 @@
     <span class="md-ellipsis">
       
         Pool settings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#all-extra-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        All extra options
       
     </span>
   </a>
@@ -7203,74 +7140,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#without-dox" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#all-extra-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        All extra options
+        Without Dox
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#table-and-column-names" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Table and column names
+        Next steps
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#query-logs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Query logs
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#more-about-orm-flags" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        More about ORM flags
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#more-about-sqlite" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        More about SQLite
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7291,37 +7178,29 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/database/index.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="database">Database</h1>
 <p>Connect Dox to Postgres, MySQL, MariaDB or SQLite with the <code>dox_orm</code> package.</p>
-<p>Almost every web app keeps its data in a database. Dox gives you two ways to work with it:</p>
+<p>Dox gives you two ways to work with the data:</p>
 <ul>
 <li>The <a href="query-builder/">query builder</a> builds SQL with methods, like <code>QueryBuilder.table('blog').where('id', 1).get()</code>.</li>
 <li><a href="model/">Models</a> give you one class per table, with relations and events.</li>
 </ul>
-<p>You can also run <a href="transactions/">transactions</a>, and create and change tables with <a href="migration/">migrations</a> and the <a href="schema/">schema builder</a>.</p>
-<h2 id="installation">Installation</h2>
+<p>You can also run <a href="transactions/">transactions</a>, and make tables with <a href="migration/">migrations</a> and the <a href="schema/">schema builder</a>.</p>
+<h2 id="setup">Setup</h2>
 <p>A new app already has <code>dox_orm</code>. To add it to an app, run:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>add<span class="w"> </span>orm<span class="w"> </span>--driver<span class="o">=</span>sqlite
 </span></code></pre></div>
-<p><code>--driver</code> is <code>sqlite</code> (the default), <code>postgres</code> or <code>mysql</code>. The command adds <code>dox_orm</code> and <code>dox_migration</code>, writes <code>lib/config/database.dart</code>, the ORM provider, <code>bin/migrate.dart</code> and <code>db/migration/</code>, and adds the <code>DB_*</code> keys to <code>.env</code>. It also turns off the build of the drivers you do not use (see <a href="#skip-unused-drivers">Skip unused drivers</a>). It never overwrites a file, so it is safe to run twice. See <a href="../getting-started/add-a-package/">Add a package</a>.</p>
-<p>If you only want the package, run <code>dart pub add dox_orm</code> and import it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span></code></pre></div>
-<h2 id="supported-databases">Supported databases</h2>
+<p>The driver is sqlite (the default), postgres or mysql. The command adds <code>dox_orm</code> and <code>dox_migration</code>, the config, the ORM provider, <code>bin/migrate.dart</code>, <code>db/migration/</code> and the <code>DB_*</code> keys in <code>.env</code>. It never overwrites a file. See <a href="../getting-started/add-a-package/">Add a package</a>.</p>
+<h3 id="supported-databases">Supported databases</h3>
 <table>
 <thead>
 <tr>
 <th>Database</th>
 <th><code>Driver</code></th>
-<th>Driver</th>
+<th>Package</th>
 <th>Pool</th>
 <th>Good for</th>
 </tr>
@@ -7331,101 +7210,153 @@
 <td>Postgres</td>
 <td><code>Driver.postgres</code></td>
 <td><a href="postgres-native/"><code>dox_postgres_native</code></a></td>
-<td>Yes</td>
-<td>Production</td>
+<td>yes</td>
+<td>production</td>
 </tr>
 <tr>
 <td>MySQL 8+ and MariaDB</td>
 <td><code>Driver.mysql</code></td>
 <td><a href="mysql-native/"><code>dox_mysql_native</code></a></td>
-<td>Yes</td>
-<td>Production</td>
+<td>yes</td>
+<td>production</td>
 </tr>
 <tr>
 <td>SQLite</td>
 <td><code>Driver.sqlite</code></td>
 <td><code>sqlite3</code></td>
-<td>No, one connection per isolate</td>
-<td>Development, tests, small apps</td>
+<td>no, one connection per isolate</td>
+<td>development, tests, small apps</td>
 </tr>
 </tbody>
 </table>
-<p>Postgres and MySQL use a native (Rust) driver, and there is no other driver. If the native library can not load, the app stops with an error. See the <a href="postgres-native/#when-the-library-does-not-load">Postgres</a> and <a href="mysql-native/#when-the-library-does-not-load">MySQL</a> pages.</p>
+<p>Postgres and MySQL use a native (Rust) driver. If the native library can not load, the app stops with an error. See <a href="postgres-native/#when-the-library-does-not-load">Postgres</a> and <a href="mysql-native/#when-the-library-does-not-load">MySQL</a>.</p>
 <h2 id="configuration">Configuration</h2>
 <p>Put your connections in <code>lib/config/database.dart</code>. <code>connection</code> is the name of the default connection:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">5432</span><span class="p">,</span>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
-</span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
-</span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-18"><a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-19"><a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span><span class="w"> </span><span class="c1">// also for MariaDB</span>
-</span><span id="__span-2-20"><a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
-</span><span id="__span-2-21"><a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
-</span><span id="__span-2-22"><a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
-</span><span id="__span-2-23"><a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
-</span><span id="__span-2-24"><a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
-</span><span id="__span-2-25"><a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
-</span><span id="__span-2-26"><a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
-</span><span id="__span-2-27"><a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-28"><a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-2-29"><a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
-</span><span id="__span-2-30"><a id="__codelineno-2-30" name="__codelineno-2-30" href="#__codelineno-2-30"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span><span class="w"> </span><span class="c1">// file path, like db/dox.sqlite, or ':memory:'</span>
-</span><span id="__span-2-31"><a id="__codelineno-2-31" name="__codelineno-2-31" href="#__codelineno-2-31"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
-</span><span id="__span-2-32"><a id="__codelineno-2-32" name="__codelineno-2-32" href="#__codelineno-2-32"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-2-33"><a id="__codelineno-2-33" name="__codelineno-2-33" href="#__codelineno-2-33"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-2-34"><a id="__codelineno-2-34" name="__codelineno-2-34" href="#__codelineno-2-34"></a><span class="p">);</span>
+<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/app.dart'</span><span class="p">;</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">5432</span><span class="p">,</span>
+</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
+</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
+</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
+</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
+</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
+</span><span id="__span-1-17"><a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="w">    </span><span class="s1">'mysql'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-1-19"><a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">mysql</span><span class="p">,</span><span class="w"> </span><span class="c1">// also for MariaDB</span>
+</span><span id="__span-1-20"><a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a><span class="w">      </span><span class="nl">host:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbHost</span><span class="p">,</span>
+</span><span id="__span-1-21"><a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a><span class="w">      </span><span class="nl">port:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPort</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="m">3306</span><span class="p">,</span>
+</span><span id="__span-1-22"><a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a><span class="w">      </span><span class="nl">user:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbUsername</span><span class="p">,</span>
+</span><span id="__span-1-23"><a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a><span class="w">      </span><span class="nl">password:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbPassword</span><span class="p">,</span>
+</span><span id="__span-1-24"><a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span>
+</span><span id="__span-1-25"><a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a><span class="w">      </span><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">},</span>
+</span><span id="__span-1-26"><a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
+</span><span id="__span-1-27"><a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-1-28"><a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a><span class="w">    </span><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-1-29"><a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a><span class="w">      </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
+</span><span id="__span-1-30"><a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a><span class="w">      </span><span class="nl">database:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbName</span><span class="p">,</span><span class="w"> </span><span class="c1">// file path, like db/dox.sqlite, or ':memory:'</span>
+</span><span id="__span-1-31"><a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="w">      </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
+</span><span id="__span-1-32"><a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-1-33"><a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-1-34"><a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a><span class="p">);</span>
 </span></code></pre></div>
-<p><code>env</code> is the typed env of the app, in <code>lib/config/env.dart</code>. Change <code>my_app</code> to the name of your app in <code>pubspec.yaml</code>. SQLite does not use <code>user</code>, <code>password</code>, <code>host</code> or <code>port</code>.</p>
-<p><code>debug: true</code> prints each SQL query with its values put in, so you can copy it and run it in psql, mysql or the sqlite CLI. The app template turns it on only in development:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>▌ [db:default] SELECT * FROM "users" WHERE "email" = 'a@b.com' LIMIT 1;
+<p>Change <code>my_app</code> to the name of your app. With <code>debug</code> on, each query prints with its values put in:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>▌ [db:default] SELECT * FROM "users" WHERE "email" = 'a@b.com' LIMIT 1;
 </span></code></pre></div>
+<h3 id="connection-options">Connection options</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>driver</code></td>
+<td><code>Driver.postgres</code>, <code>Driver.mysql</code> or <code>Driver.sqlite</code>.</td>
+</tr>
+<tr>
+<td><code>host</code>, <code>port</code>, <code>user</code>, <code>password</code></td>
+<td>The server. SQLite does not use them.</td>
+</tr>
+<tr>
+<td><code>database</code></td>
+<td>The database name. For SQLite, the file path or <code>:memory:</code>.</td>
+</tr>
+<tr>
+<td><code>useSSL</code></td>
+<td>Turn on TLS. See <a href="postgres-native/#tls">Postgres TLS</a> and <a href="mysql-native/">MySQL</a>.</td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td>Print each query.</td>
+</tr>
+<tr>
+<td><code>printer</code></td>
+<td>The query printer: <code>PrettyQueryPrinter</code> (default), <code>ConsoleQueryPrinter</code>, <code>FileQueryPrinter</code> or your own <code>QueryPrinter</code>.</td>
+</tr>
+<tr>
+<td><code>logRedact</code></td>
+<td>Names of values to show as <code>***</code> in the log, like <code>['password', 'token']</code>. A key that ends with a name matches.</td>
+</tr>
+<tr>
+<td><code>slowQueryMs</code></td>
+<td>Log queries slower than this. See <a href="#slow-query-log">Slow query log</a>.</td>
+</tr>
+<tr>
+<td><code>extra</code></td>
+<td>Driver options. See <a href="#all-extra-options">All extra options</a>.</td>
+</tr>
+<tr>
+<td><code>read</code>, <code>write</code>, <code>sticky</code></td>
+<td>Read replicas. See <a href="replicas/">Read replicas</a>.</td>
+</tr>
+<tr>
+<td><code>driverFactory</code></td>
+<td>A function that makes your own <code>DBDriver</code> from the config.</td>
+</tr>
+</tbody>
+</table>
+<p><code>DatabaseConfig</code> also takes <code>url</code> (<a href="#database_url"><code>DATABASE_URL</code></a>), <code>flags</code> (<a href="#orm-flags">ORM flags</a>) and <code>strict</code>. For <code>strict</code>, see <a href="../digging-deeper/performance-mistakes/#strict-mode-in-the-orm">Strict mode in the ORM</a>.</p>
 <h3 id="environment-values">Environment values</h3>
 <p>The app config and the <a href="migration/">migration</a> commands read these keys from <code>.env</code>:</p>
-<div class="language-py highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">DB_CONNECTION</span><span class="o">=</span><span class="n">postgres</span> <span class="c1"># postgres, mysql or sqlite</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">DB_HOST</span><span class="o">=</span><span class="n">localhost</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">DB_PORT</span><span class="o">=</span><span class="mi">5432</span>           <span class="c1"># 3306 for mysql</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">DB_NAME</span><span class="o">=</span><span class="n">dox</span>            <span class="c1"># for sqlite: the file path, like db/dox.sqlite</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="n">DB_USERNAME</span><span class="o">=</span><span class="n">postgres</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">DB_PASSWORD</span><span class="o">=</span><span class="n">postgres</span>
+<div class="language-py highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">DB_CONNECTION</span><span class="o">=</span><span class="n">postgres</span> <span class="c1"># postgres, mysql or sqlite</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">DB_HOST</span><span class="o">=</span><span class="n">localhost</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">DB_PORT</span><span class="o">=</span><span class="mi">5432</span>           <span class="c1"># 3306 for mysql</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="n">DB_NAME</span><span class="o">=</span><span class="n">dox</span>            <span class="c1"># for sqlite: the file path, like db/dox.sqlite</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="n">DB_USERNAME</span><span class="o">=</span><span class="n">postgres</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="n">DB_PASSWORD</span><span class="o">=</span><span class="n">postgres</span>
 </span></code></pre></div>
 <h3 id="starting-the-orm">Starting the ORM</h3>
 <p>The ORM starts in a provider. The app template already has this file:</p>
-<div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>
-</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="c1">/// Close the database connections when the server stops.</span>
-</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shutdown</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
-</span><span id="__span-5-15"><a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-16"><a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a><span class="p">}</span>
+<div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ORMProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
+</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>
+</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shutdown</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Dox finds every <code>DoxProvider</code> class on its own. After you add a provider, run <code>dart run build_runner build</code>.</p>
-<p>Each isolate runs the provider. Isolates with the same settings share one pool, so <code>maxConnectionCount</code> is for the whole process, not for one isolate.</p>
+<p>After you add a provider, run <code>dart run build_runner build</code>. Isolates with the same settings share one pool, so <code>maxConnectionCount</code> is for the whole process.</p>
 <h3 id="database_url"><code>DATABASE_URL</code></h3>
-<p>Many hosts (Fly, Render, Heroku and others) give you one database url. Dox reads it from the <code>DATABASE_URL</code> key, in <code>.env</code> or in the shell. If both have it, the shell wins.</p>
-<p>When <code>DATABASE_URL</code> is set, it wins over the config of the default connection. That config still gives <code>debug</code>, <code>printer</code>, <code>slowQueryMs</code> and <code>extra</code>. Other named connections do not change.</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://app:s%40cret@db.example.com:5432/blog?sslmode<span class="o">=</span>require
+<p>Many hosts give you one database url. Dox reads it from the <code>DATABASE_URL</code> key, in <code>.env</code> or in the shell. The shell wins:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://app:s%40cret@db.example.com:5432/blog?sslmode<span class="o">=</span>require
 </span></code></pre></div>
 <table>
 <thead>
@@ -7449,253 +7380,40 @@
 </tr>
 </tbody>
 </table>
-<p>The app passes the url in through the env class, so the app and <code>dox migrate</code> use the same url:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">databaseUrl</span><span class="p">;</span>
+<p>The url replaces the config of the default connection. That config still gives <code>debug</code>, <code>printer</code>, <code>logRedact</code>, <code>slowQueryMs</code>, <code>extra</code> and the read hosts. Pass the url through the env class, so the app and <code>dox migrate</code> read the same url:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nl">url:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">databaseUrl</span><span class="p">,</span><span class="w"> </span><span class="c1">// String? get databaseUrl; in env.dart</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="p">{...},</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="p">);</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">url:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">databaseUrl</span><span class="p">,</span>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
-</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="p">{...},</span>
-</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>If your <code>lib/config/database.dart</code> has no <code>url: env.databaseUrl</code> line, Dox reads <code>DATABASE_URL</code> only from the shell, not from <code>.env</code>. An empty <code>url</code> (<code>url: ''</code>) turns <code>DATABASE_URL</code> off.</p>
-<p>Some rules for the url:</p>
+<p>Without the <code>url</code> line, Dox reads <code>DATABASE_URL</code> only from the shell. An empty url turns it off.</p>
 <ul>
 <li>The user, password and database name are url-decoded. Write <code>@</code> in a password as <code>%40</code>.</li>
-<li>With no port, Postgres uses <code>5432</code> and MySQL uses <code>3306</code>.</li>
-<li>For Postgres, <code>sslmode</code> works like libpq (<code>disable</code>, <code>prefer</code>, <code>require</code>, <code>verify-ca</code>, <code>verify-full</code>). <code>require</code> does not check the certificate, so use <code>verify-full</code> when your host supports it. See <a href="postgres-native/#tls">Postgres TLS</a>.</li>
-<li>For MySQL, <code>ssl=true</code> (or <code>sslmode=require</code>) turns TLS on and checks the certificate. Add <code>verifyCertificate=false</code> to skip the check, only for a self-signed certificate in development.</li>
-<li><code>host=/path</code> (or <code>socket=/path</code>) connects to a Unix socket. See <a href="#unix-socket">Unix socket</a>.</li>
-<li>Any other option goes to <code>extra</code>, like <code>?maxConnectionCount=20</code>. A number becomes an <code>int</code>, and <code>true</code> and <code>false</code> become a <code>bool</code>. This works for SQLite too, like <code>sqlite://db/dox.sqlite?background=true</code>.</li>
+<li>For Postgres, <code>sslmode</code> works like libpq. <code>require</code> does not check the certificate, so use <code>verify-full</code> when you can. See <a href="postgres-native/#tls">Postgres TLS</a>.</li>
+<li>For MySQL, <code>ssl=true</code> turns on TLS and checks the certificate. <code>verifyCertificate=false</code> skips the check, for development only.</li>
+<li>Other options go to <code>extra</code>, like <code>?maxConnectionCount=20</code>.</li>
 </ul>
 <p>To make one <code>ConnectionConfig</code> from a url, use <code>ConnectionConfig.fromUrl(url)</code>.</p>
 <h3 id="unix-socket">Unix socket</h3>
-<p>Some hosts, like Google Cloud SQL on Cloud Run, give you a Unix socket instead of a network host. A host that starts with <code>/</code> is a Unix socket:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nv">DB_HOST</span><span class="o">=</span>/cloudsql/my-project:europe-west1:blog
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1"># or</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://blog:secret@/blog?host<span class="o">=</span>/cloudsql/my-project:europe-west1:blog
+<p>A host that starts with <code>/</code> is a Unix socket:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nv">DB_HOST</span><span class="o">=</span>/cloudsql/my-project:europe-west1:blog
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="c1"># or</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>postgres://blog:secret@/blog?host<span class="o">=</span>/cloudsql/my-project:europe-west1:blog
 </span></code></pre></div>
-<p>For Postgres, the host is the socket folder, like in libpq. The driver uses the socket file <code>&lt;folder&gt;/.s.PGSQL.&lt;port&gt;</code>. A host that already ends with <code>/.s.PGSQL.5432</code> works too.</p>
-<p>For MySQL and MariaDB, the host is the socket file itself, and the port is not used. On Cloud SQL the socket file is <code>/cloudsql/PROJECT:REGION:INSTANCE</code>. A local server often uses <code>/var/run/mysqld/mysqld.sock</code> or <code>/tmp/mysql.sock</code>:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nv">DB_CONNECTION</span><span class="o">=</span>mysql
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="nv">DB_HOST</span><span class="o">=</span>/var/run/mysqld/mysqld.sock
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># or</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="nv">DATABASE_URL</span><span class="o">=</span>mysql://app:secret@/app?socket<span class="o">=</span>/var/run/mysqld/mysqld.sock
-</span></code></pre></div>
-<p>In the url, <code>?socket=</code> and <code>?host=</code> do the same thing.</p>
+<p>For Postgres, the host is the socket folder, like in libpq. For MySQL and MariaDB, the host is the socket file, like <code>/var/run/mysqld/mysqld.sock</code>. In the url, <code>?socket=</code> and <code>?host=</code> do the same.</p>
 <h3 id="pool-settings">Pool settings</h3>
-<p>Postgres and MySQL keep a pool of connections. You can set how long the pool waits and how long it keeps a connection, in the <code>extra</code> map. A time is a <code>Duration</code> or a number of seconds, so <code>?requestTimeout=30</code> in <code>DATABASE_URL</code> works too:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="s1">'requestTimeout'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
-</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="s1">'maxConnectionAge'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
-</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="s1">'idleTimeout'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span>
-</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="s1">'serverKill'</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="c1">// MySQL only</span>
-</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="p">},</span>
+<p>Set the pool of Postgres and MySQL in the <code>extra</code> map. A time is a <code>Duration</code> or a number of seconds:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nl">extra:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="s1">'maxConnectionCount'</span><span class="o">:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="s1">'requestTimeout'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="s1">'maxConnectionAge'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="s1">'idleTimeout'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="s1">'serverKill'</span><span class="o">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="c1">// MySQL only</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="p">},</span>
 </span></code></pre></div>
-<ul>
-<li><code>maxConnectionCount</code> (default <code>10</code>): the most connections in the pool.</li>
-<li><code>requestTimeout</code> (default 300 s): the longest wait for one request. A request is getting a free connection, connecting and running the query. If it takes longer, it fails and its connection is closed. A transaction with no request for this long is rolled back.</li>
-<li><code>maxConnectionAge</code> (default: no limit on Postgres, 12 hours on MySQL): a connection older than this is closed and opened again. It is never closed while it runs a query or a transaction. This helps behind a load balancer, or after a database failover.</li>
-<li><code>idleTimeout</code> (default: no limit on Postgres, 12 hours on MySQL): a free connection that is not used for this long is closed.</li>
-<li><code>serverKill</code> (MySQL, default <code>true</code>): the server stops a cancelled or timed out query with <code>KILL QUERY</code>. Set it to <code>false</code> behind a proxy like ProxySQL, because the <code>KILL</code> may reach another server. Then a cancelled query stops in Dart at once, but it runs to its end on the server.</li>
-</ul>
-<p>To stop one query by hand, see <a href="query-builder/#cancelling-a-query">Cancel a query</a>. All other <code>extra</code> keys are in <a href="#all-extra-options">All <code>extra</code> options</a>.</p>
-<h2 id="skip-unused-drivers">Skip unused drivers</h2>
-<p><code>dox_orm</code> brings all three drivers, and the build downloads a native library for each one. Your app needs only the driver of its database. To skip the others, add a <code>hooks: user_defines:</code> block to the <code>pubspec.yaml</code> of your app. In a pub workspace, put it in the root <code>pubspec.yaml</code>, because Dart reads <code>user_defines</code> only from the root package.</p>
-<p><code>skip: true</code> turns off the download of a driver. Only the bool <code>true</code> skips, any other value does nothing.</p>
-<p>A new app uses SQLite, and its <code>pubspec.yaml</code> already has this block:</p>
-<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nt">hooks</span><span class="p">:</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">    </span><span class="nt">dox_postgres_native</span><span class="p">:</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">    </span><span class="nt">dox_mysql_native</span><span class="p">:</span>
-</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span></code></pre></div>
-<p>For a Postgres app:</p>
-<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nt">hooks</span><span class="p">:</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="nt">dox_mysql_native</span><span class="p">:</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="nt">sqlite3</span><span class="p">:</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
-</span></code></pre></div>
-<p>For a MySQL app:</p>
-<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nt">hooks</span><span class="p">:</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">    </span><span class="nt">dox_postgres_native</span><span class="p">:</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="nt">sqlite3</span><span class="p">:</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
-</span></code></pre></div>
-<p><code>sqlite3: source: system</code> comes from the <code>sqlite3</code> package. The build does not download SQLite, and the app loads the <code>libsqlite3</code> library of the system when it opens SQLite. So if your app does open SQLite, remove these lines: a system without <code>libsqlite3</code>, like the <code>FROM scratch</code> Docker image, fails then.</p>
-<p>When you switch to another database, remove the <code>skip</code> line of the driver you now use, and run <code>dart pub get</code>. A driver that is still skipped stops the app when it opens a pool. The error tells you to remove <code>skip</code>.</p>
-<h2 id="running-raw-queries">Running raw queries</h2>
-<p>Sometimes the query builder can not build the SQL you need. <code>QueryBuilder.query()</code> runs your own SQL on the default connection. Use <code>@name</code> for values, so they are sent as bound parameters and are safe from SQL injection:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="s1">'select * from blog where id = @id'</span><span class="p">,</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nl">substitutionValues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>Pass <code>connection</code> to run it on another connection:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'select 1'</span><span class="p">,</span><span class="w"> </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'mysql'</span><span class="p">);</span>
-</span></code></pre></div>
-<h2 id="using-other-connections">Using other connections</h2>
-<p>If your app has more than one connection, use <code>withConnection()</code> with a connection name from the config:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'blog'</span><span class="p">)</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">)</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<p>A model keeps its connection, so <code>save()</code> and <code>delete()</code> use it. Models that a query returns use the connection of the query:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">()..</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">);</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">;</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// saved on 'mysql'</span>
-</span></code></pre></div>
-<h2 id="listen-to-queries">Listen to queries</h2>
-<p>If you want metrics or your own query log, <code>SqlQueryBuilder().listen()</code> runs your function after each query. It works on every connection and inside transactions:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">onQuery</span><span class="p">(</span><span class="n">QueryEvent</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="n">connection</span><span class="si">}</span><span class="s1"> </span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="n">time</span><span class="p">.</span><span class="n">inMilliseconds</span><span class="si">}</span><span class="s1"> ms: </span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="n">sql</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="p">}</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="n">SqlQueryBuilder</span><span class="p">().</span><span class="n">listen</span><span class="p">(</span><span class="n">onQuery</span><span class="p">);</span>
-</span></code></pre></div>
-<p>A <code>QueryEvent</code> has:</p>
-<ul>
-<li><code>sql</code>: the SQL text, with <code>@name</code> for each value.</li>
-<li><code>bindings</code>: the values. A value named in <code>logRedact</code> shows as <code>***</code>.</li>
-<li><code>time</code>: how long the query took, a <code>Duration</code>.</li>
-<li><code>connection</code>: the name of the connection.</li>
-</ul>
-<p>The function runs only after a query that worked, because the error of a failed query goes to your code. If the function throws, Dox logs the error and the query still returns its rows. <code>SqlQueryBuilder().removeListener(onQuery)</code> stops it.</p>
-<h3 id="slow-query-log">Slow query log</h3>
-<p>To find slow queries in production, set <code>slowQueryMs</code> on a connection. Dox then logs each query that takes longer than that many milliseconds. It is off by default, and it works with <code>debug</code> off:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span><span class="nl">slowQueryMs:</span><span class="w"> </span><span class="m">500</span><span class="p">,</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="p">),</span>
-</span></code></pre></div>
-<p>The line goes to the query <code>printer</code>, with the connection name, the time and the SQL:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>▌ [db:postgres SLOW 812ms] SELECT * FROM "orders" WHERE "user_id" = 42;
-</span></code></pre></div>
-<p>Set <code>slowQueryMs</code> to <code>0</code> to log every query. A failed query is not logged here.</p>
-<h2 id="orm-flags">ORM flags</h2>
-<p><code>OrmFlags</code> turns on opt-in ORM behaviors. Each flag is off by default, and with all flags off the ORM works as the database pages say. Pass the flags as <code>flags:</code> in <code>DatabaseConfig</code>. A new app can start with <code>OrmFlags.all()</code>, which turns on every flag:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">},</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="n">OrmFlags</span><span class="p">.</span><span class="n">all</span><span class="p">(),</span><span class="w"> </span><span class="c1">// every flag on</span>
-</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>To turn on only some flags, name them:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="nl">flags:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">OrmFlags</span><span class="p">(</span><span class="nl">pluralTableNames:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">sumReturnsZero:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
-</span></code></pre></div>
-<table>
-<thead>
-<tr>
-<th>Flag</th>
-<th>Off (default)</th>
-<th>On</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>skipCleanUpdateEvents</code></td>
-<td><code>save()</code> with no changes fires <code>saving</code>, <code>updating</code>, <code>updated</code> and <code>saved</code>.</td>
-<td>It fires only <code>saving</code> and <code>saved</code>. A model with a <code>Map</code> or <code>List</code> field always counts as changed. A save with changes runs <code>beforeSave</code> two times, and a save with no changes runs it one time.</td>
-</tr>
-<tr>
-<td><code>belongsToKeyFromRelation</code></td>
-<td>The default <code>belongsTo</code> foreign key comes from the class name: <code>@BelongsTo(User) User? author</code> uses <code>user_id</code>.</td>
-<td>It comes from the relation name: <code>author_id</code>.</td>
-</tr>
-<tr>
-<td><code>pluralTableNames</code></td>
-<td>The default table name is singular: <code>User</code> uses <code>user</code>.</td>
-<td>It is plural, with English plural rules: <code>users</code>, <code>blog_posts</code>, <code>categories</code>.</td>
-</tr>
-<tr>
-<td><code>createWritesNull</code></td>
-<td><code>create()</code> does not send a <code>null</code> key, so the column default is used.</td>
-<td>It writes <code>NULL</code> for a key that is <code>null</code> in the map.</td>
-</tr>
-<tr>
-<td><code>sumReturnsZero</code></td>
-<td><code>sum()</code> gives <code>null</code> when no row matches.</td>
-<td>It gives <code>0</code>.</td>
-</tr>
-<tr>
-<td><code>selectRawAdds</code></td>
-<td><code>selectRaw()</code> replaces the select list.</td>
-<td>It adds to it, so <code>select('a').selectRaw('count(*) as c')</code> selects both.</td>
-</tr>
-<tr>
-<td><code>groupByAdds</code></td>
-<td>A second <code>groupBy()</code> replaces the first.</td>
-<td>It adds to the first. <code>groupByRaw()</code> too.</td>
-</tr>
-<tr>
-<td><code>lastPageAtLeastOne</code></td>
-<td><code>paginate()</code> gives <code>lastPage</code> <code>0</code> when there are no rows.</td>
-<td>It gives <code>1</code>.</td>
-</tr>
-<tr>
-<td><code>updateSetsUpdatedAt</code></td>
-<td>A model query <code>update()</code>, like <code>Blog().where('id', 1).update({...})</code>, does not touch <code>updated_at</code>.</td>
-<td>It sets <code>updated_at</code>, unless the data already has it.</td>
-</tr>
-<tr>
-<td><code>incrementFiresEvents</code></td>
-<td><code>increment()</code> and <code>decrement()</code> on a model do not fire events or set <code>updated_at</code>.</td>
-<td>They fire <code>saving</code>, <code>updating</code>, <code>updated</code> and <code>saved</code>, and set <code>updated_at</code>. A hook that cancels stops the write.</td>
-</tr>
-<tr>
-<td><code>preloadUnknownThrows</code></td>
-<td><code>preload('typo')</code> loads nothing, with no error.</td>
-<td>It throws an <code>ArgumentError</code>. With a dot path, each level is checked.</td>
-</tr>
-<tr>
-<td><code>toJsonLoadedRelations</code></td>
-<td><code>toJson()</code> has only the relations named in <code>preload()</code>.</td>
-<td>It also has the relations loaded with <code>$getRelation()</code>.</td>
-</tr>
-<tr>
-<td><code>laravelPostgresTypes</code></td>
-<td>On Postgres, <code>timestamps()</code> and <code>softDeletes()</code> make <code>TIMESTAMPTZ</code>, and <code>json()</code> makes <code>JSONB</code>.</td>
-<td>A new table gets <code>TIMESTAMP</code> and <code>JSON</code>.</td>
-</tr>
-</tbody>
-</table>
-<p><code>bin/migrate.dart</code> does not start the ORM, so give the flags to the migrator too: <code>Migrator(migrations: migrations, flags: databaseConfig.flags)</code>. See <a href="migration/#database-settings">Migration</a>.</p>
-<h2 id="sqlite">SQLite</h2>
-<p>SQLite is good for development, tests and small apps. For a busy production app, use Postgres or MySQL.</p>
-<p>You do not install SQLite on your system, because the <code>sqlite3</code> package bundles it with a build hook. For the AOT binary, use <code>dox build</code>. It puts the library in <code>build/bundle/lib/</code>, next to <code>build/bundle/bin/server</code>, so keep the two folders together. <code>dart compile exe</code> does not work with build hooks. See <a href="../digging-deeper/deployment/">Deployment</a>.</p>
-<p>SQLite has no bool, JSON or date type, so Dox converts them for you:</p>
-<ul>
-<li><code>boolean()</code> is saved as <code>0</code>/<code>1</code> and read back as <code>bool</code>.</li>
-<li><code>json()</code> is saved as text and read back as <code>Map</code> or <code>List</code>.</li>
-<li>Dates are saved as ISO text in UTC and read back as <code>DateTime</code>.</li>
-</ul>
-<p>This works for tables made by <code>Schema</code>, or by SQL with the same type names (<code>BOOLEAN</code>, <code>JSON</code>, <code>TIMESTAMP</code>, <code>DATE</code>, <code>DATETIME</code>). A column with an alias (<code>active as is_active</code>) is not converted.</p>
-<p>Schema limits, like <code>change()</code>, <code>dropColumn</code> and <code>NOT NULL</code> columns, are in <a href="schema/#sqlite-notes">SQLite notes</a>.</p>
-<h3 id="run-queries-in-a-helper-isolate">Run queries in a helper isolate</h3>
-<p>A SQLite query blocks the isolate while it runs, so one slow query stops every other request on that isolate. Set <code>background</code> to <code>true</code> to run the queries in a helper isolate instead. Your isolate only waits for the answer, so it keeps serving other requests:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
-</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'db/dox.sqlite'</span><span class="p">,</span>
-</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="w">  </span><span class="nl">extra:</span><span class="w"> </span><span class="p">{</span><span class="s1">'background'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
-</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="p">),</span>
-</span></code></pre></div>
-<p>With <code>DATABASE_URL</code>, add <code>?background=true</code>, like <code>sqlite://db/dox.sqlite?background=true</code>.</p>
-<p>Each query costs one message to the helper isolate and one back. So turn it on when some queries are slow, like a big report or a search with no index. Leave it off when the app runs many tiny queries, because they get a little slower.</p>
-<h2 id="mysql-and-mariadb">MySQL and MariaDB</h2>
-<p>The driver is <a href="mysql-native/"><code>dox_mysql_native</code></a>. Its page lists how values are converted.</p>
-<p>On MySQL and MariaDB, <code>CREATE</code>, <code>ALTER</code> and <code>DROP</code> are saved right away, so a transaction can not undo them.</p>
-<h2 id="details">Details</h2>
-<p>This section is for special cases. Most apps do not need it.</p>
-<h3 id="all-extra-options">All <code>extra</code> options</h3>
+<p>A request is a wait for a connection, the connect and the query. A transaction with no request for the <code>requestTimeout</code> is rolled back. Set <code>serverKill</code> to false behind a proxy like ProxySQL, because the kill can reach another server.</p>
+<h3 id="all-extra-options">All extra options</h3>
 <table>
 <thead>
 <tr>
@@ -7709,61 +7427,61 @@
 <tr>
 <td><code>maxConnectionCount</code></td>
 <td>Postgres, MySQL</td>
-<td><code>10</code></td>
+<td>10</td>
 <td>Most connections in the pool.</td>
 </tr>
 <tr>
 <td><code>requestTimeout</code></td>
 <td>Postgres, MySQL</td>
 <td>300 s</td>
-<td>The longest wait for one request.</td>
+<td>The longest time for one request.</td>
 </tr>
 <tr>
 <td><code>maxConnectionAge</code></td>
 <td>Postgres, MySQL</td>
-<td>none on Postgres, 12 hours on MySQL</td>
-<td>A connection older than this is closed once it has no query.</td>
+<td>no limit on Postgres, 12 hours on MySQL</td>
+<td>Close a connection older than this, when it has no query.</td>
 </tr>
 <tr>
 <td><code>idleTimeout</code></td>
 <td>Postgres, MySQL</td>
 <td>no limit on Postgres, 12 hours on MySQL</td>
-<td>A connection not used for this long is closed.</td>
+<td>Close a connection not used for this long.</td>
 </tr>
 <tr>
 <td><code>serverKill</code></td>
 <td>MySQL</td>
-<td><code>true</code></td>
-<td>Stop a cancelled or timed out query on the server with <code>KILL</code>.</td>
+<td>true</td>
+<td>Stop a cancelled or timed out query on the server with <code>KILL QUERY</code>.</td>
 </tr>
 <tr>
 <td><code>preparedStatementCacheSize</code></td>
 <td>MySQL, SQLite</td>
-<td><code>100</code></td>
+<td>100</td>
 <td>Prepared statements kept per connection.</td>
 </tr>
 <tr>
 <td><code>sslMode</code></td>
 <td>Postgres</td>
-<td><code>disable</code></td>
-<td>TLS mode: <code>disable</code>, <code>prefer</code>, <code>require</code>, <code>verify-ca</code> or <code>verify-full</code>.</td>
+<td>disable</td>
+<td>TLS mode: disable, prefer, require, verify-ca or verify-full.</td>
 </tr>
 <tr>
 <td><code>sslRootCert</code></td>
 <td>Postgres</td>
 <td>none</td>
-<td>Path of a PEM file with the CA certificates to trust for <code>verify-ca</code> and <code>verify-full</code>.</td>
+<td>PEM file with the CA certificates for verify-ca and verify-full.</td>
 </tr>
 <tr>
 <td><code>verifyCertificate</code></td>
 <td>MySQL</td>
-<td><code>true</code></td>
-<td><code>false</code> skips the TLS certificate check. Only for development.</td>
+<td>true</td>
+<td>false skips the TLS certificate check. Development only.</td>
 </tr>
 <tr>
 <td><code>timeZone</code></td>
 <td>Postgres</td>
-<td><code>UTC</code></td>
+<td>UTC</td>
 <td>Time zone of the session.</td>
 </tr>
 <tr>
@@ -7775,47 +7493,214 @@
 <tr>
 <td><code>busyTimeout</code></td>
 <td>SQLite</td>
-<td><code>5000</code></td>
+<td>5000</td>
 <td>Milliseconds a query waits for a lock.</td>
 </tr>
 <tr>
 <td><code>background</code></td>
 <td>SQLite</td>
-<td><code>false</code></td>
-<td><code>true</code> (or <code>1</code>, <code>'true'</code>, <code>'1'</code>) runs the queries in a <a href="#run-queries-in-a-helper-isolate">helper isolate</a>.</td>
+<td>false</td>
+<td>Run the queries in a <a href="#run-queries-in-a-helper-isolate">helper isolate</a>.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="table-and-column-names">Table and column names</h3>
+<p>To stop one query, see <a href="query-builder/#cancelling-a-query">Cancelling a query</a>.</p>
+<h2 id="skip-unused-drivers">Skip unused drivers</h2>
+<p><code>dox_orm</code> brings all three drivers, and the build downloads a native library for each. To skip the ones you do not use, add a <code>hooks: user_defines:</code> block to the root <code>pubspec.yaml</code>. A new app uses SQLite and already has this block:</p>
+<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">    </span><span class="nt">dox_postgres_native</span><span class="p">:</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="nt">dox_mysql_native</span><span class="p">:</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span></code></pre></div>
+<p>For a Postgres app:</p>
+<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">    </span><span class="nt">dox_mysql_native</span><span class="p">:</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="nt">sqlite3</span><span class="p">:</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+</span></code></pre></div>
+<p>For a MySQL app:</p>
+<div class="language-yaml highlight"><span class="filename">pubspec.yaml</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="nt">hooks</span><span class="p">:</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nt">user_defines</span><span class="p">:</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="nt">dox_postgres_native</span><span class="p">:</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">      </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="nt">sqlite3</span><span class="p">:</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">      </span><span class="nt">source</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">system</span>
+</span></code></pre></div>
+<p>Only the bool true skips. With <code>sqlite3: source: system</code>, the app loads the <code>libsqlite3</code> of the system. If your app opens SQLite, remove these lines, because an image without <code>libsqlite3</code> fails.</p>
+<p>When you change the database, remove the skip line of the new driver and run <code>dart pub get</code>.</p>
+<h2 id="running-raw-queries">Running raw queries</h2>
+<p><code>QueryBuilder.query()</code> runs your own SQL. Use <code>@name</code> for values, so they are bound:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="s1">'select * from blog where id = @id'</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">substitutionValues:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'id'</span><span class="o">:</span><span class="w"> </span><span class="m">1</span><span class="p">},</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">);</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'select 1'</span><span class="p">,</span><span class="w"> </span><span class="nl">connection:</span><span class="w"> </span><span class="s1">'mysql'</span><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="using-other-connections">Using other connections</h2>
+<p><code>withConnection()</code> runs a query on another connection from the config:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="p">.</span><span class="n">table</span><span class="p">(</span><span class="s1">'blog'</span><span class="p">)</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">)</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<p>A model keeps its connection, so <code>save()</code> and <code>delete()</code> use it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">Blog</span><span class="w"> </span><span class="n">blog</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Blog</span><span class="p">()..</span><span class="n">withConnection</span><span class="p">(</span><span class="s1">'mysql'</span><span class="p">);</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">blog</span><span class="p">.</span><span class="n">title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'Hello'</span><span class="p">;</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">blog</span><span class="p">.</span><span class="n">save</span><span class="p">();</span><span class="w"> </span><span class="c1">// saved on 'mysql'</span>
+</span></code></pre></div>
+<h2 id="listen-to-queries">Listen to queries</h2>
+<p><code>SqlQueryBuilder().listen()</code> runs your function after each query, on every connection:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">void</span><span class="w"> </span><span class="n">onQuery</span><span class="p">(</span><span class="n">QueryEvent</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="s1">'</span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="n">connection</span><span class="si">}</span><span class="s1"> </span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="n">time</span><span class="p">.</span><span class="n">inMilliseconds</span><span class="si">}</span><span class="s1"> ms: </span><span class="si">${</span><span class="n">e</span><span class="p">.</span><span class="n">sql</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="p">}</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="n">SqlQueryBuilder</span><span class="p">().</span><span class="n">listen</span><span class="p">(</span><span class="n">onQuery</span><span class="p">);</span>
+</span></code></pre></div>
+<p>A <code>QueryEvent</code> has <code>sql</code>, <code>bindings</code> (with <code>logRedact</code> values as <code>***</code>), <code>time</code> and <code>connection</code>. A failed query is not sent. <code>SqlQueryBuilder().removeListener(onQuery)</code> stops it.</p>
+<h3 id="slow-query-log">Slow query log</h3>
+<p>Set <code>slowQueryMs</code> on a connection to log each query slower than that many milliseconds. It works with <code>debug</code> off:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="s1">'postgres'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">postgres</span><span class="p">,</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="n">appConfig</span><span class="p">.</span><span class="n">isDevelopment</span><span class="p">,</span>
+</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="w">  </span><span class="nl">slowQueryMs:</span><span class="w"> </span><span class="m">500</span><span class="p">,</span>
+</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="p">),</span>
+</span></code></pre></div>
+<p>The line goes to the query printer:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>▌ [db:postgres SLOW 812ms] SELECT * FROM "orders" WHERE "user_id" = 42;
+</span></code></pre></div>
+<p>Set it to 0 to log every query.</p>
+<h2 id="orm-flags">ORM flags</h2>
+<p><code>OrmFlags</code> turns on opt-in ORM behaviors. Each flag is off by default. Pass them as <code>flags</code> in <code>DatabaseConfig</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/database.dart</span><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">DatabaseConfig</span><span class="w"> </span><span class="n">databaseConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DatabaseConfig</span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nl">connection:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">dbConnection</span><span class="p">,</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nl">connections:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="o">&gt;</span><span class="p">{</span><span class="w"> </span><span class="cm">/* ... */</span><span class="w"> </span><span class="p">},</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="nl">flags:</span><span class="w"> </span><span class="n">OrmFlags</span><span class="p">.</span><span class="n">all</span><span class="p">(),</span><span class="w"> </span><span class="c1">// every flag on</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>To turn on only some flags, name them:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="nl">flags:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">OrmFlags</span><span class="p">(</span><span class="nl">pluralTableNames:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">sumReturnsZero:</span><span class="w"> </span><span class="kc">true</span><span class="p">),</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Off (default)</th>
+<th>On</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>skipCleanUpdateEvents</code></td>
+<td><code>save()</code> with no changes fires <code>saving</code>, <code>updating</code>, <code>updated</code> and <code>saved</code>.</td>
+<td>It fires only <code>saving</code> and <code>saved</code>. A model with a <code>Map</code> or <code>List</code> field always counts as changed.</td>
+</tr>
+<tr>
+<td><code>belongsToKeyFromRelation</code></td>
+<td>The <code>belongsTo</code> foreign key comes from the class name: <code>@BelongsTo(User) User? author</code> uses user_id.</td>
+<td>It comes from the relation name: author_id.</td>
+</tr>
+<tr>
+<td><code>pluralTableNames</code></td>
+<td>The table name is singular: <code>User</code> uses user.</td>
+<td>It is plural: users, blog_posts, categories. A name in <code>@DoxModel(table: ...)</code> does not change.</td>
+</tr>
+<tr>
+<td><code>createWritesNull</code></td>
+<td><code>create()</code> does not send a null key, so the column default is used.</td>
+<td>It writes NULL for a null key.</td>
+</tr>
+<tr>
+<td><code>sumReturnsZero</code></td>
+<td><code>sum()</code> gives null when no row matches.</td>
+<td>It gives 0.</td>
+</tr>
+<tr>
+<td><code>selectRawAdds</code></td>
+<td><code>selectRaw()</code> replaces the select list.</td>
+<td>It adds to it.</td>
+</tr>
+<tr>
+<td><code>groupByAdds</code></td>
+<td>A second <code>groupBy()</code> replaces the first.</td>
+<td>It adds to the first. <code>groupByRaw()</code> too.</td>
+</tr>
+<tr>
+<td><code>lastPageAtLeastOne</code></td>
+<td><code>paginate()</code> gives <code>lastPage</code> 0 when there are no rows.</td>
+<td>It gives 1.</td>
+</tr>
+<tr>
+<td><code>updateSetsUpdatedAt</code></td>
+<td>A model query <code>update()</code> does not set updated_at.</td>
+<td>It sets updated_at, unless the data has it.</td>
+</tr>
+<tr>
+<td><code>incrementFiresEvents</code></td>
+<td><code>increment()</code> and <code>decrement()</code> on a model fire no events and do not set updated_at.</td>
+<td>They fire <code>saving</code>, <code>updating</code>, <code>updated</code> and <code>saved</code>, and set updated_at.</td>
+</tr>
+<tr>
+<td><code>preloadUnknownThrows</code></td>
+<td><code>preload('typo')</code> loads nothing, with no error.</td>
+<td>It throws an <code>ArgumentError</code>.</td>
+</tr>
+<tr>
+<td><code>toJsonLoadedRelations</code></td>
+<td><code>toJson()</code> has only the relations named in <code>preload()</code>.</td>
+<td>It also has the relations loaded with <code>$getRelation()</code>.</td>
+</tr>
+<tr>
+<td><code>laravelPostgresTypes</code></td>
+<td>On Postgres, <code>timestamps()</code> and <code>softDeletes()</code> make TIMESTAMPTZ, and <code>json()</code> makes JSONB.</td>
+<td>A new table gets TIMESTAMP and JSON.</td>
+</tr>
+</tbody>
+</table>
+<p><code>bin/migrate.dart</code> does not start the ORM, so give the flags to the migrator too: <code>Migrator(migrations: migrations, flags: databaseConfig.flags)</code>. See <a href="migration/#database-settings">Migration</a>.</p>
+<h2 id="sqlite">SQLite</h2>
+<p>SQLite is good for development, tests and small apps. The <code>sqlite3</code> package brings SQLite with a build hook, so you do not install it.</p>
+<p>For the AOT binary, use <code>dox build</code>. It puts the library in <code>build/bundle/lib/</code>, so keep it next to <code>build/bundle/bin/</code>. See <a href="../digging-deeper/deployment/">Deployment</a>.</p>
+<p>SQLite has no bool, JSON or date type, so Dox converts them:</p>
 <ul>
-<li>Table and column names you pass to <code>select</code>, <code>where</code>, <code>join</code>, <code>groupBy</code>, <code>orderBy</code>, <code>insert</code> and <code>update</code> are quoted. Postgres and SQLite use <code>"name"</code>, MySQL uses <code>`name`</code>. So names like <code>order</code> or <code>key</code> work.</li>
-<li><code>table.column</code>, <code>table.*</code>, <code>*</code> and <code>column as alias</code> are quoted the right way. Anything else, like <code>count(*) as total</code>, throws an <code>ArgumentError</code>, so user input can not add SQL. For expressions, use the raw methods (<code>selectRaw</code>, <code>whereRaw</code>, <code>orderByRaw</code>, <code>groupByRaw</code>, <code>joinRaw</code>).</li>
-<li>On Postgres, a quoted name is case sensitive. <code>userId</code> is not the same column as <code>userid</code>.</li>
+<li><code>boolean()</code> is saved as 0 or 1 and read back as a bool.</li>
+<li><code>json()</code> is saved as text and read back as a map or a list.</li>
+<li>Dates are saved as ISO text in UTC and read back as a <code>DateTime</code>.</li>
 </ul>
-<h3 id="query-logs">Query logs</h3>
+<p>This works for columns with these type names: BOOLEAN, JSON, TIMESTAMP, DATE and DATETIME. Schema limits are in <a href="schema/#sqlite-notes">SQLite notes</a>.</p>
+<h3 id="run-queries-in-a-helper-isolate">Run queries in a helper isolate</h3>
+<p>A SQLite query blocks its isolate. Set <code>background</code> to true to run the queries in a helper isolate, so your isolate keeps serving requests:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="s1">'sqlite'</span><span class="o">:</span><span class="w"> </span><span class="n">ConnectionConfig</span><span class="p">(</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">,</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="nl">database:</span><span class="w"> </span><span class="s1">'db/dox.sqlite'</span><span class="p">,</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="nl">debug:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span><span class="nl">extra:</span><span class="w"> </span><span class="p">{</span><span class="s1">'background'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">},</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="p">),</span>
+</span></code></pre></div>
+<p>With <code>DATABASE_URL</code>, add <code>?background=true</code>. Each query costs two messages, so turn it on for slow queries and leave it off for many tiny queries.</p>
+<h2 id="mysql-and-mariadb">MySQL and MariaDB</h2>
+<p>The driver is <a href="mysql-native/"><code>dox_mysql_native</code></a>. On MySQL and MariaDB, a transaction can not undo CREATE, ALTER and DROP.</p>
+<h2 id="without-dox">Without Dox</h2>
+<p><code>dox_orm</code> also works on its own:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_orm
+</span></code></pre></div>
+<p>Start it with a <code>DatabaseConfig</code>, or with your own database object: a <code>PgNativePool</code>, a <code>MysqlNativePool</code> or a SQLite <code>Database</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="c1">// or</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span><span class="nl">database:</span><span class="w"> </span><span class="n">db</span><span class="p">,</span><span class="w"> </span><span class="nl">driver:</span><span class="w"> </span><span class="n">Driver</span><span class="p">.</span><span class="n">sqlite</span><span class="p">);</span>
+</span></code></pre></div>
+<p><code>initialize</code> also takes <code>debug</code>, <code>printer</code>, <code>flags</code> and <code>strict</code>. Call <code>await SqlQueryBuilder.close()</code> to close the connections.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>The default printer is <code>PrettyQueryPrinter</code>. Other printers, like <code>ConsoleQueryPrinter</code> and <code>FileQueryPrinter</code>, get the slow line as <code>Slow query (812 ms, postgres): select ...</code>.</li>
-<li>A value named in <code>logRedact</code> shows as <code>***</code> in the slow query log (<code>'***'</code> in the <code>PrettyQueryPrinter</code> line).</li>
-<li>With <code>debug</code> on, a slow query of the query builder shows twice: the debug line before it runs, and the slow line after it.</li>
-<li>The query listener also gets the queries of <code>Schema</code>, <code>truncate()</code> and the migrator, when they run on a connection of the ORM. A migrator that opens its own database from <code>.env</code> does not, so its queries are not sent.</li>
-</ul>
-<h3 id="more-about-orm-flags">More about ORM flags</h3>
-<ul>
-<li>The ORM keeps the flags in <code>SqlQueryBuilder().flags</code>. Each isolate runs the ORM provider, so each isolate gets the same flags, and all connections use them.</li>
-<li><code>SqlQueryBuilder.initialize(..., flags: ...)</code> takes the flags too.</li>
-<li><code>pluralTableNames</code> does not change a name set with <code>@DoxModel(table: ...)</code>. The default foreign key stays singular (<code>user_id</code>).</li>
-<li><code>belongsToKeyFromRelation</code> needs the relation name. The model generator does not pass it yet, so a generated model still uses the class name. Set <code>foreignKey</code> on the relation to be sure.</li>
-<li><code>laravelPostgresTypes</code> changes only tables made with <code>Schema.create</code>. It never changes a table that is already there, and <code>Schema.table</code> keeps the old types. MySQL and SQLite do not change.</li>
-</ul>
-<h3 id="more-about-sqlite">More about SQLite</h3>
-<ul>
-<li>The <code>sqlite3</code> package calls SQLite directly (FFI). Each isolate has one connection.</li>
-<li>The file uses WAL mode, so readers do not wait for the writer. <code>busyTimeout</code> makes a query wait for a lock from another isolate instead of failing. Foreign keys are on.</li>
-<li>Before each <code>SELECT</code>, the driver checks <code>PRAGMA schema_version</code> to see if a table changed. It finds the column types from <code>CREATE TABLE</code>, by the table names in the query.</li>
-<li><code>dropColumn</code> does not work on a primary key column.</li>
-<li><code>insertMultiple</code> with rows that have different keys inserts the rows one by one, because SQLite has no <code>DEFAULT</code> in <code>VALUES</code>.</li>
-<li>SQLite before 3.39 has no <code>RIGHT JOIN</code>.</li>
-<li>With <code>background</code> on, queries, transactions, <code>:memory:</code> databases, the query listener and the slow query log work the same, and a SQL error is the same <code>SqliteException</code>. A database that does not open (for example a wrong folder) does not throw at startup. The error comes on the first query, and on every query after it.</li>
+<li><a href="query-builder/">Query Builder</a>: write queries.</li>
+<li><a href="model/">Model</a>: work with rows as objects.</li>
+<li><a href="migration/">Migration</a>: create and change tables.</li>
 </ul>
 
 
@@ -7936,7 +7821,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>

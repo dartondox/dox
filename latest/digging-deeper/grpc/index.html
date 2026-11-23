@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -2815,13 +2817,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Setup
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2889,16 +2908,22 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-supported" class="md-nav__link">
+    <nav class="md-nav" aria-label="Add auth">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#middleware-for-a-full-router" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is supported
+        Middleware for a full router
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2976,6 +3001,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#status-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#http-errors-and-grpc-statuses" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3000,6 +3036,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#binary-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binary metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -3014,63 +3067,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#middleware-for-a-full-router" class="md-nav__link">
+  <a href="#changing-the-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Middleware for a full router
+        Changing the options
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Options
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#set-the-maximum-message-size" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Set the maximum message size
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#compress-replies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Compress replies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stop-idle-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stop idle calls
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -3153,10 +3156,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -5474,10 +5477,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5603,95 +5602,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7411,13 +7321,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Setup
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7485,16 +7412,22 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-supported" class="md-nav__link">
+    <nav class="md-nav" aria-label="Add auth">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#middleware-for-a-full-router" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What is supported
+        Middleware for a full router
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7572,6 +7505,17 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#status-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Status codes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#http-errors-and-grpc-statuses" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7596,6 +7540,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Metadata">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#binary-metadata" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binary metadata
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -7610,63 +7571,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#middleware-for-a-full-router" class="md-nav__link">
+  <a href="#changing-the-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Middleware for a full router
+        Changing the options
       
     </span>
   </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Options
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Options">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#set-the-maximum-message-size" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Set the maximum message size
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#compress-replies" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Compress replies
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stop-idle-calls" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stop idle calls
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7749,10 +7660,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7776,31 +7687,60 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/grpc.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="grpc">gRPC</h1>
 <p>gRPC lets your services call each other with typed messages, on the same port as your HTTP routes.</p>
-<p>Use gRPC when one service calls a different service. You write the calls one time in a <code>.proto</code> file, and each side gets typed code from this file. A client in any language can call your app.</p>
-<h2 id="install">Install</h2>
+<p>You write the calls one time in a <code>.proto</code> file, and each side gets typed code from it. A client in any language can call your app.</p>
+<h2 id="setup">Setup</h2>
 <p>Run the setup command in your app:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>add<span class="w"> </span>grpc
 </span></code></pre></div>
-<p>The command adds the packages, a sample <code>protos/greeter.proto</code> file and <code>lib/routes/grpc.dart</code>. It also adds <code>APP_HTTP2=true</code> to <code>.env</code>. It does not overwrite a file.</p>
-<p>gRPC works only over HTTP/2, and <a href="../http2/">HTTP/2</a> is off by default. Turn it on in the app config:</p>
+<p>It adds the packages, a sample <code>protos/greeter.proto</code> file, <code>lib/routes/grpc.dart</code> and <code>APP_HTTP2=true</code> in <code>.env</code>. To add the packages yourself, run <code>dart pub add dox_grpc protobuf grpc</code>.</p>
+<p>gRPC works only over <a href="../http2/">HTTP/2</a>. A new app turns it on from the <code>APP_HTTP2</code> key:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">http2:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nl">http2:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">appHttp2</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Your HTTP routes continue to work on the same port. To use the <code>APP_HTTP2</code> key, see <a href="#details">Details</a>.</p>
+<p>If your <code>AppEnv</code> has no <code>appHttp2</code> getter, add <code>bool? get appHttp2;</code> and run <code>dart run build_runner build</code>. Or set <code>http2: true</code>.</p>
+<h3 id="options">Options</h3>
+<p>Give a <code>GrpcOptions</code> to <code>Grpc.register</code> to change the limits of one service:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>maxReceiveMessageSize</code></td>
+<td>4 MiB</td>
+<td>The largest request message, also after unzip.</td>
+</tr>
+<tr>
+<td><code>maxSendMessageSize</code></td>
+<td>4 MiB</td>
+<td>The largest reply message.</td>
+</tr>
+<tr>
+<td><code>gzipResponses</code></td>
+<td>false</td>
+<td>Gzip the replies for clients that accept gzip.</td>
+</tr>
+<tr>
+<td><code>idleTimeout</code></td>
+<td>5 minutes</td>
+<td>Stop a call with no message in or out for this time. null means no limit.</td>
+</tr>
+</tbody>
+</table>
+<p>A bigger message stops the call with <code>RESOURCE_EXHAUSTED</code>. An idle call stops with <code>DEADLINE_EXCEEDED</code>. See <a href="#changing-the-options">Changing the options</a>.</p>
 <h2 id="write-the-proto-file">Write the .proto file</h2>
-<p>A <code>.proto</code> file gives the calls of a service and the messages that the calls use. The setup command wrote this sample file:</p>
+<p>A <code>.proto</code> file gives the calls of a service and their messages. The setup command wrote this sample:</p>
 <div class="language-proto highlight"><span class="filename">protos/greeter.proto</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">syntax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">"proto3"</span><span class="p">;</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="kn">package</span><span class="w"> </span><span class="nn">greeter</span><span class="p">;</span>
@@ -7818,31 +7758,31 @@
 </span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="generate-the-dart-code">Generate the Dart code</h2>
-<p>The <code>protoc</code> tool makes Dart code from the <code>.proto</code> file. Install <code>protoc</code> and its Dart plugin one time. Make sure that <code>~/.pub-cache/bin</code> is on your <code>PATH</code>:</p>
+<p>Install <code>protoc</code> and its Dart plugin one time. <code>~/.pub-cache/bin</code> must be on your <code>PATH</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>brew<span class="w"> </span>install<span class="w"> </span>protobuf
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dart<span class="w"> </span>pub<span class="w"> </span>global<span class="w"> </span>activate<span class="w"> </span>protoc_plugin
 </span></code></pre></div>
-<p>Then generate the code. Run these commands again after each change to the <code>.proto</code> file:</p>
+<p>Generate the code. Do this again after each change to the <code>.proto</code> file:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>lib/generated
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>protoc<span class="w"> </span>--dart_out<span class="o">=</span>grpc:lib/generated<span class="w"> </span>-Iprotos<span class="w"> </span>protos/greeter.proto
 </span></code></pre></div>
-<p>The commands write the message classes and a <code>GreeterServiceBase</code> class to <code>lib/generated</code>.</p>
+<p>It writes the message classes and a <code>GreeterServiceBase</code> class to <code>lib/generated</code>.</p>
 <h2 id="write-the-service">Write the service</h2>
-<p>Extend the generated base class. Each <code>rpc</code> in the <code>.proto</code> file is one method:</p>
+<p>Extend the generated base class. Each <code>rpc</code> of the <code>.proto</code> file is one method:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/grpc/greeter_service.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_grpc/dox_grpc.dart'</span><span class="p">;</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../../generated/greeter.pbgrpc.dart'</span><span class="p">;</span>
 </span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GreeterService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">GreeterServiceBase</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHello</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="p">}</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHello</span><span class="p">(</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">      </span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>For calls that send many messages, see <a href="#call-types">Call types</a>.</p>
 <h2 id="register-the-service">Register the service</h2>
-<p>A client can call a service only after you register it. Call <code>Grpc.register</code> in the router that the setup command wrote:</p>
+<p>Call <code>Grpc.register</code> in the router that the setup command wrote. Keep the <a href="#health-check">health check</a> as the first call:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/grpc.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_grpc/dox_grpc.dart'</span><span class="p">;</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>
@@ -7856,58 +7796,56 @@
 </span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Run <code>dart run build_runner build</code>, and start the app again. Then Dox finds the router.</p>
-<p>The router must not have a prefix, because a gRPC client always calls the path <code>/&lt;package.Service&gt;/&lt;Method&gt;</code>. Do not use the <code>api</code> router, a <code>Route.group</code>, or a <code>Route.prefix</code>. If the path changes, Dox throws a <code>StateError</code> when the app starts.</p>
-<p><code>HealthService</code> is the <a href="#health-check">health check</a>. Keep it as the first <code>Grpc.register</code> call.</p>
+<p>Run <code>dart run build_runner build</code> and start the app again.</p>
+<p>The router must have no prefix, because a gRPC client always calls <code>/&lt;package.Service&gt;/&lt;Method&gt;</code>. So do not use the <code>api</code> router or a <code>Route.group</code>. A changed path throws a <code>StateError</code> at start.</p>
 <h2 id="call-the-service">Call the service</h2>
-<p>Do a test call before you write a client. For example, use <a href="https://github.com/fullstorydev/grpcurl">grpcurl</a>:</p>
+<p>Test a call with <a href="https://github.com/fullstorydev/grpcurl">grpcurl</a>. Give it the <code>.proto</code> file, because Dox has no server reflection:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>grpcurl<span class="w"> </span>-plaintext<span class="w"> </span>-import-path<span class="w"> </span>protos<span class="w"> </span>-proto<span class="w"> </span>greeter.proto<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span>-d<span class="w"> </span><span class="s1">'{"name": "Ann"}'</span><span class="w"> </span>localhost:3000<span class="w"> </span>greeter.Greeter/SayHello
 </span></code></pre></div>
-<p>The reply is JSON:</p>
-<div class="language-json highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="p">{</span><span class="w"> </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Hello Ann"</span><span class="w"> </span><span class="p">}</span>
-</span></code></pre></div>
-<p>Give the <code>.proto</code> file to grpcurl, because Dox does not have server reflection.</p>
+<p>The reply is <code>{ "message": "Hello Ann" }</code>.</p>
 <h2 id="add-auth">Add auth</h2>
-<p>Most services must know the caller. Your Dox middleware runs before each call, so your gRPC services and your HTTP routes can use the same auth. Put the services that need a login in <code>Route.middleware</code>:</p>
-<div class="language-dart highlight"><span class="filename">lib/routes/grpc.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../app/http/middleware/auth.middleware.dart'</span><span class="p">;</span><span class="w"> </span><span class="c1">// dox make:middleware auth</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GrpcRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">HealthService</span><span class="p">());</span>
-</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>
-</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="n">middleware</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">()],</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">      </span><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">GreeterService</span><span class="p">());</span>
-</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">    </span><span class="p">});</span>
-</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-9-12"><a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="p">}</span>
+<p>Your Dox middleware runs before each call. Put the services that need a login in <code>Route.middleware</code>, and keep the health check out of it:</p>
+<div class="language-dart highlight"><span class="filename">lib/routes/grpc.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GrpcRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">    </span><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">HealthService</span><span class="p">());</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">    </span><span class="n">Route</span><span class="p">.</span><span class="n">middleware</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">()],</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">GreeterService</span><span class="p">());</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="p">});</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>A gRPC client sends its token as metadata. The middleware reads the token the same as an HTTP header:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/auth.middleware.dart</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AuthMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="w"> </span><span class="p">{</span>
+<p>A client sends its token as metadata. The middleware reads it as a header:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/http/middleware/auth.middleware.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AuthMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxMiddleware</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="kt">dynamic</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">IDoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'API_TOKEN'</span><span class="p">);</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">sent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'authorization'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">;</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Hash</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">sent</span><span class="p">,</span><span class="w"> </span><span class="s1">'Bearer </span><span class="si">$</span><span class="n">token</span><span class="s1">'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">HttpStatusException</span><span class="p">(</span><span class="m">401</span><span class="p">,</span><span class="w"> </span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Bad token'</span><span class="p">);</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-9-9"><a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">req</span><span class="p">;</span>
+</span><span id="__span-9-10"><a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-9-11"><a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>The client gets the gRPC status of the HTTP error, so 401 becomes <code>UNAUTHENTICATED</code>. See <a href="#http-errors-and-grpc-statuses">HTTP errors and gRPC statuses</a>.</p>
+<h3 id="middleware-for-a-full-router">Middleware for a full router</h3>
+<p>Set the <code>middleware</code> of the router when all its services need it:</p>
+<div class="language-dart highlight"><span class="filename">lib/routes/grpc.dart</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GrpcRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="kt">dynamic</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">IDoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Env</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'API_TOKEN'</span><span class="p">);</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Hash</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'authorization'</span><span class="p">)</span><span class="w"> </span><span class="o">??</span><span class="w"> </span><span class="s1">''</span><span class="p">,</span><span class="w"> </span><span class="s1">'Bearer </span><span class="si">$</span><span class="n">token</span><span class="s1">'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">      </span><span class="k">throw</span><span class="w"> </span><span class="n">HttpStatusException</span><span class="p">(</span><span class="m">401</span><span class="p">,</span><span class="w"> </span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Bad token'</span><span class="p">);</span>
-</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">req</span><span class="p">;</span>
-</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="p">}</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">()];</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">    </span><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">GreeterService</span><span class="p">());</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>When a middleware throws an HTTP error, the client gets the related gRPC status and the message. For example, <code>401</code> becomes <code>UNAUTHENTICATED</code>. See <a href="#http-errors-and-grpc-statuses">the full list</a>.</p>
-<p>The health check stays out of <code>Route.middleware</code>, because a load balancer has no token.</p>
-<h2 id="what-is-supported">What is supported</h2>
-<ul>
-<li>The four <a href="#call-types">call types</a>: unary, server streaming, client streaming and bidirectional streaming.</li>
-<li><a href="#deadlines-and-cancelled-calls">Deadlines, cancel</a> and <a href="#metadata">metadata</a>.</li>
-<li><a href="#return-errors">Errors</a> with a <code>GrpcStatus</code> and error details.</li>
-<li>gzip and <a href="#options">limits for the message size</a>.</li>
-<li>The standard <a href="#health-check">health check</a>.</li>
-</ul>
-<p>Dox does not have server reflection, gRPC-Web or TLS. For TLS, see <a href="#deployment">Deployment</a>.</p>
+<p>Then register the health check in a router with no middleware, and put it first in <code>routers</code> of the app config. See <a href="../../the-basic/dependency-injection/#routers-and-providers">Routers and providers</a>. The first <code>Grpc.register</code> of the app in <code>Route.middleware</code> throws a <code>StateError</code> at start.</p>
 <h2 id="call-types">Call types</h2>
-<p>gRPC has four types of calls. The position of <code>stream</code> in the <code>.proto</code> file sets the type:</p>
+<p>gRPC has four types of calls. The place of <code>stream</code> in the <code>.proto</code> file sets the type:</p>
 <div class="language-proto highlight"><span class="filename">protos/greeter.proto</span><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">service</span><span class="w"> </span><span class="n">Greeter</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="k">rpc</span><span class="w"> </span><span class="n">SayHello</span><span class="w"> </span><span class="p">(</span><span class="n">HelloRequest</span><span class="p">)</span><span class="w"> </span><span class="k">returns</span><span class="w"> </span><span class="p">(</span><span class="n">HelloReply</span><span class="p">);</span>
 </span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="k">rpc</span><span class="w"> </span><span class="n">SayHelloMany</span><span class="w"> </span><span class="p">(</span><span class="n">HelloRequest</span><span class="p">)</span><span class="w"> </span><span class="k">returns</span><span class="w"> </span><span class="p">(</span><span class="n">stream</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">);</span>
@@ -7916,25 +7854,25 @@
 </span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="unary-calls">Unary calls</h3>
-<p>A unary call has one request and one reply. The method returns a <code>Future</code>:</p>
+<p>One request and one reply. The method returns a <code>Future</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="nd">@override</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHello</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="server-streaming">Server streaming</h3>
-<p>The client sends one request and gets many replies. The method returns a <code>Stream</code>. Use <code>async*</code> and <code>yield</code>:</p>
+<p>One request and many replies. The method returns a <code>Stream</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="nd">@override</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHelloMany</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="o">*</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">call</span><span class="p">.</span><span class="n">isCanceled</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="kd">yield</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> </span><span class="si">$</span><span class="n">i</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="p">}</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHelloMany</span><span class="p">(</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="o">*</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="m">3</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">call</span><span class="p">.</span><span class="n">isCanceled</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="kd">yield</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> </span><span class="si">$</span><span class="n">i</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The <code>call.isCanceled</code> check stops the work when the client cancels the call or disconnects.</p>
 <h3 id="client-streaming">Client streaming</h3>
-<p>The client sends many requests and gets one reply. The method gets a <code>Stream</code> of requests:</p>
+<p>Many requests and one reply. The method gets a <code>Stream</code> of requests:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nd">@override</span>
 </span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">collectNames</span><span class="p">(</span>
 </span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span>
@@ -7948,22 +7886,28 @@
 </span><span id="__span-14-11"><a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="p">}</span>
 </span></code></pre></div>
 <h3 id="bidirectional-streaming">Bidirectional streaming</h3>
-<p>The client and the server both send many messages. The method gets a <code>Stream</code> and returns a <code>Stream</code>:</p>
+<p>Many requests and many replies. The method gets a <code>Stream</code> and returns a <code>Stream</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nd">@override</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">chat</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloRequest</span><span class="o">&gt;</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="o">*</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">    </span><span class="kd">yield</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">item</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">}</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">chat</span><span class="p">(</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">    </span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloRequest</span><span class="o">&gt;</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="o">*</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">item</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">    </span><span class="kd">yield</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">item</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="return-errors">Return errors</h2>
-<p>To stop a call with an error, throw a <code>GrpcException</code>. The first argument is a value of the <code>GrpcStatus</code> enum, which has all the gRPC status codes. The second argument is the message for the client:</p>
+<p>Throw a <code>GrpcException</code> with a <code>GrpcStatus</code> and a message for the client:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">throw</span><span class="w"> </span><span class="n">GrpcException</span><span class="p">(</span><span class="n">GrpcStatus</span><span class="p">.</span><span class="n">notFound</span><span class="p">,</span><span class="w"> </span><span class="s1">'No user 5'</span><span class="p">);</span>
 </span></code></pre></div>
-<p>If your method throws a different error, the call stops with <code>INTERNAL</code>. Dox sends the error to your <code>ExceptionHandler</code>, the same as for HTTP routes. The client sees the error text only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.</p>
-<p>A call to a service or a method that does not exist gets <code>UNIMPLEMENTED</code>.</p>
+<p>The third argument is a list of protobuf messages. The client gets them as error details. A <code>GrpcError</code> from <code>package:grpc</code> also works.</p>
+<p>Any other error stops the call with <code>INTERNAL</code> and goes to your exception handler. The client sees its text only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>. A call to an unknown service or method gets <code>UNIMPLEMENTED</code>.</p>
+<h3 id="status-codes">Status codes</h3>
+<p><code>GrpcStatus</code> has the 17 gRPC status codes. <code>code</code> is the number, <code>fromCode</code> gives the status of a number, and <code>fromHttp</code> gives the status of an HTTP error:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrpcStatus</span><span class="p">.</span><span class="n">notFound</span><span class="p">.</span><span class="n">code</span><span class="p">;</span><span class="w"> </span><span class="c1">// 5</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">GrpcStatus</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrpcStatus</span><span class="p">.</span><span class="n">fromHttp</span><span class="p">(</span><span class="m">401</span><span class="p">);</span><span class="w"> </span><span class="c1">// unauthenticated</span>
+</span></code></pre></div>
 <h3 id="http-errors-and-grpc-statuses">HTTP errors and gRPC statuses</h3>
-<p>A middleware throws HTTP errors. Dox changes each HTTP error to a gRPC status:</p>
+<p>Dox changes an HTTP error of a middleware to a gRPC status:</p>
 <table>
 <thead>
 <tr>
@@ -8018,119 +7962,71 @@
 </tr>
 </tbody>
 </table>
-<p>The client also gets the message of the error. Dox shows the message of a 5xx error only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.</p>
+<p>The client also gets the message of the error. The message of a 5xx error shows only when <code>APP_ENV</code> is <code>development</code> or <code>local</code>.</p>
 <h2 id="metadata">Metadata</h2>
-<p>Metadata is the gRPC name for headers. Use it for data that is not in the messages, for example a language or a request ID. The <code>call</code> argument gives you three maps:</p>
-<ul>
-<li><code>call.clientMetadata</code>: the headers that the client sent.</li>
-<li><code>call.headers</code>: the headers that you send back. Set them before the first reply.</li>
-<li><code>call.trailers</code>: the headers that you send at the end of the call.</li>
-</ul>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@override</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHello</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">call</span><span class="p">.</span><span class="n">clientMetadata</span><span class="o">!</span><span class="p">[</span><span class="s1">'accept-language'</span><span class="p">];</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="n">call</span><span class="p">.</span><span class="n">headers</span><span class="o">!</span><span class="p">[</span><span class="s1">'x-served-by'</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'greeter'</span><span class="p">;</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">  </span><span class="n">call</span><span class="p">.</span><span class="n">trailers</span><span class="o">!</span><span class="p">[</span><span class="s1">'x-done'</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'yes'</span><span class="p">;</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">$</span><span class="n">language</span><span class="s1">)'</span><span class="p">);</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="p">}</span>
-</span></code></pre></div>
-<p>You must use <code>!</code>, because the maps are nullable in the <code>ServiceCall</code> type.</p>
-<h2 id="deadlines-and-cancelled-calls">Deadlines and cancelled calls</h2>
-<p>A client can set a deadline for a call. When the deadline passes, Dox stops the call with <code>DEADLINE_EXCEEDED</code>. A client can also cancel a call or lose its connection.</p>
-<p>In these cases, your method can continue to run. If your method runs for a long time, make it read <code>call.isCanceled</code> and <code>call.isTimedOut</code>, and stop:</p>
+<p><strong>Metadata</strong> is the gRPC name for headers. <code>call.clientMetadata</code> has the headers of the client, with no <code>grpc-*</code> headers. Set <code>call.headers</code> before the first reply, and <code>call.trailers</code> for the end of the call:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="nd">@override</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHelloMany</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="o">*</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">call</span><span class="p">.</span><span class="n">isCanceled</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">call</span><span class="p">.</span><span class="n">isTimedOut</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span><span class="kd">yield</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">1</span><span class="p">));</span>
-</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHello</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">language</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">call</span><span class="p">.</span><span class="n">clientMetadata</span><span class="o">!</span><span class="p">[</span><span class="s1">'accept-language'</span><span class="p">];</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="n">call</span><span class="p">.</span><span class="n">headers</span><span class="o">!</span><span class="p">[</span><span class="s1">'x-served-by'</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'greeter'</span><span class="p">;</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="n">call</span><span class="p">.</span><span class="n">trailers</span><span class="o">!</span><span class="p">[</span><span class="s1">'x-done'</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'yes'</span><span class="p">;</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> (</span><span class="si">$</span><span class="n">language</span><span class="s1">)'</span><span class="p">);</span>
 </span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>call.deadline</code> is the time of the deadline. It is <code>null</code> if the client did not set a deadline. When the client cancels a streaming call, the request stream also stops.</p>
-<h2 id="middleware-for-a-full-router">Middleware for a full router</h2>
-<p>When all the services of a router need the same middleware, set the <code>middleware</code> of the router. This is an alternative to <code>Route.middleware</code> in <a href="#add-auth">Add auth</a>:</p>
-<div class="language-dart highlight"><span class="filename">lib/routes/grpc.dart</span><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GrpcRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">middleware</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">[</span><span class="n">AuthMiddleware</span><span class="p">()];</span>
-</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>
-</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-19-7"><a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="w">    </span><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">GreeterService</span><span class="p">());</span>
-</span><span id="__span-19-8"><a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-19-9"><a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="p">}</span>
+<p>The maps are nullable in the <code>ServiceCall</code> type, so use <code>!</code>.</p>
+<h3 id="binary-metadata">Binary metadata</h3>
+<p>A value with a name that ends in <code>-bin</code> is base64 text. <code>GrpcWire.decodeBinary</code> gives its bytes, and <code>GrpcWire.encodeBinary</code> makes a value from bytes:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrpcWire</span><span class="p">.</span><span class="n">decodeBinary</span><span class="p">(</span><span class="n">call</span><span class="p">.</span><span class="n">clientMetadata</span><span class="o">!</span><span class="p">[</span><span class="s1">'trace-bin'</span><span class="p">]</span><span class="o">!</span><span class="p">);</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">call</span><span class="p">.</span><span class="n">trailers</span><span class="o">!</span><span class="p">[</span><span class="s1">'trace-bin'</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrpcWire</span><span class="p">.</span><span class="n">encodeBinary</span><span class="p">(</span><span class="n">bytes</span><span class="p">);</span>
 </span></code></pre></div>
-<p>Then move the <a href="#health-check">health check</a> to a router that has no middleware:</p>
-<div class="language-dart highlight"><span class="filename">lib/routes/grpc_health_router.dart</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_grpc/dox_grpc.dart'</span><span class="p">;</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GrpcHealthRouter</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Router</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">register</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">    </span><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">HealthService</span><span class="p">());</span>
-</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-20-9"><a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a><span class="p">}</span>
+<h2 id="deadlines-and-cancelled-calls">Deadlines and cancelled calls</h2>
+<p>When the deadline of the client passes, Dox stops the call with <code>DEADLINE_EXCEEDED</code>. Your method can still run, so a long method must check <code>call.isCanceled</code> and <code>call.isTimedOut</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="nd">@override</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHelloMany</span><span class="p">(</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">    </span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="o">*</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">call</span><span class="p">.</span><span class="n">isCanceled</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">call</span><span class="p">.</span><span class="n">isTimedOut</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">    </span><span class="kd">yield</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">.</span><span class="n">delayed</span><span class="p">(</span><span class="n">Duration</span><span class="p">(</span><span class="nl">seconds:</span><span class="w"> </span><span class="m">1</span><span class="p">));</span>
+</span><span id="__span-20-7"><a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-20-8"><a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>In the app config, put <code>GrpcHealthRouter()</code> in <code>routers</code> before the other gRPC routers. See <a href="../../the-basic/dependency-injection/#routers-and-providers">Routers and providers</a>.</p>
-<p>The first <code>Grpc.register</code> call of your app must not be in <code>Route.middleware</code>. If it is, Dox throws a <code>StateError</code> when the app starts.</p>
-<h2 id="options">Options</h2>
-<p>The default values are correct for most services. To change them for one service, give a <code>GrpcOptions</code>:</p>
+<p><code>call.deadline</code> is the time of the deadline, or null. gRPC routes skip the <code>RequestTimeout</code> middleware, so a long stream does not stop.</p>
+<h2 id="changing-the-options">Changing the options</h2>
+<p>Give a <code>GrpcOptions</code> to <code>Grpc.register</code>. All options are in <a href="#options">Options</a>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span>
 </span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="n">GreeterService</span><span class="p">(),</span>
 </span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">GrpcOptions</span><span class="p">(</span>
 </span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">    </span><span class="nl">maxReceiveMessageSize:</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span>
-</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">5</span><span class="p">),</span><span class="w"> </span><span class="c1">// the default</span>
-</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="p">);</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">    </span><span class="nl">maxSendMessageSize:</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="w">    </span><span class="nl">gzipResponses:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-21-7"><a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a><span class="w">    </span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">30</span><span class="p">),</span>
+</span><span id="__span-21-8"><a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-21-9"><a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a><span class="p">);</span>
 </span></code></pre></div>
-<h3 id="set-the-maximum-message-size">Set the maximum message size</h3>
-<p>Change the limits when your messages are larger than 4 MiB. <code>maxReceiveMessageSize</code> is the maximum size of a request message, in bytes. <code>maxSendMessageSize</code> is the maximum size of a reply message. If a message is larger, the call stops with <code>RESOURCE_EXHAUSTED</code>.</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">GrpcOptions</span><span class="p">(</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nl">maxReceiveMessageSize:</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span>
-</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nl">maxSendMessageSize:</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span>
-</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="p">)</span>
-</span></code></pre></div>
-<h3 id="compress-replies">Compress replies</h3>
-<p>Turn on <code>gzipResponses</code> when your replies are large and contain text. Dox then compresses the replies with gzip for clients that accept gzip. It is off by default, because gzip uses CPU time for each message, and most gRPC messages are small:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">GrpcOptions</span><span class="p">(</span><span class="nl">gzipResponses:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span></code></pre></div>
-<p>Dox always reads gzip requests, with or without this option.</p>
-<h3 id="stop-idle-calls">Stop idle calls</h3>
-<p>A client can open a call and then not read the reply. Dox stops such a call: if no message goes in or out for 5 minutes, the call gets <code>DEADLINE_EXCEEDED</code>. To change the time, set <code>idleTimeout</code>. To turn the limit off, set it to <code>null</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">GrpcOptions</span><span class="p">(</span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">30</span><span class="p">))</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">GrpcOptions</span><span class="p">(</span><span class="nl">idleTimeout:</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span><span class="w"> </span><span class="c1">// no limit</span>
-</span></code></pre></div>
-<p>Set <code>idleTimeout</code> longer than your slowest method, because the time also counts while your method works and sends no message. A quiet <code>Watch</code> or other long stream also stops, and the client must connect again. Send a message from time to time, or set a longer time.</p>
+<p>Set <code>idleTimeout</code> longer than your slowest method, because the time also counts while your method sends no message. A quiet <code>Watch</code> stream also stops, so send a message from time to time. Dox always reads gzip requests.</p>
 <h2 id="health-check">Health check</h2>
-<p>Load balancers and Kubernetes ask a server for its health before they send calls to it. <code>HealthService</code> answers them. It is the standard <code>grpc.health.v1.Health</code> service, with <code>Check</code> and <code>Watch</code>.</p>
-<p>The setup command registers it in <code>lib/routes/grpc.dart</code>. Do not put the health check behind auth middleware, because a load balancer has no token.</p>
+<p><code>HealthService</code> is the standard <code>grpc.health.v1.Health</code> service, with <code>Check</code> and <code>Watch</code>. Load balancers and Kubernetes use it. Do not put it behind auth middleware, because a load balancer has no token.</p>
 <h3 id="set-the-status-of-a-service">Set the status of a service</h3>
-<p>The full server has the empty name <code>''</code>, and its status at start is <code>SERVING</code>. To set the status of one service by its name, keep the <code>HealthService</code> object and call <code>setStatus</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">HealthService</span><span class="w"> </span><span class="n">health</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HealthService</span><span class="p">();</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">health</span><span class="p">);</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>
-</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="n">health</span><span class="p">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s1">'greeter.Greeter'</span><span class="p">,</span><span class="w"> </span><span class="n">ServingStatus</span><span class="p">.</span><span class="n">SERVING</span><span class="p">);</span>
+<p>The full server has the empty name <code>''</code>, and it starts as <code>SERVING</code>. Keep the <code>HealthService</code> object to set the status of one service in all isolates:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">HealthService</span><span class="w"> </span><span class="n">health</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">HealthService</span><span class="p">();</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="n">Grpc</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="n">health</span><span class="p">);</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="n">health</span><span class="p">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s1">'greeter.Greeter'</span><span class="p">,</span><span class="w"> </span><span class="n">ServingStatus</span><span class="p">.</span><span class="n">SERVING</span><span class="p">);</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="n">health</span><span class="p">.</span><span class="n">setStatus</span><span class="p">(</span><span class="s1">'greeter.Greeter'</span><span class="p">,</span><span class="w"> </span><span class="n">ServingStatus</span><span class="p">.</span><span class="n">NOT_SERVING</span><span class="p">);</span>
 </span></code></pre></div>
-<p>When the service cannot work, call <code>setStatus</code> again with <code>ServingStatus.NOT_SERVING</code>. For example, do this when the database of the service is down. All isolates get the change.</p>
+<p><code>statusOf(name)</code> gives the status, or null. <code>clearStatus(name)</code> removes it, and a <code>Check</code> for that name then gets <code>NOT_FOUND</code>.</p>
 <h2 id="services-and-isolates">Services and isolates</h2>
-<p>Dox runs your app in many <a href="../isolate/">isolates</a>, and each isolate gets its own copy of your service. You cannot copy a database connection, a socket, or a <code>ReceivePort</code> to a different isolate. Thus, do not create these objects when you register the service.</p>
-<p>Create them on the first call, inside the isolate that uses them:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GreeterService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">GreeterServiceBase</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="n">HttpClient</span><span class="o">?</span><span class="w"> </span><span class="n">_client</span><span class="p">;</span>
-</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>
-</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="w">  </span><span class="c1">// made on the first call, in the isolate that runs the call</span>
-</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="w">  </span><span class="n">HttpClient</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">_client</span><span class="w"> </span><span class="o">??=</span><span class="w"> </span><span class="n">HttpClient</span><span class="p">();</span>
-</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>
-</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-26-8"><a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">HelloReply</span><span class="o">&gt;</span><span class="w"> </span><span class="n">sayHello</span><span class="p">(</span><span class="n">ServiceCall</span><span class="w"> </span><span class="n">call</span><span class="p">,</span><span class="w"> </span><span class="n">HelloRequest</span><span class="w"> </span><span class="n">request</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-26-9"><a id="__codelineno-26-9" name="__codelineno-26-9" href="#__codelineno-26-9"></a><span class="w">    </span><span class="c1">// use client here</span>
-</span><span id="__span-26-10"><a id="__codelineno-26-10" name="__codelineno-26-10" href="#__codelineno-26-10"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">HelloReply</span><span class="p">(</span><span class="nl">message:</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">${</span><span class="n">request</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s1">'</span><span class="p">);</span>
-</span><span id="__span-26-11"><a id="__codelineno-26-11" name="__codelineno-26-11" href="#__codelineno-26-11"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-26-12"><a id="__codelineno-26-12" name="__codelineno-26-12" href="#__codelineno-26-12"></a><span class="p">}</span>
+<p>Each <a href="../isolate/">isolate</a> gets its own copy of your service. A database connection or a socket can not be copied, so make it on the first call:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">GreeterService</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">GreeterServiceBase</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="n">HttpClient</span><span class="o">?</span><span class="w"> </span><span class="n">_client</span><span class="p">;</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">  </span><span class="c1">// made on the first call, in the isolate that runs the call</span>
+</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="w">  </span><span class="n">HttpClient</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">client</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">_client</span><span class="w"> </span><span class="o">??=</span><span class="w"> </span><span class="n">HttpClient</span><span class="p">();</span>
+</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="deployment">Deployment</h2>
-<p>gRPC runs on the <a href="../native-server/">native server</a>. Build your app with <code>dox build</code>. See <a href="../deployment/#build">Deployment</a>.</p>
-<p>Dox does not have TLS. Put a proxy in front of the app. The proxy does the TLS and sends h2c to Dox. h2c is plain HTTP/2 without TLS.</p>
-<p>With nginx, use <code>grpc_pass</code> for the gRPC paths. With Caddy, use <code>h2c://</code> in <code>reverse_proxy</code>. For the full config, see <a href="../deployment/#http2-and-grpc">Deployment: HTTP/2 and gRPC</a>.</p>
+<p>Build your app with <code>dox build</code>. See <a href="../deployment/#build">Deployment</a>.</p>
+<p>Dox has no TLS, so put a proxy in front of the app. The proxy does the TLS and sends h2c to Dox. With nginx, use <code>grpc_pass</code>. With Caddy, use <code>h2c://</code> in <code>reverse_proxy</code>. See <a href="../deployment/#http2-and-grpc">Deployment: HTTP/2 and gRPC</a>.</p>
 <h2 id="benchmark">Benchmark</h2>
 <p>On one core, <code>dox_grpc</code> does the most small calls. Small calls are the most usual type of gRPC call.</p>
 <div class="dox-bench dox-bench--simple">
@@ -8158,7 +8054,7 @@
 </div>
 <p class="dox-bench__foot"><span>Linux · 16 connections · 128 calls in flight · ghz · median of 3 runs</span></p>
 </div>
-<p>Dox is not the fastest in all tests. With large messages and with streaming, grpc-go is faster on one core. <code>dox_grpc</code> is faster than <code>package:grpc</code> in all three tests.</p>
+<p>With large messages and with streaming, grpc-go is faster on one core. <code>dox_grpc</code> is faster than <code>package:grpc</code> in all three tests.</p>
 <p>Calls a second on one core:</p>
 <table>
 <thead>
@@ -8217,7 +8113,7 @@
 </tr>
 </tbody>
 </table>
-<p>For small calls, both servers stop at approximately 57,000 calls a second. This number is near the limit of the client on 4 cores. Both servers can possibly do more.</p>
+<p>For small calls, both servers stop at approximately 57,000 calls a second. This number is near the limit of the client on 4 cores.</p>
 <h3 id="test-setup">Test setup</h3>
 <ul>
 <li>All servers run the same service: the gRPC interop <code>TestService</code>.</li>
@@ -8227,19 +8123,10 @@
 <li>The client used 16 connections. For small calls, it kept 128 calls open at the same time. For the other two tests, it kept 32 calls open.</li>
 <li>Each number is the median of 3 runs. Each run took 10 seconds, after a warm up of 3 seconds.</li>
 </ul>
-<h2 id="details">Details</h2>
-<p>This section gives special cases. Most apps do not need it.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>To add the package manually, run <code>dart pub add dox_grpc protobuf grpc</code>. The generated code imports <code>protobuf</code> and <code>grpc</code>.</li>
-<li>An app made with <code>dox create</code> reads the <code>APP_HTTP2</code> key already. In an older app, the key does not turn on HTTP/2 alone. Add a <code>bool? get appHttp2;</code> getter to <code>AppEnv</code>, and run <code>dart run build_runner build</code>. Then set <code>http2: env.appHttp2 ?? false</code> in the app config.</li>
-<li><code>GrpcException</code> takes a list of protobuf messages as a third argument. Dox sends them to the client as error details in <code>grpc-status-details-bin</code>.</li>
-<li>A <code>GrpcError</code> from <code>package:grpc</code> works the same as a <code>GrpcException</code>.</li>
-<li><code>call.clientMetadata</code> does not contain the <code>grpc-*</code> headers.</li>
-<li>A metadata value with a name that ends in <code>-bin</code> is base64 text. <code>GrpcWire.decodeBinary</code> gives its bytes. <code>GrpcWire.encodeBinary</code> makes a value from bytes.</li>
-<li><code>maxReceiveMessageSize</code> also applies to the size of a gzip message after Dox decompresses it.</li>
-<li>The deadline of the client always works, also when <code>idleTimeout</code> is <code>null</code>.</li>
-<li>gRPC routes skip the <code>RequestTimeout</code> middleware. Thus, Dox does not stop a long stream.</li>
-<li><code>health.clearStatus(name)</code> removes the status of a service. A <code>Check</code> for a name with no status gets <code>NOT_FOUND</code>.</li>
+<li><a href="../http2/">HTTP/2</a>: gRPC runs on HTTP/2.</li>
+<li><a href="../deployment/">Deployment</a>: put a proxy in front.</li>
 </ul>
 
 
@@ -8360,7 +8247,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

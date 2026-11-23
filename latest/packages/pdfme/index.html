@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5058,10 +5060,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5188,95 +5186,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -5491,10 +5400,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Setup
       
     </span>
   </a>
@@ -5513,6 +5422,317 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generating-a-pdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generating a PDF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Generating a PDF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-a-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building a template
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Building a template">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reading-and-writing-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading and writing JSON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blank-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blank pages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static schemas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-pdf-file-as-the-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A PDF file as the base
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-schema-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common schema options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding text
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding text">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fitting-text-to-the-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fitting text to the box
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#text-with-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text with variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#select" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Select
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-dates-and-times" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding dates and times
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-images-and-svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding images and SVG
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding images and SVG">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signatures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signatures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SVG
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drawing-shapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drawing shapes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Drawing shapes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#circle-marks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Circle marks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-boxes-and-radio-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check boxes and radio groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-barcodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding barcodes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cell-styles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cell styles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#using-other-fonts" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -5521,16 +5741,83 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#platforms" class="md-nav__link">
+    <nav class="md-nav" aria-label="Using other fonts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#font-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Platforms
+        Font options
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugins
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#your-own-schema-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your own schema type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#render-props" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Render props
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fonts-and-cache-in-a-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fonts and cache in a plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-in-a-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layout in a plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -5546,10 +5833,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#learn-more" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Learn more
+        Next steps
       
     </span>
   </a>
@@ -7128,10 +7415,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install
+        Setup
       
     </span>
   </a>
@@ -7150,6 +7437,317 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#generating-a-pdf" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generating a PDF
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Generating a PDF">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inputs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Options
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-a-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building a template
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Building a template">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#reading-and-writing-json" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reading and writing JSON
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#blank-pages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Blank pages
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#static-schemas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Static schemas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-pdf-file-as-the-base" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A PDF file as the base
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-schema-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common schema options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-text" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding text
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding text">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fitting-text-to-the-box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fitting text to the box
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#text-with-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Text with variables
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#select" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Select
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-dates-and-times" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding dates and times
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-images-and-svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding images and SVG
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding images and SVG">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Images
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#signatures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signatures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#svg" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SVG
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drawing-shapes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Drawing shapes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Drawing shapes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#circle-marks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Circle marks
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#check-boxes-and-radio-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Check boxes and radio groups
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-barcodes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding barcodes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adding-tables" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding tables
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Adding tables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cell-styles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cell styles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#image-columns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Image columns
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#using-other-fonts" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7158,16 +7756,83 @@
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#platforms" class="md-nav__link">
+    <nav class="md-nav" aria-label="Using other fonts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#font-options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Platforms
+        Font options
       
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#plugins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Plugins
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Plugins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#your-own-schema-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Your own schema type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#render-props" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Render props
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fonts-and-cache-in-a-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fonts and cache in a plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#layout-in-a-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Layout in a plugin
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7183,10 +7848,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#learn-more" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Learn more
+        Next steps
       
     </span>
   </a>
@@ -7210,25 +7875,18 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/packages/pdfme.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="pdfme">pdfme</h1>
 <p>Make PDF files from <a href="https://pdfme.com">pdfme</a> templates in Dart with <code>dox_pdf_me</code>, and send them from a Dox controller.</p>
-<p>You design the template in the pdfme designer, then fill it with data on the server. <code>dox_pdf_me</code> reads the same template JSON as pdfme, and the PDF looks the same.</p>
-<p>The package is standalone. It does not need Dox, and Dox does not need it. It is built on <a href="../pdf-lib/">PDF Library</a>.</p>
-<h2 id="install">Install</h2>
+<p>You design the template in the pdfme designer, then fill it with data on the server. The package reads the same template JSON as pdfme, and the PDF looks the same. It is built on <a href="../pdf-lib/">PDF Library</a>.</p>
+<h2 id="setup">Setup</h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_pdf_me
 </span></code></pre></div>
+<p>It uses the native library of <code>dox_pdf_lib</code>, so it runs in Dart programs on macOS, Linux and Windows, not on the web, iOS or Android. On Linux, the ready-built library needs glibc 2.35 or newer. For older Linux or Alpine, see <a href="../pdf-lib/#setup">PDF Library setup</a>.</p>
 <h2 id="filling-a-template">Filling a template</h2>
-<p>Design the template in the pdfme designer and save its JSON. Read it with <code>Template.fromJson</code>. The inputs are one map of strings for each copy of the template.</p>
-<p>A controller can return a <code>DownloadableFile</code>. Dox streams the bytes and sets <code>Content-Type</code> and <code>Content-Disposition</code>. The browser saves the file. See <a href="../../the-basic/response/">Response</a>.</p>
-<p>Use <code>StreamFile</code> instead to show the PDF in the browser tab.</p>
+<p>Read the template JSON with <code>Template.fromJson</code>, and give one map of inputs for each copy of the template. Return a <code>DownloadableFile</code>, or a <code>StreamFile</code> to show the PDF in the browser tab. See <a href="../../the-basic/response/">Response</a>:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/controllers/invoice.controller.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:convert'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:typed_data'</span><span class="p">;</span>
@@ -7261,58 +7919,663 @@
 </span></code></pre></div>
 <div class="language-dart highlight"><span class="filename">lib/routes/api.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice.pdf'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">InvoiceController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">show</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>dox_pdf_me</code> supports text, image, svg, shapes, barcodes and QR codes, date and time, checkbox, radio group, select, table, multi variable text, signature and circle mark. Pass <code>builtInPlugins</code> to use all of them.</p>
-<h2 id="using-other-fonts">Using other fonts</h2>
-<p>Text uses Roboto by default. For other languages, pass your fonts in <code>GenerateOptions</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">noto</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'NotoSansJP-Regular.otf'</span><span class="p">).</span><span class="n">readAsBytesSync</span><span class="p">();</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">pdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">generate</span><span class="p">(</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">template:</span><span class="w"> </span><span class="n">template</span><span class="p">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">inputs:</span><span class="w"> </span><span class="n">inputs</span><span class="p">,</span>
+<h2 id="generating-a-pdf">Generating a PDF</h2>
+<p><code>generate</code> takes a template, the inputs, the options and the plugins, and gives the bytes of the file:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">pdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">generate</span><span class="p">(</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">template:</span><span class="w"> </span><span class="n">template</span><span class="p">,</span>
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">inputs:</span><span class="w"> </span><span class="n">inputs</span><span class="p">,</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">GenerateOptions</span><span class="p">(</span><span class="nl">lang:</span><span class="w"> </span><span class="s1">'en'</span><span class="p">,</span><span class="w"> </span><span class="nl">title:</span><span class="w"> </span><span class="s1">'Invoice'</span><span class="p">),</span>
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">plugins:</span><span class="w"> </span><span class="n">builtInPlugins</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">GenerateOptions</span><span class="p">(</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span><span class="nl">font:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">FontSource</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">      </span><span class="s1">'Roboto'</span><span class="o">:</span><span class="w"> </span><span class="n">FontStore</span><span class="p">.</span><span class="n">defaultFont</span><span class="p">,</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">      </span><span class="s1">'NotoSansJP'</span><span class="o">:</span><span class="w"> </span><span class="n">FontSource</span><span class="p">(</span><span class="n">noto</span><span class="p">),</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span><span class="p">},</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="p">),</span>
-</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="p">);</span>
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Thai, Myanmar, Khmer, Lao, Arabic, Hebrew and Hindi text is laid out correctly. Line breaks in Myanmar, Thai, Khmer and Lao go between words.</p>
-<h2 id="platforms">Platforms</h2>
-<p><code>dox_pdf_me</code> uses <code>dox_pdf_lib</code>, which has a small native library. It runs in Dart programs on macOS, Linux and Windows.</p>
-<p>It does not run on the web, iOS or Android.</p>
-<p>A ready-built native library is downloaded for you, so you do not need Rust.</p>
-<p>On Linux, the ready-built library needs glibc 2.35 or newer, for example Ubuntu 22.04 or Debian 12. On older Linux, or on Alpine, build the library yourself. The <a href="https://pub.dev/packages/dox_pdf_lib">dox_pdf_lib README</a> shows how.</p>
+<p>With no plugins, only <code>text</code> schemas work. Pass <code>builtInPlugins</code> for all field types.</p>
+<h3 id="inputs">Inputs</h3>
+<p>Each input map makes one copy of the template. The keys are the schema names, and every value is a string:</p>
+<table>
+<thead>
+<tr>
+<th>Schema type</th>
+<th>Input value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text, select, date, time</td>
+<td>The text, like <code>'Jane'</code> or <code>'2026-11-23'</code>.</td>
+</tr>
+<tr>
+<td>table</td>
+<td>A JSON string of rows, from <code>jsonEncode(rows)</code>.</td>
+</tr>
+<tr>
+<td>multiVariableText</td>
+<td>A JSON string of values, like <code>'{"name": "Ann"}'</code>.</td>
+</tr>
+<tr>
+<td>checkbox, radioGroup, circleMark</td>
+<td><code>'true'</code> to turn it on.</td>
+</tr>
+<tr>
+<td>image, signature</td>
+<td>A PNG or JPEG data URL or base64.</td>
+</tr>
+<tr>
+<td>svg</td>
+<td>The SVG text.</td>
+</tr>
+<tr>
+<td>barcodes</td>
+<td>The data of the code.</td>
+</tr>
+</tbody>
+</table>
+<p>A schema with <code>required: true</code> and no value makes <code>generate</code> throw.</p>
+<h3 id="options">Options</h3>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it sets</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>font</code></td>
+<td>The fonts, by name. See <a href="#using-other-fonts">Using other fonts</a>.</td>
+</tr>
+<tr>
+<td><code>colorType</code></td>
+<td><code>ColorType.rgb</code> (default) or <code>ColorType.cmyk</code>.</td>
+</tr>
+<tr>
+<td><code>lang</code></td>
+<td>The PDF language and the default date locale, like <code>en</code>.</td>
+</tr>
+<tr>
+<td><code>title</code>, <code>author</code>, <code>subject</code>, <code>keywords</code>, <code>creator</code>, <code>producer</code></td>
+<td>The PDF metadata.</td>
+</tr>
+<tr>
+<td><code>creationDate</code>, <code>modificationDate</code></td>
+<td>The PDF dates.</td>
+</tr>
+</tbody>
+</table>
+<p>Read the pdfme options JSON with <code>GenerateOptions.fromJson</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">GenerateOptions</span><span class="w"> </span><span class="n">options</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="n">GenerateOptions</span><span class="p">.</span><span class="n">fromJson</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">{</span><span class="s1">'lang'</span><span class="o">:</span><span class="w"> </span><span class="s1">'en'</span><span class="p">});</span>
+</span></code></pre></div>
+<h2 id="building-a-template">Building a template</h2>
+<p>A <code>Template</code> has a base PDF and a list of schemas for each page. Sizes and positions are in millimetres, from the top left corner:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Template</span><span class="w"> </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Template</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nl">basePdf:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">BlankPdf</span><span class="p">(),</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">schemas:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;&gt;</span><span class="p">[</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">    </span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">      </span><span class="k">const</span><span class="w"> </span><span class="n">TextSchema</span><span class="p">(</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">        </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'title'</span><span class="p">,</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">        </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="w">        </span><span class="nl">width:</span><span class="w"> </span><span class="m">170</span><span class="p">,</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">        </span><span class="nl">height:</span><span class="w"> </span><span class="m">15</span><span class="p">,</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">        </span><span class="nl">fontSize:</span><span class="w"> </span><span class="m">24</span><span class="p">,</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">      </span><span class="p">),</span>
+</span><span id="__span-5-12"><a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">    </span><span class="p">],</span>
+</span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="reading-and-writing-json">Reading and writing JSON</h3>
+<p><code>Template.fromJson</code> reads both pdfme formats. Each schema becomes its typed class, and a type with no plugin becomes an <code>UnknownSchema</code>. <code>toJson</code> gives the JSON back, with the keys this package does not know:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Template</span><span class="w"> </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Template</span><span class="p">.</span><span class="n">fromJson</span><span class="p">(</span><span class="n">json</span><span class="p">);</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">back</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">template</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span>
+</span></code></pre></div>
+<p>Every schema, <code>Position</code> and <code>Sides</code> also has <code>fromJson</code> and <code>toJson</code>.</p>
+<h3 id="blank-pages">Blank pages</h3>
+<p><code>BlankPdf</code> makes blank pages. The default is A4, 210 by 297 mm, with a padding of 10 mm:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">const</span><span class="w"> </span><span class="n">BlankPdf</span><span class="p">(</span><span class="nl">width:</span><span class="w"> </span><span class="m">148</span><span class="p">,</span><span class="w"> </span><span class="nl">height:</span><span class="w"> </span><span class="m">210</span><span class="p">,</span><span class="w"> </span><span class="nl">padding:</span><span class="w"> </span><span class="n">Sides</span><span class="p">.</span><span class="n">all</span><span class="p">(</span><span class="m">5</span><span class="p">));</span>
+</span></code></pre></div>
+<h3 id="static-schemas">Static schemas</h3>
+<p>Static schemas are drawn on every page of a blank base PDF, like a header. Read-only text can use <code>{currentPage}</code> and <code>{totalPages}</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">BlankPdf</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">staticSchema:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="k">const</span><span class="w"> </span><span class="n">TextSchema</span><span class="p">(</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">      </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'footer'</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">      </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">285</span><span class="p">),</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">      </span><span class="nl">readOnly:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">      </span><span class="nl">content:</span><span class="w"> </span><span class="s1">'{currentPage}/{totalPages}'</span><span class="p">,</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">  </span><span class="p">],</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>Read-only text also takes input names and dotted paths, like <code>{order.id}</code>, and <code>{date}</code> and <code>{dateTime}</code>.</p>
+<h3 id="a-pdf-file-as-the-base">A PDF file as the base</h3>
+<p>With <code>PdfFile</code>, each page of the file is one page of the template. The schemas are drawn on top:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Template</span><span class="w"> </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Template</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nl">basePdf:</span><span class="w"> </span><span class="n">PdfFile</span><span class="p">(</span><span class="n">File</span><span class="p">(</span><span class="s1">'form.pdf'</span><span class="p">).</span><span class="n">readAsBytesSync</span><span class="p">()),</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">schemas:</span><span class="w"> </span><span class="n">schemas</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="common-schema-options">Common schema options</h2>
+<p>Every schema has these options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it is</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>name</code></td>
+<td>The input key.</td>
+</tr>
+<tr>
+<td><code>position</code></td>
+<td>The top left corner, like <code>Position(20, 40)</code>.</td>
+</tr>
+<tr>
+<td><code>width</code>, <code>height</code></td>
+<td>The size in mm.</td>
+</tr>
+<tr>
+<td><code>rotate</code></td>
+<td>Degrees, clockwise.</td>
+</tr>
+<tr>
+<td><code>opacity</code></td>
+<td>0 (clear) to 1 (solid).</td>
+</tr>
+<tr>
+<td><code>readOnly</code></td>
+<td>Shows <code>content</code> and takes no input.</td>
+</tr>
+<tr>
+<td><code>required</code></td>
+<td><code>generate</code> throws when the input has no value.</td>
+</tr>
+<tr>
+<td><code>content</code></td>
+<td>The value of a read-only schema.</td>
+</tr>
+</tbody>
+</table>
+<p>Colors are hex strings, like <code>#ff0000</code>, <code>#f00</code> or <code>#ff000080</code> with alpha. An empty string means no color, and a bad hex value makes <code>generate</code> throw. <code>Sides(top: 1, right: 2, bottom: 1, left: 2)</code> and <code>Sides.all(1)</code> give a size for each side of a box.</p>
+<h2 id="adding-text">Adding text</h2>
+<p><code>TextSchema</code> draws text in a box. Long text wraps, and Thai, Lao, Khmer and Myanmar text breaks between words:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">const</span><span class="w"> </span><span class="n">TextSchema</span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'note'</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">60</span><span class="p">),</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nl">width:</span><span class="w"> </span><span class="m">170</span><span class="p">,</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nl">height:</span><span class="w"> </span><span class="m">30</span><span class="p">,</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nl">fontSize:</span><span class="w"> </span><span class="m">11</span><span class="p">,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="w">  </span><span class="nl">alignment:</span><span class="w"> </span><span class="n">Alignment</span><span class="p">.</span><span class="n">justify</span><span class="p">,</span>
+</span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="w">  </span><span class="nl">verticalAlignment:</span><span class="w"> </span><span class="n">VerticalAlignment</span><span class="p">.</span><span class="n">middle</span><span class="p">,</span>
+</span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="w">  </span><span class="nl">fontColor:</span><span class="w"> </span><span class="s1">'#333333'</span><span class="p">,</span>
+</span><span id="__span-10-10"><a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="w">  </span><span class="nl">padding:</span><span class="w"> </span><span class="n">Sides</span><span class="p">.</span><span class="n">all</span><span class="p">(</span><span class="m">2</span><span class="p">),</span>
+</span><span id="__span-10-11"><a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="p">);</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fontName</code></td>
+<td>The fallback font.</td>
+</tr>
+<tr>
+<td><code>fontSize</code></td>
+<td>13 points.</td>
+</tr>
+<tr>
+<td><code>alignment</code></td>
+<td><code>Alignment.left</code>. Also <code>center</code>, <code>right</code> and <code>justify</code>.</td>
+</tr>
+<tr>
+<td><code>verticalAlignment</code></td>
+<td><code>VerticalAlignment.top</code>. Also <code>middle</code> and <code>bottom</code>.</td>
+</tr>
+<tr>
+<td><code>lineHeight</code></td>
+<td>1, a factor of the font size.</td>
+</tr>
+<tr>
+<td><code>characterSpacing</code></td>
+<td>0 points.</td>
+</tr>
+<tr>
+<td><code>fontColor</code></td>
+<td><code>#000000</code>.</td>
+</tr>
+<tr>
+<td><code>backgroundColor</code></td>
+<td>none.</td>
+</tr>
+<tr>
+<td><code>borderColor</code>, <code>borderWidth</code></td>
+<td><code>#000000</code>, no width.</td>
+</tr>
+<tr>
+<td><code>padding</code></td>
+<td>none.</td>
+</tr>
+<tr>
+<td><code>underline</code>, <code>strikethrough</code></td>
+<td>false.</td>
+</tr>
+<tr>
+<td><code>dynamicFontSize</code></td>
+<td>none. See below.</td>
+</tr>
+</tbody>
+</table>
+<p><code>TextSchema</code> also has <code>textFormat</code>, <code>overflow</code>, <code>fontVariants</code> and <code>fontVariantFallback</code>. They are kept in the JSON. Inline markdown is drawn as plain text, and <code>TextOverflow.expand</code> is drawn like <code>visible</code>.</p>
+<h3 id="fitting-text-to-the-box">Fitting text to the box</h3>
+<p><code>DynamicFontSize</code> changes the font size between <code>min</code> and <code>max</code>, so the text fits:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">const</span><span class="w"> </span><span class="n">TextSchema</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'title'</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nl">dynamicFontSize:</span><span class="w"> </span><span class="n">DynamicFontSize</span><span class="p">(</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">    </span><span class="nl">min:</span><span class="w"> </span><span class="m">8</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">    </span><span class="nl">max:</span><span class="w"> </span><span class="m">40</span><span class="p">,</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">    </span><span class="nl">fit:</span><span class="w"> </span><span class="n">DynamicFontSizeFit</span><span class="p">.</span><span class="n">horizontal</span><span class="p">,</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>The defaults are 4, 72 and <code>DynamicFontSizeFit.vertical</code>.</p>
+<h3 id="text-with-variables">Text with variables</h3>
+<p><code>MultiVariableTextSchema</code> has a text with <code>{name}</code> variables. The input is a JSON string with a value for each variable:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">const</span><span class="w"> </span><span class="n">MultiVariableTextSchema</span><span class="p">(</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'greeting'</span><span class="p">,</span>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="w">  </span><span class="nl">width:</span><span class="w"> </span><span class="m">170</span><span class="p">,</span>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="nl">height:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="w">  </span><span class="nl">text:</span><span class="w"> </span><span class="s1">'Hello {name}, welcome to {city}!'</span><span class="p">,</span>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="nl">variables:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'city'</span><span class="p">],</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="p">);</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="c1">// input: {'greeting': '{"name": "Ann", "city": "Paris"}'}</span>
+</span></code></pre></div>
+<p>It takes all text options. When a variable is missing, nothing is drawn. For a read-only schema, <code>content</code> is a JSON string of values. With <code>contentSnapshot: true</code>, <code>content</code> is the text to draw.</p>
+<h3 id="select">Select</h3>
+<p><code>SelectSchema</code> is a text field with a list of <code>options</code>. It takes all text options:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">const</span><span class="w"> </span><span class="n">SelectSchema</span><span class="p">(</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'size'</span><span class="p">,</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">80</span><span class="p">),</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Small'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Large'</span><span class="p">],</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="adding-dates-and-times">Adding dates and times</h2>
+<p><code>DateSchema</code>, <code>TimeSchema</code> and <code>DateTimeSchema</code> format the input with date-fns tokens:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">const</span><span class="w"> </span><span class="n">DateSchema</span><span class="p">(</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'date'</span><span class="p">,</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">150</span><span class="p">),</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">  </span><span class="nl">format:</span><span class="w"> </span><span class="s1">'MM/dd/yyyy'</span><span class="p">,</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>They also take <code>locale</code>, <code>fontName</code>, <code>alignment</code>, <code>fontSize</code>, <code>characterSpacing</code>, <code>fontColor</code> and <code>backgroundColor</code>. Month and day names are English for every locale, and weeks start on Sunday.</p>
+<h2 id="adding-images-and-svg">Adding images and SVG</h2>
+<h3 id="images">Images</h3>
+<p><code>ImageSchema</code> draws a PNG or JPEG. <code>objectFit</code> is <code>ObjectFit.contain</code> (default) or <code>cover</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">const</span><span class="w"> </span><span class="n">ImageSchema</span><span class="p">(</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'photo'</span><span class="p">,</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">70</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">),</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nl">objectFit:</span><span class="w"> </span><span class="n">ObjectFit</span><span class="p">.</span><span class="n">cover</span><span class="p">,</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="nl">objectPosition:</span><span class="w"> </span><span class="n">ObjectPosition</span><span class="p">.</span><span class="n">centerTop</span><span class="p">,</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<p><code>ObjectPosition</code> has <code>leftTop</code>, <code>centerTop</code>, <code>rightTop</code>, <code>leftCenter</code>, <code>centerCenter</code> (default), <code>rightCenter</code>, <code>leftBottom</code>, <code>centerBottom</code> and <code>rightBottom</code>.</p>
+<h3 id="signatures">Signatures</h3>
+<p><code>SignatureSchema</code> is drawn like an image. Its default size is 62.5 by 37.5 mm:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">const</span><span class="w"> </span><span class="n">SignatureSchema</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'sign'</span><span class="p">,</span><span class="w"> </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">250</span><span class="p">));</span>
+</span></code></pre></div>
+<h3 id="svg">SVG</h3>
+<p><code>SvgSchema</code> draws the SVG text of the input:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="k">const</span><span class="w"> </span><span class="n">SvgSchema</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'logo'</span><span class="p">,</span><span class="w"> </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">10</span><span class="p">));</span>
+</span></code></pre></div>
+<h2 id="drawing-shapes">Drawing shapes</h2>
+<p><code>LineSchema</code>, <code>RectangleSchema</code> and <code>EllipseSchema</code> are read-only by default:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">const</span><span class="w"> </span><span class="n">LineSchema</span><span class="p">(</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'rule'</span><span class="p">,</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">40</span><span class="p">),</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">  </span><span class="nl">width:</span><span class="w"> </span><span class="m">190</span><span class="p">,</span>
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="w">  </span><span class="nl">color:</span><span class="w"> </span><span class="s1">'#cccccc'</span><span class="p">,</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="p">);</span>
+</span><span id="__span-18-7"><a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a><span class="k">const</span><span class="w"> </span><span class="n">RectangleSchema</span><span class="p">(</span>
+</span><span id="__span-18-8"><a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'box'</span><span class="p">,</span>
+</span><span id="__span-18-9"><a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">40</span><span class="p">,</span><span class="w"> </span><span class="m">70</span><span class="p">),</span>
+</span><span id="__span-18-10"><a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a><span class="w">  </span><span class="nl">color:</span><span class="w"> </span><span class="s1">'#b3e5fc'</span><span class="p">,</span>
+</span><span id="__span-18-11"><a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="w">  </span><span class="nl">borderColor:</span><span class="w"> </span><span class="s1">'#0288d1'</span><span class="p">,</span>
+</span><span id="__span-18-12"><a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="w">  </span><span class="nl">borderWidth:</span><span class="w"> </span><span class="m">1</span><span class="p">,</span>
+</span><span id="__span-18-13"><a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a><span class="w">  </span><span class="nl">radius:</span><span class="w"> </span><span class="m">5</span><span class="p">,</span>
+</span><span id="__span-18-14"><a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="p">);</span>
+</span><span id="__span-18-15"><a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="k">const</span><span class="w"> </span><span class="n">EllipseSchema</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'dot'</span><span class="p">,</span><span class="w"> </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">70</span><span class="p">));</span>
+</span></code></pre></div>
+<p>A rectangle and an ellipse take <code>color</code>, <code>borderColor</code> and <code>borderWidth</code>. A rectangle also takes <code>radius</code>.</p>
+<h3 id="circle-marks">Circle marks</h3>
+<p><code>CircleMarkSchema</code> draws a circle line around the box when the input is <code>'true'</code>. <code>borderWidth</code> is the line width in mm:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">const</span><span class="w"> </span><span class="n">CircleMarkSchema</span><span class="p">(</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'yes'</span><span class="p">,</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="m">100</span><span class="p">),</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="w">  </span><span class="nl">color:</span><span class="w"> </span><span class="s1">'#ff0000'</span><span class="p">,</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="w">  </span><span class="nl">borderWidth:</span><span class="w"> </span><span class="m">0.5</span><span class="p">,</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="check-boxes-and-radio-groups">Check boxes and radio groups</h2>
+<p>Both are on when the input is <code>'true'</code>. The radio buttons of one <code>group</code> work together in the designer:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">const</span><span class="w"> </span><span class="n">CheckboxSchema</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'agree'</span><span class="p">,</span><span class="w"> </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="m">115</span><span class="p">));</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="k">const</span><span class="w"> </span><span class="n">RadioGroupSchema</span><span class="p">(</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'small'</span><span class="p">,</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="m">125</span><span class="p">),</span>
+</span><span id="__span-20-5"><a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a><span class="w">  </span><span class="nl">group:</span><span class="w"> </span><span class="s1">'size'</span><span class="p">,</span>
+</span><span id="__span-20-6"><a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>Both take <code>color</code>.</p>
+<h2 id="adding-barcodes">Adding barcodes</h2>
+<p><code>BarcodeSchema</code> draws a barcode or a QR code as vector shapes. Pick the type with <code>barcodeType</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">BarcodeSchema</span><span class="p">(</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'link'</span><span class="p">,</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">  </span><span class="nl">barcodeType:</span><span class="w"> </span><span class="n">BarcodeType</span><span class="p">.</span><span class="n">qrcode</span><span class="p">,</span>
+</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">40</span><span class="p">),</span>
+</span><span id="__span-21-5"><a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="w">  </span><span class="nl">barColor:</span><span class="w"> </span><span class="s1">'#000000'</span><span class="p">,</span>
+</span><span id="__span-21-6"><a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a><span class="p">);</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>width</code>, <code>height</code></td>
+<td>The size of the type, like 30 by 30 mm for a QR code.</td>
+</tr>
+<tr>
+<td><code>backgroundColor</code></td>
+<td><code>#ffffff</code>.</td>
+</tr>
+<tr>
+<td><code>barColor</code>, <code>textColor</code></td>
+<td><code>#000000</code>.</td>
+</tr>
+<tr>
+<td><code>includetext</code></td>
+<td>true. The text under the bars.</td>
+</tr>
+</tbody>
+</table>
+<p>The types of <code>BarcodeType</code> are <code>qrcode</code>, <code>japanpost</code>, <code>ean13</code>, <code>ean8</code>, <code>code39</code>, <code>code128</code>, <code>nw7</code>, <code>itf14</code>, <code>upca</code>, <code>upce</code>, <code>gs1datamatrix</code> and <code>pdf417</code>. Each has its default <code>width</code> and <code>height</code>, and <code>is2D</code> is true for QR code, Data Matrix and PDF417. <code>barcodeTypes</code> is the list of the type names.</p>
+<p>A value that the barcode check refuses, like a bad EAN-13 check digit, draws nothing. A value that passes the check but can not be encoded makes <code>generate</code> throw a <code>BarcodeInputException</code> with a <code>message</code>.</p>
+<h2 id="adding-tables">Adding tables</h2>
+<p><code>TableSchema</code> draws a table. The input is a JSON string of rows:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">const</span><span class="w"> </span><span class="n">TableSchema</span><span class="p">(</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'items'</span><span class="p">,</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="w"> </span><span class="m">170</span><span class="p">),</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">  </span><span class="nl">head:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'Item'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Qty'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Price'</span><span class="p">],</span>
+</span><span id="__span-22-5"><a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">  </span><span class="nl">headWidthPercentages:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="p">[</span><span class="m">50</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">30</span><span class="p">],</span>
+</span><span id="__span-22-6"><a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">  </span><span class="nl">columnStyles:</span><span class="w"> </span><span class="n">ColumnStyles</span><span class="p">(</span>
+</span><span id="__span-22-7"><a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">    </span><span class="nl">alignment:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">Alignment</span><span class="o">&gt;</span><span class="p">{</span><span class="m">1</span><span class="o">:</span><span class="w"> </span><span class="n">Alignment</span><span class="p">.</span><span class="n">right</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="o">:</span><span class="w"> </span><span class="n">Alignment</span><span class="p">.</span><span class="n">right</span><span class="p">},</span>
+</span><span id="__span-22-8"><a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-22-9"><a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="p">);</span>
+</span><span id="__span-22-10"><a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="c1">// input: {'items': jsonEncode([['Pen', '2', '3.00']])}</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>head</code></td>
+<td>The head text of each column.</td>
+</tr>
+<tr>
+<td><code>headWidthPercentages</code></td>
+<td>The width of each column, in percent. By default, each column gets the same width (30, 30, 40 for the default head).</td>
+</tr>
+<tr>
+<td><code>showHead</code></td>
+<td>Shows the head (true).</td>
+</tr>
+<tr>
+<td><code>repeatHead</code></td>
+<td>Shows the head again on each new page (false).</td>
+</tr>
+<tr>
+<td><code>tableStyles</code></td>
+<td>The outer border: <code>TableStyles(borderColor:, borderWidth:)</code>.</td>
+</tr>
+<tr>
+<td><code>headStyles</code>, <code>bodyStyles</code></td>
+<td>The cell styles: <code>CellStyle.head()</code> and <code>CellStyle.body()</code>.</td>
+</tr>
+<tr>
+<td><code>columnStyles</code></td>
+<td>Styles by column index, from 0.</td>
+</tr>
+</tbody>
+</table>
+<p>On a blank base PDF, a table that is taller than its box goes on over new pages. The schemas below it move down. A row with fewer cells than the head throws.</p>
+<h3 id="cell-styles">Cell styles</h3>
+<p><code>CellStyle.head()</code> and <code>CellStyle.body()</code> take the text options <code>fontName</code>, <code>alignment</code>, <code>verticalAlignment</code>, <code>fontSize</code>, <code>lineHeight</code>, <code>characterSpacing</code>, <code>fontColor</code> and <code>backgroundColor</code>. They also take <code>borderColor</code>, <code>borderWidth</code> and <code>padding</code>. A body style has <code>alternateBackgroundColor</code> for every second row:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="k">const</span><span class="w"> </span><span class="n">CellStyle</span><span class="p">.</span><span class="n">body</span><span class="p">(</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">  </span><span class="nl">fontSize:</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">  </span><span class="nl">alternateBackgroundColor:</span><span class="w"> </span><span class="s1">'#f5f5f5'</span><span class="p">,</span>
+</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="image-columns">Image columns</h3>
+<p>A column of <code>TableCellType.image</code> shows PNG and JPEG data URLs. <code>ImageHeightMode.fixed</code> makes the image <code>imageHeight</code> mm high, 20 by default. <code>ImageHeightMode.auto</code> follows the image ratio:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="k">const</span><span class="w"> </span><span class="n">ColumnStyles</span><span class="p">(</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">  </span><span class="nl">cellType:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">TableCellType</span><span class="o">&gt;</span><span class="p">{</span><span class="m">0</span><span class="o">:</span><span class="w"> </span><span class="n">TableCellType</span><span class="p">.</span><span class="n">image</span><span class="p">},</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">  </span><span class="nl">imageHeightMode:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">ImageHeightMode</span><span class="o">&gt;</span><span class="p">{</span><span class="m">0</span><span class="o">:</span><span class="w"> </span><span class="n">ImageHeightMode</span><span class="p">.</span><span class="n">fixed</span><span class="p">},</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">  </span><span class="nl">imageHeight:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="o">&gt;</span><span class="p">{</span><span class="m">0</span><span class="o">:</span><span class="w"> </span><span class="m">15</span><span class="p">},</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<p><code>ColumnStyles</code> also has <code>verticalAlignment</code>.</p>
+<h2 id="using-other-fonts">Using other fonts</h2>
+<p>Text uses Roboto by default. For other languages, give your fonts in <code>GenerateOptions</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">noto</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'NotoSansJP-Regular.otf'</span><span class="p">).</span><span class="n">readAsBytesSync</span><span class="p">();</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">pdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">generate</span><span class="p">(</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">  </span><span class="nl">template:</span><span class="w"> </span><span class="n">template</span><span class="p">,</span>
+</span><span id="__span-25-4"><a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a><span class="w">  </span><span class="nl">inputs:</span><span class="w"> </span><span class="n">inputs</span><span class="p">,</span>
+</span><span id="__span-25-5"><a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a><span class="w">  </span><span class="nl">plugins:</span><span class="w"> </span><span class="n">builtInPlugins</span><span class="p">,</span>
+</span><span id="__span-25-6"><a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a><span class="w">  </span><span class="nl">options:</span><span class="w"> </span><span class="n">GenerateOptions</span><span class="p">(</span>
+</span><span id="__span-25-7"><a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a><span class="w">    </span><span class="nl">font:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">FontSource</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-25-8"><a id="__codelineno-25-8" name="__codelineno-25-8" href="#__codelineno-25-8"></a><span class="w">      </span><span class="s1">'Roboto'</span><span class="o">:</span><span class="w"> </span><span class="n">FontStore</span><span class="p">.</span><span class="n">defaultFont</span><span class="p">,</span>
+</span><span id="__span-25-9"><a id="__codelineno-25-9" name="__codelineno-25-9" href="#__codelineno-25-9"></a><span class="w">      </span><span class="s1">'NotoSansJP'</span><span class="o">:</span><span class="w"> </span><span class="n">FontSource</span><span class="p">(</span><span class="n">noto</span><span class="p">),</span>
+</span><span id="__span-25-10"><a id="__codelineno-25-10" name="__codelineno-25-10" href="#__codelineno-25-10"></a><span class="w">    </span><span class="p">},</span>
+</span><span id="__span-25-11"><a id="__codelineno-25-11" name="__codelineno-25-11" href="#__codelineno-25-11"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-25-12"><a id="__codelineno-25-12" name="__codelineno-25-12" href="#__codelineno-25-12"></a><span class="p">);</span>
+</span></code></pre></div>
+<p>Thai, Myanmar, Khmer, Lao, Arabic, Hebrew and Hindi text is laid out correctly. A schema picks a font with <code>fontName</code>. Letters that are not in the font show as empty boxes.</p>
+<h3 id="font-options">Font options</h3>
+<p>One font has <code>fallback: true</code>, and schemas with no <code>fontName</code> use it. <code>subset</code> is true by default, so only the used letters go into the file:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">FontSource</span><span class="p">(</span><span class="n">noto</span><span class="p">,</span><span class="w"> </span><span class="nl">fallback:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">subset:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span>
+</span></code></pre></div>
+<p>In the options JSON, the font data can also be a base64 string or a data URI. Font URLs throw an <code>ArgumentError</code>.</p>
+<h2 id="plugins">Plugins</h2>
+<p>Each schema type is a plugin. <code>builtInPlugins</code> has all types, and <code>defaultPlugins</code> has only <code>text</code>. Pick only the plugins you need:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">generate</span><span class="p">(</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="nl">template:</span><span class="w"> </span><span class="n">template</span><span class="p">,</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">  </span><span class="nl">inputs:</span><span class="w"> </span><span class="n">inputs</span><span class="p">,</span>
+</span><span id="__span-27-4"><a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">  </span><span class="nl">plugins:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">SchemaPlugin</span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;&gt;</span><span class="p">{</span>
+</span><span id="__span-27-5"><a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">    </span><span class="s1">'Text'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TextPlugin</span><span class="p">(),</span>
+</span><span id="__span-27-6"><a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a><span class="w">    </span><span class="s1">'QR Code'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">BarcodePlugin</span><span class="p">(</span><span class="n">BarcodeType</span><span class="p">.</span><span class="n">qrcode</span><span class="p">),</span>
+</span><span id="__span-27-7"><a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-27-8"><a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a><span class="p">);</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Plugin</th>
+<th>Schema type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>TextPlugin</code>, <code>MultiVariableTextPlugin</code>, <code>SelectPlugin</code></td>
+<td><code>text</code>, <code>multiVariableText</code>, <code>select</code></td>
+</tr>
+<tr>
+<td><code>DatePlugin</code>, <code>TimePlugin</code>, <code>DateTimePlugin</code></td>
+<td><code>date</code>, <code>time</code>, <code>dateTime</code></td>
+</tr>
+<tr>
+<td><code>ImagePlugin</code>, <code>SignaturePlugin</code>, <code>SvgPlugin</code></td>
+<td><code>image</code>, <code>signature</code>, <code>svg</code></td>
+</tr>
+<tr>
+<td><code>LinePlugin</code>, <code>RectanglePlugin</code>, <code>EllipsePlugin</code>, <code>CircleMarkPlugin</code></td>
+<td><code>line</code>, <code>rectangle</code>, <code>ellipse</code>, <code>circleMark</code></td>
+</tr>
+<tr>
+<td><code>CheckboxPlugin</code>, <code>RadioGroupPlugin</code></td>
+<td><code>checkbox</code>, <code>radioGroup</code></td>
+</tr>
+<tr>
+<td><code>BarcodePlugin(type)</code></td>
+<td>the barcode types</td>
+</tr>
+<tr>
+<td><code>TablePlugin</code></td>
+<td><code>table</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>findPlugin(plugins, 'qrcode')</code> gives the plugin for a type, or null.</p>
+<h3 id="your-own-schema-type">Your own schema type</h3>
+<p>A schema extends <code>Schema</code>, and its <code>fromJson</code> constructor calls <code>Schema.fromJson</code>. A plugin extends <code>SchemaPlugin</code>, reads its schema from JSON and draws it in <code>pdf</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">StampSchema</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Schema</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">StampSchema</span><span class="p">({</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">    </span><span class="kd">required</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">    </span><span class="kd">required</span><span class="w"> </span><span class="k">super</span><span class="p">.</span><span class="n">position</span><span class="p">,</span>
+</span><span id="__span-28-5"><a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span>
+</span><span id="__span-28-6"><a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a><span class="w">    </span><span class="k">super</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10</span><span class="p">,</span>
+</span><span id="__span-28-7"><a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a><span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'PAID'</span><span class="p">,</span>
+</span><span id="__span-28-8"><a id="__codelineno-28-8" name="__codelineno-28-8" href="#__codelineno-28-8"></a><span class="w">  </span><span class="p">});</span>
+</span><span id="__span-28-9"><a id="__codelineno-28-9" name="__codelineno-28-9" href="#__codelineno-28-9"></a>
+</span><span id="__span-28-10"><a id="__codelineno-28-10" name="__codelineno-28-10" href="#__codelineno-28-10"></a><span class="w">  </span><span class="n">StampSchema</span><span class="p">.</span><span class="n">fromJson</span><span class="p">(</span><span class="k">super</span><span class="p">.</span><span class="n">json</span><span class="p">)</span>
+</span><span id="__span-28-11"><a id="__codelineno-28-11" name="__codelineno-28-11" href="#__codelineno-28-11"></a><span class="w">    </span><span class="o">:</span><span class="w"> </span><span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json</span><span class="p">[</span><span class="s1">'label'</span><span class="p">]</span><span class="w"> </span><span class="k">is</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">json</span><span class="p">[</span><span class="s1">'label'</span><span class="p">]</span><span class="o">!</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s1">'PAID'</span><span class="p">,</span>
+</span><span id="__span-28-12"><a id="__codelineno-28-12" name="__codelineno-28-12" href="#__codelineno-28-12"></a><span class="w">      </span><span class="k">super</span><span class="p">.</span><span class="n">fromJson</span><span class="p">();</span>
+</span><span id="__span-28-13"><a id="__codelineno-28-13" name="__codelineno-28-13" href="#__codelineno-28-13"></a>
+</span><span id="__span-28-14"><a id="__codelineno-28-14" name="__codelineno-28-14" href="#__codelineno-28-14"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="n">label</span><span class="p">;</span>
+</span><span id="__span-28-15"><a id="__codelineno-28-15" name="__codelineno-28-15" href="#__codelineno-28-15"></a>
+</span><span id="__span-28-16"><a id="__codelineno-28-16" name="__codelineno-28-16" href="#__codelineno-28-16"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-28-17"><a id="__codelineno-28-17" name="__codelineno-28-17" href="#__codelineno-28-17"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'stamp'</span><span class="p">;</span>
+</span><span id="__span-28-18"><a id="__codelineno-28-18" name="__codelineno-28-18" href="#__codelineno-28-18"></a>
+</span><span id="__span-28-19"><a id="__codelineno-28-19" name="__codelineno-28-19" href="#__codelineno-28-19"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-28-20"><a id="__codelineno-28-20" name="__codelineno-28-20" href="#__codelineno-28-20"></a><span class="w">  </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">toJson</span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="p">{</span>
+</span><span id="__span-28-21"><a id="__codelineno-28-21" name="__codelineno-28-21" href="#__codelineno-28-21"></a><span class="w">    </span><span class="p">...</span><span class="k">super</span><span class="p">.</span><span class="n">toJson</span><span class="p">(),</span>
+</span><span id="__span-28-22"><a id="__codelineno-28-22" name="__codelineno-28-22" href="#__codelineno-28-22"></a><span class="w">    </span><span class="s1">'label'</span><span class="o">:</span><span class="w"> </span><span class="n">label</span><span class="p">,</span>
+</span><span id="__span-28-23"><a id="__codelineno-28-23" name="__codelineno-28-23" href="#__codelineno-28-23"></a><span class="w">  </span><span class="p">};</span>
+</span><span id="__span-28-24"><a id="__codelineno-28-24" name="__codelineno-28-24" href="#__codelineno-28-24"></a><span class="p">}</span>
+</span><span id="__span-28-25"><a id="__codelineno-28-25" name="__codelineno-28-25" href="#__codelineno-28-25"></a>
+</span><span id="__span-28-26"><a id="__codelineno-28-26" name="__codelineno-28-26" href="#__codelineno-28-26"></a><span class="kd">class</span><span class="w"> </span><span class="nc">StampPlugin</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SchemaPlugin</span><span class="o">&lt;</span><span class="n">StampSchema</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-28-27"><a id="__codelineno-28-27" name="__codelineno-28-27" href="#__codelineno-28-27"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">StampPlugin</span><span class="p">();</span>
+</span><span id="__span-28-28"><a id="__codelineno-28-28" name="__codelineno-28-28" href="#__codelineno-28-28"></a>
+</span><span id="__span-28-29"><a id="__codelineno-28-29" name="__codelineno-28-29" href="#__codelineno-28-29"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-28-30"><a id="__codelineno-28-30" name="__codelineno-28-30" href="#__codelineno-28-30"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">type</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'stamp'</span><span class="p">;</span>
+</span><span id="__span-28-31"><a id="__codelineno-28-31" name="__codelineno-28-31" href="#__codelineno-28-31"></a>
+</span><span id="__span-28-32"><a id="__codelineno-28-32" name="__codelineno-28-32" href="#__codelineno-28-32"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-28-33"><a id="__codelineno-28-33" name="__codelineno-28-33" href="#__codelineno-28-33"></a><span class="w">  </span><span class="n">StampSchema</span><span class="w"> </span><span class="n">fromJson</span><span class="p">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">Object</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">json</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span>
+</span><span id="__span-28-34"><a id="__codelineno-28-34" name="__codelineno-28-34" href="#__codelineno-28-34"></a><span class="w">      </span><span class="n">StampSchema</span><span class="p">.</span><span class="n">fromJson</span><span class="p">(</span><span class="n">json</span><span class="p">);</span>
+</span><span id="__span-28-35"><a id="__codelineno-28-35" name="__codelineno-28-35" href="#__codelineno-28-35"></a>
+</span><span id="__span-28-36"><a id="__codelineno-28-36" name="__codelineno-28-36" href="#__codelineno-28-36"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-28-37"><a id="__codelineno-28-37" name="__codelineno-28-37" href="#__codelineno-28-37"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">pdf</span><span class="p">(</span><span class="n">RenderProps</span><span class="o">&lt;</span><span class="n">StampSchema</span><span class="o">&gt;</span><span class="w"> </span><span class="n">props</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-28-38"><a id="__codelineno-28-38" name="__codelineno-28-38" href="#__codelineno-28-38"></a><span class="w">    </span><span class="n">PdfLayout</span><span class="w"> </span><span class="n">box</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PdfLayout</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="n">props</span><span class="p">.</span><span class="n">schema</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">page</span><span class="p">.</span><span class="n">getHeight</span><span class="p">());</span>
+</span><span id="__span-28-39"><a id="__codelineno-28-39" name="__codelineno-28-39" href="#__codelineno-28-39"></a><span class="w">    </span><span class="n">props</span><span class="p">.</span><span class="n">page</span><span class="p">.</span><span class="n">drawRectangle</span><span class="p">(</span>
+</span><span id="__span-28-40"><a id="__codelineno-28-40" name="__codelineno-28-40" href="#__codelineno-28-40"></a><span class="w">      </span><span class="nl">x:</span><span class="w"> </span><span class="n">box</span><span class="p">.</span><span class="n">x</span><span class="p">,</span>
+</span><span id="__span-28-41"><a id="__codelineno-28-41" name="__codelineno-28-41" href="#__codelineno-28-41"></a><span class="w">      </span><span class="nl">y:</span><span class="w"> </span><span class="n">box</span><span class="p">.</span><span class="n">y</span><span class="p">,</span>
+</span><span id="__span-28-42"><a id="__codelineno-28-42" name="__codelineno-28-42" href="#__codelineno-28-42"></a><span class="w">      </span><span class="nl">width:</span><span class="w"> </span><span class="n">box</span><span class="p">.</span><span class="n">width</span><span class="p">,</span>
+</span><span id="__span-28-43"><a id="__codelineno-28-43" name="__codelineno-28-43" href="#__codelineno-28-43"></a><span class="w">      </span><span class="nl">height:</span><span class="w"> </span><span class="n">box</span><span class="p">.</span><span class="n">height</span><span class="p">,</span>
+</span><span id="__span-28-44"><a id="__codelineno-28-44" name="__codelineno-28-44" href="#__codelineno-28-44"></a><span class="w">      </span><span class="nl">color:</span><span class="w"> </span><span class="n">rgb</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="m">0</span><span class="p">),</span>
+</span><span id="__span-28-45"><a id="__codelineno-28-45" name="__codelineno-28-45" href="#__codelineno-28-45"></a><span class="w">    </span><span class="p">);</span>
+</span><span id="__span-28-46"><a id="__codelineno-28-46" name="__codelineno-28-46" href="#__codelineno-28-46"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-28-47"><a id="__codelineno-28-47" name="__codelineno-28-47" href="#__codelineno-28-47"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Give the plugin to <code>Template.fromJson</code> and to <code>generate</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">SchemaPlugin</span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">plugins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">SchemaPlugin</span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;&gt;</span><span class="p">{</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">  </span><span class="p">...</span><span class="n">builtInPlugins</span><span class="p">,</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="w">  </span><span class="s1">'Stamp'</span><span class="o">:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">StampPlugin</span><span class="p">(),</span>
+</span><span id="__span-29-4"><a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a><span class="p">};</span>
+</span><span id="__span-29-5"><a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a><span class="n">Template</span><span class="w"> </span><span class="n">template</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Template</span><span class="p">.</span><span class="n">fromJson</span><span class="p">(</span><span class="n">json</span><span class="p">,</span><span class="w"> </span><span class="nl">plugins:</span><span class="w"> </span><span class="n">plugins</span><span class="p">);</span>
+</span><span id="__span-29-6"><a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a><span class="kd">await</span><span class="w"> </span><span class="n">generate</span><span class="p">(</span><span class="nl">template:</span><span class="w"> </span><span class="n">template</span><span class="p">,</span><span class="w"> </span><span class="nl">inputs:</span><span class="w"> </span><span class="n">inputs</span><span class="p">,</span><span class="w"> </span><span class="nl">plugins:</span><span class="w"> </span><span class="n">plugins</span><span class="p">);</span>
+</span></code></pre></div>
+<p>The package exports the <a href="../pdf-lib/">PDF Library</a> API, so you can use all its drawing methods on the page.</p>
+<h3 id="render-props">Render props</h3>
+<p><code>RenderProps</code> has the input <code>value</code>, the typed <code>schema</code>, the <code>basePdf</code>, the <code>page</code>, the document <code>doc</code>, the <code>options</code>, the <code>fonts</code> and a <code>cache</code>. Draw with a built-in plugin on a changed schema with <code>withSchema</code> or <code>copyWith</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kd">await</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">TextPlugin</span><span class="p">().</span><span class="n">pdf</span><span class="p">(</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="n">props</span><span class="p">.</span><span class="n">withSchema</span><span class="p">(</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">    </span><span class="n">TextSchema</span><span class="p">(</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">      </span><span class="nl">name:</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">schema</span><span class="p">.</span><span class="n">name</span><span class="p">,</span>
+</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="w">      </span><span class="nl">position:</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">schema</span><span class="p">.</span><span class="n">position</span><span class="p">,</span>
+</span><span id="__span-30-6"><a id="__codelineno-30-6" name="__codelineno-30-6" href="#__codelineno-30-6"></a><span class="w">      </span><span class="nl">fontColor:</span><span class="w"> </span><span class="s1">'#ffffff'</span><span class="p">,</span>
+</span><span id="__span-30-7"><a id="__codelineno-30-7" name="__codelineno-30-7" href="#__codelineno-30-7"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-30-8"><a id="__codelineno-30-8" name="__codelineno-30-8" href="#__codelineno-30-8"></a><span class="w">    </span><span class="nl">value:</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">schema</span><span class="p">.</span><span class="n">label</span><span class="p">,</span>
+</span><span id="__span-30-9"><a id="__codelineno-30-9" name="__codelineno-30-9" href="#__codelineno-30-9"></a><span class="w">  </span><span class="p">),</span>
+</span><span id="__span-30-10"><a id="__codelineno-30-10" name="__codelineno-30-10" href="#__codelineno-30-10"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="fonts-and-cache-in-a-plugin">Fonts and cache in a plugin</h3>
+<p><code>fonts.resolve</code> gives the font name, or the fallback name for null. <code>fonts.embed</code> gives the <code>PDFFont</code>. The <code>cache</code> keeps values for the whole document:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">fonts</span><span class="p">.</span><span class="n">resolve</span><span class="p">(</span><span class="kc">null</span><span class="p">);</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">PDFFont</span><span class="w"> </span><span class="n">font</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">fonts</span><span class="p">.</span><span class="n">embed</span><span class="p">(</span><span class="n">name</span><span class="p">);</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="n">PDFImage</span><span class="o">?</span><span class="w"> </span><span class="n">logo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">cache</span><span class="p">.</span><span class="kd">get</span><span class="o">&lt;</span><span class="n">PDFImage</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'logo'</span><span class="p">);</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="n">props</span><span class="p">.</span><span class="n">cache</span><span class="p">.</span><span class="kd">set</span><span class="o">&lt;</span><span class="n">PDFImage</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'logo'</span><span class="p">,</span><span class="w"> </span><span class="n">image</span><span class="p">);</span>
+</span></code></pre></div>
+<p><code>fonts.sources</code> has all fonts, and <code>fonts.fallbackName</code> is the name of the fallback font.</p>
+<h3 id="layout-in-a-plugin">Layout in a plugin</h3>
+<p><code>PdfLayout.of</code> turns the box of a schema into PDF points, with the origin at the bottom left. It has <code>x</code>, <code>y</code>, <code>width</code>, <code>height</code>, <code>rotate</code> and <code>opacity</code>. <code>rotatePoint</code> turns a <code>Point</code> around another one:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">PdfLayout</span><span class="w"> </span><span class="n">box</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">PdfLayout</span><span class="p">.</span><span class="n">of</span><span class="p">(</span><span class="n">props</span><span class="p">.</span><span class="n">schema</span><span class="p">,</span><span class="w"> </span><span class="n">props</span><span class="p">.</span><span class="n">page</span><span class="p">.</span><span class="n">getHeight</span><span class="p">());</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="n">Point</span><span class="w"> </span><span class="n">corner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rotatePoint</span><span class="p">(</span>
+</span><span id="__span-32-3"><a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a><span class="w">    </span><span class="p">(</span><span class="nl">x:</span><span class="w"> </span><span class="n">box</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="nl">y:</span><span class="w"> </span><span class="n">box</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="nl">x:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="nl">y:</span><span class="w"> </span><span class="m">100</span><span class="p">),</span><span class="w"> </span><span class="m">90</span><span class="p">);</span>
+</span></code></pre></div>
 <h2 id="without-dox">Without Dox</h2>
-<p>The same code works in any Dart program. Call <code>generate(...)</code>, then write the bytes to a file:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:typed_data'</span><span class="p">;</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_pdf_me/dox_pdf_me.dart'</span><span class="p">;</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="n">Uint8List</span><span class="w"> </span><span class="n">pdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">generate</span><span class="p">(</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="w">    </span><span class="nl">template:</span><span class="w"> </span><span class="n">Template</span><span class="p">(</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">      </span><span class="nl">basePdf:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">BlankPdf</span><span class="p">(),</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">      </span><span class="nl">schemas:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;&gt;</span><span class="p">[</span>
-</span><span id="__span-4-11"><a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">        </span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;</span><span class="p">[</span>
-</span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a><span class="w">          </span><span class="k">const</span><span class="w"> </span><span class="n">TextSchema</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">),</span><span class="w"> </span><span class="nl">width:</span><span class="w"> </span><span class="m">170</span><span class="p">,</span><span class="w"> </span><span class="nl">height:</span><span class="w"> </span><span class="m">15</span><span class="p">),</span>
-</span><span id="__span-4-13"><a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a><span class="w">          </span><span class="n">BarcodeSchema</span><span class="p">(</span><span class="nl">name:</span><span class="w"> </span><span class="s1">'link'</span><span class="p">,</span><span class="w"> </span><span class="nl">barcodeType:</span><span class="w"> </span><span class="n">BarcodeType</span><span class="p">.</span><span class="n">qrcode</span><span class="p">,</span><span class="w"> </span><span class="nl">position:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">40</span><span class="p">)),</span>
-</span><span id="__span-4-14"><a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a><span class="w">        </span><span class="p">],</span>
-</span><span id="__span-4-15"><a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a><span class="w">      </span><span class="p">],</span>
-</span><span id="__span-4-16"><a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a><span class="w">    </span><span class="p">),</span>
-</span><span id="__span-4-17"><a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a><span class="w">    </span><span class="nl">inputs:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="p">[</span>
-</span><span id="__span-4-18"><a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a><span class="w">      </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Hello, PDF!'</span><span class="p">,</span><span class="w"> </span><span class="s1">'link'</span><span class="o">:</span><span class="w"> </span><span class="s1">'https://dartondox.dev'</span><span class="p">},</span>
-</span><span id="__span-4-19"><a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a><span class="w">    </span><span class="p">],</span>
-</span><span id="__span-4-20"><a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a><span class="w">    </span><span class="nl">plugins:</span><span class="w"> </span><span class="n">builtInPlugins</span><span class="p">,</span>
-</span><span id="__span-4-21"><a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a><span class="w">  </span><span class="p">);</span>
-</span><span id="__span-4-22"><a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a><span class="w">  </span><span class="n">File</span><span class="p">(</span><span class="s1">'hello.pdf'</span><span class="p">).</span><span class="n">writeAsBytesSync</span><span class="p">(</span><span class="n">pdf</span><span class="p">);</span>
-</span><span id="__span-4-23"><a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a><span class="p">}</span>
+<p>The same code works in any Dart program. Write the bytes to a file:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:typed_data'</span><span class="p">;</span>
+</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>
+</span><span id="__span-33-4"><a id="__codelineno-33-4" name="__codelineno-33-4" href="#__codelineno-33-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_pdf_me/dox_pdf_me.dart'</span><span class="p">;</span>
+</span><span id="__span-33-5"><a id="__codelineno-33-5" name="__codelineno-33-5" href="#__codelineno-33-5"></a>
+</span><span id="__span-33-6"><a id="__codelineno-33-6" name="__codelineno-33-6" href="#__codelineno-33-6"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-33-7"><a id="__codelineno-33-7" name="__codelineno-33-7" href="#__codelineno-33-7"></a><span class="w">  </span><span class="n">Uint8List</span><span class="w"> </span><span class="n">pdf</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">generate</span><span class="p">(</span>
+</span><span id="__span-33-8"><a id="__codelineno-33-8" name="__codelineno-33-8" href="#__codelineno-33-8"></a><span class="w">    </span><span class="nl">template:</span><span class="w"> </span><span class="n">Template</span><span class="p">(</span>
+</span><span id="__span-33-9"><a id="__codelineno-33-9" name="__codelineno-33-9" href="#__codelineno-33-9"></a><span class="w">      </span><span class="nl">basePdf:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">BlankPdf</span><span class="p">(),</span>
+</span><span id="__span-33-10"><a id="__codelineno-33-10" name="__codelineno-33-10" href="#__codelineno-33-10"></a><span class="w">      </span><span class="nl">schemas:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;&gt;</span><span class="p">[</span>
+</span><span id="__span-33-11"><a id="__codelineno-33-11" name="__codelineno-33-11" href="#__codelineno-33-11"></a><span class="w">        </span><span class="o">&lt;</span><span class="n">Schema</span><span class="o">&gt;</span><span class="p">[</span>
+</span><span id="__span-33-12"><a id="__codelineno-33-12" name="__codelineno-33-12" href="#__codelineno-33-12"></a><span class="w">          </span><span class="k">const</span><span class="w"> </span><span class="n">TextSchema</span><span class="p">(</span>
+</span><span id="__span-33-13"><a id="__codelineno-33-13" name="__codelineno-33-13" href="#__codelineno-33-13"></a><span class="w">              </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'title'</span><span class="p">,</span>
+</span><span id="__span-33-14"><a id="__codelineno-33-14" name="__codelineno-33-14" href="#__codelineno-33-14"></a><span class="w">              </span><span class="nl">position:</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">20</span><span class="p">),</span>
+</span><span id="__span-33-15"><a id="__codelineno-33-15" name="__codelineno-33-15" href="#__codelineno-33-15"></a><span class="w">              </span><span class="nl">width:</span><span class="w"> </span><span class="m">170</span><span class="p">,</span>
+</span><span id="__span-33-16"><a id="__codelineno-33-16" name="__codelineno-33-16" href="#__codelineno-33-16"></a><span class="w">              </span><span class="nl">height:</span><span class="w"> </span><span class="m">15</span><span class="p">),</span>
+</span><span id="__span-33-17"><a id="__codelineno-33-17" name="__codelineno-33-17" href="#__codelineno-33-17"></a><span class="w">          </span><span class="n">BarcodeSchema</span><span class="p">(</span>
+</span><span id="__span-33-18"><a id="__codelineno-33-18" name="__codelineno-33-18" href="#__codelineno-33-18"></a><span class="w">              </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'link'</span><span class="p">,</span>
+</span><span id="__span-33-19"><a id="__codelineno-33-19" name="__codelineno-33-19" href="#__codelineno-33-19"></a><span class="w">              </span><span class="nl">barcodeType:</span><span class="w"> </span><span class="n">BarcodeType</span><span class="p">.</span><span class="n">qrcode</span><span class="p">,</span>
+</span><span id="__span-33-20"><a id="__codelineno-33-20" name="__codelineno-33-20" href="#__codelineno-33-20"></a><span class="w">              </span><span class="nl">position:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">Position</span><span class="p">(</span><span class="m">20</span><span class="p">,</span><span class="w"> </span><span class="m">40</span><span class="p">)),</span>
+</span><span id="__span-33-21"><a id="__codelineno-33-21" name="__codelineno-33-21" href="#__codelineno-33-21"></a><span class="w">        </span><span class="p">],</span>
+</span><span id="__span-33-22"><a id="__codelineno-33-22" name="__codelineno-33-22" href="#__codelineno-33-22"></a><span class="w">      </span><span class="p">],</span>
+</span><span id="__span-33-23"><a id="__codelineno-33-23" name="__codelineno-33-23" href="#__codelineno-33-23"></a><span class="w">    </span><span class="p">),</span>
+</span><span id="__span-33-24"><a id="__codelineno-33-24" name="__codelineno-33-24" href="#__codelineno-33-24"></a><span class="w">    </span><span class="nl">inputs:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="p">[</span>
+</span><span id="__span-33-25"><a id="__codelineno-33-25" name="__codelineno-33-25" href="#__codelineno-33-25"></a><span class="w">      </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-33-26"><a id="__codelineno-33-26" name="__codelineno-33-26" href="#__codelineno-33-26"></a><span class="w">        </span><span class="s1">'title'</span><span class="o">:</span><span class="w"> </span><span class="s1">'Hello, PDF!'</span><span class="p">,</span>
+</span><span id="__span-33-27"><a id="__codelineno-33-27" name="__codelineno-33-27" href="#__codelineno-33-27"></a><span class="w">        </span><span class="s1">'link'</span><span class="o">:</span><span class="w"> </span><span class="s1">'https://dartondox.dev'</span><span class="p">,</span>
+</span><span id="__span-33-28"><a id="__codelineno-33-28" name="__codelineno-33-28" href="#__codelineno-33-28"></a><span class="w">      </span><span class="p">},</span>
+</span><span id="__span-33-29"><a id="__codelineno-33-29" name="__codelineno-33-29" href="#__codelineno-33-29"></a><span class="w">    </span><span class="p">],</span>
+</span><span id="__span-33-30"><a id="__codelineno-33-30" name="__codelineno-33-30" href="#__codelineno-33-30"></a><span class="w">    </span><span class="nl">plugins:</span><span class="w"> </span><span class="n">builtInPlugins</span><span class="p">,</span>
+</span><span id="__span-33-31"><a id="__codelineno-33-31" name="__codelineno-33-31" href="#__codelineno-33-31"></a><span class="w">  </span><span class="p">);</span>
+</span><span id="__span-33-32"><a id="__codelineno-33-32" name="__codelineno-33-32" href="#__codelineno-33-32"></a><span class="w">  </span><span class="n">File</span><span class="p">(</span><span class="s1">'hello.pdf'</span><span class="p">).</span><span class="n">writeAsBytesSync</span><span class="p">(</span><span class="n">pdf</span><span class="p">);</span>
+</span><span id="__span-33-33"><a id="__codelineno-33-33" name="__codelineno-33-33" href="#__codelineno-33-33"></a><span class="p">}</span>
 </span></code></pre></div>
-<h2 id="learn-more">Learn more</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><a href="https://pub.dev/packages/dox_pdf_me"><code>dox_pdf_me</code> on pub.dev</a>: schema types, tables, plugins, fonts and options, and how to build a template in Dart.</li>
-<li><a href="https://github.com/dartondox/dox-pdf-lib">Source on GitHub</a></li>
+<li><a href="../pdf-lib/">PDF Library</a>: draw and edit PDF files.</li>
+<li><a href="../../the-basic/response/">Response</a>: send files from a controller.</li>
+<li><a href="https://pub.dev/packages/dox_pdf_me"><code>dox_pdf_me</code> on pub.dev</a>: the package.</li>
+<li><a href="https://github.com/dartondox/dox-pdf-lib">Source on GitHub</a>: the code of the package.</li>
 </ul>
 
 
@@ -7433,7 +8696,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

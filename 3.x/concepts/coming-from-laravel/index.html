@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1525,6 +1527,17 @@
     <span class="md-ellipsis">
       
         What is missing today
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
       
     </span>
   </a>
@@ -5321,10 +5334,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5450,95 +5459,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7444,6 +7364,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -7461,17 +7392,12 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/concepts/coming-from-laravel.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="coming-from-laravel">Coming from Laravel</h1>
 <p>This page shows the Laravel way and the Dox way side by side, so a Laravel developer can find the Dox name for each thing.</p>
-<p>Most ideas have the same name in Dox. The Laravel code here is Laravel 11. If you only read one part, read <a href="#what-is-different">What is different</a>.</p>
+<p>Most ideas have the same name in Dox. The Laravel code here is Laravel 11. For the big changes, read <a href="#what-is-different">What is different</a>.</p>
 <h2 id="routing">Routing</h2>
 <table>
 <thead>
@@ -7637,6 +7563,14 @@
 <td><code>return req;</code></td>
 </tr>
 <tr>
+<td><code>$response = $next($request);</code></td>
+<td><code>DoxResponse res = await next();</code> in an <code>IDoxNextMiddleware</code></td>
+</tr>
+<tr>
+<td><code>terminate($request, $response)</code></td>
+<td><code>IDoxTerminableMiddleware</code></td>
+</tr>
+<tr>
 <td><code>return response('no', 401);</code></td>
 <td><code>return response('no').statusCode(401);</code></td>
 </tr>
@@ -7658,8 +7592,7 @@
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>A plain function <code>dynamic apiKey(DoxRequest req)</code> also works as middleware.</p>
-<p>Dox middleware runs only before the controller. There is no "after" step. If you want to change every response, use a <code>responseHandler</code>.</p>
+<p>A plain function also works as middleware. See <a href="../../the-basic/middleware/#run-code-after-the-controller">Middleware</a> for code that runs after the controller.</p>
 <h2 id="requests-and-validation">Requests and validation</h2>
 <table>
 <thead>
@@ -8576,7 +8509,7 @@
 </tr>
 <tr>
 <td>drivers: file, redis, memcached, database, array</td>
-<td>drivers: <code>file</code>, <code>redis</code>, <code>memory</code>, <code>null</code></td>
+<td>drivers: file, redis, memory, database (<code>dox_cache_database</code>), null</td>
 </tr>
 </tbody>
 </table>
@@ -8666,9 +8599,9 @@
 </table>
 <p>Three things are different from Laravel:</p>
 <ul>
-<li>On a local disk, <code>setVisibility()</code> changes the file mode only when the disk has <code>'permissions': true</code>. Without it, <code>setVisibility()</code> does nothing, and <code>getVisibility()</code> gives the disk <code>visibility</code> (<code>public</code> by default). Laravel always runs <code>chmod</code>, so in Dox a file you made private is not private on disk until you turn this on.</li>
-<li>Paths that Dox gives you start with <code>/</code>. This is true for <code>putFile</code>, <code>store</code>, <code>files</code>, <code>allFiles</code> and <code>directories</code>.</li>
-<li><code>put()</code> returns nothing. <code>download()</code> takes <code>name:</code> but no headers. For headers, use <code>response(await Storage().download(path)).header('Cache-Control', 'no-store')</code>.</li>
+<li>On a local disk, <code>setVisibility()</code> changes the file mode only when the disk has <code>'permissions': true</code>. Without it, a private file is not private on the disk.</li>
+<li>Paths that Dox gives you start with <code>/</code>, for example from <code>putFile</code>, <code>store</code> and <code>files</code>.</li>
+<li><code>put()</code> returns nothing, and <code>download()</code> takes no headers. For headers, wrap it in <code>response(...)</code> and add <code>.header(...)</code>.</li>
 </ul>
 <p>See <a href="../../digging-deeper/file-storage/">File Storage</a>.</p>
 <h2 id="config-and-env">Config and <code>.env</code></h2>
@@ -8749,21 +8682,14 @@
 <p>Dox has no fake HTTP kernel. Instead, <code>DoxTestClient.start(appConfig)</code> starts the real server inside the test on a free port, and sends real requests. See <a href="../../digging-deeper/testing/">Testing</a>.</p>
 <h2 id="what-is-different">What is different</h2>
 <ul>
-<li><strong>A generated container.</strong> Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add <code>@Inject()</code> to the class. <code>build_runner</code> writes <code>lib/generated/container.g.dart</code> with every registration. You do not register classes by hand in a provider.
-  A singleton is one instance per isolate, not one per request.</li>
-<li><strong>Isolates, not PHP-FPM workers.</strong> One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
-  A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.
-  Anything that must be shared goes to the database, Redis or files. See <a href="../how-dox-works/#isolates">How Dox works</a>.</li>
-<li><strong>Code generation, not reflection.</strong> Laravel reads your classes at run time. Dart has no usable reflection in a compiled app.
-  So <code>build_runner</code> with <code>dox_builder</code> writes the model code, the DTO checks, the env class and the OpenAPI docs into <code>.g.dart</code> files.
-  Run <code>dox build_runner:build</code> after a change, or let <code>dox serve</code> watch for you.</li>
-<li><strong>One native binary.</strong> <code>dox build</code> makes an AOT binary in <code>build/bundle</code>. There is no interpreter, no <code>vendor/</code> folder and no <code>composer install</code> on the server.
-  The Docker image is about 11 MB.</li>
-<li><strong>A native HTTP server and native database drivers.</strong> Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.</li>
-<li><strong>Types everywhere.</strong> A DTO is a class with typed fields. A path param is an <code>int</code>. A model field is a <code>String?</code>. The compiler finds many mistakes before you run the app.</li>
-<li><strong>Async is explicit.</strong> Database calls return a <code>Future</code>. You write <code>await</code>. One isolate serves many requests at the same time while it waits for the database.</li>
-<li><strong>JSON API first.</strong> Dox returns text, JSON, files and streams. For HTML pages, add <a href="../../the-basic/views/">views</a> (<code>dox_view</code>) or <a href="../../the-basic/inertia/">Inertia</a> (<code>dox_inertia</code>).</li>
+<li>A generated container. You add <code>@Inject()</code> to a class, and build_runner writes the registrations in <code>lib/generated/container.g.dart</code>. A singleton is one instance per isolate.</li>
+<li>Isolates, not PHP-FPM workers. One process runs one isolate per CPU core, and each isolate keeps its state between requests. Data that must be shared goes to the database, Redis or files. See <a href="../how-dox-works/#isolates">How Dox works</a>.</li>
+<li>Code generation, not reflection. build_runner writes the model code, the DTO checks, the env class and the OpenAPI docs. Run <code>dox build_runner:build</code> after a change, or let <code>dox serve</code> watch.</li>
+<li>One native binary. <code>dox build</code> makes an AOT binary in <code>build/bundle</code>, with no vendor folder on the server. The Docker image is approximately 11 MB.</li>
+<li>A native HTTP server and native database drivers, written in Rust. They come ready-built, so you do not need Rust.</li>
+<li>Types everywhere. A DTO has typed fields, a path param is an integer, and the compiler finds many mistakes.</li>
+<li>Explicit async. Database calls return a <code>Future</code>, and one isolate serves many requests while it waits.</li>
+<li>JSON API first. For HTML pages, add <a href="../../the-basic/views/">views</a> or <a href="../../the-basic/inertia/">Inertia</a>.</li>
 </ul>
 <h2 id="what-is-missing-today">What is missing today</h2>
 <p>Dox does not have these Laravel features yet:</p>
@@ -8772,11 +8698,12 @@
 <li>password reset</li>
 </ul>
 <p>See <a href="../status-and-roadmap/#what-dox-does-not-have-yet">What Dox does not have yet</a> for what to use today.</p>
-<p>What is there, as separate packages: <a href="../../packages/validation/">validation</a>, <a href="../../packages/openapi/">OpenAPI docs</a>,
-<a href="../../packages/storage/">storage</a>, <a href="../../packages/cache/">cache</a>, <a href="../../packages/socketio/">Socket.IO</a>,
-<a href="../../security/authentication/">auth</a>, <a href="../../digging-deeper/queue/">queues</a>, the <a href="../../digging-deeper/scheduler/">scheduler</a>,
-<a href="../../digging-deeper/mail/">mail</a>, <a href="../../the-basic/views/">views</a> and <a href="../../the-basic/inertia/">Inertia</a>.
-<a href="../../the-basic/session/">Sessions</a> are in <code>dox_core</code>.</p>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../../getting-started/installation/">Installation</a>: make your first Dox app.</li>
+<li><a href="../how-dox-works/">How Dox works</a>: the life of a request and isolates.</li>
+<li><a href="../../tutorial/">Build a blog API</a>: a full app, step by step.</li>
+</ul>
 
 
 
@@ -8896,7 +8823,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -1924,13 +1926,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#typed-input-recommended" class="md-nav__link">
+  <a href="#typed-input" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Typed input (recommended)
+        Typed input
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Typed input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-in-the-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking in the controller
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -2066,7 +2085,7 @@
   <a href="#requestfile" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RequestFile
+        Reading and saving a file
       
     </span>
   </a>
@@ -2098,13 +2117,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Headers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#body-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Body type
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#path-and-url" class="md-nav__link">
+  <a href="#method-path-and-url" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path and URL
+        Method, path and URL
       
     </span>
   </a>
@@ -2134,10 +2170,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#other-request-data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Other request data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#send-the-response-yourself" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send the response yourself
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
       
     </span>
   </a>
@@ -5344,10 +5402,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5473,95 +5527,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7281,13 +7246,30 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#typed-input-recommended" class="md-nav__link">
+  <a href="#typed-input" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Typed input (recommended)
+        Typed input
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Typed input">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#checking-in-the-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checking in the controller
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -7423,7 +7405,7 @@
   <a href="#requestfile" class="md-nav__link">
     <span class="md-ellipsis">
       
-        RequestFile
+        Reading and saving a file
       
     </span>
   </a>
@@ -7455,13 +7437,30 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Headers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#body-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Body type
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
-  <a href="#path-and-url" class="md-nav__link">
+  <a href="#method-path-and-url" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Path and URL
+        Method, path and URL
       
     </span>
   </a>
@@ -7491,10 +7490,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#other-request-data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Other request data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#send-the-response-yourself" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Send the response yourself
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
       
     </span>
   </a>
@@ -7518,98 +7539,81 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/the-basic/request.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="request">Request</h1>
 <p>The request gives you the input, files, headers and cookies that the client sent.</p>
-<p>There are two ways to read input. You can ask for a typed, checked object (a DTO). Or you can read the raw values from <code>DoxRequest</code>. Use a DTO when you can, because Dox checks the input for you.</p>
-<h2 id="typed-input-recommended">Typed input (recommended)</h2>
-<p>Ask for a <a href="../dto/">DTO</a> in your controller. Dox reads the body (or the query for <code>GET</code>, <code>HEAD</code> and <code>DELETE</code>), checks it, and gives you a typed object:</p>
+<h2 id="typed-input">Typed input</h2>
+<p>Ask for a <a href="../dto/">DTO</a> in your controller. Dox reads the body (or the query for GET, HEAD and DELETE), checks it, and gives you a typed object:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'/users/{id}'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">UserController</span><span class="w"> </span><span class="n">c</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="n">update</span><span class="p">);</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nd">@Inject</span><span class="p">()</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UserController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="w"> </span><span class="c1">// (1)!</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="c1">// (2)!</span>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">UpdateUser</span><span class="w"> </span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="c1">// (3)!</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">  </span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">    </span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
-</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
-</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">user</span><span class="p">;</span>
-</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-0-14"><a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">}</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">User</span><span class="o">?&gt;</span><span class="w"> </span><span class="n">update</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">UpdateUser</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">    </span><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="n">id</span><span class="p">);</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">    </span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">name</span><span class="p">;</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">save</span><span class="p">();</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">user</span><span class="p">;</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<ol>
-<li>The return value is the response. Dox waits for a <code>Future</code>.
-    A <code>String</code> is sent as text. A <code>Map</code> or a model is sent as JSON.</li>
-<li>A path param. It is <code>{id}</code> from the route. <code>/users/abc</code> answers <code>404</code>, because <code>abc</code> is not an <code>int</code>.</li>
-<li>A DTO. Dox reads the body, checks it, and builds the object before this method runs.</li>
-</ol>
-<p>Bad input gets <code>422</code> before your method runs. See <a href="../dto/">DTOs</a> and <a href="../validation/">Validation</a>.</p>
+<p>Bad input gets 422 before your method runs. See <a href="../validation/">Validation</a>.</p>
+<h3 id="checking-in-the-controller">Checking in the controller</h3>
+<p>To check the input at a later point, call <code>validate</code> with the DTO type:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">CreateUser</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validate</span><span class="o">&lt;</span><span class="n">CreateUser</span><span class="o">&gt;</span><span class="p">();</span>
+</span></code></pre></div>
+<p>For input you know only at runtime, use a fluent schema. See <a href="../../packages/validation/#fluent-schemas-for-dynamic-input">Fluent schemas</a>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">validateSchema</span><span class="p">(</span><span class="n">v</span><span class="p">.</span><span class="n">object</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">Schema</span><span class="o">&lt;</span><span class="kt">Object</span><span class="o">?&gt;&gt;</span><span class="p">{</span><span class="s1">'email'</span><span class="o">:</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">string</span><span class="p">().</span><span class="n">email</span><span class="p">()}));</span>
+</span></code></pre></div>
 <h2 id="raw-input">Raw input</h2>
-<p>Sometimes you need a value that is not in a DTO. Add a <code>DoxRequest</code> parameter to read the raw values. These values are <strong>not</strong> checked.</p>
+<p>Add a <code>DoxRequest</code> parameter to read the raw values. Dox does not check these values.</p>
 <h3 id="retrieving-an-input-value">Retrieving an input value</h3>
-<p>The <code>input</code> method reads one value from the query string or the body. The body wins when both have the key:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">sayHello</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="s1">'Hello </span><span class="si">$</span><span class="n">name</span><span class="s1">'</span><span class="p">;</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">}</span>
+<p>Read one value from the query string or the body. The body wins when both have the key:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'guest'</span><span class="p">);</span><span class="w"> </span><span class="c1">// default for a missing key</span>
 </span></code></pre></div>
-<p>The second argument is the default. You get it when the key is not there or is null:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'guest'</span><span class="p">);</span>
+<p>Use a dot key to read inside a map or a list:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'user.name'</span><span class="p">);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'items.0.id'</span><span class="p">);</span><span class="w"> </span><span class="c1">// the id of the first item</span>
 </span></code></pre></div>
-<p>To read inside a map or a list, use a dot key:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'user.name'</span><span class="p">);</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'items.0.id'</span><span class="p">);</span><span class="w"> </span><span class="c1">// the id of the first item</span>
-</span></code></pre></div>
+<p>A key that is in the input as it is, like <code>'a.b'</code>, wins over a dot key.</p>
 <h3 id="retrieving-all-input">Retrieving all input</h3>
-<p>The <code>all</code> method returns all values from the query string and the body, as a <code>Map</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">all</span><span class="p">();</span>
+<p>Get all values of the query string and the body:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">all</span><span class="p">();</span>
 </span></code></pre></div>
-<p>If you want only the body or only the query string, use <code>body</code> or <code>query</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">req</span><span class="p">.</span><span class="n">body</span><span class="p">;</span><span class="w">  </span><span class="c1">// JSON or form data</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">req</span><span class="p">.</span><span class="n">query</span><span class="p">;</span><span class="w"> </span><span class="c1">// the query string</span>
+<p>Get only the body or only the query string:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">req</span><span class="p">.</span><span class="n">body</span><span class="p">;</span><span class="w">  </span><span class="c1">// JSON or form data</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">req</span><span class="p">.</span><span class="n">query</span><span class="p">;</span><span class="w"> </span><span class="c1">// the query string</span>
 </span></code></pre></div>
 <h3 id="retrieving-a-part-of-the-input">Retrieving a part of the input</h3>
-<p>Use <code>only</code> to get some keys, or <code>except</code> to get all keys but some:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">req</span><span class="p">.</span><span class="n">only</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'email'</span><span class="p">]);</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">req</span><span class="p">.</span><span class="n">except</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]);</span>
+<p>Get some keys, or all keys but some:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="n">req</span><span class="p">.</span><span class="n">only</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'name'</span><span class="p">,</span><span class="w"> </span><span class="s1">'email'</span><span class="p">]);</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">req</span><span class="p">.</span><span class="n">except</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'password'</span><span class="p">]);</span>
 </span></code></pre></div>
 <h3 id="checking-if-a-value-exists">Checking if a value exists</h3>
-<p>The <code>filled</code> method returns <code>true</code> when the key is there and not empty. A text of only spaces, an empty list and an empty map count as empty:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">filled</span><span class="p">(</span><span class="s1">'name'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="p">}</span>
+<p><code>filled</code> gives true when the key is there and not empty. Only spaces, an empty list and an empty map count as empty:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">filled</span><span class="p">(</span><span class="s1">'name'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The <code>exists</code> method returns <code>true</code> when the key is there, with any value (also <code>''</code> or null). The <code>missing</code> method is the opposite:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">req</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="n">req</span><span class="p">.</span><span class="n">missing</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+<p><code>exists</code> gives true for a key with any value, also an empty string or null. <code>missing</code> is the opposite:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">req</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">req</span><span class="p">.</span><span class="n">missing</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span>
 </span></code></pre></div>
-<p>There is also <code>has</code>. It returns <code>true</code> when the key is there as it is and not empty. It does not read dot keys, so <code>req.has('user.name')</code> is <code>false</code> for <code>{"user": {"name": "Ann"}}</code>. Use <code>filled</code> for that.</p>
+<p><code>has</code> gives true when the key is there and not empty. It does not read dot keys.</p>
 <h3 id="reading-booleans-and-numbers">Reading booleans and numbers</h3>
-<p>The <code>boolean</code> method returns <code>true</code> for <code>true</code>, <code>1</code>, <code>on</code> and <code>yes</code>, and <code>false</code> for anything else. This is useful for checkboxes:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">remember</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">boolean</span><span class="p">(</span><span class="s1">'remember'</span><span class="p">);</span>
+<p><code>boolean</code> gives true for true, 1, on and yes, so it works for checkboxes:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">remember</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">boolean</span><span class="p">(</span><span class="s1">'remember'</span><span class="p">);</span>
 </span></code></pre></div>
-<p>The <code>integer</code> method gives the value as an <code>int</code>. The default is used when the key is not there or is not a number:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">integer</span><span class="p">(</span><span class="s1">'page'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">);</span>
+<p><code>integer</code> gives the default when the key is missing or not a number:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">integer</span><span class="p">(</span><span class="s1">'page'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="adding-input">Adding input</h3>
-<p>Sometimes a middleware needs to add values to the input. Use <code>add</code> for one value, or <code>merge</code> for a map:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">req</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'key'</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="n">req</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'key'</span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="p">});</span>
+<p>Add one value, or a map of values, for example in a middleware:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">req</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="s1">'key'</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">);</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">req</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'key'</span><span class="o">:</span><span class="w"> </span><span class="n">value</span><span class="p">});</span>
 </span></code></pre></div>
 <h3 id="lists-and-maps-in-forms">Lists and maps in forms</h3>
 <p>Form and query keys with brackets give lists and maps:</p>
@@ -7640,127 +7644,139 @@
 </tbody>
 </table>
 <h2 id="route-params">Route params</h2>
-<p>Ask for a path param as a typed parameter, like <code>int id</code> in the example above. See <a href="../controller/#parameters">Controller: parameters</a>.</p>
-<p>The text values are also in <code>req.param</code>. They are URL-decoded, so <code>/users/a%20b</code> gives <code>'a b'</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">param</span><span class="p">[</span><span class="s1">'id'</span><span class="p">];</span>
+<p>Ask for a path param as a typed parameter, like <code>int id</code> above. See <a href="../controller/#parameters">Controller: parameters</a>.</p>
+<p>The URL-decoded text values are also in <code>req.param</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">param</span><span class="p">[</span><span class="s1">'id'</span><span class="p">];</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">params</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">pathParams</span><span class="p">;</span><span class="w"> </span><span class="c1">// {'id': '5'}</span>
+</span></code></pre></div>
+<p>A value from <a href="../routing/#route-model-binding">route model binding</a> comes from <code>bound</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">User</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">bound</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'user'</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="form-data-file">Form data (File)</h2>
-<p>An uploaded file is a <code>RequestFile</code>. The request must be <code>multipart/form-data</code>.</p>
-<p>Put the file in a DTO, so Dox checks its type and size:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/dtos/upload_image/upload_image.dto.dart</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>
-</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="k">part</span><span class="w"> </span><span class="s1">'upload_image.dto.g.dart'</span><span class="p">;</span>
-</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>
-</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="nd">@Dto</span><span class="p">()</span>
-</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UploadImage</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">  </span><span class="nd">@Image</span><span class="p">()</span>
-</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">  </span><span class="nd">@MaxSize</span><span class="p">(</span><span class="s1">'5MB'</span><span class="p">)</span>
-</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">RequestFile</span><span class="w"> </span><span class="n">image</span><span class="p">;</span>
-</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a>
-</span><span id="__span-13-11"><a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">UploadImage</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">image</span><span class="p">});</span>
-</span><span id="__span-13-12"><a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
-</span><span id="__span-13-13"><a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">UploadImage</span><span class="o">&gt;</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$UploadImageDto</span><span class="p">;</span>
-</span><span id="__span-13-14"><a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="p">}</span>
+<p>An uploaded file is a <code>RequestFile</code>. The request must be <code>multipart/form-data</code>. Put the file in a DTO, so Dox checks its type and size:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/dtos/upload_image/upload_image.dto.dart</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nd">@Dto</span><span class="p">()</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">UploadImage</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">  </span><span class="nd">@Image</span><span class="p">()</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">  </span><span class="nd">@MaxSize</span><span class="p">(</span><span class="s1">'5MB'</span><span class="p">)</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="kd">final</span><span class="w"> </span><span class="n">RequestFile</span><span class="w"> </span><span class="n">image</span><span class="p">;</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a>
+</span><span id="__span-15-7"><a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a><span class="w">  </span><span class="k">const</span><span class="w"> </span><span class="n">UploadImage</span><span class="p">({</span><span class="kd">required</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="n">image</span><span class="p">});</span>
+</span><span id="__span-15-8"><a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a>
+</span><span id="__span-15-9"><a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">DtoSchema</span><span class="o">&lt;</span><span class="n">UploadImage</span><span class="o">&gt;</span><span class="w"> </span><span class="n">schema</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">$UploadImageDto</span><span class="p">;</span>
+</span><span id="__span-15-10"><a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Then store it in the controller:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/http/controllers/api.controller.dart</span><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="nd">@Inject</span><span class="p">()</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ApiController</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">uploadImage</span><span class="p">(</span><span class="n">UploadImage</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="w">    </span><span class="kt">String</span><span class="w"> </span><span class="n">uploadedPath</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
-</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'filename'</span><span class="o">:</span><span class="w"> </span><span class="n">uploadedPath</span><span class="p">};</span>
-</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-14-7"><a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="p">}</span>
+<p>Then store it. <code>store</code> comes from the <a href="../../digging-deeper/file-storage/"><code>dox_storage</code></a> package:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">uploadImage</span><span class="p">(</span><span class="n">UploadImage</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'filename'</span><span class="o">:</span><span class="w"> </span><span class="n">path</span><span class="p">};</span>
+</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>store()</code> comes from the <a href="../../packages/storage/"><code>dox_storage</code></a> package. Add it and import <code>package:dox_storage/dox_storage.dart</code>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Save the file before you return</p>
-<p>A bigger upload is kept in a temp file, and the temp file is <strong>deleted when the response is sent</strong>.
-So call <code>store</code>, <code>moveTo</code> or <code>stream</code> before your controller returns.</p>
+<p>Dox deletes the temp file of a big upload when the response is sent.
+Call <code>store</code>, <code>moveTo</code> or <code>stream</code> before your controller returns.</p>
 </div>
 <h3 id="files-without-a-dto">Files without a DTO</h3>
-<p>Without a DTO, <code>req.file</code> gives the <code>RequestFile</code>, or null when the field is not a file. These files are not checked:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="n">RequestFile</span><span class="o">?</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">file</span><span class="p">(</span><span class="s1">'image'</span><span class="p">);</span>
+<p>Get a file, or null when the field is not a file. Dox does not check it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">RequestFile</span><span class="o">?</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">file</span><span class="p">(</span><span class="s1">'image'</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>hasFile</code> returns <code>true</code> when the field holds a file or a list of files. For a field with many files, use <code>req.input('images')</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">hasFile</span><span class="p">(</span><span class="s1">'image'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="c1">// ...</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">}</span>
+<p><code>hasFile</code> gives true when the field holds a file or a list of files. For a field with many files, use <code>req.input('images')</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">hasFile</span><span class="p">(</span><span class="s1">'image'</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="c1">// ...</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="p">}</span>
 </span></code></pre></div>
-<h3 id="requestfile"><code>RequestFile</code></h3>
-<p>A <code>RequestFile</code> tells you about the file and lets you save it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'video'</span><span class="p">);</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">file</span><span class="p">.</span><span class="n">filename</span><span class="p">;</span><span class="w">        </span><span class="c1">// name from the client</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">file</span><span class="p">.</span><span class="n">filetype</span><span class="p">;</span><span class="w">        </span><span class="c1">// content type, like video/mp4</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="n">file</span><span class="p">.</span><span class="n">extension</span><span class="p">;</span><span class="w">       </span><span class="c1">// mp4</span>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">file</span><span class="p">.</span><span class="n">length</span><span class="p">;</span><span class="w">          </span><span class="c1">// size in bytes</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">size</span><span class="p">;</span><span class="w">      </span><span class="c1">// size in KB</span>
+<h3 id="requestfile">Reading and saving a file</h3>
+<p>A <code>RequestFile</code> tells you about the file:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">file</span><span class="p">.</span><span class="n">filename</span><span class="p">;</span><span class="w">  </span><span class="c1">// name from the client</span>
+</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="n">file</span><span class="p">.</span><span class="n">filetype</span><span class="p">;</span><span class="w">  </span><span class="c1">// content type, like video/mp4</span>
+</span><span id="__span-19-3"><a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="n">file</span><span class="p">.</span><span class="n">extension</span><span class="p">;</span><span class="w"> </span><span class="c1">// mp4</span>
+</span><span id="__span-19-4"><a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="n">file</span><span class="p">.</span><span class="n">length</span><span class="p">;</span><span class="w">    </span><span class="c1">// size in bytes</span>
+</span><span id="__span-19-5"><a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">size</span><span class="p">;</span><span class="w"> </span><span class="c1">// size in KB</span>
+</span><span id="__span-19-6"><a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="n">file</span><span class="p">.</span><span class="n">head</span><span class="p">;</span><span class="w">      </span><span class="c1">// the first bytes, to find the real file type</span>
 </span></code></pre></div>
-<p>To save the file, use <code>store</code> (needs <code>dox_storage</code>) or <code>moveTo</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'videos'</span><span class="p">);</span><span class="w">              </span><span class="c1">// save to storage (needs dox_storage). returns the path</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">moveTo</span><span class="p">(</span><span class="s1">'/data/videos/1.mp4'</span><span class="p">);</span><span class="w"> </span><span class="c1">// move it. returns the new File</span>
+<p>Save it to storage, or move it:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'videos'</span><span class="p">);</span><span class="w">              </span><span class="c1">// gives the path</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">moveTo</span><span class="p">(</span><span class="s1">'/data/videos/1.mp4'</span><span class="p">);</span><span class="w"> </span><span class="c1">// gives the new File</span>
 </span></code></pre></div>
-<p>To read the file, use <code>stream</code> to get it in chunks. <code>bytes</code> loads the whole file in memory, so avoid it for big files:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">file</span><span class="p">.</span><span class="n">stream</span><span class="p">();</span><span class="w">        </span><span class="c1">// read it in chunks</span>
-</span><span id="__span-19-2"><a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">bytes</span><span class="p">;</span><span class="w">     </span><span class="c1">// the whole file in memory. avoid for big files</span>
+<p>Read it in chunks with <code>stream</code>. <code>bytes</code> loads the full file in memory, so do not use it for big files:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">file</span><span class="p">.</span><span class="n">stream</span><span class="p">();</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">bytes</span><span class="p">;</span>
 </span></code></pre></div>
+<p><code>file.file</code> is the temp file on disk, or null when the upload is in memory. An upload up to 1 MB stays in memory.</p>
 <h3 id="size-limits">Size limits</h3>
-<p>A body that is too big gets <code>413 Payload Too Large</code>. You can change the limits in <code>AppConfig</code>:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">AppConfig</span><span class="p">(</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">  </span><span class="nl">maxBodySize:</span><span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w">        </span><span class="c1">// JSON and urlencoded, default 10 MB</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">  </span><span class="nl">maxMultipartSize:</span><span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w">  </span><span class="c1">// form-data uploads, default 100 MB</span>
-</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="p">);</span>
+<p>A body that is too big gets 413. Change the limits in <code>AppConfig</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">AppConfig</span><span class="p">(</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nl">maxBodySize:</span><span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w">       </span><span class="c1">// JSON and urlencoded, default 10 MB</span>
+</span><span id="__span-22-3"><a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">  </span><span class="nl">maxMultipartSize:</span><span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="m">1024</span><span class="p">,</span><span class="w"> </span><span class="c1">// uploads, default 100 MB</span>
+</span><span id="__span-22-4"><a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Set the same limit in your proxy, like <code>client_max_body_size</code> in nginx.</p>
 <h2 id="headers">Headers</h2>
-<p>The <code>header</code> method reads one header:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Token'</span><span class="p">);</span>
-</span></code></pre></div>
-<p><code>headers</code> gives all of them. A repeated header is joined with <code>', '</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">headers</span><span class="p">;</span>
+<p>Read one header, or all of them. A repeated header is joined with <code>', '</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">header</span><span class="p">(</span><span class="s1">'X-Token'</span><span class="p">);</span>
+</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">headers</span><span class="p">;</span>
 </span></code></pre></div>
 <p>There are short methods for common headers:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">req</span><span class="p">.</span><span class="n">userAgent</span><span class="p">();</span><span class="w">  </span><span class="c1">// User-Agent header</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">req</span><span class="p">.</span><span class="n">host</span><span class="p">();</span><span class="w">       </span><span class="c1">// Host header</span>
-</span><span id="__span-23-3"><a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="n">req</span><span class="p">.</span><span class="n">origin</span><span class="p">();</span><span class="w">     </span><span class="c1">// Origin header, or null</span>
-</span><span id="__span-23-4"><a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="n">req</span><span class="p">.</span><span class="n">referer</span><span class="p">();</span><span class="w">    </span><span class="c1">// Referer header, or null</span>
-</span><span id="__span-23-5"><a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a><span class="n">req</span><span class="p">.</span><span class="n">locale</span><span class="p">;</span><span class="w">       </span><span class="c1">// first language of Accept-Language, like 'th', or null</span>
-</span><span id="__span-23-6"><a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a><span class="n">req</span><span class="p">.</span><span class="n">bearerToken</span><span class="p">();</span><span class="w"> </span><span class="c1">// the token of 'Authorization: Bearer &lt;token&gt;', or null</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">req</span><span class="p">.</span><span class="n">userAgent</span><span class="p">();</span><span class="w">   </span><span class="c1">// User-Agent header</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">req</span><span class="p">.</span><span class="n">host</span><span class="p">();</span><span class="w">        </span><span class="c1">// Host header</span>
+</span><span id="__span-24-3"><a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="n">req</span><span class="p">.</span><span class="n">origin</span><span class="p">();</span><span class="w">      </span><span class="c1">// Origin header, or null</span>
+</span><span id="__span-24-4"><a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="n">req</span><span class="p">.</span><span class="n">referer</span><span class="p">();</span><span class="w">     </span><span class="c1">// Referer header, or null</span>
+</span><span id="__span-24-5"><a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a><span class="n">req</span><span class="p">.</span><span class="n">locale</span><span class="p">;</span><span class="w">        </span><span class="c1">// first language of Accept-Language, like 'th', or null</span>
+</span><span id="__span-24-6"><a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a><span class="n">req</span><span class="p">.</span><span class="n">bearerToken</span><span class="p">();</span><span class="w"> </span><span class="c1">// the token of 'Authorization: Bearer &lt;token&gt;', or null</span>
 </span></code></pre></div>
-<p>To check the body type, use <code>isJson</code> or <code>isFormData</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">req</span><span class="p">.</span><span class="n">isJson</span><span class="p">();</span><span class="w">     </span><span class="c1">// true for a JSON body</span>
-</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="n">req</span><span class="p">.</span><span class="n">isFormData</span><span class="p">();</span><span class="w"> </span><span class="c1">// true for multipart/form-data</span>
+<h3 id="body-type">Body type</h3>
+<p>Check the body type, or if the client wants a JSON answer:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">req</span><span class="p">.</span><span class="n">isJson</span><span class="p">();</span><span class="w">      </span><span class="c1">// true for a JSON body</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">req</span><span class="p">.</span><span class="n">isFormData</span><span class="p">();</span><span class="w">  </span><span class="c1">// true for multipart/form-data</span>
+</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">req</span><span class="p">.</span><span class="n">expectsJson</span><span class="p">();</span><span class="w"> </span><span class="c1">// true for a JSON Accept header, JSON body or XHR</span>
 </span></code></pre></div>
-<h2 id="path-and-url">Path and URL</h2>
-<p>Use <code>path</code> and <code>fullUrl</code> to read the URL of the request:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">req</span><span class="p">.</span><span class="n">path</span><span class="p">();</span><span class="w">                   </span><span class="c1">// '/admin/users/5'</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">req</span><span class="p">.</span><span class="n">fullUrl</span><span class="p">();</span><span class="w">                </span><span class="c1">// 'https://example.com/admin/users/5?tab=info'</span>
+<h2 id="method-path-and-url">Method, path and URL</h2>
+<p>Read the method and the URL of the request:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">req</span><span class="p">.</span><span class="n">method</span><span class="p">;</span><span class="w">          </span><span class="c1">// 'GET'</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">req</span><span class="p">.</span><span class="n">path</span><span class="p">();</span><span class="w">          </span><span class="c1">// '/admin/users/5'</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="n">req</span><span class="p">.</span><span class="n">fullUrl</span><span class="p">();</span><span class="w">       </span><span class="c1">// 'https://example.com/admin/users/5?tab=info'</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a><span class="n">req</span><span class="p">.</span><span class="n">uri</span><span class="p">;</span><span class="w">             </span><span class="c1">// the Uri</span>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="n">req</span><span class="p">.</span><span class="n">protocolVersion</span><span class="p">;</span><span class="w"> </span><span class="c1">// '1.1', or '2.0' for HTTP/2</span>
 </span></code></pre></div>
-<p>To check where the request goes, use <code>pathIs</code> with a pattern, or <code>routeIs</code> with a route name. <code>*</code> matches any text:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">req</span><span class="p">.</span><span class="n">pathIs</span><span class="p">(</span><span class="s1">'admin/*'</span><span class="p">);</span><span class="w">        </span><span class="c1">// true. `*` matches any text</span>
-</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="n">req</span><span class="p">.</span><span class="n">routeIs</span><span class="p">(</span><span class="s1">'admin.users.*'</span><span class="p">);</span><span class="w"> </span><span class="c1">// true when the route name matches</span>
+<p>Check where the request goes. <code>*</code> matches any text, and a route with no name never matches <code>routeIs</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">req</span><span class="p">.</span><span class="n">pathIs</span><span class="p">(</span><span class="s1">'admin/*'</span><span class="p">);</span><span class="w">        </span><span class="c1">// a path pattern</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">req</span><span class="p">.</span><span class="n">routeIs</span><span class="p">(</span><span class="s1">'admin.users.*'</span><span class="p">);</span><span class="w"> </span><span class="c1">// a route name</span>
 </span></code></pre></div>
-<p><code>routeIs</code> is <code>false</code> for a route with no name. Give a route a name with <code>.name('admin.users.show')</code>.</p>
 <h2 id="cookies">Cookies</h2>
-<p>The <code>cookie</code> method reads a cookie. Dox encrypts cookies by default, so you get the decrypted value. For a cookie that is not encrypted, pass <code>decrypt: false</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">);</span><span class="w">                 </span><span class="c1">// decrypted value</span>
-</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">   </span><span class="c1">// value as sent</span>
+<p>Read a cookie. Dox encrypts cookies by default, so you get the decrypted value:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">token</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'token'</span><span class="p">);</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">raw</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">cookie</span><span class="p">(</span><span class="s1">'theme'</span><span class="p">,</span><span class="w"> </span><span class="nl">decrypt:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// value as sent</span>
 </span></code></pre></div>
 <p>See <a href="../response/#cookie">Response</a> to set a cookie.</p>
 <h2 id="client-ip-and-scheme">Client IP and scheme</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">req</span><span class="p">.</span><span class="n">ip</span><span class="p">();</span><span class="w">       </span><span class="c1">// client IP</span>
-</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">req</span><span class="p">.</span><span class="n">scheme</span><span class="p">();</span><span class="w">   </span><span class="c1">// http or https</span>
-</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="n">req</span><span class="p">.</span><span class="n">isSecure</span><span class="p">();</span><span class="w"> </span><span class="c1">// true for https</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">req</span><span class="p">.</span><span class="n">ip</span><span class="p">();</span><span class="w">       </span><span class="c1">// client IP</span>
+</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">req</span><span class="p">.</span><span class="n">scheme</span><span class="p">();</span><span class="w">   </span><span class="c1">// http or https</span>
+</span><span id="__span-29-3"><a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="n">req</span><span class="p">.</span><span class="n">isSecure</span><span class="p">();</span><span class="w"> </span><span class="c1">// true for https</span>
 </span></code></pre></div>
-<p>Behind a proxy, <code>req.ip()</code> shows the proxy, not the client. Set <code>trustedProxies</code> in <code>AppConfig</code> to fix it. See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment</a>.</p>
-<h2 id="details">Details</h2>
+<p>Behind a proxy, set <code>trustedProxies</code> in <code>AppConfig</code>, or <code>req.ip()</code> gives the proxy. See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment</a>.</p>
+<h2 id="other-request-data">Other request data</h2>
+<p>These come from middleware:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">req</span><span class="p">.</span><span class="n">requestId</span><span class="p">;</span><span class="w"> </span><span class="c1">// from RequestId, see Middleware</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="n">req</span><span class="p">.</span><span class="n">session</span><span class="p">;</span><span class="w">   </span><span class="c1">// from SessionMiddleware, see Session</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="n">req</span><span class="p">.</span><span class="n">hasSession</span><span class="p">;</span><span class="w"> </span><span class="c1">// true when the route has a session</span>
+</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="n">req</span><span class="p">.</span><span class="n">auth</span><span class="p">;</span><span class="w">      </span><span class="c1">// the logged in user, see Authentication</span>
+</span></code></pre></div>
+<p>See <a href="../middleware/#request-id">Middleware</a>, <a href="../session/">Session</a> and <a href="../../security/authentication/">Authentication</a>.</p>
+<h2 id="send-the-response-yourself">Send the response yourself</h2>
+<p>Write the response on <code>req.httpRequest.response</code>. After <code>takeOverResponse</code>, Dox sends nothing more for the request:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">handle</span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span><span class="n">req</span><span class="p">.</span><span class="n">takeOverResponse</span><span class="p">();</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span><span class="n">HttpResponse</span><span class="w"> </span><span class="n">res</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">httpRequest</span><span class="p">.</span><span class="n">response</span><span class="p">;</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span><span class="n">res</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'done'</span><span class="p">);</span>
+</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">  </span><span class="kd">await</span><span class="w"> </span><span class="n">res</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
+</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p>Your code must close the response. <code>req.responseTakenOver</code> gives true after the call.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>A key that is in the input as it is wins over a dot key. So a body key <code>'a.b'</code> is read before the <code>b</code> key inside <code>a</code>.</li>
-<li>Dot keys also work in <code>filled</code>, <code>exists</code>, <code>missing</code>, <code>boolean</code>, <code>integer</code>, <code>file</code> and <code>hasFile</code>.</li>
-<li>The flags <code>onlyPresent</code> and <code>hasKeyOnly</code> make <code>only</code> leave out missing keys and <code>has</code> only check the key. See <a href="../../reference/app-config/#core-flags">Core flags</a>.</li>
-<li>An upload up to 1 MB stays in memory. A bigger one is written to a temp file while it arrives.</li>
-<li>For the size limits, Dox checks <code>Content-Length</code> first. It also counts the bytes while it reads the body.</li>
-<li><code>pathIs</code> cleans the path like the router does. A <code>/</code> at the start or the end does not matter, and <code>//</code> counts as one <code>/</code>. So <code>'admin/*'</code> and <code>'/admin/*'</code> are the same.</li>
+<li><a href="../dto/">DTO</a>: typed and checked input.</li>
+<li><a href="../validation/">Validation</a>: the rules for input.</li>
+<li><a href="../response/">Response</a>: send an answer.</li>
 </ul>
 
 
@@ -7881,7 +7897,7 @@ So call <code>store</code>, <code>moveTo</code> or <code>stream</code> before yo
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

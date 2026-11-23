@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6747,10 +6656,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7139,10 +7048,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7166,25 +7075,18 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/reference/env.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="environment-variables">Environment variables</h1>
 <p>This page lists every env var that Dox and its packages read.</p>
-<p>To read your own keys with the typed env class, see <a href="../../digging-deeper/env/">Environment Variables</a>.</p>
 <h2 id="read-by-the-framework">Read by the framework</h2>
-<p><code>APP_ENV</code> changes how strict Dox is, so set it first:</p>
+<p><code>APP_ENV</code> changes how strict Dox is. Set <code>APP_ENV=development</code> in your local <code>.env</code> and in CI:</p>
 <ul>
-<li><code>development</code> or <code>local</code>: Dox shows error details in <code>500</code> answers and health checks, turns <code>/docs</code> on (when <code>openApi.enabled</code> is <code>null</code>), and turns the <code>dox_view</code> template cache off.</li>
-<li><code>development</code>, <code>local</code>, <code>test</code> or <code>testing</code>: a bad <code>APP_KEY</code> or a JWT secret under 32 bytes is only a warning.</li>
-<li>Any other value, or no value: Dox treats the app as production. A bad key stops the app at start, <code>/docs</code> is off and error details are hidden.</li>
+<li>development or local: Dox shows error details in 500 answers and health checks, turns <code>/docs</code> on (when <code>openApi.enabled</code> is null), and turns the view cache off.</li>
+<li>development, local, test or testing: a bad <code>APP_KEY</code> or a JWT secret under 32 bytes is only a warning.</li>
+<li>Any other value, or no value: production. A bad key stops the app at start, <code>/docs</code> is off and error details are hidden.</li>
 </ul>
-<p>So set <code>APP_ENV=development</code> in your local <code>.env</code> and in CI.</p>
 <table>
 <thead>
 <tr>
@@ -7304,7 +7206,7 @@
 </tbody>
 </table>
 <h2 id="read-by-a-new-project">Read by a new project</h2>
-<p>A new project (<code>dox create</code>) reads these keys with its typed env class in <code>lib/config/env.dart</code>. The framework itself does not read them. In code, use the getter, like <code>env.appPort</code>.</p>
+<p>A new project reads these keys with its typed env class in <code>lib/config/env.dart</code>. In code, use the getter, like <code>env.appPort</code>.</p>
 <table>
 <thead>
 <tr>
@@ -7447,13 +7349,14 @@
 <li>An empty value (<code>KEY=</code>), only spaces, or the text <code>null</code> counts as missing. So <code>Env.get</code> gives the default.</li>
 <li>In tests (<code>dart test</code>, or <code>APP_ENV=testing</code> as a real env var), Dox also reads <code>.env.testing</code>. Its keys win over <code>.env</code>.</li>
 <li>With <code>CoreFlags.envExpand</code>, <code>${OTHER}</code> and <code>"..."</code> escapes work. See <a href="../../digging-deeper/env/#use-one-value-in-another">Use one value in another</a>.</li>
+<li>The file is read one time per isolate, from the current folder. <code>Platform.environment</code> has only the real environment.</li>
 </ul>
-<p>Migrations (<code>dox_migration</code>) use their own simpler parser. It does not strip <code># note</code> comments, so keep comments on their own line.</p>
-<h2 id="details">Details</h2>
+<p>Migrations use their own simpler parser. It does not remove <code># note</code> comments, removes all quote characters, has no <code>${VAR}</code> expansion and does not read <code>.env.testing</code>. So keep comments on their own line.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><code>Env.get()</code> and <code>EnvReader</code> read the real environment and <code>.env</code>. Code that reads <code>Platform.environment</code> sees only the real environment.</li>
-<li>The <code>.env</code> file is read once per isolate, from the current folder.</li>
-<li>The parser of <code>dox_migration</code> removes every quote character, has no <code>${VAR}</code> expansion, and does not read <code>.env.testing</code>.</li>
+<li><a href="../../digging-deeper/env/">Environment Variables</a>: read your own keys with the typed env class.</li>
+<li><a href="../../guides/environments/">Environments</a>: a setup for dev, test and production.</li>
+<li><a href="../app-config/">App config</a>: the fields that the env keys fill.</li>
 </ul>
 
 
@@ -7574,7 +7477,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

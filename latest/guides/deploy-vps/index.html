@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5057,10 +5059,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5186,95 +5184,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6473,10 +6382,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7326,10 +7235,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7353,17 +7262,12 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/deploy-vps.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="deploy-to-a-linux-server">Deploy to a Linux server</h1>
 <p>Run the blog API on your own Linux server (a VPS), with systemd to keep it running and Caddy in front for HTTPS.</p>
-<p>A VPS gives you full control and a fixed monthly price. systemd starts the app and starts it again after a crash. Caddy gets the TLS certificate and sends the requests to the app:</p>
+<p>systemd starts the app again after a crash. Caddy gets the TLS certificate and sends the requests to the app:</p>
 <pre class="mermaid"><code>flowchart LR
   client[Browser or app] -- "HTTPS :443" --&gt; caddy[Caddy]
   caddy -- "HTTP 127.0.0.1:3000" --&gt; dox["/opt/blog/bin/server (systemd)"]</code></pre>
@@ -7375,11 +7279,12 @@
 <li>The blog API from the <a href="../../tutorial/01-create-project/">tutorial</a>, or any Dox app.</li>
 </ul>
 <h2 id="1-build-the-bundle-for-linux">1. Build the bundle for Linux</h2>
-<p><code>dox build</code> makes a native binary for the system it runs on, so a binary built on macOS does not run on Linux. Build it inside the <code>dart:stable</code> image instead, which is Debian:</p>
+<p><code>dox build</code> makes a binary for the system it runs on. So build it in the <code>dart:stable</code> image, which is Debian:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-v<span class="w"> </span><span class="s2">"</span><span class="nv">$PWD</span><span class="s2">"</span>:/app<span class="w"> </span>-w<span class="w"> </span>/app<span class="w"> </span>dart:stable<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="se">\</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">'dart pub get &amp;&amp; dart pub global activate dox &amp;&amp; /root/.pub-cache/bin/dox build'</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">'dart pub get &amp;&amp; dart pub global activate dox &amp;&amp;</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="s1">    /root/.pub-cache/bin/dox build'</span>
 </span></code></pre></div>
-<p>The result is <code>build/bundle/</code>:</p>
+<p>The result is in <code>build/bundle/</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>build/bundle/
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  bin/server                         the AOT binary
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  lib/dox_http_native-linux-*.so     the native HTTP server
@@ -7389,19 +7294,20 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  db/                                the migrations
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>  .env.example
 </span></code></pre></div>
-<p>Keep <code>bin/</code> and <code>lib/</code> together, because the binary loads the libraries from <code>../lib</code>. See <a href="../../digging-deeper/deployment/#build">Deployment</a>.</p>
+<p>Keep <code>bin/</code> and <code>lib/</code> together, because the binary loads the libraries from <code>../lib</code>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Match the CPU of the server</p>
-<p>Docker builds for the CPU of your machine. On a Mac with Apple silicon that is <code>arm64</code>, but most VPS plans are <code>x86_64</code>.
+<p>Docker builds for the CPU of your machine. On a Mac with Apple silicon that is arm64, but most VPS plans are x86_64.
 For them, add <code>--platform linux/amd64</code> after <code>docker run</code>. Check the server with <code>uname -m</code>.</p>
 </div>
 <p>The container writes Linux paths into your <code>.dart_tool/</code>. So run <code>dart pub get</code> on your machine again before you use <code>dox serve</code>.</p>
 <h2 id="2-make-a-user-and-the-folders">2. Make a user and the folders</h2>
-<p>You should not run the app as <code>root</code>. Run this on the server to make a user <code>dox</code>, which can not log in:</p>
+<p>Do not run the app as root. On the server, make a user <code>dox</code> that can not log in:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>sudo<span class="w"> </span>useradd<span class="w"> </span>--system<span class="w"> </span>--no-create-home<span class="w"> </span>--shell<span class="w"> </span>/usr/sbin/nologin<span class="w"> </span>dox
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>sudo<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/opt/blog
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>sudo<span class="w"> </span>install<span class="w"> </span>-d<span class="w"> </span>-o<span class="w"> </span>dox<span class="w"> </span>-g<span class="w"> </span>dox<span class="w"> </span>/opt/blog/storage
 </span></code></pre></div>
+<p>The app uses these paths:</p>
 <table>
 <thead>
 <tr>
@@ -7434,10 +7340,14 @@ For them, add <code>--platform linux/amd64</code> after <code>docker run</code>.
 </tbody>
 </table>
 <h2 id="3-copy-the-bundle-to-the-server">3. Copy the bundle to the server</h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>rsync<span class="w"> </span>-a<span class="w"> </span>--delete<span class="w"> </span>--exclude<span class="w"> </span>storage/<span class="w"> </span>build/bundle/<span class="w"> </span>you@server:/tmp/blog-bundle/
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>ssh<span class="w"> </span>you@server<span class="w"> </span><span class="s1">'sudo rsync -a --delete --exclude storage/ /tmp/blog-bundle/ /opt/blog/'</span>
+<p>Copy the bundle to a temp folder, then into <code>/opt/blog</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>rsync<span class="w"> </span>-a<span class="w"> </span>--delete<span class="w"> </span>--exclude<span class="w"> </span>storage/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>build/bundle/<span class="w"> </span>you@server:/tmp/blog-bundle/
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>ssh<span class="w"> </span>you@server<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span><span class="s1">'sudo rsync -a --delete --exclude storage/ /tmp/blog-bundle/ /opt/blog/'</span>
 </span></code></pre></div>
 <h2 id="4-write-the-env-file">4. Write the env file</h2>
+<p>Put the config and the secrets in <code>/etc/blog.env</code>:</p>
 <div class="language-ini highlight"><span class="filename">/etc/blog.env</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="na">APP_NAME</span><span class="o">=</span><span class="s">blog</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="na">APP_ENV</span><span class="o">=</span><span class="s">production</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="na">APP_PORT</span><span class="o">=</span><span class="s">3000</span>
@@ -7446,14 +7356,12 @@ For them, add <code>--platform linux/amd64</code> after <code>docker run</code>.
 </span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="na">DB_CONNECTION</span><span class="o">=</span><span class="s">sqlite</span>
 </span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="na">DB_NAME</span><span class="o">=</span><span class="s">/var/lib/blog/blog.sqlite</span>
 </span></code></pre></div>
+<p>Only root may read the file:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>sudo<span class="w"> </span>chown<span class="w"> </span>root:root<span class="w"> </span>/etc/blog.env
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>/etc/blog.env
 </span></code></pre></div>
-<p>systemd reads this file as <code>root</code> before it starts the app, so the user <code>dox</code> does not need to read it.</p>
-<p>For Postgres, set <code>DB_CONNECTION=postgres</code> and add <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code> and <code>DB_NAME</code>.
-Or set one <code>DATABASE_URL</code>, like <code>postgres://app:secret@localhost:5432/blog</code>. It wins over the <code>DB_*</code> keys. systemd gives it to the app as a real environment variable. See <a href="../../database/#database_url"><code>DATABASE_URL</code></a>.
-See <a href="../environments/">Environments</a> for all keys.</p>
-<p>Do not put a <code>.env</code> file in <code>/opt/blog</code>. The values of <code>/etc/blog.env</code> are real environment variables, so they win over a <code>.env</code> file anyway, and one place is easier to check.</p>
+<p>For Postgres, set <code>DB_CONNECTION=postgres</code> and add <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code> and <code>DB_NAME</code>. Or set one <a href="../../database/#database_url"><code>DATABASE_URL</code></a>, like <code>postgres://app:secret@localhost:5432/blog</code>. It wins over the <code>DB_*</code> keys.</p>
+<p>Do not put a <code>.env</code> file in <code>/opt/blog</code>. Keep all values in one place.</p>
 <h2 id="5-write-the-systemd-unit">5. Write the systemd unit</h2>
 <p>The systemd unit starts the app at boot and starts it again after a crash:</p>
 <div class="language-ini highlight"><span class="filename">/etc/systemd/system/blog.service</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">[Unit]</span>
@@ -7482,20 +7390,17 @@ See <a href="../environments/">Environments</a> for all keys.</p>
 </span><span id="__span-6-24"><a id="__codelineno-6-24" name="__codelineno-6-24" href="#__codelineno-6-24"></a><span class="k">[Install]</span>
 </span><span id="__span-6-25"><a id="__codelineno-6-25" name="__codelineno-6-25" href="#__codelineno-6-25"></a><span class="na">WantedBy</span><span class="o">=</span><span class="s">multi-user.target</span>
 </span></code></pre></div>
+<p>Start the app:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span><span class="nb">enable</span><span class="w"> </span>--now<span class="w"> </span>blog
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>systemctl<span class="w"> </span>status<span class="w"> </span>blog
 </span></code></pre></div>
-<ul>
-<li>When the main isolate dies, the process exits and <code>Restart=always</code> starts it again. See <a href="../../digging-deeper/deployment/#keep-it-running">Deployment: keep it running</a>.</li>
-<li>The app runs the migrations at start, before it takes requests.</li>
-<li>Dox starts one isolate per CPU the process may use. Set <code>APP_TOTAL_ISOLATE</code> in <code>/etc/blog.env</code> to change it.</li>
-</ul>
+<p>The app runs the migrations at start, before it takes requests. To change the number of isolates, set <code>APP_TOTAL_ISOLATE</code> in <code>/etc/blog.env</code>.</p>
 <h2 id="6-close-the-app-port">6. Close the app port</h2>
-<p>Only Caddy should talk to the app. Caddy runs on the same machine, so let Dox listen on <code>127.0.0.1</code> only. Add this line to <code>/etc/blog.env</code>:</p>
+<p>Only Caddy may talk to the app. Add this line to <code>/etc/blog.env</code>, so Dox listens on the local address only:</p>
 <div class="language-ini highlight"><span class="filename">/etc/blog.env</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="na">APP_HOST</span><span class="o">=</span><span class="s">127.0.0.1</span>
 </span></code></pre></div>
-<p>Now only programs on this machine can reach port <code>3000</code>. Also turn on a firewall, so that only SSH, HTTP and HTTPS are open:</p>
+<p>Also turn on a firewall, so that only SSH, HTTP and HTTPS are open:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>default<span class="w"> </span>deny<span class="w"> </span>incoming
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>allow<span class="w"> </span>OpenSSH
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>sudo<span class="w"> </span>ufw<span class="w"> </span>allow<span class="w"> </span><span class="m">80</span>/tcp
@@ -7503,7 +7408,7 @@ See <a href="../environments/">Environments</a> for all keys.</p>
 </span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>sudo<span class="w"> </span>ufw<span class="w"> </span><span class="nb">enable</span>
 </span></code></pre></div>
 <h2 id="7-put-caddy-in-front">7. Put Caddy in front</h2>
-<p>Install Caddy from its <a href="https://caddyserver.com/docs/install">install page</a>. The Debian package runs Caddy with systemd and reads <code>/etc/caddy/Caddyfile</code>.</p>
+<p>Install Caddy from its <a href="https://caddyserver.com/docs/install">install page</a>. Then write <code>/etc/caddy/Caddyfile</code>:</p>
 <div class="language-text highlight"><span class="filename">/etc/caddy/Caddyfile</span><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>api.example.com {
 </span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    encode zstd gzip
 </span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
@@ -7514,28 +7419,26 @@ See <a href="../environments/">Environments</a> for all keys.</p>
 </span><span id="__span-10-8"><a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    }
 </span><span id="__span-10-9"><a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>}
 </span></code></pre></div>
+<p>Check the file and load it:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>sudo<span class="w"> </span>caddy<span class="w"> </span>validate<span class="w"> </span>--config<span class="w"> </span>/etc/caddy/Caddyfile
 </span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>sudo<span class="w"> </span>systemctl<span class="w"> </span>reload<span class="w"> </span>caddy
 </span></code></pre></div>
-<ul>
-<li>Caddy gets a TLS certificate for <code>api.example.com</code> by itself. Ports 80 and 443 must be open.</li>
-<li><code>reverse_proxy</code> sets <code>X-Forwarded-For</code> and <code>X-Forwarded-Proto</code>.</li>
-</ul>
+<p>Caddy gets a TLS certificate for <code>api.example.com</code> by itself. Ports 80 and 443 must be open.</p>
 <h2 id="8-trust-caddy-in-the-app">8. Trust Caddy in the app</h2>
-<p>Dox ignores <code>X-Forwarded-For</code> and <code>X-Forwarded-Proto</code> until you list the proxy in <code>trustedProxies</code>. Caddy talks to the app from the same server, so list the local addresses:</p>
+<p>Dox ignores the <code>X-Forwarded-*</code> headers of a proxy that is not in <code>trustedProxies</code>. List the local addresses:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="nl">trustedProxies:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'127.0.0.1'</span><span class="p">,</span><span class="w"> </span><span class="s1">'::1'</span><span class="p">],</span>
 </span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Now <code>req.ip()</code> is the real client IP and <code>req.scheme()</code> is <code>https</code>.
-Build and copy again after this change (steps 1 and 3). See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment: HTTPS</a>.</p>
+<p>Now <code>req.ip()</code> is the real client IP and <code>req.scheme()</code> is https. Build and copy again after this change (steps 1 and 3).</p>
 <h2 id="check-it">Check it</h2>
+<p>Call the API over HTTPS:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>curl<span class="w"> </span>https://api.example.com/api/ping
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>pong
 </span></code></pre></div>
-<p>Read the logs. In production the app writes one JSON line per log.</p>
+<p>Read the logs. In production the app writes one JSON line per log:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>journalctl<span class="w"> </span>-u<span class="w"> </span>blog<span class="w"> </span>-f<span class="w">                     </span><span class="c1"># follow new lines</span>
 </span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>journalctl<span class="w"> </span>-u<span class="w"> </span>blog<span class="w"> </span>--since<span class="w"> </span><span class="s2">"1 hour ago"</span><span class="w">   </span><span class="c1"># the last hour</span>
 </span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>journalctl<span class="w"> </span>-u<span class="w"> </span>blog<span class="w"> </span>-b<span class="w">                     </span><span class="c1"># since the last boot</span>
@@ -7547,8 +7450,8 @@ Build and copy again after this change (steps 1 and 3). See <a href="../../diggi
 </span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>Migrated: 2026_10_22_205345_create_posts_table
 </span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>{"timestamp":"...","status":"info","message":"Server started at http://127.0.0.1:3000 with 2 isolate (native)","logger":{"name":"dox"},"source":"server"}
 </span></code></pre></div>
-<p><code>(native)</code> means the native HTTP server loaded. When it does not load, the app stops at start and the error says why.</p>
-<p>Check that the app port is closed. From your machine:</p>
+<p><code>(native)</code> means the native HTTP server loaded.</p>
+<p>From your machine, make sure that the app port is closed:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>curl<span class="w"> </span>-m<span class="w"> </span><span class="m">5</span><span class="w"> </span>http://api.example.com:3000/api/ping<span class="w">   </span><span class="c1"># must time out</span>
 </span></code></pre></div>
 <h2 id="updating-the-app">Updating the app</h2>
@@ -7556,9 +7459,12 @@ Build and copy again after this change (steps 1 and 3). See <a href="../../diggi
 <li>Build a new bundle (step 1).</li>
 <li>
 <p>Copy it to the server (step 3). Keep the old one first, so you can go back:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>ssh<span class="w"> </span>you@server<span class="w"> </span><span class="s1">'sudo rm -rf /opt/blog.prev &amp;&amp; sudo cp -a /opt/blog /opt/blog.prev'</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>rsync<span class="w"> </span>-a<span class="w"> </span>--delete<span class="w"> </span>--exclude<span class="w"> </span>storage/<span class="w"> </span>build/bundle/<span class="w"> </span>you@server:/tmp/blog-bundle/
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>ssh<span class="w"> </span>you@server<span class="w"> </span><span class="s1">'sudo rsync -a --delete --exclude storage/ /tmp/blog-bundle/ /opt/blog/'</span>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>ssh<span class="w"> </span>you@server<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">    </span><span class="s1">'sudo rm -rf /opt/blog.prev &amp;&amp; sudo cp -a /opt/blog /opt/blog.prev'</span>
+</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>rsync<span class="w"> </span>-a<span class="w"> </span>--delete<span class="w"> </span>--exclude<span class="w"> </span>storage/<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">    </span>build/bundle/<span class="w"> </span>you@server:/tmp/blog-bundle/
+</span><span id="__span-18-5"><a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>ssh<span class="w"> </span>you@server<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-18-6"><a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="w">    </span><span class="s1">'sudo rsync -a --delete --exclude storage/ /tmp/blog-bundle/ /opt/blog/'</span>
 </span></code></pre></div>
 </li>
 <li>
@@ -7570,18 +7476,14 @@ Build and copy again after this change (steps 1 and 3). See <a href="../../diggi
 <p>Read the logs (<code>journalctl -u blog -n 20</code>) and run the check.</p>
 </li>
 </ol>
-<p>To go back: copy <code>/opt/blog.prev</code> to <code>/opt/blog</code> and restart. A migration that already ran is not undone.</p>
-<div class="admonition note">
-<p class="admonition-title">A restart is short, but not zero</p>
-<p>A restart takes about one second. New requests do not fail, because <code>lb_try_duration</code> makes Caddy wait for the app.
-If you need a real zero-downtime update, run two copies on two ports and list both in Caddy. See <a href="../../digging-deeper/deployment/#many-processes-or-machines">Deployment: many processes</a>.</p>
-</div>
-<h2 id="see-also">See also</h2>
+<p>To go back, copy <code>/opt/blog.prev</code> to <code>/opt/blog</code> and restart. A migration that already ran stays.</p>
+<p>A restart takes about one second, and Caddy waits for the app. For an update with no downtime, run two copies on two ports and list both in Caddy. See <a href="../../digging-deeper/deployment/#many-processes-or-machines">Deployment: many processes</a>.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><a href="../../digging-deeper/deployment/">Deployment</a> for <code>dox build</code>, Docker, nginx and many processes</li>
-<li><a href="../environments/">Environments</a> for config per environment and <code>APP_KEY</code></li>
-<li><a href="../docker/">Docker</a> to run the app and Postgres with Docker Compose</li>
-<li><a href="../../digging-deeper/native-server/">Native server</a></li>
+<li><a href="../../digging-deeper/deployment/">Deployment</a>: <code>dox build</code>, nginx and many processes.</li>
+<li><a href="../environments/">Environments</a>: config per environment and <code>APP_KEY</code>.</li>
+<li><a href="../docker/">Docker</a>: the app and Postgres in Docker Compose.</li>
+<li><a href="../../digging-deeper/native-server/">Native server</a>: the native HTTP server.</li>
 </ul>
 
 
@@ -7702,7 +7604,7 @@ If you need a real zero-downtime update, run two copies on two ports and list bo
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

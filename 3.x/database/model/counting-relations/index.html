@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../../assets/style.css">
     
@@ -4261,10 +4263,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -5200,10 +5202,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5329,95 +5327,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7198,10 +7107,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7225,53 +7134,36 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/database/model/counting-relations.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="counting-relations">Counting relations</h1>
 <p><code>withCount()</code> adds the number of related rows to each model, without loading the rows.</p>
-<p>This is useful when a page shows "3 posts" next to each user. It adds a subquery to the select, so you get the counts with the same query.</p>
+<p>It adds a subquery to the select, so you get the counts with the same query. Use the relation name, which is the field name.</p>
 <h2 id="counting-related-rows">Counting related rows</h2>
-<p>Give <code>withCount</code> the relation name (the field name). Then read the count with <code>countOf</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">User</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">UserGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nd">@HasMany</span><span class="p">(</span><span class="n">Post</span><span class="p">)</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="w"> </span><span class="n">posts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Post</span><span class="o">&gt;</span><span class="p">[];</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">}</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>
-</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">users</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">countOf</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span><span class="w"> </span><span class="c1">// 3</span>
-</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="n">users</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span><span class="w">         </span><span class="c1">// {..., "posts_count": 3}</span>
+<p>Read the count with <code>countOf()</code>. In JSON, the key is the relation name in snake_case with <code>_count</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">users</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">countOf</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span><span class="w"> </span><span class="c1">// 3</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">users</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">toJson</span><span class="p">();</span><span class="w">         </span><span class="c1">// {..., "posts_count": 3}</span>
 </span></code></pre></div>
-<p>In JSON, the key is the relation name in snake_case and <code>_count</code>, like <code>posts_count</code>.</p>
-<p>It works with <code>hasOne</code>, <code>hasMany</code>, <code>hasOneThrough</code>, <code>hasManyThrough</code>, <code>manyToMany</code>, <code>morphOne</code> and <code>morphMany</code> relations. It is not for <code>belongsTo</code> relations, and there it throws an <code>UnsupportedError</code>.</p>
+<p>It works with every relation but <code>@BelongsTo</code> and <code>@MorphTo</code>, which throw an <code>UnsupportedError</code>. The global scopes and soft deletes of the related model apply.</p>
 <h3 id="counting-only-some-rows">Counting only some rows</h3>
-<p>Sometimes you only want to count some related rows, like the published posts. Give a function with conditions, and use <code>as</code> to give the count its own key:</p>
+<p>Give a function with conditions, and use <code>as</code> to give the count its own key. Read a custom key with <code>aggregate()</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">User</span><span class="o">&gt;</span><span class="w"> </span><span class="n">users</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">()</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">)</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span><span class="p">.</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts as published_count'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">      </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'published'</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">})</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="n">users</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">countOf</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span><span class="w">               </span><span class="c1">// all posts</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="n">users</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'published_count'</span><span class="p">);</span><span class="w">   </span><span class="c1">// published posts</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts as published_count'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">      </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'published'</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span><span class="p">})</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="p">.</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">users</span><span class="p">.</span><span class="n">first</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'published_count'</span><span class="p">);</span>
 </span></code></pre></div>
-<p>The global scopes and soft deletes of the related model are used in the count.</p>
 <h3 id="counting-and-loading-together">Counting and loading together</h3>
-<p><code>withCount()</code> works with <code>where()</code>, <code>orderBy()</code>, <code>find()</code>, <code>getFirst()</code>, <code>paginate()</code>, and with <code>preload()</code> or eager relations:</p>
+<p><code>withCount()</code> works with the other query methods and with <code>preload()</code>:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="n">withCount</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">posts</span><span class="p">;</span><span class="w">              </span><span class="c1">// the posts</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">countOf</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">);</span><span class="w">   </span><span class="c1">// the number of posts</span>
 </span></code></pre></div>
 <h2 id="sum-average-min-and-max">Sum, average, min and max</h2>
-<p>If you need a total of one column, like all views of a user's posts, use <code>withSum()</code>, <code>withAvg()</code>, <code>withMin()</code> or <code>withMax()</code>. They work like <code>withCount()</code>. Read the value with <code>aggregate</code>. It is null when there is no related row:</p>
+<p><code>withSum()</code>, <code>withAvg()</code>, <code>withMin()</code> and <code>withMax()</code> work like <code>withCount()</code> on one column. The value is null when there is no related row:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">()</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withSum</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'views'</span><span class="p">)</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span><span class="p">.</span><span class="n">withAvg</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">,</span><span class="w"> </span><span class="s1">'views'</span><span class="p">)</span>
@@ -7280,26 +7172,17 @@
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
 </span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_sum_views'</span><span class="p">);</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_avg_views'</span><span class="p">);</span>
-</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_min_views'</span><span class="p">);</span>
-</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_max_views'</span><span class="p">);</span>
 </span></code></pre></div>
+<p>The keys are <code>posts_sum_views</code>, <code>posts_avg_views</code>, <code>posts_min_views</code> and <code>posts_max_views</code>.</p>
 <h2 id="checking-if-related-rows-exist">Checking if related rows exist</h2>
-<p>If you only need to know whether there is a related row, use <code>withExists()</code>. It adds <code>&lt;relation&gt;_exists</code>, which is <code>true</code> when there is at least one related row. It takes a function and <code>as</code>, like <code>withCount()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">()</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">    </span><span class="p">.</span><span class="n">withExists</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">)</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span><span class="p">.</span><span class="n">withExists</span><span class="p">(</span><span class="s1">'posts as has_published'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">      </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'published'</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span><span class="p">})</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_exists'</span><span class="p">);</span><span class="w">   </span><span class="c1">// true or false</span>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'has_published'</span><span class="p">);</span><span class="w">  </span><span class="c1">// true or false</span>
+<p><code>withExists()</code> adds <code>&lt;relation&gt;_exists</code>, which is true when there is a related row. It takes a function and <code>as</code>, like <code>withCount()</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">User</span><span class="o">?</span><span class="w"> </span><span class="n">user</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">User</span><span class="p">().</span><span class="n">withExists</span><span class="p">(</span><span class="s1">'posts'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">user</span><span class="o">?</span><span class="p">.</span><span class="n">aggregate</span><span class="p">(</span><span class="s1">'posts_exists'</span><span class="p">);</span><span class="w"> </span><span class="c1">// true or false</span>
 </span></code></pre></div>
-<p>If you want to keep only the rows that have related rows, use <code>whereHas()</code> or <code>has()</code> instead. See <a href="../relation-queries/">Query by relations</a>.</p>
-<h2 id="details">Details</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>It works for a relation to the same table, like the children of a category.</li>
+<li><a href="../relation-queries/">Query by relations</a>: keep only the rows that have related rows.</li>
+<li><a href="../relationship/has-many/">HasMany</a>: define a relation.</li>
 </ul>
 
 
@@ -7420,7 +7303,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>

@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6169,10 +6078,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7250,10 +7159,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7277,23 +7186,18 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/testing-with-database.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="testing-with-a-database">Testing with a database</h1>
 <p>Run model tests against a real database: SQLite for fast local tests, or a test Postgres for the real thing.</p>
-<p>A test with a real database finds bugs that a mock can not find, like a wrong column name or a broken query. In this guide the migrations run once, and every test starts with empty tables, so the tests do not change each other's data.</p>
+<p>A real database finds bugs that a mock can not find, like a wrong column name. The migrations run one time, and every test starts with empty tables.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Dox app (<code>dox create my_app</code>). A new app has the <code>User</code> model, a <code>users</code> migration in <code>db/migration</code> and the <code>test</code> package.</li>
 </ul>
 <h2 id="1-check-the-migration">1. Check the migration</h2>
-<p>The test builds its tables from your migrations. A new app has this one (its file name starts with another date). For a new table, run <code>dox make:migration create_posts_table</code>.</p>
+<p>The test makes its tables from your migrations. A new app has this one, with another date in the file name:</p>
 <div class="language-dart highlight"><span class="filename">db/migration/2026_10_22_000000_create_users_table.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_migration/dox_migration.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kd">class</span><span class="w"> </span><span class="nc">CreateUsersTable</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">Migration</span><span class="w"> </span><span class="p">{</span>
@@ -7315,9 +7219,9 @@
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>db/migration/migrations.dart</code> is the list of all migrations, and <code>dox make:migration</code> updates it. The test imports that list. Because a Dart migration works on Postgres, MySQL and SQLite, the same test runs on all of them.</p>
+<p>The test imports the list of all migrations from <code>db/migration/migrations.dart</code>. <code>dox make:migration</code> updates this list.</p>
 <h2 id="2-write-the-test-sqlite">2. Write the test (SQLite)</h2>
-<p>Start with SQLite, because it needs no server. The test makes its own database config, so your <code>.env</code> does not matter.</p>
+<p>Start with SQLite, because it needs no server. The test has its own database config:</p>
 <div class="language-dart highlight"><span class="filename">test/user_test.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
@@ -7385,18 +7289,14 @@
 </span><span id="__span-1-65"><a id="__codelineno-1-65" name="__codelineno-1-65" href="#__codelineno-1-65"></a><span class="w">  </span><span class="p">});</span>
 </span><span id="__span-1-66"><a id="__codelineno-1-66" name="__codelineno-1-66" href="#__codelineno-1-66"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>This is what happens:</p>
-<ol>
-<li><code>setUpAll</code> deletes an old database file, runs the migrations, and starts the ORM on the same file.</li>
-<li><code>setUp</code> runs <code>refreshDatabase()</code> before each test. It empties every table (not the migrations table) and starts the ids at 1 again.</li>
-<li><code>tearDownAll</code> deletes the file.</li>
-</ol>
-<p>Put <code>storage/test.sqlite</code> in <code>.gitignore</code>. The test uses a file and not <code>:memory:</code>, because the migrator and the ORM each open their own connection. Two connections to <code>:memory:</code> are two different databases.</p>
+<p><code>refreshDatabase()</code> empties every table except the migrations table, and starts the ids at 1 again.</p>
+<p>Put <code>storage/test.sqlite</code> in <code>.gitignore</code>. Use a file, not <code>:memory:</code>, because the migrator and the ORM each open their own connection.</p>
 <h2 id="3-run-it">3. Run it</h2>
+<p>Run the test file:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>test/user_test.dart
 </span></code></pre></div>
 <h2 id="check-it">Check it</h2>
-<p>You see the migrations run, and then the tests pass. The migration names start with the dates of your files, and a new app also has the tables of the queue:</p>
+<p>The migrations run, and then the tests pass:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>00:00 +0: (setUpAll)
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Migrating: 2026_10_22_000000_create_users_table
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Migrated: 2026_10_22_000000_create_users_table
@@ -7407,7 +7307,7 @@
 </span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>00:00 +2: All tests passed!
 </span></code></pre></div>
 <h2 id="the-same-test-on-postgres">The same test on Postgres</h2>
-<p>SQLite is fast, but your app may run on Postgres in production. Then you should test on Postgres too. Use a separate database for tests, never the one you develop on, because the tests delete all rows.</p>
+<p>If your app runs on Postgres in production, test on Postgres too. Use a separate database for tests, because the tests delete all rows.</p>
 <p>Start a test database with Docker:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--name<span class="w"> </span>my_app_test<span class="w"> </span>-p<span class="w"> </span><span class="m">5433</span>:5432<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>-e<span class="w"> </span><span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>postgres<span class="w"> </span>-e<span class="w"> </span><span class="nv">POSTGRES_DB</span><span class="o">=</span>my_app_test<span class="w"> </span>postgres:18
@@ -7428,14 +7328,13 @@
 </span><span id="__span-5-13"><a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a><span class="w">  </span><span class="p">},</span>
 </span><span id="__span-5-14"><a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>Delete <code>deleteDbFile()</code> and its two calls. The rest of the test stays the same. You can also read these values from the env, and run <code>DB_PORT=5433 DB_NAME=my_app_test dart test</code>.</p>
+<p>Delete <code>deleteDbFile()</code> and its two calls. The rest of the test stays the same.</p>
 <h2 id="many-test-files">Many test files</h2>
-<p>Each test file runs in its own process, at the same time as the others. So two files that use the same table can break each other. To fix it, give each file its own SQLite file (<code>storage/test_users.sqlite</code>, <code>storage/test_posts.sqlite</code>), or run the files one by one:</p>
+<p>Test files run at the same time, so two files that use the same table can break each other. Give each file its own SQLite file, or run the files one by one:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--concurrency<span class="o">=</span><span class="m">1</span>
 </span></code></pre></div>
 <h2 id="test-a-route-with-the-database">Test a route with the database</h2>
-<p>You can also test a full route, from the request to the database. This test uses the <code>GET /api/users</code> route of the <a href="../pagination/">Pagination</a> guide.</p>
-<p><code>DoxTestClient</code> starts the app inside the test. It runs the providers, so the ORM uses the config in <code>lib/config/database.dart</code>. So you pick the test database with env variables:</p>
+<p>This test uses the <code>/api/users</code> route of the <a href="../pagination/">Pagination</a> guide. <code>DoxTestClient</code> starts the app in the test, with the config in <code>lib/config/database.dart</code>:</p>
 <div class="language-dart highlight"><span class="filename">test/api_test.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/testing.dart'</span><span class="p">;</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_migration/dox_migration.dart'</span><span class="p">;</span>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/testing.dart'</span><span class="p">;</span>
@@ -7469,14 +7368,15 @@
 </span><span id="__span-7-31"><a id="__codelineno-7-31" name="__codelineno-7-31" href="#__codelineno-7-31"></a><span class="w">  </span><span class="p">});</span>
 </span><span id="__span-7-32"><a id="__codelineno-7-32" name="__codelineno-7-32" href="#__codelineno-7-32"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">DB_CONNECTION</span><span class="o">=</span>sqlite<span class="w"> </span><span class="nv">DB_NAME</span><span class="o">=</span>storage/test.sqlite<span class="w"> </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>test/api_test.dart
+<p>Pick the test database with env variables:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nv">DB_CONNECTION</span><span class="o">=</span>sqlite<span class="w"> </span><span class="nv">DB_NAME</span><span class="o">=</span>storage/test.sqlite<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">    </span>dart<span class="w"> </span><span class="nb">test</span><span class="w"> </span>test/api_test.dart
 </span></code></pre></div>
-<p>See <a href="../../digging-deeper/testing/#test-http-routes">Testing: test HTTP routes</a> for all client methods.</p>
-<h2 id="see-also">See also</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><a href="../../digging-deeper/testing/">Testing</a></li>
-<li><a href="../../database/migration/">Migration</a></li>
-<li><a href="../../database/#sqlite">Database: SQLite</a></li>
+<li><a href="../../digging-deeper/testing/#test-http-routes">Testing: test HTTP routes</a>: all the client methods.</li>
+<li><a href="../../database/migration/">Migration</a>: write migrations.</li>
+<li><a href="../../database/#sqlite">Database: SQLite</a>: the SQLite settings.</li>
 </ul>
 
 
@@ -7597,7 +7497,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

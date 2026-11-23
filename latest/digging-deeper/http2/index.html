@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="With HTTP/2, one connection can send many requests at the same time, and Dox serves HTTP/2 on the same port as HTTP/1.1.">
+        <meta name="description" content="Dox serves HTTP/2 on the same port as HTTP/1.1, so one connection can send many requests at the same time.">
       
       
       
@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -81,7 +83,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="HTTP/2 | Dox">
-  <meta property="og:description" content="With HTTP/2, one connection can send many requests at the same time, and Dox serves HTTP/2 on the same port as HTTP/1.1.">
+  <meta property="og:description" content="Dox serves HTTP/2 on the same port as HTTP/1.1, so one connection can send many requests at the same time.">
   <meta property="og:url" content="https://dartondox.dev/latest/digging-deeper/http2/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +92,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="HTTP/2 | Dox">
-  <meta name="twitter:description" content="With HTTP/2, one connection can send many requests at the same time, and Dox serves HTTP/2 on the same port as HTTP/1.1.">
+  <meta name="twitter:description" content="Dox serves HTTP/2 on the same port as HTTP/1.1, so one connection can send many requests at the same time.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -2767,10 +2769,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#turn-on-http2" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Turn on HTTP/2
+        Setup
       
     </span>
   </a>
@@ -2804,17 +2806,6 @@
     <span class="md-ellipsis">
       
         Use a proxy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-the-server-without-dox" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use the server without Dox
       
     </span>
   </a>
@@ -2861,10 +2852,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#without-dox" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Without Dox
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
       
     </span>
   </a>
@@ -5229,10 +5231,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5358,95 +5356,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7166,10 +7075,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#turn-on-http2" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Turn on HTTP/2
+        Setup
       
     </span>
   </a>
@@ -7203,17 +7112,6 @@
     <span class="md-ellipsis">
       
         Use a proxy
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-the-server-without-dox" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use the server without Dox
       
     </span>
   </a>
@@ -7260,10 +7158,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#without-dox" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Without Dox
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next steps
       
     </span>
   </a>
@@ -7287,43 +7196,30 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/http2.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="http2">HTTP/2</h1>
-<p>With HTTP/2, one connection can send many requests at the same time, and Dox serves HTTP/2 on the same port as HTTP/1.1.</p>
-<p>Use HTTP/2 for one of these reasons:</p>
-<ul>
-<li>You want to serve <a href="../grpc/">gRPC</a>. gRPC works only over HTTP/2.</li>
-<li>Your proxy sends HTTP/2 to the app. The proxy then sends many requests on a small number of connections. The app can serve more requests with fewer connections.</li>
-</ul>
-<p>HTTP/2 is off by default. If you do not turn on HTTP/2, nothing changes.</p>
-<h2 id="turn-on-http2">Turn on HTTP/2</h2>
-<p>Set <code>http2</code> to <code>true</code> in the app config:</p>
+<p>Dox serves HTTP/2 on the same port as HTTP/1.1, so one connection can send many requests at the same time.</p>
+<p>Turn it on to serve <a href="../grpc/">gRPC</a>, or when your proxy sends HTTP/2 to the app. HTTP/2 is off by default.</p>
+<h2 id="setup">Setup</h2>
+<p>Set <code>http2</code> to true in the app config. The port then accepts HTTP/1.1 and HTTP/2, and your routes stay the same:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="nl">http2:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="c1">// ...</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>The port then accepts HTTP/1.1 and HTTP/2. Old clients and health checks continue to work, because Dox finds the protocol of each connection.</p>
-<p>You do not change your routes, middleware, or controllers.</p>
 <h2 id="read-the-protocol-of-a-request">Read the protocol of a request</h2>
-<p>To find the protocol of a request, read <code>req.protocolVersion</code>. The value is <code>2.0</code> for an HTTP/2 request. For an HTTP/1.x request, the value is <code>1.0</code> or <code>1.1</code>:</p>
+<p><code>req.protocolVersion</code> is <code>2.0</code> for an HTTP/2 request, and <code>1.0</code> or <code>1.1</code> for HTTP/1.x:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/protocol'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">protocolVersion</span><span class="p">;</span><span class="w"> </span><span class="c1">// '2.0'</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">});</span>
 </span></code></pre></div>
-<p>You can do a test with curl:</p>
+<p>Test it with curl:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>curl<span class="w"> </span>--http2-prior-knowledge<span class="w"> </span>http://localhost:3000/protocol
 </span></code></pre></div>
 <h2 id="limit-the-open-requests-on-one-connection">Limit the open requests on one connection</h2>
-<p>One HTTP/2 connection can have many open requests. <code>maxConcurrentStreams</code> sets the maximum number of open requests on one connection. The default is <code>250</code>. This value is correct for most apps.</p>
-<p>To let each client keep fewer open requests, set a lower number:</p>
+<p><code>maxConcurrentStreams</code> is the most open requests on one connection. The default is 250:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nl">http2:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">maxConcurrentStreams:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span>
@@ -7331,30 +7227,20 @@
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="use-a-proxy">Use a proxy</h2>
-<p>Dox uses h2c. h2c is HTTP/2 over plain TCP, without TLS. Your proxy must do the TLS.</p>
-<p>Browsers use HTTP/2 only with TLS. The browser sends HTTP/2 with TLS to the proxy, and the proxy sends the requests to Dox:</p>
+<p>Dox speaks <strong>h2c</strong>: HTTP/2 over plain TCP, with no TLS. Browsers use HTTP/2 only with TLS, so your proxy does the TLS:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>browser  --HTTP/2 + TLS--&gt;  proxy  --h2c or HTTP/1.1--&gt;  Dox
 </span></code></pre></div>
 <p>For the Caddy and nginx config, see <a href="../deployment/#http2-and-grpc">Deployment: HTTP/2 and gRPC</a>.</p>
-<h2 id="use-the-server-without-dox">Use the server without Dox</h2>
-<p>If you use the <a href="../native-server/">native server</a> without Dox, give the same two options to <code>NativeHttpServer.bind</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">NativeHttpServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="m">3000</span><span class="p">,</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">http2:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nl">maxConcurrentStreams:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">);</span>
-</span></code></pre></div>
 <h2 id="protection">Protection</h2>
-<p>HTTP/2 has some known attacks. Dox has protection against these attacks by default. You do not set anything.</p>
+<p>Dox has protection against the known HTTP/2 attacks by default:</p>
 <ul>
-<li><strong>Rapid Reset.</strong> A client can open requests and cancel them very quickly. This adds work to your app. In Dox, a cancelled request stays in the <code>maxConcurrentStreams</code> count until your handler stops. For this reason, the attack does not work. Dox does not close the connection of a normal client that has some timeouts.</li>
-<li><strong>Floods.</strong> If a client sends too many resets, <code>SETTINGS</code> frames, <code>PING</code> frames, or empty frames, Dox sends <code>GOAWAY ENHANCE_YOUR_CALM</code>. Then Dox closes the connection.</li>
-<li><strong>Large or slow bodies.</strong> A request body on HTTP/2 has the same limits as on HTTP/1.1: <code>maxBodySize</code>, <code>maxMultipartSize</code>, and <code>bodyTimeout</code>. See <a href="../../the-basic/request/#size-limits">Size limits</a>.</li>
-<li><strong>Idle and slow clients.</strong> A connection with no open request closes after <code>idleTimeout</code>. If a client does not read a response for 30 seconds, Dox stops that response.</li>
+<li>A cancelled request stays in the <code>maxConcurrentStreams</code> count until your handler stops. This stops the Rapid Reset attack.</li>
+<li>Too many resets, <code>SETTINGS</code> frames, <code>PING</code> frames or empty frames close the connection with <code>GOAWAY ENHANCE_YOUR_CALM</code>.</li>
+<li>A request body has the same limits as on HTTP/1.1. See <a href="../../the-basic/request/#size-limits">Size limits</a>.</li>
+<li>A connection with no open request closes after <code>idleTimeout</code>.</li>
 </ul>
-<p>On the internet, keep a proxy in front of Dox. See the <a href="../deployment/">deployment guide</a>.</p>
 <h2 id="benchmark">Benchmark</h2>
-<p>HTTP/2 is faster when a client sends many requests on one connection. On one isolate, HTTP/2 does approximately 1.6 times the requests of HTTP/1.1.</p>
+<p>On one isolate, HTTP/2 does approximately 1.6 times the requests of HTTP/1.1, when a client sends many requests on one connection.</p>
 <div class="dox-bench dox-bench--simple">
 <p class="dox-bench__title">One isolate: HTTP/2 is 1.6× faster</p>
 <p class="dox-bench__sub"><code>GET /</code> answers <code>Hello, World!</code>. The server has 4 cores and runs one isolate.</p>
@@ -7385,7 +7271,7 @@
 </div>
 <p class="dox-bench__foot"><span>Dox · one isolate · Linux · oha · median of 3 runs</span></p>
 </div>
-<p>The two HTTP/1.1 rows are almost the same. Thus, <code>http2: true</code> does not make your HTTP/1.1 clients slower.</p>
+<p>The two HTTP/1.1 rows are almost the same, so <code>http2: true</code> does not make HTTP/1.1 clients slower.</p>
 <table>
 <thead>
 <tr>
@@ -7420,10 +7306,21 @@
 <li>All tests ran in Linux containers on one machine with 8 cores. The server used 4 cores. The load tool, <a href="https://github.com/hatoo/oha">oha</a>, used the other 4 cores.</li>
 <li>Each number is the median of 3 runs. Each run took 10 seconds, after a warm up of 3 seconds.</li>
 </ul>
-<h2 id="details">Details</h2>
+<h2 id="without-dox">Without Dox</h2>
+<p>With the <a href="../native-server/">native server</a> on its own, give the same options to <code>NativeHttpServer.bind</code>. <code>http2ResetBurst</code> and <code>http2ResetRate</code> limit the resets of one connection. Raise them behind a proxy that sends many cancels:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">NativeHttpServer</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">NativeHttpServer</span><span class="p">.</span><span class="n">bind</span><span class="p">(</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="m">3000</span><span class="p">,</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nl">http2:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="nl">maxConcurrentStreams:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span><span class="nl">http2ResetBurst:</span><span class="w"> </span><span class="m">1000</span><span class="p">,</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nl">http2ResetRate:</span><span class="w"> </span><span class="m">100</span><span class="p">,</span><span class="w"> </span><span class="c1">// a second</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">);</span>
+</span></code></pre></div>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>Dox passes all 146 tests of the <a href="https://github.com/summerwind/h2spec">h2spec</a> conformance suite in strict mode.</li>
-<li><code>maxConcurrentStreams</code> must be 1 or more. Dox uses it only when <code>http2</code> is <code>true</code>.</li>
+<li><a href="../grpc/">gRPC</a>: gRPC services on the same server.</li>
+<li><a href="../native-server/">Native server</a>: the server below Dox.</li>
+<li><a href="../deployment/">Deployment</a>: put a proxy in front.</li>
 </ul>
 
 
@@ -7544,7 +7441,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

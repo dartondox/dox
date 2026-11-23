@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -5056,10 +5058,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5185,95 +5183,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -6389,10 +6298,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7274,10 +7183,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#see-also" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        See also
+        Next steps
       
     </span>
   </a>
@@ -7301,25 +7210,19 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/guides/docker.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="docker">Docker</h1>
 <p>Build a small production image with <code>dox build</code>, and run it with Postgres in Docker Compose, with a health check.</p>
-<p>A Docker image runs the same way on your laptop and on any server. The image in this guide holds only the compiled app, so it is small and starts fast.</p>
+<p>The image holds only the compiled app, so it is small and starts fast.</p>
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Dox app with a database.</li>
 <li>Docker with Compose.</li>
 </ul>
 <h2 id="1-add-a-health-route">1. Add a health route</h2>
-<p>Docker needs a way to know if the app works. Add a health route that it can ask. The route answers <code>503</code> when the database does not answer.</p>
-<p>Put it in <code>register()</code> of <code>WebRouter</code>. <code>QueryBuilder</code> comes from <code>package:dox_orm/dox_orm.dart</code>:</p>
+<p>Docker asks this route if the app works. It answers 503 when the database does not answer. Put it in <code>register()</code> of <code>WebRouter</code>:</p>
 <div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Route</span><span class="p">.</span><span class="n">health</span><span class="p">(</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">'/health'</span><span class="p">,</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">checks:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">HealthCheckFunction</span><span class="o">&gt;</span><span class="p">{</span>
@@ -7327,9 +7230,8 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">  </span><span class="p">},</span>
 </span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>See <a href="../../digging-deeper/health-check/">Health check</a> for more checks.</p>
 <h2 id="2-add-the-health-check-binary">2. Add the health check binary</h2>
-<p>The final image has no shell and no <code>curl</code>, so the health check is a second small Dart binary:</p>
+<p>The final image has no shell and no <code>curl</code>, so the health check is a small Dart binary:</p>
 <div class="language-dart highlight"><span class="filename">bin/health.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1">/// Docker health check. The final image has no shell and no curl,</span>
@@ -7350,7 +7252,7 @@
 </span><span id="__span-1-18"><a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="3-write-the-dockerfile">3. Write the Dockerfile</h2>
-<p>The Dockerfile has two stages. The first stage builds the AOT bundle. The second stage holds only the Dart runtime and the bundle, so the final image is small: about 17 MB for the blog API.</p>
+<p>The first stage builds the AOT bundle. The second stage holds only the Dart runtime and the bundle, about 17 MB for the blog API:</p>
 <div class="language-dockerfile highlight"><span class="filename">Dockerfile</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c"># Stage 1: build the AOT bundle with the Dart SDK and the dox CLI.</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">FROM</span><span class="w"> </span><span class="s">dart:stable</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">build</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
@@ -7394,15 +7296,13 @@
 </span><span id="__span-2-41"><a id="__codelineno-2-41" name="__codelineno-2-41" href="#__codelineno-2-41"></a><span class="w">  </span>CMD<span class="w"> </span><span class="o">[</span><span class="s2">"/app/bin/health"</span><span class="o">]</span>
 </span><span id="__span-2-42"><a id="__codelineno-2-42" name="__codelineno-2-42" href="#__codelineno-2-42"></a><span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">"/app/bin/server"</span><span class="p">]</span>
 </span></code></pre></div>
-<p>Delete the <code>public</code> lines if your app has no <code>public</code> folder.</p>
-<p>When the container starts, check the start log. It must end with <code>(native)</code>:</p>
+<p>Delete the <code>public</code> lines if your app has no <code>public</code> folder. Keep the <code>libgcc_s</code> lines. Without them, Dox stops at start with <code>dox_http_native did not load</code>.</p>
+<p>When the container starts, the start log must end with <code>(native)</code>:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[server] Server started at http://[::]:3000 with 8 isolate (native)
 </span></code></pre></div>
-<p>The <code>libgcc_s</code> lines are needed. Without them the native HTTP server does not load, and Dox stops at start with <code>dox_http_native did not load</code>.</p>
 <div class="admonition warning">
 <p class="admonition-title"><code>dox build</code>, not <code>dart compile exe</code></p>
-<p><code>dox_orm</code> bundles SQLite with a build hook. <code>dart compile exe</code> does not run build hooks and stops with an error.
-<code>dox build</code> runs <code>dart build cli</code>, which does. It puts the native libraries in <code>build/bundle/lib</code>, next to <code>bin/server</code>.</p>
+<p><code>dox_orm</code> bundles SQLite with a build hook. <code>dart compile exe</code> does not run build hooks and stops with an error. Build the server with <code>dox build</code>.</p>
 </div>
 <p>Keep the build context small with a <code>.dockerignore</code>:</p>
 <div class="language-text highlight"><span class="filename">.dockerignore</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>.dart_tool/
@@ -7419,7 +7319,7 @@
 </span><span id="__span-4-12"><a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>pubspec_overrides.yaml
 </span></code></pre></div>
 <h2 id="4-write-the-compose-file">4. Write the compose file</h2>
-<p>Docker Compose runs the app and Postgres together. <code>env_file: .env</code> gives the app your <code>.env</code>. The lines under <code>environment</code> win over the file, so the app always talks to the <code>postgres</code> service:</p>
+<p>Docker Compose runs the app and Postgres together. The lines under <code>environment</code> win over <code>.env</code>:</p>
 <div class="language-yaml highlight"><span class="filename">docker-compose.yml</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">services</span><span class="p">:</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">app</span><span class="p">:</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
@@ -7459,12 +7359,9 @@
 </span><span id="__span-5-37"><a id="__codelineno-5-37" name="__codelineno-5-37" href="#__codelineno-5-37"></a><span class="w">  </span><span class="nt">postgres</span><span class="p">:</span>
 </span><span id="__span-5-38"><a id="__codelineno-5-38" name="__codelineno-5-38" href="#__codelineno-5-38"></a><span class="w">  </span><span class="nt">uploads</span><span class="p">:</span>
 </span></code></pre></div>
-<ul>
-<li><code>depends_on</code> with <code>service_healthy</code> starts the app after Postgres answers. This matters because the app runs the migrations at start.</li>
-<li><code>${DB_PASSWORD:?...}</code> stops compose with a clear message if <code>.env</code> has no password.</li>
-<li>When the main isolate dies, the process exits and <code>restart: unless-stopped</code> starts it again.</li>
-</ul>
+<p><code>depends_on</code> starts the app after Postgres answers, because the app runs the migrations at start.</p>
 <h2 id="5-write-the-env">5. Write the <code>.env</code></h2>
+<p>Put the secrets in <code>.env</code>. It never goes into the image or into git:</p>
 <div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="na">APP_NAME</span><span class="o">=</span><span class="s">my_app</span>
 </span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="na">APP_ENV</span><span class="o">=</span><span class="s">production</span>
 </span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="na">APP_KEY</span><span class="o">=</span><span class="s">&lt;output of dox key:generate&gt;</span>
@@ -7475,33 +7372,33 @@
 </span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="na">DB_USERNAME</span><span class="o">=</span><span class="s">postgres</span>
 </span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="na">DB_PASSWORD</span><span class="o">=</span><span class="s">&lt;a real password&gt;</span>
 </span></code></pre></div>
-<p><code>.env</code> is in <code>.dockerignore</code> and <code>.gitignore</code>. It never goes into the image or into git.</p>
-<p>The app now uses Postgres, so the build needs the Postgres driver. A new app skips it in <code>pubspec.yaml</code>, so remove the <code>dox_postgres_native</code> skip lines.
-See <a href="../../database/#skip-unused-drivers">Skip unused drivers</a>.</p>
+<p>A new app skips the Postgres driver in <code>pubspec.yaml</code>. Remove the <code>dox_postgres_native</code> skip lines. See <a href="../../database/#skip-unused-drivers">Skip unused drivers</a>.</p>
 <h2 id="6-build-and-run">6. Build and run</h2>
+<p>Build the image and start both services:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w"> </span>--build
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>ps
 </span></code></pre></div>
 <h2 id="check-it">Check it</h2>
+<p>Both services are healthy:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>ps
 </span></code></pre></div>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>NAME             STATUS
 </span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>my_app-app-1       Up 30 seconds (healthy)
 </span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>my_app-postgres-1  Up 35 seconds (healthy)
 </span></code></pre></div>
+<p>Ask the health route:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>curl<span class="w"> </span>http://localhost:3000/health
 </span></code></pre></div>
 <div class="language-json highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="p">{</span><span class="nt">"status"</span><span class="p">:</span><span class="s2">"ok"</span><span class="p">,</span><span class="nt">"checks"</span><span class="p">:{</span><span class="nt">"database"</span><span class="p">:</span><span class="s2">"ok"</span><span class="p">}}</span>
 </span></code></pre></div>
-<p>To see the health check work, stop Postgres with <code>docker compose stop postgres</code>. After about 45 seconds, <code>docker compose ps</code> shows the app as <code>unhealthy</code>.</p>
+<p>Now stop Postgres with <code>docker compose stop postgres</code>. After about 45 seconds, <code>docker compose ps</code> shows the app as unhealthy.</p>
 <h2 id="https">HTTPS</h2>
-<p>Do not add TLS to the app itself. Put Caddy or nginx in front, and set <code>trustedProxies</code> in <code>AppConfig</code>.
-See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment: HTTPS</a>.</p>
-<h2 id="see-also">See also</h2>
+<p>Put Caddy or nginx in front of the app, and set <code>trustedProxies</code> in <code>AppConfig</code>. See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deployment: HTTPS</a>.</p>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li><a href="../../digging-deeper/deployment/">Deployment</a> for <code>dox build</code>, the bundle layout and systemd</li>
-<li><a href="../environments/">Environments</a> for dev, staging and production config</li>
-<li><a href="../../database/migration/#run-on-server-start">Migration: run on server start</a></li>
+<li><a href="../../digging-deeper/deployment/">Deployment</a>: <code>dox build</code>, the bundle and systemd.</li>
+<li><a href="../../digging-deeper/health-check/">Health check</a>: more checks.</li>
+<li><a href="../environments/">Environments</a>: dev, staging and production config.</li>
+<li><a href="../../database/migration/#run-on-server-start">Migration: run on server start</a>: the migrations at start.</li>
 </ul>
 
 
@@ -7622,7 +7519,7 @@ See <a href="../../digging-deeper/deployment/#https-put-a-proxy-in-front">Deploy
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

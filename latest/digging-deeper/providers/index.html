@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.">
+        <meta name="description" content="A provider is a class that sets up one part of your app in every isolate when it starts, like the database, auth or a Redis connection.">
       
       
       
@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../assets/style.css">
     
@@ -81,7 +83,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="Providers | Dox">
-  <meta property="og:description" content="A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.">
+  <meta property="og:description" content="A provider is a class that sets up one part of your app in every isolate when it starts, like the database, auth or a Redis connection.">
   <meta property="og:url" content="https://dartondox.dev/latest/digging-deeper/providers/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -90,7 +92,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Providers | Dox">
-  <meta name="twitter:description" content="A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.">
+  <meta name="twitter:description" content="A provider is a class that sets up one part of your app in every isolate when it starts, like the database, auth or a Redis connection.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -3060,40 +3062,39 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#writing-providers" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Writing providers
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Writing providers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-setup-method" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The setup method
+        Setup
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#the-boot-method" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-a-part-of-the-app" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The boot method
+        Setting up a part of the app
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
+  <a href="#running-code-after-all-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running code after all providers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#clean-up-on-shutdown" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3103,25 +3104,8 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
-  <a href="#registering-providers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Registering providers
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Registering providers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#choosing-the-order" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3131,8 +3115,8 @@
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#adding-a-provider-in-code" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3142,9 +3126,26 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#adding-global-middleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding global middleware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#work-only-in-the-web-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Work only in the web server
+      
+    </span>
+  </a>
   
 </li>
       
@@ -3160,10 +3161,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -5233,10 +5234,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5362,95 +5359,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7170,40 +7078,39 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#writing-providers" class="md-nav__link">
+  <a href="#setup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Writing providers
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Writing providers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-setup-method" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The setup method
+        Setup
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#the-boot-method" class="md-nav__link">
+      
+        <li class="md-nav__item">
+  <a href="#setting-up-a-part-of-the-app" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The boot method
+        Setting up a part of the app
       
     </span>
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
+  <a href="#running-code-after-all-providers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running code after all providers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#clean-up-on-shutdown" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7213,25 +7120,8 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
       
         <li class="md-nav__item">
-  <a href="#registering-providers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Registering providers
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Registering providers">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
   <a href="#choosing-the-order" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7241,8 +7131,8 @@
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#adding-a-provider-in-code" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7252,9 +7142,26 @@
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#adding-global-middleware" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adding global middleware
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#work-only-in-the-web-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Work only in the web server
+      
+    </span>
+  </a>
   
 </li>
       
@@ -7270,10 +7177,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
@@ -7297,24 +7204,19 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/digging-deeper/providers.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="providers">Providers</h1>
-<p>A provider is a class that sets up one part of your app when it starts, for example the database, auth or a Redis connection.</p>
-<p>Dox runs your app on many <a href="../isolate/">isolates</a>, and they do not share memory. So code that you run once in <code>bin/server.dart</code> only sets up the first isolate, and the others have, for example, no database connection. A provider fixes this, because each isolate runs it itself.</p>
-<h2 id="writing-providers">Writing providers</h2>
-<p>To make a provider, run <code>dox make:provider</code>. It writes <code>lib/providers/cache_provider.dart</code> with an empty <code>setup()</code>:</p>
+<p>A provider is a class that sets up one part of your app in every isolate when it starts, like the database, auth or a Redis connection.</p>
+<p>Dox runs your app on many <a href="../isolate/">isolates</a>, and they do not share memory. So code in <code>bin/server.dart</code> sets up only the first isolate. Each isolate runs every provider itself.</p>
+<h2 id="setup">Setup</h2>
+<p>Make a provider with the CLI. It writes <code>lib/providers/cache_provider.dart</code>:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>dox<span class="w"> </span>make:provider<span class="w"> </span>Cache
 </span></code></pre></div>
-<p>See <a href="../../reference/cli/#dox-makeprovider"><code>dox make:provider</code></a>.</p>
-<h3 id="the-setup-method">The setup method</h3>
-<p>A provider extends <code>DoxProvider</code>. Put your code in <code>setup()</code>. It runs when the app starts, and it can be <code>async</code>, because Dox waits for it:</p>
+<p>Dox finds every class that extends <code>DoxProvider</code> after <code>dart run build_runner build</code>. You do not register it. Its constructor can ask for other classes of the container. See <a href="../../the-basic/dependency-injection/#routers-and-providers">Dependency injection</a>.</p>
+<h2 id="setting-up-a-part-of-the-app">Setting up a part of the app</h2>
+<p>Put the code in <code>setup()</code>. It runs in each isolate before the routes are registered, and Dox waits for it:</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/orm_provider.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/database.dart'</span><span class="p">;</span>
@@ -7324,19 +7226,12 @@
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">    </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">initializeWithDatabaseConfig</span><span class="p">(</span><span class="n">databaseConfig</span><span class="p">);</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="w">  </span><span class="c1">/// Close the database connections when the server stops.</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="n">Future</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="w"> </span><span class="n">shutdown</span><span class="p">()</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">SqlQueryBuilder</span><span class="p">.</span><span class="n">close</span><span class="p">();</span>
-</span><span id="__span-1-15"><a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-1-16"><a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a><span class="p">}</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>Open connections in <code>setup()</code>, not in the constructor. A provider listed in <code>AppConfig</code> is copied to each isolate. An open socket or database pool can not be copied, so the isolate fails to start.</p>
-<p>Keep <code>setup()</code> short, because it runs once per isolate. Data you load in it is also kept once per isolate, so 8 isolates keep 8 copies.</p>
-<p>A package that does not use <code>dox_core</code> imports <code>DoxProvider</code> from <code>package:dox_annotation/provider.dart</code>.</p>
-<h3 id="the-boot-method">The boot method</h3>
-<p>Sometimes a provider needs other providers to be ready, for example to start a background worker. Use <code>boot()</code> for this. It runs after <code>setup()</code> of every provider is done:</p>
+<p>Open connections in <code>setup()</code>, not in the constructor. Dox copies a provider to each isolate, and an open socket can not be copied.</p>
+<p>A package with no <code>dox_core</code> dependency imports <code>DoxProvider</code> from <code>package:dox_annotation/provider.dart</code>.</p>
+<h2 id="running-code-after-all-providers">Running code after all providers</h2>
+<p><code>boot()</code> runs after <code>setup()</code> of every provider is done. Use it for work that needs the other providers, like a background worker:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">ReportProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="nd">@override</span>
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{}</span>
@@ -7347,10 +7242,9 @@
 </span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The boots run one by one, in the provider order. <code>boot()</code> is optional.</p>
-<p>The web server and the queue worker (<code>bin/queue.dart</code>) run <code>boot()</code>. The scheduler (<code>bin/schedule.dart</code>) and <code>dox openapi:generate</code> do not. They run only <code>setup()</code>.</p>
-<h3 id="clean-up-on-shutdown">Clean up on shutdown</h3>
-<p>When the app stops, you often want to close connections or flush data. Use <code>shutdown()</code> for this. On <code>SIGTERM</code> or <code>SIGINT</code>, Dox stops the server gracefully (see <a href="../deployment/#graceful-shutdown">Deployment</a>). After the open requests are done, it runs <code>shutdown()</code> of every provider, in every isolate:</p>
+<p>The web server and the queue worker (<code>bin/queue.dart</code>) run <code>boot()</code>. The scheduler (<code>bin/schedule.dart</code>) and <code>dox openapi:generate</code> run only <code>setup()</code>.</p>
+<h2 id="clean-up-on-shutdown">Clean up on shutdown</h2>
+<p><code>shutdown()</code> runs in every isolate when the server stops, after the open requests are done. See <a href="../deployment/#graceful-shutdown">Graceful shutdown</a>:</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/redis_provider.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">RedisProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="kd">late</span><span class="w"> </span><span class="n">RedisConnection</span><span class="w"> </span><span class="n">redis</span><span class="p">;</span>
 </span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
@@ -7365,53 +7259,63 @@
 </span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="w">  </span><span class="p">}</span>
 </span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a><span class="p">}</span>
 </span></code></pre></div>
-<p><code>shutdown()</code> is optional. The <code>ORMProvider</code> of a new project already closes the database here. Dox closes the cache stores (like Redis) by itself, after the providers.</p>
-<p>An error in <code>shutdown()</code> goes to the <code>report</code> method of the <a href="../../the-basic/errors/">exception handler</a>. The other providers still run.</p>
-<h2 id="registering-providers">Registering providers</h2>
-<p>You do not need to register a provider. Dox finds every class that extends <code>DoxProvider</code>. Run <code>dart run build_runner build</code>, and the provider is then in <code>lib/generated/container.g.dart</code>.</p>
-<p>Each isolate makes its own instance from the container, so its constructor can ask for other classes of the container. See <a href="../../the-basic/dependency-injection/#routers-and-providers">Dependency injection</a>.</p>
-<h3 id="choosing-the-order">Choosing the order</h3>
-<p>Providers run in the order of their file path. If one provider must run first, list it in <code>AppConfig</code>:</p>
+<p>Dox closes the cache stores by itself. An error in <code>shutdown()</code> goes to the <a href="../../the-basic/errors/">exception handler</a>, and the other providers still run.</p>
+<h2 id="choosing-the-order">Choosing the order</h2>
+<p>Providers run in the order of their file path. List a provider in <code>AppConfig</code> to run it first:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/app.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">AppConfig</span><span class="w"> </span><span class="n">appConfig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">AppConfig</span><span class="p">(</span>
 </span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nl">container:</span><span class="w"> </span><span class="n">registerContainer</span><span class="p">,</span>
 </span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">providers:</span><span class="w"> </span><span class="o">&lt;</span><span class="n">DoxProvider</span><span class="o">&gt;</span><span class="p">[</span><span class="n">ORMProvider</span><span class="p">()],</span><span class="w"> </span><span class="c1">// runs before the others</span>
 </span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="p">);</span>
 </span></code></pre></div>
-<p>A listed provider runs first, then the others run. No provider runs twice.</p>
-<h3 id="adding-a-provider-in-code">Adding a provider in code</h3>
-<p>You can also add a provider in <code>bin/server.dart</code>, before <code>startServer()</code>:</p>
+<p>No provider runs twice.</p>
+<h2 id="adding-a-provider-in-code">Adding a provider in code</h2>
+<p>Call <code>Dox().addProvider()</code> or <code>Dox().addProviders()</code> before <code>startServer()</code>:</p>
 <div class="language-dart highlight"><span class="filename">bin/server.dart</span><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Dox</span><span class="p">().</span><span class="n">initialize</span><span class="p">(</span><span class="n">appConfig</span><span class="p">);</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">Dox</span><span class="p">().</span><span class="n">addProvider</span><span class="p">(</span><span class="n">MyProvider</span><span class="p">());</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">startServer</span><span class="p">();</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">Dox</span><span class="p">().</span><span class="n">addProviders</span><span class="p">(</span><span class="o">&lt;</span><span class="n">DoxProvider</span><span class="o">&gt;</span><span class="p">[</span><span class="n">OtherProvider</span><span class="p">()]);</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">Dox</span><span class="p">().</span><span class="n">startServer</span><span class="p">();</span>
+</span></code></pre></div>
+<h2 id="adding-global-middleware">Adding global middleware</h2>
+<p>A provider can add a global middleware in <code>setup()</code>. It runs before the middleware of the app. See <a href="../../the-basic/middleware/#global-middleware">Middleware</a>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@override</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="n">Dox</span><span class="p">().</span><span class="n">addGlobalMiddleware</span><span class="p">(</span><span class="n">AuditMiddleware</span><span class="p">());</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="work-only-in-the-web-server">Work only in the web server</h2>
+<p><code>Dox().isWebServer</code> is true only in the web server process. It is false in the queue worker, the scheduler and tests:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@override</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kt">void</span><span class="w"> </span><span class="n">boot</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Dox</span><span class="p">().</span><span class="n">isWebServer</span><span class="p">)</span><span class="w"> </span><span class="n">startMetrics</span><span class="p">();</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="example-auth">Example: auth</h2>
-<p>This provider sets up <a href="../../security/authentication/">authentication</a>:</p>
-<div class="language-dart highlight"><span class="filename">lib/providers/auth_provider.dart</span><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppAuthProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">  </span><span class="nd">@override</span>
-</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">    </span><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">AuthConfig</span><span class="p">(</span>
-</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">      </span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span>
-</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">      </span><span class="nl">guards:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">AuthGuard</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">        </span><span class="s1">'web'</span><span class="o">:</span><span class="w"> </span><span class="n">AuthGuard</span><span class="p">(</span>
-</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">          </span><span class="nl">driver:</span><span class="w"> </span><span class="n">JwtAuthDriver</span><span class="p">(</span><span class="nl">secret:</span><span class="w"> </span><span class="n">SecretKey</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">)),</span>
-</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">          </span><span class="nl">provider:</span><span class="w"> </span><span class="n">AuthProvider</span><span class="p">(</span><span class="nl">model:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">()),</span>
-</span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="w">        </span><span class="p">),</span>
-</span><span id="__span-6-16"><a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a><span class="w">      </span><span class="p">},</span>
-</span><span id="__span-6-17"><a id="__codelineno-6-17" name="__codelineno-6-17" href="#__codelineno-6-17"></a><span class="w">    </span><span class="p">));</span>
-</span><span id="__span-6-18"><a id="__codelineno-6-18" name="__codelineno-6-18" href="#__codelineno-6-18"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-6-19"><a id="__codelineno-6-19" name="__codelineno-6-19" href="#__codelineno-6-19"></a><span class="p">}</span>
+<p>This provider sets up <a href="../../security/authentication/">authentication</a>. Its name is <code>AppAuthProvider</code>, because <code>dox_auth</code> already has an <code>AuthProvider</code> class:</p>
+<div class="language-dart highlight"><span class="filename">lib/providers/auth_provider.dart</span><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_auth/dox_auth.dart'</span><span class="p">;</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/app/models/user/user.model.dart'</span><span class="p">;</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/env.dart'</span><span class="p">;</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="kd">class</span><span class="w"> </span><span class="nc">AppAuthProvider</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">DoxProvider</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="nd">@override</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="kt">void</span><span class="w"> </span><span class="n">setup</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="w">    </span><span class="n">Auth</span><span class="p">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">AuthConfig</span><span class="p">(</span>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="w">      </span><span class="nl">defaultGuard:</span><span class="w"> </span><span class="s1">'web'</span><span class="p">,</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="w">      </span><span class="nl">guards:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">AuthGuard</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">        </span><span class="s1">'web'</span><span class="o">:</span><span class="w"> </span><span class="n">AuthGuard</span><span class="p">(</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">          </span><span class="nl">driver:</span><span class="w"> </span><span class="n">JwtAuthDriver</span><span class="p">(</span><span class="nl">secret:</span><span class="w"> </span><span class="n">SecretKey</span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">appKey</span><span class="p">)),</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">          </span><span class="nl">provider:</span><span class="w"> </span><span class="n">AuthProvider</span><span class="p">(</span><span class="nl">model:</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">User</span><span class="p">()),</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="w">        </span><span class="p">),</span>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="w">      </span><span class="p">},</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="w">    </span><span class="p">));</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">  </span><span class="p">}</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="p">}</span>
 </span></code></pre></div>
-<p>The class is named <code>AppAuthProvider</code>, because <code>dox_auth</code> already has a class named <code>AuthProvider</code> (it finds the user model).</p>
-<h2 id="details">Details</h2>
+<h2 id="next-steps">Next steps</h2>
 <ul>
-<li>In each isolate, Dox runs <code>setup()</code> of each provider one after the other: the listed ones first, then the ones of the container. Then it registers the routes and starts the server, so routes can use what a provider set up. See <a href="../isolate/#what-each-isolate-does-at-start">What each isolate does at start</a>.</li>
-<li><code>dox openapi:generate</code> also runs <code>setup()</code> of every provider, because it needs the routes.</li>
-<li>The queue <code>inProcess</code> worker starts in <code>boot()</code>, so it does not run in the scheduler process.</li>
+<li><a href="../isolate/#what-each-isolate-does-at-start">Isolate</a>: what each isolate does at start.</li>
+<li><a href="../../the-basic/dependency-injection/">Dependency injection</a>: the container.</li>
+<li><a href="../package-commands/">Package commands</a>: add CLI commands from a package.</li>
 </ul>
 
 
@@ -7532,7 +7436,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>

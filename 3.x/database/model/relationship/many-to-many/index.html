@@ -49,10 +49,12 @@
         
         
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Instrument+Sans:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
-        <style>:root{--md-text-font:"Instrument Sans";--md-code-font:"JetBrains Mono"}</style>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Onest:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Onest";--md-code-font:"JetBrains Mono"}</style>
       
     
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap">
     
       <link rel="stylesheet" href="../../../../assets/style.css">
     
@@ -4491,6 +4493,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#tables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4500,8 +4514,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#defining-the-relation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4510,14 +4524,13 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Defining the relation">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#custom-keys" class="md-nav__link">
+  <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Custom keys
+        Options
       
     </span>
   </a>
@@ -4585,12 +4598,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#reading-pivot-columns" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -4599,18 +4607,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Reading pivot columns">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pivot-timestamps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pivot timestamps
-      
-    </span>
-  </a>
-  
 </li>
         
       </ul>
@@ -4619,15 +4615,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#changing-the-links" class="md-nav__link">
+  <a href="#saving-related-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Changing the links
+        Saving related models
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Changing the links">
+    <nav class="md-nav" aria-label="Saving related models">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -4713,63 +4709,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#all-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        All options
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#null-and-unsaved-ids" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Null and unsaved ids
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-ids-match" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How ids match
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -5411,10 +5357,6 @@
       
         
       
-        
-      
-        
-      
     
     
     
@@ -5540,95 +5482,6 @@
     
   
     OpenAPI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../packages/storage/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-hard-drive"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M10 16h.01" />
-  <path d="M2.212 11.577a2 2 0 0 0-.212.896V18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5.527a2 2 0 0 0-.212-.896L18.55 5.11A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  <path d="M21.946 12.013H2.054" />
-  <path d="M6 16h.01" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../../packages/cache/" class="md-nav__link">
-        
-  
-  
-    <svg
-  class="lucide lucide-zap"
-  xmlns="http://www.w3.org/2000/svg"
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
->
-  <path d="M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z" />
-</svg>
-  
-  <span class="md-ellipsis">
-    
-  
-    Cache
   
 
     
@@ -7348,6 +7201,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#tables" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7357,8 +7222,8 @@
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#defining-the-relation" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7367,14 +7232,13 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Defining the relation">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#custom-keys" class="md-nav__link">
+  <a href="#options" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Custom keys
+        Options
       
     </span>
   </a>
@@ -7442,12 +7306,7 @@
   
 </li>
         
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
+          <li class="md-nav__item">
   <a href="#reading-pivot-columns" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -7456,18 +7315,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Reading pivot columns">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#pivot-timestamps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pivot timestamps
-      
-    </span>
-  </a>
-  
 </li>
         
       </ul>
@@ -7476,15 +7323,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#changing-the-links" class="md-nav__link">
+  <a href="#saving-related-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Changing the links
+        Saving related models
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Changing the links">
+    <nav class="md-nav" aria-label="Saving related models">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -7570,63 +7417,13 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#details" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Details
+        Next steps
       
     </span>
   </a>
-  
-    <nav class="md-nav" aria-label="Details">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#all-options" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        All options
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#null-and-unsaved-ids" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Null and unsaved ids
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#how-ids-match" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        How ids match
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#other-cases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other cases
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -7647,18 +7444,14 @@
 
 
   
-    <a href="https://github.com/dartondox/dox/edit/main/docs/database/model/relationship/many-to-many.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
-      
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 20H6V4h7v5h5v3.1l2-2V8l-6-6H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h4zm10.2-7c.1 0 .3.1.4.2l1.3 1.3c.2.2.2.6 0 .8l-1 1-2.1-2.1 1-1c.1-.1.2-.2.4-.2m0 3.9L14.1 23H12v-2.1l6.1-6.1z"/></svg>
-    </a>
-  
   
 
 
 <h1 id="manytomany">ManyToMany</h1>
 <p>Use <code>ManyToMany</code> when rows on both sides can have many rows on the other side.</p>
-<p>For example, an artist has many songs, and a song has many artists. The link is kept in a third table, the pivot table. It has one foreign key to each side.</p>
-<h2 id="tables">Tables</h2>
+<p>For example, an artist has many songs, and a song has many artists. A third table, the <strong>pivot table</strong>, keeps the links. It has one foreign key to each side.</p>
+<h2 id="setup">Setup</h2>
+<h3 id="tables">Tables</h3>
 <table>
 <thead>
 <tr>
@@ -7681,264 +7474,194 @@
 </tr>
 </tbody>
 </table>
-<p>A migration for the pivot table:</p>
+<p>The default pivot table name is the two class names in snake_case, in A-Z order, joined with <code>_</code>. A migration for it:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">schema</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="s1">'artist_song'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">Table</span><span class="w"> </span><span class="n">table</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">id</span><span class="p">();</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">foreignId</span><span class="p">(</span><span class="s1">'artist_id'</span><span class="p">).</span><span class="n">constrained</span><span class="p">(</span><span class="s1">'artist'</span><span class="p">).</span><span class="n">cascadeOnDelete</span><span class="p">();</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="n">table</span><span class="p">.</span><span class="n">foreignId</span><span class="p">(</span><span class="s1">'song_id'</span><span class="p">).</span><span class="n">constrained</span><span class="p">(</span><span class="s1">'song'</span><span class="p">).</span><span class="n">cascadeOnDelete</span><span class="p">();</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">});</span>
 </span></code></pre></div>
-<p>By default the pivot table name is the two class names in snake_case, in A-Z order, joined with <code>_</code>. So <code>Artist</code> and <code>Song</code> give <code>artist_song</code>, and <code>BlogPost</code> and <code>Tag</code> give <code>blog_post_tag</code>. The table names of the models do not change this.</p>
-<h2 id="defining-the-relation">Defining the relation</h2>
-<p>Add a field with <code>@ManyToMany(...)</code> to each model that needs it. The field type is a list of the related model. Start it as an empty list:</p>
-<div class="language-dart highlight"><span class="filename">lib/app/models/artist/artist.model.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../song/song.model.dart'</span><span class="p">;</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">part</span><span class="w"> </span><span class="s1">'artist.model.g.dart'</span><span class="p">;</span>
+<h3 id="defining-the-relation">Defining the relation</h3>
+<p>Add a list field with <code>@ManyToMany()</code> to each model that needs it, and start it as an empty list:</p>
+<div class="language-dart highlight"><span class="filename">lib/app/models/artist/artist.model.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Artist</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ArtistGenerator</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">)</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
 </span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
 </span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Artist</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ArtistGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">name</span><span class="p">;</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a><span class="w">  </span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">)</span>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a><span class="p">}</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Song</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SongGenerator</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="w">  </span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Artist</span><span class="p">)</span>
+</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="p">[];</span>
+</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="p">}</span>
 </span></code></pre></div>
-<div class="language-dart highlight"><span class="filename">lib/app/models/song/song.model.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_orm/dox_orm.dart'</span><span class="p">;</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'../artist/artist.model.dart'</span><span class="p">;</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="k">part</span><span class="w"> </span><span class="s1">'song.model.g.dart'</span><span class="p">;</span>
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Song</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">SongGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nd">@Column</span><span class="p">()</span>
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="n">title</span><span class="p">;</span>
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">  </span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Artist</span><span class="p">)</span>
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="p">[];</span>
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">}</span>
+<p>Run <code>dart run build_runner build</code> after you add a relation.</p>
+<h3 id="options">Options</h3>
+<p>Set the names when your pivot table or columns have other names:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="n">Song</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nl">pivotTable:</span><span class="w"> </span><span class="s1">'artist_song'</span><span class="p">,</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">pivotForeignKey:</span><span class="w"> </span><span class="s1">'artist_id'</span><span class="p">,</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span><span class="nl">pivotRelatedForeignKey:</span><span class="w"> </span><span class="s1">'song_id'</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="p">)</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
 </span></code></pre></div>
-<p>Run <code>dart run build_runner build</code> after you add a relationship.</p>
-<h3 id="custom-keys">Custom keys</h3>
-<p>If your pivot table or columns have other names, set them:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="n">Song</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">pivotTable:</span><span class="w"> </span><span class="s1">'artist_song'</span><span class="p">,</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">pivotForeignKey:</span><span class="w"> </span><span class="s1">'artist_id'</span><span class="p">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">pivotRelatedForeignKey:</span><span class="w"> </span><span class="s1">'song_id'</span><span class="p">,</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nl">localKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span>
-</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">  </span><span class="nl">relatedKey:</span><span class="w"> </span><span class="s1">'id'</span><span class="p">,</span>
-</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="p">)</span>
-</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
-</span></code></pre></div>
-<h2 id="loading-the-relation">Loading the relation</h2>
-<p>The relation is not loaded by default. Use the field name (<code>'songs'</code>) as the relation name.</p>
-<h3 id="preloading">Preloading</h3>
-<p>Use <code>preload</code> when you load the models with a query. For a list of models, it runs one query for all of them. A model without links gets an empty list:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">Artist</span><span class="o">?</span><span class="w"> </span><span class="n">artist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">print</span><span class="p">(</span><span class="n">artist</span><span class="o">?</span><span class="p">.</span><span class="n">songs</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Song</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'artists'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<p><code>preload</code> works with <code>find</code>, <code>get</code>, <code>all</code> and <code>getFirst</code>.</p>
-<h3 id="loading-on-a-model-you-have">Loading on a model you have</h3>
-<p>If you already have the model, use <code>$getRelation</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">Artist</span><span class="o">?</span><span class="w"> </span><span class="n">artist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="o">?</span><span class="p">.</span><span class="n">$getRelation</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">);</span>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">print</span><span class="p">(</span><span class="n">artist</span><span class="o">?</span><span class="p">.</span><span class="n">songs</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="querying-the-relation">Querying the relation</h3>
-<p>Sometimes you need more conditions on the related rows. <code>related</code> gives you a query for them. It does not set <code>artist.songs</code>.</p>
-<p>The query joins the pivot table, so write <code>table.column</code> for column names:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">Artist</span><span class="o">?</span><span class="w"> </span><span class="n">artist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">artist</span>
-</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">        </span><span class="o">?</span><span class="p">.</span><span class="n">related</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">)</span>
-</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">        </span><span class="o">?</span><span class="p">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'song.title'</span><span class="p">)</span>
-</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">        </span><span class="p">.</span><span class="kd">get</span><span class="p">()</span><span class="w"> </span><span class="o">??</span>
-</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
-</span></code></pre></div>
-<h3 id="always-loading-the-relation">Always loading the relation</h3>
-<p>If every query of <code>Artist</code> should load the relation, set <code>eager: true</code>. Then you do not call <code>preload</code>. Do not set <code>eager: true</code> on both sides, because each side would load the other side again and again:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">eager:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
-</span></code></pre></div>
-<h2 id="reading-pivot-columns">Reading pivot columns</h2>
-<p>The pivot table can have more columns, like a <code>role</code>. List them in <code>withPivot</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">withPivot:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'role'</span><span class="p">])</span>
-</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
-</span></code></pre></div>
-<p>Then read them with <code>pivot</code> on each related model:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">Artist</span><span class="o">?</span><span class="w"> </span><span class="n">artist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Song</span><span class="w"> </span><span class="n">song</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">artist</span><span class="o">!</span><span class="p">.</span><span class="n">songs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="n">song</span><span class="p">.</span><span class="n">pivot</span><span class="p">[</span><span class="s1">'role'</span><span class="p">]);</span>
-</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="p">}</span>
-</span></code></pre></div>
-<p><code>pivot</code> also has the two pivot keys, like <code>artist_id</code> and <code>song_id</code>. It is filled when the rows are loaded by the relation: with <code>preload</code>, <code>$getRelation</code>, <code>eager</code> or <code>related('songs')!.get()</code>. A model that was not loaded by the relation has an empty <code>pivot</code>.</p>
-<h3 id="pivot-timestamps">Pivot timestamps</h3>
-<p>If you want <code>created_at</code> and <code>updated_at</code> on the pivot rows, set <code>withTimestamps: true</code>. The pivot table needs both columns (<code>table.timestamps()</code>). Then <code>attach()</code>, <code>sync()</code> and <code>toggle()</code> set them, and <code>updateExistingPivot()</code> sets <code>updated_at</code>.</p>
-<h2 id="changing-the-links">Changing the links</h2>
-<p>These methods add and remove rows in the pivot table. The first argument is the relation name, like <code>'songs'</code>. Save the model first, because a model without an id throws a <code>StateError</code>.</p>
-<p>The ids can be:</p>
-<ul>
-<li>one id: <code>1</code></li>
-<li>a model: <code>song</code></li>
-<li>a list of ids or models: <code>[1, 2, song]</code></li>
-<li>a map of <code>id =&gt; pivot values</code>: <code>{1: {'role': 'singer'}, 2: {}}</code></li>
-</ul>
-<p>Each id is used once, so <code>[1, 1, '1']</code> adds one row.</p>
-<h3 id="attaching">Attaching</h3>
-<p><code>attach</code> adds a pivot row for each id. The third argument has the pivot values for every new row:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">);</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">],</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="s1">'singer'</span><span class="p">});</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="m">4</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="s1">'writer'</span><span class="p">},</span>
-</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="p">});</span>
-</span></code></pre></div>
-<p><code>attach</code> does not check for a row that is already there. If the row may be there, use <code>sync</code> or <code>syncWithoutDetaching</code>.</p>
-<h3 id="detaching">Detaching</h3>
-<p><code>detach</code> deletes the pivot rows of the ids and returns how many rows it deleted. With no ids argument, it deletes every pivot row of the model. The songs stay in the <code>song</code> table:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">detach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]);</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">detach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="syncing">Syncing</h3>
-<p><code>sync</code> makes the pivot rows match the ids. It adds a row for each new id, deletes the rows of the ids that are not in the list, and sets changed pivot values on the rows that are already there.</p>
-<p>It returns a <code>PivotSyncResult</code> with the ids of each change:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="n">PivotSyncResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="kd">sync</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">attached</span><span class="p">);</span><span class="w"> </span><span class="c1">// ids that got a new row</span>
-</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">detached</span><span class="p">);</span><span class="w"> </span><span class="c1">// ids whose row was deleted</span>
-</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">updated</span><span class="p">);</span><span class="w">  </span><span class="c1">// ids whose pivot values changed</span>
-</span></code></pre></div>
-<p>If you only want to add links and never delete, use <code>syncWithoutDetaching</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">syncWithoutDetaching</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">4</span><span class="p">]);</span>
-</span></code></pre></div>
-<h3 id="toggling">Toggling</h3>
-<p><code>toggle</code> adds a row for each id that has none, and deletes the row of each id that has one. It returns a <code>PivotSyncResult</code> with <code>attached</code> and <code>detached</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">toggle</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]);</span>
-</span></code></pre></div>
-<h3 id="updating-pivot-values">Updating pivot values</h3>
-<p><code>updateExistingPivot</code> sets pivot values on the rows of one id or a list of ids. It returns how many rows changed:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">updateExistingPivot</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="s1">'writer'</span><span class="p">});</span>
-</span></code></pre></div>
-<h2 id="filtering-by-the-relation">Filtering by the relation</h2>
-<p><code>whereHas()</code> keeps the artists that have a song. It checks the pivot table <code>artist_song</code> for you, and it does not load the songs:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Yesterday'</span><span class="p">);</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">noSongs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">whereDoesntHave</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
-</span></code></pre></div>
-<p>See <a href="../../relation-queries/">Query by relations</a>.</p>
-<h2 id="changing-the-relation-query">Changing the relation query</h2>
-<p>Sometimes the relation should only load some rows. Give <code>onQuery</code> a static function in the same model class. It gets the query of the related model and returns it. Write <code>table.column</code>, because the query joins the pivot table:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="nd">@DoxModel</span><span class="p">()</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kd">class</span><span class="w"> </span><span class="nc">Artist</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">ArtistGenerator</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">  </span><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">onQuery:</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">)</span>
-</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="w">  </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
-</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
-</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="w">  </span><span class="kd">static</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">(</span><span class="n">Song</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'song.status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'published'</span><span class="p">);</span>
-</span><span id="__span-17-8"><a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a><span class="w">  </span><span class="p">}</span>
-</span><span id="__span-17-9"><a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="p">}</span>
-</span></code></pre></div>
-<h2 id="details">Details</h2>
-<h3 id="all-options">All options</h3>
-<p>The examples are for <code>@ManyToMany(Song)</code> in the <code>Artist</code> model.</p>
+<p>The examples are for <code>@ManyToMany(Song)</code> in the <code>Artist</code> model:</p>
 <table>
 <thead>
 <tr>
 <th>Option</th>
 <th>Default</th>
-<th>Example value</th>
 <th>What it is</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>pivotTable</code></td>
-<td>the two model names in A-Z order, joined with <code>_</code></td>
-<td><code>artist_song</code></td>
+<td>the two class names in A-Z order, like <code>artist_song</code></td>
 <td>The pivot table.</td>
 </tr>
 <tr>
 <td><code>pivotForeignKey</code></td>
-<td><code>{this model}_id</code></td>
-<td><code>artist_id</code></td>
+<td><code>{this model}_id</code>, like <code>artist_id</code></td>
 <td>The pivot column that points to this model.</td>
 </tr>
 <tr>
 <td><code>pivotRelatedForeignKey</code></td>
-<td><code>{related model}_id</code></td>
-<td><code>song_id</code></td>
+<td><code>{related model}_id</code>, like <code>song_id</code></td>
 <td>The pivot column that points to the related model.</td>
 </tr>
 <tr>
 <td><code>localKey</code></td>
 <td>the primary key of this model</td>
-<td><code>id</code></td>
 <td>The column in <code>artist</code> that <code>pivotForeignKey</code> points to.</td>
 </tr>
 <tr>
 <td><code>relatedKey</code></td>
 <td>the primary key of the related model</td>
-<td><code>id</code></td>
 <td>The column in <code>song</code> that <code>pivotRelatedForeignKey</code> points to.</td>
 </tr>
 <tr>
 <td><code>withPivot</code></td>
 <td>none</td>
-<td><code>['role']</code></td>
-<td>Extra pivot columns to read. See <a href="#reading-pivot-columns">Reading pivot columns</a>.</td>
+<td>More pivot columns to read, like <code>['role']</code>.</td>
 </tr>
 <tr>
 <td><code>withTimestamps</code></td>
 <td><code>false</code></td>
-<td><code>true</code></td>
 <td>Read and set <code>created_at</code> and <code>updated_at</code> in the pivot table.</td>
 </tr>
 <tr>
 <td><code>onQuery</code></td>
 <td>none</td>
-<td></td>
 <td>A static function that changes the query.</td>
 </tr>
 <tr>
 <td><code>eager</code></td>
 <td><code>false</code></td>
-<td></td>
 <td>Load the relation on every query.</td>
 </tr>
 </tbody>
 </table>
-<h3 id="null-and-unsaved-ids">Null and unsaved ids</h3>
-<ul>
-<li><code>null</code> means no ids. So <code>attach('songs', null)</code> and <code>detach('songs', null)</code> change nothing, and <code>sync('songs', null)</code> deletes every link, like <code>sync('songs', [])</code>.</li>
-<li>In a list, a <code>null</code> id or a model that is not saved is skipped by <code>attach</code>, <code>detach</code>, <code>toggle</code>, <code>syncWithoutDetaching</code> and <code>updateExistingPivot</code>.</li>
-<li><code>sync</code> throws an <code>ArgumentError</code> for one, before it changes anything, because it would delete every other link.</li>
-</ul>
-<h3 id="how-ids-match">How ids match</h3>
-<ul>
-<li>Two texts only match when the text is the same. So on a text key column, <code>'007'</code> and <code>'7'</code> are two ids.</li>
-<li>When one id is a number, Dart reads the other one as a number too. So on a number key column, <code>'01'</code> matches song <code>1</code>.</li>
-<li>A bool id is <code>1</code> or <code>0</code>. A whole double like <code>2.0</code> is sent as the int <code>2</code>. A <code>BigInt</code> that fits is an <code>int</code>.</li>
-<li>Other doubles (like <code>1.5</code>), a text number at or past ±2^53, a <code>BigInt</code> that does not fit, and any other type throw an <code>ArgumentError</code>. <code>sync</code> checks every id before its first write.</li>
-<li>In <code>PivotSyncResult</code>, a number id is an <code>int</code>, also when you gave <code>'3'</code>. A text like <code>'03'</code> stays text.</li>
-<li>On a text key that ignores case (MySQL and MariaDB by default, SQLite with <code>COLLATE NOCASE</code>), <code>sync</code> and <code>toggle</code> also ask the database about text ids that Dart did not match. So with a stored <code>'ABC'</code>, <code>sync('songs', ['abc'])</code> keeps that row.</li>
-<li>Text ids are sent to the database as they are. The database may read some texts in its own way, for example <code>'0x1'</code>.</li>
-</ul>
-<h3 id="other-cases">Other cases</h3>
-<ul>
-<li><code>toJson()</code> of a model loaded by a ManyToMany relation has a <code>pivot</code> key. Dates are ISO text. Put <code>'pivot'</code> in <code>hidden</code> to leave it out. If the model has its own <code>pivot</code> column, the key keeps the column value.</li>
-<li>A relation with <code>eager: true</code> is always in <code>toJson()</code>. A relation loaded with <code>preload</code> is in <code>toJson()</code> of that query. The JSON key is the field name in snake_case: <code>songs</code>.</li>
-<li><code>reload()</code> and a preload set the relation fields again, also when there is no related row. See <a href="../../#relationships">Relationships</a>.</li>
-<li>The load runs one query like this. With <code>withPivot</code> or <code>withTimestamps</code>, it also selects those pivot columns, like <code>"artist_song"."role" as "_pivot_role"</code>:</li>
-</ul>
-<div class="language-sql highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">SELECT</span><span class="w"> </span><span class="ss">"song"</span><span class="p">.</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="p">.</span><span class="ss">"artist_id"</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="ss">"_owner_id"</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="ss">"song"</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="p">.</span><span class="ss">"song_id"</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ss">"song"</span><span class="p">.</span><span class="ss">"id"</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="ss">"artist_song"</span><span class="p">.</span><span class="ss">"artist_id"</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="o">@</span><span class="n">artist_songartist_id_p0</span><span class="p">,</span><span class="w"> </span><span class="p">...)</span>
+<h2 id="loading-the-relation">Loading the relation</h2>
+<p>The relation is not loaded by default. Use the field name, <code>'songs'</code>, as the relation name.</p>
+<h3 id="preloading">Preloading</h3>
+<p><code>preload()</code> loads the relation for all models of a query, with one more query. A model with no links gets an empty list:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">Artist</span><span class="o">?</span><span class="w"> </span><span class="n">artist</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">preload</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">).</span><span class="n">find</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">print</span><span class="p">(</span><span class="n">artist</span><span class="o">?</span><span class="p">.</span><span class="n">songs</span><span class="p">.</span><span class="n">length</span><span class="p">);</span>
 </span></code></pre></div>
+<p>The relation is then in <code>toJson()</code>, with the field name in snake_case as the key.</p>
+<h3 id="loading-on-a-model-you-have">Loading on a model you have</h3>
+<p><code>$getRelation()</code> loads the relation into the field:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">$getRelation</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="querying-the-relation">Querying the relation</h3>
+<p><code>related()</code> gives a query for the related rows. It does not set the field. The query joins the pivot table, so write <code>table.column</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">artist</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">        </span><span class="p">.</span><span class="n">related</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">)</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">        </span><span class="o">?</span><span class="p">.</span><span class="n">orderBy</span><span class="p">(</span><span class="s1">'song.title'</span><span class="p">)</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">        </span><span class="p">.</span><span class="kd">get</span><span class="p">()</span><span class="w"> </span><span class="o">??</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">    </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
+</span></code></pre></div>
+<h3 id="always-loading-the-relation">Always loading the relation</h3>
+<p>Set <code>eager: true</code> to load the relation on every query of the model. Do not set it on both sides, because each side then loads the other side again and again:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">eager:</span><span class="w"> </span><span class="kc">true</span><span class="p">)</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
+</span></code></pre></div>
+<h3 id="reading-pivot-columns">Reading pivot columns</h3>
+<p>List the pivot columns in <code>withPivot</code>, then read them with <code>pivot</code> on each related model:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">withPivot:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="p">[</span><span class="s1">'role'</span><span class="p">])</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">Song</span><span class="w"> </span><span class="n">song</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">songs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="n">print</span><span class="p">(</span><span class="n">song</span><span class="p">.</span><span class="n">pivot</span><span class="p">[</span><span class="s1">'role'</span><span class="p">]);</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<p><code>pivot</code> is empty on a model that the relation did not load. <code>toJson()</code> has a <code>pivot</code> key. Put <code>'pivot'</code> in <code>hidden</code> to leave it out.</p>
+<h2 id="saving-related-models">Saving related models</h2>
+<p>These methods add and remove pivot rows. Save the model first, because a model with no key throws a <code>StateError</code>.</p>
+<p>The ids can be one id, a model, a list of ids or models, or a map of <code>id =&gt; pivot values</code>. Each id is used once.</p>
+<h3 id="attaching">Attaching</h3>
+<p><code>attach()</code> adds a pivot row for each id. The third argument has the pivot values for each new row:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">);</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">],</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">    </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="s1">'singer'</span><span class="p">});</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">attach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;&gt;</span><span class="p">{</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="m">4</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="s1">'writer'</span><span class="p">},</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="p">});</span>
+</span></code></pre></div>
+<p><code>attach()</code> does not check for a row that is already there. Use <code>sync()</code> or <code>syncWithoutDetaching()</code> when it can be there.</p>
+<h3 id="detaching">Detaching</h3>
+<p><code>detach()</code> deletes the pivot rows of the ids and returns the number of deleted rows. With no ids, it deletes every pivot row of the model:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">detach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]);</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">detach</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="syncing">Syncing</h3>
+<p><code>sync()</code> makes the pivot rows match the ids. It returns a <code>PivotSyncResult</code> with the ids of each change:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">PivotSyncResult</span><span class="w"> </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="kd">sync</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">attached</span><span class="p">);</span><span class="w"> </span><span class="c1">// ids that got a new row</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">detached</span><span class="p">);</span><span class="w"> </span><span class="c1">// ids whose row was deleted</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">updated</span><span class="p">);</span><span class="w">  </span><span class="c1">// ids whose pivot values changed</span>
+</span></code></pre></div>
+<p>A null id or an unsaved model in the list makes <code>sync()</code> throw an <code>ArgumentError</code>, because it would delete every other link. A null list deletes every link.</p>
+<p><code>syncWithoutDetaching()</code> adds links and never deletes:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">syncWithoutDetaching</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">4</span><span class="p">]);</span>
+</span></code></pre></div>
+<h3 id="toggling">Toggling</h3>
+<p><code>toggle()</code> adds a row for each id that has none, and deletes the row of each id that has one:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">toggle</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">]);</span>
+</span></code></pre></div>
+<h3 id="updating-pivot-values">Updating pivot values</h3>
+<p><code>updateExistingPivot()</code> sets pivot values on the rows of one id or a list of ids. It returns the number of changed rows:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">artist</span><span class="p">.</span><span class="n">updateExistingPivot</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">,</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'role'</span><span class="o">:</span><span class="w"> </span><span class="s1">'writer'</span><span class="p">});</span>
+</span></code></pre></div>
+<p>With <code>withTimestamps</code>, <code>attach()</code>, <code>sync()</code> and <code>toggle()</code> set the pivot timestamps, and <code>updateExistingPivot()</code> sets <code>updated_at</code>.</p>
+<h2 id="filtering-by-the-relation">Filtering by the relation</h2>
+<p><code>whereHas()</code> keeps the artists that have a song. It checks the pivot table for you:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">artists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">whereHas</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">,</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">    </span><span class="p">(</span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'title'</span><span class="p">,</span><span class="w"> </span><span class="s1">'Yesterday'</span><span class="p">);</span>
+</span><span id="__span-14-4"><a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="p">}).</span><span class="kd">get</span><span class="p">();</span>
+</span><span id="__span-14-5"><a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+</span><span id="__span-14-6"><a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Artist</span><span class="o">&gt;</span><span class="w"> </span><span class="n">noSongs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Artist</span><span class="p">().</span><span class="n">whereDoesntHave</span><span class="p">(</span><span class="s1">'songs'</span><span class="p">).</span><span class="kd">get</span><span class="p">();</span>
+</span></code></pre></div>
+<p>See <a href="../../relation-queries/">Query by relations</a>.</p>
+<h2 id="changing-the-relation-query">Changing the relation query</h2>
+<p>Give <code>onQuery</code> a static function of the model. It gets the query of the related model and returns it. Write <code>table.column</code>, because the query joins the pivot table:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nd">@ManyToMany</span><span class="p">(</span><span class="n">Song</span><span class="p">,</span><span class="w"> </span><span class="nl">onQuery:</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">)</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">songs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="p">[];</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="kd">static</span><span class="w"> </span><span class="n">QueryBuilder</span><span class="o">&lt;</span><span class="n">Song</span><span class="o">&gt;</span><span class="w"> </span><span class="n">onlyPublished</span><span class="p">(</span><span class="n">Song</span><span class="w"> </span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="s1">'song.status'</span><span class="p">,</span><span class="w"> </span><span class="s1">'published'</span><span class="p">);</span>
+</span><span id="__span-15-6"><a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="p">}</span>
+</span></code></pre></div>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><a href="../has-many/">HasMany</a>: a relation with no pivot table.</li>
+<li><a href="../../../schema/">Schema</a>: make the pivot table.</li>
+<li><a href="../../counting-relations/">Counting relations</a>: count the related rows.</li>
+</ul>
 
 
 
@@ -8058,7 +7781,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.tabs", "navigation.sections", "navigation.expand", "navigation.indexes", "navigation.top", "navigation.footer", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.tabs.link", "toc.follow"], "search": "../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "provider": "mike"}}</script>
     
     
       <script src="../../../../assets/javascripts/bundle.d7400e89.min.js"></script>
