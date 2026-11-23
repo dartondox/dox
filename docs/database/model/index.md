@@ -2,27 +2,39 @@
 
 A model is a Dart class for one database table, used to read, create, change and delete its rows.
 
-Each model maps to one table, and each object of the model is one row. A model also has all the [query builder](../query-builder.md) methods, so you can query the table through it.
+Each object of the model is one row. A model also has all the [query builder](../query-builder.md) methods, so you can query the table through it.
 
-## Generating models
+## Setup
 
 Use `make:model` to make a new model. The `-m` option also makes a migration for the table:
 
 ```bash
 dox make:model Blog      # only the model
-dox make:model Blog -m   # the model and a migration for the table `blogs`
-dox make:model Blog -a   # the model, a migration, a factory, a seeder and a resource controller
+dox make:model Blog -m   # the model and a migration for the table blogs
+dox make:model Blog -a   # also a migration, factory, seeder, controller
 ```
 
-This makes `lib/app/models/blog/blog.model.dart`. Other options are `-c` (controller), `-r` (resource controller), `--api` (resource controller without `create` and `edit`), `-f` (factory) and `-s` (seeder). You can join them, like `-mfs`. See the [CLI reference](../../reference/cli.md#dox-makemodel).
+This makes `lib/app/models/blog/blog.model.dart`. For the other options, see the [CLI reference](../../reference/cli.md#dox-makemodel).
 
-A model uses a generated class (`BlogGenerator`), so you must run the generator after you make or change a model:
+A model uses a generated class, so run the generator after you make or change a model. Use `watch` in place of `build` to run it on each save:
 
 ```bash
 dart run build_runner build
 ```
 
-If you want it to run again each time you save a file, use `dart run build_runner watch`.
+### Model options
+
+All options go in `@DoxModel(...)`:
+
+| Option | Default | What it does |
+|---|---|---|
+| `table` | class name in snake_case | The table name. |
+| `primaryKey` | `'id'` | The primary key column. |
+| `primaryKeyType` | `int` | The Dart type of the primary key, like `String` for a UUID. |
+| `createdAt` | `'created_at'` | The column that keeps the create time. null turns it off. |
+| `updatedAt` | `'updated_at'` | The column that keeps the last update time. null turns it off. |
+| `timestamps` | `true` | false turns off `createdAt` and `updatedAt`. |
+| `softDelete` | `false` | `delete()` sets `deleted_at` and keeps the row. |
 
 ## Defining models
 
@@ -38,80 +50,52 @@ class Blog extends BlogGenerator { // (3)!
   @Column() // (4)!
   String? title;
 
-  @Column(beforeSave: makeSlug) // (5)!
-  String? slug;
-
-  @Column()
-  String? status;
-
-  @Column(name: 'body') // (6)!
+  @Column(name: 'body') // (5)!
   String? description;
 
   @Column(name: 'user_id')
   int? userId;
-
-  static String? makeSlug(Map<String, dynamic> map) {
-    return map['title']?.toString().toLowerCase().replaceAll(' ', '-');
-  }
 }
 ```
 
 1.  `build_runner` writes this file. It holds the generated `BlogGenerator` class.
-2.  Marks the class as a model. The options, like `table` and `softDelete`, go here.
+2.  Marks the class as a model. See [Model options](#model-options).
 3.  The generated class gives the model `id`, `createdAt` and `updatedAt`, and the query builder methods.
-4.  The column name is the field name in snake_case. Digits stay as they are: `address2` is `address2`.
-5.  `beforeSave` runs this static function before a save. See [Changing values on save and read](#changing-values-on-save-and-read).
-6.  Use `name` when the column name is not the snake_case of the field. The name is used exactly as written.
+4.  The column name is the field name in snake_case.
+5.  Use `name` when the column name is not the snake_case of the field.
 
-Make every column field nullable (`String?`, `int?`), because a new model has no values yet.
+Make every column field nullable, because a new model has no values yet.
 
 ### Table names
 
-The default table name is the class name in snake_case and singular: `Blog` uses `blog`, and `BlogPost` uses `blog_post`. With the [`pluralTableNames` flag](../index.md#orm-flags) it is plural. If your table has another name, set `table`:
+The default table name is the class name in snake_case: `BlogPost` uses `blog_post`. Set `table` for another name:
 
 ```dart
 @DoxModel(table: 'blogs')
 class Blog extends BlogGenerator {}
 ```
 
-`dox make:model Blog` always sets `table: 'blogs'` for you, and the migration from `-m` uses the same table.
+`dox make:model Blog` sets `table: 'blogs'` for you. With the [`pluralTableNames` flag](../index.md#orm-flags), the default name is plural.
 
 ### Primary keys
 
-The primary key is `id` by default. If your key has another name, set `primaryKey`. The field name is the key in camelCase, so `blog_id` becomes `blogId`:
-
-```dart
-@DoxModel(primaryKey: 'uid')
-class Blog extends BlogGenerator {}
-```
-
-The key field is `int?` by default. If your key is a UUID string, set `primaryKeyType`:
+Set `primaryKey` for a key with another name, and `primaryKeyType` for a key that is not an integer:
 
 ```dart
 @DoxModel(primaryKey: 'uuid', primaryKeyType: String)
 class Device extends DeviceGenerator {}
 ```
 
-```dart
-Device device = Device();
-device.uuid = '0b6f2c1e-1a2b-4c3d-8e9f-001122334455';
-await device.save(); // insert
-```
-
-`save()` inserts a new model, even when you set the key yourself.
+The field name is the key in camelCase. `save()` inserts a new model, also when you set the key yourself.
 
 ### Timestamps
 
-`save()` sets `created_at` and `updated_at` to the current UTC time. You read them with `blog.createdAt` and `blog.updatedAt`. If your columns have other names, set them:
+`save()` sets `created_at` and `updated_at` to the current UTC time. Set other column names, or turn them off:
 
 ```dart
 @DoxModel(createdAt: 'created', updatedAt: 'modified')
 class Blog extends BlogGenerator {}
-```
 
-If the table has no timestamp columns, turn them off. To turn off only one, set it to `null`, like `@DoxModel(updatedAt: null)`:
-
-```dart
 @DoxModel(timestamps: false)
 class Setting extends SettingGenerator {}
 ```
@@ -124,8 +108,8 @@ The field type tells Dox how to read the value:
 |---|---|
 | `String?` | text, varchar |
 | `int?` | integer types |
-| `double?` | float, double. MySQL also gives `DECIMAL` as `double`. Postgres gives `numeric` as `String`. |
-| `bool?` | boolean, or a number like `tinyint` (0 is false) |
+| `double?` | float, double. MySQL also gives decimal as a double. Postgres gives numeric as a string. |
+| `bool?` | boolean, or a number like tinyint (0 is false) |
 | `DateTime?` | date, datetime, timestamp |
 | `Map<String, dynamic>?` or `List<dynamic>?` | JSON |
 | an enum, like `Status?` | text with the enum name |
@@ -134,70 +118,79 @@ For other types, use a [cast](casts.md).
 
 ### Changing values on save and read
 
-Sometimes a column needs a small change when you save or read it. `beforeSave` and `beforeGet` take a static function of the model. The function gets a map and returns the value:
-
-- `beforeSave` gets the model values (column name => value) and returns the value to save.
-- `beforeGet` gets the row from the database and returns the value for the field.
+`beforeSave` and `beforeGet` take a static function of the model. The function gets a map of the values and returns the new value:
 
 ```dart
-@DoxModel()
-class Blog extends BlogGenerator {
-  @Column()
-  String? title;
+@Column(beforeSave: makeSlug)
+String? slug;
 
-  // beforeSave: make the slug from the title
-  @Column(beforeSave: makeSlug)
-  String? slug;
+@Column(beforeGet: readStatus)
+String? status;
 
-  // beforeGet: old rows have no status, show them as draft
-  @Column(beforeGet: readStatus)
-  String? status;
-
-  static String? makeSlug(Map<String, dynamic> map) {
-    return map['title']?.toString().toLowerCase().replaceAll(' ', '-');
-  }
-
-  static String? readStatus(Map<String, dynamic> map) {
-    return map['status'] as String? ?? 'draft';
-  }
+static String? makeSlug(Map<String, dynamic> map) {
+  return map['title']?.toString().toLowerCase().replaceAll(' ', '-');
 }
+
+static String? readStatus(Map<String, dynamic> map) {
+  return map['status'] as String? ?? 'draft';
+}
+```
+
+`beforeSave` gets the model values by column name. `beforeGet` gets the row from the database.
+
+### Using another connection
+
+Use a named connection for the query, and for the save and delete of its models:
+
+```dart
+Blog blog = Blog()..withConnection('mysql');
+await blog.save();
 ```
 
 ## Retrieving models
 
-A model has all the [query builder](../query-builder.md) methods, so you read rows with them:
+Use the [query builder](../query-builder.md) methods to read rows:
 
 ```dart
 Blog? found = await Blog().find(1);
+List<Blog> drafts = await Blog().where('status', 'draft').get();
 ```
 
 ### Starting a new query
 
-A model object keeps the parts of its query (`where`, `orderBy`, ...). If you want to start another query from it, use `query()`. It gives a new, empty model:
+A model object keeps the parts of its query. `query()` gives a new, empty model to start another query:
 
 ```dart
 Blog blog = Blog();
 List<Blog> active = await blog.where('status', 'active').get();
-
-// a new query, without the where above
 List<Blog> deleted = await blog.query().where('status', 'deleted').get();
 ```
 
 ### Refreshing models
 
-Sometimes the row changed in the database after you read it. `refresh()` reads the row again into this model, and loads its relations again. `fresh()` gives a new model of the row and leaves this one as it is:
+`refresh()` reads the row again into this model, with its relations. `fresh()` gives a new model and keeps this one as it is:
 
 ```dart
-Blog? blog = await Blog().find(1);
-await blog!.refresh();          // this model now has the values of the table
-Blog? now = await blog.fresh(); // a new model, or null when the row is gone
+await blog.refresh();
+Blog? now = await blog.fresh(); // null when the row is gone
+```
+
+Both read the row by its primary key. They also find a soft deleted row.
+
+### Reloading relations
+
+`reload()` loads the relations of the model again, for example after a save:
+
+```dart
+await blog.save();
+await blog.reload();
 ```
 
 ## Inserting and updating models
 
 ### Inserts
 
-To add a row, make a new model, set its fields and call `save()`:
+Make a new model, set its fields and call `save()`:
 
 ```dart
 Blog blog = Blog();
@@ -206,11 +199,11 @@ await blog.save();
 print(blog.id); // the new id
 ```
 
-Fields that are `null` are not sent, so the database default is used.
+Null fields are not sent, so the database default is used.
 
 ### Updates
 
-`save()` also updates a model that was read from the table or saved before. Only the fields that changed are sent:
+`save()` on a model from the table updates it. It sends only the fields that changed:
 
 ```dart
 Blog? found = await Blog().find(1);
@@ -218,18 +211,22 @@ found?.title = 'New title';
 await found?.save();
 ```
 
-To clear a column, set the field to `null` and save:
+To clear a column, set the field to null and save. A map or list field is always sent, because it can change in place.
+
+`save()` returns false when a [model event](events.md) cancels it. `saveQuietly()` saves with no events.
+
+### Checking if a row exists
+
+`exists` is true when the model is in the table. `wasRecentlyCreated` is true after a save inserted the row:
 
 ```dart
-found?.status = null;
-await found?.save(); // status is now NULL in the database
+User user = await User().firstOrCreate(<String, dynamic>{'email': email});
+if (user.wasRecentlyCreated) await sendWelcomeMail(user);
 ```
-
-`model.exists` tells you if `save()` will insert or update. `save()` returns `false` when a [model event](events.md) cancels it.
 
 ### Creating from a map
 
-`create()` makes a new row from a map and returns the model as it is in the table. The model needs `fillable`, see [Mass assignment](#mass-assignment):
+`create()` makes a new row from a map and returns the model. The model needs `fillable`, see [Mass assignment](#mass-assignment):
 
 ```dart
 Blog created = await Blog().create(<String, dynamic>{
@@ -238,13 +235,19 @@ Blog created = await Blog().create(<String, dynamic>{
 });
 ```
 
-`create()` works like `save()` on a new model: it saves only the `@Column` fields, runs `beforeSave`, sets the timestamps and fires the [model events](events.md).
+It works like `save()` on a new model, with the events. A null key is not sent, unless the [`createWritesNull` flag](../index.md#orm-flags) is on. `insert()` on a model does the same as `create()`.
 
-To change some columns of a loaded model from a map, use `blog.update(<String, dynamic>{...})`. It changes only that row and sets `updated_at`, but it fires no model events.
+### Updating from a map
+
+`update()` on a model from the table changes only that row and sets `updated_at`. It fires no model events:
+
+```dart
+await blog.update(<String, dynamic>{'status': 'live'});
+```
 
 ### Mass assignment
 
-`create()`, `insert()`, `update()`, `upsert()` and the find or create methods take their keys from a map. If they took every key, `User().create(req.body)` with `{"is_admin": 1}` would make an admin. So a model is guarded by default, and you must say which keys may come from a map:
+`create()`, `insert()`, `update()`, `upsert()` and the find or create methods take their keys from a map. So a model is guarded by default. List the keys that may come from a map:
 
 ```dart
 @DoxModel()
@@ -259,11 +262,9 @@ class User extends UserGenerator {
 }
 ```
 
-- With `fillable`, other keys are dropped.
-- A model with no `fillable` (and the default `guarded`) throws a `MassAssignmentException` when it gets a map with keys.
-- Fields you set in code and save with `save()` are always saved.
+With `fillable`, other keys are dropped. A model with no `fillable` and the default `guarded` throws a `MassAssignmentException` for a map with keys. Fields you set in code are always saved.
 
-If you want to take every key, set `guarded` to an empty list. This is not safe with user input:
+To take every key, set `guarded` to an empty list. This is not safe with user input:
 
 ```dart
 @override
@@ -272,167 +273,145 @@ List<String> get guarded => const <String>[];
 
 #### Skip the fillable check
 
-Sometimes your own code must set a guarded column, like `is_admin`. These methods ignore `fillable` and `guarded`, so never pass user input like `req.body` to them.
-
-`forceCreate()` creates a row with every key of the map:
+These methods ignore `fillable` and `guarded`. Never pass user input, like `req.body`, to them:
 
 ```dart
-User admin = await User().forceCreate(<String, dynamic>{'name': 'Ann', 'is_admin': true});
+await User().forceCreate(
+    <String, dynamic>{'name': 'Ann', 'is_admin': true});
+await User().where('id', 1)
+    .forceUpdate(<String, dynamic>{'is_admin': true});
+await user.forceFill(<String, dynamic>{'is_admin': true}).save();
 ```
 
-`forceUpdate()` updates the rows of a query with every key of the map:
+`forceFill()` sets the fields and does not save. Model events that fire inside `forceCreate()` and `forceUpdate()` also skip the check.
 
-```dart
-await User().where('id', 1).forceUpdate(<String, dynamic>{'is_admin': true});
-```
-
-`forceFill()` sets fields on a model. It does not save, so call `save()` after it:
-
-```dart
-User? user = await User().find(1);
-await user!.forceFill(<String, dynamic>{'is_admin': true}).save();
-```
-
-`Model.unguarded()` turns the check off for everything inside the callback. Other requests that run at the same time still use `fillable`. Await everything inside the callback, because work that finishes later also runs with the check off:
+`Model.unguarded()` turns the check off for everything inside the callback. Await all work inside it, because work that ends later also runs with the check off:
 
 ```dart
 await Model.unguarded(() async {
   await User().create(<String, dynamic>{'name': 'Bob', 'is_admin': true});
-  await User().where('id', 2).update(<String, dynamic>{'is_admin': true});
 });
 ```
 
+`Model.isUnguarded` is true inside the callback.
+
 ### Find or create
 
-Sometimes you want a row if it exists, and a new one if it does not. These methods find a row by the first map. When there is no row, they use both maps.
-
-`firstOrCreate()` finds the row, or creates it:
+These methods find a row by the first map. When there is no row, they use both maps:
 
 ```dart
 User user = await User().firstOrCreate(
   <String, dynamic>{'email': 'ann@example.com'},
   <String, dynamic>{'name': 'Ann'},
 );
-```
 
-`firstOrNew()` finds the row, or makes a new model that is not saved yet:
+User other = await User().firstOrNew(
+    <String, dynamic>{'email': 'bob@example.com'});
 
-```dart
-User other = await User().firstOrNew(<String, dynamic>{'email': 'bob@example.com'});
-if (!other.exists) {
-  await other.save();
-}
-```
-
-`updateOrCreate()` updates the row, or creates it:
-
-```dart
 User updated = await User().updateOrCreate(
   <String, dynamic>{'email': 'ann@example.com'},
   <String, dynamic>{'name': 'Ann Lee'},
 );
 ```
 
-`firstOrCreate()` and `updateOrCreate()` fire the [model events](events.md). `firstOrNew()` does not save, so no event fires. See also the [query builder](../query-builder.md#finding-or-creating-a-row).
+`firstOrNew()` does not save the new model. See the [query builder](../query-builder.md#finding-or-creating-a-row).
 
 ### Incrementing and decrementing
 
-If you want to add to a number column, like a view count, use `increment()` and `decrement()`. They change the column in one query, and the model field gets the new value too:
+Add to or take from a number column in one query. The field gets the new value too:
 
 ```dart
-Blog? blog = await Blog().find(1);
-await blog!.increment('views');      // views + 1
-await blog.increment('views', 5);    // views + 5
-await blog.decrement('views');       // views - 1
-print(blog.views);
+await blog.increment('views');      // views + 1
+await blog.increment('views', 5);   // views + 5
+await blog.decrement('views');      // views - 1
+await blog.increment('views', 1, <String, dynamic>{'status': 'hot'});
 ```
 
-They return the number of changed rows. They fire no model events and do not set `updated_at`.
+The third argument sets other columns. They fire no model events and do not set `updated_at`, unless the [`incrementFiresEvents` flag](../index.md#orm-flags) is on.
 
 ### Touch and replicate
 
-`touch()` sets `updated_at` to now. Give a column name to set another column. It fires the save events, and `touchQuietly()` does the same with no events:
+`touch()` sets `updated_at`, or the column you give, to now. It fires the save events. `touchQuietly()` fires none:
 
 ```dart
-Blog? blog = await Blog().find(1);
-await blog!.touch();               // updated_at = now
-await blog.touch('published_at');  // published_at = now
+await blog.touch();               // updated_at = now
+await blog.touch('published_at'); // published_at = now
 ```
 
-`replicate()` makes an unsaved copy of a model. It has no primary key and no timestamps, so `save()` inserts a new row. Relations are not copied:
+`replicate()` makes an unsaved copy with no primary key and no timestamps. List the columns to leave out:
 
 ```dart
-Blog? blog = await Blog().find(1);
-Blog copy = blog!.replicate()..title = 'Copy of ${blog.title}';
+Blog copy = blog.replicate(<String>['slug'])..title = 'Copy';
 await copy.save();
 ```
 
-If you do not want some columns in the copy, list them. They are set to `null`:
-
-```dart
-Blog other = blog.replicate(<String>['slug']);
-```
+Relations are not copied. The copy of a soft deleted model is soft deleted too.
 
 ### Checking changed columns
 
-Sometimes you need to know what changed before or after a save. A model tracks this. The names are column names, like `user_id`, not the Dart field names:
+These methods tell you what changed before or after a save. The names are column names, like `user_id`:
 
 ```dart
-Blog? blog = await Blog().find(1);
-blog!.title = 'New title';
+blog.title = 'New title';
 
-blog.isDirty();                     // true
-blog.isDirty('title');              // true
-blog.isDirty(<String>['body']);     // false
-blog.isClean('body');               // true
-blog.getDirty();                    // {title: New title}
-blog.getOriginal('title');          // the old title
-```
+blog.isDirty();             // true
+blog.isDirty('title');      // true
+blog.isClean('body');       // true
+blog.getDirty();            // {title: New title}
+blog.getOriginal('title');  // the old title
 
-After a save, `wasChanged()` and `getChanges()` tell you what the last save changed:
-
-```dart
 await blog.save();
-blog.wasChanged('title');           // true
-blog.getChanges();                  // {title: New title, updated_at: ...}
+blog.wasChanged('title');   // true
+blog.getChanges();          // {title: New title, updated_at: ...}
 ```
+
+`isDirty()`, `isClean()` and `wasChanged()` also take a list of names.
 
 ## Deleting models
 
-Call `delete()` on a model to delete its row. It returns the number of deleted rows: `1`, or `0` when the row was not there or a [model event](events.md) cancelled it:
+`delete()` deletes the row of the model. It returns 1, or 0 when the row was not there or a [model event](events.md) cancelled it:
 
 ```dart
-Blog? blog = await Blog().find(1);
-int count = await blog!.delete(); // deletes only this record
+int count = await blog.delete();
 ```
 
-A model with no primary key value throws a `StateError` and runs no query, so `Blog().delete()` can not delete every row by mistake. To delete the rows of a query, add a `where`, like `Blog().where('status', 'draft').delete()`. A [global scope](scopes.md#global-scopes) counts as a `where`. To delete every row on purpose, see [write every row](../query-builder.md#writing-every-row).
+A model with no primary key value throws a `StateError`, so `Blog().delete()` can not delete every row. To delete the rows of a query, add a `where`. A [global scope](scopes.md#global-scopes) counts as a `where`. See [writing every row](../query-builder.md#writing-every-row).
 
 ### Soft deleting
 
-Sometimes you want to keep deleted rows, so you can bring them back later. Turn on `softDelete`:
+A **soft delete** keeps the row and sets its `deleted_at`. Turn it on with `softDelete`:
 
 ```dart
 @DoxModel(softDelete: true)
 class Blog extends BlogGenerator {}
 ```
 
-The table needs a nullable `deleted_at` column. In a migration, add `table.softDeletes();`.
+The table needs a nullable `deleted_at` column. In a migration, add `table.softDeletes();`. Queries then leave out soft deleted rows.
 
-Now `delete()` sets `deleted_at` to the current time and keeps the row. Queries leave out soft deleted rows. Use `withTrash()` to get them too, or `onlyTrashed()` to get only them.
+### Reading soft deleted rows
 
-`trashed()` tells you if a model is soft deleted, and `restore()` brings it back:
+`withTrash()` also gets the soft deleted rows. `onlyTrashed()` gets only them:
+
+```dart
+List<Blog> all = await Blog().withTrash().get();
+List<Blog> trashed = await Blog().onlyTrashed().get();
+```
+
+### Restoring soft deleted models
+
+`trashed()` tells you if a model is soft deleted. `restore()` brings it back:
 
 ```dart
 Blog? blog = await Blog().withTrash().find(1);
 if (blog!.trashed()) await blog.restore();
 ```
 
-To really remove a soft deleted row, use `forceDelete()`:
+### Deleting for good
+
+`forceDelete()` deletes the row, also on a soft delete model:
 
 ```dart
-Blog? trashed = await Blog().withTrash().find(1);
-await trashed?.forceDelete(); // deletes the row, also with softDelete
+await blog.forceDelete();
 ```
 
 ## Converting to a map or JSON
@@ -440,35 +419,30 @@ await trashed?.forceDelete(); // deletes the row, also with softDelete
 `toMap()` gives all columns and computed values. `toJson()` gives the same without hidden fields:
 
 ```dart
-Blog? blog = await Blog().find(1);
-
-Map<String, dynamic>? map = blog?.toMap();  // all columns and computed values
-Map<String, dynamic>? json = blog?.toJson(); // the same, without hidden fields
-Map<String, dynamic>? row = blog?.toMap(original: true); // the raw database row
+Map<String, dynamic> map = blog.toMap();
+Map<String, dynamic> json = blog.toJson();
+Map<String, dynamic> row = blog.toMap(original: true); // the raw row
 ```
 
-`jsonEncode(blog)` uses `toJson()`, so you can return a model, or a list of models, from a controller.
+`jsonEncode(blog)` uses `toJson()`, so a controller can return a model or a list of models.
 
 ### Hide fields
 
-You should never send fields like a password to the client. Put them in `hidden`, and `toJson()` leaves them out. Use the column names:
+Put fields like a password in `hidden`, and `toJson()` leaves them out. Use the column names:
 
 ```dart
-@DoxModel()
-class User extends UserGenerator {
-  @override
-  List<String> get hidden => <String>['password', 'remember_token'];
-}
+@override
+List<String> get hidden => <String>['password', 'remember_token'];
 ```
 
-If you prefer a list of the fields to keep, use `visibleFields`. When it is empty (the default), every field is kept:
+To keep only some fields, list them in `visibleFields`:
 
 ```dart
 @override
 List<String> get visibleFields => const <String>['id', 'name'];
 ```
 
-To change this for one model, or for a list of models, use `makeHidden()` and `makeVisible()`. `makeVisible()` also shows a field that is in `hidden`:
+For one model or a list of models, use `makeHidden()` and `makeVisible()`:
 
 ```dart
 return user.makeVisible(<String>['email']).toJson();
@@ -477,83 +451,34 @@ return users.makeHidden(<String>['phone']);
 
 ### Computed values
 
-Sometimes you want a value in the JSON that is not a column, like a full name. Add `@Computed()` to a getter, then run `dart run build_runner build`:
+A **computed value** is a getter in the JSON that is not a column. Add `@Computed()`, then run the generator:
 
 ```dart
-@DoxModel()
-class User extends UserGenerator {
-  @Column(name: 'first_name')
-  String? firstName;
+@Computed() // json key: full_name
+String get fullName => '$firstName $lastName';
 
-  @Column(name: 'last_name')
-  String? lastName;
-
-  @Computed() // json key: full_name
-  String get fullName => '$firstName $lastName';
-
-  @Computed(name: 'initials') // custom json key
-  String get shortName => '${firstName?[0]}${lastName?[0]}';
-}
+@Computed(name: 'initials') // custom json key
+String get shortName => '${firstName?[0]}${lastName?[0]}';
 ```
 
-```dart
-User? user = await User().find(1);
-print(user?.toJson());
-// {id: 1, first_name: John, last_name: Wick, ..., full_name: John Wick, initials: JW}
-```
-
-The key is the getter name in snake_case, or the `name` you give. A computed value is never read from or written to the database. `hidden` also hides it, by its json key. The getter runs each time `toJson()` or `toMap()` is called, so keep it fast.
+The getter runs each time `toJson()` or `toMap()` runs, so keep it fast. `hidden` hides it by its json key.
 
 ## Relationships
 
 A model can load related models. See [HasOne](relationship/has-one.md), [HasMany](relationship/has-many.md), [BelongsTo](relationship/belongs-to.md), [ManyToMany](relationship/many-to-many.md), [HasManyThrough](relationship/through.md) and [Polymorphic](relationship/polymorphic.md).
 
-The relationship pages use these tables:
+### Preloading relations
 
-```mermaid
-erDiagram
-    user ||--o| user_info : "HasOne"
-    user ||--o{ post : "HasMany"
-    user ||--o{ comment : "BelongsTo, from comment"
-    artist ||--o{ artist_song : "ManyToMany"
-    song ||--o{ artist_song : "ManyToMany"
-    user {
-        int id PK
-        string name
-    }
-    user_info {
-        int id PK
-        int user_id FK
-        string address
-    }
-    post {
-        int id PK
-        int user_id FK
-        string title
-    }
-    comment {
-        int id PK
-        int user_id FK
-        string content
-    }
-    artist_song {
-        int id PK
-        int artist_id FK
-        int song_id FK
-    }
-```
-
-### Preloading nested relations
-
-A dot path also loads the relations of the loaded rows. It runs one query for each level:
+`preload()` loads a relation for all rows of a query. A dot path also loads the relations of the loaded rows:
 
 ```dart
+Blog? blog = await Blog().preload('comments').find(1);
 List<User> users = await User().preload('posts.comments').get();
 ```
 
 ### Filtering a preload
 
-If you want only some related rows, give a callback. It adds conditions to the query of the relation. With a dot path, it is for the last relation:
+Give a callback to load only some related rows. With a dot path, it is for the last relation:
 
 ```dart
 await User().preload('posts', (QueryBuilder<dynamic> q) {
@@ -561,99 +486,55 @@ await User().preload('posts', (QueryBuilder<dynamic> q) {
 }).get();
 ```
 
+### Loading a relation on a model
+
+`$getRelation()` loads a relation into its field. `related()` gives a query for the related rows:
+
 ```dart
-// all posts, and only the approved comments of each post
-await User().preload('posts.comments', (QueryBuilder<dynamic> q) {
-  q.where('approved', true);
-}).get();
+await blog.$getRelation('comments');
+List<Comment> recent = await blog
+        .related<Comment>('comments')
+        ?.orderBy('id', 'desc')
+        .get() ??
+    <Comment>[];
 ```
 
 ### Saving through a relation
 
-These methods save a related model and set the foreign key for you. They work with `@HasMany`, `@HasOne`, `@MorphMany` and `@MorphOne`:
+These methods save a related model and set the foreign key. They work with `@HasMany`, `@HasOne`, `@MorphMany` and `@MorphOne`:
 
 ```dart
-Blog blog = (await Blog().find(1))!;
-Comment c = await blog.createRelated<Comment>('comments', <String, dynamic>{'body': 'hi'});
+Comment c = await blog.createRelated<Comment>('comments',
+    <String, dynamic>{'body': 'hi'});
 await blog.saveRelated('comments', Comment()..body = 'hi');
 await blog.saveManyRelated('comments', <Comment>[c1, c2]);
 ```
 
-`createRelated()` uses `create()`, so `fillable`, events and timestamps work. The foreign key does not need to be in `fillable`.
-
-For a `@BelongsTo`, `comment.associate('blog', blog)` sets the key and `comment.dissociate('blog')` sets it to `null`. Call `save()` after them.
+`createRelated()` uses `create()`, but the foreign key does not need to be in `fillable`. For a `@BelongsTo`, use `associate()` and `dissociate()`. See [BelongsTo](relationship/belongs-to.md#saving-related-models).
 
 ## Debugging queries
 
-If you want to see the SQL of a model, use `debug(true)`. It prints the SQL in the terminal:
+`debug(true)` prints the SQL of the model in the terminal:
 
 ```dart
-Blog blog = Blog();
-blog.debug(true);
+Blog blog = Blog()..debug(true);
 blog.title = 'John Wick';
 await blog.save();
 ```
 
-## Details
+## Methods on other pages
 
-This section is for special cases. Most apps do not need it.
+| Methods | Page |
+|---|---|
+| `Model.observe()`, `Model.forgetObservers()`, `Model.withoutEvents()` | [Model events](events.md) |
+| `withCount()`, `withSum()`, `withAvg()`, `withMin()`, `withMax()`, `withExists()`, `countOf()`, `aggregate()` | [Counting relations](counting-relations.md) |
+| `whereHas()`, `orWhereHas()`, `whereDoesntHave()`, `orWhereDoesntHave()`, `has()` | [Query by relations](relation-queries.md) |
+| `withoutGlobalScope()`, `withoutGlobalScopes()` | [Query scopes](scopes.md) |
+| `associate()`, `dissociate()` | [BelongsTo](relationship/belongs-to.md) |
+| `attach()`, `detach()`, `sync()`, `syncWithoutDetaching()`, `toggle()`, `updateExistingPivot()`, `pivot` | [ManyToMany](relationship/many-to-many.md) |
+| `Model.morphMap()`, `Model.morphTypeOf()`, `Model.morphModel()` | [Polymorphic](relationship/polymorphic.md) |
 
-### All options
-
-All options go in `@DoxModel(...)`.
-
-| Option | Default | What it does |
-|---|---|---|
-| `table` | class name in snake_case | The table name. |
-| `primaryKey` | `'id'` | The primary key column. |
-| `primaryKeyType` | `int` | The Dart type of the primary key, like `String` for a UUID. |
-| `createdAt` | `'created_at'` | The column that keeps the create time. |
-| `updatedAt` | `'updated_at'` | The column that keeps the last update time. |
-| `timestamps` | `true` | `false` turns off `createdAt` and `updatedAt`. |
-| `softDelete` | `false` | `delete()` sets `deleted_at` and keeps the row. |
-
-### Saving
-
-- `create()` can write `NULL` for a key that is `null` in the map, with the [`createWritesNull` flag](../index.md#orm-flags).
-- On update, a field is compared to its value from the last load or save. A `Map` or `List` field is always sent, because it can change in place.
-- On update, a field is set to `NULL` only when it had a value before. Fields that were not loaded, for example with `select()`, are not changed.
-- When nothing changed, `save()` runs no query and `updated_at` stays as it is. It still fires `updating` and `updated`, unless the [`skipCleanUpdateEvents` flag](../index.md#orm-flags) is on.
-- When you set `updatedAt` yourself, `save()` keeps your value.
-- `getChanges()` and `wasChanged()` also count `update()`, `increment()`, `decrement()`, `touch()`, `restore()` and a soft delete on the model as a save.
-- A soft delete and `restore()` also set `updated_at` when the model has timestamps.
-
-### Mass assignment
-
-- `forceFill()` skips a key that is not a column. A value of the wrong type throws an `ArgumentError`.
-- `Model.unguarded()` also covers timers, futures that are not awaited and stream listeners that start inside the callback.
-- A query `update()` keeps the check, so `update(req.body)` stays safe.
-- Model events that fire inside `forceCreate()` and `forceUpdate()` also run with the check off. So a `create()` or `update()` inside such a hook skips `fillable` too.
-
-### Increment, touch and replicate
-
-- A third argument to `increment()` sets other columns in the same query: `increment('views', 1, <String, dynamic>{'status': 'hot'})`. Keys that `fillable` and `guarded` do not allow are dropped.
-- `touch()` returns the number of changed rows. It returns `0` when the model has no `updated_at` column and you give no column, or when a hook throws `CancelModelEvent`.
-- `replicate()` copies `deleted_at`, so a copy of a soft deleted model is soft deleted too. A column in its list that can not be `null`, or that is not a column, throws an `ArgumentError`.
-
-### Rows with no primary key
-
-`update()`, `increment()`, `decrement()`, `touch()` and `delete()` on a model with no primary key value and no `where` throw a `StateError`. This happens on a model that was never saved, or that was read without its key.
-
-### Refreshing
-
-- `refresh()` and `fresh()` read by primary key from the write database. They find a soft deleted row too, and skip global scopes.
-- `refresh()` throws a `StateError` on a model that is not in the table, and a `ModelNotFoundException` when the row is gone.
-
-### Relations after a reload
-
-`await user.reload()` and a preload set the relation fields again, also when there is no related row. A to-one field that can be `null` becomes `null`. A to-many field becomes `[]`. A to-one field that can not be `null` keeps its old value.
-
-### Other cases
-
-- `create:model` is another name for `make:model`.
-- Computed values of loaded relations are in the nested JSON too. `toMap(original: true)` has no computed values.
-
-## See also
+## Next steps
 
 - [HasMany](relationship/has-many.md): connect one model to many.
 - [Query scopes](scopes.md): keep a query you use often in the model.

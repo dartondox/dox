@@ -27,36 +27,41 @@
   --md-default-fg-color--light: #5b6478;
   --md-default-fg-color--lighter: #9aa3b5;
   --md-default-fg-color--lightest: #e6e9f0;
-  --md-typeset-color: #1c2333;
+  --md-typeset-color: #4a5468;
+  --dox-heading: #0b1220;
   --md-typeset-a-color: var(--dox-blue);
   --md-accent-fg-color: #0090d6;
   --md-accent-fg-color--transparent: rgba(0, 144, 214, 0.1);
 
   --dox-surface: #f6f7fa;
   --dox-line: #e3e6ee;
-  --dox-inline-code-bg: #eef1f8;
-  --dox-inline-code-fg: #1f4fa3;
+  --dox-bar: #a9afbd;
+  --dox-inline-code-bg: #f3f5f9;
 
-  /* Tokyo Night Day */
-  --md-code-bg-color: #f4f5f9;
-  --md-code-fg-color: #343b58;
-  --md-code-hl-color: #2c5bd1;
-  --md-code-hl-color--light: rgba(44, 91, 209, 0.12);
-  --md-code-hl-keyword-color: #7a3fc7;
-  --md-code-hl-function-color: #2c5bd1;
-  --md-code-hl-string-color: #3d6a1c;
-  --md-code-hl-number-color: #a24f06;
-  --md-code-hl-constant-color: #a24f06;
-  --md-code-hl-special-color: #0b6584;
-  --md-code-hl-operator-color: #0b6584;
-  --md-code-hl-punctuation-color: #565d78;
-  --md-code-hl-comment-color: #5f6890;
-  --md-code-hl-name-color: #343b58;
-  --md-code-hl-variable-color: #343b58;
-  --md-code-hl-generic-color: #5f6890;
-  --dox-code-type-color: #00698a;
-  --dox-code-annotation-color: #875400;
-  --dox-code-label-color: #22766a;
+  /* code: red keywords, purple calls, blue strings, orange names */
+  --dox-code-frame: #f1f3f7;
+  --dox-code-frame-line: #e4e8f0;
+  --md-code-bg-color: #ffffff;
+  --dox-code-fade: linear-gradient(155deg, #ffffff 0%, #f8f9fc 100%);
+  --dox-code-grain: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+  --md-code-fg-color: #24292f;
+  --md-code-hl-color: #0550ae;
+  --md-code-hl-color--light: rgba(5, 80, 174, 0.1);
+  --md-code-hl-keyword-color: #cf222e;
+  --md-code-hl-function-color: #8250df;
+  --md-code-hl-string-color: #0a3069;
+  --md-code-hl-number-color: #0550ae;
+  --md-code-hl-constant-color: #0550ae;
+  --md-code-hl-special-color: #cf222e;
+  --md-code-hl-operator-color: #cf222e;
+  --md-code-hl-punctuation-color: #24292f;
+  --md-code-hl-comment-color: #6e7781;
+  --md-code-hl-name-color: #24292f;
+  --md-code-hl-variable-color: #953800;
+  --md-code-hl-generic-color: #6e7781;
+  --dox-code-type-color: #8250df;
+  --dox-code-annotation-color: #953800;
+  --dox-code-label-color: #953800;
 }
 
 /* ---------- Tokens: dark ---------- */
@@ -66,38 +71,44 @@
   --md-default-fg-color--light: #9aa4bb;
   --md-default-fg-color--lighter: #6b7590;
   --md-default-fg-color--lightest: #222c42;
-  --md-typeset-color: #dde3f0;
+  --md-typeset-color: #a3adc2;
+  --dox-heading: #ffffff;
   --md-typeset-a-color: var(--dox-cyan);
   --md-accent-fg-color: #8fdcff;
   --md-accent-fg-color--transparent: rgba(92, 198, 255, 0.12);
   --md-footer-bg-color: #0a0f1b;
   --md-footer-bg-color--dark: #070b14;
 
-  --dox-surface: #141c2e;
-  --dox-line: #232e46;
-  --dox-inline-code-bg: #1c2539;
-  --dox-inline-code-fg: #a8dcff;
+  /* neutral, the same as the code card */
+  --dox-surface: #0c0d12;
+  --dox-line: #24262e;
+  --dox-bar: #5a5d68;
+  --dox-inline-code-bg: rgba(255, 255, 255, 0.07);
 
-  /* Tokyo Night */
-  --md-code-bg-color: #1a1b26;
-  --md-code-fg-color: #c0caf5;
-  --md-code-hl-color: #7aa2f7;
-  --md-code-hl-color--light: rgba(122, 162, 247, 0.16);
-  --md-code-hl-keyword-color: #bb9af7;
-  --md-code-hl-function-color: #7aa2f7;
-  --md-code-hl-string-color: #9ece6a;
-  --md-code-hl-number-color: #ff9e64;
-  --md-code-hl-constant-color: #ff9e64;
-  --md-code-hl-special-color: #89ddff;
-  --md-code-hl-operator-color: #89ddff;
-  --md-code-hl-punctuation-color: #a9b1d6;
-  --md-code-hl-comment-color: #7f88b5;
-  --md-code-hl-name-color: #c0caf5;
-  --md-code-hl-variable-color: #c0caf5;
-  --md-code-hl-generic-color: #7f88b5;
-  --dox-code-type-color: #2ac3de;
-  --dox-code-annotation-color: #e0af68;
-  --dox-code-label-color: #73daca;
+  /* code: pink keywords, purple calls, light blue strings, orange names */
+  --dox-code-frame: #0c0d12;
+  --dox-code-frame-line: #24262e;
+  --md-code-bg-color: #07080b;
+  --dox-code-fade: linear-gradient(155deg, #14151c 0%, #0a0b0f 45%, #07080b 100%);
+  --dox-code-grain: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.07 0'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23n)'/%3E%3C/svg%3E");
+  --md-code-fg-color: #f0f1f5;
+  --md-code-hl-color: #9ecbff;
+  --md-code-hl-color--light: rgba(158, 203, 255, 0.14);
+  --md-code-hl-keyword-color: #f47083;
+  --md-code-hl-function-color: #b392f0;
+  --md-code-hl-string-color: #9ecbff;
+  --md-code-hl-number-color: #79b8ff;
+  --md-code-hl-constant-color: #79b8ff;
+  --md-code-hl-special-color: #f47083;
+  --md-code-hl-operator-color: #f47083;
+  --md-code-hl-punctuation-color: #f0f1f5;
+  --md-code-hl-comment-color: #6b7280;
+  --md-code-hl-name-color: #f0f1f5;
+  --md-code-hl-variable-color: #ffab70;
+  --md-code-hl-generic-color: #6b7280;
+  --dox-code-type-color: #b392f0;
+  --dox-code-annotation-color: #ffab70;
+  --dox-code-label-color: #ffab70;
 }
 
 /* ---------- Syntax: Dart details Material does not split out ---------- */
@@ -113,6 +124,30 @@
 .highlight .dox-call { color: var(--md-code-hl-function-color); }
 .highlight .c1, .highlight .cm { font-style: italic; }
 
+/* ---------- Page background: a soft glow at the top with a fine grain ---------- */
+[data-md-color-scheme="default"] {
+  --dox-page-fade: radial-gradient(ellipse 90% 60% at 50% 0%, #f1f5fd 0%, #ffffff 70%);
+}
+[data-md-color-scheme="slate"] {
+  --dox-page-fade: radial-gradient(ellipse 90% 60% at 50% 0%, #18233f 0%, #0f1524 45%, #0a0e19 100%);
+}
+body {
+  background-image: var(--dox-code-grain), var(--dox-page-fade);
+  background-attachment: fixed;
+}
+/* the sidebar titles have their own solid color. On a wide screen it shows
+   as a bar on top of the page background, so remove it there. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar .md-nav__title,
+  .md-nav--lifted > .md-nav__list > .md-nav__item--active > .md-nav__link {
+    background: none;
+    box-shadow: none;
+  }
+  /* with no background, a title that stays at the top would sit on the items
+     that scroll below it. So the title scrolls with the list. */
+  .md-sidebar .md-nav__title { position: static; }
+}
+
 /* ---------- Typography ---------- */
 .md-typeset {
   font-size: 0.82rem;
@@ -121,44 +156,104 @@
 .md-typeset h1,
 .md-typeset h2,
 .md-typeset h3 {
-  color: var(--md-default-fg-color);
+  color: var(--dox-heading);
   letter-spacing: -0.015em;
 }
 .md-typeset h1 { font-weight: 700; font-size: 2.1em; margin-bottom: 0.8em; }
-.md-typeset h2 { font-weight: 650; margin-top: 2em; }
-.md-typeset h3 { font-weight: 600; }
+.md-typeset h2 { font-weight: 650; margin-top: 2.2em; }
+/* a sub-heading stays close to its own text */
+.md-typeset h3 { font-weight: 600; margin: 1.9em 0 0.5em; }
+/* body text is soft, headings and bold text are strong */
+.md-typeset strong,
+.md-typeset th { color: var(--md-default-fg-color); }
 .md-typeset a { text-underline-offset: 0.2em; }
 .md-typeset a:hover { text-decoration: underline; }
 
-/* comfortable reading width for long text */
-.md-content__inner > p,
-.md-content__inner > ul,
-.md-content__inner > ol { max-width: 44rem; }
+/* the width of the whole page: header, menus and content together */
+.md-grid { max-width: 1300px; }
+/* the middle column keeps its old width (61rem less the two side menus).
+   The extra page width becomes space on its left and right. */
+@media screen and (min-width: 76.25em) {
+  /* only on pages that show the table of contents. The home page hides it
+     and uses the full width. */
+  .md-sidebar--secondary:not([hidden]) ~ .md-content {
+    max-width: 36.8rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 
-/* inline code */
+/* inline code: the same color as the text around it, on a faint background */
 .md-typeset :not(pre) > code {
   background: var(--dox-inline-code-bg);
-  color: var(--dox-inline-code-fg);
+  box-shadow: none;
+  color: inherit;
   border-radius: 5px;
   padding: 0.1em 0.38em;
   font-size: 0.86em;
 }
 .md-typeset a > code { color: inherit; }
 
-/* code blocks */
-.md-typeset pre > code {
-  border-radius: var(--dox-radius);
+/* code blocks: a framed card. The title sits on the frame, the code on an
+   inner panel. */
+.md-typeset .highlight {
+  /* a fine grain on top of the color, so the surface is not flat */
+  background: var(--dox-code-grain), var(--dox-code-frame);
+  border: 1px solid var(--dox-code-frame-line);
+  border-radius: 14px;
+  padding: 1px;
+  margin: 1.2em 0;
+}
+.md-typeset .highlight pre {
+  margin: 0;
+  border-radius: 12px;
+}
+/* the inner panel: the frame radius minus the frame padding, on all four
+   corners, also below a title */
+.md-typeset .highlight pre > code,
+.md-typeset .highlight span.filename + pre > code {
+  border: 0;
+  background-image: var(--dox-code-grain), var(--dox-code-fade);
+  border-radius: 12px;
   font-size: 0.8em;
   line-height: 1.65;
+  padding: 1.05em 1.25em;
 }
-.md-typeset .highlight,
-.md-typeset pre {
-  border-radius: var(--dox-radius);
+/* copy button: an outline icon with no box. With a title it sits on the
+   frame, at the right of the title. */
+.md-typeset .highlight { position: relative; }
+.md-typeset .highlight span.filename + pre { position: static; }
+.md-typeset .highlight .md-code__nav {
+  background: none;
+  padding: 0;
+  top: 0.75em;
+  right: 0.8em;
 }
-.md-typeset pre > code {
-  border: 1px solid var(--dox-line);
+.md-typeset .highlight span.filename + pre .md-code__nav { top: 0.5em; right: 0.75em; }
+.md-typeset .highlight :hover > .md-code__nav { background: none; }
+.md-typeset .highlight .md-code__button {
+  color: var(--md-default-fg-color--lighter);
+  width: 1.7em;
+  height: 1.7em;
 }
-[data-md-color-scheme="slate"] .md-typeset pre > code { border-color: #2a2c3d; }
+.md-typeset .highlight .md-code__button:hover { color: var(--md-default-fg-color); }
+.md-typeset .highlight .md-code__button::after { width: 1.25em; height: 1.25em; margin-top: 0.22em; }
+.md-typeset .highlight .md-code__button[data-md-type="copy"]::after {
+  -webkit-mask-image: var(--dox-copy-icon);
+  mask-image: var(--dox-copy-icon);
+}
+:root {
+  --dox-copy-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="3"/><path d="M5 16a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2"/></svg>');
+}
+.md-typeset .highlight span.filename {
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0.7em 1em 0.75em;
+  font-size: 0.8em;
+  font-weight: 400;
+  color: var(--md-default-fg-color--light);
+}
 
 /* ---------- Header and tabs ---------- */
 [dir=ltr] .md-header__title { margin-left: 0; }
@@ -204,7 +299,59 @@
   }
 }
 
+/* ---------- One header row ----------
+   script.js moves the section tabs into the header, after the title.
+   Material shows tabs only from 76.25em. Below that the drawer has them. */
+.md-container > .md-tabs { display: none; }
+@media screen and (min-width: 76.25em) {
+  .md-header__title {
+    flex: 0 0 auto;
+    margin-right: 0.6rem;
+  }
+  /* the title keeps the site name. The page name does not slide in. */
+  .md-header__title .md-header__topic + .md-header__topic { display: none; }
+  .md-header__title .md-header__ellipsis { position: static; height: auto; }
+  .md-header__title .md-header__topic:first-child,
+  .md-header__title--active .md-header__topic:first-child {
+    position: static;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    z-index: 0;
+  }
+  /* the logo alone is the name. The version selector of the live site stays. */
+  .md-header__title .md-header__topic:first-child > .md-ellipsis { display: none; }
+  .md-header__title { margin-right: 0.2rem; }
+  /* Material hides the tabs after a scroll. In the header they always show. */
+  .md-header__inner > .md-tabs[hidden] { pointer-events: auto; }
+  .md-header__inner > .md-tabs[hidden] .md-tabs__link {
+    opacity: 0.78;
+    transform: none;
+    transition: none;
+  }
+  .md-header__inner > .md-tabs[hidden] .md-tabs__item--active .md-tabs__link { opacity: 1; }
+  .md-header__inner > .md-tabs {
+    display: block;
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    background: none;
+    border: 0;
+    overflow: hidden;
+  }
+  .md-header__inner > .md-tabs .md-grid { margin: 0; max-width: none; }
+  .md-header__inner > .md-tabs .md-tabs__list { padding: 0; margin: 0; }
+  .md-header__inner > .md-tabs .md-tabs__item { height: 2.4rem; padding: 0 0.45rem; }
+  .md-header__inner > .md-tabs .md-tabs__link { margin-top: 0.8rem; font-size: 0.68rem; }
+  /* room for the tabs: a smaller search box, and GitHub as an icon only */
+  .md-search { flex: 0 0 auto; }
+  .md-search__inner { width: 8.5rem; }
+  .md-header__source .md-source__repository { display: none; }
+}
+
 /* ---------- Navigation ---------- */
+/* the table of contents on the right is smaller than the main menu */
+.md-sidebar--secondary .md-nav { font-size: 0.62rem; line-height: 1.35; }
 .md-nav__title { font-weight: 700; }
 .md-nav__item--section > .md-nav__link {
   color: var(--md-default-fg-color);
@@ -244,21 +391,26 @@ svg.lucide {
 }
 
 /* ---------- Tables ---------- */
+/* tables use the same card as code blocks: the frame color, a fine grain,
+   and neutral lines */
 .md-typeset table:not([class]) {
-  border: 1px solid var(--dox-line);
-  border-radius: 8px;
+  background: var(--dox-code-grain), var(--md-code-bg-color);
+  border: 1px solid var(--dox-code-frame-line);
+  border-radius: 14px;
   box-shadow: none;
   font-size: 0.78rem;
 }
 .md-typeset table:not([class]) th {
-  background: var(--dox-surface);
+  background: var(--dox-code-frame);
+  color: var(--md-default-fg-color);
   font-weight: 650;
 }
 .md-typeset table:not([class]) td,
 .md-typeset table:not([class]) th {
   padding: 0.6em 1.1em;
-  border-top-color: var(--dox-line);
+  border-top-color: var(--dox-code-frame-line);
 }
+.md-typeset table:not([class]) tbody tr:hover { background: none; box-shadow: none; }
 .md-typeset table:not([class]) code { font-size: 0.8em; }
 
 /* ---------- Content tabs ---------- */
@@ -315,12 +467,14 @@ svg.lucide {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
   gap: 2.4rem;
-  align-items: center;
-  margin: 0.4rem 0 2rem;
+  align-items: start;
+  margin: 0 0 2rem;
 }
-.md-typeset .dox-hero__mascot { display: block; width: 140px; height: auto; margin: 0 0 0.8rem; }
+/* Doxie sits at the left of the title, on the same row */
+.md-typeset .dox-hero__mascot { float: left; width: 110px; height: auto; margin: 0 0.8rem 0.6rem 0; }
+.md-typeset .dox-hero__lead { clear: both; }
 .md-typeset .dox-hero h1 {
-  font-size: 2.6rem;
+  font-size: 2.15rem;
   line-height: 1.08;
   letter-spacing: -0.03em;
   font-weight: 700;
@@ -335,13 +489,15 @@ svg.lucide {
 .md-typeset .dox-hero__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
 .md-typeset .dox-hero__actions .md-button { margin: 0; }
 .md-typeset .dox-hero__code .highlight { margin: 0; }
+/* the hero sample is not a full file, so it has no copy button */
+.md-typeset .dox-hero__code .md-code__nav { display: none; }
 .md-typeset .dox-hero__code pre > code { font-size: 0.76em; padding: 1.1em 1.3em; }
 
 .md-typeset .grid.cards > ul > li,
 .md-typeset .grid > .card {
   border: 1px solid var(--dox-line);
-  border-radius: var(--dox-radius);
-  background: var(--md-default-bg-color);
+  border-radius: 14px;
+  background: var(--dox-code-grain), var(--dox-surface);
   box-shadow: none;
   padding: 1rem 1.1rem;
 }
@@ -356,7 +512,8 @@ svg.lucide {
 
 @media screen and (max-width: 59.9375em) {
   .dox-hero { grid-template-columns: minmax(0, 1fr); gap: 1.6rem; }
-  .md-typeset .dox-hero h1 { font-size: 2rem; }
+  .md-typeset .dox-hero h1 { font-size: 1.8rem; }
+  .md-typeset .dox-hero__mascot { width: 88px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -367,7 +524,7 @@ svg.lucide {
 .dox-bench {
   border: 1px solid var(--dox-line);
   border-radius: 14px;
-  background: var(--dox-surface);
+  background: var(--dox-code-grain), var(--dox-surface);
   padding: 1.2rem 1.4rem 0.8rem;
   margin: 0.4rem 0 1.6rem;
 }
@@ -412,7 +569,7 @@ svg.lucide {
   height: 100%;
   width: var(--w);
   flex: none;
-  background: var(--md-default-fg-color--lighter);
+  background: var(--dox-bar);
 }
 .dox-bench__num,
 .dox-bench__p99,
@@ -457,24 +614,6 @@ svg.lucide {
   .dox-bench--simple .dox-bench__grid { grid-template-columns: 5.4rem minmax(0, 1fr) 4.8rem; column-gap: 0.6rem; }
   .dox-bench__p99, .dox-bench__ram, .dox-bench__head:nth-child(4), .dox-bench__head--ram { display: none; }
   .md-typeset .dox-bench__foot { flex-direction: column; }
-}
-
-/* ---------- Page background: faint grid that fades at the edges ---------- */
-[data-md-color-scheme="default"] { --dox-grid-line: rgba(11, 27, 54, 0.07); }
-[data-md-color-scheme="slate"] { --dox-grid-line: rgba(148, 163, 200, 0.09); }
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--dox-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--dox-grid-line) 1px, transparent 1px);
-  background-size: 35px 35px;
-  background-position: center top;
-  -webkit-mask-image: radial-gradient(ellipse 50% 65% at 50% 35%, #000 30%, transparent 100%);
-  mask-image: radial-gradient(ellipse 50% 65% at 50% 35%, #000 30%, transparent 100%);
 }
 
 /* Blog list: a thin line between the posts. */

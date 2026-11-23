@@ -6,7 +6,7 @@ icon: lucide/cpu
 
 Dox runs your app on many isolates (threads) at once, so it can use every CPU core.
 
-Each isolate runs its own [native server](native-server.md) on the same port, and the operating system spreads the connections between them. You write your app once, and Dox starts a copy of it in every isolate.
+Each isolate runs its own [native server](native-server.md) on the same port, and the operating system spreads the connections between them:
 
 ```mermaid
 flowchart TD
@@ -20,13 +20,11 @@ flowchart TD
     I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
 ```
 
-With the Postgres and MySQL drivers, all isolates share one database pool in Rust. See [How Dox works](../concepts/how-dox-works.md#where-the-database-pools-live).
+## Setup
 
-## Setting the number of isolates
+Dox starts one isolate per CPU the process may use. In a container, it uses the CPU limit, and a quota rounds up: 1.5 CPUs gives 2 isolates. On Windows only one isolate serves HTTP.
 
-By default Dox starts one isolate per CPU the process may use. In a container, this respects the cpuset and the CPU quota (`--cpuset-cpus`, `--cpus`, Kubernetes limits). A quota rounds up: 1.5 CPUs gives 2 isolates. You may want fewer when the same machine also runs the database or other heavy work.
-
-Set `totalIsolate` in the app config. A new app reads it from `APP_TOTAL_ISOLATE`:
+To change the number, set `totalIsolate` in the app config. A new app reads it from `APP_TOTAL_ISOLATE`:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -35,7 +33,9 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-You can also set it in code, before `startServer()`. This wins over the config:
+## Setting the number in code
+
+Call `Dox().totalIsolate()` before `startServer()`. It wins over the config:
 
 ```dart title="bin/server.dart"
 Dox().initialize(appConfig);
@@ -45,48 +45,45 @@ await Dox().startServer();
 
 ## Each isolate has its own memory
 
-Isolates do not share memory. This matters when you keep state in your code:
+A static value, a singleton and the `memory` cache store exist one time per isolate. To share data between isolates or servers, use a database, Redis or files.
 
-- A static value or a singleton exists once **per isolate**. If you change it in one isolate, the others do not see it.
-- The `memory` cache store is per isolate. See [Cache](cache.md).
-- To share data between isolates or servers, use a database, Redis or files.
+## Finding the current isolate
 
-If you need to know which isolate runs your code, use `Dox().isolateId`. The first isolate is `1`:
+`Dox().isolateId` is the id of the isolate that runs your code. The first isolate is 1. `Dox().isolateCount` is the number of running isolates:
 
 ```dart
 int id = Dox().isolateId;
+int count = Dox().isolateCount;
 ```
 
 ## Sending a message to the other isolates
 
-Sometimes one isolate needs to tell the others that something changed, for example "forget this cache key". Use `IsolateBus` for this. It sends a message from one isolate to all the others in the same process.
-
-Listen on a channel in a provider's `setup()`, and publish from anywhere:
+`IsolateBus` sends a message from one isolate to all the other isolates in the same process. Listen in the `setup()` of a provider, and publish from anywhere:
 
 ```dart
-IsolateBus.instance.on('users').listen(onMessage); // in a provider's setup()
+IsolateBus.instance.on('users').listen(onMessage);
 IsolateBus.instance.publish('users', <Object>['changed', 42]);
 ```
 
-A listener only gets the messages of its own channel, and an isolate never gets its own message. A message must be something a `SendPort` can send: null, bool, num, String, typed data, and lists and maps of those.
+An isolate never gets its own message, and a listener gets only the messages sent after it started to listen. A message must be a value a `SendPort` can send, or `publish` throws an `ArgumentError`.
 
-The bus works inside one process only. For many servers, use Redis. Socket.IO uses the bus to share broadcasts, see [Socket.IO](../packages/socketio.md#many-isolates).
+`IsolateBus.instance.size` is the number of isolates that listen, this one included. For many servers, use Redis. [Socket.IO](../packages/socketio.md#many-isolates) uses the bus to share broadcasts.
 
 ## What each isolate does at start
 
-Dox copies the `AppConfig`, the providers and the routes you added before `startServer()` to each new isolate. Then every isolate:
+Dox copies the `AppConfig`, the providers and the routes to each new isolate. Then every isolate:
 
-1. runs `setup()` of each provider (for example, it opens the database pool),
+1. runs `setup()` of each provider,
 2. registers the routes of your routers,
-3. reads the parameter types of each controller once,
+3. reads the parameter types of each controller one time,
 4. runs `boot()` of each provider,
 5. starts its HTTP server.
 
-Because the config and providers are copied, they must not hold open sockets or database pools. Open these in `setup()`. See [Providers](providers.md).
+So the config and the providers must not hold open sockets or database pools. Open them in `setup()`. See [Providers](providers.md).
 
 ## Heavy CPU work
 
-Heavy CPU work in a request blocks every other request on the same isolate. So run it on a worker isolate with `Dox().compute`. The server answers other requests while the task runs:
+Heavy CPU work in a request blocks every other request on the same isolate. Run it on a worker isolate with `Dox().compute`:
 
 ```dart
 Future<List<int>> renderPdf(Map<String, dynamic> data) {
@@ -94,9 +91,9 @@ Future<List<int>> renderPdf(Map<String, dynamic> data) {
 }
 ```
 
-The task runs in another isolate, so it can only use values that can go between isolates: numbers, strings, lists, maps and plain objects. It can not use the container, a database connection or a cache store. Read the data first, and pass it in. Make the task in a small top-level or static function.
+The task can use only values that can go between isolates: numbers, strings, lists, maps and plain objects. It can not use the container, a database connection or a cache store, so read the data first and pass it in. Make the task in a small top-level or static function.
 
-The tasks run on a pool of 4 workers. More tasks wait in line. To change the number, set `computeWorkers` in `AppConfig`:
+The tasks run on a pool of 4 workers, and more tasks wait in line. Set `computeWorkers` to change the number:
 
 ```dart
 AppConfig(
@@ -105,22 +102,16 @@ AppConfig(
 );
 ```
 
-More workers than CPU cores do not make the work faster. An error of the task is thrown at the `await`, with its stack trace. `compute` also works with no server, like in a command, a test or a queue job.
+An error of the task is thrown at the `await`. `compute` also works with no server, like in a command, a test or a queue job.
 
 ## When an isolate crashes
 
-Dox keeps your app running when code fails:
+An error in a request gives a 500, and an async error outside a request goes to the [exception handler](../the-basic/errors.md). If a worker isolate dies, Dox starts a new one after 1 second.
 
-- An error in a request is caught. Dox sends a `500` and keeps going.
-- An async error outside a request (for example a future that nobody awaits) is passed to the `report` method of the [exception handler](../the-basic/errors.md). The isolate keeps running.
-- If a worker isolate still dies, Dox prints `[server] isolate N exited, restarting` to stderr and starts a new isolate after 1 second.
+If the first isolate dies, the process exits with a non-zero code. Let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
 
-If the first (main) isolate dies, the process exits with a non-zero code. So let a supervisor start it again, like Docker `restart:` or systemd `Restart=always`. See [Deployment](deployment.md#keep-it-running).
+## Next steps
 
-## Details
-
-- Linux gives each isolate its own socket (`SO_REUSEPORT`). On macOS the isolates share one socket. On Windows only one isolate serves HTTP.
-- `Dox().isolateCount` is the number of running isolates. `IsolateBus.instance.size` is the number of isolates that listen on the bus, this one included. `size` can be old for a short time after an isolate joins or leaves.
-- `publish` throws an `ArgumentError` for a value a `SendPort` can not send, and then no isolate gets the message. In the main isolate it only throws when another isolate listens.
-- `publish` never waits. A slow listener keeps the messages in a queue in its memory.
-- A message only reaches the isolates that listen at that moment. An isolate that calls `on()` later does not get older messages.
+- [Providers](providers.md): code that runs in each isolate at start.
+- [Native server](native-server.md): the HTTP server in each isolate.
+- [Deployment](deployment.md): run the app on a server.

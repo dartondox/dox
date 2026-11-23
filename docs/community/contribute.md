@@ -6,7 +6,7 @@ icon: lucide/git-pull-request-arrow
 
 This page shows how to work on Dox: set up the repo, run the tests, release packages and update the docs.
 
-To send a change, fork the repo and open a pull request. The first part of this page is all you need for that. The release parts are for maintainers.
+To send a change, fork the repo and open a pull request. The release parts are for maintainers.
 
 ## Setting up local development
 
@@ -18,7 +18,7 @@ git clone git@github.com:dartondox/dox.git
 
 ### 2. Install melos
 
-The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces), and melos runs the commands for all packages. Its config is in the root `pubspec.yaml`, under `melos:`. You need Dart 3.13 or newer.
+The repo is a [Dart pub workspace](https://dart.dev/tools/pub/workspaces). Melos runs the commands for all packages, with its config in the root `pubspec.yaml`. You need Dart 3.13 or newer.
 
 ```bash
 dart pub global activate melos
@@ -26,7 +26,7 @@ dart pub global activate melos
 
 ### 3. Run melos bootstrap
 
-This runs one `dart pub get` at the root and links all local packages, so there is one `pubspec.lock` for the whole repo.
+This gets the packages at the root and links all local packages:
 
 ```bash
 melos bs
@@ -34,11 +34,10 @@ melos bs
 
 ### 4. Run the tests and checks
 
-Run these before you open a pull request. They are the same checks CI runs:
+Run the checks of CI before you open a pull request:
 
 ```bash
-# Run all tests.
-# Use `melos run test`. `melos test` is a built-in melos command.
+# Run all tests (not `melos test`, a built-in melos command)
 melos run test
 
 # Analyze and check format (same as CI)
@@ -56,21 +55,19 @@ If `melos bs` fails or the packages do not resolve, start clean:
 
 ## Release (maintainers)
 
-The `Release` GitHub workflow (`.github/workflows/publish.yaml`) publishes one package to pub.dev. Each package has its own version and its own tag, in the form `<package>-v<version>`. The workflow uses pub.dev automated publishing, so it needs no token or secret.
+The Release workflow (`.github/workflows/publish.yaml`) publishes one package to pub.dev with automated publishing. Each package has its own version and its own tag, in the form `<package>-v<version>`.
 
 ### Steps
 
 The full guide is [RELEASING.md](https://github.com/dartondox/dox/blob/main/RELEASING.md) in the repo. In short, for each package that changed:
 
-1. Run `bin/bump.sh <package> <version>`. It sets the version of that package only. If the package needs a newer sibling, raise that constraint by hand. Then close the `## Unreleased` section of its `CHANGELOG.md`.
+1. Run `bin/bump.sh <package> <version>`. It sets the version of that package only. Raise the constraint of a newer sibling by hand. Then close the Unreleased section of its `CHANGELOG.md`.
 2. Merge the release PR, then push the tag `<package>-v<version>`. This publishes that package to pub.dev. Release in dependency order: `dox_annotation`, `dox_cache`, `dox_builder`, `dox_core`.
 3. Release the matching `dox-sample` template.
 
-A builder-only fix needs a `dox_builder` release only. It does not need a `dox_core` release.
+A fix in the builder needs only a `dox_builder` release. Many packages are in other repos. See [Packages in other repos](#packages-in-other-repos) and [Native packages](#native-packages).
 
-The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native`) are not in this repo. See [Native packages](#native-packages) below. `dox_orm`, `dox_migration`, `dox_socketio`, `dox_storage`, `dox_queue`, `dox_queue_database`, `dox_scheduler`, `dox_inertia`, `dox_view` and `dox_mailer` are not in this repo either. See [Packages in other repos](#packages-in-other-repos).
-
-**New package only:** a new package must first exist on pub.dev, so publish its first version by hand with `dart pub publish`. Then turn on pub.dev automated publishing for it. See [One-time setup](#one-time-setup).
+For a new package, publish the first version by hand with `dart pub publish`. Then turn on automated publishing for it. See [One-time setup](#one-time-setup).
 
 ### What the workflow does
 
@@ -79,7 +76,7 @@ The native packages (`dox_http_native`, `dox_postgres_native`, `dox_mysql_native
 3. It runs the tests, and they must pass. Then it checks that the sibling packages it needs are on pub.dev. If not, it stops with "release <dep> first".
 4. It checks that one package with a dry run, then publishes it.
 
-A tag for a version that is already on pub.dev is skipped. So if a run fails, fix the problem and click "Re-run jobs".
+The workflow skips a version that is already on pub.dev. So if a run fails, fix the problem and click "Re-run jobs".
 
 To see the packages in publish order on your machine:
 
@@ -89,7 +86,7 @@ python3 bin/publish_order.py
 
 ### Dry run
 
-If you want to check a release without publishing, open Actions > Release > "Run workflow" and pick one package, or `all`. It runs `dart pub publish --dry-run` and publishes nothing. Warnings, like a missing CHANGELOG entry, show in yellow and do not fail the run.
+To check a release with no publish, open Actions > Release > "Run workflow" and pick one package, or all. It runs `dart pub publish --dry-run`. Warnings show in yellow and do not fail the run.
 
 ### One-time setup
 
@@ -123,7 +120,7 @@ On GitHub, in `dartondox/dox` > Settings > Environments, there must be an enviro
 | `dox_view` | [dartondox/dox-view](https://github.com/dartondox/dox-view) |
 | `dox_mailer` | [dartondox/dox-mailer](https://github.com/dartondox/dox-mailer) |
 
-The packages in this repo use them from pub.dev. `dox_core` uses `dox_openapi` and `dox_validation`. The database tests (Postgres, MySQL, MariaDB, SQLite) run in `dox-orm`. CI in this repo tests against their newest code: it runs `ci/clone-siblings.sh`, then `ci/use-siblings.sh`.
+The packages in this repo use them from pub.dev. `dox_core` uses `dox_openapi` and `dox_validation`. The database tests run in dox-orm. CI in this repo tests with their newest code: it runs `ci/clone-siblings.sh`, then `ci/use-siblings.sh`.
 
 To work on one of them and Dox together:
 
@@ -141,8 +138,7 @@ To work on one of them and Dox together:
 
 3. Run `dart pub get`.
 
-The apps in `examples/` already use these clones (their `pubspec_overrides.yaml`), so clone them before you run an example.
-In the other repo, a `pubspec_overrides.yaml` that points to `../dox/packages/...` uses your local Dox packages.
+The apps in `examples/` use these clones, so clone them before you run an example. In the other repo, a `pubspec_overrides.yaml` that points to `../dox/packages/...` uses your local Dox packages.
 
 Each of these repos has its own version. To release one, push a `v<version>` tag in that repo.
 
@@ -156,7 +152,7 @@ The three native packages live in their own repos:
 | `dox_postgres_native` | [dartondox/dox-postgres-native](https://github.com/dartondox/dox-postgres-native) |
 | `dox_mysql_native` | [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native) |
 
-Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox. You only need these steps if you change a native package.
+Dox uses them from pub.dev. Their build hooks download ready-built libraries, so you do not need Rust to work on Dox.
 
 To work on a native package and Dox together:
 
@@ -179,8 +175,8 @@ The docs site is https://dartondox.dev. It is built with MkDocs Material and [mi
 
 | URL | What it is |
 | --- | --- |
-| `/3.x/...` | 3.x docs, built from `main` |
-| `/latest/...` | a copy of the newest version (now 3.x) |
+| `/<version>/...` | the docs of one version, built from `main` |
+| `/latest/...` | a copy of the newest version |
 | `/` | redirects to `/latest/` |
 | old links like `/the-basic/routing/` | redirect to `/latest/the-basic/routing/` |
 
@@ -193,9 +189,7 @@ python3 -m venv .venv
 .venv/bin/mkdocs build --strict  # the same build as CI. Broken links fail.
 ```
 
-`hooks/docs_hooks.py` runs during the build. It writes `llms.txt` and `llms-full.txt`.
-
-Every pull request that changes the docs runs the `Docs check` workflow (`.github/workflows/docs-check.yaml`). It has three checks:
+The build hook `hooks/docs_hooks.py` writes `llms.txt` and `llms-full.txt`. Each pull request that changes the docs runs the Docs check workflow, with three checks:
 
 - `mkdocs build --strict`
 - a spell check: `codespell docs --skip "*.svg,*.png,*.ico,*.css,*.js" --ignore-words .codespell-ignore`
@@ -203,11 +197,12 @@ Every pull request that changes the docs runs the `Docs check` workflow (`.githu
 
 ### Deploy
 
-- 3.x deploys with each release. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on a `dox_core-v<version>` tag, the same tag that publishes `dox_core`, and runs `mike deploy --update-aliases 3.x latest`. So docs for a feature that is not released yet stay off the site.
-- If you want to deploy the docs only (a typo fix, or the docs of a package from another repo that was just released), push a `docs-v<version>` tag on `main`, like `git tag docs-v3.0.1-1 && git push origin docs-v3.0.1-1`. It publishes no package and runs no tests.
-- After each deploy, the workflow writes small redirect pages for the old root links, the root `index.html`, a `404.html` and the `CNAME` file. So `dartondox.dev` and old links keep working.
-- The workflow pushes with the built-in `GITHUB_TOKEN`. This works because `gh-pages` is not a protected branch.
+- The docs deploy with each release. The `Docs` workflow (`.github/workflows/docs.yaml`) runs on a `dox_core-v<version>` tag, the same tag that publishes `dox_core`, and runs `mike deploy`. So docs for a feature that is not released yet stay off the site.
+- To deploy the docs only, push a `docs-v<version>` tag on `main`. It publishes no package and runs no tests.
+- After each deploy, the workflow writes the redirect pages, the root `index.html`, a `404.html` and the `CNAME` file.
+- The workflow pushes with the built-in `GITHUB_TOKEN`, so `gh-pages` must not be a protected branch.
 
-### New major version
+## Next steps
 
-When 4.x starts, deploy it with `mike deploy --update-aliases 4.x latest`. Keep a `v3.x` branch and add `3.x` to the workflow input, so 3.x can still be fixed.
+- [Status and roadmap](../concepts/status-and-roadmap.md): the state and the tests of each package.
+- [Showcase](showcase.md): apps built with Dox.

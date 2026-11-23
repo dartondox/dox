@@ -9,16 +9,17 @@ hide:
 
 <div class="dox-hero__text" markdown>
 
-<img class="dox-hero__mascot" src="assets/mascot.png" alt="Doxie, the Dox mascot" width="140" height="137">
+<img class="dox-hero__mascot" src="assets/mascot.png" alt="Doxie, the Dox mascot" width="110" height="108">
 
 # Fast backends<br>in Dart
 
 <p class="dox-hero__lead"><strong>Everything your Dart backend needs.</strong></p>
 
 <p class="dox-hero__lead">
-Dox is a web backend framework for Dart.
-It has routing, an ORM, migrations, validation, auth and a CLI in one place.
-It runs one isolate per CPU core and builds to a small native binary.
+Build APIs and full web apps in Dart, with batteries included.
+Routing, an ORM, validation, auth and a CLI work from the first command.
+One command adds the rest: queues, mail, GraphQL and more.
+Your app uses every CPU core and ships as one small native binary.
 </p>
 
 <p class="dox-hero__actions" markdown>
@@ -32,37 +33,32 @@ It runs one isolate per CPU core and builds to a small native binary.
 <div class="dox-hero__code" markdown>
 
 ```dart
-Route.post('/blogs', BlogController.store); // (1)!
+Route.post('/blogs', (BlogController c) => c.store);
 
-@Dto() // (2)!
+@Inject() // (1)!
+class BlogController {
+  BlogController(this.blogs);
+  final BlogService blogs;
+
+  Future<Blog> store(CreateBlog input) { // (2)!
+    return blogs.create(input);
+  }
+}
+
+@Dto() // (3)!
 class CreateBlog {
   @Length(min: 3, max: 100)
   final String title;
 
   @MinLength(10)
   final String body;
-
-  const CreateBlog({required this.title, required this.body});
   ...
-}
-
-class BlogController {
-  static Future<DoxResponse> store(
-    CreateBlog input, // (3)!
-  ) async {
-    Blog blog = Blog()
-      ..title = input.title
-      ..body = input.body;
-    await blog.save(); // (4)!
-    return response(blog).statusCode(201);
-  }
 }
 ```
 
-1.  A route points to a static method. Dox needs no reflection and no list of controllers.
-2.  `@Dto()` marks an input class. `build_runner` makes the checks from the fields, their types and their rules.
-3.  Ask for the DTO as a parameter. Dox reads the JSON body, checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
-4.  The ORM. The same code runs on Postgres, MySQL and SQLite. Postgres and MySQL use native drivers.
+1.  Dox makes the controller and gives it the service it asks for. There is no reflection and no list of classes to keep.
+2.  Ask for the DTO as a parameter. Dox reads the JSON body, checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
+3.  `@Dto()` marks an input class. The code generator writes the checks from the fields, their types and their rules.
 
 </div>
 

@@ -6,23 +6,17 @@ icon: material/package-variant-plus
 
 `dox add` adds a Dox package to your app and sets it up.
 
-Many packages need config files and `.env` keys. `dox add` writes them for you, so you do not set up each package by hand:
+## Adding a package
+
+Give the short name of the package. The full name, like `dox_orm`, also works:
 
 ```bash
 dox add orm
 ```
 
-## What it does
+It runs `dart pub add dox_orm`, then `dart pub get`, then the setup command of the package (here `dox orm:install`). The setup command writes the config files, adds the keys to `.env` and `.env.example`, and runs build_runner if necessary. At the end it shows what it did and the next steps.
 
-`dox add orm` does three steps:
-
-1. Runs `dart pub add dox_orm`. `orm` is short for `dox_orm`. The full name works too.
-2. Runs `dart pub get`.
-3. Runs the setup command of the package, `dox orm:install`.
-
-The setup command writes the config files, adds the keys to `.env` and `.env.example`, and runs `build_runner` when the package needs it. At the end it prints what it did and the next steps.
-
-A package with no setup command is only added, and `dox add` says so.
+A package with no setup command is only added.
 
 ## Options
 
@@ -32,15 +26,13 @@ Words after the name go to the setup command, for example to pick a driver:
 dox add orm --driver=postgres
 ```
 
-`--dev` adds the package as a dev dependency.
+Add `--dev` to add the package as a dev dependency.
 
-## Safe to run twice
+## Running it again
 
-The setup command never overwrites a file and never changes a `.env` key that is already there. So you can run `dox add` again, and it only adds what is missing.
+The setup command never overwrites a file or a `.env` key. So you can run `dox add` again, and it adds only what is missing.
 
 ## Packages with a setup command
-
-These packages have a setup command:
 
 | Command | What it sets up |
 | --- | --- |
@@ -57,6 +49,9 @@ These packages have a setup command:
 | `dox add mcp` | An MCP server with a sample tool. See [MCP](../packages/mcp.md). |
 | `dox add grpc` | gRPC: a sample `.proto` file, a router with the health service and `APP_HTTP2` in `.env`. See [gRPC](../digging-deeper/grpc.md). |
 
-The first `dox add orm` can download (or build) the Postgres and MySQL drivers once, also the one you do not use. After that, `pubspec.yaml` skips the unused drivers, so later builds do not get them.
+The first `dox add orm` can download or build the Postgres and MySQL drivers one time. After that, `pubspec.yaml` skips the drivers that you do not use.
 
-To add a setup command to your own package, see [Package commands](../digging-deeper/package-commands.md#ship-an-install-command).
+## Next steps
+
+- [Package commands](../digging-deeper/package-commands.md#ship-an-install-command): add a setup command to your own package.
+- [CLI](../reference/cli.md): all commands of the CLI.

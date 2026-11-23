@@ -2,7 +2,7 @@
 
 Each guide solves one job from start to end: you copy the files, run the commands and check the result.
 
-The guides are short on theory. If you want to know more about one part, follow the links to the reference pages.
+To know more about one part, follow the links to the reference pages.
 
 | Guide | What you get |
 | --- | --- |

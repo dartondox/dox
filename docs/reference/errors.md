@@ -4,9 +4,9 @@ icon: lucide/circle-alert
 
 # Error index
 
-This page lists the messages Dox prints or throws, so you can search for the text you see.
+This page lists the messages that Dox shows or throws, so you can search for the text you see.
 
-A `<...>` part changes, like a name or a number. Dart puts a prefix in front of some errors, like `Bad state:` or `Invalid argument(s):`. For problems that need a longer fix, see [Troubleshooting](troubleshooting.md).
+A `<...>` part changes, like a name or a number. Dart puts a prefix in front of some errors, like `Bad state:` or `Invalid argument(s):`.
 
 ## dox_core: start of the app
 
@@ -25,7 +25,7 @@ A `<...>` part changes, like a name or a number. Dart puts a prefix in front of 
 
 ## dox_core: routes and controllers
 
-These stop the app at start, so a bad route never reaches a request.
+These stop the app at start.
 
 | Text | When | What to do |
 | --- | --- | --- |
@@ -56,8 +56,7 @@ See [Environment variables](../digging-deeper/env.md).
 
 ## dox_core: requests (what the client gets)
 
-An `IHttpException` with a text message answers `{"code":"<errorCode>","message":"<text>"}`.
-The table shows the `message` text.
+An HTTP exception with a text message answers `{"code":"<errorCode>","message":"<text>"}`. The table shows the message text.
 
 | Status | Message | When | What to do |
 | --- | --- | --- | --- |
@@ -100,8 +99,7 @@ The table shows the `message` text.
 | `401` `The access token was already rotated.` | `rotateAccessToken` on a token that was rotated before. A token can be rotated only once. | Use the new token. |
 | `Bad state: The table 'auth_access_tokens' has no rotated_at column. ...` | `rotateAccessToken` on a token table without the `rotated_at` column. | Add the column in a migration. See [Authentication](../security/authentication.md#a-token-table-without-rotated_at). |
 
-`Hash.verify()` gives `false` for a value that is not a bcrypt hash. It does not throw.
-`Auth().attempt()` returns `null` for a wrong password. It does not throw. More auth errors are in [Authentication: Problems](../security/authentication.md#problems).
+`Hash.verify()` gives false for a value that is not a bcrypt hash, and `Auth().attempt()` gives null for a wrong password. More auth errors are in [Authentication: Problems](../security/authentication.md#problems).
 
 ## dox_orm
 
@@ -221,9 +219,7 @@ These stop `dart run build_runner build`.
 
 ## Native libraries (build hooks)
 
-Printed during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`.
-
-When a library is missing, the app stops with the reason and the fix. `dox_http_native` stops at start. The database drivers stop when the ORM opens the database.
+These show during `dart pub get`, `dox serve` or `dox build`. `<pkg>` is `dox_http_native`, `dox_postgres_native` or `dox_mysql_native`. When a library is missing, the app stops with the reason and the fix.
 
 | Text | When | What to do |
 | --- | --- | --- |
@@ -239,7 +235,7 @@ See [Native server](../digging-deeper/native-server.md).
 
 ## dox_socketio
 
-These are printed to stderr. The connection or the request fails, but the app keeps running.
+These show on stderr. The connection or the request fails, and the app continues.
 
 | Text | When | What to do |
 | --- | --- | --- |
@@ -268,7 +264,8 @@ These are printed to stderr. The connection or the request fails, but the app ke
 | `Unknown option <x> for <command>.` | `dox make:model` or `dox make:controller` with an option it does not know. | Run `dox help <command>` to see the options. |
 | `<command> takes 1 name, got 2: <words>.` or `<command> takes 1 name, got 0.` | `dox make:model` or `dox make:controller` with no name (like `dox make:model -m`), or with an extra word after the name (like `dox make:model Pen extra`). | Give one name. |
 | `--model needs a value, like --model=Post.` | `dox make:controller` with `--model` and no model name. | Use `--model=Post`. |
-| `Invalid option <x>, use --step=<count>` | `dox migration:rollback` with another option. | Use `--step=2`. |
+| `Invalid option <x>, use --step=<count>, --batch=<number> or --force` | `dox migration:rollback` with another option. | Use `--step=2`. |
+| `Give --step or --batch, not both.` | `dox migration:rollback` with both options. | Give one. |
 | `Skip <file>: no class that extends Migration.` | A Dart file in `db/migration` has no migration class. | Add `class X extends Migration`, or move the file. |
 | `.env.example is missing.` | `dox env:generate` with no example file. | Make `.env.example`. |
 | `lib/config/env.dart is already there. Delete it to make it again.` | `dox env:generate` again. | Delete the file, or edit it by hand. |
@@ -277,4 +274,8 @@ These are printed to stderr. The connection or the request fails, but the app ke
 | `bin/openapi.dart is missing. Make it with: ...` | `dox openapi:generate` with no entry file. | Make `bin/openapi.dart`. See [OpenAPI](../packages/openapi.md). |
 | `zsh: command not found: dox` | `$HOME/.pub-cache/bin` is not in `PATH`. | See [Troubleshooting](troubleshooting.md#dox-command-not-found-after-dart-pub-global-activate). |
 
-See [CLI](cli.md).
+## Next steps
+
+- [Troubleshooting](troubleshooting.md): problems that need a longer fix.
+- [HTTP exceptions](http-exceptions.md): the error classes and their status codes.
+- [CLI](cli.md): all commands and their options.

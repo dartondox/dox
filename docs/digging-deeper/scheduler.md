@@ -6,31 +6,25 @@ icon: lucide/calendar-clock
 
 `dox_scheduler` runs your tasks on a schedule, so you do not need a cron line for each task.
 
-You write the whole schedule in Dart, in one file, and each task is a plain function. One small process runs the schedule. A task runs only once per tick, even when many isolates or servers run the schedule.
+You write the full schedule in Dart, in one file, and each task is a plain function. A task runs one time for each tick, also when many isolates or servers run the schedule.
 
 ## Setup
 
-Add the package with the `dox` CLI. A new app from `dox create` already has it:
+A new app already has the scheduler. In an older app, run this command:
 
 ```bash
 dox add scheduler
 ```
 
-It adds the package and writes three files. It never overwrites a file, so it is safe to run twice.
+It adds the package and writes these files. It never overwrites a file:
 
 - `lib/config/schedule.dart`: your tasks and the `ScheduleConfig`. See [Defining tasks](#defining-tasks).
 - `bin/schedule.dart`: the program that runs the schedule. See [Running the scheduler](#running-the-scheduler).
-- `lib/providers/schedule_provider.dart` (optional): runs the schedule inside the server. See [Run inside the server](#run-inside-the-server).
-
-If you want to set it up by hand, add the package and write these files yourself:
-
-```bash
-dart pub add dox_scheduler
-```
+- `lib/providers/schedule_provider.dart`: runs the schedule inside the server. See [Run inside the server](#run-inside-the-server).
 
 ## Defining tasks
 
-Put your tasks in the `schedule` function in `lib/config/schedule.dart`. Use `s.call(name, function)` to add a task, then chain a frequency:
+Add a task with `s.call(name, function)` in `lib/config/schedule.dart`, then add a frequency:
 
 ```dart title="lib/config/schedule.dart"
 import 'package:dox_scheduler/dox_scheduler.dart';
@@ -48,76 +42,66 @@ Future<void> cleanup() async {
 }
 ```
 
-The name must be unique, because it is used in the logs and in the lock keys. A task with no frequency runs every minute.
+The name must be unique, because the logs and the locks use it. A task with no frequency runs every minute. `s.find(name)` gives the task with that name, or null.
 
 ### Scheduling queued jobs
 
-If a task is slow, you can put a [queue](queue.md) job on the queue instead. Wrap the dispatch in a function, so the task only adds the job and a queue worker runs it:
+For a slow task, put a [queue](queue.md) job on the queue. A queue worker then runs it:
 
 ```dart
 s.call('report', () => SendReport().dispatch()).hourly();
-```
-
-To use another [queue connection](queue.md#queue-connections), pass `connection:` to `dispatch()`:
-
-```dart
 s.call('prune', () => PruneFiles().dispatch(connection: 'redis')).hourly();
 ```
 
 ### Scheduling shell commands
 
-Use `exec` to run a program. A non-zero exit code fails the task:
+Use `exec` to run a program. An exit code that is not 0 fails the task:
 
 ```dart
 s.exec('pg_dump', args: <String>['-f', 'backup.sql', 'mydb']).daily();
 ```
 
-No shell is used, so `|`, `>` and `*` are plain text. If you need a shell, run it yourself:
+No shell is used, so `|`, `>` and `*` are plain text. To use a shell, run it yourself:
 
 ```dart
-s.exec('sh', args: <String>['-c', 'pg_dump mydb | gzip > backup.sql.gz']).daily();
+s.exec('sh', args: <String>['-c', 'pg_dump mydb | gzip > backup.sql.gz'])
+    .daily();
 ```
 
 ### Scheduling dox commands
 
-Use `command` to run a `dox` command of your app. It runs as the process `dox <command> <args>`:
+Use `command` to run `dox <command> <args>`:
 
 ```dart
 s.command('queue:prune', args: <String>['--hours=48']).hourly();
 ```
 
-The task name is the command line, like `dox queue:prune --hours=48`, and it shows in the logs and in `list`. So if `args` holds a secret, give the task your own name:
+The task name is the command line, and the logs show it. If `args` has a secret, give your own name:
 
 ```dart
 s.command('sync', args: <String>['--token=$token'], name: 'sync');
 ```
 
-The output of `exec` and `command` tasks is dropped. Use the [output hooks](#task-output) to keep it.
+If `dox` is not on the PATH, set `Schedule.doxExecutable = '/usr/local/bin/dox';`.
 
 ## Frequency options
 
-Chain one of these methods to say how often a task runs:
+Add one of these methods to set how often a task runs:
 
 | Method | Runs |
 | --- | --- |
 | `everySecond()` | every second. Also `everyTwoSeconds`, `everyFiveSeconds`, `everyTenSeconds`, `everyFifteenSeconds`, `everyTwentySeconds`, `everyThirtySeconds` |
 | `everyMinute()` | every minute (the default) |
-| `everyTwoMinutes()` | every 2 minutes |
-| `everyThreeMinutes()` | every 3 minutes |
-| `everyFourMinutes()` | every 4 minutes |
-| `everyFiveMinutes()` | every 5 minutes |
-| `everyTenMinutes()` | every 10 minutes |
-| `everyFifteenMinutes()` | every 15 minutes |
+| `everyTwoMinutes()` | every 2 minutes. Also `everyThreeMinutes`, `everyFourMinutes`, `everyFiveMinutes`, `everyTenMinutes`, `everyFifteenMinutes` |
 | `everyThirtyMinutes()` | at minute 0 and 30 |
 | `hourly()` | at minute 0 of every hour |
 | `hourlyAt(17)` | at minute 17 of every hour |
-| `everyTwoHours()` | every 2 hours at minute 0. Also `everyThreeHours`, `everyFourHours`, `everySixHours`. Pass a minute: `everyTwoHours(15)` |
-| `everyOddHour()` | at 01:00, 03:00 ... 23:00. Pass a minute: `everyOddHour(30)` |
+| `everyTwoHours()` | every 2 hours at minute 0. Also `everyThreeHours`, `everyFourHours`, `everySixHours`. Give a minute: `everyTwoHours(15)` |
+| `everyOddHour()` | at 01:00, 03:00 ... 23:00. Give a minute: `everyOddHour(30)` |
 | `daily()` | every day at 00:00 |
-| `dailyAt('13:00')` | every day at 13:00 |
+| `dailyAt('13:00')` | every day at 13:00. `at('13:00')` is the same |
 | `twiceDaily(1, 13)` | every day at 01:00 and 13:00 |
 | `twiceDailyAt(1, 13, 15)` | every day at 01:15 and 13:15 |
-| `at('13:00')` | same as `dailyAt('13:00')` |
 | `weekly()` | every Sunday at 00:00 |
 | `weeklyOn(DateTime.monday, '08:00')` | every Monday at 08:00 |
 | `monthly()` | the 1st of every month at 00:00 |
@@ -130,9 +114,11 @@ Chain one of these methods to say how often a task runs:
 | `yearlyOn(6, 1, '17:00')` | June 1st at 17:00 |
 | `cron('*/5 9-17 * * 1-5')` | any 5 field cron expression |
 
+The last method that sets a field wins. So `.dailyAt('09:00').weekly()` runs at 00:00, but `.weekly().dailyAt('09:00')` runs at 09:00.
+
 ### Day constraints
 
-If a task should run only on some days, add a day method:
+Add a day method to run a task only on some days:
 
 | Method | Runs |
 | --- | --- |
@@ -145,11 +131,11 @@ If a task should run only on some days, add a day method:
 s.call('standup', remind).weekdays().dailyAt('09:00');
 ```
 
-A day method and a time method like `dailyAt()` can come in any order.
+A day of the month and a day of the week join with OR, like in cron. So `monthlyOn(15).fridays()` runs on the 15th and on every Friday.
 
 ### Sub-minute tasks
 
-A task with a seconds method, like `everyFiveSeconds()`, repeats inside each due minute. You can still limit the minutes with a frequency, days or filters. Call the seconds method first, because it also sets the task to every minute:
+A seconds method, like `everyFiveSeconds()`, repeats the task in each due minute. Call it first, because it also sets the task to every minute:
 
 ```dart
 s.call('poll', poll).everyFiveSeconds().between('09:00', '17:00');
@@ -157,7 +143,7 @@ s.call('poll', poll).everyFiveSeconds().between('09:00', '17:00');
 
 ### Cron expressions
 
-`cron()` takes the standard 5 fields: `minute hour day-of-month month day-of-week`.
+`cron()` takes the 5 standard fields: `minute hour day-of-month month day-of-week`.
 
 | Field | Values |
 | --- | --- |
@@ -177,19 +163,20 @@ The schedule uses UTC by default. Use `timezone()` to read the time of a task in
 s.call('report', sendReport).dailyAt('08:00').timezone('Asia/Yangon');
 ```
 
-The name is an IANA name, like `Europe/London` or `America/New_York`. An unknown name throws an `ArgumentError` when the schedule starts.
-
-To use one zone for every task, set it in the config. A task's own `timezone()` still wins:
+The name is an IANA name, like `Europe/London`. To use one zone for all tasks, set it in the config:
 
 ```dart
-ScheduleConfig scheduleConfig = const ScheduleConfig(timezone: 'Asia/Yangon');
+ScheduleConfig scheduleConfig =
+    const ScheduleConfig(timezone: 'Asia/Yangon');
 ```
+
+On a summer time change, a time that does not exist that day does not run. A time that occurs two times runs one time.
 
 ## Limiting when a task runs
 
 ### Between times
 
-Use `between` to run a task only in one time of day. Use `unlessBetween` to skip a time of day. Both ends are included, and a range can cross midnight:
+Use `between` to run a task only in a time of day, and `unlessBetween` to skip a time of day. A range can cross midnight:
 
 ```dart
 s.call('sync', sync).everyFiveMinutes().between('09:00', '17:00');
@@ -199,7 +186,7 @@ s.call('quiet', quiet).hourly().unlessBetween('23:00', '04:00');
 
 ### Truth tests
 
-Sometimes a task should run only when a condition is true. `when` runs the task when the function gives `true`, and `skip` skips it when the function gives `true`. The function can give a `bool` or a `Future<bool>`:
+`when` runs the task when the function gives true. `skip` skips the task when the function gives true:
 
 ```dart
 s.call('promo', promo).daily().when(isPromoOn);
@@ -208,33 +195,34 @@ s.call('backup', backup).daily().skip(isHoliday);
 
 ### Environments
 
-Use `environments` to run a task only when `APP_ENV` is one of the names. When `APP_ENV` is not set, the task does not run:
+Run a task only when `APP_ENV` is one of the names:
 
 ```dart
-s.call('emails', sendEmails).daily().environments(<String>['production']);
+s.call('emails', sendEmails).daily()
+    .environments(<String>['production']);
 ```
+
+When `APP_ENV` is not set, the task does not run.
 
 ## Preventing task overlaps
 
-A slow task may still run when its next minute comes. If it must not run twice at the same time, use `withoutOverlapping`. The task is then skipped while the last run still runs:
+Skip a run while the last run of the task still runs:
 
 ```dart
 s.call('report', sendReport).everyFiveMinutes().withoutOverlapping();
 ```
 
-The lock expires after 24 hours, in case the process dies. You can pass another expiry: `withoutOverlapping(Duration(hours: 1))`. After a crash, remove the lock at once with [`clear-cache`](#clearing-overlap-locks).
+The lock expires after 24 hours. Give another time with `withoutOverlapping(Duration(hours: 1))`. After a crash, remove the lock with [`clear-cache`](#clearing-overlap-locks).
 
 ## Running tasks on one server
 
-A task runs only once per tick across all isolates and servers. This is on by default (`onOneServer()`). Before a task runs, the scheduler takes a lock named after the task and the minute. The first process to get it runs the task, and the others skip it.
-
-The locks live in a [cache](cache.md) store. If many servers run the schedule, use a shared store like Redis, because a `memory` or `file` store is not shared between servers:
+A task runs one time for each tick on all isolates and servers. This is `onOneServer()`, the default. The locks are in a [cache](cache.md) store, so use a shared store like Redis for many servers:
 
 ```dart
 ScheduleConfig scheduleConfig = const ScheduleConfig(store: 'redis');
 ```
 
-If a task should run on every process instead, use `onEveryServer()`:
+To run a task on every process, use `onEveryServer()`:
 
 ```dart
 s.call('clear-tmp', clearTmp).hourly().onEveryServer();
@@ -242,7 +230,7 @@ s.call('clear-tmp', clearTmp).hourly().onEveryServer();
 
 ## Background tasks
 
-Tasks of the same minute run one after another. If a long task should not hold back the next one, use `runInBackground`:
+Tasks of the same minute run one after the other. Use `runInBackground` so a long task does not stop the next one:
 
 ```dart
 s.call('export', export).daily().runInBackground();
@@ -250,17 +238,18 @@ s.call('export', export).daily().runInBackground();
 
 ## Timeouts
 
-Use `timeout` to count a run as failed when it takes too long. The failure hooks then run:
+Count a run as failed when it takes too long. The failure hooks then run:
 
 ```dart
-s.exec('pg_dump', args: <String>['mydb']).daily().timeout(Duration(minutes: 5));
+s.exec('pg_dump', args: <String>['mydb']).daily()
+    .timeout(Duration(minutes: 5));
 ```
 
-For an `exec()` or `command()` task, the process is killed at the timeout. A Dart function can not be stopped, so its work may go on after the timeout.
+An `exec()` or `command()` process gets SIGTERM, then SIGKILL after `Schedule.processGrace` (5 seconds). A Dart function cannot be stopped, so its work can continue.
 
 ## Running the scheduler
 
-`bin/schedule.dart` runs your schedule. With `app`, the runner starts your app providers first (like the database), and it stops them at the end:
+`bin/schedule.dart` runs your schedule. With `app`, it starts your app providers first, like the database:
 
 ```dart title="bin/schedule.dart"
 import 'dart:io';
@@ -278,31 +267,31 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-The `dox` CLI runs the same file. For example, `dox schedule:work` is the same as `dart run bin/schedule.dart work`.
+The `dox` CLI runs the same file: `dox schedule:work` is `dart run bin/schedule.dart work`.
 
 ### Running the worker
 
-`work` is a long running process. It wakes at each full minute and runs the due tasks. Run it next to your server, with the same deploy tool (systemd, Docker, Kubernetes):
+Start a process that runs the due tasks at each full minute. Run it next to your server:
 
 ```bash
 dox schedule:work
 ```
 
-On Ctrl+C or SIGTERM it starts no new task and waits for the running ones. A second signal stops it at once.
+On Ctrl+C or SIGTERM, it waits for the running tasks. A second signal stops it at once.
 
 ### Running from cron
 
-If you would rather use the system cron, `run` runs the tasks of this minute once, waits for them, and exits. Add one line to the crontab:
+`run` runs the tasks of this minute one time, then exits. Add one line to the crontab:
 
 ```bash
 * * * * * cd /path/to/app/build/bundle && ./bin/schedule run
 ```
 
-`./bin/schedule` is the binary that `dox build` makes in `build/bundle`. It starts fast and needs no Dart SDK. Do not use `dart compile exe`, because it can not build apps with native libraries like SQLite. The exit code is 1 when a task failed.
+`./bin/schedule` is the binary that `dox build` makes. The exit code is 1 when a task failed.
 
 ### Listing tasks
 
-`list` shows each task, its schedule and its next run time:
+Show each task, its schedule and its next run:
 
 ```bash
 dox schedule:list
@@ -315,9 +304,11 @@ report   0 * * * *                  2026-10-25 14:00 UTC
 ping     */5 * * * * Asia/Yangon    2026-10-25 20:35 Asia/Yangon
 ```
 
+The next run does not check `when()`, `skip()` and `environments()`.
+
 ### Running one task now
 
-`test` runs one task now, with its hooks. It does not check the schedule, the filters or the locks:
+Run one task now, with its hooks. The schedule, the filters and the locks are not checked:
 
 ```bash
 dox schedule:test cleanup
@@ -325,17 +316,17 @@ dox schedule:test cleanup
 
 ### Clearing overlap locks
 
-If the process crashed while a task ran, its `withoutOverlapping()` lock stays in the store, so the task is skipped until the lock expires. `clear-cache` removes these locks:
+Remove the `withoutOverlapping()` locks that a crash left in the store:
 
 ```bash
 dox schedule:clear-cache
 ```
 
-Only run it when the task does not really run on another process or server. Otherwise that task could start a second time.
+Run it only when the task does not run on another process. If it does, the task can start a second time.
 
 ## Run inside the server
 
-For a small app, you can run the schedule inside your Dox server instead of a `work` process. Add a provider that extends `SchedulerProvider`:
+For a small app, run the schedule inside the Dox server. Add a provider that extends `SchedulerProvider`:
 
 ```dart title="lib/providers/schedule_provider.dart"
 import 'package:dox_scheduler/dox_scheduler.dart';
@@ -346,19 +337,17 @@ class ScheduleProvider extends SchedulerProvider {
 }
 ```
 
-Then turn it on in the config, and run `dart run build_runner build` so the generated container finds the provider:
+Then turn it on, and run `dart run build_runner build`:
 
 ```dart title="lib/config/schedule.dart"
 ScheduleConfig scheduleConfig = const ScheduleConfig(inProcess: true);
 ```
 
-Only the first isolate of the web server runs the tasks, and the other isolates only serve requests. A `bin/queue.dart` worker, a test or the `work` process does not start this in-process schedule. The `work` process runs the tasks on its own. In a test of the in-process schedule, set `Dox().isWebServer = true;` first. With many servers, each server runs the loop, and the once-per-tick lock makes each task run once. Use a Redis store for this. When the server stops, it waits for the running tasks.
-
-The tasks use the CPU of the server, so they can slow down requests on the first isolate. A separate `work` process can be deployed, scaled and restarted on its own. So use `work` for heavy tasks.
+Only the first isolate of the web server runs the tasks, so heavy tasks can slow its requests. Use `work` for heavy tasks. In a test of the in-process schedule, set `Dox().isWebServer = true;` first.
 
 ## Logging the schedule
 
-By default the scheduler prints its own plain `[schedule]` lines. To send them through the app `Logger` instead, turn on `loggerLines`:
+Send the `[schedule]` lines through the app `Logger`:
 
 ```dart title="lib/config/schedule.dart"
 ScheduleConfig scheduleConfig = const ScheduleConfig(
@@ -366,33 +355,38 @@ ScheduleConfig scheduleConfig = const ScheduleConfig(
 );
 ```
 
-The lines get the tag `[scheduler]`, for example `[scheduler] ran cleanup in 12ms`. They follow `LoggerConfig.enabled`, `level` and `prettyPrint`. `SchedulerFlags.all()` turns on every flag.
+The lines then get the tag `[scheduler]`, like `[scheduler] ran cleanup in 12ms`. `SchedulerFlags.all()` turns on every flag.
 
 ## Task output
 
-These hooks keep the output (stdout and stderr) of an `exec()` or `command()` task. They do nothing on a function task.
+These hooks keep the output of an `exec()` or `command()` task. Without them, the output is lost.
 
-Use `sendOutputTo` to write the output to a file. It replaces the file each run:
-
-```dart
-s.exec('pg_dump', args: <String>['mydb']).daily().sendOutputTo('storage/logs/backup.log');
-```
-
-Use `appendOutputTo` to add the output to the end of the file:
+Write the output to a file. Each run replaces the file:
 
 ```dart
-s.exec('pg_dump', args: <String>['mydb']).daily().appendOutputTo('storage/logs/backup.log');
+s.exec('pg_dump', args: <String>['mydb']).daily()
+    .sendOutputTo('storage/logs/backup.log');
 ```
 
-Use `onOutput` to get the output in code after the process ends. It holds the whole output in memory, so do not use it for a very large output:
+Add the output to the end of the file:
 
 ```dart
-s.exec('pg_dump', args: <String>['mydb']).daily().onOutput((String output) {...});
+s.exec('pg_dump', args: <String>['mydb']).daily()
+    .appendOutputTo('storage/logs/backup.log');
 ```
+
+Get the output in code after the process ends:
+
+```dart
+s.exec('pg_dump', args: <String>['mydb']).daily()
+    .onOutput((String output) {...});
+```
+
+`onOutput` keeps the full output in memory, so do not use it for very large output.
 
 ## Task hooks
 
-Hooks run code around a task, for example to log it or to alert your team when it fails:
+Run code around a task, for example to tell your team when it fails:
 
 ```dart
 s
@@ -410,7 +404,7 @@ Future<void> alertTeam(Object error, StackTrace stack) async {
 
 | Hook | Runs |
 | --- | --- |
-| `before` | before the task. If it throws, the task does not run and counts as failed |
+| `before` | before the task. If it throws, the task does not run and fails |
 | `onSuccess` | after the task worked |
 | `onFailure` | after the task threw or timed out. It gets the error and the stack trace |
 | `after` | after the task, always |
@@ -419,7 +413,7 @@ An error in a task is logged, and the next task still runs.
 
 ### Pinging URLs
 
-You can send a GET request to a URL around a task, for example to a health check service:
+Send a GET request to a URL around a task, for example to a health check service:
 
 ```dart
 s
@@ -430,35 +424,11 @@ s
     .pingOnFailure('https://health.example.com/backup/fail');
 ```
 
-`thenPing(url)` pings after the task, always. Each ping method also has an `If` form that takes a bool first, like `pingOnFailureIf(isProduction, url)`. A failed ping is logged, but it never fails the task.
-
-## Without Dox
-
-`dox_scheduler` also works in a plain Dart app. Leave out `app`:
-
-```dart
-import 'dart:io';
-
-import 'package:dox_scheduler/dox_scheduler.dart';
-
-void schedule(Schedule s) {
-  s.call('cleanup', cleanup).dailyAt('02:00');
-}
-
-Future<void> cleanup() async {
-  // delete old files, ...
-}
-
-Future<void> main(List<String> args) async {
-  exitCode = await SchedulerRunner(schedule: schedule).run(args);
-}
-```
-
-With no `app`, no providers start, and the locks use a memory store. For many servers, pass a shared `CacheStore` from `dox_cache`, like `SchedulerRunner(schedule: schedule, store: myRedisStore)`. The commands are the same.
+`thenPing(url)` pings after the task, always. Each ping method has an `If` form, like `pingOnFailureIf(isProduction, url)`. A failed ping is logged, and the task does not fail. A ping stops after `ScheduledTask.pingTimeout` (10 seconds).
 
 ## Testing
 
-`Scheduler` runs the tasks. Give it a fake clock, so you can test a schedule with no waiting:
+Give `Scheduler` a fake clock to test a schedule with no wait:
 
 ```dart
 import 'package:dox_cache/dox_cache.dart';
@@ -490,49 +460,33 @@ test('cleanup runs at 02:00', () async {
 });
 ```
 
-To check a schedule without running anything, use `ScheduledTask.isDue(time)` and `ScheduledTask.nextRun(time)`. To replace the ping request in tests, set `ScheduledTask.sendPing = (Uri url) async {...};`.
+To run one task, use `scheduler.runTask(task, time)`. To check a schedule with no run, use `task.isDue(time)` and `task.nextRun(time)`. To replace the ping request, set `ScheduledTask.sendPing = (Uri url) async {...};`.
 
-## Details
+## Without Dox
 
-This section is for special cases. Most apps do not need it.
+`dox_scheduler` also works in a plain Dart app. Leave out `app`:
 
-### Frequencies
+```dart
+import 'dart:io';
 
-- The day methods, `weekly()`, `weeklyOn()` and `cron()` all set the day of the week. The last call wins: `.mondays().weekly()` runs on Sundays.
-- `weekly()` and `weeklyOn()` also set the time (00:00 unless you pass one). So `.dailyAt('09:00').weekly()` runs at 00:00, but `.weekly().dailyAt('09:00')` runs at 09:00.
-- A day of the month and a day of the week join with OR, like standard cron: `monthlyOn(15).fridays()` and `0 0 1 * MON` run on that date and on every such weekday. When one day field of a cron expression starts with `*`, both must match.
-- `lastDayOfMonth()` runs only on the last day of the month, whatever day methods you add. `list` shows it as `28-31`, but the next run time is right.
-- `yearlyOn()` with a day the month never has, like `yearlyOn(2, 30)`, throws.
-- A seconds method called last undoes the frequency before it: `.everyFiveSeconds().hourly()` repeats in minute 0 of each hour, but `.hourly().everyFiveSeconds()` repeats in every minute.
-- With a sub-minute task, `when()` and `skip()` are checked before each repeat. A run that takes longer than its step skips the steps it missed. `run` from cron then stays until the end of the minute, and `work` also wakes inside the minute.
-- With summer time (DST), a time that does not exist that day does not run, and a time that happens twice runs once. `hourly()` and other "every" frequencies keep running every real hour.
-- The zone data comes from the `timezone` package.
+import 'package:dox_scheduler/dox_scheduler.dart';
 
-### Filters and locks
+void schedule(Schedule s) {
+  s.call('cleanup', cleanup).dailyAt('02:00');
+}
 
-- `environments()` ignores case and spaces around the names. It is read at run time. An empty list or a blank name throws.
-- With `loggerLines` on, the plain `[schedule]` line is left out on stdout and stderr when the Logger printed it. So the lock store warning goes to stdout, not to stderr. Other sinks (like a `StringBuffer`) still get every plain line.
-- The once-per-tick lock is not released, so a late server can not run the same minute again. It expires after 10 minutes. When the store is `null`, the scheduler uses a memory store.
-- At start, the scheduler prints one warning to stderr when a task uses `onOneServer()` and the lock store is `memory`, `file` or `null`. It does not print when `APP_ENV` is `development` or `local`. With one server you can ignore it.
-- `clear-cache` removes only the `withoutOverlapping()` lock of each task, by its exact name. Other cache keys and the once-per-tick locks stay. It exits with 0, also when there was no lock. A `memory` store loses its locks with the process, so `clear-cache` is for `file` and Redis stores.
+Future<void> cleanup() async {
+  // delete old files, ...
+}
 
-### Processes
+Future<void> main(List<String> args) async {
+  exitCode = await SchedulerRunner(schedule: schedule).run(args);
+}
+```
 
-- The stdin of an `exec()` or `command()` process is closed, so a program that waits for input ends at once.
-- At a timeout the process gets SIGTERM, and SIGKILL 5 seconds later (`Schedule.processGrace`). Only the process itself is killed, so the children of a shell (`sh -c 'a | b'`) may live on.
-- A stop of `work` waits for the processes to end.
-- If `dox` is not on PATH, set its full path: `Schedule.doxExecutable = '/usr/local/bin/dox';`.
-- A `name:` also lets you add the same command line twice.
+With no `app`, the locks use a memory store. For many servers, give a shared `CacheStore` from `dox_cache`: `SchedulerRunner(schedule: schedule, store: myRedisStore)`.
 
-### Output and pings
-
-- The file gets the output as it comes. Two runs at the same time write to the same file, so use `withoutOverlapping()` or `appendOutputTo()`.
-- A file that can not be written fails the task, and so does a throwing `onOutput` hook. `onOutput` still gets the output first. When more than one thing fails, the error is the first of: a non-zero exit code, an `onOutput` error, a file error.
-- After a timeout, the file and `onOutput` finish a bit later, after the failure hooks ran. An error there is lost.
-- A ping fails after 10 seconds (`ScheduledTask.pingTimeout`), or on a status of 400 or more. A URL that is not `http` or `https` throws an `ArgumentError` when the schedule is made.
-- The next run time in `list` checks the frequency, `between()` and `unlessBetween()`. It does not check `when()`, `skip()` and `environments()`.
-
-## See also
+## Next steps
 
 - [Queue](queue.md): jobs that must not get lost.
 - [Background work](../guides/background-work.md): pick the right tool for work after the response.

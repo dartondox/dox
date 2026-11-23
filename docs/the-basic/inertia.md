@@ -6,23 +6,19 @@ icon: lucide/app-window
 
 Inertia lets you build a single page app with React, Vue or Svelte, and keep routes and controllers in Dox.
 
-You do not write an API. A controller gives a page name and its props, and Inertia shows the page in the browser. The first visit gets a full HTML page. After that, links and forms get only JSON, and the page changes without a reload.
-
-The `dox_inertia` package is the server side of Inertia. Use it with Vite and the Inertia 3 client for your front-end (`@inertiajs/react`, `@inertiajs/vue3` or `@inertiajs/svelte`, version 3).
+A controller gives a page name and its props, and Inertia shows the page in the browser. The first visit gets a full HTML page. After that, links and forms get only JSON. The `dox_inertia` package is the server side. Use it with Vite and the Inertia 3 client (`@inertiajs/react`, `@inertiajs/vue3` or `@inertiajs/svelte`).
 
 ## Setup
 
-Add the package with the CLI:
+Add the package with the CLI. It does steps 1 to 3 below, and prints the steps you do yourself:
 
 ```bash
 dox add inertia
 ```
 
-It does steps 1 to 3 of [Set it up by hand](#set-it-up-by-hand): the root view, the config and the provider. Then do steps 4 to 6 (Vite, the built files and the middleware) yourself. The command prints a short list of them. It never overwrites a file, so it is safe to run twice.
+### Set it up by hand
 
-## Set it up by hand
-
-If you do not use `dox add`, add the package yourself:
+Add the package:
 
 ```bash
 dart pub add dox_inertia
@@ -30,7 +26,7 @@ dart pub add dox_inertia
 
 ### 1. Root view
 
-The root view is the HTML page of the first visit. Dox puts the script and style tags in place of `@vite`, and the page in place of `@inertia`. It is plain HTML, with no template engine. It can hold `{{ key }}` marks for values like the title. See [Root view data](#root-view-data).
+The **root view** is the HTML page of the first visit. Dox puts the script and style tags in place of `@vite`, and the page in place of `@inertia`:
 
 ```html title="resources/views/app.html"
 <!DOCTYPE html>
@@ -49,40 +45,35 @@ The root view is the HTML page of the first visit. Dox puts the script and style
 
 ### 2. Config
 
-The config tells Dox where your Vite files are:
+Tell Dox where your Vite files are:
 
 ```dart title="lib/config/inertia.dart"
 import 'package:dox_inertia/dox_inertia.dart';
 
 InertiaConfig inertiaConfig = InertiaConfig(
-  /// the Vite entry files
   entryPoints: <String>['resources/js/app.jsx'],
-
-  /// load the scripts from the Vite dev server. null in production.
   devServerUrl: 'http://localhost:5173',
-
-  /// add the React Fast Refresh code in dev mode
   reactRefresh: true,
 );
 ```
 
 | Option | Default | What it does |
 | --- | --- | --- |
-| `rootView` | `resources/views/app.html` | the HTML page of the first visit. One request can use another file with `Inertia.setRootView` |
+| `rootView` | `resources/views/app.html` | the HTML page of the first visit |
 | `entryPoints` | `['resources/js/app.js']` | the Vite entry files |
 | `publicPath` | `public` | the folder of public files |
 | `buildDirectory` | `build` | the folder in `publicPath` where `vite build` writes its files |
-| `devServerUrl` | `null` | the url of the Vite dev server, see [Vite](#vite) |
-| `reactRefresh` | `false` | add the React Fast Refresh code in dev mode |
-| `version` | hash of the manifest | the asset version, see [Asset version](#asset-version) |
-| `encryptHistory` | `false` | encrypt the browser history of every page, see [History encryption](#history-encryption) |
-| `ssr` | `null` | server side rendering, see [SSR](#server-side-rendering-ssr) |
+| `devServerUrl` | null | the URL of the Vite dev server. See [Vite](#vite). |
+| `reactRefresh` | false | add the React Fast Refresh code in dev mode |
+| `version` | hash of the manifest | the asset version. See [Asset version](#asset-version). |
+| `encryptHistory` | false | encrypt the browser history of every page. See [History encryption](#history-encryption). |
+| `ssr` | null | server side rendering. See [SSR](#server-side-rendering-ssr). |
 
-Paths are from the project root, where the app runs.
+Paths are from the project root.
 
 ### 3. Provider
 
-The provider sets up Inertia in every isolate. Put it in `lib/`, so the generated container finds it:
+The provider sets up Inertia in every isolate. Put it in `lib/`:
 
 ```dart title="lib/providers/inertia_provider.dart"
 import 'package:dox_inertia/dox_inertia.dart';
@@ -94,7 +85,7 @@ class AppInertiaProvider extends InertiaProvider {
 }
 ```
 
-With no provider, Dox uses the defaults of `InertiaConfig`.
+With no provider, Dox uses the defaults. `Inertia.configure(config)` sets the config with no provider, and `Inertia.config` reads it.
 
 ### 4. Vite
 
@@ -106,10 +97,8 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ command }) => ({
   plugins: [react()],
-  // public/ holds the Dox public files. The build goes into public/build,
-  // so do not let Vite copy public/ into the build.
+  // public/ holds the Dox public files, so Vite must not copy it
   publicDir: false,
-  // the built files are served from /build/
   base: command === 'build' ? '/build/' : '/',
   server: { origin: 'http://localhost:5173' },
   build: {
@@ -139,13 +128,14 @@ createInertiaApp({
 
 ### 5. Serve the built files
 
-In production the browser loads `/build/assets/...`. Add a route for them, or let your proxy (nginx, Caddy) serve `public/build`:
+In production the browser loads `/build/assets/...`. Add a route for them, or let your proxy serve `public/build`:
 
 ```dart title="lib/routes/web.dart"
 Route.get('/build/{path*}', (String path) {
   if (path.contains('..')) throw NotFoundHttpException();
   // the file names have a hash, so the browser can keep them for a year
-  return response(File('public/build/$path')).cache(const Duration(days: 365));
+  return response(File('public/build/$path'))
+      .cache(const Duration(days: 365));
 });
 ```
 
@@ -160,25 +150,20 @@ AppConfig appConfig = AppConfig(
     const CsrfMiddleware(),
     HandleInertiaRequests(),
   ],
-  // ...
 );
 ```
 
-- `SessionMiddleware` gives each request a session. Inertia uses it for validation errors and flash data.
-- `CsrfMiddleware` stops cross site form posts. It sets the `XSRF-TOKEN` cookie. The Inertia client reads it and sends it back in the `X-XSRF-TOKEN` header. You do not write any code for this.
-- `HandleInertiaRequests` is your `InertiaMiddleware`, see [Shared props](#shared-props). With no props to share, use `const InertiaMiddleware()`.
+- `SessionMiddleware` keeps the validation errors and the flash data. See [Session](session.md).
+- `CsrfMiddleware` sets the `XSRF-TOKEN` cookie, and the Inertia client sends it back. See [CSRF](../security/csrf.md#axios-and-inertia).
+- `HandleInertiaRequests` is your `InertiaMiddleware`. See [Shared props](#shared-props). With no props to share, use `const InertiaMiddleware()`.
 
-If only some routes are Inertia pages, you can add them to a router instead, in the same order.
+You can also add them to a router, in the same order.
 
 ## Rendering pages
 
-Call `inertia` with the request, the page name and the props. The page name is the file in `resources/js/Pages`, without the extension:
+Give the request, the page name and the props. The page name is the file in `resources/js/Pages`, with no extension:
 
 ```dart title="lib/app/http/controllers/user.controller.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_inertia/dox_inertia.dart';
-import 'package:my_app/app/models/user/user.model.dart';
-
 @Inject()
 class UserController {
   Future<DoxResponse> index(DoxRequest req) {
@@ -190,20 +175,25 @@ class UserController {
 }
 ```
 
-A normal request gets the root view as HTML. An Inertia request (a link or a form) gets the page as JSON.
+A function prop, like `users`, runs only when the prop is sent. It can give a Future. Props become JSON, so a model works. `Inertia.render(req, ...)` is the same as `inertia(req, ...)`.
 
-A prop can be a function, like `users` above. It runs only when the prop is sent, and it can give a `Future`. Props become JSON, so a model or any object with `toJson()` works. A `DateTime` becomes ISO text.
+A Dart integer above 2^53 loses precision in JavaScript, so send such a number as a string.
 
-`Inertia.render(req, 'Users/Index', {...})` does the same as `inertia(...)`.
+### Is it an Inertia request
+
+Check if the request came from the Inertia client:
+
+```dart
+if (Inertia.isInertia(req)) {
+  // ...
+}
+```
 
 ## Shared props
 
-Some props are needed on every page, like the signed in user or the app name. Extend `InertiaMiddleware` and return them from `share`. Then add it to `globalMiddleware` (see [Middleware](#6-middleware)):
+Share props with every page, like the signed in user. Extend `InertiaMiddleware` and return them from `share`. It can be async:
 
 ```dart title="lib/app/http/middleware/handle_inertia_requests.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_inertia/dox_inertia.dart';
-
 class HandleInertiaRequests extends InertiaMiddleware {
   @override
   Map<String, dynamic> share(DoxRequest req) {
@@ -215,35 +205,40 @@ class HandleInertiaRequests extends InertiaMiddleware {
 }
 ```
 
-A page prop with the same name wins over a shared prop. `share` can be `async`. You can also share from any middleware or controller with `Inertia.share(req, {...})`.
+A page prop with the same name wins. Share from any middleware or controller with `Inertia.share(req, {...})`, and read all shared props with `Inertia.shared(req)`.
 
 ### Global values
 
-For a value that is the same for the whole app, use `Inertia.shareGlobal(key, value)`. Call it once in the `setup()` of your `InertiaProvider`, so it runs in every isolate:
+Share one value with the full app. Call it in the `setup()` of your provider:
 
 ```dart
-class AppInertiaProvider extends InertiaProvider {
-  AppInertiaProvider() : super(inertiaConfig);
-
-  @override
-  void setup() {
-    super.setup();
-    Inertia.shareGlobal('appName', 'Dox');
-  }
+@override
+void setup() {
+  super.setup();
+  Inertia.shareGlobal('appName', 'Dox');
 }
 ```
 
-A global value is kept for all users and all requests. So use it only for a constant, or a function that does not read a request. Data of one user, like the signed in user, must go in `InertiaMiddleware.share`.
+!!! warning
+    All users get a global value. Put data of one user, like the signed in user, in `share`.
 
 ## Partial reloads
 
-Sometimes a page only needs new data for one prop. The client can ask for some props only, with `router.reload({ only: ['users'] })`. Dox then sends only those props, and function props that are not sent do not run.
+The client can ask for some props only, with `router.reload({ only: ['users'] })`. Dox then sends only those props. Ask for a top level prop, like `auth`, not `auth.user`.
 
-These helpers change when a prop is sent.
+These helpers change when a prop is sent:
+
+| Helper | First visit | Partial reload |
+| --- | --- | --- |
+| plain value or function | sent | sent when asked |
+| `Inertia.optional` | not sent | sent when asked |
+| `Inertia.always` | sent | always sent |
+| `Inertia.defer` | not sent, loaded right after | sent when asked |
+| `Inertia.merge` | sent | sent when asked |
 
 ### Optional props
 
-`Inertia.optional` sends the prop only when a partial reload asks for it:
+Send the prop only when a partial reload asks for it. `Inertia.lazy` is the same:
 
 ```dart
 'stats': Inertia.optional(() => Stats.load()),
@@ -251,7 +246,7 @@ These helpers change when a prop is sent.
 
 ### Always props
 
-`Inertia.always` sends the prop on every request, also on a partial reload that does not ask for it:
+Send the prop on every request:
 
 ```dart
 'notices': Inertia.always(notices),
@@ -259,50 +254,25 @@ These helpers change when a prop is sent.
 
 ### Deferred props
 
-A slow prop can make the first visit slow. `Inertia.defer` leaves it out of the first visit, and the page loads it right after:
+Leave a slow prop out of the first visit. The page loads it right after. Props of the same `group` load in one request:
 
 ```dart
 'comments': Inertia.defer(() => Comment().query().all()),
-```
-
-Deferred props of the same `group` load in one request. The default group is `default`:
-
-```dart
 'likes': Inertia.defer(() => Like().query().count(), group: 'side'),
 ```
 
 ### Merging props
 
-For infinite scroll, the page should add the new items to the old ones, not replace them. Use `Inertia.merge` for this:
+Add the new items to the old ones, for infinite scroll:
 
 ```dart
 'posts': Inertia.merge(posts),
-```
-
-A deferred prop can merge too:
-
-```dart
 'feed': Inertia.defer(() => Post().query().all()).merge(),
 ```
 
-This table shows when each prop is sent:
-
-| Helper | First visit | Partial reload |
-| --- | --- | --- |
-| plain value or function | sent | sent when asked |
-| `Inertia.optional` | not sent | sent when asked |
-| `Inertia.always` | sent | always sent |
-| `Inertia.defer` | not sent, listed in `deferredProps` | sent when asked |
-| `Inertia.merge` | sent, listed in `mergeProps` | sent when asked |
-
 ## Forms and validation errors
 
-A form post needs no extra code for errors. This is how it works:
-
-1. The page posts the form: `router.post('/users', data)` or `useForm`.
-2. The controller validates. The validation fails.
-3. Dox flashes the errors and the old input to the session, and redirects back.
-4. The page loads again. It gets the errors in the `errors` prop.
+A form post needs no extra code for errors. When validation fails, Dox flashes the errors and redirects back. The page gets them in the `errors` prop:
 
 ```dart
 Future<DoxResponse> store(DoxRequest req) async {
@@ -317,37 +287,32 @@ Future<DoxResponse> store(DoxRequest req) async {
 }
 ```
 
-The page reads the errors from the form:
-
 ```jsx
 const { data, setData, post, errors } = useForm({ name: '', email: '' })
 // errors.email holds the message, or is undefined
 ```
 
-Every page gets `errors`, also on a partial reload. It is `{}` when there are no errors. The old input is in `req.session.old('email')`. Password fields are not kept.
-
 ### Error bags
 
-If one page has two forms, the errors of one form should not show on the other. Pass `errorBag` in the post, like `router.post(url, data, { errorBag: 'login' })` or `form.post(url, { errorBag: 'login' })`. Then the errors are under the bag name: `errors.login.email`.
+Keep the errors of two forms on one page apart. Pass `errorBag` in the post, and the errors are under the bag name, like `errors.login.email`:
+
+```jsx
+router.post(url, data, { errorBag: 'login' })
+```
 
 ## Redirects
 
-After a form, redirect with `redirect(url)` or `back(req)` from Dox:
+Redirect with `redirect(url)` or `back(req)`. After PUT, PATCH or DELETE, `InertiaMiddleware` changes a 302 into 303, so the browser follows with GET:
 
 ```dart
-Future<DoxResponse> update(DoxRequest req, int id) async {
-  // ... save the user
-  return redirect('/users'); // 303 for an Inertia PUT
-}
+return redirect('/users');
 ```
 
-After `PUT`, `PATCH` or `DELETE`, the browser must follow the redirect with `GET`, not with the same method. So `InertiaMiddleware` turns a `302` into `303` for these requests. You do not need to do anything.
-
-If a controller returns nothing to an Inertia request, `InertiaMiddleware` sends the browser back to the page it came from, like `back(req)`.
+A controller that returns nothing to an Inertia request sends the browser back, like `back(req)`.
 
 ### External redirects
 
-To go to an outside site, or any page that is not an Inertia page, use `Inertia.location`. The client then loads the url with a full page load:
+Go to an outside site, or a page that is not an Inertia page, with a full page load:
 
 ```dart
 return Inertia.location(req, 'https://checkout.example.com/pay/1');
@@ -355,176 +320,132 @@ return Inertia.location(req, 'https://checkout.example.com/pay/1');
 
 ## Flash data
 
-Flash data is a short message for the next page, like "User saved". Use `Inertia.flash`, and the next page gets it in `page.flash`, once:
+Give the next page a short message, like "User saved". It needs `SessionMiddleware`:
 
 ```dart
-Future<DoxResponse> store(DoxRequest req) async {
-  // ... save the user
-  Inertia.flash(req, 'message', 'User saved');
-  return redirect('/users');
-}
+Inertia.flash(req, 'message', 'User saved');
+return redirect('/users');
 ```
 
-Read it on the page:
+The next page gets it in `page.flash`, one time:
 
 ```jsx
-import { usePage } from '@inertiajs/react'
-
 const { flash } = usePage()
 // flash.message is 'User saved'
 ```
 
-The client also fires a `flash` event, and calls the `onFlash` callback of the visit. `Inertia.flash` needs `SessionMiddleware`.
-
 ## Vite
 
-In dev mode, `@vite` loads the entry files from the Vite dev server, so you get hot reload. In production, Dox reads `public/build/.vite/manifest.json` and gives the `<link>` and `<script>` tags of the built files.
+In dev mode, `@vite` loads the entry files from the Vite dev server, with hot reload. In production, Dox reads `public/build/.vite/manifest.json`.
 
-Dox is in dev mode when `devServerUrl` is set, or when the file `public/hot` exists. So set `devServerUrl` from the env, and production does not use it:
+Dox is in dev mode when `devServerUrl` is set, or when `public/hot` exists. So set `devServerUrl` from the env:
 
 ```dart title="lib/config/inertia.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_inertia/dox_inertia.dart';
-
 InertiaConfig inertiaConfig = InertiaConfig(
   entryPoints: <String>['resources/js/app.jsx'],
   devServerUrl: Env.get<String>('APP_ENV') == 'development'
       ? 'http://localhost:5173'
       : null,
-  reactRefresh: true,
 );
 ```
+
+When `APP_ENV` is production, Dox ignores `public/hot` and prints a warning.
 
 ## Asset version
 
-When you deploy new JavaScript, a browser that is still open has the old files. The asset version fixes this. When the version changes, the next link click loads the whole page again, with the new files.
+When the asset version changes, the next link click loads the full page again, with the new files. The default is a hash of the Vite manifest, read one time for each isolate. So restart the server after `vite build`.
 
-The default version is a hash of the Vite manifest. Dox reads it once per isolate, so restart the server after `vite build` (a deploy does this). To set your own, use `version` in the config, for example the git commit.
+Set your own version, for example the git commit:
+
+```dart
+InertiaConfig(version: Env.get<String>('GIT_SHA'));
+```
+
+`Inertia.version` gives the current version.
 
 ## Root view data
 
-Page props go to the JavaScript page. Sometimes the root view itself needs a value, like the `<title>` or a CSRF meta tag. Use `Inertia.withViewData` for that.
-
-Write `{{ key }}` in the root view:
+Give the root view a value, like the title. Write `{{ key }}` in the root view:
 
 ```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="csrf-token" content="{{ csrfToken }}">
-    <title>{{ title }}</title>
-    @vite
-  </head>
-  <body>
-    @inertia
-  </body>
-</html>
+<head>
+  <meta name="csrf-token" content="{{ csrfToken }}">
+  <title>{{ title }}</title>
+  @vite
+</head>
 ```
 
-Set the values in the controller:
+Set the values in a controller or a middleware. More calls merge the data:
 
 ```dart
-Future<DoxResponse> index(DoxRequest req) {
-  Inertia.withViewData(req, <String, Object?>{'title': 'Users'});
-  return inertia(req, 'Users/Index', <String, dynamic>{
-    'users': () => User().query().all(),
-  });
-}
+Inertia.withViewData(req, <String, Object?>{'title': 'Users'});
+return inertia(req, 'Users/Index');
 ```
 
-The values are for the root view only. They are not page props, so an Inertia request (a link or a form) does not get them. You can call `withViewData` many times, also in a middleware, and the data is merged.
-
-Each value is HTML escaped. Put a value in text or in a quoted attribute only. It is not safe inside a `<script>` block, an unquoted attribute or a link address.
-
-`{{ csrfToken }}` is filled for you with the CSRF token of the session. It needs `SessionMiddleware`.
-
-A `{{ key }}` that you did not set stays as it is, so set every key that the root view uses.
-
-A title set this way is for the first page load only, because later visits do not load the root view again. There, the `<Head>` component of the Inertia client changes the title. So set the title in `<Head>` too.
+- Dox fills `{{ csrfToken }}` with the CSRF token of the session.
+- A key that you did not set stays as it is, so set every key of the root view.
+- Each value is HTML escaped. Put it only in text or in a quoted attribute.
+- Later visits do not load the root view again. So set the title in the `<Head>` component of the client too.
 
 ### Another root view for some pages
 
-Sometimes a part of the app needs another HTML page, like an admin area. `Inertia.setRootView` uses another file for one request:
+Use another HTML file for one request, like an admin area:
 
 ```dart
-Future<DoxResponse> dashboard(DoxRequest req) {
-  Inertia.setRootView(req, 'resources/views/admin.html');
-  return inertia(req, 'Admin/Dashboard');
-}
+Inertia.setRootView(req, 'resources/views/admin.html');
+return inertia(req, 'Admin/Dashboard');
 ```
 
-`RootViewMiddleware` does the same for every page of a router:
+For every page of a router, use `RootViewMiddleware`:
 
 ```dart
-class AdminRouter extends Router {
-  @override
-  List<dynamic> get middleware => <dynamic>[
-    const RootViewMiddleware('resources/views/admin.html'),
-  ];
-
-  // ...
-}
+@override
+List<dynamic> get middleware => <dynamic>[
+  const RootViewMiddleware('resources/views/admin.html'),
+];
 ```
 
-The path is from the project root, like `rootView` in the config. Use a fixed path. Never pass a value from the request, because it could show any file of the server as the page.
+!!! warning
+    Use a fixed path. A path from the request could show any file of the server.
 
 ## History encryption
 
-The browser keeps the props of each page in its history, so the back button is fast. After a logout, the back button can still show a page with private data. History encryption stops this.
+The browser keeps the props of each page in its history. After a logout, the back button can show private data. With history encryption, the browser encrypts the page data, and a cleared history can not be read. It works only on HTTPS and on localhost.
 
-With it, the browser encrypts the page data before it goes into the history. When you clear the history, the old pages can not be read any more, and the back button asks the server for the page again. The browser can only encrypt on HTTPS, and on `localhost`.
-
-Turn it on for all pages in the config:
+Turn it on for all pages:
 
 ```dart title="lib/config/inertia.dart"
-InertiaConfig inertiaConfig = InertiaConfig(
-  encryptHistory: true,
-);
+InertiaConfig inertiaConfig = InertiaConfig(encryptHistory: true);
 ```
 
-Or for one page, in the controller. `false` turns it off for one page when the config turns it on:
+Or for one page. Pass false to turn it off for one page:
 
 ```dart
-Future<DoxResponse> show(DoxRequest req) {
-  Inertia.encryptHistory(req);
-  // Inertia.encryptHistory(req, false);
-  return inertia(req, 'Account/Show', props);
-}
+Inertia.encryptHistory(req);
+return inertia(req, 'Account/Show', props);
 ```
 
-Or for all pages of a router, with `EncryptHistoryMiddleware`:
+Or for all pages of a router:
 
 ```dart
-class AccountRouter extends Router {
-  @override
-  List<dynamic> get middleware => <dynamic>[const EncryptHistoryMiddleware()];
-
-  // ...
-}
+@override
+List<dynamic> get middleware => <dynamic>[const EncryptHistoryMiddleware()];
 ```
 
-Call `Inertia.clearHistory(req)` to clear the history, for example on logout:
+Clear the history, for example at logout. It needs `SessionMiddleware`:
 
 ```dart
-Future<DoxResponse> logout(DoxRequest req) async {
-  // ... sign the user out
-  Inertia.clearHistory(req);
-  return redirect('/login');
-}
+Inertia.clearHistory(req);
+return redirect('/login');
 ```
-
-The next Inertia page tells the browser to clear its history, once. The mark is kept in the session, so it works with a redirect. It needs `SessionMiddleware`.
 
 ## Server side rendering (SSR)
 
-By default, the first visit gets an empty page, and the browser renders it. With SSR, the first visit gets the full HTML of the page. Search engines can read it, and the visitor sees the page sooner.
-
-The page is rendered by the Inertia SSR server. It is a JavaScript process (Bun or Node) that you build with Vite and run next to your Dox app. On a first visit, Dox sends the page to it and puts the answer in the root view. Inertia requests (links and forms) never use it.
+With SSR, the first visit gets the full HTML of the page, so search engines can read it. The Inertia SSR server renders it. It is a Bun or Node process next to your Dox app. Links and forms never use it.
 
 ### 1. The SSR entry file
 
-`dox inertia:install --ssr` writes this file for you, and adds a `build:ssr` script to `package.json`. It never overwrites a file. With no `package.json` (or one it cannot change safely), it prints a hint instead.
+`dox inertia:install --ssr` writes the entry file and adds a `build:ssr` script to `package.json`:
 
 ```json title="package.json"
 {
@@ -534,7 +455,7 @@ The page is rendered by the Inertia SSR server. It is a JavaScript process (Bun 
 }
 ```
 
-Without `--ssr`, add the `build:ssr` line to `scripts` yourself, and write the entry file like this:
+The entry file looks like this:
 
 ```jsx title="resources/js/ssr.jsx"
 import { createInertiaApp } from '@inertiajs/react'
@@ -556,51 +477,32 @@ createServer(
 )
 ```
 
-Vue and Svelte have the same `createServer`, in `@inertiajs/vue3/server` and `@inertiajs/svelte/server`.
-
-The SSR server listens on port `13714`. Set `host` to `127.0.0.1`, so only your own machine can reach it.
+Vue and Svelte have the same `createServer`, in `@inertiajs/vue3/server` and `@inertiajs/svelte/server`. Keep `host` at 127.0.0.1, so only your own machine can reach the server.
 
 ### 2. Hydrate in the browser
 
-The browser must reuse the HTML from the server, and not render the page again. Change `setup` in your app file:
+Reuse the HTML from the server. Change `setup` in your app file:
 
 ```jsx title="resources/js/app.jsx"
-import { createInertiaApp } from '@inertiajs/react'
-import { createRoot, hydrateRoot } from 'react-dom/client'
-
-createInertiaApp({
-  resolve: (name) => {
-    const pages = import.meta.glob('./Pages/**/*.jsx', { eager: true })
-    return pages[`./Pages/${name}.jsx`]
-  },
-  setup({ el, App, props }) {
-    if (el.hasAttribute('data-server-rendered')) {
-      hydrateRoot(el, <App {...props} />)
-    } else {
-      createRoot(el).render(<App {...props} />)
-    }
-  },
-})
+setup({ el, App, props }) {
+  if (el.hasAttribute('data-server-rendered')) {
+    hydrateRoot(el, <App {...props} />)
+  } else {
+    createRoot(el).render(<App {...props} />)
+  }
+},
 ```
-
-The `else` part is for a page that was sent without SSR.
 
 ### 3. Build and run
 
-Build the browser files and the SSR file, then start the SSR server:
+Build the files, then start the SSR server with Bun. Add `--node` for Node:
 
 ```bash
 bun run build:ssr
 dox inertia:start-ssr
 ```
 
-`dox inertia:start-ssr` runs `bootstrap/ssr/ssr.js` (or `ssr.mjs`) with Bun, in the foreground. When both files exist, it starts the newer one and prints which. It stops with an error when the file is not built yet. A stop signal (Ctrl+C, `docker stop`) is sent on to the SSR process.
-
-With Node, use `npm run build:ssr` and `dox inertia:start-ssr --node`.
-
-The file is `ssr.js` when your `package.json` has `"type": "module"`. Else it is `ssr.mjs`. The SSR file loads your packages from `node_modules`, so keep that folder on the server.
-
-The command does not run in the background. Run it under Docker, pm2 or systemd, like the Dox app. Build and start it again on each deploy.
+It runs `bootstrap/ssr/ssr.js` (or `ssr.mjs`) in the foreground. Run it under Docker, pm2 or systemd, and keep `node_modules` on the server.
 
 ### 4. Turn it on
 
@@ -609,64 +511,21 @@ Set `ssr` in the config:
 ```dart title="lib/config/inertia.dart"
 InertiaConfig inertiaConfig = InertiaConfig(
   entryPoints: <String>['resources/js/app.jsx'],
-  ssr: InertiaSsr(),
+  ssr: Env.get<String>('APP_ENV') == 'production' ? InertiaSsr() : null,
 );
 ```
 
-With no `ssr`, SSR is off. `InertiaSsr` has two options:
-
 | Option | Default | What it does |
 | --- | --- | --- |
-| `url` | `http://127.0.0.1:13714/render` | the render url of the SSR server |
-| `timeout` | 2 seconds | how long Dox waits for the answer. Then it stops the request. |
+| `url` | `http://127.0.0.1:13714/render` | the render URL of the SSR server |
+| `timeout` | 2 seconds | how long Dox waits for the answer |
 
-The `url` must be a full `http` or `https` url. A wrong url gives an error when the app starts.
+The head tags of the page go before `</head>`. So when your pages set a title with `<Head>`, remove the title from the root view.
 
-To use SSR only in production, set it from the env:
+When the SSR server is down or slow, the visitor gets the normal page, and Dox prints one warning.
 
-```dart
-ssr: Env.get<String>('APP_ENV') == 'production' ? InertiaSsr() : null,
-```
-
-### The root view with SSR
-
-The root view needs no change. The HTML from the SSR server goes in place of `@inertia`. The head tags of the page (from the `<Head>` component, like `<title>`) go right before `</head>`.
-
-When your pages set a title with `<Head>`, remove the `<title>` from the root view, so the page does not have two.
-
-### When the SSR server fails
-
-If the SSR server is down, is too slow, or gives a bad answer, the visitor gets the normal page and the browser renders it. No error is shown. Dox prints one warning for the first failure, and no more until the SSR server works again.
-
-## Not included
-
-- The Inertia 1 and 2 clients. They read the page from `<div id="app" data-page="...">`. Use the Inertia 3 client.
-- Once props, scroll props (infinite scroll), `prependProps`, `deepMergeProps` and `matchPropsOn`.
-- Partial reloads of nested props with dots, like `only: ['auth.user']`. Ask for the top level prop (`auth`).
-
-Inertia needs [sessions](session.md) for the errors, flash data and redirects. The client sends the CSRF token by itself, see [CSRF](../security/csrf.md#axios-and-inertia).
-
-## Details
-
-This section is for special cases. Most apps do not need it.
-
-- `@inertia` becomes `<script data-page="app" type="application/json">{"component":"Home",...}</script><div id="app"></div>`. In the JSON, `<`, `>` and `&` are written as `\u003c`, `\u003e` and `\u0026`, so a prop can not end the script tag.
-- An Inertia request has `X-Inertia: true`. Its answer has `X-Inertia: true` and `Vary: X-Inertia`.
-- A Dart `int` above 2^53 in a prop loses precision, because JavaScript reads the page JSON. Send such a number as a string.
-- The page lists the names of the shared props in `sharedProps`. The client keeps them on an instant visit. A prop shared for the request wins over a global one.
-- `Inertia.lazy` is the same as `Inertia.optional`. A deferred prop with `.merge()` (or `merge: true`) is also listed in `mergeProps` when it is sent.
-- With an error bag, the client sends the `X-Inertia-Error-Bag` header. You do not need to pass `errors` yourself, but a page prop named `errors` still wins.
-- An empty `200` answer to an Inertia request goes back only to a `Referer` of the same site. Any other `Referer` goes to `/`. A request without `X-Inertia` gets the empty answer as it is.
-- `Inertia.location` gives an Inertia request `409` with `X-Inertia-Location`. Other requests get `302`. An old asset version on an Inertia `GET` also gets `409` with `X-Inertia-Location`.
-- In dev mode, `@vite` loads `@vite/client` too. With `reactRefresh: true` it adds the React Fast Refresh code first. In production, `@vite` gives a `<link>` tag for the css of each entry and of the chunks it imports, and a `<script type="module">` tag for each entry.
-- `public/hot` holds the dev server url. Some Vite plugins write it while `vite` runs. Dox ignores it only when `APP_ENV` is `production` (in any case), and prints a warning. Other values, like `staging` or an empty value, still use it.
-- Root view data: the escaped characters are `&`, `<`, `>`, `"` and `'`. A `null` value gives empty text. For the same key, the last call wins. A key has letters, digits and `_`, and the spaces are optional: `{{title}}` works too. With no session, `{{ csrfToken }}` stays as it is. Your own `csrfToken` value wins. Only `{{ key }}` in the root view file is replaced, not the same text in a prop or in the SSR HTML.
-- With SSR, the `<Head>` title is also added to the first page, so use only one of `withViewData` and `<Head>` for the title.
-- Another root view works like the default one, with `@vite`, `@inertia` and `{{ key }}`.
-- History encryption keeps its key in the browser, in session storage. With no session, `clearHistory` only works when the same request renders a page with `inertia(...)`.
-- With SSR, head tags need a `</head>` tag (`</HEAD>` works too). A root view with no `</head>` gets no head tags. The SSR HTML holds the page data and the rendered `<div id="app">`.
-
-## See also
+## Next steps
 
 - [Views](views.md): server templates with no front-end framework.
+- [Session](session.md): errors and flash data.
 - [Static files and SPA](../guides/static-files.md): serve the built front-end files.

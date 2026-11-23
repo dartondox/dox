@@ -4,13 +4,11 @@ icon: lucide/arrow-down-up
 
 # Request and response
 
-A short list of what you can use on `DoxRequest`, `DoxResponse` and the response helpers.
-
-Examples and explanations are on the [Request](../the-basic/request.md) and [Response](../the-basic/response.md) pages.
+This page lists the members of `DoxRequest`, `DoxResponse` and the response helpers.
 
 ## `DoxRequest`
 
-A controller gets a `DoxRequest`. So does a middleware that uses `next` (`IDoxNextMiddleware`). A simple middleware (`IDoxMiddleware`) gets an `IDoxRequest`, which has fewer members. The last column shows which members it has.
+A controller and an `IDoxNextMiddleware` get a `DoxRequest`. An `IDoxMiddleware` gets an `IDoxRequest`, with fewer members. The last column shows its members.
 
 ### Input
 
@@ -63,6 +61,9 @@ A controller gets a `DoxRequest`. So does a middleware that uses `next` (`IDoxNe
 | `locale` | `String?` | The first language of `Accept-Language`, like `th`. `null` when there is none or it is `*`. | no |
 | `auth` | `IAuth?` | The auth object set by `AuthMiddleware`. `req.auth?.id()` gives the user id. It is `null` for a guest. | yes |
 | `expectsJson()` | `bool` | The client wants JSON: an `Accept` header with json, a JSON body, or `X-Requested-With: XMLHttpRequest`. An Inertia request is not. | no |
+| `DoxRequest.expectsJsonFor(HttpHeaders headers)` | `bool` | The same check as `expectsJson()`, for raw headers. A static method. | no |
+| `requestId` | `String?` | The id that the `RequestId` middleware set, or null. | no |
+| `protocolVersion` | `String` | The HTTP version: `1.0`, `1.1` or `2.0`. | no |
 
 ### Session
 
@@ -85,10 +86,12 @@ A controller gets a `DoxRequest`. So does a middleware that uses `next` (`IDoxNe
 | `routeIs(String pattern)` | `bool` | `true` when the route name matches. It is `false` for a route with no name. | no |
 | `getRouteIdentifier()` | `String` | A key for the route (base64 of `<method>|<domain><path>`). Useful for a cache or rate limit key. | yes |
 | `httpRequest` | `HttpRequest` | The `dart:io` request. Use it for raw access. | yes |
+| `takeOverResponse()` | `void` | Your handler sends the response itself on `httpRequest.response`, and Dox sends nothing more. Your code must close the response. | no |
+| `responseTakenOver` | `bool` | True after `takeOverResponse()`. | no |
 
 ## `DoxResponse`
 
-Every setter returns the same `DoxResponse`, so you can chain the calls.
+Each setter returns the same `DoxResponse`, so you can chain the calls.
 
 | Member | Returns | What it does |
 | --- | --- | --- |
@@ -99,7 +102,7 @@ Every setter returns the same `DoxResponse`, so you can chain the calls.
 | `getContent()` | `dynamic` | The content as it was given. |
 | `stream(Stream<List<int>> stream)` | `DoxResponse` | Sets a byte stream as content. |
 | `contentType(ContentType type)` | `DoxResponse` | Sets `Content-Type`. A `File` without it gets the type from its extension. |
-| `header(String key, dynamic value)` | `DoxResponse` | Sets one header. A second call with the same key replaces the value. `cache-control` and `Cache-Control` are one header. |
+| `header(String key, dynamic value, {bool? replace})` | `DoxResponse` | Sets one header. A second call with the same key, in any case, replaces the value. A value that a middleware already put on the response stays, unless `replace` is true. When `replace` is null, `CoreFlags.replaceHeaders` decides. |
 | `headers` | `Map<String, dynamic>` | The headers set so far, by name. |
 | `withHeaders(Map<String, dynamic> values)` | `DoxResponse` | Adds these headers. A key replaces the header with the same name, in any case. Other headers stay. |
 | `cookie(DoxCookie cookie, {bool setExpire = false})` | `DoxResponse` | Adds a `Set-Cookie` header. `setExpire: true` sends the cookie as expired, which removes it. |
@@ -117,7 +120,7 @@ These top level functions give a `DoxResponse`.
 
 ## How the content is sent
 
-A controller can return a plain value or a `DoxResponse`. Dox sends the content like this:
+A controller can return a plain value or a `DoxResponse`:
 
 | Content | Sent as |
 | --- | --- |
@@ -130,4 +133,10 @@ A controller can return a plain value or a `DoxResponse`. Dox sends the content 
 | `DownloadableFile` | streamed with `Content-Disposition: attachment; filename="<name>"` |
 | `Stream<List<int>>` | streamed chunk by chunk |
 | `IHttpException` | its status and `toResponse()`, see [HTTP exceptions](http-exceptions.md) |
-| other `Exception` or `Error` | `500` with `{"code": "server_error", "message": "Server Error"}`. In `development` or `local`, the body is the error text. |
+| other `Exception` or `Error` | `500` with `{"code": "server_error", "message": "Server Error"}`. In development or local, the body is the error text. |
+
+## Next steps
+
+- [Request](../the-basic/request.md): read the input of a request, with examples.
+- [Response](../the-basic/response.md): send a response, with examples.
+- [HTTP exceptions](http-exceptions.md): the error classes and their status codes.

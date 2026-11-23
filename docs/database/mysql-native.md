@@ -6,21 +6,47 @@ icon: lucide/database-zap
 
 `dox_mysql_native` is the MySQL and MariaDB driver of the Dox ORM, written in Rust.
 
-You use it through your models and queries, and it needs no extra config. Rust ([mysql_async](https://docs.rs/mysql_async)) owns the connections and the pool, and each connection keeps its prepared statements. It works with MySQL 8.4 (with the default `caching_sha2_password` login) and MariaDB 11.
+You use it through your models and queries. Rust ([mysql_async](https://docs.rs/mysql_async)) owns the connections and the pool, and each connection keeps its prepared statements. It works with MySQL 8.4 and MariaDB 11.
 
 ## Setup
 
-`dox_orm` already depends on `dox_mysql_native`, so you do not add it yourself. Add it only if you want to use `MysqlNativePool` without the ORM:
+`dox_orm` already depends on `dox_mysql_native`. Add it yourself only to use `MysqlNativePool` without the ORM:
 
 ```bash
 dart pub add dox_mysql_native
 ```
 
-You do not need Rust, because the build hook downloads a ready-built library for your system. The package lives in its own repo: [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native).
+The build hook downloads a ready library for your system, so you do not need Rust. The package has its own repo: [dartondox/dox-mysql-native](https://github.com/dartondox/dox-mysql-native).
+
+### Options
+
+The driver reads `host`, `port`, `user`, `password`, `database` and `useSSL` of the `ConnectionConfig`, and these keys from `extra`:
+
+| Key | Default | What it does |
+|---|---|---|
+| `maxConnectionCount` | 10 | Most connections in the pool, for the whole process. |
+| `requestTimeout` | 300 s | The longest time for one request. |
+| `maxConnectionAge` | 12 hours | Close a connection older than this, when it has no query. |
+| `idleTimeout` | 12 hours | Close a connection with no traffic for this long. |
+| `serverKill` | true | Stop a cancelled or timed out query on the server with `KILL QUERY`. |
+| `preparedStatementCacheSize` | 100 | Prepared statements kept per connection. |
+| `verifyCertificate` | true | With `useSSL`, check the server certificate. Set false only for a self-signed certificate in development. |
+
+See [Pool settings](index.md#pool-settings). The connection uses utf8mb4. A login with sha256_password does not work. The default caching_sha2_password and mysql_native_password work.
+
+### Behind a proxy
+
+A cancelled query gets a `KILL QUERY` on a new connection. Behind a proxy with its own connection ids, like ProxySQL, that connection can reach another server. Turn it off there:
+
+```dart
+extra: <String, dynamic>{'serverKill': false},
+```
+
+Then a cancelled query fails in Dart at once, but it runs to its end on the server. In `DATABASE_URL`, use `?serverKill=false`.
 
 ## When the library does not load
 
-MySQL has no other driver in Dox. So if the native library does not load, `SqlQueryBuilder.initializeWithDatabaseConfig` (and every other place that opens a MySQL connection) throws an `UnsupportedError` like this:
+If the native library does not load, `SqlQueryBuilder.initializeWithDatabaseConfig` throws an `UnsupportedError`:
 
 ```text
 dox_mysql_native did not load: <reason>.
@@ -31,41 +57,48 @@ To fix it:
 
 - Run the app with `dart run`, `dart test` or `dart build cli`, because they run the build hook. `dart compile exe` does not.
 - Or install [Rust](https://rustup.rs). The build hook then builds the library from source.
-- If you set `lib_path` in `pubspec.yaml`, check that the file is there and is built for your system.
+- If you set `lib_path` in `pubspec.yaml`, check that the file is there and fits your system.
 
-## Options
+`MysqlNativePool.isAvailable` tells you if the library loaded, and `MysqlNativePool.loadError` gives the reason.
 
-The driver reads the normal fields of the `ConnectionConfig` (`host`, `port`, `user`, `password`, `database`, `useSSL`) and these keys from `extra`:
+## Types
 
-| Key | Default | What it does |
-|---|---|---|
-| `maxConnectionCount` | `10` | Most connections in the pool. |
-| `requestTimeout` | 300 s | The longest wait for one request. |
-| `maxConnectionAge` | 12 hours | A connection older than this is closed once it has no query. |
-| `idleTimeout` | 12 hours | A connection with no traffic for this long is closed. |
-| `serverKill` | `true` | Stop a cancelled or timed out query on the server with `KILL`. |
-| `preparedStatementCacheSize` | `100` | Prepared statements kept per connection. |
-| `verifyCertificate` | `true` | With `useSSL`, TLS checks the server certificate. Set it to `false` only for a self-signed certificate in development. |
+Rows come back with these Dart types:
 
-The pool settings are explained in [Pool settings](index.md#pool-settings).
+| MySQL, MariaDB | Dart |
+|---|---|
+| TINYINT(1) (`boolean()`) | `bool` |
+| TINYINT, SMALLINT, INT, BIGINT, YEAR | `int` |
+| FLOAT, DOUBLE, DECIMAL | `double` |
+| CHAR, VARCHAR, TEXT, ENUM | `String` |
+| DATE, DATETIME, TIMESTAMP | `DateTime` in UTC |
+| TIME | `String`, like 12:34:56 |
+| JSON | the decoded JSON value |
+| BLOB, BINARY, VARBINARY | `Uint8List` |
+| NULL | null |
 
-Isolates that open a pool with the same settings share one pool in Rust. So `maxConnectionCount` is for the whole process, not per isolate.
+MariaDB keeps JSON columns as LONGTEXT. So on MariaDB, TEXT that holds a JSON object or array comes back decoded.
 
-### Behind a proxy
+## Handling errors
 
-When a query is cancelled or times out, the driver sends `KILL QUERY` on a new connection, so the server stops it. Behind a proxy or a load balancer, like ProxySQL or a cloud endpoint over many servers, that new connection may reach another server.
-
-The driver checks that both connections name the same server, and it sends no `KILL` (and prints a warning) if they do not. But behind a proxy with its own connection ids, like ProxySQL, you should set `serverKill` to `false`:
+Every error throws a `MysqlException`. For a server error, `code` is the MySQL error number, like 1062 for a duplicate key:
 
 ```dart
-extra: <String, dynamic>{'serverKill': false},
+try {
+  await QueryBuilder.table('users')
+      .insert(<String, dynamic>{'email': email});
+} on MysqlException catch (error) {
+  if (error.code == 1062) print('taken');
+}
 ```
 
-Then a cancelled query fails in Dart at once, but it runs to its end on the server. A timed out query only has its socket closed.
+`sqlState` is the 5 letter SQLSTATE. For other errors, like a down server, both are null. A cancelled query throws a `MysqlQueryCancelledException`. They come from `package:dox_orm/dox_orm.dart`.
 
-## Using the pool without the ORM
+## Without Dox
 
-If you do not use the ORM, open a `MysqlNativePool` and run queries on it:
+### Opening a pool
+
+`MysqlNativePool.open` opens a pool. `query` returns a `MysqlNativeResult` with `columns` and `rows`:
 
 ```dart
 MysqlNativePool pool = MysqlNativePool.open(
@@ -82,30 +115,20 @@ MysqlNativeResult result = await pool.query(
 print(result.rows); // [{id: 1, name: Ada}]
 ```
 
-`parameters` is a list for `?`, or a map for `@name`. A write gives you the new id and the changed row count:
+`parameters` is a list for `?`, or a map for `@name`. A write also gives the new id and the changed row count:
 
 ```dart
 MysqlNativeResult insert = await pool.query(
   'INSERT INTO users (name) VALUES (@name)',
   parameters: <String, dynamic>{'name': 'Bob'},
 );
-print(insert.insertId); // the new AUTO_INCREMENT id
+print(insert.insertId);     // the new AUTO_INCREMENT id
 print(insert.affectedRows); // 1
-```
-
-### Transactions
-
-A transaction runs on one connection, and its queries run in the order you send them. `execute` is like `query`, but the rows are not sent back to Dart:
-
-```dart
-int tx = await pool.begin();
-await pool.execute('UPDATE users SET name = ?', parameters: <Object?>['Cy'], transaction: tx);
-await pool.commit(tx); // or pool.rollback(tx)
 ```
 
 ### Pool settings
 
-All pool settings are optional. Pass them to `MysqlNativePool.open`, with a `Duration` for each time:
+`open` also takes `port` (3306), `maxConnections` (10), `secure` (TLS), `verifyCertificate`, `sslRootCert`, `statementCacheSize` (32), `requestTimeout`, `maxConnectionAge`, `idleTimeout` and `serverKill`:
 
 ```dart
 MysqlNativePool pool = MysqlNativePool.open(
@@ -113,90 +136,71 @@ MysqlNativePool pool = MysqlNativePool.open(
   user: 'root',
   password: 'password',
   database: 'app',
+  secure: true,
+  sslRootCert: '/etc/ssl/certs/db-ca.pem',
   requestTimeout: const Duration(seconds: 30),
-  maxConnectionAge: const Duration(minutes: 30),
-  idleTimeout: const Duration(minutes: 5),
-  serverKill: true,
 );
 ```
 
-They work like the [ORM pool settings](index.md#pool-settings). In `MysqlNativePool.open`, `maxConnectionAge` has no limit by default. In the ORM config, the default is 12 hours.
+A host that starts with `/` is a Unix socket file. Here `maxConnectionAge` has no limit by default.
+
+### Pool from a url
+
+`MysqlNativePool.fromUrl` takes a url with the mysql_async options, like `?pool_max=20`. The kill option there is `server_kill`:
+
+```dart
+MysqlNativePool pool =
+    MysqlNativePool.fromUrl('mysql://root:password@localhost:3306/app');
+```
+
+### Transactions
+
+`begin` gives a transaction id. `execute` is like `query`, but it sends no rows back:
+
+```dart
+int tx = await pool.begin();
+await pool.execute('UPDATE users SET name = ?',
+    parameters: <Object?>['Cy'], transaction: tx);
+await pool.commit(tx); // or pool.rollback(tx)
+```
 
 ### Cancelling a query
 
-Sometimes a query takes too long and you want to stop it. Pass a `MysqlCancelToken` and call `cancel()`. `query`, `execute` and `stream` all take `cancelToken`:
+Pass a `MysqlCancelToken` to `query`, `execute` or `stream`, and call `cancel()`. `isCancelled` is true after it:
 
 ```dart
 MysqlCancelToken token = MysqlCancelToken();
-Future<MysqlNativeResult> slow = pool.query('SELECT SLEEP(10)', cancelToken: token);
+Future<MysqlNativeResult> slow =
+    pool.query('SELECT SLEEP(10)', cancelToken: token);
 token.cancel(); // slow fails with MysqlQueryCancelledException
 ```
 
-If the query has not started, it does not run. If it is running, the driver sends `KILL QUERY` so the server stops it (see `serverKill`). If it already ended, nothing changes. In the ORM, use [`cancelWith()`](query-builder.md#cancelling-a-query).
+In the ORM, use [`cancelWith()`](query-builder.md#cancelling-a-query).
 
 ### Streaming rows
 
-For a big result, you do not want all rows in memory at once. `stream` gives the rows in chunks of up to `chunkSize` rows:
+`stream` gives the rows in chunks of up to `chunkSize` rows. Rust reads at most 2 chunks ahead:
 
 ```dart
-await for (MysqlNativeResult chunk in pool.stream('SELECT * FROM logs', chunkSize: 1000)) {
-  print(chunk.rows.length); // up to 1000
+await for (MysqlNativeResult chunk
+    in pool.stream('SELECT * FROM logs', chunkSize: 1000)) {
+  print(chunk.rows.length);
 }
 ```
 
-Rust reads at most 2 chunks ahead of your listener, so a big result does not fill the memory. Stop listening (`break` in `await for`) to stop the query. Do not pause a stream for longer than the server's `net_write_timeout` (60 s by default), because the server then stops the connection. In the ORM, use [`cursor()`](query-builder.md#streaming-results).
+Stop the loop with `break` to stop the query. Do not pause a stream for longer than the `net_write_timeout` of the server (60 s by default). In the ORM, use [`cursor()`](query-builder.md#streaming-results).
 
-## Types
+### Sharing and closing a pool
 
-Rows come back with these Dart types:
-
-| MySQL / MariaDB | Dart |
-|---|---|
-| `TINYINT(1)` (`boolean()`) | `bool` |
-| `TINYINT`, `SMALLINT`, `INT`, `BIGINT`, `YEAR` | `int` |
-| `FLOAT`, `DOUBLE`, `DECIMAL` | `double` |
-| `CHAR`, `VARCHAR`, `TEXT`, `ENUM` | `String` |
-| `DATE`, `DATETIME`, `TIMESTAMP` | `DateTime` in UTC |
-| `TIME` | `String`, like `12:34:56` |
-| `JSON` | the decoded JSON value |
-| `BLOB`, `BINARY`, `VARBINARY` | `Uint8List` |
-| `NULL` | `null` |
-
-MariaDB keeps `JSON` columns as `LONGTEXT`. So on MariaDB, `TEXT` that holds a JSON object or array comes back decoded.
-
-## Handling errors
-
-Every error throws `MysqlException`. For an error from the server, `code` is the MySQL error number, like `1062` for a duplicate key, so you can check for the error you expect:
+`pool.handle` works in every isolate of the process. Open the same pool there with `MysqlNativePool.fromHandle(handle)`. `close()` gives back one open, and the last close closes the pool:
 
 ```dart
-try {
-  await QueryBuilder.table('users').insert(<String, dynamic>{'email': email});
-} on MysqlException catch (error) {
-  if (error.code == 1062) print('taken');
-}
+MysqlNativePool other = MysqlNativePool.fromHandle(pool.handle);
+pool.close();
 ```
 
-`sqlState` is the 5 letter SQLSTATE. For other errors, like the server is down, both `code` and `sqlState` are null. `MysqlException` comes from `package:dox_orm/dox_orm.dart`.
+## Next steps
 
-## Details
-
-This section is for special cases. Most apps do not need it.
-
-### Limits
-
-- The `timeZone`, `collation`, `serverPublicKey` and `timeoutMs` keys are not read. The connection uses `utf8mb4`.
-- A login with `sha256_password` (not the default) does not work. The default `caching_sha2_password` and `mysql_native_password` work.
-
-### Other cases
-
-- A `driverFactory` on the connection wins over the native driver: the ORM uses your driver.
-- You can give `driver.pool.handle` (an `int`) to another isolate and use `MysqlNativeDriver(MysqlNativePool.fromHandle(handle))` there. `MysqlNativeDriver` comes from `package:dox_orm/dox_orm.dart`.
-- A `CREATE`, `ALTER`, `RENAME` or `DROP` makes every connection prepare its statements again. So run `CREATE TEMP TABLE` or `DROP` once at start up, not on every request.
-- `maxConnectionAge` is a real age, also for a busy connection. `idleTimeout` and `maxConnectionAge` never close a connection that runs a query.
-- In the url of `MysqlNativePool.fromUrl`, the option is `server_kill`. In `DATABASE_URL` of the ORM, use `?serverKill=false`.
-- With `serverKill` on, each connection reads the server name once after login (`@@server_uuid`, on MariaDB the hostname, port and `server_id`). This small query shows in the general log and the audit log of the server. Two servers with the same `server_uuid` (for example a copied data folder) still look like one server.
-- The `KILL` connection counts for `max_user_connections`. A `KILL` that fails prints a warning on stderr.
-- In a transaction, the next queries wait until the `KILL` has its answer, so it can only stop the cancelled query. When more queries wait on the same connection, the cancelled one runs to its end instead, and its rows are dropped. A connection that got a `KILL QUERY` closes once it has no query. Inside a transaction it stays, and the transaction goes on.
-- A stream reads rows as they come, and a paused listener stops the reading. Stopping a stream sends `KILL QUERY` and closes the connection. Outside a transaction, a stream gets a connection of its own. Pass `transaction:` to stream inside a transaction.
-- Speed: a find-by-id query takes about 65 µs alone, and about 10 µs each with 32 queries in flight (AOT build, local MySQL 8.4 or MariaDB 11, Apple M-series). See [Performance: database drivers](../digging-deeper/performance.md#database-drivers).
-- If you see a problem, please [open an issue](https://github.com/dartondox/dox-mysql-native/issues).
+- [Database](index.md): connections and settings.
+- [Native Postgres driver](postgres-native.md): the Postgres driver.
+- [Performance: database drivers](../digging-deeper/performance.md#database-drivers): driver speed.

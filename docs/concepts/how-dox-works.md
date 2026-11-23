@@ -4,13 +4,11 @@ icon: lucide/cog
 
 # How Dox works
 
-This page explains what happens inside Dox when a request comes in, how isolates work and what each folder of an app is for.
-
-You do not need this page to build an app. Read it when you want to know why Dox behaves the way it does, for example why a static value is not shared, or where an error status comes from.
+This page shows the path of a request, how isolates work and what each folder of an app is for.
 
 ## The life of a request
 
-In short, every request takes the same path. The pages in "The basics" follow this order:
+Each request takes the same path. The pages in "The basics" follow this order:
 
 ```mermaid
 flowchart LR
@@ -19,28 +17,23 @@ flowchart LR
 
 [Routing](../the-basic/routing.md) → [Middleware](../the-basic/middleware.md) → [DTOs](../the-basic/dto.md) → [Controller](../the-basic/controller.md) → [Views](../the-basic/views.md) → [Response](../the-basic/response.md)
 
-The rest of this section shows each step in detail.
-
-Dox has two parts that work together:
-
-- A native server (`dox_http_native`). It owns the sockets and parses HTTP.
-- Your app, written in Dart. Routes, middleware, DTOs, controllers and the ORM all run here.
+Dox has two parts. The native server (`dox_http_native`) owns the sockets and parses HTTP. Your Dart app runs the routes, middleware, DTOs, controllers and the ORM.
 
 A request goes through these steps:
 
-1. The native server accepts the connection and parses the request line, the headers and the body. If the request is broken, it answers `400`. Headers over 16 KB get `431`, and a body over the size limit gets `413`. Dart never sees these requests.
-2. The native server hands the requests to Dart in a batch, so one message holds many requests.
-3. Dart finds the route by the method, the `Host` (for domain routes) and the path. If no route matches, the answer is `404`. A CORS preflight (`OPTIONS`) gets `204`.
+1. The native server parses the request. A broken request gets 400, headers over 16 KB get 431, and a body over the size limit gets 413.
+2. The native server gives the requests to Dart in a batch.
+3. Dart finds the route by the method, the host and the path. No match gets 404. A CORS preflight gets 204.
 4. Dart adds the CORS headers of the route.
-5. Dart reads the body, but only when the request has a `Content-Type`.
-6. Dart runs the middleware of the route in this order: global, router, group, route. A middleware returns the request to go on. If it returns anything else, that is sent as the response and the controller does not run.
-7. Dart fills the controller parameters. Path params are converted first, and a value that does not fit its type (`abc` for `int id`) gets `404`. Then the DTO is read and checked. Bad input gets `422`, a body that is not JSON gets `400`, and a content type Dox can not read gets `415`.
+5. Dart reads the body, if the request has a content type.
+6. Dart runs the middleware in this order: global, router, group, route. If a middleware returns a value that is not the request, Dart sends that value as the response.
+7. Dart fills the controller parameters. A path param that does not fit its type gets 404. Bad DTO input gets 422, a body that is not JSON gets 400, and an unknown content type gets 415.
 8. The controller runs and returns a value.
-9. If you set a `responseHandler` in `AppConfig`, it runs now. It can change every response.
-10. Dox turns the value into the response: a `String` is text, a `Map` or model is JSON, and a `File` is streamed.
-11. Dart sends the answers of the batch back to the native server in one call, and it writes the bytes to the socket.
+9. The `responseHandler` of `AppConfig` runs, if you set one.
+10. Dox makes the response: a string is text, a map or model is JSON, and a file is streamed.
+11. Dart gives the answers of the batch back to the native server, which writes them to the socket.
 
-If a step throws, Dox catches the error. An `IHttpException` (like `NotFoundHttpException`) gives its own status. Any other error gives `500` and goes to the `report` method of the `ExceptionHandler` in `AppConfig`.
+If a step throws, Dox catches the error. An `IHttpException` gives its own status. Any other error gives 500 and goes to the `report` method of your `ExceptionHandler`.
 
 ```mermaid
 sequenceDiagram
@@ -65,31 +58,25 @@ sequenceDiagram
     R->>C: bytes
 ```
 
-!!! note "No reflection"
-    Dox reads the parameter types of every controller once, at start. It does not use `dart:mirrors`, and DTOs come from a generated list (`lib/generated/dtos.g.dart`). This is why `dox build` can make a native (AOT) binary.
+Dox uses no reflection. DTOs come from a generated list, so `dox build` can make a native binary.
 
 ### Where things are decided
-
-When you want to change what happens to a request, this table shows where to look:
 
 | Step | Code | What it decides |
 | --- | --- | --- |
 | Route match | `lib/routes/*.dart`, `Route.get(...)` | which controller runs |
 | Middleware | `AppConfig(globalMiddleware:)`, `Router.middleware`, `Route.middleware(...)`, the route list | go on, or answer early |
-| Input | a `@Dto` class in `lib/app/dtos/<name>/` | what the controller gets, or `422` |
+| Input | a `@Dto` class in `lib/app/dtos/<name>/` | what the controller gets, or 422 |
 | Output | the return value, `response(...)`, `responseHandler` | status, headers, body |
 | Errors | `IHttpException`, `AppConfig(exceptionHandler:)` | the error response, logging |
 
-See [Routing](../the-basic/routing.md), [Middleware](../the-basic/middleware.md),
-[Validation](../the-basic/validation.md) and [Response](../the-basic/response.md).
-
 ## Isolates
 
-Dart runs code on isolates. An isolate is like a thread, but it has its own memory. Dox starts one isolate per CPU the process may use (it respects the container cpuset and CPU quota), and every isolate runs the full app. This is how one Dox process uses all cores.
+An **isolate** is like a thread with its own memory. Dox starts one isolate for each CPU that the process can use, also in a container, and each isolate runs the full app.
 
 ### One port, many isolates
 
-Every isolate runs its own HTTP server on the same port, and the operating system spreads the connections between them:
+Each isolate runs its own HTTP server on the same port:
 
 | System | Native server |
 | --- | --- |
@@ -97,53 +84,43 @@ Every isolate runs its own HTTP server on the same port, and the operating syste
 | macOS | the isolates share one socket |
 | Windows | only one isolate serves HTTP |
 
-Each isolate does its socket work on its own thread. See [Native server](../digging-deeper/native-server.md#how-it-works).
+See [Native server](../digging-deeper/native-server.md#how-it-works).
 
 ### What each isolate gets
 
-Before Dox starts an isolate, it copies three things to it:
+Dox copies the `AppConfig`, the providers, and the routes and binders that you added before `startServer()` to each isolate. Then each isolate does these steps one time:
 
-- the `AppConfig`,
-- the list of providers,
-- the routes and route binders (`Route.bind`) you added before `startServer()`.
-
-Then each isolate does these steps once:
-
-1. It runs `setup()` of every provider, in list order. This is where a database pool is opened.
+1. It runs `setup()` of each provider, in list order.
 2. It registers the routes of your routers.
-3. It reads the parameter types of every controller.
+3. It reads the parameter types of each controller.
 4. It starts its HTTP server.
 
-Nothing in this list runs per request.
-
-Because the config and the providers are copied, they must not hold open sockets or pools. Open these in `setup()` instead. See [Providers](../digging-deeper/providers.md).
+The config and the providers are copied, so they must not hold open sockets or pools. Open them in `setup()`. See [Providers](../digging-deeper/providers.md).
 
 ### Each isolate has its own memory
 
-Isolates do not share memory, so you must keep this in mind when you store state:
+Isolates do not share memory:
 
-- A static value or a singleton exists once per isolate. A change in one isolate is not seen in the others.
-- The `memory` cache store is per isolate. Use the `redis` store to share cache data.
-- To share data between isolates, use the database, Redis or files.
+- A static value or a singleton exists one time in each isolate.
+- The memory cache store is per isolate. Use the Redis store to share cache data.
+- To share data, use the database, Redis or files.
 
-`Dox().isolateId` tells you which isolate runs the code. The first one is `1`.
+`Dox().isolateId` gives the isolate that runs the code. The first one is 1.
 
 ### When an isolate crashes
 
-Dox tries hard to keep isolates alive:
-
-- An error in a request is caught. Dox answers `500` and keeps going.
-- An async error outside a request is caught and passed to the `ExceptionHandler`, and the isolate keeps running.
-- If a worker isolate still dies, Dox prints `[server] isolate N exited, restarting` and starts a new one after 1 second.
-- If the first (main) isolate dies, the process exits with a non-zero code. So in production, use a supervisor (Docker `restart:`, systemd `Restart=always`) to start it again.
+- An error in a request gets 500, and the isolate continues.
+- An async error outside a request goes to the `ExceptionHandler`, and the isolate continues.
+- If a worker isolate stops, Dox starts a new one after 1 second.
+- If the main isolate stops, the process exits with an error code. In production, use a supervisor to start it again, like Docker `restart:` or systemd `Restart=always`.
 
 ### How many isolates
 
-To change the number, set `totalIsolate` in `AppConfig` or `APP_TOTAL_ISOLATE` in `.env`. `Dox().totalIsolate(2)` before `startServer()` wins over the config. Use `1` in tests. See [Isolate](../digging-deeper/isolate.md).
+Set `totalIsolate` in `AppConfig` or `APP_TOTAL_ISOLATE` in `.env`. `Dox().totalIsolate(2)` before `startServer()` wins over the config. See [Isolate](../digging-deeper/isolate.md).
 
 ## Where the database pools live
 
-The ORM is started in a provider (`ORMProvider`). Every isolate runs `setup()`, so every isolate asks for a pool. But the native drivers live outside Dart, and there, isolates that open the same settings get the same pool:
+Each isolate runs `setup()` of the ORM provider, so each isolate asks for a pool. The native drivers give isolates with the same settings the same pool:
 
 | Driver | Per isolate | Per process |
 | --- | --- | --- |
@@ -151,13 +128,11 @@ The ORM is started in a provider (`ORMProvider`). Every isolate runs `setup()`, 
 | MySQL native (`dox_mysql_native`) | nothing | one pool of `maxConnectionCount` connections per settings |
 | SQLite | one connection | nothing shared |
 
-So for Postgres and MySQL, the app opens at most `maxConnectionCount` connections, for any number of isolates. You choose the pool size. Set it below the `max_connections` of the database. The pool closes when the last isolate that uses it closes it. See [Native Postgres driver](../database/postgres-native.md#options).
-
-Postgres and MySQL have only the native drivers. If the native library does not load, the app stops with an error that says why and how to fix it. See [Database](../database/index.md).
+So for Postgres and MySQL, the app opens at most `maxConnectionCount` connections for all isolates. Set it below the max_connections of the database. See [Native Postgres driver](../database/postgres-native.md#options).
 
 ## The layout of a Dox app
 
-`dox create my_app` copies the [dox-sample](https://github.com/dartondox/dox-sample) template. Each folder has one job, so you always know where a new file goes:
+`dox create my_app` copies the [dox-sample](https://github.com/dartondox/dox-sample) template:
 
 ```text
 my_app/
@@ -190,7 +165,7 @@ my_app/
 │   ├── routes/
 │   │   ├── api.dart             # ApiRouter, prefix `api`
 │   │   └── web.dart             # WebRouter
-│   ├── providers/               # one DoxProvider per file, runs in every isolate
+│   ├── providers/               # one DoxProvider per file
 │   │   ├── orm_provider.dart        # opens the database
 │   │   ├── queue_provider.dart
 │   │   ├── schedule_provider.dart
@@ -200,41 +175,31 @@ my_app/
 │       ├── jobs.g.dart          # the list of queue jobs
 │       └── openapi.g.dart       # the OpenAPI docs
 ├── test/
-├── .env                         # local settings, not in git. `dox create` makes it
+├── .env                         # local settings, not in git
 ├── .env.example
 ├── Dockerfile
 ├── docker-compose.yml
 └── pubspec.yaml
 ```
 
-Some folders are added later, by the `dox make:*` commands, when you first need them:
-
-- `dox make:dto` adds `lib/app/dtos/<name>/<name>.dto.dart`. Then `build_runner` writes `lib/generated/dtos.g.dart`, the list of DTOs.
-- `dox make:middleware` adds `lib/app/http/middleware/`.
-- `dox make:serializer` adds `lib/app/serializers/`.
-
-The app makes `storage/` when it first writes files (the local disk, the file cache, uploads).
-
-This table says what goes in each folder:
+The `dox make:*` commands add more folders when you need them, like `lib/app/dtos/`, `lib/app/http/middleware/` and `lib/app/serializers/`. The app makes `storage/` when it first writes files.
 
 | Folder | What goes there |
 | --- | --- |
-| `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. The other files are the entry points that the `dox migration:*`, `db:seed`, `queue:*` and `schedule:*` commands run. |
-| `db/` | Your migrations, factories and seeders. Dart migrations are listed in `db/migration/migrations.dart`, which the CLI writes. |
-| `lib/app/http/` | Everything about HTTP: controllers and middleware. |
-| `lib/app/serializers/` | Serializers. They are not only for HTTP: MCP and websocket use them too. |
+| `bin/` | `server.dart` calls `Dox().initialize(appConfig)`, runs the migrations, then `Dox().startServer()`. The other files are the entry points of the `dox migration:*`, `db:seed`, `queue:*` and `schedule:*` commands. |
+| `db/` | Your migrations, factories and seeders. The CLI writes the list of Dart migrations in `db/migration/migrations.dart`. |
+| `lib/app/http/` | Controllers and middleware. |
+| `lib/app/serializers/` | Serializers. MCP and WebSocket code also use them. |
 | `lib/app/dtos/` | One folder per DTO: typed and checked input. |
 | `lib/app/jobs/` | Queue jobs. |
-| `lib/app/models/` | One folder per model. `build_runner` writes the `.g.dart` file next to it. |
+| `lib/app/models/` | One folder per model, with its generated file. |
 | `lib/config/` | One file per config object. `app.dart` puts them together in `AppConfig`. |
-| `lib/routes/` | One `Router` class per file. Dox finds each router by itself. |
-| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in every isolate. Dox finds each provider by itself. |
-| `lib/generated/` | Generated files. Do not edit them. Run `dox build_runner:build` to make them again. |
+| `lib/routes/` | One `Router` class per file. Dox finds each router. |
+| `lib/providers/` | Classes that extend `DoxProvider`. Their `setup()` runs in each isolate. Dox finds each provider. |
+| `lib/generated/` | Generated files. Run `dox build_runner:build` to make them again. |
 | `storage/` | Files the app writes: uploads, the file cache, SQLite files. |
 
-`build_runner` with `dox_builder` makes the generated files: the model classes, the DTO checks, the typed env class, the OpenAPI docs and the list of queue jobs.
-
-## See also
+## Next steps
 
 - [Isolate](../digging-deeper/isolate.md): more on isolates.
 - [Providers](../digging-deeper/providers.md): code that runs when the app starts.

@@ -6,12 +6,12 @@ icon: lucide/key-square
 
 Let users register and log in, give them a JWT token, protect routes with it, and read the user in a controller.
 
-A JWT token is a good fit for an API that a mobile app or a single page app calls. The client gets the token at login and sends it with every request, so the server needs no session.
+A JWT token is good for an API that a mobile app or a single page app calls. The client sends the token with every request, so the server needs no session.
 
 ## What you need
 
 - A Dox app (`dox create my_app`). A new app has a database (SQLite), a `User` model and a `users` table with `name`, `email` and `password` columns.
-- The `dox_auth` package. A new app does not have it. Add it:
+- The `dox_auth` package. Add it:
 
 ```bash
 dart pub add dox_auth
@@ -19,7 +19,7 @@ dart pub add dox_auth
 
 ## 1. Hide the password in the model
 
-The token holds `user.toJson()`, and anyone with the token can read it. So the password hash must be in `hidden`. The model of a new app already does this:
+Anyone with the token can read the user in it. So put the password in `hidden`. The model of a new app already does this:
 
 ```dart title="lib/app/models/user/user.model.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -44,7 +44,7 @@ class User extends UserGenerator {
 
 ## 2. Set up the auth provider
 
-The provider tells Dox how to make and check tokens, and how to find the user:
+The provider tells Dox how to make and check tokens, and how to find the user. Dox finds the provider by itself:
 
 ```dart title="lib/providers/auth_provider.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -75,13 +75,11 @@ class AppAuthProvider extends DoxProvider {
 }
 ```
 
-The secret must be at least 32 bytes. A key from `dox key:generate` has the right length. A shorter secret stops the app in production, and prints a warning in development.
-
-You do not need to register the provider, because Dox finds it by itself. After `dart run build_runner build` it is in `lib/generated/container.g.dart`.
+The secret must have at least 32 bytes, like a key from `dox key:generate`. A shorter secret stops the app in production.
 
 ## 3. Write the DTOs
 
-You need one DTO for register and one for login. `@Unique` makes sure the email is not taken yet. It comes from `dox_orm`, so hide the `Schema` class of `dox_orm` in the import.
+Write one DTO for register and one for login. `@Unique` comes from `dox_orm`, so hide the `Schema` class of `dox_orm` in the import:
 
 ```dart title="lib/app/dtos/register_user/register_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -187,11 +185,11 @@ class AuthController {
 }
 ```
 
-`Hash.makeAsync` makes a bcrypt hash of the password. At login, `auth.attempt` finds the user by `email` and checks the password against that hash. It returns `null` if the email or the password is wrong.
+`auth.attempt` finds the user by email and checks the password hash. It returns null if the email or the password is wrong.
 
 ## 5. Add the routes
 
-Register and login are open to everyone. Every other route goes inside `AuthMiddleware`. The middleware reads the `Authorization: Bearer <token>` header, checks the token and loads the user from the database. A missing or bad token stops the request with `401`.
+Put every protected route inside `AuthMiddleware`. It reads the `Authorization: Bearer <token>` header. A missing or bad token gets 401:
 
 ```dart title="lib/routes/api.dart"
 import 'package:dox_auth/dox_auth.dart';
@@ -221,7 +219,7 @@ class ApiRouter extends Router {
 
 ## 6. Register the DTOs
 
-Dox finds a DTO in the `dtos` list of `AppConfig`. `build_runner` writes this list to `lib/generated/dtos.g.dart`. You add it only once, so skip this step if your `app.dart` already has `dtos: dtos`.
+Add the `dtos` list that `build_runner` writes. Skip this step if your `app.dart` already has `dtos: dtos`:
 
 ```dart title="lib/config/app.dart"
 import 'package:my_app/generated/dtos.g.dart';
@@ -233,6 +231,8 @@ AppConfig appConfig = AppConfig(
 ```
 
 ## 7. Build and run
+
+Build the code and start the server:
 
 ```bash
 dart run build_runner build --delete-conflicting-outputs
@@ -250,10 +250,19 @@ curl -H 'Content-Type: application/json' \
 ```
 
 ```json
-{"token":"eyJhbGciOiJIUzI1NiIs...","user":{"id":1,"name":"Ann","email":"ann@example.com","created_at":"...","updated_at":"..."}}
+{
+  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "user": {
+    "id": 1,
+    "name": "Ann",
+    "email": "ann@example.com",
+    "created_at": "...",
+    "updated_at": "..."
+  }
+}
 ```
 
-If you log in with a wrong password, you get `401`:
+A login with a wrong password gets 401:
 
 ```json
 {"error":{"code":"unauthorized","message":"Wrong email or password"}}
@@ -270,28 +279,34 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/api/auth/me
 ```
 
 ```json
-{"id":1,"name":"Ann","email":"ann@example.com","created_at":"...","updated_at":"..."}
+{
+  "id": 1,
+  "name": "Ann",
+  "email": "ann@example.com",
+  "created_at": "...",
+  "updated_at": "..."
+}
 ```
 
-Without the header, `/api/auth/me` gives `401 Authentication failed`.
+Without the header, you get 401 with "Authentication failed".
 
-The `{"error": ...}` shape comes from the response handler in [Custom errors](custom-errors.md). Without that handler, the `401` body is `{"code":"unauthorized","message":"Wrong email or password"}`.
+The `{"error": ...}` shape comes from the handler in [Custom errors](custom-errors.md). Without it, the body is `{"code":"unauthorized","message":"Wrong email or password"}`.
 
 ## Logout and expiry
 
-By default the server checks only the signature of a JWT, so it can not cancel one token. This is what you can do:
+By default the server can not cancel one token. You can do this:
 
 | You want | Do this |
 | --- | --- |
 | Log out on this device | The client deletes the token. That is all `logout` does. |
 | Limit the damage of a stolen token | Keep `expiresIn` short, for example `Duration(hours: 12)`. |
 | Log every user out at once | Change `APP_KEY`. Every old token stops working. |
-| Block one user | Delete the user. `AuthMiddleware` loads the user from the database on each request, so a deleted user gets `401`. |
+| Block one user | Delete the user. `AuthMiddleware` loads the user on each request, so a deleted user gets 401. |
 
-If you need to cancel one token, or all tokens of a user, turn on revocation. See [Revoke tokens](../security/authentication.md#revoke-tokens). Or use [access tokens](../security/authentication.md#access-tokens), which you can revoke at any time.
+To cancel one token, or all tokens of a user, turn on [revocation](../security/authentication.md#revoke-tokens). Or use [access tokens](../security/authentication.md#access-tokens).
 
-## See also
+## Next steps
 
-- [Authentication](../security/authentication.md) for all options of `AuthGuard`, `JwtAuthDriver` and `AuthProvider`
-- [Hashing](../security/hashing.md)
-- [Middleware](../the-basic/middleware.md)
+- [Authentication](../security/authentication.md): all the options of the guards and drivers.
+- [Hashing](../security/hashing.md): make and check password hashes.
+- [Middleware](../the-basic/middleware.md): run code before a route.

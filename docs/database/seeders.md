@@ -8,15 +8,15 @@ A seeder puts data in your database, like sample data for development or a list 
 
 ## Writing seeders
 
-Use the `make:seeder` command to make a seeder:
+`make:seeder` makes a seeder:
 
 ```bash
 dox make:seeder UserSeeder
 ```
 
-This makes `db/seeders/user.seeder.dart`. It also writes `db/seeders/seeders.dart`, the list of all seeders, and `bin/seed.dart`, the script that runs them. Do not edit the list, because Dox writes it again on each `make:seeder` and `db:seed`.
+This makes `db/seeders/user.seeder.dart`. It also writes `db/seeders/seeders.dart`, the list of all seeders, and `bin/seed.dart`. Do not edit the list, because Dox writes it again.
 
-A seeder has one method, `run`. Put your code there. You can use [factories](factories.md), models or the [query builder](query-builder.md):
+Put your code in `run`. You can use [factories](factories.md), models or the [query builder](query-builder.md):
 
 ```dart title="db/seeders/user.seeder.dart"
 import 'package:dox_migration/dox_migration.dart';
@@ -33,11 +33,7 @@ class UserSeeder extends Seeder {
 
 ### Calling other seeders
 
-`dox db:seed` runs `DatabaseSeeder` by default. So you use `DatabaseSeeder` to call your other seeders, with the `call` method:
-
-```bash
-dox make:seeder DatabaseSeeder
-```
+`dox db:seed` runs `DatabaseSeeder`. Use its `call` method to run your other seeders, one after another:
 
 ```dart title="db/seeders/database.seeder.dart"
 import 'package:dox_migration/dox_migration.dart';
@@ -53,39 +49,26 @@ class DatabaseSeeder extends Seeder {
 }
 ```
 
-`call` runs the seeders one after another, in the list order.
-
 ## Running seeders
 
-Use the `db:seed` command to run `DatabaseSeeder`:
+`db:seed` runs `DatabaseSeeder`. `--class` runs one seeder:
 
 ```bash
 dox db:seed
-```
-
-If you want to run only one seeder, use `--class`:
-
-```bash
 dox db:seed --class=UserSeeder
 ```
 
-You can also seed right after the migrations. Add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh`:
+`--class` finds the seeder by its `name`, which is the class name. To seed after the migrations, add `--seed` to `migration:run`, `migration:refresh` or `migration:fresh`:
 
 ```bash
 dox migration:fresh --seed
 ```
 
-`migration:fresh` drops every table of the database, also tables that no migration made. So do not run it on a production database.
-
 The seeders use the same database as the migrations. See [Database settings](migration.md#database-settings).
 
 ### Transactions
 
-A seed runs in one transaction. If a seeder throws an error, nothing is saved, and the command exits with code 1.
-
-On MySQL and MariaDB, `CREATE`, `ALTER` and `DROP TABLE` save right away, and a rollback can not undo them. So keep schema changes in migrations.
-
-A very large seed can turn the transaction off with `withinTransaction`. Only the seeder you run decides this. For `dox db:seed` it is `DatabaseSeeder`:
+A seed runs in one transaction. If a seeder throws, nothing is saved, and the command exits with code 1. For a very large seed, turn the transaction off:
 
 ```dart
 class BigSeeder extends Seeder {
@@ -99,43 +82,19 @@ class BigSeeder extends Seeder {
 }
 ```
 
-## Testing
+Only the seeder you run decides this. For `dox db:seed`, it is `DatabaseSeeder`.
 
-A seeder is a normal class. In a test, call `run` after you set up the ORM:
+### The seed script
 
-```dart
-await DatabaseSeeder().run();
-```
-
-## Details
-
-### bin/seed.dart
-
-`dox db:seed` runs `dart run bin/seed.dart`. You can run it yourself too, for example in a deploy script:
-
-```bash
-dart run bin/seed.dart
-dart run bin/seed.dart --class=UserSeeder
-```
-
-`bin/seed.dart` is made only when it is missing. `SeederRunner` sets up the ORM, runs the seeder and closes the ORM:
+`dox db:seed` runs `bin/seed.dart`. `SeederRunner` sets up the ORM, runs the seeder and closes the ORM. Pass `config` to use the database config of the app in place of `.env`:
 
 ```dart title="bin/seed.dart"
 import 'dart:io';
 
 import 'package:dox_migration/dox_migration.dart';
+import 'package:my_app/config/database.dart';
 
 import '../db/seeders/seeders.dart';
-
-Future<void> main(List<String> args) async {
-  exitCode = await SeederRunner(seeders: seeders).run(args);
-}
-```
-
-By default it reads the database from `.env`. Pass `config:` to use your app's database config instead:
-
-```dart
-import 'package:my_app/config/database.dart';
 
 Future<void> main(List<String> args) async {
   exitCode = await SeederRunner(
@@ -145,12 +104,22 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-### Other cases
+You can run it yourself, like `dart run bin/seed.dart --class=UserSeeder`. From code, `seed` runs one seeder by name:
 
-- `migrate:fresh` and `migrate:refresh` are short names, so `dox migrate:fresh --seed` works too.
-- `migration:refresh --seed` undoes all migrations, runs them again, then runs `DatabaseSeeder`. `migration:run --seed` runs the new migrations, then `DatabaseSeeder`.
+```dart
+await SeederRunner(seeders: seeders).seed('UserSeeder');
+```
 
-## See also
+## Testing
+
+In a test, set up the ORM, then call `run`:
+
+```dart
+await DatabaseSeeder().run();
+```
+
+## Next steps
 
 - [Factories](factories.md): make many rows fast.
+- [Migration](migration.md): make the tables first.
 - [Testing with a database](../guides/testing-with-database.md): use the database in tests.

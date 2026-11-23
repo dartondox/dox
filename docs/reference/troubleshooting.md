@@ -6,11 +6,9 @@ icon: lucide/bug
 
 This page lists known problems, with the text you see, the cause and the fix.
 
-For short errors, search the [Error index](errors.md).
-
 ## The native HTTP library did not load
 
-**Symptom.** The app stops at start with this error:
+Symptom: The app stops at start with this error:
 
 ```
 Unsupported operation: dox_http_native did not load: <reason>.
@@ -27,14 +25,14 @@ dox_http_native: sha256 of dox_http_native-<os>-<arch>.<ext> does not match
 dox_http_native: cargo build failed
 ```
 
-**Cause.** The package could not find, download or build its native library. Common reasons:
+Cause: The package could not find, download or build its native library. Common reasons:
 
 - There was no internet during `dart pub get`, or there is no ready build for your OS and CPU. Ready builds exist for macOS arm64 and x64, Linux x64 and arm64, and Windows x64.
 - Rust is not installed, so the library can not be built from source.
 - You compiled with `dart compile exe`. It does not run build hooks, so the binary has no native library.
-- The `<reason>` is `native library ABI <x>, expected <y>`. This means the library on disk is from another version of the package.
+- The reason is `native library ABI <x>, expected <y>`: the library on disk is from another version of the package.
 
-**Fix.** Pick one:
+Fix: Pick one:
 
 1. Install Rust with [rustup](https://rustup.rs) and run `dart pub get` again. Dox then builds the library with `cargo`.
 2. If the reason is an ABI mismatch and you set `lib_path`, rebuild that library: run `cargo build --release` in the `native` folder of the `dox-http-native` repo.
@@ -62,7 +60,7 @@ See [Native server](../digging-deeper/native-server.md), [Postgres native](../da
 
 ## Port already in use
 
-**Symptom.** At start:
+Symptom: At start:
 
 ```
 SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno>), port = 3000
@@ -70,24 +68,24 @@ SocketException: dox_http_native: bind failed (<code>) (OS Error: errno = <errno
 
 The `errno` is `48` on macOS and `98` on Linux.
 
-**Cause.** Another process listens on the port. Often it is an old `bin/server.dart` that `dox serve` did not stop, or a second copy of the app.
+Cause: Another process listens on the port, like an old `bin/server.dart` or a second copy of the app.
 
-**Fix.** Find and stop the process, or use another port.
+Fix: Find and stop the process, or use another port:
 
 ```bash
 lsof -i :3000          # macOS and Linux: who has the port
 kill <pid>
 ```
 
-Or set `APP_PORT=3001` in `.env` (a new project reads it into `serverPort`).
+Or set `APP_PORT=3001` in `.env`.
 
 ## build_runner: conflicting outputs
 
-**Symptom.** `dox build_runner:build`, `dox serve` or `dox build` stops with a build_runner message that starts with `Conflicting outputs were detected`, and names files like `lib/generated/dtos.g.dart` or `lib/app/models/user/user.model.g.dart`.
+Symptom: `dox build_runner:build`, `dox serve` or `dox build` stops with a build_runner message that starts with `Conflicting outputs were detected`, and names files like `lib/generated/dtos.g.dart` or `lib/app/models/user/user.model.g.dart`.
 
-**Cause.** The generated `.g.dart` files are on disk, but `.dart_tool/build` does not know them. This happens after a `git clone` with committed `.g.dart` files, after deleting `.dart_tool`, or after a Dart SDK update.
+Cause: The generated `.g.dart` files are on disk, but `.dart_tool/build` does not know them. This happens after a `git clone` with committed `.g.dart` files, after deleting `.dart_tool`, or after a Dart SDK update.
 
-**Fix.** Delete the build cache and build again:
+Fix: Delete the build cache and build again:
 
 ```bash
 rm -rf .dart_tool/build
@@ -98,11 +96,11 @@ If that is not enough, delete the `.g.dart` files that the message names, and bu
 
 ## Ambiguous import: `Uuid`, `Name` or `Schema`
 
-**Symptom.** The analyzer or the build says a name like `Uuid`, `Name`, `Range`, `Image` or `Schema` is an "ambiguous import".
+Symptom: The analyzer or the build says a name like `Uuid`, `Name`, `Range`, `Image` or `Schema` is an "ambiguous import".
 
-**Cause.** `dox_core` exports the validation rules (`Uuid`, `Name`, `Range`, `Image`, ...) and the `Schema` class. Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
+Cause: `dox_core` exports the validation rules (`Uuid`, `Name`, `Range`, `Image`, ...) and the `Schema` class. Another import has a class with the same name, like `package:uuid`. `dox_orm` also has a `Schema` class.
 
-**Fix.** Hide the name you do not use in that file:
+Fix: Hide the name you do not use in that file:
 
 ```dart
 import 'package:dox_core/dox_core.dart' hide Uuid;
@@ -123,15 +121,15 @@ When a value must have ` #` in it (a space, then `#`), put the value in quotes. 
 
 ## `Hash.make` throws on a long password
 
-**Symptom.** Saving a user, or registering, gives a `500`. The log shows:
+Symptom: Saving a user, or registering, gives a `500`. The log shows:
 
 ```
 Invalid argument(s) (password): The password is too long. bcrypt takes at most 72 bytes.
 ```
 
-**Cause.** `Hash.make()` and `Hash.makeAsync()` use bcrypt. bcrypt takes at most 72 bytes, so Dox throws an `ArgumentError` for a longer password. The error text does not hold the password.
+Cause: `Hash.make()` and `Hash.makeAsync()` use bcrypt, which takes at most 72 bytes. So Dox throws an `ArgumentError` for a longer password.
 
-**Fix.** Refuse long passwords in your DTO, before you hash them:
+Fix: Refuse long passwords in your DTO, before you hash them:
 
 ```dart
 @MaxLength(72)
@@ -142,11 +140,11 @@ final String password;
 
 ## MySQL 8 login fails
 
-**Symptom.** The connection to MySQL 8 is refused at login, while the same user works from the `mysql` client. Often the user was made with the default `caching_sha2_password` plugin.
+Symptom: The connection to MySQL 8 is refused at login, while the same user works from the `mysql` client. Often the user was made with the default `caching_sha2_password` plugin.
 
-**Cause.** `caching_sha2_password` needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.
+Cause: `caching_sha2_password` needs either TLS or the server RSA public key to send the password. A client that has neither can not log in.
 
-**Fix.** The Dox MySQL driver supports `caching_sha2_password`. Check these settings on the connection in `lib/config/database.dart`:
+Fix: The Dox MySQL driver supports this plugin. Check these settings of the connection in `lib/config/database.dart`:
 
 | Setting | What to do |
 | --- | --- |
@@ -162,20 +160,20 @@ ALTER USER 'app'@'%' IDENTIFIED WITH mysql_native_password BY 'secret';
 
 ## SQLite: the database file
 
-**Symptom.** An `SqliteException` with `unable to open database file`, or an empty database after `dox build`.
+Symptom: An `SqliteException` with `unable to open database file`, or an empty database after `dox build`.
 
-**Cause.** A relative path is relative to the folder you start the app from. After `dox build` you run the app from `build/bundle`, so the default `DB_NAME=db/dox.sqlite` becomes `build/bundle/db/dox.sqlite`. `dox build` does not copy your SQLite files, so that database starts empty. Also, SQLite makes a missing file, but not a missing folder.
+Cause: A relative path starts from the folder where you start the app. After `dox build` you run the app from `build/bundle`, where the database is a new empty file. Also, SQLite makes a missing file, but not a missing folder.
 
-**Fix.**
+Fix:
 
 - Use an absolute path, or make the folder first.
-- Set it with `DB_NAME` (a new project reads it): `DB_NAME=/var/lib/my_app/dox.sqlite`.
+- Set it with `DB_NAME`, like `DB_NAME=/var/lib/my_app/dox.sqlite`.
 - Migrations read `DB_DATABASE` or `DB_NAME` as the path too, so use the same value.
 - Do not use `:memory:` with more than one isolate. Each isolate gets its own empty database.
 
 ## `dox: command not found` after `dart pub global activate`
 
-**Symptom.**
+Symptom:
 
 ```
 zsh: command not found: dox
@@ -183,9 +181,9 @@ zsh: command not found: dox
 
 right after `dart pub global activate dox`.
 
-**Cause.** `dart pub global activate` puts the `dox` script in `$HOME/.pub-cache/bin`. That folder is not in your `PATH`.
+Cause: The `dox` script is in `$HOME/.pub-cache/bin`, and that folder is not in your path.
 
-**Fix.** Add it to your shell profile and open a new terminal:
+Fix: Add it to your shell profile and open a new terminal:
 
 ```bash
 export PATH="$PATH":"$HOME/.pub-cache/bin"
@@ -193,6 +191,7 @@ export PATH="$PATH":"$HOME/.pub-cache/bin"
 
 On Windows the folder is `%LOCALAPPDATA%\Pub\Cache\bin`.
 
-## See also
+## Next steps
 
-- [Error index](errors.md): every message Dox prints or throws.
+- [Error index](errors.md): each message that Dox shows or throws.
+- [Production checklist](production-checklist.md): what to check before you deploy.

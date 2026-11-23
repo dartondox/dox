@@ -18,6 +18,35 @@ dox add graphql
 
 The command adds the packages, `lib/config/graphql.dart` and `lib/providers/graphql_provider.dart`. It does not overwrite a file. For an app with no models, see [Without the ORM](#without-the-orm).
 
+### Configuration
+
+All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`. Set only the settings that you want to change:
+
+```dart title="lib/config/graphql.dart"
+GraphQLConfig graphqlConfig = GraphQLConfig(
+  schema: graphqlSchema,
+  path: '/api/graphql',
+);
+```
+
+| Setting | Default | What it does |
+|---|---|---|
+| `path` | `/graphql` | The URL of the API. |
+| `middleware` | none | Route middleware, like `AuthMiddleware()`. |
+| `graphiql` | on in development | The GraphiQL page. |
+| `introspection` | on in development | Lets tools like GraphiQL read the list of your types and fields. |
+| `showInternalErrors` | on in development | Sends the real text of an error to the client. |
+| `rules` | none | More validation rules, run after the rules of the GraphQL spec. |
+| `maxDepth` | `64` | How deep a query can nest fields. |
+| `maxQueryLength` | `1000000` | The most characters in the text of one query. |
+| `maxFields` | `20000` | The most fields one query can ask for. |
+| `maxNodes` | `100000` | The most values one request can load. |
+| `maxRootFields` | `50` | The most top-level fields in one request. Each alias counts. |
+| `maxRelationRows` | `50000` | The most rows that one list relation can load for all parent rows together. |
+| `maxErrors` | `100` | The most errors in one result. After it, the fields that start give null. |
+
+"On in development" means on when `APP_ENV` is `development`. A request that is larger than a `max` setting gets an error.
+
 ## Add a model to the API
 
 Put `@GraphQL()` on a model. Then add one annotation for each operation that a client can use:
@@ -70,7 +99,7 @@ The result has the same shape as the query:
 
 Dox loads the users of all ten posts with one database query.
 
-Your client sends the same query as a `POST` request to `/graphql`. The JSON body is `{"query": "..."}`.
+Your client sends the same query as a POST request to `/graphql`. The JSON body is `{"query": "..."}`. A query can also come as a GET request, with `query` in the URL. A mutation needs POST.
 
 ## All operations
 
@@ -117,7 +146,8 @@ By default, all clients can use all operations. Set `guard: true` on an operatio
 @GraphQL(filter: Ability.view)
 @GraphQLAll(can: Ability.viewAny)
 @GraphQLFind(can: Ability.view)
-@GraphQLCreate(dto: PostInput, can: Ability.create, guard: true, owner: 'userId')
+@GraphQLCreate(
+    dto: PostInput, can: Ability.create, guard: true, owner: 'userId')
 @GraphQLUpdate(dto: PostInput, can: Ability.update, guard: true)
 @GraphQLDelete(can: Ability.delete, guard: true)
 class Post extends PostGenerator {}
@@ -170,6 +200,15 @@ Use it to make the model a type of the API. All other model annotations need it.
 A model with only `@GraphQL()` has no queries and no mutations. A client gets it only through a relation, for example `post.user`.
 
 Dox does not show the fields in the `hidden` list of the model, so a password stays on the server. To hide a different field, put `@GraphQLIgnore()` above its `@Column()`.
+
+A field can be a `String`, `int`, `double`, `bool`, `DateTime`, an enum, a `@GraphQL` class, or a `List` of them. A different type stops the build, so put `@GraphQLIgnore()` on a field that the API does not need.
+
+To make a getter a field, put `@GraphQLField()` on it. It has `name:`, `description:`, `deprecationReason:` and `guard: true`:
+
+```dart
+@GraphQLField()
+String get fullName => '$firstName $lastName';
+```
 
 `@GraphQL` also has `filter:`. See [Hide rows](#hide-rows).
 
@@ -341,6 +380,8 @@ GraphQLConfig graphqlConfig = GraphQLConfig(
 
 The middleware does not stop a request. All fields stay public until you add `guard: true`. The client sends its token in the `Authorization: Bearer <token>` header, as usual.
 
+If you use a subclass of `AuthMiddleware`, override `asOptional()` to return your subclass. Else your changes do not run.
+
 ### Make a query or mutation need a login
 
 Set `guard: true` on each operation that a guest must not use:
@@ -386,7 +427,12 @@ Future<User?> me(DoxGraphQLContext context) {
 }
 ```
 
-`context.user<User>()` gives `null` for a guest.
+`context.user<User>()` gives null for a guest. The context also has these members:
+
+- `context.auth()` gives the `IAuth` of the login, or null.
+- `context.make<T>()` gives a service from the container.
+- `context.request` is the `DoxRequest`.
+- `context.loader` gives a `DataLoader` of the request, see [Without the ORM](#without-the-orm).
 
 ## Authorization
 
@@ -447,7 +493,8 @@ Give an ability to an operation with `can:`. Dox asks the policy before the oper
 @GraphQLAll(can: Ability.viewAny)
 @GraphQLPaginate(can: Ability.viewAny)
 @GraphQLFind(can: Ability.view)
-@GraphQLCreate(dto: PostInput, can: Ability.create, guard: true, owner: 'userId')
+@GraphQLCreate(
+    dto: PostInput, can: Ability.create, guard: true, owner: 'userId')
 @GraphQLUpdate(dto: PostInput, can: Ability.update, guard: true)
 @GraphQLDelete(can: Ability.delete, guard: true)
 class Post extends PostGenerator {}
@@ -473,6 +520,8 @@ When the policy refuses a user, the field is `null`. The other fields keep their
 ```
 
 The `errors` list of the result has one error for `posts`. Its code is `FORBIDDEN`, in `extensions.code`.
+
+For an id that does not exist, Dox asks the policy about an empty row, so a refused user gets `FORBIDDEN` for each id. If your policy method allows an empty row, a client can find which ids exist.
 
 ### viewAny
 
@@ -520,7 +569,11 @@ Dox hides each row that the ability refuses, and gives no error. This applies to
 
     `filter:` does not decide who can change a row. `updatePost` and `deletePost` ask only their `can:`. Give them a `can:`.
 
-To get `null` and no error from `post(id)`, use `filter:` and no `can:` on `@GraphQLFind`.
+To get null and no error from `post(id)`, use `filter:` and no `can:` on `@GraphQLFind`.
+
+- In a paged list, `data` and `count` do not include the hidden rows, but `total` and `lastPage` include them.
+- `createPost` always gives the new row. `updatePost` saves a hidden row, but its result is null.
+- A field can give a filtered model as `Post`, `Post?`, `List<Post>` or `List<Post>?`. A different shape stops the build.
 
 ### create
 
@@ -599,7 +652,8 @@ class PostPolicy extends Policy<User?, Post> {
   }
 
   @override
-  Map<String, Function> get abilities => <String, Function>{Ability.view: view};
+  Map<String, Function> get abilities =>
+      <String, Function>{Ability.view: view};
 }
 ```
 
@@ -633,7 +687,7 @@ Dox gets the data of the query from the method:
 - The return type is the type that the client gets.
 - Dox gets the constructor parameters from the [container](../the-basic/dependency-injection.md).
 
-A resolver annotation has `name:`, `description:` and `guard: true`, the same as a model annotation.
+A resolver annotation has `name:`, `description:` and `guard: true`, the same as a model annotation. It also has `deprecationReason:`, which marks the field as deprecated.
 
 ### Write your own mutation
 
@@ -653,10 +707,11 @@ Dox applies the rules of the DTO before your method runs.
 To send your own message, throw a `GraphQLError`:
 
 ```dart
-throw GraphQLError('This post is not published yet');
+throw GraphQLError('This post is not published yet',
+    extensions: <String, Object?>{'code': 'NOT_PUBLISHED'});
 ```
 
-For all other errors, the client sees "Internal server error" in production. Dox sends the real error to the `ExceptionHandler` of your app.
+`extensions` is optional. For all other errors, the client sees "Internal server error" in production. Dox sends the real error to the `ExceptionHandler` of your app.
 
 ### Check a policy in a resolver
 
@@ -675,35 +730,6 @@ Future<Post?> latestPost(DoxGraphQLContext context) async {
 ```
 
 `GraphQLAuth.forbidden()` gives the same `FORBIDDEN` error as `can:`. `filter:` also hides rows in the result of your own resolvers.
-
-## Configuration
-
-All settings are fields of `GraphQLConfig` in `lib/config/graphql.dart`. Each setting has a default, so set only the settings that you want to change:
-
-```dart title="lib/config/graphql.dart"
-GraphQLConfig graphqlConfig = GraphQLConfig(
-  schema: graphqlSchema,
-  path: '/api/graphql',
-);
-```
-
-| Setting | Default | What it does |
-|---|---|---|
-| `path` | `/graphql` | The URL of the API. |
-| `middleware` | none | Route middleware, like `AuthMiddleware()`. |
-| `graphiql` | on in development | The GraphiQL page. |
-| `introspection` | on in development | Lets tools like GraphiQL read the list of your types and fields. |
-| `showInternalErrors` | on in development | Sends the real text of an error to the client. |
-| `maxDepth` | `64` | How deep a query can nest fields. |
-| `maxQueryLength` | `1000000` | The most characters in the text of one query. |
-| `maxFields` | `20000` | The most fields one query can ask for. |
-| `maxNodes` | `100000` | The most values one request can load. |
-| `maxRootFields` | `50` | The most top-level fields in one request. Each alias counts. |
-| `maxRelationRows` | `50000` | The most rows that one list relation can load for all parent rows together. |
-
-"On in development" means on when `APP_ENV` is `development`. For all other values, these three settings are off.
-
-A request that is larger than a `max` setting gets an error. Set lower values when your API is open to the public.
 
 ## Without the ORM
 
@@ -752,6 +778,17 @@ A `DataLoader` also has these methods:
 - `loadMany(ids)` loads a list of keys in the same batch.
 - `prime(id, value)` puts a value in the loader, if the key is not there. Use it when you already have the row.
 - `clear(id)` and `clearAll()` remove values, for example after a change.
+
+When some keys can fail on their own, use `DataLoader.withResults`. The batch function gives one `LoadValue(value)` or `LoadError(error)` for each key:
+
+```dart
+DataLoader<int, Shop> shops = DataLoader<int, Shop>.withResults(
+    (List<int> ids) async => <LoadResult<Shop>>[
+          for (int id in ids) LoadValue<Shop>(await findShop(id)),
+        ]);
+```
+
+`DataLoader.of(loader)` takes a class that implements `BatchLoader`.
 
 ## Performance
 
@@ -810,13 +847,8 @@ All three queries at 256 connections, requests per second:
 
 How it was run: the same rig as the [benchmark](../digging-deeper/performance.md#how-it-was-run) of the server. The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4. Each server has 8 database connections. Each query runs for 15 seconds, three times. The numbers are the median.
 
-## Details
+## Next steps
 
-- **GET requests.** A client can also send a query as a `GET` request, with `query` in the URL. A mutation needs `POST`.
-- **Computed fields.** Put `@GraphQLField()` on a getter of a `@GraphQL` class to make the getter a field. It has `guard: true` also.
-- **Field types.** A field can be a `String`, `int`, `double`, `bool`, `DateTime`, an enum, a `@GraphQL` class, or a `List` of them. A different type stops the build. Put `@GraphQLIgnore()` on a field that the API does not need.
-- **Paged lists with `filter:`.** `data` and `count` do not include the hidden rows. `total` and `lastPage` include them.
-- **Results of mutations with `filter:`.** `createPost` always gives the new row. `updatePost` saves a hidden row, but its result is `null`.
-- **Filtered types.** A field can give a model with `filter:` as `Post`, `Post?`, `List<Post>` or `List<Post>?`. A different shape stops the build.
-- **An id that does not exist.** With `can:`, Dox asks the policy about an empty row. Thus, a refused user gets `FORBIDDEN` for each id. If your policy method allows an empty row, a client can find which ids exist.
-- **Your own `AuthMiddleware`.** If you use a subclass of `AuthMiddleware`, override `asOptional()` to return your subclass. If you do not, your changes do not run.
+- [Authorization](../security/authorization.md): write the policies for `can:` and `filter:`.
+- [DTOs](../the-basic/dto.md): the input of create and update.
+- [Authentication](../security/authentication.md): log users in.

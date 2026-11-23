@@ -6,53 +6,47 @@ icon: lucide/cloud-upload
 
 This page shows how to build a Dox app for production and run it safely.
 
-When your app is ready, you build it into a native binary, copy the binary to a server or a Docker image, and put a proxy in front of it for HTTPS.
+You build the app into a native binary, copy it to a server or a Docker image, and put a proxy in front of it for HTTPS.
 
 !!! danger "Never run production with `dart run`"
-    `dart run` (and `dox serve`) uses the JIT compiler, which is made for
+    `dart run` and `dox serve` use the JIT compiler, which is for
     development. It uses about 25x more memory at start (around 390 MB
     instead of 16 MB) and starts slower. Always build an AOT binary for
     production.
 
 ## Build
 
-Run `dox build` to build your app for production:
+`dox build` builds your app for production into `build/bundle/`:
 
 ```bash
 dox build
 ```
 
-It makes a `build/bundle/` folder:
-
 | File                        | What it is                                       |
 | --------------------------- | ------------------------------------------------ |
-| `build/bundle/bin/server`   | the native binary. No Dart SDK needed to run it  |
+| `build/bundle/bin/server`   | the native binary. It needs no Dart SDK          |
 | `build/bundle/bin/queue`    | the queue worker, when `bin/queue.dart` exists   |
 | `build/bundle/bin/schedule` | the scheduler, when `bin/schedule.dart` exists   |
-| `build/bundle/lib/`         | native libraries from build hooks (eg. SQLite)   |
-| `build/bundle/db/`          | your `db/` folder (migrations, seeders). SQLite database files are left out |
+| `build/bundle/lib/`         | native libraries from build hooks (like SQLite)  |
+| `build/bundle/db/`          | your `db/` folder, with no SQLite database files |
 | `build/bundle/.env.example` | copy it to `build/bundle/.env`, or use env variables |
 
-Keep `bin/` and `lib/` together, because the binary loads the native libraries from `../lib`.
-
-`dox build` exits with code 1 when a step fails, so CI can stop.
+Keep `bin/` and `lib/` together, because the binary loads the native libraries from `../lib`. Do not use `dart compile exe`: it does not run build hooks, so the app has no native libraries.
 
 ### Starting the server
 
-Start the binary from the bundle folder:
+Start the binary from the bundle folder. It reads `.env` and `db/` from the folder you start it in:
 
 ```bash
 cd build/bundle
 ./bin/server
 ```
 
-The binary reads `.env` and `db/` from the folder you start it in. A real environment variable wins over the `.env` file.
-
-A new Dox app runs the migrations in `bin/server.dart`, before the server starts. So the database is up to date when the first request comes in.
+A real environment variable wins over the `.env` file. A new Dox app runs the migrations in `bin/server.dart`, before the server starts.
 
 ## Docker
 
-A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `db/`, `libgcc_s` and an empty `/tmp`.
+A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `libgcc_s` and an empty `/tmp`.
 
 ```dockerfile
 FROM dart:stable AS build
@@ -65,41 +59,32 @@ RUN dart pub get
 COPY . .
 RUN dart pub get --offline
 
-# The dox CLI. `dox build` runs build_runner, then AOT-compiles
-# bin/server.dart, bin/queue.dart and bin/schedule.dart with
-# `dart build cli`. It puts all of them in build/bundle/bin, the native
-# libraries in build/bundle/lib and the migrations in build/bundle/db.
-# The queue worker and the scheduler run as their own processes:
-# `/app/bin/queue work` and `/app/bin/schedule work`.
-ARG DOX_VERSION=^3.2.0
-RUN dart pub global activate dox "$DOX_VERSION"
+# `dox build` runs build_runner, then builds bin/server.dart,
+# bin/queue.dart and bin/schedule.dart into build/bundle.
+RUN dart pub global activate dox
 RUN /root/.pub-cache/bin/dox build
 
-# Lay out the final file tree:
-# /app/bin/server, /app/bin/queue, /app/bin/schedule, /app/lib (native
-# libraries), /app/db/migration, /app/storage and a writable /tmp
-# (uploads bigger than 1 MB are streamed to a temp file).
+# The final file tree: /app/bin, /app/lib, /app/db, /app/storage and
+# a writable /tmp (uploads bigger than 1 MB go to a temp file).
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
+  # the native HTTP server (Rust) needs libgcc_s
   && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
   && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
 
-# Minimal serving image: the AOT runtime files from the dart image
-# (`/runtime/`) plus our bundle. No Dart SDK, no source code.
+# The AOT runtime files of the dart image plus the bundle.
 FROM scratch
 COPY --from=build /runtime/ /
 COPY --from=build /out/ /
 WORKDIR /app
 
-# Config comes from env variables. The image has no .env file,
-# so secrets stay out of it.
+# Config comes from env variables. The image has no .env file.
 EXPOSE 3000
 CMD ["/app/bin/server"]
 ```
 
-The image has no `.env` file, so secrets stay out of it. Pass config as environment variables:
+The image has no `.env` file, so secrets stay out of it. Pass the config as environment variables:
 
 ```bash
 docker build -t my-app .
@@ -108,15 +93,14 @@ docker run -p 3000:3000 --env-file .env -e DB_HOST=... my-app
 
 ### Docker compose
 
-A new app also has a `docker-compose.yml`. It runs the app, a queue worker and Postgres, and reads `.env` with `env_file: .env`:
+A new app also has a `docker-compose.yml`. It runs the app, a queue worker and Postgres:
 
 ```bash
 docker compose up -d --build
 ```
 
-- A new `.env` uses SQLite. The compose services set `DB_CONNECTION=postgres` and `DB_NAME=dox` themselves. To use the compose Postgres with `dox s`, set the same two values in `.env`.
-- A new app skips the Postgres driver in `pubspec.yaml`, because it uses SQLite. Remove the `dox_postgres_native` skip lines before you run the compose app. See [Skip unused drivers](../database/index.md#skip-unused-drivers).
-- The database port listens on `127.0.0.1` only.
+- The compose services set `DB_CONNECTION=postgres` and `DB_NAME=dox`. To use this Postgres with `dox s`, set the same two values in `.env`.
+- A new app skips the Postgres driver in `pubspec.yaml`. Remove the `dox_postgres_native` skip lines first. See [Skip unused drivers](../database/index.md#skip-unused-drivers).
 
 See [Docker](../guides/docker.md) for a health check in the image.
 
@@ -130,7 +114,7 @@ One build has three binaries. Run each one as its own process:
 | queue worker | `/app/bin/queue work` |
 | scheduler | `/app/bin/schedule work` |
 
-The image is `FROM scratch`, so it has no shell. Start the other binaries with `--entrypoint`:
+The image has no shell, so start the other binaries with `--entrypoint`:
 
 ```bash
 docker run -d -p 3000:3000 --env-file .env my-app
@@ -138,19 +122,13 @@ docker run -d --env-file .env --entrypoint /app/bin/queue my-app work
 docker run -d --env-file .env --entrypoint /app/bin/schedule my-app work
 ```
 
-In compose, use `command: ["/app/bin/queue", "work"]`. The `worker` service of a new app does this.
+In compose, use `command: ["/app/bin/queue", "work"]`. With no Docker, run `./bin/queue work` and `./bin/schedule work` in `build/bundle`. Only the server runs the migrations, so start the server first.
 
-Without Docker, run `./bin/queue work` and `./bin/schedule work` in `build/bundle`, for example as two more systemd services.
-
-Only the server runs the migrations when it starts, so start the server first.
-
-For a small app, you can skip the extra processes. `QueueConfig(inProcess: true)` runs the jobs inside the server, and `ScheduleConfig(inProcess: true)` runs the schedule there. But heavy jobs then slow down requests. See [Running jobs in the web server](queue.md#running-jobs-in-the-web-server).
+A small app can run the jobs and the schedule inside the server, with `QueueConfig(inProcess: true)` and `ScheduleConfig(inProcess: true)`. See [Running jobs in the web server](queue.md#running-jobs-in-the-web-server).
 
 ## HTTPS: put a proxy in front
 
-Dox serves plain HTTP only, because its [native server](native-server.md) has no TLS. So run Dox on a private port, and put [Caddy](https://caddyserver.com) or nginx in front of it. The proxy does TLS, HTTP/2 and gzip.
-
-By default Dox listens on all network interfaces. When the proxy runs on the same machine, set `APP_HOST=127.0.0.1`, so the app port can not be reached from outside.
+Dox serves plain HTTP only. Run it on a private port, and put [Caddy](https://caddyserver.com) or nginx in front of it for TLS and gzip. When the proxy is on the same machine, set `APP_HOST=127.0.0.1`:
 
 ```mermaid
 flowchart LR
@@ -159,27 +137,22 @@ flowchart LR
     D --> DB[("Database")]
 ```
 
-Dox runs one isolate per core, and they share one database pool. The migrations run once, before the server starts.
-
 ### Trusting the proxy
 
-Behind a proxy, every request comes from the proxy. Tell Dox to trust the proxy, so `req.ip()` and `req.scheme()` show the real client:
+Tell Dox to trust the proxy, so `req.ip()` and `req.scheme()` show the real client:
 
 ```dart
 AppConfig(
-  /// the proxy's IP, or a range like '10.0.0.0/8', or '172.16.0.0/12' for docker
+  // the IP of the proxy, or a range like '10.0.0.0/8'
   trustedProxies: <String>['127.0.0.1', '::1'],
 );
 ```
 
-- `req.ip()` reads `X-Forwarded-For`. Dox walks the list from the right and skips your proxies, so a fake value from the client is ignored.
-- `req.scheme()` reads `X-Forwarded-Proto` (`http` or `https`). `req.isSecure()` is true for `https`.
-- `trustedProxies` is empty by default. Then Dox ignores those headers, because any client can send them.
-- `['*']` trusts any direct client. Only use it when the app port can not be reached from outside. If you have two proxies in a row, list their IPs or ranges instead.
+`req.ip()` then reads `X-Forwarded-For`, and `req.scheme()` reads `X-Forwarded-Proto`. The list is empty by default, so Dox ignores these headers. `['*']` trusts any direct client, so use it only when the app port can not be reached from outside.
 
 ### Caddy
 
-Caddy gets a certificate for you and sets `X-Forwarded-For` and `X-Forwarded-Proto`. Websockets work with no extra config.
+Caddy gets a certificate for you and sets the forwarded headers. WebSockets work with no extra config:
 
 ```
 example.com {
@@ -241,9 +214,9 @@ server {
 
 ### HTTP/2 and gRPC
 
-Dox can speak HTTP/2 to your proxy. This is needed for gRPC. It is opt-in: set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Dox speaks h2c only, which is HTTP/2 without TLS. The proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port, so the same upstream address works for both.
+gRPC needs HTTP/2 between the proxy and Dox. Set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Dox speaks h2c, so the proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port.
 
-With Caddy, `h2c://` tells it to use HTTP/2 without TLS to the app:
+With Caddy, `h2c://` sends HTTP/2 with no TLS to the app:
 
 ```
 example.com {
@@ -251,7 +224,7 @@ example.com {
 }
 ```
 
-With nginx, gRPC calls need `grpc_pass`, and normal routes need `proxy_pass`. Use a separate location for each. The `grpc://` scheme is used because the app has no TLS:
+With nginx, use `grpc_pass` for the gRPC paths and `proxy_pass` for the other routes:
 
 ```nginx
 server {
@@ -275,25 +248,15 @@ server {
 }
 ```
 
-nginx can not send normal `proxy_pass` requests to an upstream over HTTP/2. It always uses HTTP/1.1 there, and that works fine because Dox accepts it on the same port. Use `grpc_pass` only for gRPC routes, and keep `proxy_pass` for the rest.
-
-nginx `grpc_read_timeout` and `grpc_send_timeout` are 60 seconds by default. A long stream is cut when it is quiet for that long, so raise them for long streams.
+The nginx `grpc_read_timeout` and `grpc_send_timeout` are 60 seconds by default, and a quiet stream stops after that time. Raise them for long streams.
 
 ### Pass the real `Host` header
 
-The proxy must pass the real `Host` header to Dox, like `proxy_set_header Host $host;` above. Some checks compare the request with this header:
-
-- the WebSocket origin check (`allowedOrigins` on `Route.websocket`, or `AppConfig.webSocketAllowedOrigins`)
-- `back()`, which only goes back to a page of the same host
-- `allowedOrigins` of socket.io
-
-If the proxy sends its own host (like `localhost:3000`) instead, your own pages look like another site. Then their sockets get `403`, and `back()` goes to the fallback.
+The proxy must pass the real `Host` header, like `proxy_set_header Host $host;` above. If it sends its own host, the WebSocket origin check gives 403, and `back()` goes to the fallback.
 
 ## Behind a load balancer
 
-A load balancer keeps idle connections to Dox open and sends new requests on them. Dox closes a connection after 30 seconds with no request. If the balancer keeps it longer, it may send a request on a connection Dox just closed, and the client gets `502`.
-
-To fix this, set `idleTimeout` longer than the idle timeout of the balancer. AWS ALB keeps idle connections for 60 seconds, so use 65 seconds:
+Dox closes an idle connection after 30 seconds. Set `idleTimeout` longer than the idle timeout of the balancer, or clients can get 502. AWS ALB keeps idle connections for 60 seconds, so use 65 seconds:
 
 ```dart
 AppConfig(
@@ -304,7 +267,7 @@ AppConfig(
 
 ## Keep it running
 
-When a worker isolate dies, Dox starts it again. But when the main isolate dies, the process exits with a non-zero code (see [Isolate](isolate.md#when-an-isolate-crashes)). So let a supervisor restart it: `restart: unless-stopped` in Docker compose, or `Restart=always` in systemd.
+When the main isolate dies, the process exits with a non-zero code. See [Isolate](isolate.md#when-an-isolate-crashes). Let a supervisor restart it, like `restart: unless-stopped` in Docker compose or `Restart=always` in systemd:
 
 ```ini
 # /etc/systemd/system/dox.service
@@ -320,23 +283,20 @@ WantedBy=multi-user.target
 
 ## Graceful shutdown
 
-When the platform stops your app, you want open requests to finish first. Dox does this on `SIGTERM` (docker stop, Kubernetes, Cloud Run, Fly, systemd) and on `SIGINT` (Ctrl+C), in every isolate:
+On SIGTERM (docker stop, Kubernetes, Cloud Run, systemd) and SIGINT (Ctrl+C), Dox lets open requests finish. In every isolate it:
 
-1. It stops taking new connections at once.
-2. Open requests can finish. Each keep-alive connection closes after its current answer.
-3. After `shutdownTimeout` (default 8 seconds), it closes the connections that are still open.
-4. It runs `shutdown()` of every provider (see [Providers](providers.md#clean-up-on-shutdown)). The `ORMProvider` of a new project closes the database connections here.
-5. It closes the cache stores of `Cache()`, eg. the Redis connections.
-6. The process exits with code `0`.
+1. stops taking new connections,
+2. lets open requests finish, for `shutdownTimeout` at most (8 seconds by default),
+3. runs `shutdown()` of every provider (see [Providers](providers.md#clean-up-on-shutdown)),
+4. closes the cache stores of `Cache()`,
+5. exits with code 0.
 
-A second `SIGINT` or `SIGTERM` stops the process at once.
-
-Set the timeout in `lib/config/app.dart`:
+A second signal stops the process at once. Set the timeout in `lib/config/app.dart`:
 
 ```dart
 AppConfig(
   shutdownTimeout: Duration(seconds: 20),
-  ...
+  // ...
 )
 ```
 
@@ -350,11 +310,17 @@ Keep it shorter than the time your platform waits before it kills the process:
 | Fly.io | 5 seconds | `kill_timeout` in `fly.toml` |
 | systemd | 90 seconds | `TimeoutStopSec` |
 
-In code, `await Dox().stop()` does steps 1 to 5 and does not exit.
+### Stopping in code
+
+`Dox().stop()` does steps 1 to 4, and the process keeps running:
+
+```dart
+await Dox().stop();
+```
 
 ## Many processes or machines
 
-One Dox process already uses every core. You only need more processes to run on more machines, or to restart one process without downtime. Run each one on its own port (or machine), and list them in the proxy:
+One Dox process uses every core. Run more processes only for more machines, or to restart one process with no downtime. List them in the proxy:
 
 ```nginx
 upstream dox {
@@ -364,15 +330,9 @@ upstream dox {
 }
 ```
 
-Socket.IO rooms then need a shared adapter (like Redis), because each process has its own memory.
+Socket.IO rooms then need a shared adapter, like Redis.
 
-## Details
-
-- `dox build` runs `build_runner` (when your app uses it), then `dart build cli --target bin/server.dart --output build`. It builds `bin/queue.dart` and `bin/schedule.dart` the same way, when they exist.
-- Do not use `dart compile exe`. `dox_orm` bundles SQLite with a build hook, and `dart compile exe` does not run build hooks, so it stops with an error. `dart build cli` is the same AOT compiler and runs the hooks.
-- With `trustedProxies: ['*']`, `req.ip()` is the right-most `X-Forwarded-For` hop, the one your proxy added.
-
-## See also
+## Next steps
 
 - [Docker](../guides/docker.md): a full Docker setup.
 - [Deploy to a Linux server](../guides/deploy-vps.md): your own server with systemd and Caddy.

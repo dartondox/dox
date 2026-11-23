@@ -6,9 +6,7 @@ icon: lucide/hard-drive
 
 `Storage()` saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), or memory.
 
-You use the same methods for every disk. So you can keep files in a local folder in development and on S3 in production, and your code stays the same.
-
-It is in the `dox_storage` package. A new project already has it. You can also use the package [without Dox](#without-dox).
+All disks have the same methods. So you can use a local folder in development and S3 in production, with the same code. Storage is in the `dox_storage` package. You can also use it [without Dox](#without-dox).
 
 ```dart
 import 'package:dox_storage/dox_storage.dart';
@@ -22,21 +20,19 @@ Route.post('/avatar', (DoxRequest req) async {
 
 ## Setup
 
-If your project does not have storage yet, add it with the CLI:
+A new project already has storage. In an older project, run this command:
 
 ```bash
 dox add storage
 ```
 
-It writes `lib/config/storage.dart`, the provider, the `storage` folder and the `STORAGE_DISK=local` key. It never overwrites a file, so it is safe to run twice.
+It writes `lib/config/storage.dart`, the provider, the `storage` folder and the `STORAGE_DISK=local` key. It never overwrites a file.
 
-Add `--disk=s3` to also add an `s3` disk and the `AWS_*` keys. `STORAGE_DISK` stays `local`, so the app starts before you fill in the keys. Fill them in, then set `STORAGE_DISK=s3`.
+Add `--disk=s3` to also add an `s3` disk and the `AWS_*` keys. `STORAGE_DISK` stays `local`, so fill in the keys first, then set `STORAGE_DISK=s3`.
 
 ### Configuration
 
-The disks are in `lib/config/storage.dart`. A new project has one `local` disk in the `storage` folder. `STORAGE_DISK` in `.env` picks the default disk.
-
-To add disks, edit the file. This example adds a `url` to the local disk, an `s3` disk and a `memory` disk:
+The disks are in `lib/config/storage.dart`. `STORAGE_DISK` in `.env` picks the default disk. This example adds a `url` to the local disk, an `s3` disk and a `memory` disk:
 
 ```dart title="lib/config/storage.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -48,7 +44,8 @@ StorageConfig storageConfig = StorageConfig(
     'local': <String, dynamic>{
       'driver': 'local',
       'root': 'storage',
-      'url': 'https://app.test/files', // for signedUrl(); url() gives /storage/<path> without it
+      // for signedUrl(). Without it, url() gives /storage/<path>
+      'url': 'https://app.test/files',
     },
 
     /// only when AWS_BUCKET is set
@@ -66,15 +63,15 @@ StorageConfig storageConfig = StorageConfig(
 );
 ```
 
-Each driver takes these options:
+| Driver | Use for | Options |
+| --- | --- | --- |
+| `local` | a folder on the server | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility`, `atomic_writes`, `permissions` |
+| `s3` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete`, `unsigned_payload` |
+| `memory` | tests | none |
 
-| Driver | Options |
-| --- | --- |
-| `local` | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility`, `atomic_writes`, `permissions` |
-| `s3` | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete`, `unsigned_payload` |
-| `memory` | none. For tests |
+Signed upload URLs work only on S3. The memory disk gives fake URLs.
 
-The provider of a new project sets up these disks in every isolate. It is in `lib/providers/`, so the generated container finds it:
+The provider in `lib/providers/` sets up these disks in every isolate:
 
 ```dart title="lib/providers/storage_provider.dart"
 import 'package:dox_storage/dox_storage.dart';
@@ -85,17 +82,9 @@ class AppStorageProvider extends StorageProvider {
 }
 ```
 
-### Drivers
-
-| Driver | Use for | Signed download URL | Signed upload URL |
-| --- | --- | --- | --- |
-| `local` | a folder on the server | Yes (HMAC with your app key) | No |
-| `s3` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS (HMAC keys) | Yes (SigV4) | Yes (SigV4) |
-| `memory` | tests | fake URLs | fake URLs |
-
 ### The S3 disk
 
-The `s3` disk reads five keys that a new project does not have yet. Add them to `lib/config/env.dart` and run `dart run build_runner build`. They are nullable, and the `s3` disk is only added when `AWS_BUCKET` is set, so the app starts without them:
+Add the S3 keys to `lib/config/env.dart`, then run `dart run build_runner build`. The `s3` disk is added only when `AWS_BUCKET` is set:
 
 ```dart title="lib/config/env.dart"
   String? get awsBucket;
@@ -110,20 +99,21 @@ The `s3` disk reads five keys that a new project does not have yet. Add them to 
   String? get awsEndpoint;
 ```
 
-The `s3` disk needs `bucket`, `key` and `secret`. If one is missing, the app stops at start with an `ArgumentError` that names the setting.
+Without `bucket`, `key` or `secret`, the app stops at start with an ArgumentError. To save CPU on big uploads, set `'unsigned_payload': true`. The signature then does not cover the body, so use it only over HTTPS.
 
-### Skipping the body hash
+### Atomic writes
 
-To save CPU on big uploads, add `unsigned_payload` to the `s3` disk. The upload then skips the hash of the body. Only use it over HTTPS:
+A local disk writes a file in place. With `atomic_writes`, it writes a temp file and renames it, so a failed upload never leaves a partial file:
 
 ```dart
-'s3': <String, dynamic>{
-  'driver': 's3',
-  'bucket': env.awsBucket,
-  // ... region, key, secret, endpoint
-  'unsigned_payload': true,
+'local': <String, dynamic>{
+  'driver': 'local',
+  'root': 'storage',
+  'atomic_writes': true,
 },
 ```
+
+The rename makes a new file, so the file gets the default mode and owner.
 
 ## Using another disk
 
@@ -135,38 +125,41 @@ await Storage().disk('s3').put('reports/2026.pdf', bytes, exact: true);
 
 ## Storing files
 
-The `putFile` method saves a file in a folder with a new uuid name, and returns the path. It takes a `RequestFile` or bytes. For bytes, Dox finds the extension from the bytes, or you pass `extension:`:
+`putFile` saves a file in a folder with a new uuid name, and returns the path. It takes a `RequestFile` or bytes. For bytes, give `extension:`, or Dox finds it from the bytes:
 
 ```dart
-// save with a new uuid file name, returns '/images/<uuid>.png'
-String path = await Storage().putFile('images', file);  // a RequestFile
+// returns '/images/<uuid>.png'
+String path = await Storage().putFile('images', file); // a RequestFile
 Uint8List bytes = Uint8List.fromList(<int>[1, 2, 3]);
-String path2 = await Storage().putFile('images', bytes, extension: 'png');
-String path3 = await Storage().put('images', bytes, extension: 'png'); // like putFile
+String path2 =
+    await Storage().putFile('images', bytes, extension: 'png');
+String path3 =
+    await Storage().put('images', bytes, extension: 'png'); // like putFile
 ```
+
+When the bytes are a known format, like png, the extension of the bytes wins over the file name. So a png sent as `a.html` is saved as `.png`.
 
 ### Storing with your own name
 
-If you want to pick the file name, use `putFileAs`. It replaces an old file with the same name:
+`putFileAs` uses your file name. It replaces an old file with that name:
 
 ```dart
-String path4 = await Storage().putFileAs('avatars', file, 'user-1.png'); // your own name
+String path4 = await Storage().putFileAs('avatars', file, 'user-1.png');
 ```
 
-Do not use the file name from the client here, because the name is used as it is. Make your own name, like `user-1.png`.
+Do not use the file name from the client, because the name is used as it is.
 
 ### Storing at an exact path
 
-Use `put` with `exact: true` to write to an exact path. It replaces an old file there and returns the path. It takes a `String`, a `List<int>` or a `Stream<List<int>>`:
+`put` with `exact: true` writes to an exact path. It takes a string, a `List<int>` or a `Stream<List<int>>`:
 
 ```dart
-// save to this exact path. String, List<int> or Stream<List<int>>
 await Storage().put('notes/a.txt', 'hello', exact: true);
 ```
 
 ### Storing uploaded files
 
-An uploaded file can store itself. `store` gives it a new uuid name, like `putFile`. `storeAs` uses your name, like `putFileAs`. Both take `disk:`:
+An uploaded file can store itself. `store` works like `putFile`, and `storeAs` works like `putFileAs`:
 
 ```dart
 RequestFile file = req.input('image');
@@ -175,25 +168,33 @@ String onS3 = await file.store('images', disk: 's3');
 String avatar = await file.storeAs('avatars', 'user-1.png');
 ```
 
-`putFile` and `store` take the extension from the file name. But if the bytes are a known format (png, jpg, pdf, zip, ...) that does not match the name, the extension of the bytes is used. So a png sent as `a.html` is saved as `.png`, and it is never served as a web page.
+`putRequestFile` and `putRequestFileAs` on `Storage()` do the same:
+
+```dart
+String path = await Storage().putRequestFile('images', file);
+String avatar =
+    await Storage().putRequestFileAs('avatars', 'user-1.png', file);
+```
+
+On a local disk, the upload temp file is moved, not read into memory.
 
 ### Prepending and appending
 
-Use `append` and `prepend` to add text to the end or the start of a file. A missing file is made:
+Add text to the end or the start of a file. A missing file is made:
 
 ```dart
-await Storage().append('logs/app.log', 'new line');    // a missing file is made
+await Storage().append('logs/app.log', 'new line');
 await Storage().prepend('logs/app.log', 'first line');
 ```
 
-They add a new line between the old and the new text, if the file is not empty. Change it with `separator`.
+A new line goes between the old and the new text. Change it with `separator`. Two writers at the same time can lose a write.
 
 ## Retrieving files
 
-The `get` method returns the bytes of a file, or `null` when the file is missing:
+`get` gives the bytes of a file, or null when the file is missing:
 
 ```dart
-Uint8List? found = await Storage().get(path);  // null when missing
+Uint8List? found = await Storage().get(path);
 ```
 
 ### Checking if a file exists
@@ -201,8 +202,8 @@ Uint8List? found = await Storage().get(path);  // null when missing
 `exists` checks for a file. `missing` is the opposite:
 
 ```dart
-bool exists = await Storage().exists(path);           // files only
-bool gone = await Storage().missing(path);            // not exists()
+bool exists = await Storage().exists(path);
+bool gone = await Storage().missing(path);
 ```
 
 ### File metadata
@@ -210,27 +211,25 @@ bool gone = await Storage().missing(path);            // not exists()
 `size` gives the size in bytes, and `lastModified` gives the time of the last change. Both throw `FileNotFoundException` when the file is missing:
 
 ```dart
-int size = await Storage().size(path);                 // throws when missing
-DateTime changed = await Storage().lastModified(path); // throws when missing
+int size = await Storage().size(path);
+DateTime changed = await Storage().lastModified(path);
 ```
 
 ## Downloading files
 
-Sometimes you want to send a stored file to the browser. `stream` shows it in the browser, and `download` makes the browser save it as a file:
+`stream` shows a file in the browser, and `download` makes the browser save it. Both stream the file, and a missing file answers 404:
 
 ```dart
 Route.get('/photo', (DoxRequest req) {
-  return Storage().stream(req.input('path'));    // shown in the browser
+  return Storage().stream(req.input('path'));
 });
 
 Route.get('/report', (DoxRequest req) {
-  return Storage().disk('s3').download('reports/2024.pdf'); // saved as a file
+  return Storage().disk('s3').download('reports/2024.pdf');
 });
 ```
 
-Both read the file as a stream, so a big file is never loaded into memory. A missing file answers `404`.
-
-`download` names the file after the last part of the path. Pass `name:` to pick another name:
+`download` uses the last part of the path as the file name. Give `name:` to use another name:
 
 ```dart
 Route.get('/invoice', (DoxRequest req) {
@@ -238,7 +237,7 @@ Route.get('/invoice', (DoxRequest req) {
 });
 ```
 
-If you want to add headers, put the download in a `response()`:
+To add headers, put the download in a `response()`:
 
 ```dart
 Route.get('/invoice', (DoxRequest req) async {
@@ -249,47 +248,45 @@ Route.get('/invoice', (DoxRequest req) async {
 
 ## File URLs
 
-The `url` method gives the URL of a file. On a local disk with no `url` option, it gives `/storage/<path>`:
+`url` gives the URL of a file. On a local disk with no `url` option, it gives `/storage/<path>`:
 
 ```dart
-String url = await Storage().url(path);         // /storage/<path> when the disk has no `url`
+String url = await Storage().url(path);
 ```
 
-Dox only serves that URL when you add `Storage.route('storage', signed: false)`. See [Serving local files](#serving-local-files).
+Dox serves that URL only with `Storage.route('storage', signed: false)`. See [Serving local files](#serving-local-files).
 
 ### Signed URLs
 
-Sometimes a file should only be open for a short time, like a private invoice. Use `signedUrl` for this. `temporaryUrl` is the same method:
+A signed URL opens a file for a short time, like a private invoice. `temporaryUrl` is the same as `signedUrl`:
 
 ```dart
-String signed = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
-String same = await Storage().temporaryUrl(path); // the same as signedUrl()
+String signed =
+    await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
+String same = await Storage().temporaryUrl(path);
 ```
 
-On a local disk, `signedUrl` needs the disk `url` option. Set it to the full URL of the route, like `https://app.test/files`.
+On a local disk, `signedUrl` needs the disk `url` option: the full URL of the route, like `https://app.test/files`.
 
 ### Serving local files
 
-A local disk needs a route, so the browser can open its files. `Storage.route` adds one:
+`Storage.route` adds a route that serves the files of a disk:
 
-```dart
-// lib/routes/web.dart
-Storage.route('files');                    // GET /files/{key*}, signed URLs only
-Storage.route('public', signed: false);    // any file of the disk
-Storage.route('docs', disk: 'memory', signed: false); // another disk than the default
-Storage.route('uploads', download: true);  // every file is a download
+```dart title="lib/routes/web.dart"
+Storage.route('files');                  // GET /files/{key*}, signed only
+Storage.route('public', signed: false);  // any file of the disk
+Storage.route('docs', disk: 'memory', signed: false); // another disk
+Storage.route('uploads', download: true); // every file is a download
 ```
 
-With a signed route, the URL looks like this:
+A signed URL of the `files` route looks like this:
 
 ```dart
-String url = await Storage().signedUrl('invoices/1.pdf'); // https://app.test/files/invoices/1.pdf?expires=...&signature=...
+String url = await Storage().signedUrl('invoices/1.pdf');
+// https://app.test/files/invoices/1.pdf?expires=...&signature=...
 ```
 
-- A missing, wrong or expired signature answers `403`.
-- Signed URLs work only on a `local` disk, and only on the route of their own disk. For another disk, use `signed: false`.
-- An html, svg, xml or javascript file is always sent as a download in a sandbox, so its script does not run on your site.
-- Every file has `X-Content-Type-Options: nosniff`.
+A missing, wrong or expired signature answers 403. Signed routes work only on a `local` disk. An html, svg, xml or javascript file is always sent as a download in a sandbox, so its script cannot run on your site.
 
 ## Copying and moving files
 
@@ -300,7 +297,7 @@ await Storage().copy('notes/a.txt', 'backup/a.txt');
 await Storage().move('backup/a.txt', 'old/a.txt');
 ```
 
-On S3 the copy runs inside S3, so the bytes do not pass through your app. A missing source file answers `404`.
+On S3, the copy runs inside S3. A missing source file answers 404.
 
 ## Deleting files
 
@@ -310,55 +307,76 @@ await Storage().delete(path);
 
 ## Directories
 
-`files` gives the files in a folder. `allFiles` also gives the files in sub-folders. `directories` gives the sub-folders. All paths start with `/`, like the paths from `putFile`:
+`files` gives the files in a folder, `allFiles` also gives the files in sub-folders, and `directories` gives the sub-folders. Each path starts with `/`:
 
 ```dart
-List<String> files = await Storage().files('images');         // direct files only
-List<String> all = await Storage().allFiles('images');        // in sub-folders too
-List<String> folders = await Storage().directories('images'); // direct sub-folders
+List<String> files = await Storage().files('images');
+List<String> all = await Storage().allFiles('images');
+List<String> folders = await Storage().directories('images');
 ```
 
-Use `directoryExists` to check for a folder. On S3 and memory disks, a folder exists when a file is under it:
+`directoryExists` checks for a folder. On S3 and memory disks, a folder exists when a file is in it:
 
 ```dart
 bool folder = await Storage().directoryExists('images');
 ```
 
-`makeDirectory` makes a folder. It only works on a local disk. On other disks it does nothing:
+`makeDirectory` makes a folder. It works only on a local disk:
 
 ```dart
-await Storage().makeDirectory('reports');              // local disk only
+await Storage().makeDirectory('reports');
 ```
 
-`deleteDirectory` deletes a folder and every file in it. A missing folder is not an error:
+`deleteDirectory` deletes a folder and all files in it:
 
 ```dart
-await Storage().deleteDirectory('old');                       // the folder and its files
+await Storage().deleteDirectory('old');
 ```
 
-It refuses the root (`''` or `/`) with `InvalidKeyException`, so a wrong path can not empty the disk. To empty a whole disk on purpose, use `Storage().use().deleteAll()`.
+The root (`''` or `/`) throws `InvalidKeyException`. To empty a full disk, use `Storage().use().deleteAll()`.
 
 ## File visibility
 
-A file can be `public` or `private`. Use `setVisibility` and `getVisibility`:
+A file is public or private. Use `setVisibility` and `getVisibility`:
 
 ```dart
 await Storage().setVisibility(path, Visibility.private);
 Visibility visibility = await Storage().getVisibility(path);
 ```
 
-- On S3, `setVisibility` sets the ACL, because `acl` is on by default. With `'acl': false` (R2 and similar), it does nothing, and `getVisibility` gives the disk `visibility`.
-- On a local disk, `setVisibility` does nothing by default, and `getVisibility` gives the disk `visibility`. Turn on `permissions` to use file modes.
+On S3, `setVisibility` sets the ACL. With `'acl': false` (R2 and similar), it does nothing, and `getVisibility` gives the disk `visibility`. On a local disk it is the same, unless you turn on `permissions`.
 
 ### Visibility on a local disk
 
-If you want visibility to be the file mode on a local disk, add `'permissions': true` to the disk. Then `setVisibility` runs `chmod`, and `getVisibility` reads the mode of the file:
+Add `'permissions': true` to use file modes. Then `setVisibility` runs `chmod`, and `getVisibility` reads the mode:
 
 ```dart
-'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'permissions': true},
+'local': <String, dynamic>{
+  'driver': 'local',
+  'root': 'storage',
+  'permissions': true,
+},
 ```
 
-The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`. To change them, see [Custom file modes](#custom-file-modes). On Windows, `permissions` does nothing, because there is no `chmod`.
+The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`. On Windows, `permissions` does nothing.
+
+### Custom file modes
+
+Give `permissions` a map with a `file` and a `dir` key. Dart has no octal numbers, so write the modes in hex: `0x1a0` is `0640`:
+
+```dart
+'private': <String, dynamic>{
+  'driver': 'local',
+  'root': 'storage-private',
+  'visibility': 'private',
+  'permissions': <String, dynamic>{
+    'file': <String, int>{'public': 0x1a4, 'private': 0x1a0},
+    'dir': <String, int>{'public': 0x1ed, 'private': 0x1e8},
+  },
+},
+```
+
+A mode you leave out keeps its default. A mode that is not an int from 0 to 0x1ff throws an ArgumentError.
 
 ## The disk API
 
@@ -368,12 +386,16 @@ The modes are: public file `0644`, private file `0600`, public folder `0755`, pr
 Disk disk = Storage().use('s3');
 ```
 
+A `Disk` also has `get`, `exists`, `missing`, `delete`, `copy`, `move`, `size`, `lastModified`, `append`, `prepend`, `files`, `allFiles`, `directories`, `directoryExists`, `makeDirectory`, `deleteDirectory`, `getVisibility` and `setVisibility`. Its `get` throws `FileNotFoundException` when the file is missing.
+
 ### Write options
 
-The `put` method of a `Disk` writes to the exact key. You can set the content type and the visibility with `WriteOptions`:
+`put` on a `Disk` writes to the exact key. `WriteOptions` sets the content type and the visibility. `copy` and `move` also take `options:`:
 
 ```dart
-await disk.put('a.json', '{}', options: WriteOptions(contentType: 'application/json', visibility: Visibility.public));
+await disk.put('a.json', '{}',
+    options: WriteOptions(
+        contentType: 'application/json', visibility: Visibility.public));
 ```
 
 ### Storing big files
@@ -383,6 +405,8 @@ await disk.put('a.json', '{}', options: WriteOptions(contentType: 'application/j
 ```dart
 await disk.putStream('videos/big.mp4', File('big.mp4').openRead());
 ```
+
+On S3, `put` has a limit of 5 GiB. `putStream` uses a multipart upload with parts of `multipartPartSize` (8 MiB, a field of `S3DriverConfig`), up to about 78 GiB.
 
 ### Reading text and streams
 
@@ -394,6 +418,13 @@ String text = await disk.getString('notes/a.txt');
 Stream<List<int>> stream = await disk.getStream('videos/big.mp4');
 ```
 
+`getStreamWithMetaData` gives the stream and the metadata together. On S3 it is one request:
+
+```dart
+ObjectStream file = await disk.getStreamWithMetaData('videos/big.mp4');
+// file.stream, file.metaData
+```
+
 ### All metadata in one call
 
 `getMetaData` gives the size, content type, last change time and etag:
@@ -402,9 +433,17 @@ Stream<List<int>> stream = await disk.getStream('videos/big.mp4');
 ObjectMetaData meta = await disk.getMetaData('avatars/1.png');
 ```
 
+### Public URLs
+
+`getUrl` gives the public URL of a file:
+
+```dart
+String url = await disk.getUrl('avatars/1.png');
+```
+
 ### Deleting many files
 
-`deleteAll` removes every file under a prefix. With `''` or no argument, it empties the disk:
+`deleteAll` removes all files under a prefix. With `''` or no argument, it empties the disk:
 
 ```dart
 await disk.deleteAll('avatars');
@@ -412,16 +451,17 @@ await disk.deleteAll('avatars');
 
 ### Listing page by page
 
-For a big folder, read it one page at a time with `listAll`:
+For a big folder, read one page at a time with `listAll`:
 
 ```dart
-ListResult page = await disk.listAll('avatars', ListOptions(recursive: true, limit: 100));
+ListResult page = await disk.listAll('avatars',
+    ListOptions(recursive: true, limit: 100));
 // next page: ListOptions(paginationToken: page.paginationToken)
 ```
 
 ### Signed URL options
 
-`getSignedUrl` takes `SignedUrlOptions`. `expiresIn` is 30 minutes when you do not set it. `contentDisposition` asks the server to send this header on download, like `attachment; filename="report.pdf"`. On S3, a signed URL can live 7 days at most:
+`getSignedUrl` takes `SignedUrlOptions`. `expiresIn` is 30 minutes by default, and on S3 the maximum is 7 days. `contentDisposition` sets the header of the download:
 
 ```dart
 String signed = await disk.getSignedUrl('avatars/1.png',
@@ -430,7 +470,7 @@ String signed = await disk.getSignedUrl('avatars/1.png',
 
 ### Signed upload URLs
 
-On S3, the browser can upload a file straight to the bucket with a signed upload URL. So the file does not pass through your app:
+On S3, the browser can upload a file directly to the bucket with a signed upload URL:
 
 ```dart
 String upload = await disk.getSignedUploadUrl('avatars/2.png',
@@ -439,11 +479,11 @@ String upload = await disk.getSignedUploadUrl('avatars/2.png',
 
 ## S3-compatible services
 
-The examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are keys in the disk map: `endpoint`, `path_style`, `acl` and `batch_delete`. See [Configuration](#configuration).
+These examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are the disk keys `endpoint`, `path_style`, `acl` and `batch_delete`. See [Configuration](#configuration).
 
 ### Cloudflare R2
 
-Set `supportsAcl: false`, because R2 does not take ACL headers:
+R2 does not take ACL headers, so set `supportsAcl: false`:
 
 ```dart
 S3DriverConfig(
@@ -458,7 +498,7 @@ S3DriverConfig(
 
 ### MinIO
 
-MinIO needs path style URLs, so set `forcePathStyle: true`:
+MinIO needs path style URLs:
 
 ```dart
 S3DriverConfig(
@@ -473,7 +513,7 @@ S3DriverConfig(
 
 ### DigitalOcean Spaces
 
-Spaces works like S3. Put the region of your space in `region` and in the endpoint:
+Put the region of your space in `region` and in the endpoint:
 
 ```dart
 S3DriverConfig(
@@ -487,7 +527,7 @@ S3DriverConfig(
 
 ### Google Cloud Storage
 
-Set `supportsAcl: false` and `supportsBatchDelete: false`, because GCS does not take ACL headers or the S3 batch delete call:
+GCS does not take ACL headers or the S3 batch delete call:
 
 ```dart
 S3DriverConfig(
@@ -503,20 +543,30 @@ S3DriverConfig(
 
 ## Custom drivers
 
-Implement `DriverContract` from `package:dox_storage/dox_storage.dart`. Register it in a [provider](providers.md), so every isolate has it:
+Implement `DriverContract`, and register it in a [provider](providers.md) so every isolate has it:
 
 ```dart
 Storage.manager.register('dropbox', DropboxDriver());
 await Storage().disk('dropbox').put('notes/a.txt', 'hello', exact: true);
 ```
 
+## Errors
+
+All errors extend `StorageException` and have the `key`:
+
+| Error | When |
+| --- | --- |
+| `FileNotFoundException` | the file does not exist |
+| `PermissionDeniedException` | a file system permission error, or S3 403 |
+| `InvalidKeyException` | an unsafe key |
+| `UnsupportedOperationException` | the driver cannot do this |
+| `DriverException` | any other error. The first error is in `cause` |
+
+A key with `..`, an absolute path like `/etc/passwd`, or a null byte throws `InvalidKeyException`. So a user cannot get files outside the disk.
+
 ## Testing
 
-To swap a disk with a memory disk in tests, see [Testing](testing.md#test-file-storage).
-
-`Storage.manager.restoreAll()` removes all fakes in one call.
-
-A disk also has `assertExists` and `assertMissing`. They throw a `StateError` when the check fails:
+To replace a disk with a memory disk in tests, see [Testing](testing.md#test-file-storage). A disk also has `assertExists` and `assertMissing`. They throw a StateError when the check fails:
 
 ```dart
 Disk fake = Storage.manager.fake('s3');
@@ -524,19 +574,7 @@ await fake.assertExists('avatars/1.png');
 await fake.assertMissing('avatars/old.png');
 ```
 
-## Errors
-
-All errors extend `StorageException` and have the `key`.
-
-| Error | When |
-| --- | --- |
-| `FileNotFoundException` | the file does not exist |
-| `PermissionDeniedException` | file system permission error, or S3 403 |
-| `InvalidKeyException` | unsafe key |
-| `UnsupportedOperationException` | the driver can not do this |
-| `DriverException` | anything else. The first error is in `cause` |
-
-Keys are checked, so a user can not reach files outside the disk. `..`, absolute paths like `/etc/passwd` and null bytes throw `InvalidKeyException`. A local disk also checks that the path stays inside its root folder.
+`Storage.manager.restore('s3')` removes one fake, and `Storage.manager.restoreAll()` removes all fakes.
 
 ## Without Dox
 
@@ -576,11 +614,11 @@ DriveManager drive = DriveManager(
 Disk disk = drive.use('s3'); // or drive.use() for the default disk
 ```
 
-To add your own driver, call `drive.register('dropbox', DropboxDriver())`. `use()` throws `UnsupportedOperationException` when no disk has that name. For file permissions, pass `LocalDriverConfig(permissions: LocalPermissions())`.
+To add your own driver, call `drive.register('dropbox', DropboxDriver())`. For file modes, give `LocalDriverConfig(permissions: LocalPermissions())`.
 
 ### Checking a local signed URL
 
-A local signed URL looks like `<urlBase>/<key>?expires=...&signature=...`. Without Dox, check it in the route that serves the file:
+Check a local signed URL in the route that serves the file:
 
 ```dart
 LocalDriver local = LocalDriver(localConfig);
@@ -590,70 +628,7 @@ if (!ok) {
 }
 ```
 
-## Details
-
-This section is for special cases. Most apps do not need it.
-
-### Signature and the body
-
-`unsigned_payload` is off by default. The signature then does not cover the body, so only use it over HTTPS.
-
-### S3 part size
-
-`multipartPartSize` is the size of one part of a big upload. It is a field of `S3DriverConfig`, not a key of the disk map. The default is 8 MiB. S3 needs 5 MiB to 5 GiB. With another size, Dox prints one warning to stderr. It does not throw.
-
-### Atomic writes
-
-A local disk writes a file in place by default. Add `'atomic_writes': true` to write to a temp file and rename it when the write is done. Then a failed upload never leaves a partial file, and the old file stays:
-
-```dart
-'local': <String, dynamic>{'driver': 'local', 'root': 'storage', 'atomic_writes': true},
-```
-
-The rename makes a new file. So the folder must be writable, the file gets the default mode and owner, a hard link keeps the old content, and a symlink is replaced.
-
-### Custom file modes
-
-Give `permissions` a map with a `file` and a `dir` key. Each has a `public` and a `private` mode. A mode you leave out keeps its default. Dart has no octal numbers, so write the modes in hex: `0x1a0` is `0640`, `0x1e8` is `0750`:
-
-```dart
-'private': <String, dynamic>{
-  'driver': 'local',
-  'root': 'storage-private',
-  'visibility': 'private',
-  'permissions': <String, dynamic>{
-    'file': <String, int>{'public': 0x1a4, 'private': 0x1a0},
-    'dir': <String, int>{'public': 0x1ed, 'private': 0x1e8},
-  },
-},
-```
-
-Each mode must be an int from 0 to 0x1ff (0777). Anything else, like the string `'0644'`, throws `ArgumentError` when the disk is made. Other keys are ignored.
-
-### How file modes work
-
-- The mode is set before the content is written, so a private file is never readable by others, not even for a moment.
-- A new file gets the visibility of the write, or the disk `visibility`.
-- An overwrite, `append`, `prepend` and `move` keep the mode of the file, unless the call gives a visibility.
-- A `copy` gets the visibility of the call, or else the mode of the source.
-- Folders that a write creates get the folder mode. Folders that were there before, and the disk root, keep their mode.
-- `getVisibility` reads the real mode. The private mode is private. Any other mode is public.
-- `getVisibility` and `setVisibility` of a symlink throw `UnsupportedOperationException`.
-- If the `chmod` fails, a file that the write created is removed.
-
-### Other cases
-
-- `append` and `prepend` read the file and write it back, so two writers at the same time can lose a write. They keep the visibility and content type of the file.
-- `putFile` with a `RequestFile` on a local disk moves the upload temp file, so it does not read the file into memory.
-- `directoryExists('')` is always true: the empty path is the root.
-- `getVisibility` and `setVisibility` of a missing file answer `404`. With `'acl': false` on S3, `getVisibility` gives the disk `visibility`, also for a missing file.
-- On a local disk, a `copy` or `move` of a missing file makes no folders. A local `copy` writes a temp file and renames it. Listings hide that temp file.
-- Any `download` name is safe in the header. Quotes are escaped, a new line becomes `_`, and a name like `résumé.pdf` is also sent as `filename*=UTF-8''r%C3%A9sum%C3%A9.pdf`.
-- Keys are cleaned: `a//b/./c.txt` becomes `a/b/c.txt`, and `\` becomes `/`.
-- Atomic writes use temp files that end with `.dox-upload.tmp`. `listAll()` hides them.
-- On S3, `put` sends one request, so the limit is 5 GiB. `putStream` uses a multipart upload when the stream is bigger than `multipartPartSize`. Only one part is in memory at a time, and the limit is about 78 GiB. Raise `multipartPartSize` for bigger files. `copy` and `move` also have a limit of 5 GiB.
-
-## See also
+## Next steps
 
 - [File upload](../guides/file-upload.md): a full upload route, from the DTO to the URL.
 - [Request](../the-basic/request.md): read an uploaded file.

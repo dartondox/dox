@@ -6,26 +6,19 @@ icon: lucide/braces
 
 A serializer sets the JSON shape of a response: which keys the client gets, their names and their values.
 
-You often do not want to send a model as it is. Maybe the client needs other key names, a formatted date, or a field made from two columns. A serializer does this in one place. It works with any Dart type: a model, a plain class, or a map.
-
-!!! tip
-    You do not always need a serializer.
-    A controller can return a model, a `Map` or a `List` as it is. See [Response](response.md#return-a-value).
-    To only hide some model fields, use [`hidden`](../database/model/index.md#hide-fields).
+It works with any Dart type: a model, a plain class or a map. A controller can also return a model, a map or a list as it is. See [Response](response.md#return-a-value). To only hide some model fields, use [`hidden`](../database/model/index.md#hide-fields).
 
 ## Create a serializer
 
-Make a serializer with the CLI:
+Make a serializer with the CLI. It writes `lib/app/serializers/blog.serializer.dart`, for the model with the same name:
 
 ```bash
 dox make:serializer Blog
 ```
 
-This makes `lib/app/serializers/blog.serializer.dart`. The file is for a model with the same name. Change the type to use it for something else.
-
 ## Writing a serializer
 
-Extend `Serializer<T>` and write `convert`. `convert` gets one value of type `T` and gives back one JSON object:
+Extend `Serializer<T>` and write `convert`. It gets one value and gives one JSON object:
 
 ```dart title="lib/app/serializers/blog.serializer.dart"
 import 'package:dox_core/dox_core.dart';
@@ -45,7 +38,7 @@ class BlogSerializer extends Serializer<Blog> {
 }
 ```
 
-Return the serializer from a controller, and Dox sends its `toJson()`. You can give it one model or a list:
+Return the serializer from a controller, with one model or a list:
 
 ```dart title="lib/app/http/controllers/blog.controller.dart"
 class BlogController {
@@ -76,19 +69,23 @@ This is what the client gets for each input:
 | --- | --- |
 | one value of type `T` | one JSON object |
 | a `List<T>` | a JSON list (`[]` when the list is empty) |
-| `null` (for example, `find` found nothing) | `null` |
-| any other type | `null` |
+| null, or any other type | null |
 
-!!! warning "The list type must be `List<T>`"
-    A `List<dynamic>` is not a `List<T>`, so the response is `null`.
-    This happens with a list from `jsonDecode`. Call `.cast<T>()` first.
-    See [JSON from another API](#json-from-another-api).
+A `List<dynamic>`, like a list from `jsonDecode`, gives null. Call `.cast<T>()` first. See [JSON from another API](#json-from-another-api).
+
+### Getting the JSON
+
+`toJson()` gives the map, the list or null, for use in other code:
+
+```dart
+dynamic json = BlogSerializer(blogs).toJson();
+```
 
 ## Examples with models
 
 ### Change values
 
-`convert` is plain Dart, so you can format dates, join fields and add new keys:
+Format dates, join fields and add new keys:
 
 ```dart title="lib/app/serializers/user.serializer.dart"
 class UserSerializer extends Serializer<User> {
@@ -108,7 +105,7 @@ class UserSerializer extends Serializer<User> {
 
 ### A serializer inside a serializer
 
-If a model has a relation, use its serializer inside the other one. Load the relation first, for example with [`preload`](../database/model/relationship/belongs-to.md#loading-the-relation):
+Use the serializer of a relation inside the other one:
 
 ```dart title="lib/app/serializers/comment.serializer.dart"
 class CommentSerializer extends Serializer<Comment> {
@@ -125,7 +122,7 @@ class CommentSerializer extends Serializer<Comment> {
 }
 ```
 
-Then preload the relation in the controller:
+Load the relation first, with [`preload`](../database/model/relationship/belongs-to.md#loading-the-relation):
 
 ```dart
 Future<CommentSerializer> index(DoxRequest req) async {
@@ -136,7 +133,7 @@ Future<CommentSerializer> index(DoxRequest req) async {
 
 ### With pagination
 
-A paginated result has its own keys, like the page number. `page.data` is a `List<User>`, so put the serializer output in place of `data`:
+Put the serializer output in place of `data` of the page:
 
 ```dart
 Future<Map<String, dynamic>> index(ListUsers query) async {
@@ -150,19 +147,15 @@ Future<Map<String, dynamic>> index(ListUsers query) async {
 }
 ```
 
-See [Pagination](../guides/pagination.md) for the full example.
+See [Pagination](../guides/pagination.md).
 
 ## Examples without models
-
-`T` can be any type, so you do not need the ORM.
 
 ### A plain Dart class
 
 A serializer for a plain class works the same way:
 
 ```dart title="lib/app/serializers/weather.serializer.dart"
-import 'package:dox_core/dox_core.dart';
-
 class Weather {
   final String city;
   final double celsius;
@@ -184,15 +177,9 @@ class WeatherSerializer extends Serializer<Weather> {
 }
 ```
 
-```dart
-WeatherSerializer today(DoxRequest req) {
-  return WeatherSerializer(<Weather>[Weather('Yangon', 30)]);
-}
-```
-
 ### Rows from the query builder
 
-`QueryBuilder.table(...)` gives rows as maps, not models. Use `Serializer<Map<String, dynamic>>` to pick and rename the keys:
+`QueryBuilder.table(...)` gives rows as maps. Use `Serializer<Map<String, dynamic>>` to pick and rename the keys:
 
 ```dart title="lib/app/serializers/sales_report.serializer.dart"
 class SalesReportSerializer extends Serializer<Map<String, dynamic>> {
@@ -220,7 +207,7 @@ Future<SalesReportSerializer> report(DoxRequest req) async {
 
 ### JSON from another API
 
-`jsonDecode` gives a `List<dynamic>`, so cast it to the type of the serializer first:
+Cast the list to the type of the serializer first:
 
 ```dart
 Future<SalesReportSerializer> remote(DoxRequest req) async {
@@ -230,6 +217,7 @@ Future<SalesReportSerializer> remote(DoxRequest req) async {
 }
 ```
 
-## See also
+## Next steps
 
-- [CLI: `dox make:serializer`](../reference/cli.md#dox-makeserializer)
+- [Response](response.md): other values a controller can return.
+- [CLI: `dox make:serializer`](../reference/cli.md#dox-makeserializer): the make command.

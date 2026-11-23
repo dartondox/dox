@@ -6,11 +6,11 @@ icon: lucide/server
 
 A read replica is a copy of your database that only answers reads, and Dox can send reads to replicas and writes to the main database.
 
-This spreads the load over more servers, which helps when your app reads much more than it writes. Postgres and MySQL support it. SQLite does not.
+Postgres and MySQL support replicas. SQLite does not.
 
-## Configuring replicas
+## Setup
 
-Add `read` to the `ConnectionConfig`. The `host` of the config is the write host:
+Add `read` to the `ConnectionConfig`. The host of the config is the write host:
 
 ```dart title="lib/config/database.dart"
 'postgres': ConnectionConfig(
@@ -28,43 +28,45 @@ Add `read` to the `ConnectionConfig`. The `host` of the config is the write host
 ),
 ```
 
-Each map in `read` can change `host`, `port`, `user`, `password`, `database` and `extra`. The other settings come from the config. Without `read`, nothing changes.
+Each read map can change `host`, `port`, `user`, `password`, `database` and `extra`. The other settings come from the config.
 
-If the write host is not the host of the config, add `write`. It has the same keys as one `read` map:
+### Another write host
+
+`write` sets the write host, with the same keys as one read map:
 
 ```dart
 write: <String, dynamic>{'host': 'primary.db', 'port': 6432},
 ```
 
+When [`DATABASE_URL`](index.md#database_url) is set, the url is the write host and `write` is not used.
+
 ## Where queries go
 
-A plain `SELECT` goes to a read host. The read hosts take turns, in the order of the list. Everything else goes to the write host:
+A plain SELECT goes to a read host. The read hosts take turns. These go to the write host:
 
-- `INSERT`, `UPDATE` and `DELETE`
-- a raw query that is not a `SELECT`
+- INSERT, UPDATE and DELETE
+- a raw query that is not a SELECT
 - schema changes and migrations
-- a `SELECT` with a lock (`lockForUpdate()`, `sharedLock()`) or with `INTO`
+- a SELECT with a lock or with INTO
 - every query in a transaction
+
+`ReplicaDriver.isReadQuery(sql)` tells you if a query can go to a replica.
 
 ### Reading from the write host
 
-A replica may be a little behind, or a `SELECT` may change data. In these cases, use `onWriteConnection()` to read from the write host:
+`onWriteConnection()` sends the queries of a query to the write host, also its `preload()` queries:
 
 ```dart
 User? user = await User().onWriteConnection().find(id);
 ```
 
-It also sends the queries of `preload()` to the write host. You do not need it after `insert()`, `create()` and `updateOrCreate()`, because they always read the new row back from the write host.
+`insert()`, `create()` and `updateOrCreate()` always read the new row from the write host.
 
 ## Sticky reads
 
-A replica can be a little behind the main database. So a user saves a post, the next page loads, and the post is not there yet.
+A replica can be a little behind. With `sticky: true`, the reads that follow a write in the same request go to the write host. So a request always reads what it wrote.
 
-`sticky: true` fixes this. After a write, the reads of the same request go to the write host, so a request always reads what it just wrote. Other requests still read from the replicas.
-
-In a Dox app this works on its own. When a connection uses `sticky`, `dox_orm` adds the `stickyReads` middleware as a [global middleware](../the-basic/middleware.md).
-
-Outside a request, like in a job or a script, wrap the work in `stickyScope()`:
+In a Dox app this works by itself, because `dox_orm` adds the `stickyReads` [global middleware](../the-basic/middleware.md). Outside a request, like in a job, wrap the work in `stickyScope()`:
 
 ```dart
 await ReplicaDriver.stickyScope(() async {
@@ -73,8 +75,9 @@ await ReplicaDriver.stickyScope(() async {
 });
 ```
 
-If you forget it, `dox_orm` prints a warning on stderr, once, when a read from a replica follows a write outside `stickyScope()`.
+When a replica read follows a write outside a scope, Dox prints one warning.
 
-## Details
+## Next steps
 
-- When [`DATABASE_URL`](index.md#database_url) is set, the url is the write host. The `read` hosts and `sticky` stay, and `write` is not used.
+- [Database](index.md): connections and settings.
+- [Transactions](transactions.md): all queries of a transaction go to the write host.

@@ -4,13 +4,13 @@ icon: lucide/triangle-alert
 
 # Performance mistakes
 
-These are the mistakes that make a Dox app slow, with the fix for each one, and a strict mode that warns you about the worst of them while you develop.
+These are the mistakes that make a Dox app slow, with the fix for each one, and a strict mode that warns you about the worst of them.
 
-Dart runs one thing at a time in each isolate. When one request does slow work without an `await`, every other request on that isolate waits. Most of the mistakes below come from this, or from using too much memory or too many connections. For server settings, see [Performance](performance.md).
+Dart runs one thing at a time in each isolate. When one request does slow work with no `await`, every other request on that isolate waits. For server settings, see [Performance](performance.md).
 
 ## Heavy CPU work in a request
 
-Hashing, building a PDF, resizing an image or parsing a huge JSON file keeps the CPU busy. Run it on a worker isolate with `Dox().compute`, so the server can answer other requests meanwhile:
+A PDF, an image or a huge JSON file keeps the CPU busy. Run the work on a worker isolate with `Dox().compute`:
 
 ```dart title="Wrong"
 Future<List<int>> invoice(DoxRequest req) async {
@@ -30,11 +30,11 @@ Future<List<int>> renderPdf(Map<String, dynamic> data) {
 }
 ```
 
-The task runs in another isolate. So make it in a small top-level or static function, and pass only plain values (numbers, strings, lists, maps). Do not use a database connection, the container or a cache store inside it. To change the number of workers, set `computeWorkers` in `AppConfig`.
+Pass only plain values to the task, like numbers, strings, lists and maps. See [Heavy CPU work](isolate.md#heavy-cpu-work).
 
 ## Sync password hashing
 
-`Hash.make` and `Hash.verify` run bcrypt on the isolate, and bcrypt is slow on purpose. In a handler, use the async methods. They run bcrypt on a worker:
+`Hash.make` and `Hash.verify` run bcrypt on the isolate, and bcrypt is slow on purpose. In a handler, use the async methods:
 
 ```dart title="Wrong"
 bool ok = Hash.verify(password, user.password);
@@ -59,17 +59,18 @@ String text = await File('data/terms.txt').readAsString();
 
 ## Loading a whole table
 
-`all()` and `get()` read every row into memory. On a big table, this is slow and can use all your memory. Read one page, or read the rows in parts:
+`all()` and `get()` read every row into memory. On a big table, read one page:
 
 ```dart title="Wrong"
 List<Order> orders = await Order().all();
 ```
 
 ```dart title="Right"
-Pagination<Order> page = await Order().orderBy('id').paginate(currentPage: 1, perPage: 50);
+Pagination<Order> page =
+    await Order().orderBy('id').paginate(currentPage: 1, perPage: 50);
 ```
 
-To work on all rows, use `chunk()`, `lazy()` or `cursor()`. They keep only a few rows in memory:
+To work on all rows, use `chunk()`, `lazy()` or `cursor()`:
 
 ```dart
 await for (Order order in Order().orderBy('id').cursor(chunkSize: 500)) {
@@ -81,7 +82,7 @@ See [Paginating results](../database/query-builder.md#paginating-results), [Chun
 
 ## A query inside a loop
 
-This is the N+1 problem. One query loads the rows, then one more query runs for each row. 100 posts make 101 queries. Use `preload()` to load the relation for all rows in one extra query:
+This is the **N+1 problem**: 100 posts make 101 queries. `preload()` loads the relation for all rows in one extra query:
 
 ```dart title="Wrong"
 List<Post> posts = await Post().all();
@@ -100,7 +101,7 @@ for (Post post in posts) {
 
 ## Awaiting independent work one by one
 
-If two calls do not need each other, start both and wait for both. The total time is then the slowest call, not the sum:
+Start two calls that do not need each other at the same time. The total time is then the slowest call:
 
 ```dart title="Wrong"
 int users = await User().count();
@@ -115,7 +116,7 @@ For a list of futures, use `Future.wait(futures)`.
 
 ## A static Map as a cache
 
-A `static` Map that you fill and never clean grows until the memory is full. Also, each isolate has its own copy, so the isolates do not agree. Use the [cache](cache.md) with a time to live:
+A static map that you never clean grows until the memory is full, and each isolate has its own copy. Use the [cache](cache.md) with a time to live:
 
 ```dart title="Wrong"
 static final Map<String, Object> _settings = <String, Object>{};
@@ -133,7 +134,7 @@ With the `redis` or `database` store, all isolates and servers share the same va
 
 ## Forgetting await
 
-If you call an async function without `await`, the work runs on its own. Its error is lost, and it can end after the response is sent. Await it:
+An async call with no `await` loses its error, and it can end after the response is sent:
 
 ```dart title="Wrong"
 mailer.sendWelcome(user);
@@ -143,11 +144,11 @@ mailer.sendWelcome(user);
 await mailer.sendWelcome(user);
 ```
 
-Turn on the `unawaited_futures` lint in `analysis_options.yaml` and the analyzer finds these for you. If you really want the client to answer first, use a [queue job with `dispatchAfterResponse`](queue.md).
+The `unawaited_futures` lint in `analysis_options.yaml` finds these. To answer the client first, use a [queue job with `dispatchAfterResponse`](queue.md).
 
 ## A new client for every request
 
-An HTTP client or a Redis client opens connections. If you make one in each request, you open and close a connection every time. Make one client and share it:
+A new HTTP or Redis client in each request opens and closes a connection every time. Make one client and share it:
 
 ```dart title="Wrong"
 Future<String> rate(DoxRequest req) async {
@@ -168,11 +169,11 @@ class RateService {
 }
 ```
 
-Register the client once in the [container](../the-basic/dependency-injection.md) and inject it. Each isolate makes its own copy, which is fine.
+Register the client one time in the [container](../the-basic/dependency-injection.md) and inject it.
 
 ## A long transaction
 
-A transaction holds one database connection until it ends. If you call an outside API inside it, the connection waits for that API. When many requests do this, the pool runs out of connections. Do the slow call before or after the transaction:
+A transaction holds one database connection until it ends, so a slow API call inside it can empty the pool. Do the slow call before or after the transaction:
 
 ```dart title="Wrong"
 await QueryBuilder.transaction(() async {
@@ -190,7 +191,7 @@ await QueryBuilder.transaction(() async {
 
 ## Reading a big file into memory
 
-`bytes` loads the whole upload into memory. A big download read into a variable does the same. Stream both. See [Request](../the-basic/request.md#requestfile) and [Files and big responses](../the-basic/response.md#files-and-big-responses):
+`bytes` loads the whole upload into memory. Stream it. See [Request](../the-basic/request.md#requestfile) and [Files and big responses](../the-basic/response.md#files-and-big-responses):
 
 ```dart title="Wrong"
 List<int> data = await file.bytes;
@@ -200,11 +201,9 @@ List<int> data = await file.bytes;
 Stream<List<int>> data = file.stream();
 ```
 
-Keep `maxBodySize` and `maxMultipartSize` set, so a huge body gets `413` before Dart reads it. See [Size limits](../the-basic/request.md#size-limits).
-
 ## Timers and listeners that never stop
 
-On a long connection, like server-sent events or a WebSocket, a `Timer.periodic` or a stream listener keeps running after the client leaves. Keep it and cancel it when the connection closes:
+On a long connection, like a WebSocket, a `Timer.periodic` or a stream listener keeps running after the client leaves. Cancel it when the connection closes:
 
 ```dart
 StreamSubscription<Event> subscription = events.listen(send);
@@ -214,11 +213,11 @@ await subscription.cancel();
 
 ## Let Dox warn you
 
-Strict mode finds the worst mistakes while you develop. It writes a warning, and it never throws or changes the response. It is off by default, and when it is off it costs nothing.
+**Strict mode** writes a warning for the worst mistakes while you develop. It is off by default.
 
 ### Strict mode in Dox
 
-Set `strict` in `AppConfig`. Turn it on only in development:
+Set `strict` in `AppConfig`, only in development:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -227,21 +226,25 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-Warnings go to stderr with a `[strict]` tag. `blockLimit` is how long code may block the isolate, 50 ms by default. To change it, use `StrictConfig(enabled: true, blockLimit: Duration(milliseconds: 100))`.
+Warnings go to stderr with a `[strict]` tag. `blockLimit` is how long code may block the isolate, 50 ms by default:
 
-A route that blocks the isolate for too long warns once:
+```dart
+StrictConfig(enabled: true, blockLimit: Duration(milliseconds: 100))
+```
+
+A route that blocks the isolate for too long warns one time:
 
 ```text
 [strict] GET /invoices/{id} blocked the isolate for 180 ms (limit 50 ms). Other requests on this isolate had to wait. Move heavy CPU work (like bcrypt, PDF or image work) to await Dox().compute(...), and use Hash.makeAsync or Hash.verifyAsync for passwords.
 ```
 
-Code that blocks the event loop, also after an `await`, warns at most once in 10 seconds. It cannot tell you which code did it:
+Code that blocks the event loop after an `await` warns at most one time in 10 seconds, with no name of the code:
 
 ```text
 [strict] The event loop of isolate 1 was blocked for about 120 ms (limit 50 ms). Some code ran that long without an await, so other requests had to wait. Move heavy CPU work to await Dox().compute(...).
 ```
 
-`Hash.make`, `Hash.verify` and `Hash.check` in the web server warn once for each place in your code:
+`Hash.make`, `Hash.verify` and `Hash.check` in the web server warn one time for each place in your code:
 
 ```text
 [strict] Hash.make ran in the web server at AuthController.register (package:my_app/app/http/controllers/auth_controller.dart:21:18). It blocks the isolate while bcrypt runs, so other requests wait. Use await Hash.makeAsync(...) instead.
@@ -258,7 +261,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 );
 ```
 
-`nPlusOneCount` (default 5) is how many row by row loads of one relation in about one second make a warning. `maxRows` (default 1000) is how many rows `get()` or `all()` may read. The warnings are printed with a `[db]` tag:
+`nPlusOneCount` (default 5) is how many row by row loads of one relation in about one second give a warning. `maxRows` (default 1000) is how many rows `get()` or `all()` may read. The warnings have a `[db]` tag:
 
 ```text
 [db] Strict mode: possible N+1 query. The relation "author" of Post was loaded row by row 5 times in a short time. Load it for all rows in one query with preload('author').
@@ -268,7 +271,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 [db] Strict mode: table "orders" read 25000 rows into memory (the limit is 1000). Use paginate(), chunk(), lazy() or cursor() for big results.
 ```
 
-## See also
+## Next steps
 
 - [Performance](performance.md): the benchmark numbers.
 - [Isolate](isolate.md): how Dox uses the CPU cores.

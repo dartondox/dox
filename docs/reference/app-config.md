@@ -6,7 +6,7 @@ icon: lucide/settings
 
 This page lists every field of `AppConfig`, with its type, its default and what it does.
 
-`AppConfig` is the one object you give to `Dox().initialize()`. It lives in `lib/config/app.dart`. Every field has a default except `appKey`, so you only set what you want to change. A full example is at the [end of the page](#full-example).
+You give `AppConfig` to `Dox().initialize()` in `lib/config/app.dart`. Each field has a default except `appKey`. See the [full example](#full-example).
 
 ## Server
 
@@ -16,18 +16,19 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | `previousKeys` | `List<String>` | `[]` | Old app keys. Dox can still read data that was encrypted with them. New data uses `appKey` only. See [Rotating the key](../security/encryption.md#change-the-key-key-rotation). |
 | `serverPort` | `int` | `3000` | The port to listen on. When the env has no `APP_PORT` but has `PORT`, Dox uses `PORT` (Cloud Run, Fly, Render and Heroku set it). |
 | `host` | `String?` | `null`: `APP_HOST`, else all interfaces | The network interface to listen on, like `127.0.0.1`. `null` reads `APP_HOST`. With neither, Dox listens on all interfaces (`::`). |
-| `totalIsolate` | `int?` | the CPUs the container allows | How many isolates (threads) serve HTTP, all on the same port. The default is the number of CPUs this process may use. It respects the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one. |
-| `computeWorkers` | `int` | `4` | How many worker isolates run `Dox().compute`, `Hash.makeAsync` and `Hash.verifyAsync`. All server isolates share one pool. It must be 1 or more. See [Heavy CPU work](../digging-deeper/isolate.md#heavy-cpu-work). |
-| `compress` | `bool` | `false` | gzip the responses. It costs CPU on every response, so let a proxy do it when you have one. |
+| `totalIsolate` | `int?` | the CPUs the container allows | How many isolates serve HTTP, all on the same port. The default is the number of CPUs this process can use, with the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one. |
+| `computeWorkers` | `int` | `AppConfig.defaultComputeWorkers` (4) | How many worker isolates run `Dox().compute`, `Hash.makeAsync` and `Hash.verifyAsync`, in one pool for the process. It must be 1 or more. See [Heavy CPU work](../digging-deeper/isolate.md#heavy-cpu-work). |
+| `compress` | `bool` | `false` | gzip the responses, but not streamed responses. It costs CPU on each response, so let a proxy do it if you have one. |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
 | `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. |
 | `idleTimeout` | `Duration` | `Duration(seconds: 30)` | A keep-alive connection with no new request for this long is closed. Behind a load balancer, set it longer than the balancer's idle timeout. See [Behind a load balancer](../digging-deeper/deployment.md#behind-a-load-balancer). |
-| `maxConnections` | `int?` | `null` (no limit) | The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue until a connection closes. The whole app holds up to `maxConnections * totalIsolate`, so keep that below `ulimit -n`. |
+| `maxConnections` | `int?` | `null` (no limit) | The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue. The app holds up to `maxConnections * totalIsolate`, so keep that below `ulimit -n`. |
 | `http2` | `bool` | `false` | The same port also speaks HTTP/2 over plain TCP (h2c). HTTP/1.1 keeps working. See [HTTP/2](../digging-deeper/http2.md). |
 | `maxConcurrentStreams` | `int` | `250` | The most open requests one HTTP/2 connection can have (1 or more). Used only when `http2` is `true`. |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
-| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of your reverse proxies. Dox reads `X-Forwarded-For` (for `req.ip()`) and `X-Forwarded-Proto` (for `req.scheme()`) only from these. `['*']` trusts any direct client. |
+| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of your reverse proxies. Dox reads `X-Forwarded-For` (for `req.ip()`) and `X-Forwarded-Proto` (for `req.scheme()`) only from these. `['*']` trusts any direct client, but only the last hop. Use it only when the app port is not open to the outside. |
+| `isDevelopment` | `bool` (getter) | | True when `APP_ENV` is development. It reads the env at each call, so it works before the server starts. Use it in config, like a database `debug` flag. |
 
 ## Routing and request handling
 
@@ -43,7 +44,7 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | `htmlErrors` | `bool` | `false` | Sends an HTML error page to a request that does not want JSON. In `development` or `local` the page also shows the error and the stack. JSON clients do not change. See [An HTML error page](../the-basic/errors.md#an-html-error-page). |
 | `errorPage` | `String Function(int status, Object error, StackTrace stack, bool debug)` | `defaultErrorPage` | Makes the HTML of the page. `debug` is `true` in `development` or `local`. Escape every value you put in the page. Used only with `htmlErrors`. |
 | `providers` | `List<DoxProvider>` | `[]` | Providers to run first, in this order. Every other `DoxProvider` class comes from `container`. Dox runs them in every isolate at start. |
-| `webSocketAllowedOrigins` | `List<String>?` | `null` (no check) | Checks the `Origin` of every `Route.websocket` route. Only the same host and the listed sites, like `https://app.example.com`, can open a socket. Others get `403`. `[]` means the same host only. With `null`, any website can open a socket with the user's cookies, and Dox prints a warning at start. |
+| `webSocketAllowedOrigins` | `List<String>?` | `null` (no check) | Checks the `Origin` of each `Route.websocket` route. Only the same host and the listed sites, like `https://app.example.com`, can open a socket. Others get `403`. `[]` means the same host only. With `null`, any website can open a socket with the cookies of the user. The `allowedOrigins` of a route wins. |
 
 ## Sub configs
 
@@ -54,12 +55,12 @@ This page lists every field of `AppConfig`, with its type, its default and what 
 | `cache` | `CacheConfig` | `file` store in `storage/cache`, plus a `memory` store | Cache stores for `Cache()`. See [CacheConfig](#cacheconfig). |
 | `session` | `SessionConfig` | `cookie` driver, cookie `dox_session`, 2 hours | Settings for `SessionMiddleware`. See [Session](../the-basic/session.md#configuration). |
 | `openApi` | `OpenApiConfig` | `OpenApiConfig()` | `/docs`, `/openapi.json` and `/openapi.yaml`. See [OpenApiConfig](#openapiconfig). |
-| `strict` | `StrictConfig` | `StrictConfig()` (off) | Warnings for code that blocks the server, for development. `enabled` turns it on. `blockLimit` is how long code can block an isolate before a warning, 50 ms by default. See [Let Dox warn you](../digging-deeper/performance-mistakes.md#let-dox-warn-you). |
+| `strict` | `StrictConfig` | `StrictConfig()` (off) | Warnings for code that blocks the server, for development. `enabled` turns it on. `blockLimit` is how long code can block an isolate before a warning, `StrictConfig.defaultBlockLimit` (50 ms) by default. See [Let Dox warn you](../digging-deeper/performance-mistakes.md#let-dox-warn-you). |
 | `flags` | `CoreFlags` | `CoreFlags()` (all off) | Opt-in core behaviors. See [Core flags](#core-flags). |
 
 ## Core flags
 
-`CoreFlags` turns on extra behaviors. Every flag is off by default, so you turn on only the ones you want:
+`CoreFlags` turns on extra behaviors. Each flag is off by default:
 
 ```dart
 AppConfig(
@@ -91,7 +92,7 @@ The cache has its own flag class, `CacheFlags`, in [`CacheConfig`](#cacheconfig)
 
 ## CORSConfig
 
-A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` value sends no header. Because every value is `null` by default, you must set at least `origin`.
+A value can be a string (`'*'` or a comma list) or a list of strings. A null value sends no header, so set at least `origin`.
 
 | Field | Type | Default | Header |
 | --- | --- | --- | --- |
@@ -100,7 +101,7 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | `methods` | `dynamic` | `null` | `Access-Control-Allow-Methods` |
 | `headers` | `dynamic` | `null` | `Access-Control-Allow-Headers` |
 | `exposeHeaders` | `dynamic` | `null` | `Access-Control-Expose-Headers` |
-| `credentials` | `bool?` | `null` | `Access-Control-Allow-Credentials` |
+| `credentials` | `bool?` | `null` | `Access-Control-Allow-Credentials`. Browsers refuse it with origin `'*'`, so list your sites in `origin`. |
 | `maxAge` | `num?` | `null` | `Access-Control-Max-Age` in seconds |
 
 ## LoggerConfig
@@ -110,9 +111,9 @@ A value can be a `String` (`'*'` or a comma list) or a `List<String>`. A `null` 
 | `name` | `String` | `''` | Written as `logger.name` in each JSON log line. Left out when empty. |
 | `enabled` | `bool` | `false` | Turn the `Logger` on. When it is off, `LogMiddleware` logs nothing too. |
 | `prettyPrint` | `bool` | `false` | `true` prints colored text. Each line starts with a tag that says where it comes from, like `[request]`, `[server]` or `[app]`. `false` prints one JSON object per line, for log services. The tag is then in the `source` field, unless your data already has a `source` key. |
-| `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. |
+| `level` | `String` | `'info'` | The lowest level to print: `debug`, `info`, `warn` or `error`. `success` counts as info, and `danger` as error. |
 
-Your own lines get the tag `[app]`. To use another tag, pass it as the third argument. `log`, `info`, `warn`, `success` and `danger` all take it:
+Your own lines get the tag `[app]`. To use another tag, give it as the third argument of `log`, `info`, `warn`, `success` or `danger`:
 
 ```dart
 Logger.info('invoice sent', null, 'billing');
@@ -127,6 +128,7 @@ In JSON mode the tag is the `source` field. Plain warnings on stderr use the sam
 | `defaultStore` | `String` | required | The store `Cache()` uses when no store is named. |
 | `stores` | `Map<String, Map<String, dynamic>>` | required | Store name to options. Each store needs a `driver` option. |
 | `flags` | `CacheFlags` | `CacheFlags()` (all off) | Opt-in cache behaviors. See below. |
+| `encrypter` | `CacheEncrypter?` | `null` | Encrypts stores with `'encrypt': true`. Dox sets it. You need it only [without Dox](../digging-deeper/cache.md#encryption-without-dox). |
 
 `CacheFlags` has one flag. `CacheFlags.all()` turns it on.
 
@@ -146,8 +148,9 @@ Options of each driver:
 
 | Driver | Option | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| all | `driver` | `String` | required | `file`, `memory`, `redis` or `null` |
-| all | `prefix` | `String` | `dox_cache:` | Text in front of every key. |
+| all | `driver` | `String` | required | `file`, `memory`, `redis`, `database` or `null` |
+| all | `prefix` | `String` | `dox_cache:` (`<app name>_cache:` on Redis) | Text in front of each key. |
+| `file`, `redis`, `database` | `encrypt` | `bool` | `false` | Encrypt the values with the app key. |
 | `file` | `path` | `String` | `storage/cache` | Folder of the cache files. |
 | `file` | `prune_every` | `int` | `0` | Run `prune()` once every this many writes. `0`: a light prune at most once an hour. |
 | `file` | `fsync` | `bool` | `true` | Sync each write to the disk. `false` is faster, but a power cut can lose the last writes. |
@@ -159,6 +162,9 @@ Options of each driver:
 | `redis` | `db` | `int` | `0` | Redis database number. |
 | `redis` | `tls` | `bool` | `false` | Use TLS. |
 | `redis` | `pool_size` | `int` | `10` | Most connections per store. |
+| `redis` | `max_value_bytes` | `int` | no limit | Biggest value in bytes. |
+| `redis` | `options` | `RedisOptions` | none | All client options. See [Redis options](../digging-deeper/cache.md#redis-options). |
+| `database` | `table`, `connection`, `prune_interval` | | | See [Database store](../digging-deeper/cache.md#database-store). |
 
 ## StorageConfig
 
@@ -464,7 +470,7 @@ CORSConfig cors = CORSConfig(
 );
 ```
 
-Do not use `origin: '*'` together with `credentials: true`, because the browser refuses that pair and the call fails. `'*'` is fine for a public API without credentials.
+Do not use `origin: '*'` with `credentials: true`, because the browser refuses that pair.
 
 ```dart title="lib/providers/orm_provider.dart"
 import 'package:dox_core/dox_core.dart';
@@ -488,4 +494,10 @@ class ORMProvider extends DoxProvider {
 
 A new project also has `lib/config/storage.dart`, `queue.dart` and `schedule.dart`, with a provider for each in `lib/providers/`. See [File storage](../digging-deeper/file-storage.md), [Queue](../digging-deeper/queue.md) and [Scheduler](../digging-deeper/scheduler.md).
 
-A new project has no `openapi.dart`, `socketio.dart` or auth provider. You add them when you need them. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).
+A new project has no `openapi.dart`, `socketio.dart` or auth provider. See [OpenAPI](../packages/openapi.md), [Socket.IO](../packages/socketio.md) and [Authentication](../security/authentication.md).
+
+## Next steps
+
+- [Environment variables](env.md): the env keys that fill the config.
+- [Dependency injection](../the-basic/dependency-injection.md): the container, routers and providers.
+- [Deployment](../digging-deeper/deployment.md): the server settings in production.

@@ -6,18 +6,16 @@ icon: lucide/file-code
 
 Turn on OpenAPI docs for the blog API, open the docs page, and make the docs better with annotations.
 
-API docs show every route on one page, so a front-end team can see what to send and what comes back. Dox builds the docs from your code, so they never get out of date.
+Dox makes the docs from your code, so they stay up to date.
 
 ## What you need
 
 - The blog API from the [tutorial](../tutorial/01-create-project.md), or any Dox app.
-- `build_runner` and `dox_builder`. A new app has both. `dox_core` already has `dox_openapi`, so you add no package.
+- `build_runner` and `dox_builder`. A new app has both, and `dox_core` has `dox_openapi`.
 
 ## 1. Write the config
 
-A new app already serves the docs pages, but each route shows only its path and method. To get the full docs, give Dox what the builder found in your code.
-
-`build_runner` writes `lib/generated/openapi.g.dart`. Its `openApiRegistry` holds your routes, controllers, DTOs and models. Pass it to an `OpenApiConfig`:
+`build_runner` writes `openApiRegistry` to `lib/generated/openapi.g.dart`, with your routes, DTOs and models. Pass it to an `OpenApiConfig`:
 
 ```dart title="lib/config/openapi.dart"
 import 'package:dox_core/dox_core.dart';
@@ -43,6 +41,8 @@ AppConfig appConfig = AppConfig(
 
 ## 2. Build and start
 
+Build the code and start the server:
+
 ```bash
 dart run build_runner build --delete-conflicting-outputs
 dox serve
@@ -52,9 +52,7 @@ The docs routes are on, because `.env` has `APP_ENV=development`.
 
 ## 3. Open the docs page
 
-Open `http://localhost:3000/docs`. It is a [Scalar](https://github.com/scalar/scalar) page with every route and "Try it" buttons.
-
-The app now has three new routes:
+Open `http://localhost:3000/docs`. It is a [Scalar](https://github.com/scalar/scalar) page with every route and "Try it" buttons. The app now has three new routes:
 
 | Route | What it gives |
 | --- | --- |
@@ -64,11 +62,13 @@ The app now has three new routes:
 
 ## 4. Read the JSON
 
+Get the document:
+
 ```bash
 curl http://localhost:3000/openapi.json
 ```
 
-This is the output for the blog API, shortened. The top level:
+This is the top level for the blog API, made shorter:
 
 ```json
 {
@@ -84,7 +84,14 @@ This is the output for the blog API, shortened. The top level:
     "/ping": {}
   },
   "components": {
-    "schemas": {"Post": {}, "SavePost": {}, "RegisterUser": {}, "LoginUser": {}, "User": {}, "ValidationError": {}},
+    "schemas": {
+      "Post": {},
+      "SavePost": {},
+      "RegisterUser": {},
+      "LoginUser": {},
+      "User": {},
+      "ValidationError": {}
+    },
     "securitySchemes": {
       "bearerAuth": {"type": "http", "scheme": "bearer"}
     }
@@ -101,17 +108,35 @@ This is `POST /api/posts`. You wrote no docs code for it:
   "operationId": "PostController.store",
   "requestBody": {
     "required": true,
-    "content": {"application/json": {"schema": {"$ref": "#/components/schemas/SavePost"}}}
+    "content": {
+      "application/json": {
+        "schema": {"$ref": "#/components/schemas/SavePost"}
+      }
+    }
   },
   "responses": {
     "200": {"description": "Successful response"},
     "401": {
       "description": "Not logged in",
-      "content": {"application/json": {"schema": {"type": "object", "properties": {"code": {"type": "string"}, "message": {"type": "string"}}}}}
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "object",
+            "properties": {
+              "code": {"type": "string"},
+              "message": {"type": "string"}
+            }
+          }
+        }
+      }
     },
     "422": {
       "description": "Validation failed",
-      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ValidationError"}}}
+      "content": {
+        "application/json": {
+          "schema": {"$ref": "#/components/schemas/ValidationError"}
+        }
+      }
     },
     "500": {"description": "Server error"}
   },
@@ -119,22 +144,22 @@ This is `POST /api/posts`. You wrote no docs code for it:
 }
 ```
 
-Where each part comes from:
+Each part comes from your code:
 
 | Part | Comes from |
 | --- | --- |
 | `tags: ["Post"]` | the class name `PostController`, without `Controller` |
 | `summary` | no `@Summary` here, so the first line of the `///` comment: `/// POST /api/posts` |
 | `requestBody` | the argument `SavePost body` of `store` |
-| `401` and `bearerAuth` | `AuthMiddleware` on the route |
-| `422` | the route has a request class |
-| `200` with no body | `store` returns `DoxResponse`, so the builder can not see the body. Step 6 fixes this |
+| 401 and `bearerAuth` | `AuthMiddleware` on the route |
+| 422 | the route has a request class |
+| 200 with no body | `store` returns `DoxResponse`, so the builder can not see the body. Step 6 fixes this |
 
-Other routes get error answers in the same way. The `Can` middleware or a `req.authorize(...)` call gives `401` and `403`. The `GuestMiddleware` and `ValidateSignature` middleware give `403`. A `req.validateSchema(...)` call gives `422`.
+The `Can` middleware or a `req.authorize(...)` call gives 401 and 403. `GuestMiddleware` and `ValidateSignature` give 403. A `req.validateSchema(...)` call gives 422.
 
 ## 5. See how a DTO becomes a schema
 
-Dox turns each [DTO](../the-basic/dto.md) into a schema, so the docs show the rules of every field. This is the `SavePost` DTO of the tutorial:
+Dox turns each [DTO](../the-basic/dto.md) into a schema with the rules of every field. This is the `SavePost` DTO of the tutorial:
 
 ```dart title="lib/app/dtos/save_post/save_post.dto.dart"
 @Dto()
@@ -167,6 +192,8 @@ And this is its schema in `/openapi.json`:
 }
 ```
 
+Each rule becomes a schema key:
+
 | In the DTO | In the schema |
 | --- | --- |
 | `String title` (not nullable) | `"type": "string"` and `title` in `required` |
@@ -176,13 +203,11 @@ And this is its schema in `/openapi.json`:
 | `@Describe('...')` or `/// A comment` | `"description"`. `@Describe` wins over the comment |
 | `@Trim()`, `@Lowercase()`, `@Unique(...)` | nothing. They change or check the value on the server only |
 
-A model becomes a schema too. `Post` has `id`, the `@Column` fields `title` and `body`, and `created_at` and `updated_at`. Keys in `hidden` are left out, so `User` has no `password`.
-
-When you change a rule, run `build_runner` again, and the docs change with it.
+A model becomes a schema too. Keys in `hidden` are left out, so `User` has no `password`. When you change a rule, run `build_runner` again.
 
 ## 6. Make the docs better
 
-The builder can not guess everything. For example, it can not see the body of a `DoxResponse`. Add annotations to a controller method to fill the gaps: `@Summary`, `@Description`, `@Tags` and `@Response` (from `dox_core`). A `///` comment on the method also works for the summary and the description.
+Add `@Summary`, `@Description`, `@Tags` and `@Response` to a controller method. They fill the gaps that the builder can not see, like the body of a `DoxResponse`:
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 @Inject()
@@ -219,7 +244,14 @@ Run `dart run build_runner build` again and restart the app. The result:
   "responses": {
     "200": {
       "description": "Successful response",
-      "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Post"}}}}
+      "content": {
+        "application/json": {
+          "schema": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/Post"}
+          }
+        }
+      }
     },
     "500": {}
   }
@@ -231,7 +263,11 @@ Run `dart run build_runner build` again and restart the app. The result:
   "responses": {
     "201": {
       "description": "The new post",
-      "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Post"}}}
+      "content": {
+        "application/json": {
+          "schema": {"$ref": "#/components/schemas/Post"}
+        }
+      }
     },
     "401": {},
     "422": {},
@@ -240,27 +276,27 @@ Run `dart run build_runner build` again and restart the app. The result:
 }
 ```
 
-- `@Response(201, Post)` replaces the empty `200`. The docs now match the real status code.
+- `@Response(201, Post)` replaces the empty 200.
 - `@Tags(['Posts'])` moves the route to the group "Posts" in the docs page.
-- `@Summary('...')` and `@Description('...')` set the text. A `///` comment gives the same result. When a method has both, the annotation wins.
-- `@ApiIgnore()` leaves a method (or a whole controller) out of the docs.
+- `@Summary('...')` and `@Description('...')` set the text. A `///` comment gives the same result, but the annotation wins.
+- `@ApiIgnore()` leaves a method, or a whole controller, out of the docs.
 
 See [OpenAPI: describe a route](../packages/openapi.md#describe-a-route) for all annotations.
 
 ## 7. Turn it off in production
 
-You do not need to do anything here. `enabled` is `null` by default, so the docs routes are on only when `APP_ENV` is `development` or `local`. With `APP_ENV=production` all three routes give `404`:
+The docs routes are on only when `APP_ENV` is development or local. With `APP_ENV=production` all three routes give 404:
 
 ```bash
-curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/docs           # 404
-curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/openapi.json   # 404
+# 404
+curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/docs
+# 404
+curl -o /dev/null -w '%{http_code}\n' http://localhost:3000/openapi.json
 ```
 
-To turn the docs on in production, set `enabled: true`. See [OpenAPI: turn the docs on in production](../packages/openapi.md#turn-the-docs-on-in-production).
+To turn the docs on in production, set `enabled: true`. See [OpenAPI: turn the docs on in production](../packages/openapi.md#turn-the-docs-on-in-production). To serve files made at build time, see [OpenAPI: production setup](../packages/openapi.md#production-setup).
 
-To build the document at build time and serve the files in production, see [OpenAPI: production setup](../packages/openapi.md#production-setup).
-
-If you want the docs on staging too, but never in production, set `enabled` yourself:
+To show the docs on staging, but never in production, set `enabled` yourself:
 
 ```dart title="lib/config/openapi.dart"
 import 'package:blog/config/env.dart';
@@ -273,11 +309,13 @@ OpenApiConfig openApi = OpenApiConfig(
 ```
 
 !!! warning
-    `enabled: true` in production shows every route of your API to anyone. Only do it for a public API.
+    `enabled: true` in production shows every route of your API to anyone. Do it only for a public API.
 
-To give the document to a front-end team without a running server, write it to files with `dox openapi:generate`. See [OpenAPI: write the files](../packages/openapi.md#write-the-files).
+To write the document to files, run `dox openapi:generate`. See [OpenAPI: write the files](../packages/openapi.md#write-the-files).
 
 ## Check it
+
+Read the start of the document:
 
 ```bash
 curl -s http://localhost:3000/openapi.json | head -n 5
@@ -293,8 +331,8 @@ curl -s http://localhost:3000/openapi.json | head -n 5
 
 Open `http://localhost:3000/docs`, find "Create a post" under "Posts", and send a request with "Try it".
 
-## See also
+## Next steps
 
-- [OpenAPI](../packages/openapi.md) for all options, the Scalar look, Swagger UI and login schemes
-- [Validation rules](../the-basic/validation-rules.md) for the rules and their JSON Schema keys
-- [Environments](environments.md) for `APP_ENV`
+- [OpenAPI](../packages/openapi.md): all the options, Swagger UI and login schemes.
+- [Validation rules](../the-basic/validation-rules.md): the rules and their JSON Schema keys.
+- [Environments](environments.md): set `APP_ENV`.

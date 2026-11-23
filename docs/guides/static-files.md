@@ -6,31 +6,29 @@ icon: lucide/file-image
 
 Serve a folder of files, or a single page app (React, Vue, Flutter web), from the Dox app, with the right cache headers.
 
-If your front-end is small, you can serve it from the same Dox app as your API. Then you have one server to run and no CORS setup.
+With the front-end in the same app as your API, you have one server to run and no CORS setup.
 
 ## What you need
 
 - A Dox app.
 - A `public` folder with the built front-end (`index.html`, `assets/...`).
-- For the storage way and the controller below: the `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#configuration).
+- For the storage disk and the controller below: the `dox_storage` package, with its provider. See [File storage](../digging-deeper/file-storage.md#configuration).
 
 ## Serve a folder: one line
 
-If you only need to serve the files of a folder, `Route.staticFiles` does it in one line. Add it in `register()` of `WebRouter`:
+`Route.staticFiles` serves the files of a folder. Add it in `register()` of `WebRouter`:
 
 ```dart title="lib/routes/web.dart"
 Route.staticFiles('/', 'public');
 ```
 
-Now `GET /app.js` sends `public/app.js` with the right `Content-Type`. If a route and a file have the same path, the route wins. A missing file answers `404`.
+Now `/app.js` sends `public/app.js`. A route wins over a file with the same path. For a `Cache-Control` header, add `maxAge`. See [Routing: serve static files](../the-basic/routing.md#serve-static-files).
 
-The browser gets `304` when it already has the file, because Dox sends `ETag` and `Last-Modified`. If you want a `Cache-Control` header too, add `maxAge:`. See [Routing: serve static files](../the-basic/routing.md#serve-static-files) for all the rules.
-
-For a single page app, add `Route.fallback`, so every URL with no route and no file gets `index.html`. See [Routing: fallback route](../the-basic/routing.md#fallback-route).
+For a single page app, add a [fallback route](../the-basic/routing.md#fallback-route) that sends `index.html`.
 
 ### Or serve a storage disk
 
-You can also serve the folder as a storage disk. `Storage.route` serves every file of a disk. First add a `public` disk for the folder in `lib/config/storage.dart`:
+`Storage.route` serves every file of a disk. First add a `public` disk for the folder:
 
 ```dart title="lib/config/storage.dart"
 StorageConfig storageConfig = StorageConfig(
@@ -44,26 +42,25 @@ StorageConfig storageConfig = StorageConfig(
 );
 ```
 
-Then add the route in `register()` of `WebRouter`. `Storage` comes from `package:dox_storage/dox_storage.dart`.
+Then add the route in `register()` of `WebRouter`:
 
 ```dart title="lib/routes/web.dart"
-Storage.route('static', disk: 'public', signed: false); // GET /static/{key*}
+// GET /static/{key*}
+Storage.route('static', disk: 'public', signed: false);
 ```
 
-Now `GET /static/app.js` sends `public/app.js` with the right `Content-Type`. A missing file answers `404`. The disk rejects `..` in the path, so a client can not read files outside `public`.
-
-This is enough for a few files, but it sends no `Cache-Control` header. For an SPA, read on.
+Now `/static/app.js` sends `public/app.js`. This route sends no `Cache-Control` header.
 
 ## Serve an SPA
 
-An SPA needs two things, and a small controller gives you both:
+A single page app (SPA) needs two things:
 
 - `index.html` for every URL the SPA router handles, with no cache.
 - The built assets with a long cache. Build tools put a hash in the file name (`app.3f9c2b.js`), so a new build has new names.
 
 ### 1. Write the controller
 
-The controller has one method for the assets and one for `index.html`:
+Write one method for the assets and one for `index.html`:
 
 ```dart title="lib/app/http/controllers/static.controller.dart"
 import 'dart:io';
@@ -94,11 +91,11 @@ class StaticController {
 }
 ```
 
-`cache(duration)` sets `Cache-Control: max-age=<seconds>`. `Duration.zero` gives `max-age=0`, so the browser asks again each time.
+`cache(duration)` sets `Cache-Control: max-age=<seconds>`.
 
 ### 2. Add the routes
 
-The catch-all route must come **last**, because it matches every URL. So put the API router before the web router in `AppConfig`:
+The catch-all route matches every URL, so it must come last. Put the API router before the web router in `AppConfig`:
 
 ```dart title="lib/routes/web.dart"
 import 'package:dox_core/dox_core.dart';
@@ -118,6 +115,8 @@ class WebRouter extends Router {
 }
 ```
 
+Set the order of the routers:
+
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   /// the SPA catch-all route is in WebRouter, so it must come last.
@@ -127,7 +126,7 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-Keep the route for `/` too, because `/{path*}` does not match the start page.
+Keep the route for `/`, because `/{path*}` does not match the start page.
 
 ### 3. Put the build in `public`
 
@@ -141,7 +140,7 @@ npm run build && cp -r dist/. public/
 flutter build web && cp -r build/web/. public/
 ```
 
-Vite puts the files in `assets/`. Flutter web puts them next to `index.html`. For Flutter, change the asset route to match, or serve everything with `Storage.route` and give `index.html` the catch-all.
+Flutter web puts the files next to `index.html`, not in `assets/`. So for Flutter, change the asset route to match.
 
 ## Check it
 
@@ -170,17 +169,14 @@ cache-control: max-age=31536000
 content-type: text/javascript
 ```
 
-`GET /assets/nope.js` answers `404`. `GET /assets/..%2Fpubspec.yaml` answers `404` too.
-`GET /api/nothing` answers `404`, not the page.
+`/assets/nope.js`, `/assets/..%2Fpubspec.yaml` and `/api/nothing` answer 404.
 
 ## In production
 
-Put a proxy in front of Dox, and let it do gzip. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
+Put a [proxy](../digging-deeper/deployment.md#https-put-a-proxy-in-front) in front of Dox, and let it do gzip. For a big site, serve `public` from the proxy or a CDN.
 
-For a big site, serve `public` from the proxy or a CDN, and keep Dox for the API only.
+## Next steps
 
-## See also
-
-- [Routing: serve storage files](../the-basic/routing.md#serve-storage-files)
-- [Response: files and big responses](../the-basic/response.md#files-and-big-responses)
-- [File storage](../digging-deeper/file-storage.md)
+- [Routing: serve storage files](../the-basic/routing.md#serve-storage-files): all the options of `Storage.route`.
+- [Response: files and big responses](../the-basic/response.md#files-and-big-responses): send a file.
+- [File storage](../digging-deeper/file-storage.md): disks and drivers.

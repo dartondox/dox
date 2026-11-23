@@ -6,8 +6,8 @@ icon: lucide/package
 
 In this step you compile the app to one native binary, run it, and run it in Docker.
 
-!!! warning "Never run production with `dox s` or `dart run`"
-    They use the JIT compiler, which needs about 25 times more memory and starts slower. Build a native (AOT) binary for production.
+!!! warning "Use a native binary in production"
+    `dox s` and `dart run` use the JIT compiler. It uses approximately 25 times more memory and starts slower.
 
 ## 1. Build the binary
 
@@ -24,11 +24,11 @@ Generated: /.../blog/build/bundle/bin/server
 [Dox] Built build/bundle. Run it with: cd build/bundle && ./bin/server
 ```
 
-`dox build` runs the code generator, then `dart build cli`. You get a `build/bundle` folder with everything the app needs:
+It runs the code generator, then `dart build cli`. The `build/bundle` folder has all that the app needs:
 
 | Path | What it is |
 | --- | --- |
-| `bin/server` | the binary, about 10 MB. It needs no Dart SDK. |
+| `bin/server` | the binary, approximately 10 MB. It needs no Dart SDK. |
 | `bin/queue` | the [queue worker](../digging-deeper/queue.md). Run it as its own process. |
 | `bin/schedule` | the [scheduler](../digging-deeper/scheduler.md). Run it as its own process. |
 | `lib/` | native libraries from build hooks, like `libsqlite3`. Keep it next to `bin/`. |
@@ -37,7 +37,7 @@ Generated: /.../blog/build/bundle/bin/server
 
 ## 2. Run the binary
 
-The binary reads `.env` from the folder you start it in, so copy yours there first. The `db` folder for the SQLite file is already in `build/bundle`.
+The binary reads `.env` from the folder where you start it, so copy your file there:
 
 ```bash
 cd build/bundle
@@ -55,9 +55,9 @@ Migrated: 2026_10_22_205345_create_posts_table
 ... "message":"Server started at http://[::]:3000 with 8 isolate (native)" ...
 ```
 
-The migrations run again, because `db/dox.sqlite` is a new file in `build/bundle`. The migration list is compiled into the binary, so you do not need the source code.
+The migrations run again, because the bundle has a new database file. The binary has the migration list in it.
 
-On a server you can skip `.env` and set real environment variables instead. They win over `.env`.
+On a server you can set real environment variables in place of `.env`. They win over `.env`.
 
 ## Check it
 
@@ -73,11 +73,11 @@ pong
 []
 ```
 
-The list is empty, because this is a new database file. Stop the server with `Ctrl+C`.
+The list is empty, because the database file is new. Stop the server with Ctrl+C.
 
 ## 3. Docker
 
-If you deploy with Docker, the project already has a `Dockerfile`. It builds the same bundle and copies it into an empty (`scratch`) image:
+The project has a `Dockerfile`. It builds the same bundle and copies it into an empty scratch image:
 
 ```dockerfile title="Dockerfile"
 FROM dart:stable AS build
@@ -96,8 +96,7 @@ RUN dart pub get --offline
 # libraries in build/bundle/lib and the migrations in build/bundle/db.
 # The queue worker and the scheduler run as their own processes:
 # `/app/bin/queue work` and `/app/bin/schedule work`.
-ARG DOX_VERSION=^3.2.0
-RUN dart pub global activate dox "$DOX_VERSION"
+RUN dart pub global activate dox
 RUN /root/.pub-cache/bin/dox build
 
 # Lay out the final file tree:
@@ -107,7 +106,8 @@ RUN /root/.pub-cache/bin/dox build
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
+  # the native HTTP server (Rust) needs libgcc_s,
+  # which /runtime/ does not have
   && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
   && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
 
@@ -124,7 +124,7 @@ EXPOSE 3000
 CMD ["/app/bin/server"]
 ```
 
-Build and run the image. The image has no `.env` file, so pass the config as environment variables. `APP_KEY` must be exactly 32 characters, or the app does not start.
+Build and run the image. The image has no `.env` file, so give the config as environment variables. The app key must have exactly 32 characters, or the app does not start:
 
 ```bash
 docker build -t blog .
@@ -135,13 +135,13 @@ docker run -p 3000:3000 \
   blog
 ```
 
-!!! note "SQLite in Docker"
-    The database file lives inside the container, so it is lost when the container is removed. Mount a volume for it: `-v blog-data:/app/storage`. For a busy app, use Postgres or MySQL. See [Database](../database/index.md).
+!!! warning "SQLite in Docker"
+    The database file is in the container, so you lose it when you remove the container. Mount a volume for it: `-v blog-data:/app/storage`. For a busy app, use Postgres or MySQL. See [Database](../database/index.md).
 
-## Where to go next
+## Next steps
 
 - [Deployment](../digging-deeper/deployment.md): HTTPS with a proxy, systemd, many machines.
 - [Model](../database/model/index.md): relationships and events.
 - [Serializer](../the-basic/serializer.md): change the JSON shape of a response.
-- [Authentication](../security/authentication.md): all options of `dox_auth`.
+- [Authentication](../security/authentication.md): all options of the auth package.
 - [OpenAPI](../packages/openapi.md): API docs from your routes and DTOs.

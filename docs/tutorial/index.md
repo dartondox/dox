@@ -2,19 +2,17 @@
 
 This tutorial takes you from an empty folder to a small blog API that runs as one native binary.
 
-Every step has the full code and a `curl` command, so you can check your work after each step.
-
-The finished project is on GitHub: [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api). CI builds it and runs its tests on every push, so the code on these pages always works.
+Each step has the full code and a `curl` command to check your work. The finished project is on GitHub: [examples/blog-api](https://github.com/dartondox/dox/tree/main/examples/blog-api). CI builds it and runs its tests on each push.
 
 ## What you will build
 
-You will build a JSON API for blog posts. Anyone can read posts, but only a logged in user can write them:
+A JSON API for blog posts. Anyone can read posts. Only a logged in user can write them:
 
 | Method | Path | Who | What it does |
 | --- | --- | --- | --- |
 | `GET` | `/api/posts` | anyone | list all posts |
-| `GET` | `/api/posts/{id}` | anyone | one post, or `404` |
-| `POST` | `/api/posts` | logged in user | make a post (`201`, or `422` on bad input) |
+| `GET` | `/api/posts/{id}` | anyone | one post, or 404 |
+| `POST` | `/api/posts` | logged in user | make a post (201, or 422 on bad input) |
 | `PUT` | `/api/posts/{id}` | logged in user | change a post |
 | `POST` | `/api/auth/register` | anyone | make an account, get a token |
 | `POST` | `/api/auth/login` | anyone | log in, get a token |
@@ -23,10 +21,10 @@ You will build a JSON API for blog posts. Anyone can read posts, but only a logg
 ## What you need
 
 - Dart 3.13 or newer. Check it with `dart --version`.
-- `curl`, to call the API.
-- About 15 minutes.
+- curl, to call the API.
+- Approximately 15 minutes.
 
-You do not need Docker or a database server, because the app uses SQLite. SQLite keeps the whole database in one file in your project.
+You do not need Docker or a database server. The app uses SQLite, which keeps the database in one file in your project.
 
 ## The steps
 
@@ -40,7 +38,7 @@ You do not need Docker or a database server, because the app uses SQLite. SQLite
 
 ## The finished project
 
-This is the project at the end. Files that you make or change are marked with `*`. The template has more files, like queue, scheduler and storage, but this tree only shows the ones you need here.
+This is the project at the end. A `*` marks the files that you make or change. The template has more files, but this tree shows only the files of this tutorial.
 
 ```text
 blog/
@@ -80,4 +78,6 @@ blog/
 └── pubspec.yaml                  * adds dox_auth
 ```
 
-Start with [step 1: create the project](01-create-project.md).
+## Next steps
+
+- [Step 1: Create the project](01-create-project.md): make the project and start the server.
