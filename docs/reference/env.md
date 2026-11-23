@@ -6,17 +6,13 @@ icon: lucide/file-key
 
 This page lists every env var that Dox and its packages read.
 
-To read your own keys with the typed env class, see [Environment Variables](../digging-deeper/env.md).
-
 ## Read by the framework
 
-`APP_ENV` changes how strict Dox is, so set it first:
+`APP_ENV` changes how strict Dox is. Set `APP_ENV=development` in your local `.env` and in CI:
 
-- `development` or `local`: Dox shows error details in `500` answers and health checks, turns `/docs` on (when `openApi.enabled` is `null`), and turns the `dox_view` template cache off.
-- `development`, `local`, `test` or `testing`: a bad `APP_KEY` or a JWT secret under 32 bytes is only a warning.
-- Any other value, or no value: Dox treats the app as production. A bad key stops the app at start, `/docs` is off and error details are hidden.
-
-So set `APP_ENV=development` in your local `.env` and in CI.
+- development or local: Dox shows error details in 500 answers and health checks, turns `/docs` on (when `openApi.enabled` is null), and turns the view cache off.
+- development, local, test or testing: a bad `APP_KEY` or a JWT secret under 32 bytes is only a warning.
+- Any other value, or no value: production. A bad key stops the app at start, `/docs` is off and error details are hidden.
 
 | Variable | Who reads it | Default | Meaning | Example |
 | --- | --- | --- | --- | --- |
@@ -38,7 +34,7 @@ So set `APP_ENV=development` in your local `.env` and in CI.
 
 ## Read by a new project
 
-A new project (`dox create`) reads these keys with its typed env class in `lib/config/env.dart`. The framework itself does not read them. In code, use the getter, like `env.appPort`.
+A new project reads these keys with its typed env class in `lib/config/env.dart`. In code, use the getter, like `env.appPort`.
 
 | Variable | Getter | Type | Default | Used for |
 | --- | --- | --- | --- | --- |
@@ -93,11 +89,12 @@ A real environment variable always wins over the `.env` file. The file is read l
 - An empty value (`KEY=`), only spaces, or the text `null` counts as missing. So `Env.get` gives the default.
 - In tests (`dart test`, or `APP_ENV=testing` as a real env var), Dox also reads `.env.testing`. Its keys win over `.env`.
 - With `CoreFlags.envExpand`, `${OTHER}` and `"..."` escapes work. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another).
+- The file is read one time per isolate, from the current folder. `Platform.environment` has only the real environment.
 
-Migrations (`dox_migration`) use their own simpler parser. It does not strip `# note` comments, so keep comments on their own line.
+Migrations use their own simpler parser. It does not remove `# note` comments, removes all quote characters, has no `${VAR}` expansion and does not read `.env.testing`. So keep comments on their own line.
 
-## Details
+## Next steps
 
-- `Env.get()` and `EnvReader` read the real environment and `.env`. Code that reads `Platform.environment` sees only the real environment.
-- The `.env` file is read once per isolate, from the current folder.
-- The parser of `dox_migration` removes every quote character, has no `${VAR}` expansion, and does not read `.env.testing`.
+- [Environment Variables](../digging-deeper/env.md): read your own keys with the typed env class.
+- [Environments](../guides/environments.md): a setup for dev, test and production.
+- [App config](app-config.md): the fields that the env keys fill.

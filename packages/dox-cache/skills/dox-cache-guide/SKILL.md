@@ -11,7 +11,7 @@ so a Dox app uses `Cache()` from `package:dox_core/dox_core.dart` and installs n
 Full docs:
 
 - https://dartondox.dev/latest/digging-deeper/cache/
-- https://dartondox.dev/latest/packages/cache/
+- https://dartondox.dev/latest/digging-deeper/cache/
 
 Do not invent methods. The lists below are the real API.
 

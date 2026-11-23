@@ -18,7 +18,7 @@ A dachshund is small, fast and full of energy. Dox tries to be the same: a small
 
 ## Logo and mascot
 
-Dox has a logo and a mascot. They have different jobs.
+Dox has a logo and a mascot, with different jobs:
 
 | | Logo | Mascot |
 | --- | --- | --- |
@@ -26,7 +26,7 @@ Dox has a logo and a mascot. They have different jobs.
 | Where | The docs header, the favicon, the README, pub.dev | The home page, social cards, talks, stickers |
 | Files | [`logo.svg`](../assets/logo.svg) (white, for dark backgrounds) | [`mascot.png`](../assets/mascot.png) (transparent background) |
 
-Use the logo when the space is small, like an icon or an avatar. Doxie has too much detail to read well at 16 or 32 pixels.
+Use the logo in a small space, like an icon or an avatar. Doxie has too much detail for 16 or 32 pixels.
 
 ## Colors
 
@@ -38,5 +38,9 @@ Use the logo when the space is small, like an icon or an avatar. Doxie has too m
 
 ## Use Doxie
 
-You are welcome to use Doxie when you write or talk about Dox: blog posts, slides, videos and stickers.
-Please do not change Doxie's colors, and do not use Doxie to brand another product.
+You can use Doxie when you write or talk about Dox: blog posts, slides, videos and stickers. Do not change the colors of Doxie, and do not use Doxie for another product.
+
+## Next steps
+
+- [Showcase](showcase.md): apps built with Dox.
+- [Contribute](contribute.md): work on Dox.

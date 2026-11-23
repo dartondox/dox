@@ -6,29 +6,25 @@ icon: lucide/package
 
 A DTO is a typed Dart class that describes the input of a request, so your controller gets checked data instead of a raw map.
 
-DTO means "data transfer object". You write a class with `@Dto()` and give each field a Dart type and some [rules](validation.md#rules). When you ask for the class in a controller, Dox reads the request, converts the values to your types, and checks the rules. Your method gets a typed object. When the input is wrong, the client gets `422`, and your method does not run.
-
-You write the input shape once, and Dox uses it in many places: the request body, the query string, file uploads, the [OpenAPI docs](#openapi-docs), [MCP tools](#mcp-tools) and even a [Flutter app](#sharing-with-flutter).
+A **DTO** (data transfer object) is a class with `@Dto()`. Each field has a Dart type and some [rules](validation.md#rules). When the input is wrong, the client gets 422, and your method does not run.
 
 ## Creating a DTO
 
-Use the `make:dto` command. It writes a DTO with one `name` field to `lib/app/dtos/<name>/<name>.dto.dart`:
+Make a DTO with the CLI. It writes `lib/app/dtos/<name>/<name>.dto.dart`:
 
 ```bash
 dox make:dto CreateUser
 ```
 
-A DTO uses generated code, so run the generator after you create or change one. It writes a `.dto.g.dart` file next to the DTO:
+Then run the generator. It writes a `.dto.g.dart` file next to the DTO. `dox serve` and `dox build_runner:watch` run it on every save:
 
 ```bash
 dox build_runner:build
 ```
 
-If `dox serve` or `dox build_runner:watch` is running, this happens for you on every save.
-
 ## Defining fields
 
-Each field is a `final` field and a parameter of the constructor. Put rules on a field as annotations:
+Each field is a final field and a parameter of the constructor. Put rules on a field as annotations:
 
 ```dart title="lib/app/dtos/create_user/create_user.dto.dart"
 import 'package:dox_core/dox_core.dart';
@@ -53,9 +49,9 @@ class CreateUser {
 }
 ```
 
-Keep the `part` line and the `static const DtoSchema<CreateUser> schema` line. They connect the class to its generated code.
+Keep the `part` line and the `schema` line. They connect the class to its generated code.
 
-The Dart type decides if a field is required. A field that is not nullable and has no default is required. A nullable field, or a field with a default, is optional. See [Required and optional fields](validation.md#required-and-optional-fields).
+A field that is not nullable and has no default is required. See [Required and optional fields](validation.md#required-and-optional-fields).
 
 ### Field types
 
@@ -71,9 +67,11 @@ These field types work:
 | `List<T>` | an array | `tags=a&tags=b` or `tags[]=a` |
 | `Map<String, T>` | an object | bracket keys: `meta[color]` |
 
-JSON is strict: `"18"` is not an `int`. Query and form data are text, so Dox converts them.
+JSON is strict: "18" is not an integer. See [Types in detail](validation-rules.md#types-in-detail).
 
-If a client sends numbers as text in JSON too, use `@Dto(coerce: true)`. Then `"18"` is read as `18`, `"4.5"` as `4.5`, and `"true"`, `"1"`, `"yes"`, `"on"` (and the opposites) as a bool. A `bool` also takes the numbers `1` and `0`:
+### Numbers as text in JSON
+
+Read numbers and bools that a client sends as text in JSON:
 
 ```dart
 @Dto(coerce: true)
@@ -85,11 +83,9 @@ class UpdateStock {
 }
 ```
 
-Every detail is in [Types in detail](validation-rules.md#types-in-detail).
-
 ### Nested objects and lists
 
-Sometimes the input has an object inside it, or a list of objects. A field can be another `@Dto` class, or a list of them:
+A field can be another `@Dto` class, or a list of them:
 
 ```dart
 @Dto()
@@ -105,11 +101,11 @@ class CreateOrder {
 }
 ```
 
-`Address` and `OrderItem` are `@Dto` classes too. An error in a nested value has a path key, like `items.1.quantity`.
+An error in a nested value has a path key, like `items.1.quantity`.
 
 ### Input keys
 
-The input key is the field name in snake_case, so `firstName` reads `first_name`. Use `@Name` to pick another key:
+The input key is the field name in snake case, so `firstName` reads `first_name`. Use `@Name` to pick another key:
 
 ```dart
 final String firstName; // key: first_name
@@ -118,24 +114,19 @@ final String firstName; // key: first_name
 final String email; // key: emailAddress
 ```
 
-To use the field names as they are, use `@Dto(keyCase: KeyCase.field)`.
-
-Unknown keys are dropped. If you want an unknown key to be an error, use `@Dto(strict: true)`.
+`@Dto(keyCase: KeyCase.field)` uses the field names as they are. Unknown keys are dropped, and `@Dto(strict: true)` makes them an error. All options are in [Keys and DTO options](validation-rules.md#keys-and-dto-options).
 
 ## Registering DTOs
 
-Dox uses no reflection, so it needs a list of all your DTOs. The generator writes this list to `lib/generated/dtos.g.dart`. Give it to the app config:
+The generator writes the list of all DTOs to `lib/generated/dtos.g.dart`. Give it to the app config one time. A new app already has this line:
 
 ```dart title="lib/config/app.dart"
 import 'package:my_app/generated/dtos.g.dart';
 
 AppConfig appConfig = AppConfig(
-  dtos: dtos, // from lib/generated/dtos.g.dart
-  // ...
+  dtos: dtos,
 );
 ```
-
-A new app already has this line. You only add it once, and new DTOs join the list when the generator runs. Without it, Dox throws an error that tells you to add it.
 
 ## Using a DTO in a controller
 
@@ -154,17 +145,11 @@ class UserController {
 }
 ```
 
-You can mix it with other parameters, like `DoxRequest` and path params. A method can have at most one DTO parameter:
-
-```dart
-Future<User> update(DoxRequest req, int id, UpdateUser body) async { ... }
-```
-
-See [Controller: parameters](controller.md#parameters) for the full rules.
+A method can have one DTO parameter, next to others like `DoxRequest` and path params. See [Controller: parameters](controller.md#parameters).
 
 ### Validating inside the method
 
-Sometimes you want to check the input later in the method, not before it. Use `req.validate<T>()`. It returns the object, or throws the `422` error:
+Check the input later in the method. It gives the object, or throws the 422 error:
 
 ```dart
 CreateUser data = await req.validate<CreateUser>();
@@ -172,14 +157,14 @@ CreateUser data = await req.validate<CreateUser>();
 
 ### Body and query string
 
-Dox reads **one** source, and it never mixes the query and the body:
+Dox reads one source. It never mixes the query and the body:
 
 | Request | Dox reads |
 | --- | --- |
-| `GET`, `HEAD`, `DELETE` | the query string |
-| `POST`, `PUT`, `PATCH` | the body (JSON, form or multipart) |
+| GET, HEAD, DELETE | the query string |
+| POST, PUT, PATCH | the body (JSON, form or multipart) |
 
-So a DTO for a list page, like `GET /users?page=2`, reads the query string for you. To choose the source yourself, set `source` on the DTO, or on one call:
+Set `source` to pick the source, on the DTO or on one call:
 
 ```dart
 @Dto(source: Source.query) // on the DTO
@@ -188,11 +173,11 @@ class SearchUsers { ... }
 await req.validate<SearchUsers>(source: Source.query); // for one call
 ```
 
-Path params are not part of a DTO. Ask for them as controller parameters, like `int id`. See the [Pagination](../guides/pagination.md) guide for a full query DTO.
+Path params are not part of a DTO. See the [Pagination](../guides/pagination.md) guide for a full query DTO.
 
 ### Uploaded files
 
-A `RequestFile` field reads a file from a `multipart/form-data` request. Add [file rules](validation-rules.md#files) to check its type and size:
+A `RequestFile` field reads a file from a multipart request. Add [file rules](validation-rules.md#files) to check its type and size:
 
 ```dart
 @Image()
@@ -203,11 +188,11 @@ final RequestFile avatar;
 final List<RequestFile> documents;
 ```
 
-Dox checks the real file type from its first bytes. It does not trust the file name or the client. To save the file, see [Request: form data](request.md#form-data-file) and the [File upload](../guides/file-upload.md) guide.
+Dox checks the real file type from its first bytes. To save the file, see [Request: form data](request.md#form-data-file).
 
 ## When validation fails
 
-When the input is wrong, Dox answers `422` with one message per field, and your method does not run:
+Dox answers 422 with one message for each field:
 
 ```json
 {
@@ -215,32 +200,45 @@ When the input is wrong, Dox answers `422` with one message per field, and your 
 }
 ```
 
-On a form post with a [session](session.md#validation-errors-and-old-input), Dox redirects back with the errors instead. To change the messages or add your own rules, see [Validation](validation.md).
+On a form post with a [session](session.md#validation-errors-and-old-input), Dox redirects back with the errors. To change the messages, see [Validation](validation.md).
 
-## OpenAPI docs
+## Converting a DTO
 
-If you use [`dox_openapi`](../packages/openapi.md), each DTO becomes a schema in the API docs. The field types and the rules (like `@Length` and `@Email`) show up there, so the docs always match the checks. A `///` comment or `@Describe('...')` on a field becomes its `description`. See [API docs with OpenAPI](../guides/api-docs-with-openapi.md#5-see-how-a-dto-becomes-a-schema).
+Build a DTO from trusted data with no checks, or turn it into a map with the input keys:
 
-## MCP tools
+```dart
+CreateUser user = CreateUser.schema.fromMap(<String, dynamic>{
+  'name': 'Ann',
+  'email': 'ann@dox.dev',
+});
+Map<String, dynamic> map = CreateUser.schema.toMap(user);
+```
 
-An [MCP](../packages/mcp.md) tool can use a DTO as its input. Extend `McpDtoTool<T>`, and `handle` gets the checked object, with the same rules as a controller. See [Tools that take a DTO](../packages/mcp.md#tools-that-take-a-dto).
+Get the JSON Schema of the DTO:
 
-## Sharing with Flutter
+```dart
+Map<String, dynamic> json = CreateUser.schema.toJsonSchema();
+```
 
-The generated DTO code is pure Dart, so a Flutter app can use the same DTO to check a form before it sends it. Put the DTO in a shared package and import `dox_validation` instead of `dox_core`. See [Share code with Flutter](../guides/share-code-with-flutter.md).
+## Using a DTO in other places
+
+- [OpenAPI docs](../guides/api-docs-with-openapi.md#5-see-how-a-dto-becomes-a-schema): each DTO becomes a schema. A `///` comment or `@Describe('...')` on a field becomes its description.
+- [MCP tools](../packages/mcp.md#tools-that-take-a-dto): extend `McpDtoTool<T>` to get the checked object.
+- [Flutter](../guides/share-code-with-flutter.md): import `dox_validation` in a shared package, and check a form before you send it.
 
 ## Testing
 
-A DTO is a normal Dart class. If you want to skip the checks in a test, for example to test a service, make one directly:
+Make a DTO directly to skip the checks:
 
 ```dart
 CreateUser input = const CreateUser(name: 'Ann', email: 'ann@dox.dev');
 ```
 
-To test the checks, use `safeValidateMap` on the schema. It never throws:
+Test the checks with `safeValidateMap`. It never throws:
 
 ```dart
-ParseResult<CreateUser> result = await CreateUser.schema.safeValidateMap(<String, dynamic>{
+ParseResult<CreateUser> result =
+    await CreateUser.schema.safeValidateMap(<String, dynamic>{
   'name': 'A',
   'email': 'not-an-email',
 });
@@ -249,11 +247,10 @@ expect(result.success, isFalse);
 expect(result.errors['email'], 'The email is not a valid email');
 ```
 
-`validateMap` does the same, but returns the object or throws. Pass `source: Source.query` to read the map like a query string, and `params: {'id': '5'}` to give path params. `@Unique` and `@Exists` need a test database.
+`validateMap` gives the object or throws. Pass `source: Source.query` to read the map like a query string, and `params:` to give path params. `@Unique` and `@Exists` need a test database.
 
-## Details
+## Next steps
 
-- All `@Dto(...)` options are in [Keys and DTO options](validation-rules.md#keys-and-dto-options).
-- The content type of the body decides how Dox reads it. See [Body types](validation-rules.md#body-types).
-- The generator stops with a clear error for a field it can not use, like a field that is not `final`. See [What the generator checks](validation-rules.md#what-the-generator-checks).
-- A trailing `Dto` in the `make:dto` name is removed: `dox make:dto CreateUserDto` gives the class `CreateUser`.
+- [Validation](validation.md): rules, messages and custom checks.
+- [Validation rules](validation-rules.md): every rule and option.
+- [Request](request.md): raw input and files.

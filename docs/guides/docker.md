@@ -6,7 +6,7 @@ icon: lucide/container
 
 Build a small production image with `dox build`, and run it with Postgres in Docker Compose, with a health check.
 
-A Docker image runs the same way on your laptop and on any server. The image in this guide holds only the compiled app, so it is small and starts fast.
+The image holds only the compiled app, so it is small and starts fast.
 
 ## What you need
 
@@ -15,9 +15,7 @@ A Docker image runs the same way on your laptop and on any server. The image in 
 
 ## 1. Add a health route
 
-Docker needs a way to know if the app works. Add a health route that it can ask. The route answers `503` when the database does not answer.
-
-Put it in `register()` of `WebRouter`. `QueryBuilder` comes from `package:dox_orm/dox_orm.dart`:
+Docker asks this route if the app works. It answers 503 when the database does not answer. Put it in `register()` of `WebRouter`:
 
 ```dart title="lib/routes/web.dart"
 Route.health(
@@ -28,11 +26,9 @@ Route.health(
 );
 ```
 
-See [Health check](../digging-deeper/health-check.md) for more checks.
-
 ## 2. Add the health check binary
 
-The final image has no shell and no `curl`, so the health check is a second small Dart binary:
+The final image has no shell and no `curl`, so the health check is a small Dart binary:
 
 ```dart title="bin/health.dart"
 import 'dart:io';
@@ -57,7 +53,7 @@ Future<void> main() async {
 
 ## 3. Write the Dockerfile
 
-The Dockerfile has two stages. The first stage builds the AOT bundle. The second stage holds only the Dart runtime and the bundle, so the final image is small: about 17 MB for the blog API.
+The first stage builds the AOT bundle. The second stage holds only the Dart runtime and the bundle, about 17 MB for the blog API:
 
 ```dockerfile title="Dockerfile"
 # Stage 1: build the AOT bundle with the Dart SDK and the dox CLI.
@@ -104,19 +100,16 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
 CMD ["/app/bin/server"]
 ```
 
-Delete the `public` lines if your app has no `public` folder.
+Delete the `public` lines if your app has no `public` folder. Keep the `libgcc_s` lines. Without them, Dox stops at start with `dox_http_native did not load`.
 
-When the container starts, check the start log. It must end with `(native)`:
+When the container starts, the start log must end with `(native)`:
 
 ```text
 [server] Server started at http://[::]:3000 with 8 isolate (native)
 ```
 
-The `libgcc_s` lines are needed. Without them the native HTTP server does not load, and Dox stops at start with `dox_http_native did not load`.
-
 !!! warning "`dox build`, not `dart compile exe`"
-    `dox_orm` bundles SQLite with a build hook. `dart compile exe` does not run build hooks and stops with an error.
-    `dox build` runs `dart build cli`, which does. It puts the native libraries in `build/bundle/lib`, next to `bin/server`.
+    `dox_orm` bundles SQLite with a build hook. `dart compile exe` does not run build hooks and stops with an error. Build the server with `dox build`.
 
 Keep the build context small with a `.dockerignore`:
 
@@ -137,7 +130,7 @@ pubspec_overrides.yaml
 
 ## 4. Write the compose file
 
-Docker Compose runs the app and Postgres together. `env_file: .env` gives the app your `.env`. The lines under `environment` win over the file, so the app always talks to the `postgres` service:
+Docker Compose runs the app and Postgres together. The lines under `environment` win over `.env`:
 
 ```yaml title="docker-compose.yml"
 services:
@@ -180,11 +173,11 @@ volumes:
   uploads:
 ```
 
-- `depends_on` with `service_healthy` starts the app after Postgres answers. This matters because the app runs the migrations at start.
-- `${DB_PASSWORD:?...}` stops compose with a clear message if `.env` has no password.
-- When the main isolate dies, the process exits and `restart: unless-stopped` starts it again.
+`depends_on` starts the app after Postgres answers, because the app runs the migrations at start.
 
 ## 5. Write the `.env`
+
+Put the secrets in `.env`. It never goes into the image or into git:
 
 ```ini title=".env"
 APP_NAME=my_app
@@ -198,19 +191,19 @@ DB_USERNAME=postgres
 DB_PASSWORD=<a real password>
 ```
 
-`.env` is in `.dockerignore` and `.gitignore`. It never goes into the image or into git.
-
-The app now uses Postgres, so the build needs the Postgres driver. A new app skips it in `pubspec.yaml`, so remove the `dox_postgres_native` skip lines.
-See [Skip unused drivers](../database/index.md#skip-unused-drivers).
+A new app skips the Postgres driver in `pubspec.yaml`. Remove the `dox_postgres_native` skip lines. See [Skip unused drivers](../database/index.md#skip-unused-drivers).
 
 ## 6. Build and run
 
+Build the image and start both services:
+
 ```bash
 docker compose up -d --build
-docker compose ps
 ```
 
 ## Check it
+
+Both services are healthy:
 
 ```bash
 docker compose ps
@@ -222,6 +215,8 @@ my_app-app-1       Up 30 seconds (healthy)
 my_app-postgres-1  Up 35 seconds (healthy)
 ```
 
+Ask the health route:
+
 ```bash
 curl http://localhost:3000/health
 ```
@@ -230,15 +225,15 @@ curl http://localhost:3000/health
 {"status":"ok","checks":{"database":"ok"}}
 ```
 
-To see the health check work, stop Postgres with `docker compose stop postgres`. After about 45 seconds, `docker compose ps` shows the app as `unhealthy`.
+Now stop Postgres with `docker compose stop postgres`. After about 45 seconds, `docker compose ps` shows the app as unhealthy.
 
 ## HTTPS
 
-Do not add TLS to the app itself. Put Caddy or nginx in front, and set `trustedProxies` in `AppConfig`.
-See [Deployment: HTTPS](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
+Put Caddy or nginx in front of the app, and set `trustedProxies` in `AppConfig`. See [Deployment: HTTPS](../digging-deeper/deployment.md#https-put-a-proxy-in-front).
 
-## See also
+## Next steps
 
-- [Deployment](../digging-deeper/deployment.md) for `dox build`, the bundle layout and systemd
-- [Environments](environments.md) for dev, staging and production config
-- [Migration: run on server start](../database/migration.md#run-on-server-start)
+- [Deployment](../digging-deeper/deployment.md): `dox build`, the bundle and systemd.
+- [Health check](../digging-deeper/health-check.md): more checks.
+- [Environments](environments.md): dev, staging and production config.
+- [Migration: run on server start](../database/migration.md#run-on-server-start): the migrations at start.

@@ -4,20 +4,16 @@ icon: material/robot-outline
 
 # AI agents
 
-An AI coding agent must know the real Dox API. If it does not, it guesses class names and method names, and the code does not compile.
+Give your AI coding agent the real Dox API with skills, `AGENTS.md` and the llms files.
 
-Dox gives the agent two sources:
+Without the real API, an agent guesses class and method names, and the code does not compile. Dox gives two sources:
 
 - **Skills**: short guides that each package ships. The agent reads them while it writes code in your app.
-- **`llms.txt` and `llms-full.txt`**: these docs as plain text files, for a chat or for a tool that has no skills.
+- **llms files**: these docs as plain text, for a chat or a tool with no skills.
 
 ## Skills
 
-A skill is a `SKILL.md` file with the real API of one package and the steps for the usual tasks. Each Dox package ships its skill in its `skills/<name>/` folder.
-
-The agent does not read all skills at the start. It reads a skill only when your task matches it. Thus the skills use little space in the memory of the agent.
-
-A skill comes with the package. Thus it always agrees with the package version that your app uses.
+A skill is a `SKILL.md` file with the real API of one package and the steps for the usual tasks. The agent reads a skill only when your task matches it. A skill comes with the package, so it always agrees with the package version of your app.
 
 These packages ship a skill:
 
@@ -44,15 +40,13 @@ These packages ship a skill:
 
 ## Install the skills
 
-The skills are not in your project until you install them. The [skills](https://pub.dev/packages/skills) tool copies them from your packages into the skills folder of your agent.
-
-Run it in the root folder of your app, after `dart pub get`:
+The [skills](https://pub.dev/packages/skills) tool copies the skills from your packages into the skills folder of your agent. Run it in the root folder of your app, after `dart pub get`:
 
 ```bash
 dart run skills@ get
 ```
 
-The tool finds the skills of your packages. Then it asks which skills to install. To install all of them with no question, add `--all`:
+It asks which skills to install. Add `--all` to install all of them:
 
 ```bash
 dart run skills@ get --all
@@ -60,15 +54,11 @@ dart run skills@ get --all
 
 ### Select your agent
 
-The tool finds your agent from the folders in your project, for example `.claude/` or `.cursor/`. If it finds more than one agent, it installs the skills for each of them. If it finds none, it asks you.
-
-To set the agent yourself, use `--agent`:
+The tool finds your agent from the folders in your project, like `.claude/`. If it finds none, it asks you. To set the agent, use `--agent`:
 
 ```bash
 dart run skills@ get --all --agent claude
 ```
-
-Each agent has its own skills folder:
 
 | Agent | `--agent` | Skills folder |
 | --- | --- | --- |
@@ -81,19 +71,21 @@ Each agent has its own skills folder:
 | Antigravity | `antigravity` | `.agents/skills/` |
 | Other agents | `generic` | `.agents/skills/` |
 
-The tool does not find GitHub Copilot automatically. For Copilot, always use `--agent copilot`.
+The tool does not find GitHub Copilot, so for Copilot always add `--agent copilot`.
 
 ### Run it again after a package change
 
-The installed skills are copies. They do not change when a package changes.
+The installed skills are copies. Run the tool again after you add or update a package:
 
-Run `dart run skills@ get` again after you add a package or update a package. The tool then installs the new skills. With `--all`, it also removes the skills of packages that you no longer use. Without `--all`, it asks first.
+```bash
+dart run skills@ get
+```
+
+With `--all`, it also removes the skills of packages that you do not use now.
 
 ### Packages that come in through another package
 
-The tool only reads the packages in your own `pubspec.yaml`. It does not see a package that comes in through a different package.
-
-For example, `dox_cache` uses `ioredis`. If you use `ioredis` directly in your code, add it to your `pubspec.yaml`:
+The tool reads only the packages in your `pubspec.yaml`. For example, the cache uses ioredis. To get its skill, add it to your app:
 
 ```bash
 dart pub add ioredis
@@ -108,15 +100,13 @@ List the installed skills:
 dart run skills@ list
 ```
 
-You can also look in the skills folder of your agent. For Claude Code, the `dox_core` skill is the file `.claude/skills/dox-core-guide/SKILL.md`.
-
-If your tool has no support for skills, open the `SKILL.md` file as a normal file, or give it to the agent.
+For Claude Code, the core skill is `.claude/skills/dox-core-guide/SKILL.md`. If your tool has no skills, give the `SKILL.md` file to the agent.
 
 ## AGENTS.md
 
-A skill tells the agent how a package works. It does not tell the agent how your project is organized. The `AGENTS.md` file in the root folder of your app does that. Most coding agents read this file before they change code.
+The `AGENTS.md` file in the root folder of your app tells the agent how your project is organized. Most coding agents read it before they change code.
 
-The starter project that `dox create` makes has an `AGENTS.md` file. It holds:
+The starter project has one. It holds:
 
 - what the project is, and the links to the llms files
 - the command that installs the skills, and the list of skills
@@ -128,39 +118,32 @@ The starter project that `dox create` makes has an `AGENTS.md` file. It holds:
 - the checks to run before a change is done: `dart format .`, `dart analyze` and `dart test`
 - a list of things that the agent must not do
 
-This file is yours. Edit it when your app gets its own rules, for example a new folder or a rule for tests.
+The file is yours. Edit it when your app gets its own rules.
 
 ## llms.txt and llms-full.txt
 
-Not every tool can read skills, and a chat does not see your project. For these, the docs site has two plain text files. They obey the [llms.txt](https://llmstxt.org) convention.
+For a chat or a tool with no skills, the docs site has two plain text files in the [llms.txt](https://llmstxt.org) format:
 
 | File | What it holds |
 | --- | --- |
-| [llms.txt](https://dartondox.dev/llms.txt) | The page list: a short description of Dox, then one line for each page with its title and its link. |
-| [llms-full.txt](https://dartondox.dev/llms-full.txt) | All the docs as one Markdown file. |
+| [llms.txt](https://dartondox.dev/llms.txt) | A short description of Dox, then one line for each page with its title and its link. |
+| [llms-full.txt](https://dartondox.dev/llms-full.txt) | All the docs as one Markdown file, in the order of the menu. |
 
-### What is in the files
-
-The docs build makes the two files again each time the docs change. Thus they always agree with this site.
-
-- They hold the docs of the latest Dox version. The links in them go to `https://dartondox.dev/latest/`.
-- They hold the docs pages, in the sequence of the menu of this site.
-- In `llms-full.txt`, each page starts with its title and its link. Then comes the Markdown source of the page, with all its code examples.
-- The blog and the docs of older Dox versions are not in the files.
+The docs build makes them again at each change, so they agree with this site.
 
 ### Use them
 
-There are three ways to give the files to an agent:
+Give the files to an agent in one of these ways:
 
-1. **Paste the link.** In a chat agent that can open links, paste `https://dartondox.dev/llms-full.txt` and ask your question.
-2. **Add a docs source.** Some editors let you add documentation by its link. If your editor has this feature, add the link of `llms-full.txt`.
-3. **Download the file.** Save it, then point the agent at the file or attach it to the chat:
+1. Paste the link `https://dartondox.dev/llms-full.txt` in a chat agent that can open links.
+2. Add the link as a docs source in your editor.
+3. Download the file, then attach it to the chat:
 
     ```bash
     curl -o dox-docs.md https://dartondox.dev/llms-full.txt
     ```
 
-`llms-full.txt` is a large file. If your agent cannot hold it, give it `llms.txt`. The agent then opens only the pages that it needs.
+If your agent cannot hold the large file, give it `llms.txt`. The agent then opens only the pages that it needs.
 
 ## Skills or llms-full.txt
 
@@ -171,4 +154,7 @@ There are three ways to give the files to an agent:
 | Version | the package version of your app | the latest Dox version |
 | How the agent gets it | automatically, when the task matches | you give it the link or the file |
 
-For daily work in your app, install the skills and keep `AGENTS.md`. Use `llms-full.txt` when you ask about Dox out of your project, or when your tool cannot read skills.
+## Next steps
+
+- [Installation](installation.md): create a project.
+- [MCP server](../packages/mcp.md): give AI clients tools from your own app.

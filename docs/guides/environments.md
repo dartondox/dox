@@ -6,7 +6,7 @@ icon: lucide/toggle-left
 
 Run the same app in development, staging and production with different config, and keep secrets out of git and out of the image.
 
-Your app needs different values in each place it runs: another database, another log format, another front-end URL. You should not put these values, and above all your secrets, in the code. So Dox reads them from the environment.
+Each place needs other values, like another database or front-end URL. Dox reads them from the environment, not from the code.
 
 ## What you need
 
@@ -20,11 +20,11 @@ Dox looks for each key in two places:
 1. A real environment variable (from the shell, Docker or systemd). This one wins.
 2. The `.env` file in the folder where the app starts.
 
-So use a `.env` file on your machine, and real environment variables on a server. On a server the `.env` file is optional.
+So use a `.env` file on your machine, and real environment variables on a server.
 
 ## 1. The typed env class
 
-A new project already has `lib/config/env.dart`. Its `AppEnv` class lists every key, with its type and its default. In this guides app, `corsOrigin` and `appUrl` are added keys. The rest comes with a new project.
+The `AppEnv` class in `lib/config/env.dart` lists every key, with its type and its default. This guides app adds `corsOrigin` and `appUrl`:
 
 ```dart title="lib/config/env.dart"
 import 'package:dox_core/dox_core.dart';
@@ -35,7 +35,8 @@ part 'env.g.dart';
 /// -------------------------------
 /// Each getter reads one key: `appName` reads `APP_NAME`.
 /// A getter body is the default. A nullable getter is optional.
-/// Other getters are required: the app stops at startup when one is missing.
+/// Other getters are required: the app stops at startup when one is
+/// missing.
 /// Run `dart run build_runner build` after you change this class.
 @DoxEnv()
 abstract class AppEnv {
@@ -54,7 +55,8 @@ abstract class AppEnv {
   /// required: used to sign tokens and encrypt cookies
   String get appKey;
 
-  /// isolates (threads) of the HTTP server. Null: one per CPU the process may use.
+  /// isolates (threads) of the HTTP server.
+  /// Null: one per CPU the process may use.
   int? get appTotalIsolate;
 
   String get logLevel => 'info';
@@ -91,17 +93,17 @@ abstract class AppEnv {
 final AppEnv env = AppEnv.load();
 ```
 
-Each getter reads the key with the same name in UPPER_SNAKE case, so `dbPort` reads `DB_PORT`. The getter decides if the key is needed:
+Each getter reads its name in upper snake case, so `dbPort` reads `DB_PORT`:
 
 - A getter with a body has a default: `int get appPort => 3000;`.
-- A nullable getter with no body is optional: `int? get dbPort;` is `null` when the key is not set.
+- A nullable getter with no body is optional: `int? get dbPort;` is null when the key is not set.
 - Any other getter with no body is required: `String get appKey;`.
 
-If a required key is missing, the app stops at start and lists all the problems. `build_runner` makes the part file `env.g.dart`.
+If a required key is missing, the app stops at start and lists all the problems.
 
 ## 2. Add a key
 
-When your app needs a new value, add a getter for it. For example, if the app needs a mail host, add this getter to `AppEnv`:
+For a new value, add a getter to `AppEnv`, like this mail host:
 
 ```dart
   /// the SMTP server for mails
@@ -114,11 +116,11 @@ Then run `build_runner` again:
 dart run build_runner build --delete-conflicting-outputs
 ```
 
-Now `env.mailHost` reads `MAIL_HOST`. Add `MAIL_HOST` to `.env.example` too, so other developers know the key exists.
+Now `env.mailHost` reads `MAIL_HOST`. Add the key to `.env.example` too.
 
 ## 3. Use it in the config files
 
-The config files read the typed getters. If a setting must differ per environment, base it on `APP_ENV`, like `prettyPrint` and `debug` here:
+The config files read the typed getters. For a setting that changes per environment, use `APP_ENV`, like `prettyPrint` and `debug` here. Development is an `APP_ENV` of development, local, test or testing. Any other value is production:
 
 ```dart title="lib/config/logger.dart"
 import 'package:dox_core/dox_core.dart';
@@ -128,12 +130,15 @@ LoggerConfig logger = LoggerConfig(
   name: env.appName,
   enabled: true,
   level: env.logLevel,
-  // colors on your machine, one JSON line per log in staging and production.
+  // colors on your machine, one JSON line per log in staging and
+  // production.
   // Env.appEnv, not appConfig.isDevelopment: appConfig is built from
   // this logger, so reading appConfig here would loop.
   prettyPrint: Env.appEnv == 'development',
 );
 ```
+
+The database prints every query in development only:
 
 ```dart title="lib/config/database.dart"
 import 'package:dox_orm/dox_orm.dart';
@@ -164,7 +169,7 @@ DatabaseConfig databaseConfig = DatabaseConfig(
 
 ## 4. Write the env files
 
-You should commit `.env.example`, because it shows every key with a safe value. Never commit `.env`, because it holds your real secrets.
+Commit `.env.example` with every key and a safe value. Never commit `.env`, because it holds your real secrets:
 
 ```ini title=".env.example"
 APP_NAME=my_app
@@ -200,28 +205,28 @@ Keep every `.env` file out of git, except the example:
 !.env.example
 ```
 
-This is where the values live in each environment:
+The values live in a different place in each environment:
 
 | Environment | Where the values live | `APP_ENV` |
 | --- | --- | --- |
-| your machine | `.env` | `development` |
-| staging | real env variables (compose `environment:`, a secrets manager) | `staging` |
-| production | real env variables | `production` |
+| your machine | `.env` | development |
+| staging | real env variables (compose `environment:`, a secrets manager) | staging |
+| production | real env variables | production |
 
-On a server you can also keep a `.env` file next to the binary, outside git, with `chmod 600`. systemd reads it with `EnvironmentFile=`. See [Deployment](../digging-deeper/deployment.md#keep-it-running).
+On a server you can also keep a `.env` file next to the binary, with `chmod 600`. See [Deployment](../digging-deeper/deployment.md#keep-it-running).
 
 ## 5. `APP_KEY`
 
-`APP_KEY` is your most important secret, because it encrypts cookies and signs JWT tokens and local signed URLs.
+`APP_KEY` is your most important secret. It encrypts cookies and signs JWT tokens and local signed URLs.
 
 - Make one key per environment with `dox key:generate`. Never share the production key with staging.
-- The key must be exactly 32 characters. `dox key:generate` makes a key of the right length.
-- In production a bad key stops the app at start. A bad key is empty, not 32 characters, or a public sample key. In development the app only logs a warning.
-- If you change the key, every cookie, token and signed URL stops working, so every user is logged out. Plan it.
+- The key must be exactly 32 characters.
+- In production a bad key stops the app at start. A bad key is empty, not 32 characters, or a public sample key.
+- A new key stops every cookie, token and signed URL, so every user is logged out.
 
 ## 6. Check the env before a deploy
 
-You want to find a missing key before the deploy, not after it. `dox env:check` loads `AppEnv` with the real environment and `.env`, and prints every missing or bad key. If there is a problem, it exits with code 1, so CI stops.
+`dox env:check` prints every missing or bad key. On a problem it exits with code 1, so CI stops:
 
 ```bash
 dox env:check
@@ -247,26 +252,22 @@ Now start it as staging on another port. The real variables win over `.env`:
 APP_ENV=staging APP_PORT=4000 dart run bin/server.dart
 ```
 
-The app listens on `4000`. `env.appEnv` is `'staging'`, and `appConfig.isDevelopment` is `false`.
+The app listens on port 4000. `env.appEnv` is staging, and `appConfig.isDevelopment` is false.
 
 ## Things that differ per environment
 
-These are the settings that most apps change between environments:
+Most apps change these settings between environments:
 
 | Setting | Development | Staging and production |
 | --- | --- | --- |
-| `prettyPrint` of the logger | `true` | `false` (one JSON line per log) |
-| `debug` of the database | `true` | `false` |
-| `totalIsolate` | `1` or `2` is enough | one per core (the default) |
+| `prettyPrint` of the logger | true | false (one JSON line per log) |
+| `debug` of the database | true | false |
+| `totalIsolate` | 1 or 2 is enough | one per core (the default) |
 | `CORS_ORIGIN` | `http://localhost:5173` | the real front-end URL |
 | the server | `dox serve` (JIT) | the `dox build` binary (AOT) |
 
-## Details
+## Next steps
 
-- "Development" means an `APP_ENV` of `development`, `local`, `test` or `testing`. Any other value, or no value, counts as production.
-
-## See also
-
-- [Environment variables](../digging-deeper/env.md) for all types and rules of the typed env class
-- [Docker](docker.md)
-- [Deployment](../digging-deeper/deployment.md)
+- [Environment variables](../digging-deeper/env.md): all the types and rules of the env class.
+- [Docker](docker.md): set the env in a container.
+- [Deployment](../digging-deeper/deployment.md): run the app on a server.

@@ -6,7 +6,7 @@ icon: lucide/timer
 
 `RateLimit` is a middleware that stops a client that sends too many requests.
 
-You should use it on login, sign up and other routes that bots like to hammer.
+Use it on login, sign up and other routes that bots attack.
 
 ## Limiting a route
 
@@ -19,7 +19,7 @@ Route.post('/auth/login', <dynamic>[
 ]);
 ```
 
-Now each client (by ip) can send 5 login requests per minute. The 6th request gets a `429`:
+Each client ip can now send 5 login requests per minute. The 6th request gets 429:
 
 ```text
 HTTP/1.1 429 Too Many Requests
@@ -30,11 +30,11 @@ X-RateLimit-Remaining: 0
 {"code":"too_many_requests","message":"Too Many Requests"}
 ```
 
-`Retry-After` is the number of seconds until the client can try again. Every answer, also a normal one, has the `X-RateLimit-Limit` and `X-RateLimit-Remaining` headers. The error goes through your exception handler, so it has the same JSON shape as your other errors.
+`Retry-After` is the number of seconds until the client can try again. Every answer has the `X-RateLimit-Limit` and `X-RateLimit-Remaining` headers. A blocked request also counts, so a client that keeps sending stays blocked.
 
 ## Limiting every route
 
-To limit all routes, put it in `globalMiddleware`:
+Put it in `globalMiddleware`:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -47,7 +47,7 @@ AppConfig appConfig = AppConfig(
 
 ## Counting by user
 
-By default each ip has its own count. Sometimes you want to count per user instead. Give a `key` function, which returns any `String`. For example, count by user id after `AuthMiddleware`:
+Each ip has its own count. To count by another value, give a `key` function that returns a string, like the user id after `AuthMiddleware`:
 
 ```dart
 Route.get('/reports', <dynamic>[
@@ -60,11 +60,12 @@ Route.get('/reports', <dynamic>[
 ]);
 ```
 
-Do not count by a raw header, like `req.header('X-Api-Key')`. A client can send a new value with each request and get a new count each time. Count by a value that you checked first, like the id of the logged in user.
+!!! warning
+    Do not count by a raw header, like `req.header('X-Api-Key')`. A client can send a new value each time and get a new count. Count by a value that you checked.
 
 ## Two limits with the same settings
 
-Two `RateLimit` with the same `max` and `per` share one count for the same client. If you want separate counts, give each one a `name`:
+Two limits with the same `max` and `per` share one count for a client. To keep the counts separate, give each one a `name`:
 
 ```dart
 Route.post('/auth/login', <dynamic>[
@@ -79,13 +80,11 @@ Route.post('/auth/register', <dynamic>[
 
 ## Behind a proxy
 
-Behind Caddy, nginx or a load balancer, every request comes from the proxy ip, so all clients share one count. Add the proxy to `AppConfig.trustedProxies`, so `req.ip()` is the real client ip. See [App config](../reference/app-config.md).
+Behind Caddy, nginx or a load balancer, all clients come from the proxy ip and share one count. Add the proxy to `AppConfig.trustedProxies`, so `req.ip()` is the real client ip. See [App config](../reference/app-config.md).
 
 ## IPv6 clients
 
-A home or a server with IPv6 often gets a whole /64 block. That is 2^64 addresses. By default each address has its own count, so such a client can send from a new address each time and never hit the limit.
-
-Turn on `rateLimitIpv6Prefix` in `CoreFlags` to count each IPv6 client by its /64 prefix:
+An IPv6 client often has a full /64 block, so it can send from a new address each time. Turn on `rateLimitIpv6Prefix` to count each IPv6 client by its /64 prefix:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
@@ -94,42 +93,32 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-All clients in one /64 then share one count. An IPv4 address stays as it is. A `key` function you give is used as it is. To use the same rule in your own key, call `RateLimit.ipBucket(req.ip())`.
+An IPv4 address stays as it is. Your own `key` function does not change. To use the same rule in it, call `RateLimit.ipBucket(req.ip())`.
 
 ## Where the counts live
 
-When the default [cache](../digging-deeper/cache.md) store is Redis, the counts are in Redis, so all isolates and all servers share them. Use this when you run more than one server. To set a command timeout or other Redis options, see [Redis options](../digging-deeper/cache.md#redis-options).
+When the default [cache](../digging-deeper/cache.md) store is Redis, the counts are in Redis, and all servers share them. For Redis options, see [Redis options](../digging-deeper/cache.md#redis-options).
 
-With any other default store, the counts are kept in the main isolate of each server. All isolates of one server share them, but each server has its own counts. So with 3 servers, a client can send up to 3 times `max`.
-
-To use a store by name, pass `store`:
+With any other default store, each server keeps its counts in its main isolate. So with 3 servers, a client can send up to 3 times `max`. To use a store by name, give `store`:
 
 ```dart
 RateLimit(max: 10, store: 'redis')
 ```
 
+In a test, give a ready store with `cacheStore`.
+
 ## Sliding window
 
-By default the count starts at 0 at the start of each window. So a client can send `max` requests at the end of one minute, and `max` more at the start of the next. That is fine for most apps.
-
-If you want to stop this burst, set `sliding: true`:
+By default the count starts at 0 in each window. So a client can send `max` requests at the end of one minute and `max` more at the start of the next. To stop this burst, set `sliding: true`:
 
 ```dart
 RateLimit(max: 5, per: Duration(minutes: 1), sliding: true)
 ```
 
-The count is then the count of this window, plus a part of the window before. That part gets smaller as the window goes on. It costs one more read per request.
+The count is then the count of this window plus a part of the window before. It costs one more read per request.
 
-## Details
+## Next steps
 
-- A blocked request still counts, so a client that keeps sending while it is blocked stays blocked.
-- In the main isolate mode, each limited request sends one small message to the main isolate.
-- In the main isolate mode, the counter keeps at most 100,000 clients (about 15 MB). When it is full, it first drops the expired counts, then the oldest ones. A dropped client starts again at 0. New clients are never turned away, so a flood of fake clients can not lock out real users.
-- A `memory` store named in `store` also counts in the main isolate. A store passed in `cacheStore` is used as it is.
-- Sliding window example: 4 requests last minute, 1 this minute, 15 seconds in: the count is `4 x 45/60 + 1 = 4`. `X-RateLimit-Remaining` is `max` minus this count, rounded up. Each count is kept for 2 windows.
-
-## See also
-
-- [Middleware](../the-basic/middleware.md)
-- [Security headers](security-headers.md)
-- [Production checklist](../reference/production-checklist.md)
+- [Middleware](../the-basic/middleware.md): add middleware to routes.
+- [Security headers](security-headers.md): safe headers on every answer.
+- [Production checklist](../reference/production-checklist.md): what to set before you go live.

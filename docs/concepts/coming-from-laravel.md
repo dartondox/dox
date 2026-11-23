@@ -6,7 +6,7 @@ icon: lucide/arrow-right-left
 
 This page shows the Laravel way and the Dox way side by side, so a Laravel developer can find the Dox name for each thing.
 
-Most ideas have the same name in Dox. The Laravel code here is Laravel 11. If you only read one part, read [What is different](#what-is-different).
+Most ideas have the same name in Dox. The Laravel code here is Laravel 11. For the big changes, read [What is different](#what-is-different).
 
 ## Routing
 
@@ -73,6 +73,8 @@ The container is generated code, not reflection. See [Dependency injection](../t
 | `php artisan make:middleware Logger` | `dox make:middleware Logger` |
 | `public function handle(Request $request, Closure $next)` | `dynamic handle(IDoxRequest req)` |
 | `return $next($request);` | `return req;` |
+| `$response = $next($request);` | `DoxResponse res = await next();` in an `IDoxNextMiddleware` |
+| `terminate($request, $response)` | `IDoxTerminableMiddleware` |
 | `return response('no', 401);` | `return response('no').statusCode(401);` |
 | `abort(404);` | `abort(404);` |
 | `$middleware->append(LogMiddleware::class)` in `bootstrap/app.php` | `AppConfig(globalMiddleware: <dynamic>[LogMiddleware()])` |
@@ -87,9 +89,7 @@ class LoggerMiddleware implements IDoxMiddleware {
 }
 ```
 
-A plain function `dynamic apiKey(DoxRequest req)` also works as middleware.
-
-Dox middleware runs only before the controller. There is no "after" step. If you want to change every response, use a `responseHandler`.
+A plain function also works as middleware. See [Middleware](../the-basic/middleware.md#run-code-after-the-controller) for code that runs after the controller.
 
 ## Requests and validation
 
@@ -407,7 +407,7 @@ For web pages, a guard with `SessionAuthDriver` keeps the login in the session c
 | `Cache::store('redis')` | `Cache().store('redis')` |
 | `Cache::tags(['a'])` | `Cache().tags(<String>['a'])` |
 | `Cache::lock('k', 10)` | `Cache().lock('k', Duration(seconds: 10))` |
-| drivers: file, redis, memcached, database, array | drivers: `file`, `redis`, `memory`, `null` |
+| drivers: file, redis, memcached, database, array | drivers: file, redis, memory, database (`dox_cache_database`), null |
 
 A value must be a JSON type. The `memory` store is per isolate. See [Cache](../digging-deeper/cache.md).
 
@@ -436,9 +436,9 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 
 Three things are different from Laravel:
 
-- On a local disk, `setVisibility()` changes the file mode only when the disk has `'permissions': true`. Without it, `setVisibility()` does nothing, and `getVisibility()` gives the disk `visibility` (`public` by default). Laravel always runs `chmod`, so in Dox a file you made private is not private on disk until you turn this on.
-- Paths that Dox gives you start with `/`. This is true for `putFile`, `store`, `files`, `allFiles` and `directories`.
-- `put()` returns nothing. `download()` takes `name:` but no headers. For headers, use `response(await Storage().download(path)).header('Cache-Control', 'no-store')`.
+- On a local disk, `setVisibility()` changes the file mode only when the disk has `'permissions': true`. Without it, a private file is not private on the disk.
+- Paths that Dox gives you start with `/`, for example from `putFile`, `store` and `files`.
+- `put()` returns nothing, and `download()` takes no headers. For headers, wrap it in `response(...)` and add `.header(...)`.
 
 See [File Storage](../digging-deeper/file-storage.md).
 
@@ -471,21 +471,14 @@ Dox has no fake HTTP kernel. Instead, `DoxTestClient.start(appConfig)` starts th
 
 ## What is different
 
-- **A generated container.** Like Laravel, Dox makes your controllers and injects what the constructor asks for.
-  You add `@Inject()` to the class. `build_runner` writes `lib/generated/container.g.dart` with every registration. You do not register classes by hand in a provider.
-  A singleton is one instance per isolate, not one per request.
-- **Isolates, not PHP-FPM workers.** One process runs one isolate per CPU core. Each isolate runs your whole app and has its own memory.
-  A static value or a singleton lives once per isolate. A PHP worker starts from zero on each request. A Dox isolate keeps its state between requests, so a memory leak stays.
-  Anything that must be shared goes to the database, Redis or files. See [How Dox works](how-dox-works.md#isolates).
-- **Code generation, not reflection.** Laravel reads your classes at run time. Dart has no usable reflection in a compiled app.
-  So `build_runner` with `dox_builder` writes the model code, the DTO checks, the env class and the OpenAPI docs into `.g.dart` files.
-  Run `dox build_runner:build` after a change, or let `dox serve` watch for you.
-- **One native binary.** `dox build` makes an AOT binary in `build/bundle`. There is no interpreter, no `vendor/` folder and no `composer install` on the server.
-  The Docker image is about 11 MB.
-- **A native HTTP server and native database drivers.** Rust parses HTTP and talks to Postgres and MySQL. Your code stays in Dart. They come ready-built, so you do not need Rust.
-- **Types everywhere.** A DTO is a class with typed fields. A path param is an `int`. A model field is a `String?`. The compiler finds many mistakes before you run the app.
-- **Async is explicit.** Database calls return a `Future`. You write `await`. One isolate serves many requests at the same time while it waits for the database.
-- **JSON API first.** Dox returns text, JSON, files and streams. For HTML pages, add [views](../the-basic/views.md) (`dox_view`) or [Inertia](../the-basic/inertia.md) (`dox_inertia`).
+- A generated container. You add `@Inject()` to a class, and build_runner writes the registrations in `lib/generated/container.g.dart`. A singleton is one instance per isolate.
+- Isolates, not PHP-FPM workers. One process runs one isolate per CPU core, and each isolate keeps its state between requests. Data that must be shared goes to the database, Redis or files. See [How Dox works](how-dox-works.md#isolates).
+- Code generation, not reflection. build_runner writes the model code, the DTO checks, the env class and the OpenAPI docs. Run `dox build_runner:build` after a change, or let `dox serve` watch.
+- One native binary. `dox build` makes an AOT binary in `build/bundle`, with no vendor folder on the server. The Docker image is approximately 11 MB.
+- A native HTTP server and native database drivers, written in Rust. They come ready-built, so you do not need Rust.
+- Types everywhere. A DTO has typed fields, a path param is an integer, and the compiler finds many mistakes.
+- Explicit async. Database calls return a `Future`, and one isolate serves many requests while it waits.
+- JSON API first. For HTML pages, add [views](../the-basic/views.md) or [Inertia](../the-basic/inertia.md).
 
 ## What is missing today
 
@@ -496,8 +489,8 @@ Dox does not have these Laravel features yet:
 
 See [What Dox does not have yet](status-and-roadmap.md#what-dox-does-not-have-yet) for what to use today.
 
-What is there, as separate packages: [validation](../packages/validation.md), [OpenAPI docs](../packages/openapi.md),
-[storage](../packages/storage.md), [cache](../packages/cache.md), [Socket.IO](../packages/socketio.md),
-[auth](../security/authentication.md), [queues](../digging-deeper/queue.md), the [scheduler](../digging-deeper/scheduler.md),
-[mail](../digging-deeper/mail.md), [views](../the-basic/views.md) and [Inertia](../the-basic/inertia.md).
-[Sessions](../the-basic/session.md) are in `dox_core`.
+## Next steps
+
+- [Installation](../getting-started/installation.md): make your first Dox app.
+- [How Dox works](how-dox-works.md): the life of a request and isolates.
+- [Build a blog API](../tutorial/index.md): a full app, step by step.

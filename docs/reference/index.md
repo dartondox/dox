@@ -1,6 +1,6 @@
 # Reference
 
-These are short pages to look things up: config fields, commands, env vars, errors and more.
+These pages are lists to look up config fields, commands, env vars, errors and more.
 
 | Page | What is on it |
 | --- | --- |
@@ -11,6 +11,11 @@ These are short pages to look things up: config fields, commands, env vars, erro
 | [Request and response](request-and-response.md) | the members of `DoxRequest`, `DoxResponse` and `response()` |
 | [Troubleshooting](troubleshooting.md) | known problems, the exact error text, the cause and the fix |
 | [Cheat sheet](cheat-sheet.md) | one page of the code you use every day, with links to the full pages |
-| [Production checklist](production-checklist.md) | what to check before you deploy, and what Dox does not do for you |
-| [Error index](errors.md) | every message Dox prints or throws, when it happens and what to do |
+| [Production checklist](production-checklist.md) | what to check before you deploy |
+| [Error index](errors.md) | each message that Dox shows or throws, when it occurs and what to do |
 | [Changelog](changelog.md) | what changed in `dox_core`, newest first |
+
+## Next steps
+
+- [Cheat sheet](cheat-sheet.md): the code you use each day.
+- [Build a blog API](../tutorial/index.md): a full app, step by step.

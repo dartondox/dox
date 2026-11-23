@@ -4,21 +4,144 @@ icon: lucide/server
 
 # Native server
 
-Dox runs on a native HTTP server from the package `dox_http_native`.
+Dox runs on a native HTTP server from the package `dox_http_native`: Rust owns the sockets and parses HTTP, and all your code stays in Dart.
 
-You do not need to set anything. Every app uses it, also an app with WebSocket or Socket.IO routes. Rust owns the sockets and parses HTTP, but all your code stays in Dart: routes, controllers, DTOs, middleware and the ORM. It gets about 5 times more requests than the `dart:io` server on one or two cores. See [Performance](performance.md).
+## Setup
 
-You do not need Rust. The package downloads a ready-built library for your system when you build the app.
+Every Dox app uses the native server, and you do not need Rust. The package gets a ready-built library for your system when you build the app. See [Performance](performance.md) for the numbers.
 
-## Using it without Dox
+Build with `dox build` or `dart build cli`. `dart compile exe` does not run build hooks, so the app has no library. See [Deployment](deployment.md).
 
-`dox_http_native` also works on its own, in any Dart app. Add the package:
+### Limits
+
+| Limit | Value | Answer |
+| --- | --- | --- |
+| Request line and headers | 16 KB | 431 |
+| Body | `maxBodySize` (10 MB) | 413 |
+| Multipart form | `maxMultipartSize` (100 MB) | 413 |
+| No body bytes for | `bodyTimeout` (120 seconds) | 408 |
+| Request head arrives in | `idleTimeout` (30 seconds) | connection closed |
+| Keep-alive connection with no request | `idleTimeout` (30 seconds) | connection closed |
+| Both `Content-Length` and chunked | - | 400 |
+| Transfer encoding other than chunked | - | 501 |
+
+These are the defaults of `AppConfig`, where you can change them. See [App config](../reference/app-config.md).
+
+## Writing handlers
+
+The server has the same API as the `dart:io` `HttpServer`, so code for `dart:io` keeps working. Each isolate runs the server on its own thread, so a slow synchronous handler blocks all the sockets of its isolate. An `await` gives the isolate back.
+
+## When the library does not load
+
+Dox stops at start and the error says why and how to fix it:
+
+```
+Unsupported operation: dox_http_native did not load: <reason>.
+Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
+```
+
+A reason like `native library ABI 8, expected 9` means the library on disk is from another version of the package. See [Troubleshooting](../reference/troubleshooting.md#the-native-http-library-did-not-load).
+
+## HTTP/2
+
+The native server also speaks HTTP/2 (h2c) on the same port, with `http2: true`. See [HTTP/2](http2.md).
+
+## WebSocket
+
+`NativeWebSocket.upgrade(request)` gives a `dart:io` `WebSocket`. Your route, middleware and the `Origin` check run first, and a normal answer (like 403) refuses the upgrade:
+
+```dart
+if (NativeWebSocket.isUpgradeRequest(request)) {
+  WebSocket socket = await NativeWebSocket.upgrade(request,
+      protocol: 'chat', maxMessageSize: 64 * 1024);
+}
+```
+
+A message over `maxMessageSize` (16 MB by default) closes the socket with code 1009. On a graceful stop, every open socket gets code 1001.
+
+### Finding lost clients
+
+Set `pingInterval` to find clients that vanished with no close, like a phone that lost its network. When the client stays quiet for two intervals, the socket closes with 1001:
+
+```dart
+socket.pingInterval = Duration(seconds: 30);
+```
+
+## Streaming a response
+
+Write with `add()` and call `flush()`. The first `flush()` sends the status, the headers and the bytes so far:
+
+```dart
+import 'dart:convert';
+import 'dart:io';
+
+server.listen((HttpRequest req) async {
+  req.response.headers.contentType = ContentType('text', 'event-stream');
+  req.response.add(utf8.encode('data: hello\n\n'));
+  await req.response.flush();
+});
+```
+
+A streamed response with a `contentLength` must send exactly that many bytes, or `add()` or `close()` fails.
+
+### Checking the response state
+
+Cast `req.response` to `NativeResponse` to read its state. `headSent` is true when the status and headers went out, so no error page can go out after it. `isGone` is true when the client left, and `gone` completes when it leaves:
+
+```dart
+NativeResponse res = req.response as NativeResponse;
+bool sent = res.headSent;
+bool left = res.isGone;
+await Future.any(<Future<void>>[res.gone, res.done]);
+```
+
+`gone` never completes for a response that ends normally, so always race it against `done` or a timeout.
+
+## Security notes
+
+- On the internet, run the app behind a reverse proxy like Caddy or nginx. The proxy does HTTPS and buffers slow clients.
+- Set `maxConnections` when the app port is open to the internet.
+- Another process of the same OS user can bind the same port. Do not run untrusted code as the user of the app.
+- `req.uri` resolves `..` in the path. Never build a file path from the raw path. Use the storage helpers.
+
+## Where the library comes from
+
+The build hook of `dox_http_native` uses the first one that works:
+
+1. A path in the root `pubspec.yaml` of your app:
+
+    ```yaml
+    hooks:
+      user_defines:
+        dox_http_native:
+          lib_path: /path/to/libdox_http_native.so
+    ```
+
+2. A local build in `native/target/release` of the package.
+3. The ready-built library from the GitHub release, checked with sha256. There are builds for macOS (arm64, x64), Linux (x64, arm64) and Windows (x64).
+4. A build from source with `cargo`, when Rust is installed.
+
+For a git or path dependency, step 4 comes before step 3. When none works, the app stops at start with the error above.
+
+## How it works
+
+The server runs on the thread of the isolate, in a loop:
+
+1. Dart calls Rust (one FFI call).
+2. Rust writes the answers of the last batch, reads the sockets and parses the new requests. It gives them back to Dart as one batch.
+3. Dart runs your handlers and calls Rust again with their answers.
+
+When the isolate has nothing to do, a small helper thread watches the sockets and wakes it. The OS spreads connections, not requests, between the [isolates](isolate.md). So a few busy connections (like from one proxy) can keep some isolates idle. Use more connections than isolates.
+
+## Without Dox
+
+`dox_http_native` also works on its own, in any Dart app:
 
 ```bash
 dart pub add dox_http_native
 ```
 
-Then bind a server and listen for requests. The API is the same as the `dart:io` `HttpServer`:
+Bind a server and listen for requests, like with the `dart:io` `HttpServer`:
 
 ```dart
 import 'dart:io';
@@ -34,113 +157,47 @@ Future<void> main() async {
 }
 ```
 
-With no address, the server listens on all interfaces. To listen on one host, pass `address`:
+With no address, the server listens on all interfaces. These are the options of `bind`:
 
 ```dart
-NativeHttpServer.bind(3000, address: '127.0.0.1');
+NativeHttpServer.bind(
+  3000,
+  address: '127.0.0.1',
+  maxConnections: 10000, // no limit by default
+  maxBodySize: 10 * 1024 * 1024,
+  maxMultipartSize: 50 * 1024 * 1024,
+  bodyTimeout: Duration(seconds: 120),
+  idleTimeout: Duration(seconds: 30),
+  http2: true, // see HTTP/2
+);
 ```
 
-If the port is open to the internet, set `maxConnections`. At the limit, the server stops accepting new connections until one closes. There is no limit by default:
+At `maxConnections`, the server stops accepting until a connection closes. Behind a load balancer, set `idleTimeout` longer than the idle timeout of the balancer, or clients can get 502.
+
+### Checking the library
+
+`NativeHttpServer.isAvailable` is true when the native library loads. `loadError` says why it did not, and `ensureAvailable()` throws that error:
 
 ```dart
-NativeHttpServer.bind(3000, maxConnections: 10000);
+if (!NativeHttpServer.isAvailable) print(NativeHttpServer.loadError);
 ```
 
-`close()` waits for open requests. `close(force: true)` closes every connection at once.
+### Stopping the server
 
-The rest of this page is the same with or without Dox.
-
-## Writing handlers
-
-Because the server has the same API as `dart:io`, `req.httpRequest`, `HttpResponse` and code written for `dart:io` keep working.
-
-Each isolate runs the server on its own thread. So a slow synchronous handler holds all the sockets of its isolate until it is done. `await` is fine, because it gives the isolate back.
-
-## When the library does not load
-
-If the native library can not load, Dox stops at start, before any isolate runs. The error says why and how to fix it:
-
-```
-Unsupported operation: dox_http_native did not load: <reason>.
-Fix: install Rust (cargo, see https://rustup.rs), then run the app again ...
-```
-
-`<reason>` is for example `native library ABI 8, expected 9`. This means the library on disk is from another version of the package. See [Troubleshooting](../reference/troubleshooting.md#the-native-http-library-did-not-load).
-
-You must build with `dox build` or `dart build cli`, because `dart compile exe` does not run build hooks, so it has no library. See [Deployment](deployment.md).
-
-## HTTP/2
-
-The native server also speaks HTTP/2 (h2c) on the same port, when you turn it on with `http2: true`. See [HTTP/2](http2.md).
-
-## WebSocket
-
-Rust also does the WebSocket upgrade and the WebSocket protocol. Your route, middleware and the `Origin` check run first, like for any request. If they give a normal answer (like `403`), the upgrade is refused.
-
-In your own code, use `NativeWebSocket.upgrade(request)`. It gives a `dart:io` `WebSocket`:
+`close()` waits for open requests. `close(force: true)` closes every connection at once. `isOpen` is false after the close:
 
 ```dart
-WebSocket socket = await NativeWebSocket.upgrade(request);
+await server.close();
 ```
 
-A message over the size limit closes the socket with code `1009`. Set the limit with `maxMessageSize` of `NativeWebSocket.upgrade`. Socket.IO uses `maxHttpBufferSize`.
+### Encrypting with AES-GCM
 
-To find clients that vanished with no close (like a phone that lost its network), set `pingInterval`. When the client sent nothing for that long, the server sends a ping. When it still sends nothing for one more interval, the socket closes with `1001`. It is off by default:
+`AesGcm` does AES-256-GCM in Rust. Dox uses it for encrypted cookies. The key is 32 bytes, and `open` gives null when the data or the `aad` is wrong:
 
 ```dart
-socket.pingInterval = Duration(seconds: 30);
+Uint8List sealed = AesGcm.seal(key, plain, aad);
+Uint8List? plain2 = AesGcm.open(key, sealed, aad);
 ```
-
-On a graceful stop (SIGTERM), every open WebSocket gets close code `1001`.
-
-## Streaming a response
-
-To send a body in parts, like server-sent events, write with `add()` and call `flush()`. The first `flush()` sends the status, the headers and the bytes so far. Later writes go out at once:
-
-```dart
-import 'dart:convert';
-import 'dart:io';
-
-server.listen((HttpRequest req) async {
-  req.response.headers.contentType = ContentType('text', 'event-stream');
-  req.response.add(utf8.encode('data: hello\n\n'));
-  await req.response.flush();
-});
-```
-
-`NativeResponse.headSent` is `true` once the status and headers went out. After that, an error page can not be sent any more. The response can only end. `req.response` is an `HttpResponse`, so cast it to read the flag:
-
-```dart
-bool sent = (req.response as NativeResponse).headSent;
-```
-
-## Security notes
-
-- On the internet, run it behind a reverse proxy like Caddy or nginx. The proxy does HTTPS, buffers slow clients and caps connections.
-- Set `maxConnections` when the app port is open to the internet.
-- Another process of the same OS user can bind the same port. So do not run untrusted code as the user of the app.
-- `req.uri` resolves `..` in the path. Never build a file path from the raw path. Use the storage helpers.
-
-## Where the library comes from
-
-The build hook of `dox_http_native` (`hook/build.dart`) picks the first one that works:
-
-1. A path you give in the root `pubspec.yaml` of your app:
-
-    ```yaml
-    hooks:
-      user_defines:
-        dox_http_native:
-          lib_path: /path/to/libdox_http_native.so
-    ```
-
-2. A local build in `native/target/release` of the package (for work on the package itself).
-3. The ready-built library from the GitHub release, checked with sha256. There are builds for macOS (arm64, x64), Linux (x64, arm64) and Windows (x64).
-4. A build from source with `cargo`, when Rust is installed.
-
-For a git or path dependency, step 4 comes before step 3, because the source can be newer than the release.
-
-When none works, the app still builds, but it stops at start with the error above. Install Rust and run it again, so step 4 works.
 
 ## Working on the native code
 
@@ -153,37 +210,10 @@ cargo test
 cd .. && dart test --concurrency=1
 ```
 
-To use your local copy in the Dox repo, or to release the package, see [Contribute](../community/contribute.md#native-packages).
+To use your local copy in the Dox repo, see [Contribute](../community/contribute.md#native-packages).
 
-## Details
+## Next steps
 
-### How it works
-
-The server runs on the thread of the isolate, in a loop:
-
-1. Dart calls Rust (one FFI call).
-2. Rust writes the answers of the last batch, reads the sockets and parses the new requests. It gives them back to Dart as one batch.
-3. Dart runs your handlers and calls Rust again with their answers.
-
-- Under load there is no other thread, so a request never waits for a thread to wake up. When the isolate has nothing to do, a small helper thread watches the sockets and wakes the isolate once when a request comes.
-- A second helper thread does gzip, only with `compress: true`. Under load both helper threads sleep.
-- The loop gives the event loop a turn after a few batches, so timers and database answers still run on time.
-- Each isolate runs its own server on the same port. See [Isolate](isolate.md). The OS spreads connections, not requests, so a keep-alive connection stays on one isolate. A few busy connections (like from one proxy) can keep some isolates idle, so use more connections than isolates.
-- WebSocket: Rust sends the `101` answer, answers pings, does the close handshake, checks that text is UTF-8 and checks the size of each frame. Dart gets whole messages in the same batches as requests.
-- Compression (permessage-deflate) is never agreed, because a small compressed message could grow very big in memory.
-
-### Limits
-
-- The request line plus headers can be at most 16 KB. Bigger gets `431`. A bad request gets `400`.
-- A multipart form over `maxMultipartSize`, or any other body over `maxBodySize`, gets `413` from Rust. With `Expect: 100-continue`, the `413` comes before the body is sent. Else Rust reads and drops the body first, so the client sees the `413`.
-- A client that sends no body bytes for 120 seconds gets `408`. A slow but steady upload is fine.
-- Accepted sockets get TCP keep-alive. After 60 seconds with no traffic, the OS checks the client every 10 seconds, and a client that misses 6 checks (about 2 minutes) is closed. A live client always answers.
-- A client that closed its side while the handler has not answered is closed when nothing was written for `idleTimeout` (30 seconds by default). Set it with the `idleTimeout` argument of `NativeHttpServer.bind`. In a Dox app, set `AppConfig.idleTimeout`.
-- A request head must arrive within 30 seconds. A keep-alive connection with no request for 30 seconds is closed. A client that does not read its answer for 30 seconds is cut off.
-- A request with both `Content-Length` and `Transfer-Encoding: chunked` gets `400`. A transfer encoding other than `chunked` gets `501`.
-- At most 64 requests of one connection wait for an answer, and at most 1 MB of answers waits to be sent. Then the server stops reading that connection until the answers go out.
-- A streamed response with a `contentLength` must send exactly that many bytes. `add()` throws when the body passes it, and `close()` fails when it is shorter.
-- A streamed response over 64 KB goes out in parts, and at most 1 MB of it waits in memory. Dart reads more of a file only when the client has read what was sent, and stops when the client leaves.
-- A request body of 64 KB or more goes to Dart without a copy.
-- `compress: true` in `AppConfig` gzips on a helper thread. A streamed response is not compressed.
-- WebSocket: one turn reads at most 256 KB of one socket, so one busy client can not hold the isolate. While more than 256 KB waits to be sent to a client, the server stops reading its frames.
+- [HTTP/2](http2.md): turn on HTTP/2.
+- [Performance](performance.md): the benchmark numbers.
+- [Isolate](isolate.md): one server per CPU core.

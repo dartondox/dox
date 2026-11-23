@@ -6,19 +6,15 @@ icon: lucide/arrow-up-from-line
 
 A controller returns a value, and Dox turns it into the response for the client.
 
-Most of the time you just return a string, a map or a model. When you need to set the status, headers or cookies, use the `response()` helper.
-
 ## Return a value
 
-Return the value from your controller. Dox sends a `String` as text, and a `Map` or a model as JSON:
+Return the value from your controller. Dox sends a string as text, and a map or a model as JSON:
 
 ```dart
-// JSON
 Map<String, String> hello(DoxRequest req) {
   return <String, String>{'message': 'hello world!'};
 }
 
-// a model
 Future<Blog?> show(int id) async {
   return Blog().find(id);
 }
@@ -32,84 +28,98 @@ This is what the client gets for each type:
 | a `Map` or a `List` | JSON |
 | a model, a list of models, a [serializer](serializer.md) | JSON (from `toJson()`) |
 | a `DateTime` | the ISO 8601 text |
-| an `IHttpException`, like `NotFoundHttpException()` | its status code and JSON: `{"code": ..., "message": ...}`, or a `Map` message as it is |
+| an `IHttpException`, like `NotFoundHttpException()` | its status code and JSON: `{"code": ..., "message": ...}` |
 | a `File` (from `dart:io`) | the file, streamed |
 | a `Stream<List<int>>` | the bytes, streamed |
-| `StreamFile`, `DownloadableFile` (also from `Storage()` of `dox_storage`) | the file, streamed |
+| a `StreamFile` or a `DownloadableFile` | the file, streamed |
 | `response(...)` | full control: status, headers, cookies |
+
+The `htmlStrings` flag sends a string as HTML. See [Core flags](../reference/app-config.md#core-flags).
 
 ## Errors
 
-To answer with an error, throw or return an exception:
+Throw or return an exception to answer with an error:
 
 ```dart
 throw NotFoundHttpException(message: 'Blog not found');
 ```
 
-The client gets `404` with `{"code":"not_found","message":"Blog not found"}`. Each exception takes `message:`, `errorCode:` and `code:`. `code` in the JSON is the `errorCode`. A `Map` message is sent as it is.
-
-Dox has these exceptions:
+The client gets 404 with `{"code":"not_found","message":"Blog not found"}`. Each exception takes `message:` and `errorCode:`. A map message is sent as it is.
 
 | Exception | Status |
 | --- | --- |
-| `BadRequestException()` | `400` |
-| `NotFoundHttpException()` | `404` |
-| `PayloadTooLargeException()` | `413` |
-| `UnsupportedMediaTypeException()` | `415` |
-| `TokenMismatchException()` | `419` |
-| `ValidationException()` | `422` |
-| `TooManyRequestsException()` | `429` |
-| `InternalErrorException()` | `500` |
+| `BadRequestException()` | 400 |
+| `ForbiddenHttpException()` | 403 |
+| `NotFoundHttpException()` | 404 |
+| `MethodNotAllowedHttpException(allow)` | 405 |
+| `PayloadTooLargeException()` | 413 |
+| `UnsupportedMediaTypeException()` | 415 |
+| `TokenMismatchException()` | 419 |
+| `ValidationException()` | 422 |
+| `TooManyRequestsException()` | 429 |
+| `InternalErrorException()` | 500 |
+| `QueryException()` | 500 |
 
-If you need another status, extend `IHttpException`:
+See [HTTP exceptions](../reference/http-exceptions.md) for all of them.
+
+### Any status
+
+Stop the request with any status, an optional message and headers:
 
 ```dart
-import 'dart:io';
+if (post.userId != req.auth?.id()) abort(403);
+throw HttpStatusException(503,
+    headers: <String, String>{'retry-after': '60'});
+```
 
-import 'package:dox_core/dox_core.dart';
+### Your own exception
 
-class ForbiddenException extends IHttpException {
-  ForbiddenException({String message = 'Forbidden'}) {
-    super.code = HttpStatus.forbidden;
-    super.errorCode = 'forbidden';
+Extend `IHttpException`:
+
+```dart
+class PaymentRequiredException extends IHttpException {
+  PaymentRequiredException({String message = 'Payment required'}) {
+    super.code = HttpStatus.paymentRequired;
+    super.errorCode = 'payment_required';
     super.message = message;
   }
 }
 ```
 
-Any other error gets `500`. It is also passed to the [exception handler](errors.md).
+Any other error gets 500, and goes to the [exception handler](errors.md).
 
 ## Files and big responses
 
-Return a `File` or a `Stream<List<int>>` to send a file. Dox sends it in chunks, so it does not load it all into memory:
+Return a `File` or a `Stream<List<int>>` to send a file. Dox sends it in chunks:
 
 ```dart
-import 'dart:io';
-
-// a file from disk
 Route.get('/video', (DoxRequest req) => File('storage/video.mp4'));
 ```
 
-A `File` gets the right `Content-Type`, `Content-Length` and `Accept-Ranges`. It also answers `Range` requests with `206 Partial Content`, so video players can seek and downloads can resume.
+A file gets the right `Content-Type` and `Content-Length`. It also answers Range requests with 206, so video players can seek and downloads can resume.
+
+### A stream with a type
+
+Send a stream with its content type, or as a download with a file name:
+
+```dart
+return StreamFile(ContentType.parse('image/png'), bytes, length: size);
+return DownloadableFile(ContentType.binary, bytes, 'report.pdf');
+```
 
 ### Files from storage
 
-If you use [File Storage](../digging-deeper/file-storage.md), return `Storage().download()` to make the browser save the file. It sends `Content-Disposition`:
+Make the browser save a file from [File Storage](../digging-deeper/file-storage.md):
 
 ```dart
-import 'package:dox_storage/dox_storage.dart';
-
-// a download from Storage
 Future<DownloadableFile> download(DoxRequest req) async {
-  // sends Content-Disposition, so the browser saves the file
   return Storage().download('report.pdf');
 }
 ```
 
-To show the file in the browser instead, return `Storage().stream()`:
+Show the file in the browser:
 
 ```dart
-// a stream from Storage
 Future<StreamFile> show(DoxRequest req) async {
   return Storage().stream('photo.jpg');
 }
@@ -117,13 +127,9 @@ Future<StreamFile> show(DoxRequest req) async {
 
 ## The `response()` helper
 
-Use `response(content)` when you need to set the status, headers or cookies. All methods return the response, so you can chain them:
+Set the status, headers or cookies. All methods return the response, so you can chain them:
 
 ```dart
-import 'dart:io';
-
-import 'package:dox_core/dox_core.dart';
-
 DoxResponse store(DoxRequest req) {
   return response(<String, String>{'status': 'created'})
       .statusCode(201)
@@ -134,7 +140,7 @@ DoxResponse store(DoxRequest req) {
 
 ### Setting the status
 
-`statusCode` sets the status code. The default is `200`:
+Set the status code. The default is 200:
 
 ```dart
 response(data).statusCode(201);
@@ -142,21 +148,22 @@ response(data).statusCode(201);
 
 ### Setting headers
 
-`header` sets one header. If a middleware already put the same header on the response, the old value stays and this one is added. Pass `replace: true` to replace it:
+Set one header. If a middleware already set it, the new value is added. Pass `replace: true` to replace it:
 
 ```dart
 response(data).header('X-Key', 'value');
-
 response(data).header('X-Key', 'value', replace: true);
 ```
 
-`withHeaders` adds many headers. A key replaces the header with the same name, in any case. Other headers stay:
+The `replaceHeaders` flag makes `header` replace by default. See [Core flags](../reference/app-config.md#core-flags).
+
+Set many headers. Each key replaces the header with the same name:
 
 ```dart
 response(data).withHeaders(<String, String>{'X-One': '1', 'X-Two': '2'});
 ```
 
-`contentType` sets `Content-Type`. `ContentType` is from `dart:io`:
+Set the content type. `ContentType` is from `dart:io`:
 
 ```dart
 response(html).contentType(ContentType.html);
@@ -164,7 +171,7 @@ response(html).contentType(ContentType.html);
 
 ### Caching
 
-`cache` sets `Cache-Control`. For example, `Duration(minutes: 5)` sends `Cache-Control: max-age=300`:
+Set `Cache-Control`. `Duration(minutes: 5)` sends `max-age=300`:
 
 ```dart
 response(data).cache(Duration(minutes: 5));
@@ -172,90 +179,84 @@ response(data).cache(Duration(minutes: 5));
 
 ### Changing the body
 
-`content` changes the body, and `stream` sends a `Stream<List<int>>` as the body:
+Change the body, or send a byte stream as the body:
 
 ```dart
 response('').content(value);
-
 response('').stream(byteStream);
+```
+
+### Reading the response
+
+Read the body, the status and the headers, for example in a [middleware](middleware.md#run-code-after-the-controller). A null status means 200:
+
+```dart
+res.getContent();
+res.status;
+res.headers;
 ```
 
 ## Redirect
 
-Use `redirect` to send the browser to another page. The status is `302`, unless you pass another one:
+Send the browser to another page. The status is 302 by default:
 
 ```dart
-// 302 to a path
 return redirect('/login');
-
-// another status
 return redirect('/posts', status: 301);
 ```
 
-`back` sends the browser back to the page the request came from (the `Referer` header). When there is no `Referer`, or it points to another host, it goes to `/`. This is useful after a form post:
+Send the browser back to the page of the Referer header, for example after a form post. With no Referer, or one of another host, it goes to the fallback:
 
 ```dart
 return back(req);
+return back(req, fallback: '/home');
 ```
 
-See [Session](session.md#flash-data) for flash messages and errors with a redirect.
+See [Session](session.md#flash-data) for flash messages with a redirect.
 
 ## Cookie
 
-To set a cookie, make a `DoxCookie` and add it with `cookie`:
+Make a `DoxCookie` and add it to the response:
 
 ```dart
 DoxCookie cookie = DoxCookie('theme', 'dark');
 return response('ok').cookie(cookie);
 ```
 
-You can set the cookie options too:
+Set the cookie options:
 
 ```dart
 DoxCookie token = DoxCookie(
   'token',
   'value',
-  maxAge: Duration(days: 7), // sent as Max-Age in seconds. default 1 hour
+  maxAge: Duration(days: 7), // default 1 hour
   httpOnly: true, // default true: page scripts can not read it
-  secure: true,   // default: Secure only when the request came over https
+  secure: true,   // default: only when the request came over https
   path: '/',
   sameSite: SameSite.lax, // from dart:io. default: none sent
 );
 return response('ok').cookie(token);
 ```
 
-To delete a cookie, pass `setExpire: true`:
+Delete a cookie:
 
 ```dart
 return response('ok').cookie(DoxCookie('token', ''), setExpire: true);
 ```
 
-Dox encrypts the cookie value with `APP_KEY`, and decrypts it when you read it. If the browser or another app must read the value, turn this off with `DoxCookie(key, value, encrypt: false)`. Then read it with `req.cookie(key, decrypt: false)`.
+Dox encrypts the cookie value with `APP_KEY`. If the browser or another app must read it, use `DoxCookie(key, value, encrypt: false)`, and read it with `req.cookie(key, decrypt: false)`. See [Request: cookies](request.md#cookies).
 
-To read a cookie, see [Request: cookies](request.md#cookies).
+To decrypt a raw cookie value with no request, use `DoxCookie.decrypt(name, value)`.
 
 ## Send the response yourself
 
-Some handlers write the raw response, for example a stream with trailers. Call `req.takeOverResponse()` first. Then Dox sends nothing more for the request: not the value you return, not a change of a middleware after `next` (like `ETag`), and not the `responseHandler`:
-
-```dart
-Future<void> handle(DoxRequest req) async {
-  req.takeOverResponse();
-  HttpResponse res = req.httpRequest.response;
-  res.write('done');
-  await res.close();
-}
-```
-
-Your code must end the response. An error after this call is still reported, but Dox does not send an error answer.
+Write the raw response, for example a stream with trailers. See [Request: send the response yourself](request.md#send-the-response-yourself).
 
 ## Change every response
 
-Sometimes you want to change every response in one place, for example to add a header. Set a `responseHandler` in `AppConfig` for this:
+Change every response in one place, for example to add a header. Set a `responseHandler` in `AppConfig`:
 
 ```dart title="lib/app/http/handler.dart"
-import 'package:dox_core/dox_core.dart';
-
 class ResponseHandler extends ResponseHandlerInterface {
   @override
   DoxResponse handle(DoxResponse res) {
@@ -267,11 +268,11 @@ class ResponseHandler extends ResponseHandlerInterface {
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   responseHandler: ResponseHandler(),
-  // ...
 );
 ```
 
-## Details
+## Next steps
 
-- Some flags change this page: `htmlStrings` sends a string as `text/html`, `replaceHeaders` makes `header()` replace, and `cookieDefaults` sends `Path=/` and `SameSite=Lax` when you set no `path` or `sameSite`. See [Core flags](../reference/app-config.md#core-flags).
-- `Storage().stream()` and `Storage().download()` on the local disk also stream the file.
+- [Serializer](serializer.md): set the JSON shape of a response.
+- [Error handling](errors.md): report and render errors.
+- [Request](request.md): read the input.

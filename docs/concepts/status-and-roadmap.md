@@ -6,16 +6,11 @@ icon: lucide/map
 
 This page shows what works in Dox today, what is missing and what is planned.
 
-Read it before you pick Dox for a project, so you know which parts are well tested and which parts are new.
-
 ## Packages
 
-Each package has a state:
+Each package has a state. A stable package has tests and real use. A new package has tests, but less real use.
 
-- **Stable**: works, has tests and has had real use.
-- **New**: works and has tests, but it is newer and has had less real use.
-
-All packages follow semantic versioning, so a breaking change only comes in a new major version. Each package has its own version number, and some packages live in their own repos. See [Contribute](../community/contribute.md#packages-in-other-repos).
+Each package has its own version, and some packages are in their own repos. See [Contribute](../community/contribute.md#packages-in-other-repos).
 
 | Package | What it does | State | Tests |
 | --- | --- | --- | --- |
@@ -45,14 +40,11 @@ All packages follow semantic versioning, so a breaking change only comes in a ne
 | `dox_postgres_native` | Native Postgres client (Rust tokio-postgres), the Postgres driver. Has TLS (`sslmode`, `sslRootCert`). | New | 41 tests in 7 files, plus the `dox_orm` tests |
 | `dox_mysql_native` | Native MySQL and MariaDB client (Rust mysql_async), the MySQL driver. Has TLS. | New | 30 tests in 2 files, plus the `dox_orm` tests |
 
-`Hash` (bcrypt password hashing) is in `dox_core`.
-
-!!! note "About the test counts"
-    The counts are the `test(` calls in each package's `test/` folder. A test inside a loop counts once, so `dart test` can report more tests. The repos do not measure line coverage.
+The counts are the `test(` calls in the test folder of each package. A test in a loop counts one time, so `dart test` can show more tests.
 
 ## What Dox does not have yet
 
-Some features are not built yet. This table says what to do until they are:
+Some features are not built yet. This is what to do today:
 
 | Feature | Status | What to do today |
 | --- | --- | --- |
@@ -62,12 +54,24 @@ Some features are not built yet. This table says what to do until they are:
 
 ## Planned
 
-Localization is planned for later.
+These features are planned. They are not built yet:
 
-If you want to see changes that are done but not released, look at the `Unreleased` section of a package CHANGELOG.
+| Feature | What it will do | What to do today |
+| --- | --- | --- |
+| Sentry | Send the errors, traces and logs of a Dox app to Sentry. | Send errors from the `report` method of your exception handler. See [Error handling](../the-basic/errors.md#your-own-handler). |
+| HTTPS | Serve HTTPS with no reverse proxy. | Put Caddy or nginx in front. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front). |
+| WebSocket compression | Compress WebSocket messages with permessage-deflate. | Messages are sent with no compression. |
+| OpenAPI SDK generation | Make a typed client from the OpenAPI document of your app. | Run an OpenAPI generator on `openapi.json`. See [OpenAPI](../packages/openapi.md#write-the-files). |
+| Localization | A general translation helper. | Keep your own message maps. |
+
+Changes that are done but not released are in the Unreleased section of the CHANGELOG of a package.
 
 ## How to help
 
 - Try Dox, and open an issue when something breaks or is missing.
-- If you want to build an item from this page, open an issue first, so the design can be discussed.
-- See [Contribute](../community/contribute.md) to set up the repo and run the tests.
+- To build an item from this page, open an issue first to discuss the design.
+
+## Next steps
+
+- [Contribute](../community/contribute.md): set up the repo and run the tests.
+- [Dox and the other Dart backends](dart-frameworks.md): compare Dox with other frameworks.

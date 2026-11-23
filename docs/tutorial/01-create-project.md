@@ -8,7 +8,7 @@ In this step you make a new Dox project, start the dev server and call the first
 
 ## 1. Make the project
 
-First install the `dox` command line tool. Then use it to make a project named `blog`:
+Install the `dox` command line tool, then make a project with the name blog:
 
 ```bash
 dart pub global activate dox
@@ -17,11 +17,11 @@ cd blog
 dart pub get
 ```
 
-`dox create` downloads the [dox-sample](https://github.com/dartondox/dox-sample) template and names the package `blog`. So every import in this tutorial starts with `package:blog/`.
+The package name is blog, so each import in this tutorial starts with `package:blog/`.
 
 ## 2. Look at the database settings
 
-You do not need to change anything here. `dox create` made a `.env` file with a new random `APP_KEY`, and the template already uses SQLite:
+You do not change anything here. `dox create` made a `.env` file with a new random app key, and the template uses SQLite:
 
 ```ini title=".env"
 APP_PORT=3000
@@ -31,10 +31,7 @@ DB_CONNECTION=sqlite
 DB_NAME=db/dox.sqlite
 ```
 
-Dox makes the file `db/dox.sqlite` at the first start. SQLite does not use the other `DB_*` lines. The app reads these keys through the typed class in `lib/config/env.dart`. See [Environment variables](../digging-deeper/env.md).
-
-!!! note "The folder must exist"
-    Dox makes the database file when it is missing, but not its folder. If you set `DB_NAME=storage/blog.sqlite`, run `mkdir storage` first.
+Dox makes the database file at the first start, but not its folder. If you set a path in a new folder, make the folder first. See [Environment variables](../digging-deeper/env.md).
 
 ## 3. Start the server
 
@@ -44,9 +41,9 @@ Start the dev server:
 dox s
 ```
 
-`dox s` runs the code generator and the server. When you save a file in `lib/app/`, it hot reloads your code. When you change routes, config or other start-up code, it restarts the server.
+It runs the code generator and the server. It hot reloads your code in `lib/app/`, and it restarts the server when you change routes or config.
 
-The first start is slower, because it compiles the SQLite library. It also runs the migrations of the template. At the end you see this log line:
+The first start is slower, because it compiles the SQLite library and runs the migrations of the template. At the end you see this log line:
 
 ```text
 [server] Server started at http://[::]:3000 with 8 isolate (native)
@@ -56,13 +53,13 @@ The number of isolates is the number of CPU cores on your machine.
 
 ## Check it
 
-Call the `ping` route from a second terminal:
+Call the ping route from a second terminal:
 
 ```bash
 curl -i http://localhost:3000/api/ping
 ```
 
-You should see:
+You see:
 
 ```text
 HTTP/1.1 200 OK
@@ -72,8 +69,8 @@ content-type: text/plain; charset=utf-8
 pong
 ```
 
-The route is in `lib/routes/api.dart`. The `ApiRouter` has the prefix `api`, so `/ping` is served at `/api/ping`.
+The route is in `lib/routes/api.dart`. Its router has the prefix api, so `/ping` is at `/api/ping`.
 
-## Next
+## Next steps
 
-[Step 2: Model and migration](02-model-and-migration.md)
+- [Step 2: Model and migration](02-model-and-migration.md): make the posts table and its model.

@@ -8,7 +8,7 @@ In this step you write one HTTP test for the list route and run it.
 
 ## 1. Write the test
 
-A test calls your routes like a real client, so you know they still work after a change. The template has `test/http_test.dart`. Replace it with this:
+A test calls your routes like a real client. Replace the template's `test/http_test.dart` with this:
 
 ```dart title="test/http_test.dart"
 import 'package:blog/config/app.dart';
@@ -41,9 +41,7 @@ void main() {
 }
 ```
 
-- `DoxTestClient.start` runs the app inside the test on a free port, so it does not clash with `dox s`.
-- The test runs the migrations first, so it also works on an empty database.
-- `package:test` is already in the `dev_dependencies` of the template.
+`DoxTestClient.start` runs the app in the test on a free port. The test runs the migrations first, so it also works on an empty database.
 
 ## Check it
 
@@ -53,15 +51,14 @@ Run the test:
 dart test test/http_test.dart
 ```
 
-You should see:
+You see:
 
 ```text
 00:01 +1: All tests passed!
 ```
 
-!!! tip "Use another database for tests"
-    The test reads `.env`, so it uses `db/dox.sqlite`. To keep test data out of it, make a `.env.testing` file with `DB_NAME=test.sqlite`. `dart test` reads it on top of `.env`.
+The test reads `.env`, so it uses your dev database. To use another database, make a `.env.testing` file with `DB_NAME=test.sqlite`. The test reads it on top of `.env`.
 
-## Next
+## Next steps
 
-[Step 7: Build and deploy](07-build-and-deploy.md)
+- [Step 7: Build and deploy](07-build-and-deploy.md): make a native binary and a Docker image.

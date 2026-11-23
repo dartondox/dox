@@ -4,15 +4,13 @@ icon: lucide/radio-tower
 
 # Notifications
 
-A notification tells a user about something, like "your invoice is paid", by email or by any channel you write.
+A notification tells a user about something, like "your invoice is paid", by email or by a channel you write.
 
-One notification can go out on more than one channel, like email, a database table or SMS. Each notification is a class, so the text and the channels live in one place.
-
-Notifications are in the `dox_mailer` package. Set up [mail](mail.md) first.
+Each notification is a class that holds the text and the channels. Notifications are in the `dox_mailer` package, so set up [mail](mail.md) first.
 
 ## Creating notifications
 
-A notification extends `Notification`. The `via` method picks the channels, and `toMail` builds the email:
+A notification extends `Notification`. The `via` method gives the channels, and `toMail` makes the email:
 
 ```dart
 class InvoicePaid extends Notification {
@@ -34,13 +32,13 @@ class InvoicePaid extends Notification {
 }
 ```
 
-`toMail()` can return any mailable, so a `WelcomeMail` with a template works too.
+`toMail()` can return any mailable, like a `WelcomeMail` with a template.
 
 ## Sending notifications
 
 ### Making a model notifiable
 
-The class that gets notifications, usually the user model, needs the `Notifiable` mixin. Its `routeNotificationFor` method tells each channel where to send. For the `mail` channel, it returns the email address:
+Add the `Notifiable` mixin to the class that gets notifications. Its `routeNotificationFor` method gives each channel the destination:
 
 ```dart
 class User extends Model<User> with Notifiable {
@@ -51,7 +49,7 @@ class User extends Model<User> with Notifiable {
 }
 ```
 
-The mail route can be an `Address`, an email text like `Ann <ann@example.com>`, or a list of these. If the mailable has its own `to` address, that address is used and the route is not.
+The mail route can be an `Address`, an email text like `Ann <ann@example.com>`, or a list of these. A `to` address on the mailable wins over the route.
 
 ### Sending to one user
 
@@ -71,44 +69,51 @@ await Notification.send(users, InvoicePaid(1));
 
 ### Sending to an address with no user
 
-Sometimes the person has no user row, like a guest. Pass an `Address`:
+For a guest with no user row, give an `Address`:
 
 ```dart
-await Notification.send(<Object>[Address('ann@example.com')], InvoicePaid(1));
+await Notification.send(<Object>[Address('ann@example.com')],
+    InvoicePaid(1));
 ```
 
 ## Handling errors
 
-If one channel throws, the other channels and the other notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list says which notifiable and channel failed, and why.
+When one channel throws, the other channels and notifiables still get the notification. At the end, `Notification.send()` throws a `NotificationException`. Its `errors` list gives the notifiable, the channel and the error of each failure:
 
-The error text of a `NotificationException` has no email addresses and no error messages, so it is safe for logs. Read `errors` for the details.
+```dart
+try {
+  await Notification.send(users, InvoicePaid(1));
+} on NotificationException catch (e) {
+  for (NotificationError error in e.errors) {
+    print('${error.channel}: ${error.error}'); // null channel: via()
+  }
+}
+```
 
-With one notifiable and one error, like in `user.notify()`, the error is thrown as it is. So `on MailException catch (e)` still works there.
+The error text has no email addresses, so it is safe for logs. With one notifiable and one error, like in `user.notify()`, you get the initial error, like a `MailException`.
 
 ## Queueing notifications
 
-Sending an email can be slow, so you may want to send it in the background. Override `shouldQueue`. The mail channel then puts the email on the job queue, like `Mail.queue()`. This needs [a queue](queue.md):
+Override `shouldQueue` to send the email in the background. The mail channel then puts the email on [the queue](queue.md), like `Mail.queue()`:
 
 ```dart
 @override
 bool get shouldQueue => true;
 ```
 
-The email is rendered at once, and the worker sends the finished email.
-
-You can set the queue options with these getters. They work like the options of `Mail.queue()`:
+The email is rendered at once, and the worker sends it. These getters set the queue options:
 
 | Getter | Default | What it does |
 | --- | --- | --- |
 | `queue` | null (`default`) | the queue name |
 | `delay` | null | the worker sends the email after this wait |
-| `encrypt` | `false` | save the job data encrypted with the app key |
+| `encrypt` | false | encrypt the job data with the app key |
 
-`shouldQueue` and these options only change the mail channel. Your own channels still run at once. To queue them, dispatch a job in the channel.
+These options change only the mail channel. To queue your own channel, dispatch a job in it.
 
 ## Custom channels
 
-If you want to send a notification another way, like to a database table, write your own channel. A channel implements `NotificationChannel`. It gets the data of the notification from `toArray()`:
+To send a notification another way, like to a database table, write a channel. A channel implements `NotificationChannel` and gets the data from `toArray()`:
 
 ```dart
 import 'dart:convert';
@@ -137,14 +142,15 @@ class InvoicePaid extends Notification {
 
   @override
   Map<String, Object?> toArray(Object notifiable) {
-    return <String, Object?>{'type': 'invoice_paid', 'invoice_id': invoiceId};
+    return <String, Object?>{
+      'type': 'invoice_paid',
+      'invoice_id': invoiceId,
+    };
   }
 
   // ...
 }
 ```
-
-`dox_mailer` has no database channel of its own, so it does not need the ORM.
 
 ## Testing
 
@@ -156,9 +162,9 @@ await user.notify(InvoicePaid(1));
 expect(mail.messages.single.subject, 'Invoice paid');
 ```
 
-With `shouldQueue`, the email goes to `mail.queued`, not to `mail.messages`, and it does not reach the job queue. Check it with `mail.assertQueued()`. See [Mail](mail.md#testing).
+With `shouldQueue`, the email goes to `mail.queued`. Check it with `mail.assertQueued()`. See [Mail](mail.md#testing).
 
-## Details
+## Next steps
 
-- Each item of `NotificationException.errors` has the notifiable and the channel. When `via()` throws, the channel is null. The error text has one line per failure: the place and the type of the notifiable, the channel, and the error type.
-- When `shouldQueue` is false, the queue options do nothing.
+- [Mail](mail.md): mailables, templates and transports.
+- [Queue](queue.md): run the workers that send queued email.

@@ -6,14 +6,14 @@ icon: lucide/clipboard-check
 
 This page lists what to check before you deploy a Dox app.
 
-Go through each table once before your first deploy. Items marked **Dox limit** are things Dox does not do for you, so you must handle them outside Dox.
+Go through each table one time before your first deploy. An item marked "Dox limit" is a task that you do outside Dox.
 
 ## Secrets and config
 
 | Check | How | Read more |
 | --- | --- | --- |
 | `APP_KEY` is set, 32 characters and secret | Run `dox key:generate`, or set a random value of exactly 32 characters in the real env. It signs JWT tokens and encrypts cookies. Never use the value from `.env.example`. | [Encryption](../security/encryption.md) |
-| `APP_ENV=production` | Set it, or leave it empty: both mean production. Then a bad `APP_KEY` stops the app at start, `/docs` is off and error details are hidden. Use `APP_ENV=development` only on your machine and in CI. | [Env reference](env.md) |
+| `APP_ENV=production` | Set it, or leave it empty: both mean production. A bad `APP_KEY` then stops the app at start, `/docs` is off and error details are hidden. | [Env reference](env.md) |
 | The env is complete | Run `dox env:check` in CI or before the deploy. It exits with code 1 when a key is missing or bad. | [CLI](cli.md) |
 | No secrets in the image or in git | Put `.env` in `.dockerignore` and `.gitignore`. Pass values as env vars (`docker run -e`, `env_file:`, systemd `EnvironmentFile=`). `dox build` copies only `.env.example`. | [Docker](../guides/docker.md) |
 | No comments after values in `.env` | The app strips `# note`, but migrations keep it in the value. Put comments on their own line. | [Env reference](env.md) |
@@ -24,7 +24,7 @@ Go through each table once before your first deploy. Items marked **Dox limit** 
 | --- | --- | --- |
 | JWT tokens expire | `JwtAuthDriver.expiresIn` is 1 hour by default. Pick a time that fits your app, like `expiresIn: Duration(hours: 12)`. | [Authentication](../security/authentication.md) |
 | A JWT works until it expires | The server keeps no token list by default. To revoke tokens, set `revocation: true` on `JwtAuthDriver`, or use `AccessTokenAuthDriver` (tokens live in a table). To log out everyone, change `APP_KEY` with no `previousKeys`. | [Authentication](../security/authentication.md) |
-| Passwords are hashed | Use `user.password = await Hash.makeAsync(input)` (bcrypt). It runs in another isolate, so other requests do not wait. Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
+| Passwords are hashed | Use `user.password = await Hash.makeAsync(input)` (bcrypt, on another isolate). Never store or encrypt a plain password. | [Hashing](../security/hashing.md) |
 | The hash is never sent | Add `List<String> get hidden => <String>['password'];` to the user model. The JWT payload is `user.toJson()`, and anyone can read it. | [Authentication](../security/authentication.md) |
 | Passwords have a max length | bcrypt takes at most 72 bytes, and `Hash.make` throws on longer input. Add `@MaxLength(72)` to the password field of the DTO. | [Troubleshooting](troubleshooting.md) |
 
@@ -65,7 +65,7 @@ Go through each table once before your first deploy. Items marked **Dox limit** 
 | Small MySQL migrations | MySQL saves `CREATE`, `ALTER` and `DROP` at once, so a failed migration can leave half the changes. Make one table change per migration. | [Migration](../database/migration.md) |
 | Pool size fits the database | Set `extra: {'maxConnectionCount': 10}`. All isolates share one pool, so this is the total for the process. Keep it under the database `max_connections`. | [Database](../database/index.md) |
 | Query logging is off | `debug: true` prints every query. The new project turns it on only in `development`. | [Database](../database/index.md) |
-| Backups | **Dox limit.** Dox has no backup tool. Use `pg_dump`, `mysqldump`, managed snapshots, or `sqlite3 app.db ".backup x.db"`. Test a restore. | |
+| Backups | Dox limit: Dox has no backup tool. Use `pg_dump`, `mysqldump`, managed snapshots, or `sqlite3 app.db ".backup x.db"`. Test a restore. | |
 
 ## Logs and errors
 
@@ -99,7 +99,13 @@ limit_req zone=api burst=20 nodelay;
 limit_req_status 429;
 ```
 
-Caddy needs the [`caddy-ratelimit`](https://github.com/mholt/caddy-ratelimit) plugin (build Caddy with `xcaddy build --with github.com/mholt/caddy-ratelimit`):
+Caddy needs the [caddy-ratelimit](https://github.com/mholt/caddy-ratelimit) plugin. Build Caddy with it:
+
+```bash
+xcaddy build --with github.com/mholt/caddy-ratelimit
+```
+
+Then add the limit:
 
 ```
 example.com {
@@ -114,5 +120,9 @@ example.com {
 }
 ```
 
-!!! note
-    The proxy must see the real client IP. When there is a load balancer in front of the proxy, set the real IP module of the proxy first.
+The proxy must see the real client IP. If a load balancer is in front of the proxy, set the real IP module of the proxy first.
+
+## Next steps
+
+- [Deployment](../digging-deeper/deployment.md): build and run the app in production.
+- [Environments](../guides/environments.md): config and secrets for each environment.

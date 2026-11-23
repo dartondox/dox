@@ -6,8 +6,6 @@ icon: lucide/test-tube
 
 This page shows how to test a Dox app with the `test` package: HTTP routes, cache, storage, env and the database.
 
-Dox starts your real app inside the test, so you can send requests to it and check the answers. Helpers for the cache, storage and the database let each test start from a clean state.
-
 ## Setup
 
 A new app from `dox create` already has the `test` package. In another app, add it as a dev dependency:
@@ -16,7 +14,7 @@ A new app from `dox create` already has the `test` package. In another app, add 
 dart pub add dev:test
 ```
 
-Put your tests in the `test/` folder and run them with `dart test`:
+Put your tests in the `test/` folder and run them:
 
 ```bash
 dart test
@@ -24,17 +22,17 @@ dart test
 
 ### Creating a test
 
-Use `dox make:test` to make a test file. It writes `test/ping_test.dart`, which already starts the app with a `DoxTestClient`:
+`dox make:test` writes `test/ping_test.dart`, which starts the app with a `DoxTestClient`. Add `--unit` for a plain test with no app:
 
 ```bash
 dox make:test Ping
 ```
 
-If the test does not need the app, add `--unit` to get a plain test. See [`dox make:test`](../reference/cli.md#dox-maketest).
+See [`dox make:test`](../reference/cli.md#dox-maketest).
 
 ## Test HTTP routes
 
-`DoxTestClient` from `package:dox_core/testing.dart` starts your app inside the test and sends requests to it. Start it once in `setUpAll` and close it in `tearDownAll`:
+`DoxTestClient` from `package:dox_core/testing.dart` starts your app inside the test and sends requests to it. Start it in `setUpAll` and close it in `tearDownAll`:
 
 ```dart title="test/http_test.dart"
 import 'package:dox_core/testing.dart';
@@ -56,50 +54,44 @@ void main() {
     TestResponse res = await client.get('/api/ping');
     res.expectStatus(200).expectBody('pong');
   });
-
-  test('POST /api/posts', () async {
-    TestResponse res = await client.post(
-      '/api/posts',
-      body: <String, dynamic>{'title': 'Hello', 'body': 'My first post.'},
-    );
-    res.expectStatus(201).expectJson(containsPair('title', 'Hello'));
-  });
 }
 ```
 
-`DoxTestClient.start(appConfig)` runs your providers and adds your routes, the same as a real start. `client.close()` stops the server and runs `shutdown()` of every provider, so for example the database is closed.
+`start` runs your providers and adds your routes, like a real start. It uses one isolate on `127.0.0.1` and a free port. `close` stops the server and runs `shutdown()` of every provider.
 
 ### Making requests
 
-The client has `get`, `post`, `put`, `patch` and `delete`. The path can have a query, like `'/api/users?page=2'`. For any other method, use `send`:
+The client has `get`, `post`, `put`, `patch` and `delete`. Use `send` for any other method:
 
 ```dart
 await client.get('/api/users?page=2');
+await client.post('/api/posts',
+    body: <String, dynamic>{'title': 'Hello'});
 await client.send('OPTIONS', '/api/users');
 ```
 
-A `Map` or `List` body is sent as JSON. A `String` or `List<int>` body is sent as it is.
-
-Redirects are not followed, so you can check a `302` and its `Location` header.
+A map or list body goes as JSON. A string or byte list body goes as it is. The client does not follow redirects, so you can check a 302 and its `Location` header.
 
 ### Sending headers
 
-To send extra headers with one request, pass `headers:`. If every request needs them, use `withHeaders`. It gives a copy of the client that sends these headers each time:
+Pass `headers` for one request. `withHeaders` gives a copy of the client that sends the headers with each request:
 
 ```dart
-await client.get('/api/me', headers: <String, String>{'Accept-Language': 'de'});
+await client.get('/api/me',
+    headers: <String, String>{'Accept-Language': 'de'});
 
-DoxTestClient german = client.withHeaders(<String, String>{'Accept-Language': 'de'});
+DoxTestClient german =
+    client.withHeaders(<String, String>{'Accept-Language': 'de'});
 ```
 
 ### Log in as a user
 
-If your API uses tokens, log in first, then use `withToken`. It gives a copy of the client that sends `Authorization: Bearer <token>`:
+`withToken` gives a copy of the client that sends `Authorization: Bearer <token>`:
 
 ```dart
 TestResponse login = await client.post(
   '/api/auth/login',
-  body: <String, dynamic>{'email': 'ann@example.com', 'password': 'secret123'},
+  body: <String, dynamic>{'email': 'ann@example.com', 'password': 'secret'},
 );
 DoxTestClient ann = client.withToken(login.json['token'] as String);
 (await ann.get('/api/auth/me')).expectStatus(200);
@@ -107,7 +99,7 @@ DoxTestClient ann = client.withToken(login.json['token'] as String);
 
 ### Keep a session (cookies and CSRF)
 
-Web pages with forms use a session cookie and a CSRF token. `client.withSession()` gives a client that works like a browser. It keeps the cookies of every response and sends them back. On `POST`, `PUT`, `PATCH` and `DELETE` it sends the `XSRF-TOKEN` cookie in the `X-XSRF-TOKEN` header, so `CsrfMiddleware` lets the request in:
+`withSession` gives a client that works like a browser. It keeps the cookies of each response and sends the CSRF token on POST, PUT, PATCH and DELETE:
 
 ```dart
 test('log in with a form', () async {
@@ -118,31 +110,41 @@ test('log in with a form', () async {
 
   (await browser.post(
     '/login',
-    body: <String, dynamic>{'email': 'ann@example.com', 'password': 'secret123'},
+    body: <String, dynamic>{'email': 'ann@example.com', 'password': 's3'},
   )).expectStatus(303).expectHeader('location', '/dashboard');
 
   (await browser.get('/dashboard')).expectStatus(200);
 });
 ```
 
-Each `withSession()` call gives a new browser with no cookies. You can read and change the kept cookies in `browser.cookies` (name to raw value).
+`browser.cookies` has the kept cookies, and you can change them. The normal client keeps no cookies. To send the cookies of one response, use `withCookies(res.cookies)`.
 
-The normal client keeps no cookies. To send the cookies of one response once, use `withCookies(res.cookies)`.
+### Testing a server that runs
+
+Give the URL of a running server to the constructor. `baseUri` and `headers` show the URL and the headers of a client:
+
+```dart
+DoxTestClient client = DoxTestClient(Uri.parse('http://127.0.0.1:3000'));
+```
 
 ## Checking the response
 
-A `TestResponse` has the status, body and headers:
+A `TestResponse` has the status, the body, the headers and the cookies:
 
 ```dart
 int status = res.status;
 String body = res.body;
+List<int> bytes = res.bodyBytes;
 dynamic json = res.json; // the body read as JSON
 String? type = res.header('content-type'); // any case
+Map<String, String> cookies = res.cookies;
 ```
 
 `res.headers` has all headers, with lower case names.
 
-The `expect` methods fail the test when the response is not right. They return the response, so you can chain them:
+### Expect methods
+
+Each `expect` method fails the test when the response is not right. It returns the response, so you can chain them:
 
 ```dart
 res
@@ -151,42 +153,14 @@ res
     .expectJson(<String, dynamic>{'title': 'The title is required'});
 ```
 
-### Checking the status
-
-`expectStatus` fails when the status is another one. The message shows the body, so you can see what went wrong:
-
-```dart
-res.expectStatus(200);
-```
-
-### Checking JSON
-
-`expectJson` takes a value or a matcher. Use a `Map` for the whole body, or a matcher to check only one part:
-
-```dart
-res.expectJson(containsPair('id', 1));
-```
-
-### Checking the body
-
-`expectBody` checks the body as text:
-
-```dart
-res.expectBody('pong');
-```
-
-### Checking a header
-
-`expectHeader` takes a header name and a value or matcher. Use `isNull` to check that a header is not there:
-
-```dart
-res.expectHeader('location', '/dashboard');
-res.expectHeader('set-cookie', isNull);
-```
+- `expectStatus(code)`: the failure message shows the body.
+- `expectJson(value)`: a value or a matcher, like `containsPair('id', 1)`.
+- `expectBody(value)`: the body as text.
+- `expectHeader(name, value)`: use `isNull` for a header that must be missing.
 
 ## Test the cache
 
-Tests should not write cache files or need Redis. So replace `Dox().cache` with a memory store. `Cache()` uses `Dox().cache`, so your code then uses the memory store:
+Replace `Dox().cache` with a memory store in `setUp`. `Cache()` then uses it, and each test starts with an empty cache:
 
 ```dart
 setUp(() {
@@ -204,11 +178,11 @@ test('caches the posts', () async {
 });
 ```
 
-Because the new `CacheManager` is made in `setUp`, each test starts with an empty cache. See [Cache](cache.md).
+See [Cache](cache.md).
 
 ## Test file storage
 
-If your code saves files, you do not want the test to write to S3 or your disk. `Storage.manager.fake(name)` from `dox_storage` swaps one disk with an empty memory disk. `restore(name)` puts the real disk back:
+`Storage.manager.fake(name)` from `dox_storage` puts an empty memory disk in place of one disk. `restore(name)` puts the real disk back:
 
 ```dart
 setUpAll(() {
@@ -220,18 +194,16 @@ test('saves the report', () async {
 
   String path = await Storage()
       .disk('s3')
-      .putFile('reports', <int>[1, 2, 3], extension: 'pdf'); // '/reports/<uuid>.pdf'
+      .putFile('reports', <int>[1, 2, 3], extension: 'pdf');
 
   expect(await fake.exists(path.substring(1)), isTrue);
   Storage.manager.restore('s3');
 });
 ```
 
-Call `Dox().initialize()` first. Without the `StorageProvider`, `Storage.manager` has only the `local` disk.
+Call `Dox().initialize()` first, or `Storage.manager` has only the `local` disk. A `Storage()` path starts with `/` and a `Disk` key does not, so remove the first `/`.
 
-`Storage()` paths start with `/`, but a `Disk` key does not. So remove the first `/` when you ask the `Disk` directly.
-
-A disk also has `assertExists(key)` and `assertMissing(key)`. They throw a `StateError` when the check fails:
+`assertExists(key)` and `assertMissing(key)` of a disk throw a `StateError` when the check fails:
 
 ```dart
 await fake.assertExists('reports/a.pdf');
@@ -241,20 +213,18 @@ See [File Storage](file-storage.md).
 
 ## Use a test database with `.env.testing`
 
-Your tests should never use the database with your real data. Put the values for tests in a `.env.testing` file, next to `.env`:
+Put the values for tests in a `.env.testing` file, next to `.env`:
 
 ```ini title=".env.testing"
 DB_NAME=my_app_test
 CACHE_STORE=memory
 ```
 
-When the app runs its tests (`dart test`, or `APP_ENV=testing`), Dox reads `.env` first and then `.env.testing`. A key in `.env.testing` wins over the same key in `.env`. Keys that are only in `.env` stay.
-
-A real environment variable still wins over both files. So CI can run `DB_NAME=ci_test dart test`. Outside tests, `.env.testing` is never read.
+In tests (`dart test`, or `APP_ENV=testing`), Dox reads `.env` and then `.env.testing`. A key in `.env.testing` wins, and a real environment variable wins over both files.
 
 ## Test the database
 
-A test that uses models needs a real database. Run the migrations once in `setUpAll`. Then empty the tables before each test with `refreshDatabase()` from `package:dox_orm/testing.dart`:
+Run the migrations one time in `setUpAll`. `refreshDatabase()` from `package:dox_orm/testing.dart` empties the tables before each test:
 
 ```dart title="test/user_test.dart"
 import 'package:dox_core/testing.dart';
@@ -298,13 +268,14 @@ void main() {
 }
 ```
 
-`refreshDatabase()` empties every table and starts the ids at 1 again. The tables stay, and the rows of the migrations table (`dox_db_migration`) are kept. It works on Postgres, MySQL, MariaDB and SQLite.
+`refreshDatabase()` empties every table and starts the ids at 1 again. It keeps the tables and the rows of the `dox_db_migration` table.
 
-Use a separate test database, set in [`.env.testing`](#use-a-test-database-with-envtesting). Never run `refreshDatabase()` on a database with real data.
+!!! warning
+    `refreshDatabase()` deletes all rows. Use a separate test database, set in [`.env.testing`](#use-a-test-database-with-envtesting).
 
 ### Keeping some tables
 
-If a table holds data that every test needs, like a list of countries, pass it in `keep`:
+Pass the tables that every test needs in `keep`:
 
 ```dart
 refreshDatabase(keep: <String>['dox_db_migration', 'countries']);
@@ -314,7 +285,7 @@ See [Testing with a database](../guides/testing-with-database.md) for a full exa
 
 ### Running test files one by one
 
-`dart test` runs test files at the same time. When two files use the same tables, they can break each other. So run them one by one:
+`dart test` runs test files at the same time. When two files use the same tables, run them one by one:
 
 ```bash
 dart test --concurrency=1
@@ -322,7 +293,7 @@ dart test --concurrency=1
 
 ## Test the env
 
-Sometimes you want to test code that reads the env, or test that the app stops on a bad env. Pass your own values to `AppEnv.load()`. Then nothing is read from the shell or the `.env` file:
+Give your own values to `AppEnv.load()`. Then it reads nothing from the shell or the `.env` file:
 
 ```dart
 AppEnv env = AppEnv.load(
@@ -334,15 +305,10 @@ AppEnv env = AppEnv.load(
 expect(env.dbPort, 5433);
 ```
 
-A missing or bad key throws an `EnvException`. See [Environment Variables](env.md).
+A missing or bad key throws an `EnvException`. A getter default that calls `Env.get()` reads the real env, so use other getters in a default. See [Environment Variables](env.md).
 
-Only the getters read through the `EnvReader`. A getter default that calls `Env.get()` or `Platform.environment` reads the real env. So in a default, use other getters, like `appEnv == 'development'`.
+## Next steps
 
-## Details
-
-- The test server listens on `127.0.0.1` on a free port. So it does not clash with `dox serve`, and many test files can run at the same time.
-- It runs on one isolate. `serverPort` and `totalIsolate` of the config are not used. Because of this, a `Route.get(...)` you add inside a test works right away.
-- The session client removes a cookie when the response deletes it (an empty value, `Max-Age=0` or an old `Expires`). A copy made from it, for example with `withHeaders`, shares its cookies.
-- Without the server, you can set the disks yourself with `Storage.manager = StorageDiskFactory().create(storageConfig);`, and start the ORM with `SqlQueryBuilder.initializeWithDatabaseConfig(databaseConfig)`.
-- `refreshDatabase()` turns off foreign key checks while it empties the tables.
-- `.env.testing` is also read by the typed `AppEnv.load()`, not only by `Env.get()`.
+- [Testing with a database](../guides/testing-with-database.md): a full example with SQLite.
+- [Cache](cache.md): the cache stores.
+- [File Storage](file-storage.md): the disks.

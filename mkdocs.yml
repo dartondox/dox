@@ -25,7 +25,11 @@ plugins:
         the-basic/installation.md: getting-started/installation.md
         others/contribute.md: community/contribute.md
         others/mascot.md: community/mascot.md
+        packages/cache.md: digging-deeper/cache.md
+        packages/storage.md: digging-deeper/file-storage.md
 extra_css:
+  # Onest as a variable font, so every weight from 100 to 900 is real
+  - https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap
   - assets/style.css
 extra_javascript:
   - assets/script.js
@@ -54,11 +58,10 @@ theme:
     - search.highlight
     - content.code.copy
     - content.code.annotate
-    - content.action.edit
     - content.tabs.link
     - toc.follow
   font:
-    text: Instrument Sans
+    text: Onest
     code: JetBrains Mono
   favicon: assets/favicon.png
   logo: assets/logo.svg
@@ -213,8 +216,6 @@ nav:
   - Packages:
     - packages/validation.md
     - packages/openapi.md
-    - packages/storage.md
-    - packages/cache.md
     - packages/socketio.md
     - packages/pdf-lib.md
     - packages/pdfme.md

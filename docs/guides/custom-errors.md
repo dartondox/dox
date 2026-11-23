@@ -6,7 +6,7 @@ icon: lucide/octagon-alert
 
 Give your app its own exception classes, send every error in one JSON shape, and log the unexpected ones.
 
-A client is easier to write when every error has the same shape. You also want to know when something breaks on the server, without showing the details to the client.
+A client is easier to write when every error has the same shape.
 
 ## What you need
 
@@ -14,21 +14,21 @@ A client is easier to write when every error has the same shape. You also want t
 
 ## How Dox handles an error
 
-First, see what Dox does when a controller or a middleware throws:
+This is what Dox does when a controller or a middleware throws:
 
 | Error | Status | What Dox does |
 | --- | --- | --- |
-| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends `{"code": ..., "message": ...}`. Does **not** call `report` |
-| a validation error (bad DTO input) | `422` | sends the field errors: `{"field": "message"}`. Does not call `report` |
-| any other `Exception` or `Error` | `500` | sends `{"code":"server_error","message":"Server Error"}`. When `APP_ENV` is `development` or `local`, it sends the error text. Calls `report` |
+| an `IHttpException`, like `NotFoundHttpException` | its `code` | sends `{"code": ..., "message": ...}` |
+| a validation error (bad DTO input) | 422 | sends the field errors: `{"field": "message"}` |
+| any other exception or error | 500 | sends `{"code":"server_error","message":"Server Error"}`, or the error text when `APP_ENV` is development or local. Calls `report` |
 
-`report` is a method of the [exception handler](../the-basic/errors.md). Every response goes through the `responseHandler` of `AppConfig` last, so this guide sets the error shape there.
+`report` is a method of the [exception handler](../the-basic/errors.md). The `responseHandler` of `AppConfig` sees every response last, so this guide sets the error shape there.
 
 ## 1. Write your own exceptions
 
 For a quick error, use `abort(403)` or `abort(409, 'The email is taken')`. See [HTTP exceptions](../reference/http-exceptions.md#any-status-abort-and-httpstatusexception).
 
-If you throw the same error in many places, write a class for it. Extend `IHttpException`, and set `code` (the HTTP status), `errorCode` (a short text for the client) and `message`:
+For an error you throw in many places, extend `IHttpException`. Set `code` (the HTTP status), `errorCode` (a short text for the client) and `message`:
 
 ```dart title="lib/app/exceptions/app_exception.dart"
 import 'dart:io';
@@ -66,7 +66,8 @@ class UserController {
   /// DELETE /api/users/{id}
   Future<Map<String, bool>> destroy(int id) async {
     if (id == 1) {
-      throw ForbiddenHttpException(message: 'The first user can not be deleted');
+      throw ForbiddenHttpException(
+          message: 'The first user can not be deleted');
     }
     User user = await show(id);
 
@@ -81,7 +82,7 @@ class UserController {
 
 ## 2. One JSON shape for every error
 
-The response handler sees every response before it is sent. For an error, the content is the exception object, so you can turn it into your shape here:
+For an error, the content of the response is the exception. Turn it into your shape in the response handler:
 
 ```dart title="lib/app/http/response_handler.dart"
 import 'dart:io';
@@ -132,11 +133,11 @@ class ResponseHandler extends ResponseHandlerInterface {
 }
 ```
 
-The last `if` gives a `500` your shape too, in every environment. Without it, the client gets the default body, which in `development` or `local` is the error text. That text can show a SQL query or a file path.
+The last `if` gives a 500 your shape in every environment. Without it, development and local send the error text, which can show a SQL query or a file path.
 
 ## 3. Log unexpected errors
 
-You want to know about unexpected errors, so log them. The `report` method of the exception handler runs for every `500`, and for errors outside a request, like a future nobody awaited or a timer:
+`report` runs for every 500, and for errors outside a request, like a timer. Log the error there:
 
 ```dart title="lib/app/error_handler.dart"
 import 'dart:convert';
@@ -189,11 +190,11 @@ Route.get('/boom', (DoxRequest req) => throw StateError('boom'));
 
 | Request | Status | Body |
 | --- | --- | --- |
-| `GET /api/users/999` | `404` | `{"error":{"code":"not_found","message":"User 999 not found"}}` |
-| `GET /api/users/abc` | `404` | `{"error":{"code":"not_found","message":"Not Found"}}` |
-| `DELETE /api/users/1` | `403` | `{"error":{"code":"forbidden","message":"The first user can not be deleted"}}` |
-| `POST /api/auth/register` with `{}` | `422` | `{"error":{"code":"validation_failed","message":"The input is not valid"},"errors":{"name":"The name is required", ...}}` |
-| `GET /api/boom` | `500` | `{"error":{"code":"server_error","message":"Something went wrong"}}` |
+| `GET /api/users/999` | 404 | `{"error":{"code":"not_found","message":"User 999 not found"}}` |
+| `GET /api/users/abc` | 404 | `{"error":{"code":"not_found","message":"Not Found"}}` |
+| `DELETE /api/users/1` | 403 | `{"error":{"code":"forbidden","message":"The first user can not be deleted"}}` |
+| `POST /api/auth/register` with `{}` | 422 | `{"error":{"code":"validation_failed","message":"The input is not valid"},"errors":{"name":"The name is required", ...}}` |
+| `GET /api/boom` | 500 | `{"error":{"code":"server_error","message":"Something went wrong"}}` |
 
 After `GET /api/boom`, the server prints one line:
 
@@ -203,14 +204,12 @@ After `GET /api/boom`, the server prints one line:
 
 Remove the `/boom` route when you are done.
 
-!!! note "A URL with no route"
-    A URL that matches no route is a `NotFoundHttpException`. It goes through the response handler too, so it gets the same JSON shape:
-    `{"error":{"code":"not_found","message":"GET /nothing not found"}}`.
+A URL with no route gets the same shape: `{"error":{"code":"not_found","message":"GET /nothing not found"}}`.
 
-## See also
+## Next steps
 
-- [Error handling](../the-basic/errors.md) for `report` and `render`
-- [Response: errors](../the-basic/response.md#errors) for the built-in exceptions
-- [Response: change every response](../the-basic/response.md#change-every-response)
-- [Validation: the error response](../the-basic/validation.md#the-error-response)
-- [Isolate: when an isolate crashes](../digging-deeper/isolate.md#when-an-isolate-crashes)
+- [Error handling](../the-basic/errors.md): `report` and `render`.
+- [Response: errors](../the-basic/response.md#errors): the built-in exceptions.
+- [Response: change every response](../the-basic/response.md#change-every-response): the response handler.
+- [Validation: the error response](../the-basic/validation.md#the-error-response): the 422 body.
+- [Isolate: when an isolate crashes](../digging-deeper/isolate.md#when-an-isolate-crashes): errors outside a request.

@@ -4,9 +4,7 @@ icon: lucide/notebook-pen
 
 # Cheat sheet
 
-This page shows the code you use every day, on one page you can keep open while you work.
-
-Each section links to its full page.
+This page shows the code you use each day, with a link to the full page in each section.
 
 ## Project layout
 
@@ -37,7 +35,7 @@ See [CLI](cli.md) and [App config](app-config.md).
 
 ```bash
 dox create my_app                  # newest template
-dox serve                          # dev server + hot reload + build_runner watch
+dox serve                          # dev server, hot reload, build_runner
 dox build                          # AOT bundle in build/bundle
 dox build_runner:build             # make .g.dart files
 dox key:generate                   # APP_KEY in .env
@@ -48,7 +46,7 @@ dox make:middleware Auth
 dox make:dto CreateBlog
 dox make:serializer Blog
 dox make:model Blog -m             # model + migration
-dox make:model Blog -a             # + migration, factory, seeder, resource controller
+dox make:model Blog -a             # all extra files
 dox make:migration create_blogs_table [--sql]
 dox make:job SendWelcomeEmail
 dox make:provider Cache
@@ -111,9 +109,7 @@ class ApiRouter extends Router {
 | `Route.enabledCors(() { ... })` / `Route.disabledCors(...)` | CORS for some routes |
 | `Route.websocket('echo', (WebSocket s, DoxRequest req) { ... })` | a raw WebSocket. For rooms and acks, use Socket.IO. |
 
-Controller parameters, by type: `DoxRequest`, one `@Dto` class, `String`/`int`/`double`/`num`/`bool` for path params (by position), a `@DoxModel` (loaded by its key), an `@Inject()` class. Only positional parameters.
-
-In the examples, `c.index` and the like are methods of a controller `C` from the container.
+Controller parameters, by type: `DoxRequest`, one `@Dto` class, a string, integer, double, num or bool for path params (by position), a `@DoxModel` (loaded by its key), an `@Inject()` class. Only positional parameters. In the examples, `c.index` is a method of a controller `C` from the container.
 
 ## Dependency injection
 
@@ -127,16 +123,14 @@ class PostService {
 @Inject(singleton: false)       // a new instance each time
 class Clock {}
 
-AppConfig(container: registerContainer); // from lib/generated/container.g.dart
+// registerContainer is in lib/generated/container.g.dart
+AppConfig(container: registerContainer);
 
 Dox().ioc.get<PostService>();
 Dox().ioc.override<PostRepository>(FakePostRepository()); // tests
 ```
 
-Routers and `DoxProvider` classes are found without `@Inject()`. Run `dart run build_runner build` after a change.
-See [Dependency injection](../the-basic/dependency-injection.md).
-
-See [Routing](../the-basic/routing.md) and [Controller](../the-basic/controller.md).
+Dox finds routers and providers with no `@Inject()`. Run `dart run build_runner build` after a change. See [Dependency injection](../the-basic/dependency-injection.md), [Routing](../the-basic/routing.md) and [Controller](../the-basic/controller.md).
 
 ## Middleware
 
@@ -146,7 +140,8 @@ class ApiKeyMiddleware implements IDoxMiddleware {
   dynamic handle(IDoxRequest req) {
     String apiKey = Env.get<String>('API_KEY');
     // Hash.equals: constant time, so the time does not leak the key
-    if (apiKey.isEmpty || !Hash.equals(req.header('X-Api-Key') ?? '', apiKey)) {
+    String given = req.header('X-Api-Key') ?? '';
+    if (apiKey.isEmpty || !Hash.equals(given, apiKey)) {
       return response('no').statusCode(401); // stop here
     }
     return req; // go on
@@ -161,6 +156,7 @@ class ApiKeyMiddleware implements IDoxMiddleware {
 | `RequestTimeout(Duration(seconds: 30))` or `Route.get(...).timeout(...)` | `503` when the route is too slow |
 | `const ServerTiming()` | `Server-Timing` header; `ServerTiming.add('db', d)` adds a time. Development or trusted clients only |
 | `const ValidateSignature()` | `403` unless the url is from `Route.signedUrl(...)` |
+| `implements IDoxNextMiddleware` | `await next()` runs the rest, then you change the response |
 | `implements IDoxTerminableMiddleware` | `terminate(req, res)` runs after the answer is sent |
 
 Middleware runs in this order: `globalMiddleware`, router `middleware`, group, route.
@@ -198,7 +194,8 @@ Files:
 ```dart
 RequestFile file = req.input('avatar');
 file.filename; file.extension; file.length;   // bytes
-String path = await file.store('avatars');    // save before you return (dox_storage)
+// save before you return (dox_storage)
+String path = await file.store('avatars');
 ```
 
 See [Request](../the-basic/request.md) and [Request and response](request-and-response.md).
@@ -254,7 +251,11 @@ class CreateBlog {
   final String? body;            // nullable = optional
   final Status status;           // enum = only its names
 
-  const CreateBlog({required this.title, this.body, this.status = Status.draft});
+  const CreateBlog({
+    required this.title,
+    this.body,
+    this.status = Status.draft,
+  });
 
   static const DtoSchema<CreateBlog> schema = $CreateBlogDto;
 }
@@ -402,7 +403,8 @@ class CreateBlogsTable extends Migration {
       table.foreignId('user_id').constrained('users').cascadeOnDelete();
       table.string('title');
       table.text('body').nullable();
-      table.enumeration('status', <String>['draft', 'live']).defaultTo('draft');
+      table.enumeration('status', <String>['draft', 'live'])
+          .defaultTo('draft');
       table.timestamps();
       table.softDeletes();
     });
@@ -439,12 +441,14 @@ See [Migration](../database/migration.md) and [Schema](../database/schema.md).
 ```dart
 int? id = await QueryBuilder.transaction(() async {
   Blog blog = await Blog().create(<String, dynamic>{'title': 'a'});
-  await QueryBuilder.table('blog_info').insert(<String, dynamic>{'blog_id': blog.id});
+  await QueryBuilder.table('blog_info')
+      .insert(<String, dynamic>{'blog_id': blog.id});
   return blog.id;
 }); // throw inside = rollback
 
 await QueryBuilder.transaction(() async {
-  Blog blog = await Blog().lockForUpdate().findOrFail(1); // other writers wait
+  // other writers wait
+  Blog blog = await Blog().lockForUpdate().findOrFail(1);
   blog.title = 'b';
   await blog.save();
 });
@@ -461,7 +465,8 @@ await Cache().remember('posts', Duration(minutes: 5), () => Post().all());
 await Cache().forget('k');
 await Cache().store('redis').increment('hits');
 await Cache().tag('users').flush();
-CacheLock lock = Cache().store('redis').lock('report', Duration(seconds: 30));
+CacheLock lock = Cache().store('redis')
+    .lock('report', Duration(seconds: 30));
 ```
 
 Values must be JSON types. `memory` is per isolate. See [Cache](../digging-deeper/cache.md).
@@ -469,12 +474,14 @@ Values must be JSON types. `memory` is per isolate. See [Cache](../digging-deepe
 ## Storage
 
 ```dart
-String path = await Storage().putFile('avatars', file); // '/avatars/<uuid>.png'
+// path is '/avatars/<uuid>.png'
+String path = await Storage().putFile('avatars', file);
 await Storage().put('notes/a.txt', 'hello', exact: true); // this exact path
 Uint8List? bytes = await Storage().get(path);
 await Storage().exists(path);
 await Storage().delete(path);
-String url = await Storage().signedUrl(path, expiresIn: Duration(minutes: 10));
+String url = await Storage().signedUrl(path,
+    expiresIn: Duration(minutes: 10));
 await Storage().copy(path, 'backup/a.png');
 List<String> files = await Storage().files('avatars');
 Uint8List report = Uint8List.fromList(<int>[1, 2, 3]);
@@ -497,7 +504,7 @@ dynamic a = JSON.parse(text);          // from a String
 dynamic b = JSON.parse(res.bodyBytes); // from bytes, from an HTTP client
 ```
 
-Use `bytes` for sockets, files, queues and HTTP client bodies. Do not return `JSON.bytes` from a controller. `parse` takes a String or bytes, so you can pass `res.bodyBytes` straight in.
+Use `bytes` for sockets, files, queues and HTTP client bodies, not as a controller result. `parse` takes a string or bytes.
 
 ## Env
 
@@ -527,13 +534,17 @@ Auth.initialize(AuthConfig(
   defaultGuard: 'web',
   guards: <String, AuthGuard>{
     'web': AuthGuard(
-      driver: JwtAuthDriver(secret: SecretKey(env.appKey), expiresIn: Duration(days: 7)),
+      driver: JwtAuthDriver(
+        secret: SecretKey(env.appKey),
+        expiresIn: Duration(days: 7),
+      ),
       provider: AuthProvider(model: () => User()),
     ),
   },
 ));
 
-String? token = await Auth().attempt(<String, dynamic>{'email': e, 'password': p});
+String? token = await Auth()
+    .attempt(<String, dynamic>{'email': e, 'password': p});
 String? token2 = Auth().login(user);
 user.password = await Hash.makeAsync(password); // bcrypt in another isolate
 bool ok = await Hash.verifyAsync(password, hash);
@@ -546,10 +557,14 @@ Access tokens (`AccessTokenAuthDriver`):
 ```dart
 Auth auth = req.auth as Auth; // after AuthMiddleware()
 User user = auth.user<User>()!;
-AccessToken token = await auth.createAccessToken(user, abilities: <String>['posts:read']);
+AccessToken token = await auth.createAccessToken(user,
+    abilities: <String>['posts:read']);
 bool ok = auth.tokenCan('posts:read');
-AccessToken next = await auth.rotateAccessToken(auth.currentAccessToken!, grace: const Duration(seconds: 10));
-await auth.setAccessTokenAbilities(auth.currentAccessToken!, <String>['posts:read']); // replaces the whole list
+AccessToken next = await auth.rotateAccessToken(auth.currentAccessToken!,
+    grace: const Duration(seconds: 10));
+// replaces the whole list
+await auth.setAccessTokenAbilities(auth.currentAccessToken!,
+    <String>['posts:read']);
 await auth.revokeToken(req); // logout
 ```
 
@@ -609,7 +624,8 @@ tearDownAll(() async => client.close());
 
 test('ping', () async {
   (await client.get('/api/ping')).expectStatus(200).expectBody('pong');
-  (await client.withToken(token).post('/api/posts', body: {...})).expectStatus(201);
+  (await client.withToken(token).post('/api/posts', body: {...}))
+      .expectStatus(201);
 });
 ```
 
@@ -622,6 +638,10 @@ test('ping', () async {
 | env | `AppEnv.load(EnvReader(environment: {...}, dotEnv: {...}))` |
 | DTO | `await CreateBlog.schema.safeValidateMap(<String, dynamic>{...})` |
 
-Run with `dart test --concurrency=1` when files share a port or tables.
+Run with `dart test --concurrency=1` when files share a port or tables. See [Testing](../digging-deeper/testing.md).
 
-See [Testing](../digging-deeper/testing.md).
+## Next steps
+
+- [CLI](cli.md): all commands and their options.
+- [App config](app-config.md): all fields of `AppConfig`.
+- [Request and response](request-and-response.md): all members of the request and the response.

@@ -4,13 +4,11 @@ icon: lucide/blocks
 
 # Package commands
 
-A package can add its own `dox` commands.
+A package or an app can add its own `dox` commands, and the `dox` CLI finds them by itself.
 
-Your app can add its own commands too. You do not write a `bin` file, and you do not register anything, because the `dox` CLI finds the commands by itself. For example, `dox queue:table` comes from the `dox_queue_database` package, and `dox auth:tokens-table` comes from the `dox_auth` package.
+## Setup
 
-## Using a package command
-
-Add the package and run `dart pub get`. Then run the command:
+Add the package and run its command. For example, `dox queue:table` comes from the `dox_queue_database` package:
 
 ```bash
 dart pub add dox_queue_database
@@ -21,11 +19,11 @@ dox queue:table
 
 ## Add a command to your package
 
-A package command needs three things: the command class, a list of commands, and a key in `pubspec.yaml`.
+A package command needs three things: the command class, a list of commands and a key in `pubspec.yaml`.
 
 ### 1. Write the command
 
-A command extends `Command` from `package:dox_core/command.dart`. The `run` method gets the words after the command name as `args`:
+A command extends `Command` from `package:dox_core/command.dart`. The `run` method gets the words after the command name:
 
 ```dart title="lib/src/commands/hello_command.dart"
 import 'package:dox_core/command.dart';
@@ -48,9 +46,7 @@ class HelloCommand extends Command {
 }
 ```
 
-So `dox hello:say Ann` calls `run(['Ann'])`.
-
-A package that does not use `dox_core` imports `package:dox_annotation/command.dart` instead.
+So `dox hello:say Ann` calls `run(['Ann'])`. A package with no `dox_core` dependency imports `package:dox_annotation/command.dart`.
 
 ### 2. List the commands
 
@@ -73,38 +69,35 @@ dox:
   commands: package:my_package/commands.dart
 ```
 
-That is all. An app that depends on your package now has `dox hello:say`.
+An app that depends on your package now has `dox hello:say`.
 
 ## Add a command to your app
 
-It works the same way. The easy way is `dox make:command`:
+`dox make:command` writes the command, adds it to `lib/app/commands/commands.dart` and sets the `dox: commands:` key:
 
 ```bash
 dox make:command send_report
 ```
 
-It writes `lib/app/commands/send_report_command.dart`, adds the command to `lib/app/commands/commands.dart`, and sets the `dox: commands:` key in your `pubspec.yaml`. The command name is `app:send-report`. See [`dox make:command`](../reference/cli.md#dox-makecommand).
+The command name is `app:send-report`. See [`dox make:command`](../reference/cli.md#dox-makecommand).
 
-If you write it by hand, put the command in `lib/` of your app and add the key to the app's own `pubspec.yaml`:
+## Name clashes
 
-```yaml title="pubspec.yaml"
-dox:
-  commands: package:my_app/commands.dart
-```
+A built-in command always wins over a package command with the same name. When two packages have a command with the same name, `dox <name>` prints an error with both package names.
 
 ## Failing a command
 
-When `run` ends, `dox` exits with code 0. If something went wrong, set `exitCode` from `dart:io`, or throw:
+Set `exitCode` from `dart:io`, or throw. The exit code of the command is the exit code of `dox`:
 
 ```dart
 exitCode = 1;
 ```
 
-A thrown error is printed with its stack trace, and the exit code is 1. The exit code of the command is the exit code of `dox`, so scripts and CI see it.
+A thrown error prints its stack trace and gives exit code 1.
 
 ## Writing a migration
 
-Some packages need a table, so their command adds a migration file. Use `MigrationFile` for this. The file gets the same name as `dox make:migration` makes, like `2026_10_21_120000_create_queue_tables.dart`:
+`MigrationFile().create` writes a migration with the same file name format as `dox make:migration`. It returns null and writes nothing when a migration with this name is already there:
 
 ```dart
 String? path = MigrationFile().create('create_queue_tables', source);
@@ -114,13 +107,13 @@ if (path == null) {
 }
 ```
 
-`create` returns `null` and writes nothing when a migration with this name is already there. The next `dox migrate` runs the new file.
+`MigrationFile().exists(name)` only tells you if the migration is there. The next `dox migrate` runs the new file.
 
 ## Ship an install command
 
-`dox add <x>` adds the package `dox_x`, then runs its `<x>:install` command. So if your package needs setup (config files, `.env` keys, a provider), ship an `<x>:install` command.
+`dox add <x>` adds the package `dox_x`, then runs its `<x>:install` command. If your package needs config files, env keys or a provider, ship an `<x>:install` command.
 
-Use `Installer` from `package:dox_annotation/install.dart`. Each step is safe to run twice, because it never overwrites a file and never adds a key twice:
+`Installer` from `package:dox_annotation/install.dart` does the steps. A step never overwrites a file and never adds a key twice, so it is safe to run twice:
 
 ```dart title="lib/src/commands/hello_install_command.dart"
 import 'package:dox_annotation/command.dart';
@@ -149,40 +142,26 @@ class HelloInstallCommand extends Command {
 }
 ```
 
-| Method | What it does |
+| Member | What it does |
 | --- | --- |
-| `writeFile(path, content)` | Writes the file only when it is not there. |
+| `Installer(root: dir)` | Works in the folder `dir`. The default is the current folder. |
+| `appName` | The `name` of the app `pubspec.yaml`, for `package:<app>/...` imports. |
+| `writeFile(path, content)` | Writes the file only when it is not there. Returns true when it wrote it. |
 | `makeFolder(path)` | Makes the folder when it is not there. |
-| `addEnv(key, value)` | Adds `KEY=value` to `.env.example` and `.env` when the key is missing. A key that is there is never changed. |
-| `addEnvGetter(getter)` | Adds a getter to `AppEnv` in `lib/config/env.dart` when the class has no member with that name. When it can not find the class, it changes nothing and prints a hint. |
+| `addEnv(key, value)` | Adds `KEY=value` to `.env.example` and `.env` when the key is missing. |
+| `addEnvGetter(getter)` | Adds a getter to `AppEnv` in `lib/config/env.dart` when the class has no member with that name. |
+| `hasDependency(package)` | True when the app `pubspec.yaml` has the package. |
 | `addDependency(package, dev: false)` | Runs `dart pub add` when the app does not have the package. |
 | `buildRunner()` | Runs `dart run build_runner build`. |
 | `note(line)` | Adds your own line to the summary, like `added    hooks to pubspec.yaml`. |
+| `lines` | The lines of the summary. |
+| `ok` | False when a step failed. |
 | `printSummary(nextSteps)` | Prints what was done and the next steps. Sets exit code 1 when a step failed. |
 
-Some tips for a good install command:
+Read the options from `args`, like `--driver=postgres`, and give a good default, so `dox add <x>` works with no options. `dox_orm` has an example: `orm:install`.
 
-- Read the options from `args`, like `--driver=postgres`. Give a good default, so `dox add <x>` with no options works.
-- Test it on an app made without your package. Run it twice and check that nothing changes the second time.
-- Add `dox add <x>` to the skill of your package (`skills/<name>/SKILL.md`), so AI agents set it up the same way.
+## Next steps
 
-`dox_orm` has an example: `orm:install`.
-
-## Details
-
-### Name clashes and errors
-
-- A built-in command always wins. If a package has a command with the same name as a built-in one, `dox` runs the built-in one, and `dox help` marks the package command as not used.
-- If two packages have a command with the same name, `dox <name>` prints an error with both package names and exits with code 1.
-- A bad `dox: commands:` key (not a library of the package, or a missing file) prints a warning with the package name. The commands of the other packages still work.
-- The key path may use only letters, digits, `_`, `-`, `.` and `/`, and no `..`.
-- An unknown command prints `Could not find a command named "<name>"`, with a hint about the `dox: commands:` key.
-
-### How it works
-
-- `dox <name>` first looks for a built-in command. Then it reads `.dart_tool/package_config.json` and the `dox: commands:` key of each package and of the app.
-- It writes `.dart_tool/dox/commands.dart`, which imports each commands library, and runs it with `dart run`. So the command code is always the newest.
-- It writes that file again only when `.dart_tool/package_config.json` or a `pubspec.yaml` changes. If a package had a warning, `dox` looks again on the next run.
-- `dox help` keeps the list in `.dart_tool/dox/commands.json`. If you change only a file that the commands library imports, `dox help` can show an old description. The command itself always runs the new code.
-- `MigrationFile().create` finds a migration with the same name and any time in its name. `dox migrate` writes `db/migration/migrations.dart` again before it runs, and makes `bin/migrate.dart` when it is missing.
-- An app inside a pub workspace works too, also when the `workspace:` list uses a glob like `apps/*`. `dox` finds the workspace root from `.dart_tool/pub/workspace_ref.json`.
+- [Dox CLI](dox-cli.md): the commands of the CLI.
+- [Add a package](../getting-started/add-a-package.md): `dox add` runs the install command of a package.
+- [Providers](providers.md): set up a package when the app starts.

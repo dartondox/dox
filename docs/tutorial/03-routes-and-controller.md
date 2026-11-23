@@ -14,7 +14,7 @@ A controller holds the code that answers a request. Make one for posts:
 dox make:controller Post -r
 ```
 
-`-r` makes a resource controller with the seven CRUD methods. You only need three of them now, so replace the file with this:
+The `-r` flag makes a resource controller with seven methods. You need three now, so replace the file with this:
 
 ```dart title="lib/app/http/controllers/post.controller.dart"
 import 'package:blog/app/models/post/post.model.dart';
@@ -49,15 +49,15 @@ class PostController {
 
 What the code does:
 
-- `@Inject()` puts the controller in the container, so Dox can make it for you. The code generator adds it to `lib/generated/container.g.dart`, and a new project already uses that file. So you change nothing else.
-- When a method returns a model or a list of models, Dox sends it as JSON.
-- `response(post).statusCode(201)` sets the status code.
-- `show(int id)` gets the `{id}` from the URL. `/api/posts/abc` answers `404`, because `abc` is not an `int`.
-- `req.input('title')` reads the input without any check. You add checks in [step 4](04-validation.md).
+- `@Inject()` puts the controller in the container. The code generator adds it to `lib/generated/container.g.dart`, and a new project uses that file.
+- A model or a list of models goes back as JSON.
+- `statusCode` sets the status code.
+- `show(int id)` gets the id from the URL. A path like `/api/posts/abc` gets 404, because abc is not an integer.
+- `input` reads the input with no check. You add checks in [step 4](04-validation.md).
 
 ## 2. Add the routes
 
-Routes connect a URL to a controller method. Open `lib/routes/api.dart` and add `Route.resource`:
+Open `lib/routes/api.dart` and add `Route.resource`:
 
 ```dart title="lib/routes/api.dart"
 import 'package:blog/app/http/controllers/api.controller.dart';
@@ -80,7 +80,7 @@ class ApiRouter extends Router {
 }
 ```
 
-`Route.resource` makes one route for each method the controller has:
+It makes one route for each method of the controller:
 
 | Method | Path | Controller method |
 | --- | --- | --- |
@@ -88,17 +88,17 @@ class ApiRouter extends Router {
 | `POST` | `/api/posts` | `store` |
 | `GET` | `/api/posts/{id}` | `show` |
 
-The controller has no `update` or `destroy` yet, so those routes are not made. You do not need to register the router anywhere, because Dox finds every `Router` class by itself.
+Dox finds each router class, so you do not register it.
 
 ## 3. Start the server
 
-If the server is not running, start it:
+If the server is off, start it:
 
 ```bash
 dox s
 ```
 
-If it is already running, it restarts by itself when you save a file.
+If it is on, it restarts when you save a file.
 
 ## Check it
 
@@ -110,7 +110,7 @@ curl -i -X POST http://localhost:3000/api/posts \
   -d '{"title":"Hello Dox","body":"My first post."}'
 ```
 
-You should get `201` and the new post:
+You get 201 and the new post:
 
 ```text
 HTTP/1.1 201 Created
@@ -140,7 +140,7 @@ curl http://localhost:3000/api/posts/1
 {"id":1,"title":"Hello Dox","body":"My first post.","created_at":"2026-10-22T13:58:14.062215Z","updated_at":"2026-10-22T13:58:14.062215Z"}
 ```
 
-Ask for a post that does not exist. You should get `404`:
+Ask for a post that does not exist. You get 404:
 
 ```bash
 curl -i http://localhost:3000/api/posts/99
@@ -153,6 +153,6 @@ HTTP/1.1 404 Not Found
 {"code":"not_found","message":"Not Found"}
 ```
 
-## Next
+## Next steps
 
-[Step 4: Validation](04-validation.md)
+- [Step 4: Validation](04-validation.md): check the input of a post.

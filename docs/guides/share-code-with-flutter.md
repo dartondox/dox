@@ -6,9 +6,7 @@ icon: lucide/share-2
 
 Put a `@Dto` class in a shared Dart package, so the Dox server and the Flutter app check input with the same rules and error messages.
 
-You want to check a form in the app, so the user sees an error at once. But the server must check the same input again, because it can not trust the client. If you write the rules twice, they drift apart. So you write them once, in a shared package.
-
-This works because the generated [DTO](../the-basic/dto.md) code imports only `dox_validation`. It is pure Dart (no `dart:io`, no `dart:mirrors`), so it runs in Flutter and on the web.
+The app checks the form, so the user sees an error at once. The server checks the same input again, because it can not trust the client. The generated [DTO](../the-basic/dto.md) code is pure Dart, so it runs in Flutter and on the web.
 
 ## What you need
 
@@ -26,6 +24,8 @@ my_blog/
   server/            # the Dox app
   app/               # the Flutter app
 ```
+
+The app and the server use the same DTO:
 
 ```mermaid
 flowchart LR
@@ -56,8 +56,6 @@ cd packages/blog_shared
 dart pub add dox_validation
 dart pub add dev:dox_builder dev:build_runner
 ```
-
-`dox_builder` is a dev dependency, because it only runs when you generate code. So the Flutter app does not get it.
 
 Now write the DTO. Import `dox_validation`, not `dox_core`, because `dox_core` does not run in Flutter:
 
@@ -99,16 +97,9 @@ dart pub get
 dart run build_runner build
 ```
 
-This writes two files:
+This writes `lib/src/save_blog.g.dart` and `lib/generated/dtos.g.dart`, the list of every DTO in the package. Commit both files, so the Flutter app does not need to run the generator.
 
-- `lib/src/save_blog.g.dart`: the checks, the converter and the JSON Schema of `SaveBlog`.
-- `lib/generated/dtos.g.dart`: the list of every DTO in this package. The server uses it.
-
-Commit both files, so the Flutter app does not need to run the generator.
-
-!!! warning "Rules that need the database stay on the server"
-    `@Unique` and `@Exists` come from `dox_orm`. Do not use them in the shared package, because the app can not import `dox_orm`.
-    Check them on the server, in the service or in a server-only DTO.
+`@Unique` and `@Exists` come from `dox_orm`, which the app can not import. Check them on the server only.
 
 ## 2. The Dox server
 
@@ -123,7 +114,7 @@ dependencies:
 
 Run `dart pub get`.
 
-Dox finds a DTO in the `dtos` list of `AppConfig`. The server's own `lib/generated/dtos.g.dart` lists only the DTOs in the server, so add the list of the shared package too:
+Add the DTO list of the shared package to the `dtos` list of `AppConfig`:
 
 ```dart title="server/lib/config/app.dart"
 import 'package:blog_shared/generated/dtos.g.dart' as shared;
@@ -136,9 +127,7 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
-If the server has no DTOs of its own, its `dtos` list is empty, and the line above still works.
-
-The controller asks for `SaveBlog` like any other DTO. Dox checks the body before the method runs, so bad input gets `422`:
+The controller asks for `SaveBlog` like any other DTO. Bad input gets 422:
 
 ```dart title="server/lib/app/http/controllers/blog.controller.dart"
 import 'package:blog_shared/blog_shared.dart' show SaveBlog;
@@ -153,17 +142,20 @@ class BlogController {
 }
 ```
 
+Use `show SaveBlog` in server code, because `dox_core` and `blog_shared` both export a `ValidationException` class.
+
+Add the route:
+
 ```dart title="server/lib/routes/api.dart"
 Route.post('/blogs', (BlogController c) => c.store);
 ```
-
-Use `show SaveBlog` in server code, because `dox_core` and `blog_shared` both export a class named `ValidationException`. With `show`, the two names do not clash.
 
 A bad request gets the errors as `{"key": "message"}`:
 
 ```text
 POST /api/blogs  {"title": "ab", "description": "short"}
-422 {"title":"The title must be between 3 and 255 characters","description":"The description must be at least 10 characters"}
+422 {"title":"The title must be between 3 and 255 characters",
+     "description":"The description must be at least 10 characters"}
 ```
 
 ## 3. The Flutter app
@@ -185,9 +177,7 @@ dependencies:
     path: ../packages/blog_shared
 ```
 
-The app does not depend on `dox_core`.
-
-The widget checks the form with `SaveBlog.schema.safeParse(...)`, and it sends the request only when the input is good. `result.errors` has the same shape as the server's `422` body, so one `_errors` map shows both:
+The widget checks the form with `SaveBlog.schema.safeParse()`, and sends only good input. `result.errors` has the same shape as the 422 body of the server:
 
 ```dart title="app/lib/new_blog_form.dart"
 import 'dart:convert';
@@ -211,7 +201,8 @@ class _NewBlogFormState extends State<NewBlogForm> {
   Map<String, String> _errors = <String, String>{};
 
   Future<void> _submit() async {
-    ParseResult<SaveBlog> result = SaveBlog.schema.safeParse(<String, dynamic>{
+    ParseResult<SaveBlog> result =
+        SaveBlog.schema.safeParse(<String, dynamic>{
       'title': _title.text,
       'description': _description.text,
     });
@@ -247,11 +238,14 @@ class _NewBlogFormState extends State<NewBlogForm> {
       children: <Widget>[
         TextField(
           controller: _title,
-          decoration: InputDecoration(labelText: 'Title', errorText: _errors['title']),
+          decoration: InputDecoration(
+              labelText: 'Title', errorText: _errors['title']),
         ),
         TextField(
           controller: _description,
-          decoration: InputDecoration(labelText: 'Description', errorText: _errors['description']),
+          decoration: InputDecoration(
+              labelText: 'Description',
+              errorText: _errors['description']),
         ),
         ElevatedButton(onPressed: _submit, child: const Text('Save')),
       ],
@@ -268,6 +262,9 @@ The schema has more methods than `safeParse`:
 - `toMap` gives the JSON map to send.
 - `toJsonSchema` gives the JSON Schema of the DTO.
 
-If the DTO has an `async` `validate()` method, use `safeParseAsync` or `parseAsync`.
+If the DTO has an async `validate()` method, use `safeParseAsync` or `parseAsync`.
 
-See [Validation](../the-basic/validation.md) and [dox_validation](../packages/validation.md) for all rules and methods.
+## Next steps
+
+- [Validation](../the-basic/validation.md): all the rules.
+- [dox_validation](../packages/validation.md): all the schema methods.

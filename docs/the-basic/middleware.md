@@ -6,9 +6,7 @@ icon: lucide/layers
 
 Middleware is code that runs before the controller, and if you want, after it too.
 
-Use it for checks like login, logging or rate limits, or to change the response. For example, an auth middleware checks the user. If the user is not logged in, it sends an error, and the controller never runs.
-
-## Defining middleware
+## Making a middleware
 
 Make a middleware with the CLI:
 
@@ -30,40 +28,34 @@ class LoggerMiddleware implements IDoxMiddleware {
 }
 ```
 
-`handle` takes an `IDoxRequest`, not a `DoxRequest`. It can be `async`, and Dox waits for it. A middleware does one of these:
-
-- **Return the request.** Dox goes on to the next middleware, then to the controller.
-- **Return something else** (a `String`, a `Map`, a `response(...)`). Dox sends it as the response. The controller does not run.
-- **Throw an exception**, like `NotFoundHttpException()`. Dox sends the error response. See [Response: errors](response.md#errors).
+`handle` can be async. Return the request to go on. Return any other value to send it as the response, or throw an exception to send an error. Then the controller does not run.
 
 !!! warning
-    Do not forget `return req`. A middleware that returns `null` ends the request with an empty `200`, and the controller does not run.
-    When `APP_ENV` is `development` or `local`, Dox prints a warning the first time a middleware does this.
+    Do not forget `return req`. A middleware that returns null ends the request with an empty 200.
 
 ### Function middleware
 
-A function that takes a `DoxRequest` also works as middleware. This one checks an API key:
+A function that takes a `DoxRequest` also works as middleware:
 
 ```dart title="lib/app/http/middleware/api_key.middleware.dart"
-import 'package:dox_core/dox_core.dart';
-
 dynamic apiKeyMiddleware(DoxRequest req) {
   String apiKey = Env.get<String>('API_KEY');
   String given = req.header('X-Api-Key') ?? '';
   if (apiKey.isEmpty || !Hash.equals(given, apiKey)) {
-    return response(<String, String>{'message': 'Unauthorized'}).statusCode(401);
+    return response(<String, String>{'message': 'Unauthorized'})
+        .statusCode(401);
   }
   return req;
 }
 ```
 
-The key comes from the `API_KEY` env variable, not from the code. Use `Hash.equals` and not `==` to compare secrets. It takes the same time for every wrong key, so the time does not tell an attacker how much of the key was right.
+Compare secrets with `Hash.equals`, not `==`, so the time does not tell an attacker how much of the key was right.
 
 ## Registering middleware
 
 ### On a route
 
-Put the middleware in a list before the controller. They run from left to right, and you can mix class and function middleware:
+Put the middleware in a list before the controller. They run from left to right:
 
 ```dart
 Route.get('/ping', <dynamic>[
@@ -75,7 +67,7 @@ Route.get('/ping', <dynamic>[
 
 ### On a group of routes
 
-Use `Route.middleware` to run a middleware for many routes:
+Run a middleware for many routes:
 
 ```dart
 Route.middleware(<dynamic>[LoggerMiddleware()], () {
@@ -86,13 +78,10 @@ Route.middleware(<dynamic>[LoggerMiddleware()], () {
 
 ### On a router
 
-For all routes of one router, set its `middleware` list:
+Run a middleware for all routes of one router:
 
 ```dart title="lib/routes/api.dart"
 class ApiRouter extends Router {
-  @override
-  String get prefix => 'api';
-
   @override
   List<dynamic> get middleware => <dynamic>[LoggerMiddleware()];
 
@@ -105,18 +94,19 @@ class ApiRouter extends Router {
 
 ### Global middleware
 
-For all routes, set `globalMiddleware` in the app config:
+Run a middleware for all routes:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   globalMiddleware: <dynamic>[
     LogMiddleware(enabled: env.appEnv != 'production'),
   ],
-  // ...
 );
 ```
 
-A package can add global middleware from the `setup()` of its provider, with `Dox().addGlobalMiddleware(...)`. It runs before the app's `globalMiddleware`:
+### Global middleware from a package
+
+A package adds a global middleware in the `setup()` of its provider. It runs before the global middleware of the app:
 
 ```dart
 class AuditProvider extends DoxProvider {
@@ -127,40 +117,37 @@ class AuditProvider extends DoxProvider {
 }
 ```
 
+A second add of the same middleware is skipped, so use a top-level function or a const instance.
+
 ### Skip a middleware on one route
 
-Some routes do not fit a global middleware. For example, a long stream should not end with `RequestTimeout`. `.withoutMiddleware<T>()` takes every middleware of type `T` out of the route, also global, router and group middleware:
+Take every middleware of a type out of one route, also a global one:
 
 ```dart
 Route.post('/events', (EventController c) => c.stream)
     .withoutMiddleware<RequestTimeout>();
 ```
 
-It takes out `T` and any subtype of `T`. So `withoutMiddleware<IDoxNextMiddleware>()` takes out every middleware that uses `next`. Use a specific type. The route is also left out of the OpenAPI docs of that middleware, for example its security.
+It also takes out the subtypes of the type, so use a specific type.
 
 ### The order
 
-Middleware runs in this order: package middleware from providers, then the app's global middleware, then router middleware, then group middleware, then route middleware. If one returns a value or throws, the rest do not run:
+Middleware runs in this order. If one returns a value or throws, the rest do not run:
 
 ```mermaid
 flowchart LR
-    G["Global"] --> R["Router"] --> P["Group"] --> T["Route"] --> C["Controller"]
+    K["Package"] --> G["Global"] --> R["Router"] --> P["Group"] --> T["Route"] --> C["Controller"]
 ```
 
 ## Run code after the controller
 
-Sometimes you want to change the response after the controller made it. For this, a middleware can get a `next` function. `await next()` runs the rest of the middleware and the controller, and gives you the response. Change it, then return it:
+Implement `IDoxNextMiddleware` to change the response. `await next()` runs the rest of the middleware and the controller:
 
 ```dart title="lib/app/http/middleware/see_other.middleware.dart"
-import 'package:dox_core/dox_core.dart';
-
-/// a redirect after a form post becomes 303, so the browser does a GET
 class SeeOtherMiddleware implements IDoxNextMiddleware {
   @override
   Future<DoxResponse> handle(DoxRequest req, Next next) async {
-    // before the controller
     DoxResponse res = await next();
-    // after the controller
     if (res.status == 302 && req.httpRequest.method != 'GET') {
       res.statusCode(303);
     }
@@ -169,11 +156,9 @@ class SeeOtherMiddleware implements IDoxNextMiddleware {
 }
 ```
 
-The response from `next()` is always a `DoxResponse`, so you can use all its methods, like `statusCode(...)` and `header(...)`. Read the status with `res.status` (`null` means 200) and the headers with `res.headers`.
+If the controller throws, `next()` gives the error response from the [ExceptionHandler](errors.md), so the code after it always runs.
 
-If the controller throws an error, `next()` does not throw. It gives the error response from the [ExceptionHandler](errors.md), like a `404` or a `422`. So the code after `next()` always runs. To stop early, return a response and do not call `next()`.
-
-A function works too. It takes the request and `next`:
+A function works too:
 
 ```dart
 Future<DoxResponse> timerMiddleware(DoxRequest req, Next next) async {
@@ -185,30 +170,26 @@ Future<DoxResponse> timerMiddleware(DoxRequest req, Next next) async {
 
 ## Run code after the answer is sent
 
-Some work should not make the client wait, like logs, metrics or cleanup. A middleware can do it in a `terminate` method, which runs after the answer has gone to the client. Implement `IDoxTerminableMiddleware`:
+Implement `IDoxTerminableMiddleware` for work that must not make the client wait, like logs or metrics:
 
 ```dart title="lib/app/http/middleware/metrics.middleware.dart"
-import 'package:dox_core/dox_core.dart';
-
-class MetricsMiddleware implements IDoxMiddleware, IDoxTerminableMiddleware {
+class MetricsMiddleware
+    implements IDoxMiddleware, IDoxTerminableMiddleware {
   @override
-  dynamic handle(IDoxRequest req) => req; // before the controller
+  dynamic handle(IDoxRequest req) => req;
 
   @override
   void terminate(DoxRequest req, DoxResponse res) {
-    // the answer is already sent
     print('${req.method} ${req.uri.path} ${res.status}');
   }
 }
 ```
 
-`res.status` is the status that was sent, also for an error answer. `terminate` can be `async`. An error in it goes to `ExceptionHandler.report`, and it never changes the answer.
+An error in `terminate` goes to `ExceptionHandler.report`. It never changes the answer.
 
-### From any code, with `AfterResponse`
+### From any code
 
-A middleware must be on the route. If you want to add work after the answer from any code (a controller, a service, a package), use `AfterResponse`. The code does not need the request.
-
-It is off by default. Turn it on in the `setup()` of a provider. `setup()` runs in every isolate, so each isolate turns it on:
+`AfterResponse` adds work after the answer from a controller, a service or a package. Turn it on in the `setup()` of a provider:
 
 ```dart title="lib/providers/app_provider.dart"
 @override
@@ -217,128 +198,109 @@ void setup() {
 }
 ```
 
-Then add work anywhere in the request:
+Then add work anywhere in the request. The work runs in the order you add it:
 
 ```dart
 AfterResponse.run(() => mailer.sendWelcome(user));
 ```
 
-The work runs after the answer is sent, one after the other. An error in it goes to `ExceptionHandler.report`, so it never reaches the client.
+Work that did not run yet is lost when the server stops. For work that must run, use a [queue](../digging-deeper/queue.md#dispatching-jobs).
 
-A request that adds no work costs almost nothing. The list of work is made on the first `run`.
-
-The work is not saved anywhere. When the server stops, work that did not run yet is lost. So use a [queue](../digging-deeper/queue.md) for work that must run. To run a queue job this way, see `dispatchAfterResponse()` in [Queue](../digging-deeper/queue.md#dispatching-jobs).
+`AfterResponse.disable()` turns it off again, for tests. `AfterResponse.enabled` tells if it is on.
 
 ## Built-in middleware
 
 ### Request id
 
-When you look for one request in your logs, an id helps. `RequestId` gives each request an id. It is sent back in the `X-Request-Id` header, and you can read it as `req.requestId`:
+`RequestId` gives each request an id. It is sent in the `X-Request-Id` header, and you read it as `req.requestId`:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   globalMiddleware: <dynamic>[
     const RequestId(),
-    LogMiddleware(enabled: true),
+    LogMiddleware(),
   ],
-  // ...
 );
 ```
 
-Put `RequestId` before `LogMiddleware`, so each log line gets `http.request_id`. The default `ExceptionHandler.report` prints the id with the error. In your own `report`, read `ExceptionHandler.requestId`.
+Put it before `LogMiddleware`, so each log line gets the id. Dox keeps a safe id from the client. `RequestId(trustClient: false)` always makes a new one.
 
-When the client (or a proxy) sends a safe `X-Request-Id`, Dox keeps it. Else it makes a new one. `RequestId(trustClient: false)` always makes a new one.
+To make an id yourself, call `RequestId.make()`. It gives 32 hex characters.
 
 ### ETag and 304 Not Modified
 
-If a client asks for the same data again and nothing changed, you can save bandwidth. `ETag` adds an `ETag` header to GET and HEAD answers. When the client sends the same ETag back in `If-None-Match`, Dox answers `304 Not Modified` with no body:
+`ETag` answers 304 with no body when the client already has the same data:
 
 ```dart
-Route.get('/posts', <dynamic>[const ETag(), (PostController c) => c.index]);
+Route.get('/posts',
+    <dynamic>[const ETag(), (PostController c) => c.index]);
 ```
 
-It works on `200` answers with a body in memory: a `String`, a `Map`, a `List` or a model. Files and streams are not touched. The controller still runs, so a `304` saves bandwidth, not server time.
+It works on 200 answers with a body in memory. The controller still runs, so it saves bandwidth, not server time.
+
+To make a weak ETag yourself, use `ETag.of(bytes)`. `ETag.matches(ifNoneMatch, tag)` tells if the header of the client has the tag.
 
 ### Request timeout
 
-A slow route should not keep the client waiting forever. `.timeout` answers `503 Service Unavailable` when the middleware after it and the controller take too long:
+Answer 503 when the route takes too long:
 
 ```dart
 Route.get('/report', (ReportController c) => c.show)
     .timeout(Duration(seconds: 30));
 ```
 
-This is the same as the `RequestTimeout` middleware. For every route, add `RequestTimeout(...)` to `globalMiddleware`:
+For every route, add the `RequestTimeout` middleware to `globalMiddleware`:
 
 ```dart
-Route.get('/report', <dynamic>[
-  RequestTimeout(Duration(seconds: 30)),
-  (ReportController c) => c.show,
-]);
+RequestTimeout(Duration(seconds: 30))
 ```
 
-The answer is the normal error JSON:
-
-```json
-{"code": "request_timeout", "message": "The request took too long"}
-```
-
-Dart can not stop a running Future, so the controller keeps running in the background. Its late result is dropped, so nothing is sent twice.
-
-A global `RequestTimeout` also ends long streams. To keep it off one route, see [Skip a middleware on one route](#skip-a-middleware-on-one-route).
+Dart can not stop a running Future, so the controller keeps running and its late result is dropped. A global timeout also ends long streams. See [Skip a middleware on one route](#skip-a-middleware-on-one-route).
 
 ### Server timing
 
-When a page is slow, you want to see where the time goes. `ServerTiming` adds a `Server-Timing` header, and the browser dev tools show it in the Network tab, under Timing:
+`ServerTiming` adds a `Server-Timing` header. The browser dev tools show it in the Network tab:
 
 ```dart title="lib/config/app.dart"
 AppConfig appConfig = AppConfig(
   globalMiddleware: <dynamic>[
     if (Env.get<String>('APP_ENV') == 'development') const ServerTiming(),
   ],
-  // ...
 );
 ```
 
 !!! warning "Development or trusted clients only"
-    The header tells every client how long your code takes. An attacker can use that, for example to guess if an email has an account. `ServerTiming` is off unless you add it. Turn it on in development, or only for clients you trust.
+    The header tells every client how long your code takes. An attacker can use it, for example to guess if an email has an account.
 
-It always sends two times, in milliseconds. `handler` is the time in the controller. `total` is the time of the middleware after `ServerTiming` and the controller.
-
-To add your own time to the current request, use `add`. You do not pass the request:
+It sends the time in the controller as `handler` and the full time as `total`. Add your own time to the current request:
 
 ```dart
 ServerTiming.add('db', Duration(milliseconds: 4));
 ```
 
-`measure` runs a function and adds the time it took, also when it throws:
+Run a function and add the time it took:
 
 ```dart
 String html = await ServerTiming.measure('render', () => view.render());
 ```
 
-The header looks like this:
+The header then looks like this. A name you add again adds up, with a count:
 
 ```
 Server-Timing: db;dur=4.10;desc="3 calls", handler;dur=12.34, total;dur=13.02
 ```
 
-When you `add` the same name again, the times are added together, and the text shows the count, like `"3 calls"`. Pass `description:` to set your own text.
-
 #### Timing database queries
 
-To add the time of every database query, listen to the queries once, in `setup()` of a provider. The listener runs inside the request that made the query, so `add` finds that request:
+Add the time of every query in the `setup()` of a provider:
 
 ```dart title="lib/providers/query_timing_provider.dart"
-import 'package:dox_core/dox_core.dart';
-import 'package:dox_orm/dox_orm.dart'; // SqlQueryBuilder and QueryEvent
+import 'package:dox_orm/dox_orm.dart';
 
 void onQuery(QueryEvent event) {
   ServerTiming.add('db', event.time);
 }
 
-/// Dox finds every DoxProvider class,
-/// see lib/generated/container.g.dart.
 class QueryTimingProvider extends DoxProvider {
   @override
   void setup() {
@@ -347,46 +309,37 @@ class QueryTimingProvider extends DoxProvider {
 }
 ```
 
-The header then shows the total query time and the count, like `db;dur=4.10;desc="3 calls"`. See [Listen to queries](../database/index.md#listen-to-queries).
+See [Listen to queries](../database/index.md#listen-to-queries).
 
-Each `listen` call adds the listener again. If `setup()` runs a second time (for example in tests), each query is counted twice. Call `SqlQueryBuilder().removeListener(onQuery)` first, or when you are done.
+### Log requests
+
+`LogMiddleware` logs one line for each request. It follows the logger config. These are its options:
+
+| Option | What it does |
+| --- | --- |
+| `enabled` | false turns the request logs off. Not set: follow the logger. |
+| `withHeader` | true also logs the headers. |
+| `redact` | Fields and headers whose name has one of these words are logged as `[REDACTED]`. Default: `LogMiddleware.defaultRedact` (password, secret, token, cookie and more). |
+| `filter` | A function that changes the line before it is logged. |
+
+```dart
+LogMiddleware(withHeader: true, redact: <String>['password', 'pin'])
+```
 
 ### More middleware
 
-Dox has more middleware on other pages:
+Other pages have more middleware:
 
-- `LogMiddleware` from `dox_core` logs one line per request. See [Details](#logmiddleware) for its options.
-- `AuthMiddleware` from `dox_auth` checks the JWT token. `AuthMiddleware(optional: true)` lets guests through too. `GuestMiddleware` lets only guests through, for login pages. See [Authentication](../security/authentication.md).
-- `RateLimit` answers `429` when a client sends too many requests. See [Rate limiting](../security/rate-limiting.md).
-- `SecurityHeaders` adds safe headers like `X-Frame-Options` to every answer. See [Security headers](../security/security-headers.md).
+- `AuthMiddleware` and `GuestMiddleware` check the login. See [Authentication](../security/authentication.md).
+- `RateLimit` answers 429 for too many requests. See [Rate limiting](../security/rate-limiting.md).
+- `SecurityHeaders` adds safe headers. See [Security headers](../security/security-headers.md).
 - `SessionMiddleware` gives each request a session. See [Session](session.md).
 - `CsrfMiddleware` stops cross site request forgery. See [CSRF protection](../security/csrf.md).
-- `ValidateSignature` checks signed urls. See [Signed URLs](../security/signed-urls.md).
-- `MethodOverride` lets HTML forms send `PUT`, `PATCH` and `DELETE`. See [Routing](routing.md#forms-with-put-patch-and-delete).
+- `ValidateSignature` checks signed URLs. See [Signed URLs](../security/signed-urls.md).
+- `MethodOverride` lets HTML forms send PUT, PATCH and DELETE. See [Routing](routing.md#forms-with-put-patch-and-delete).
 
-## Details
+## Next steps
 
-This section is for special cases. Most apps do not need it.
-
-### LogMiddleware
-
-- It follows `LoggerConfig`: `enabled`, `level` and `prettyPrint`. If the logger is off, `LogMiddleware(enabled: true)` does not turn logs on. `enabled: false` turns only the request logs off. Leave it unset to follow the logger.
-- With `prettyPrint` it prints colored text that starts with `[request]`, like `[request] GET /users => {...}`. Without it, it prints one JSON line with `status`, `source` (`request`), `message`, `network.client.ip`, `http.method`, `http.url`, `http.request_id` and `payload`.
-- The `filter` can change `status`, `message` and the other fields. It can not change `timestamp` or `logger`, because `Logger` sets them.
-- Headers are logged only with `withHeader: true`.
-- Body fields and headers whose name has a word like `password`, `secret`, `token`, `authorization`, `cookie` or `api_key` in it (upper or lower case) are logged as `[REDACTED]`. Change the list with `redact:`.
-- The new project turns it off when `APP_ENV` is `production`.
-
-### Other cases
-
-- A route with no `next` or `terminate` middleware pays nothing extra for these features.
-- A class can implement only `IDoxTerminableMiddleware`, with no `handle`.
-- `AfterResponse` work runs in the order it was added. The next one starts only when the one before it ends, so work that never ends blocks the rest for that request. Outside a request, or when it is off, the work runs soon, after the current code.
-- `Dox().addGlobalMiddleware` skips a second add of the same middleware. The list is cleared at each start, before the providers run, so add it from `setup()`. Use a top-level function or a `const` instance. `dox route:list` does not run providers, so it does not show this middleware.
-- A safe `X-Request-Id` is 1 to 128 characters of `A-Z a-z 0-9 . _ -`. A new id is 32 hex characters.
-- `ETag` skips an answer that already has an `ETag` header or `Cache-Control: no-store`. The ETag is weak (`W/"..."`), made from a fast 64-bit hash of the body. It is not a secure hash.
-- `RequestTimeout` sends `503`, not `504`, because `504 Gateway Timeout` is what a proxy sends. `503` says the app itself gave up.
-- `ServerTiming` names may only have letters, digits and ``!#$%&'*+-.^_`|~``. Other characters become `_`, and an empty name is ignored. One answer keeps at most 32 names, plus `handler` and `total`.
-- A time you add named `total` or `handler` is sent as `app_total` or `app_handler`, so it does not change the built-in times.
-- If the answer already has a `Server-Timing` header, the times are added after it.
-- Without `ServerTiming`, or outside a request, `add` and `measure` do nothing. The cost is one small lookup.
+- [Routing](routing.md): add middleware to routes and groups.
+- [Rate limiting](../security/rate-limiting.md): limit the requests of a client.
+- [CORS](../security/cors.md): let other origins call your API.

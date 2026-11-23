@@ -6,52 +6,50 @@ icon: lucide/gauge
 
 This page shows how fast Dox is, and how to keep your app fast in production.
 
-Dox is fast by default, so most apps only need to follow a few rules in production:
+## Setup
 
-1. Build with `dox build` and run the AOT binary. Never use `dart run` in production. See [Deployment](deployment.md#build).
+Dox is fast by default. In production, follow these rules:
+
+1. Build with `dox build` and run the AOT binary. See [Deployment](deployment.md#build).
 2. Put Caddy or nginx in front, for HTTPS and gzip.
 3. Keep the default isolates, one per CPU core.
-4. Keep the body limits on. Uploads stream to disk.
+4. Keep the body limits on.
 
 For the code mistakes that slow an app down, see [Performance mistakes](performance-mistakes.md).
 
 ## Bodies, uploads and big responses
 
-Big requests and responses can fill the memory of your server. Dox protects you from this by default, so you only need to keep these settings:
+Dox keeps big requests and responses out of the memory by default:
 
-- A body over `maxBodySize` or `maxMultipartSize` gets `413` from the native server, before Dart reads it. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
+- A body over `maxBodySize` or `maxMultipartSize` gets 413 before Dart reads it. Set the same limit in the proxy. See [Size limits](../the-basic/request.md#size-limits).
 - An upload over 1 MB streams to a temp file. See [Request](../the-basic/request.md#requestfile).
-- A `File` or `Stream` response is streamed, not loaded into memory. See [Files and big responses](../the-basic/response.md#files-and-big-responses).
+- A `File` or `Stream` response streams. See [Files and big responses](../the-basic/response.md#files-and-big-responses).
 
 ## gzip
 
-gzip saves bandwidth, but it costs CPU on every response. A proxy like Caddy or nginx does it better. So gzip in Dart is off by default. If there is no proxy, turn it on:
+A proxy does gzip better than Dart, so gzip in Dart is off by default. With no proxy, turn it on:
 
 ```dart
 AppConfig(compress: true);
 ```
 
-Only a body over 256 bytes is gzipped, and only when the client accepts gzip. Streamed responses are not compressed.
+Dox gzips only a body over 256 bytes, for a client that accepts gzip. A streamed response is not compressed.
 
 ## Logging
 
-`LogMiddleware` logs one line per request. If a proxy already writes access logs, turn `LogMiddleware` off, because writing logs costs time. A new project does this for you: `enabled` is `false` when `APP_ENV` is `production` or not set.
+`LogMiddleware` logs one line per request. A new project turns it off when `APP_ENV` is `production` or not set, because the proxy writes access logs.
+
+`Logger` writes its lines every 20 ms in one write. If the process is killed hard, the last 20 ms of logs can be lost.
 
 ## Response handler
 
-Leave `responseHandler` unset if you do not need it. With no handler, a plain value (text, map, list) is sent without building a `DoxResponse`.
+Leave `responseHandler` unset if you do not need it. With no handler, Dox sends a plain value (text, map, list) with no `DoxResponse`.
 
 ## Benchmark
 
-This benchmark uses the rules of [the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks):
-each server answers `GET /` (empty body), `GET /user/:id` (the id) and
-`POST /user` (empty body). Dox is a full Dox app with these three routes.
-"Dox server only" is `dox_http_native` with no framework, to show what the
-framework costs.
+This benchmark uses the rules of [the-benchmarker/web-frameworks](https://github.com/the-benchmarker/web-frameworks). Each server answers `GET /` (empty body), `GET /user/:id` (the id) and `POST /user` (empty body). "Dox server only" is `dox_http_native` with no framework.
 
-This only measures the HTTP stack. A real app spends most of its time on
-the database, JSON and your own code, so the gaps are smaller there. See
-[App benchmark](#app-benchmark).
+It measures only the HTTP stack. A real app spends most of its time on the database and your own code. See [App benchmark](#app-benchmark).
 
 ### 2 cores
 
@@ -151,13 +149,7 @@ The other two routes at 256 connections:
 
 ### Why it is fast
 
-The server runs on the isolate's own thread. One FFI call writes the
-answers, reads the sockets and parses the new requests. Dart runs the
-handlers and calls again. A request never waits for another thread to
-wake up. A small helper thread only watches the sockets while the isolate
-has nothing to do. See [Native server](native-server.md#how-it-works).
-
-A profile with `perf` (4 server cores, 64 connections) shows the effect:
+The server runs on the thread of the isolate, so a request never waits for another thread to wake up. See [Native server](native-server.md#how-it-works). A profile with `perf` (4 server cores, 64 connections):
 
 | | Dox | Bun |
 | --- | ---: | ---: |
@@ -182,10 +174,7 @@ A profile with `perf` (4 server cores, 64 connections) shows the effect:
 
 ## App benchmark
 
-A small real app, the same in each language: `GET /json` returns a map,
-`GET /db` reads one row by id from Postgres, `GET /queries?n=20` reads 20
-rows one after another. The table has 10,000 rows. Each app uses its
-database driver directly, with no ORM. Dox uses `dox_postgres_native`.
+A small real app, the same in each language: `GET /json` returns a map, `GET /db` reads one row by id from Postgres, and `GET /queries?n=20` reads 20 rows one after another. The table has 10,000 rows, and each app uses its database driver with no ORM.
 
 <div class="dox-bench" markdown>
 
@@ -246,7 +235,7 @@ database driver directly, with no ORM. Dox uses `dox_postgres_native`.
 
 </div>
 
-The Dox numbers are from the 3.2 patch release (2026-11-16). The other servers are from the run before, on the same Mac.
+The Dox numbers are from 2026-11-16. The other servers are from the run before, on the same Mac.
 
 All three routes at 256 connections, requests per second:
 
@@ -277,7 +266,7 @@ MySQL version.
 How it was run: the same rig as the [benchmark](#how-it-was-run) above.
 The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4.
 Each server has 4 database connections per core, 8 in total. One run of 15
-seconds per route. `dox_postgres_native` and `dox_mysql_native` as released when these numbers were measured. The Postgres Dox row was measured again on 2026-11-16 for the 3.2 patch release (same Mac, a new Docker VM). The other servers and the MySQL table are from the run before.
+seconds per route. The Postgres Dox row was measured again on 2026-11-16 (same Mac, a new Docker VM). The other servers and the MySQL table are from the run before.
 
 ## Database drivers
 
@@ -289,25 +278,13 @@ One find-by-id query, AOT build (`dart build cli`), database on the same machine
 | MySQL 8.4 (10 connections) | 67 µs | 11 µs each (32 in flight) | 13.5 µs |
 | MariaDB 11 (10 connections) | 63 µs | 9.7 µs each (32 in flight) | 12.4 µs |
 
-- The CPU time counts the Dart thread and the Rust thread. For MySQL, it is about 75,000 queries per second on one core.
-- Dart sends many queries to Rust in one call. Rust sends many results back in one message.
-- One query alone spends most of its time on the trip to the database. Many requests at the same time, like in a web server, get the most out of the driver.
+The CPU time counts the Dart thread and the Rust thread. For MySQL, it is about 75,000 queries per second on one core. Many requests at the same time, like in a web server, get the most out of the driver.
 
-## Details
+## Dart VM flags
 
-### Dart VM flags
+A bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64` or `128`) did not give a better p99 in 5 runs, so Dox sets no VM flags. The AOT binary of `dox build` reads `DART_VM_OPTIONS`, so you can try your own.
 
-A bigger young generation (`DART_VM_OPTIONS=--new_gen_semi_max_size=64` or `128`) did not give a better p99. Over 5 runs the change was inside the noise, and memory did not move. So there is no flag to set, and Dox never sets VM flags for you. `DART_VM_OPTIONS` is read by the AOT binary from `dox build`, so you can try your own.
+## Next steps
 
-### How logs are written
-
-- `Logger` collects log lines and writes them every 20 ms (or every 64 KB) in one write, because writing to stdout blocks the isolate.
-- A `warn`, `warning`, `danger` or `error` line is written right away, with the waiting lines before it, so the order stays.
-- The buffer is also written when the app stops. If the process is killed hard, the last 20 ms of logs can be lost.
-
-### What Dox does for you
-
-- Routes are grouped by method. The regex of each route is built once, not on every request.
-- The argument types of each controller are read once at start, not on every request.
-- JSON and text responses are encoded once, straight to bytes, with `Content-Length` set.
-- The native server gzips on a Rust thread, and the gzipped body still gets a `Content-Length`.
+- [Performance mistakes](performance-mistakes.md): the code that makes an app slow.
+- [Isolate](isolate.md): how Dox uses the CPU cores.

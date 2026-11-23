@@ -6,15 +6,13 @@ icon: lucide/ruler
 
 This page lists every annotation you can put on a `@Dto` field, with its error code and default message.
 
-Use it to look up a rule. To learn how DTOs work, read [Validation](validation.md) first.
+To learn how DTOs work, read [Validation](validation.md) first. How to read the tables:
 
-How to read the tables:
-
-- **Code** is the error code. Use it in `@Dto(messages: ...)` and in a `MessageResolver`.
-- **Message** is the default English text. `{field}` is the last key of the path.
+- Code is the error code. Use it in `@Dto(messages: ...)` and in a `MessageResolver`.
+- Message is the default English text. `{field}` is the last key of the path.
 - Every annotation also takes `message:`. It wins over every other message.
 - All limits include the limit itself, unless the table says "exclusive".
-- On a `List<T>` field, a value rule checks each item. Only the list rules check the list itself.
+- On a list field, a value rule checks each item. Only the list rules check the list itself.
 
 ## Type errors
 
@@ -22,7 +20,7 @@ You get these errors when a value does not fit the field type. They have no anno
 
 | Code | When | Message |
 | --- | --- | --- |
-| `required` | a required field is missing, `null`, or `""` | `The {field} is required` |
+| `required` | a required field is missing, null, or "" | `The {field} is required` |
 | `string` | not a string | `The {field} must be a string` |
 | `integer` | not a whole number | `The {field} must be an integer` |
 | `numeric` | not a number (`double`, `num`) | `The {field} must be a number` |
@@ -36,7 +34,7 @@ You get these errors when a value does not fit the field type. They have no anno
 
 ## Text
 
-Use these rules on `String` fields (and `List<String>` items):
+Use these rules on string fields and string list items:
 
 | Annotation | Code | Message | JSON Schema |
 | --- | --- | --- | --- |
@@ -58,20 +56,18 @@ Use these rules on `String` fields (and `List<String>` items):
 | `@AlphaNumeric()` | `alpha_numeric` | `The {field} must be only alphabetic and number` | `pattern` |
 | `@AlphaDash()` | `alpha_dash` | `The {field} must be only alphabetic, number, dash and underscore` | `pattern` |
 
-- `@Length` has `min:` and `max:`. Both are optional, but you must give one.
-  With only `min:` it acts like `@MinLength`, with only `max:` like `@MaxLength`.
-- Length counts characters (Unicode code points). `é` counts as 1.
-- `@Url()` needs `http` or `https` and a host.
-- `@Uuid()` takes any version. Upper or lower case.
-- `@Ulid()` takes 26 Crockford base32 characters, upper or lower case. The first one is `0` to `7`.
-- `@Regex(pattern, {message})` must match the **whole** value. You do not need `^` and `$`.
-  The regex is checked when the generator runs. A bad regex stops the build.
-- `@Alpha()`, `@AlphaNumeric()` and `@AlphaDash()` use ASCII letters `a-z`, `A-Z`. `@AlphaDash()` also allows digits `0-9`, `-` and `_`.
-- `@In` and `@NotIn` compare exactly (case matters).
+- `@Length` needs `min:`, `max:` or both. With one of them, it acts like `@MinLength` or `@MaxLength`.
+- Length counts characters (Unicode code points), so é counts as 1.
+- `@Url()` needs http or https and a host.
+- `@Uuid()` takes any version, in upper or lower case.
+- `@Ulid()` takes 26 Crockford base32 characters, in upper or lower case. The first one is 0 to 7.
+- `@Regex` must match the full value, so you do not need `^` and `$`. A bad regex stops the build.
+- The alpha rules use the ASCII letters a-z and A-Z. `@AlphaDash()` also allows the digits 0-9, `-` and `_`.
+- `@In` and `@NotIn` compare exactly, and case matters.
 
 ## More text rules
 
-These are also for `String` fields:
+These are also for string fields:
 
 | Annotation | Code | Message | JSON Schema |
 | --- | --- | --- | --- |
@@ -82,28 +78,23 @@ These are also for `String` fields:
 | `@HexColor()`, `@HexColor(short: true)` | `hex_color` | `The {field} must be a hex color like #1a2b3c` | `pattern` |
 | `@Password(min: 8, ...)` | `password` | `The {field} must have {rules}` | `minLength` |
 
-- `@HexColor()` takes `#` and 6 hex digits, in any case. `@HexColor(short: true)` also takes 3 digits, like `#abc`.
-- `@Digits` and `@DigitsBetween` take only `0-9`. No sign, no dot. Use a `String` field, so leading zeros stay.
+- `@HexColor()` takes # and 6 hex digits, in any case. With `short: true` it also takes 3 digits, like #abc.
+- `@Digits` and `@DigitsBetween` take only 0-9, with no sign and no dot. Use a string field, so leading zeros stay.
 - `@DateFormatted` uses these letters:
-  day `d`, `j`, `D` (`Mon`), `l` (`Monday`), `N`, `w`, `S` (`st`), `z`;
-  month `m`, `n`, `M` (`Jan`), `F` (`January`), `t`;
+  day `d`, `j`, `D` (Mon), `l` (Monday), `N`, `w`, `S` (st), `z`;
+  month `m`, `n`, `M` (Jan), `F` (January), `t`;
   year `Y`, `y`, `L`;
   time `a`, `A`, `g`, `h`, `G`, `H`, `i`, `s`, `v`, `u`;
   time zone `e`, `T`, `P`, `p`, `O`, `Z`, `I`;
   full `U`, `c`, `r`.
-  Put `\` before a letter to use it as text, like `Y-m-d\TH:i`. Any other letter stops the build (and throws an `ArgumentError` in `v.string().dateFormat()`). Other characters must be there as they are.
-  `j`, `n`, `g`, `G`, `z` and `U` take no leading zero: `j/n/Y` rejects `01/02/2024`.
-  `e` and `T` take any name that looks like a time zone. They do not check that it is a real one.
-  The date must exist: `2023-02-29` fails. Names need the case shown (`Jan`, not `jan`). A day name must fit the date. The field stays a `String`. Use a `DateTime` field for ISO 8601 dates.
-- `@Password` options: `min` (default 8), `letters`, `mixedCase` (one upper and one lower case letter), `numbers`, `symbols`. They are all off by default.
-  Letters, numbers and symbols are Unicode, so `é` is a letter. `{rules}` lists the options you set, like `at least 8 characters, one number, and one symbol`, or `at least 8 characters and one number`.
-  It does not check leaked passwords.
+  Put `\` before a letter to use it as text, like `Y-m-d\TH:i`. Any other letter stops the build. Other characters must be there as they are.
+  `j`, `n`, `g`, `G`, `z` and `U` take no leading zero, so `j/n/Y` rejects 01/02/2024.
+  The date must exist, so 2023-02-29 fails. Names need the case shown (Jan, not jan), and a day name must fit the date. The field stays a string. Use a `DateTime` field for ISO 8601 dates.
+- `@Password` options: `min` (default 8), `letters`, `mixedCase` (one upper and one lower case letter), `numbers` and `symbols`. The others are off by default. Letters, numbers and symbols are Unicode. `{rules}` lists the options you set, like "at least 8 characters and one number".
 
 ## Other fields
 
-Sometimes a field depends on another field. For example, a password must match its confirmation, or a VAT number is required only for a company. These rules read another key of the same object.
-
-The other key is the input key, like `account_type`, not the Dart name `accountType`. If you give the Dart name of a field with another key, the build stops.
+These rules read another key of the same object, like a password and its confirmation. Give the input key, like `account_type`, not the Dart name. A Dart name stops the build.
 
 | Annotation | Code | Message |
 | --- | --- | --- |
@@ -121,27 +112,21 @@ The other key is the input key, like `account_type`, not the Dart name `accountT
 | `@LessThanField('max_price')` | `less_than` | `The {field} must be less than {max}` |
 | `@LessThanOrEqualField('max_price')` | `max` | `The {field} must be less than or equal {max}` |
 
-- `@Confirmed` and `@Same` compare the raw input of both keys, so `@Trim` does not change the compare.
-- `@Confirmed()` on `password` needs the key `password_confirmation` with the same value. The error is on `password`. Use `@Confirmed(other: 'password_again')` for another key.
-  The DTO does not need a field for the confirmation key.
-- Text and numbers match by text, both ways: `1234` matches `"1234"`, and `"1234"` matches `1234`.
-- `@RequiredIf` and `@RequiredWith` work on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops.
-- `@RequiredIf('type', ['company', 'shop'])` takes a list: any of the values makes the field required. `"true"` matches `true`, `"1"` matches `1`. An enum value matches its name: `@RequiredIf('role', Role.admin)` matches `"admin"`.
-- `@RequiredWith(['phone', 'email'])`: the field is required when any of the keys is there and not empty.
-- `@RequiredUnless('type', 'guest')` makes the field required unless `type` is `guest`. A missing `type` counts as `null`, so the field is required then. It takes a list of values like `@RequiredIf`.
-- `@RequiredWithout(['email'])`: the field is required when any of the keys is missing or empty. `@RequiredWithoutAll(['email', 'phone'])`: when all of them are missing or empty.
-- `@RequiredUnless`, `@RequiredWithout` and `@RequiredWithoutAll` follow the same rules as `@RequiredIf`: a nullable, `Maybe` or default field, and input keys.
-- `@Different('old_password')` needs a value that is not the same as the other key. It compares the raw input like `@Same`. A missing other key passes.
-- `@ProhibitedIf('type', 'guest')` means: when `type` is `guest`, the field must be missing or empty. Empty is `null`, blank text, an empty list or an empty map. `0` and `false` fail. This is not the same as `@Prohibited()`, which fails on `null` and `[]`. It reads `type` and matches like `@RequiredIf`.
-- `@GreaterThanField`, `@GreaterThanOrEqualField`, `@LessThanField` and `@LessThanOrEqualField` compare a value with another field. They are for `int`, `double` and `num` fields. They read the raw input of the other key: a number, or number text from a form. A missing other key (or one that is not a number) fails.
-  `{min}` and `{max}` in the message are the other key. They use the codes of `@GreaterThan`, `@Min`, `@LessThan` and `@Max`.
-- On a `List<T>` field, `@Different` checks the whole list, not each item. The field compare rules do not fit a list.
-- Missing means: not there, `null`, blank text, an empty list or an empty map.
-- They run in step 1, with the other "required" checks. `@Confirmed` and `@Same` run in step 2.
+- `@Confirmed()` on `password` needs the key `password_confirmation` with the same value. The error is on `password`. Use `@Confirmed(other: 'password_again')` for another key. The DTO needs no field for the confirmation key.
+- `@Confirmed`, `@Same` and `@Different` compare the raw input of both keys, so `@Trim` does not change the compare. A missing other key passes `@Different`.
+- Text and numbers match by text, so 1234 matches "1234".
+- The required rules work on a nullable field, a `Maybe` field or a field with a default. On an always-required field the build stops.
+- `@RequiredIf` and `@RequiredUnless` also take a list of values, like `@RequiredIf('type', ['company', 'shop'])`. An enum value matches its name: `@RequiredIf('role', Role.admin)` matches "admin".
+- `@RequiredWith`: the field is required when any of the keys has a value. `@RequiredWithout`: when any of the keys is missing. `@RequiredWithoutAll`: when all of them are missing.
+- `@RequiredUnless`: a missing other key counts as null, so the field is required then.
+- `@ProhibitedIf`: when the other key matches, the field must be missing or empty. 0 and false fail.
+- The field compare rules (`@GreaterThanField` and the others) are for number fields. A missing other key, or one that is not a number, fails. `{min}` and `{max}` in the message are the other key.
+- On a list field, `@Different` checks the full list. The field compare rules do not fit a list.
+- Missing means: not there, null, blank text, an empty list or an empty map.
 
 ## Present or missing
 
-Use these rules to check if a key is sent and has a value:
+These rules check if a key is sent and has a value:
 
 | Annotation | Code | Message |
 | --- | --- | --- |
@@ -151,12 +136,11 @@ Use these rules to check if a key is sent and has a value:
 | `@Accepted()` | `accepted` | `The {field} must be accepted` |
 | `@Declined()` | `declined` | `The {field} must be declined` |
 
-- `@Filled()`: a missing key passes. A key that is sent must have a value: not `null`, not blank text, not an empty list.
-- `@Present()`: the key must be sent. Its value may be `null` or empty.
-- `@Filled()` and `@Present()` are for a nullable, `Maybe` or default field, like `@RequiredIf`. They run in step 1.
-- `@Prohibited()`: the key must be missing, or blank text like `""` or `"  "`. Any other sent value fails, also `null`, `[]`, `{}`, `0` and `false`. It reads the raw input, so it runs before the type check, in step 1. It is for a nullable, `Maybe` or default field.
-- `@Accepted()` takes `true`, `1`, `"1"`, `"true"`, `"yes"` and `"on"`. `@Declined()` takes `false`, `0`, `"0"`, `"false"`, `"no"` and `"off"`. The text is case sensitive.
-  Use them on a `bool` field with no default. Then a missing value fails with `required`. In a form, `yes` and `on` turn into `true` first. In a JSON body a `bool` field takes only `true` and `false`, unless the DTO has `@Dto(coerce: true)`.
+- `@Filled()`: a missing key passes. A sent key must have a value: not null, not blank text, not an empty list.
+- `@Present()`: the key must be sent. Its value can be null or empty.
+- `@Prohibited()`: the key must be missing, or blank text. Any other value fails, also null, `[]`, `{}`, 0 and false.
+- `@Filled`, `@Present` and `@Prohibited` are for a nullable, `Maybe` or default field.
+- `@Accepted()` takes true, 1, "1", "true", "yes" and "on". `@Declined()` takes false, 0, "0", "false", "no" and "off". The text is case sensitive. Use them on a bool field with no default. In a JSON body a bool field takes only true and false, unless the DTO has `@Dto(coerce: true)`.
 
 ```dart
 @Accepted()
@@ -168,18 +152,18 @@ final String? note; // the key must be there, null is fine
 
 ## Skip a field
 
-Sometimes a field only matters for some input. For example, a VAT number is only for a company. These rules skip the field for the other cases:
+These rules skip a field for some input, like a VAT number that is only for a company:
 
 | Annotation | Does |
 | --- | --- |
-| `@ExcludeIf('type', 'person')` | when `type` is `person`, the field is skipped |
-| `@ExcludeUnless('type', 'company')` | unless `type` is `company`, the field is skipped |
+| `@ExcludeIf('type', 'person')` | when `type` is person, the field is skipped |
+| `@ExcludeUnless('type', 'company')` | unless `type` is company, the field is skipped |
 
-- A skipped field is not read and not checked. It gets its default, `null` or `Maybe.missing()`, as if it was not sent. The field is left out of the validated data.
-- They read the raw input of the other key, and match like `@RequiredIf` (also with a list of values).
-- `@ExcludeIf`: a missing other key does not skip. `@ExcludeUnless`: a missing other key counts as `null`, so the field is skipped.
-- They are for a nullable, `Maybe` or default field. On an always-required field the build stops.
-- The fluent schemas have `.excludeIf()` and `.excludeUnless()`. There the key is left out of the output. See [Skip a field](../packages/validation.md#skip-a-field).
+- A skipped field gets its default, null or `Maybe.missing()`, as if it was not sent.
+- They match like `@RequiredIf`, also with a list of values.
+- `@ExcludeIf`: a missing other key does not skip. `@ExcludeUnless`: a missing other key counts as null, so the field is skipped.
+- They are for a nullable, `Maybe` or default field.
+- Fluent schemas have `.excludeIf()` and `.excludeUnless()`. See [Skip a field](../packages/validation.md#skip-a-field).
 
 ```dart
 final String type;
@@ -191,34 +175,30 @@ final String? vatNumber; // not checked for a person
 
 ## Change text
 
-These change the value before the rules run. For example, `@Trim` removes the spaces a user typed by mistake.
-
-They always run in this order, wherever you put them: `@Trim`, then `@Lowercase` or `@Uppercase`, then the "empty string is missing" check.
+These change the value before the rules run. They always run in this order: `@Trim`, then `@Lowercase` or `@Uppercase`, then the "empty string is missing" check.
 
 | Annotation | Does |
 | --- | --- |
 | `@Trim()` | removes spaces at the start and the end |
 | `@Lowercase()` | makes the text lower case |
 | `@Uppercase()` | makes the text upper case |
-| `@AllowEmpty()` | keeps `""` as a value. Without it, `""` counts as missing. |
+| `@AllowEmpty()` | keeps "" as a value. Without it, "" counts as missing. |
 
-They have no error and no JSON Schema output. `@Lowercase()` and `@Uppercase()` together stop the build.
+`@Lowercase()` and `@Uppercase()` together stop the build.
 
 ## Bad value to default
 
-Sometimes a bad value should just give the default, like `page=abc` in a list page:
-
 | Annotation | Does |
 | --- | --- |
-| `@OrDefault()` | a bad value gives the default of the field (or `null`, or `Maybe.missing()`), not an error. |
+| `@OrDefault()` | a bad value gives the default of the field (or null, or `Maybe.missing()`), not an error. |
 
 - It drops type errors and the errors of the normal rules of the field.
-- Errors from async rules (`@Unique`, `@Exists`, your `AsyncRule`) and from `validate()` are not dropped. They still give `422`.
-- The field needs a default, a nullable type or a `Maybe` type. Else the build stops.
+- Errors from async rules and from `validate()` still give 422.
+- The field needs a default, a nullable type or a `Maybe` type.
 
 ## Numbers
 
-Use these rules on `int`, `double` and `num` fields (and list items):
+Use these rules on `int`, `double` and `num` fields and list items:
 
 | Annotation | Code | Message | JSON Schema |
 | --- | --- | --- | --- |
@@ -231,11 +211,11 @@ Use these rules on `int`, `double` and `num` fields (and list items):
 | `@In([1, 2, 3])` | `in` | `The selected {field} is invalid. Valid options are {values}` | `enum` |
 | `@NotIn([0])` | `not_in` | `The {field} field cannot be {value}` | `not: {enum}` |
 
-The values are `num`. `@Min(1.5)` on an `int` field stops the build. `@Range` checks that a number is between two values.
+`@Min(1.5)` on an `int` field stops the build.
 
 ## Lists
 
-Use these rules on `List<T>` fields. They check the list, not the items:
+Use these rules on list fields. They check the list, not the items:
 
 | Annotation | Code | Message | JSON Schema |
 | --- | --- | --- | --- |
@@ -243,7 +223,7 @@ Use these rules on `List<T>` fields. They check the list, not the items:
 | `@MaxItems(5)` | `max_items` | `The {field} may not have more than {max} items` | `maxItems` |
 | `@UniqueItems()` | `unique_items` | `The {field} must not have duplicate items` | `uniqueItems: true` |
 
-`@UniqueItems()` works for `String`, numbers, `bool`, enums and `DateTime`. On a list of DTOs it stops the build.
+`@UniqueItems()` works for strings, numbers, bools, enums and dates. On a list of DTOs it stops the build.
 
 ## Dates
 
@@ -256,14 +236,11 @@ Use these rules on `DateTime` fields:
 | `@AfterOrEqual('today')` | `after_or_equal` | `The {field} must be a date after or equal to {date}` | `format: date-time` |
 | `@BeforeOrEqual('end_date')` | `before_or_equal` | `The {field} must be a date before or equal to {date}` | `format: date-time` |
 
-- The value is one of:
-    - an ISO 8601 date, like `'2000-01-01'`,
-    - a word: `'now'` (the time of the request), `'today'`, `'tomorrow'` or `'yesterday'`. These are in UTC, and `'today'` is the start of the day,
-    - the input key of another `DateTime` field of the same DTO, like `'start_date'`.
-- With another field, the check uses its converted value. When that field has no value, the check passes.
-- A text that is not a date, a word or a `DateTime` field stops the build.
-- `@After` and `@Before` are exclusive: `@After('2000-01-01')` does not accept `2000-01-01T00:00:00Z`. `@AfterOrEqual` and `@BeforeOrEqual` accept the same time.
-- Words and other fields need one `build_runner` run.
+- The value is one of these:
+    - an ISO 8601 date, like '2000-01-01',
+    - a word: 'now' (the time of the request), 'today', 'tomorrow' or 'yesterday'. These are in UTC, and 'today' is the start of the day,
+    - the input key of another date field of the same DTO, like 'start_date'. When that field has no value, the check passes.
+- `@After` and `@Before` are exclusive. `@AfterOrEqual` and `@BeforeOrEqual` accept the same time.
 
 ```dart
 final DateTime startDate;
@@ -286,29 +263,13 @@ Use these rules on `RequestFile` and `List<RequestFile>` fields:
 | `@MimeTypes(['image/png', 'image/*'])` | `mime_types` | `The {field} must be a file of type: {types}` | `contentMediaType` |
 | `@Dimensions(minWidth: 100, ratio: 3 / 2)` | `dimensions` | `The {field} has invalid image dimensions` | `contentMediaType: image/*` |
 
-- `@MaxSize` and `@MinSize` units: `B`, `KB`, `MB`, `GB`. `1KB` = 1024 bytes. A bad size text stops the build.
-- `@Mimes` takes file extensions. Dox finds the real type from the first bytes of the file.
-  The file name extension must not name another type, or a type a browser runs (like `html` or `svg`).
-  So `x.html` with GIF bytes does not pass. An empty or unknown extension is fine.
-  For zip based types (like `docx` or `xlsx`), the file name extension must match too.
-  For types without a byte signature (like `txt` or `csv`), it uses the file name extension.
-- `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`. No `svg`.
-- `@MimeTypes` takes MIME types. Dox turns each one into file extensions, then checks the real bytes like `@Mimes`.
-  It does not trust the content type the client sent.
-  `image/*` means: jpg, jpeg, png, gif, webp, bmp, tif, tiff, ico, heic, heif, avif and psd. No `svg`.
-  This is wider than `@Image()`, and browsers can not show most of the extra types.
-  For images that browsers can show, use `@Image()` or list the MIME types.
-  Write `image/jpeg`, not `image/jpg`. `image/jpg` is not a real MIME type, so it never matches.
-  An unknown MIME type never matches.
-- `@Dimensions` checks the width and height in pixels. Limits: `width`, `height` (exact), `minWidth`, `maxWidth`, `minHeight`, `maxHeight` and `ratio` (width / height, like `3 / 2`).
-  Give at least one limit, or the build stops.
-  It reads only the image header of PNG, GIF, WebP and JPEG files, never the whole file.
-  Any other file, or a broken or cut short header, fails.
-  For a JPEG over 1 MB, Dox reads the first 128 KB. A JPEG with more photo metadata than that before its size fails.
-  A `ratio` passes when it is off by less than one pixel.
-- The JSON Schema of a file is `{"type": "string", "format": "binary"}`, plus the keys above.
+- Size units are B, KB, MB and GB. 1KB is 1024 bytes.
+- `@Mimes` takes file extensions. Dox finds the real type from the first bytes of the file. The file name extension must not name another type, or a type a browser runs (like html or svg). For zip types (like docx), the extension must match too. For types with no byte signature (like txt or csv), Dox uses the extension.
+- `@Image()` is `@Mimes(['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'])`, with no svg.
+- `@MimeTypes` takes MIME types and checks the real bytes like `@Mimes`. `image/*` means jpg, jpeg, png, gif, webp, bmp, tif, tiff, ico, heic, heif, avif and psd. Browsers can not show most of these, so for web images use `@Image()`. Write `image/jpeg`: `image/jpg` never matches.
+- `@Dimensions` limits: `width`, `height` (exact), `minWidth`, `maxWidth`, `minHeight`, `maxHeight` and `ratio` (width / height). It reads the header of PNG, GIF, WebP and JPEG files. Any other file fails. A ratio passes when it is off by less than one pixel.
 
-With fluent schemas, the same rules are on `v.file()`. Sizes there are in bytes, not text:
+With fluent schemas, use `v.file()`. Sizes there are in bytes:
 
 ```dart
 v.file()
@@ -317,68 +278,62 @@ v.file()
     .dimensions(minWidth: 100, maxWidth: 2000);
 ```
 
-The fluent methods are `maxSize(bytes)`, `minSize(bytes)`, `mimes(types)`, `mimeTypes(types)`, `dimensions(...)`, `image()` and `extensions(types)`.
+The fluent methods are `maxSize`, `minSize`, `mimes`, `mimeTypes`, `dimensions`, `image` and `extensions`.
 
 ## Database
 
-These rules come from `dox_orm`. They read the database, so they run after all other checks passed:
+These rules come from `dox_orm`. They run after all other checks pass:
 
 | Annotation | Code | Message |
 | --- | --- | --- |
 | `@Unique(table, {column, ignoreParam, ignoreColumn, connection})` | `unique` | `The {field} has already been taken` |
 | `@Exists(table, {column, connection})` | `exists` | `The selected {field} is invalid` |
 
-- `@Unique` column default: the input key. `@Exists` column default: `id`.
-- They read the table, not the model. So soft-deleted rows count too.
-- `ignoreParam: 'id'` skips the row where `ignoreColumn` (default `id`) equals the path param `{id}`.
-- They add nothing to the JSON Schema.
+- The default column of `@Unique` is the input key. The default column of `@Exists` is id.
+- They read the table, not the model, so soft-deleted rows count too.
+- `ignoreParam: 'id'` skips the row where `ignoreColumn` (default id) equals the path param `{id}`.
 
-See [Database rules](validation.md#database-rules-unique-and-exists).
-
-In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int().exists('teams')`. See [Fluent schemas](../packages/validation.md#more-rules).
+See [Database rules](validation.md#database-rules-unique-and-exists). In a fluent schema, use `v.string().unique('users', column: 'email')` and `v.int().exists('teams')`. See [Fluent schemas](../packages/validation.md#more-rules).
 
 ## Keys and DTO options
 
-These options change how the whole DTO reads its input:
+These options change how the full DTO reads its input:
 
 | Annotation | Does |
 | --- | --- |
-| `@Name('emailAddress')` | the input key for this field. Default: the field name in snake_case. |
+| `@Name('emailAddress')` | the input key for this field. Default: the field name in snake case. |
 | `@Dto()` | marks the class. |
 | `@Dto(source: Source.query)` | where to read: `Source.auto` (default), `Source.query`, `Source.body`. |
-| `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as is). |
-| `@Dto(strict: true)` | unknown keys are errors. Default `false`: they are dropped. |
-| `@Dto(emptyStringsToNull: true)` | `""` is read as `null`, not as missing. Default `false`. |
-| `@Dto(trim: true)` | trims every `String` field and text item, like `@Trim()` on each. Default `false`. |
-| `@Dto(coerce: true)` | a JSON body may send text for numbers and bools, like a form. Default `false`. |
-| `@Dto(messages: {...})` | messages by `code` or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. A short rule name works too, like `name.min`. See [Short rule names](validation.md#short-rule-names-in-message-keys). |
-| `@Dto(attributes: {...})` | the names shown for `{field}`, by key, like `{'first_name': 'first name'}`. See [Names for `{field}`](validation.md#names-for-field). |
-| `@Describe('...')` | on a field: a short text for the `description` of the field in the JSON Schema. It does not change the checks. |
+| `@Dto(keyCase: KeyCase.field)` | keys: `KeyCase.snake` (default) or `KeyCase.field` (the Dart name as it is). |
+| `@Dto(strict: true)` | unknown keys are errors. Default false: they are dropped. |
+| `@Dto(emptyStringsToNull: true)` | "" is read as null, not as missing. Default false. |
+| `@Dto(trim: true)` | trims every string field and text item, like `@Trim()` on each. Default false. |
+| `@Dto(coerce: true)` | a JSON body can send text for numbers and bools, like a form. Default false. |
+| `@Dto(messages: {...})` | messages by code or `key.code`. A dotted path like `address.city.required` or `tags.*.required` works too. See [Short rule names](validation.md#short-rule-names-in-message-keys). |
+| `@Dto(attributes: {...})` | the names shown for `{field}`, by key. See [Names for field](validation.md#names-for-field). |
+| `@Describe('...')` | on a field: the description of the field in the JSON Schema. |
 
-A `///` doc comment on a field becomes its `description` in the JSON Schema.
-`@Describe` wins over the `///` comment. Use it when the text is for API users and MCP clients, not for the code.
-The OpenAPI docs and MCP tools (`McpDtoTool`) show it.
+A nested DTO uses its own `trim` and `coerce`. A `///` doc comment on a field also becomes its description. `@Describe` wins over it. The OpenAPI docs and MCP tools show it:
 
 ```dart
-@Describe('Category ID (see list_categories).') final int categoryId;
+@Describe('Category ID (see list_categories).')
+final int categoryId;
 ```
 
 ## Types in detail
 
-This is how each field type reads input. The short table is in [Types](dto.md#field-types).
+This is how each field type reads input. The short table is in [Field types](dto.md#field-types).
 
-- **JSON is strict.** In a JSON body, `"18"` is not an `int`. You get the error `integer`. With `@Dto(coerce: true)`, JSON is read like form text for `int`, `double`, `num` and `bool`, and a `bool` also takes `1` and `0`.
-- **Query and form data are text.** Dox turns the text into the field type first. If it can not, you get the type error.
-- `int` takes `18` or `18.0`, never a fraction. `"4.5"` or `4.5` gives `integer`.
-- `bool` in text takes `true`, `1`, `yes`, `on` and `false`, `0`, `no`, `off` (any case).
-- `DateTime` takes `2024-01-31` or `2024-01-31T10:00:00Z`. A value without a time zone is read as UTC.
-  The result is always UTC (`isUtc == true`). A number (timestamp) is not allowed.
-- An `enum` matches the Dart name exactly. `"Admin"` does not match `Role.admin`. Custom wire values (like `"ADMIN"`) are not supported.
-- `Object?` and `dynamic` take any value. They are not checked.
+- JSON is strict. In a JSON body, "18" is not an integer, and you get the error `integer`. With `@Dto(coerce: true)`, JSON is read like form text for numbers and bools, and a bool also takes 1 and 0.
+- Query and form data are text. Dox changes the text into the field type first.
+- `int` takes 18 or 18.0, never a fraction.
+- `bool` in text takes true, 1, yes, on and false, 0, no, off, in any case.
+- `DateTime` takes 2024-01-31 or 2024-01-31T10:00:00Z. A value with no time zone is read as UTC, and the result is always UTC. A timestamp number is not allowed.
+- An enum matches the Dart name exactly, so "Admin" does not match `Role.admin`.
+- `Object?` and `dynamic` take any value, with no check.
 - `Map<String, dynamic>` must be an object. Its values are not checked.
-- In query and form data, one value for a `List<T>` field gives a list with one item.
-- In bracket keys, list indexes are sorted and packed: `items[3]` alone gives a list with one item.
-- In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives `422` with the key `_root`.
+- In query and form data, one value for a list field gives a list with one item. Bracket indexes are sorted and packed, so `items[3]` alone gives a list with one item.
+- In query and form data, a list can have at most 1000 items, and keys can nest at most 10 levels. More gives 422 with the key `_root`.
 
 ## Body types
 
@@ -388,37 +343,39 @@ The content type of the body decides how Dox reads it:
 | --- | --- |
 | `application/json` (or any `+json` type) | read with strict JSON types |
 | `application/x-www-form-urlencoded`, `multipart/form-data` | read as text, then converted |
-| any other content type | `415 Unsupported Media Type` |
-| JSON that is not valid | `400 Bad Request` |
-| JSON that is not an object (like `[1, 2]`) | `422` with the key `_root` |
+| any other content type | 415 Unsupported Media Type |
+| JSON that is not valid | 400 Bad Request |
+| JSON that is not an object (like `[1, 2]`) | 422 with the key `_root` |
 
 ## The order of checks
 
 Dox checks the input in four steps:
 
-1. Read the input and convert types. Change text (`@Trim`, `@Lowercase`, `@Uppercase`). Find missing required fields.
-2. The field rules, top to bottom. The first rule that fails stops the other rules of that field. So there is no `@Bail`. A fluent schema runs all rules, unless you add `.bail()`. See [Stop at the first error](../packages/validation.md#stop-at-the-first-error).
-3. The `validate()` method (nested DTOs first, then the parent).
+1. Read the input and convert types. Change text (`@Trim`, `@Lowercase`, `@Uppercase`). Find missing required fields and run the rules that read other keys, except `@Confirmed` and `@Same`.
+2. The field rules, top to bottom. The first rule that fails stops the other rules of that field. A fluent schema runs all rules, unless you add `.bail()`. See [Stop at the first error](../packages/validation.md#stop-at-the-first-error).
+3. The `validate()` method, nested DTOs first.
 4. Async rules (`@Unique`, `@Exists`, your `AsyncRule`), one at a time, in field order.
 
-Each step runs only when the step before it had no errors. So the database is never asked about input that is already wrong.
-
-- Steps 1 and 2 run per DTO. So one answer can have a type error in `address` and a rule error in `items.1`.
-- Inside one step, Dox collects the errors of all fields.
-- A default value is not checked by the field rules. Async rules check the final value.
+Each step runs only when the step before it had no errors, so the database never gets input that is already wrong. Inside one step, Dox collects the errors of all fields.
 
 ## What the generator checks
 
 The build stops with a clear error when:
 
-- a field is not `final`, or is not a parameter of the unnamed constructor,
-- a field type is not supported (see [Types](dto.md#field-types)),
+- a field is not final, or is not a parameter of the unnamed constructor,
+- a field type is not supported (see [Field types](dto.md#field-types)),
 - a rule does not fit the field type (like `@Email()` on an `int`),
 - a `Maybe<T>` field has no `const Maybe.missing()` default,
-- `@RequiredIf`, `@RequiredWith`, `@RequiredUnless`, `@RequiredWithout`, `@RequiredWithoutAll`, `@Filled`, `@Present`, `@Prohibited`, `@ProhibitedIf`, `@ExcludeIf` or `@ExcludeUnless` is on a field that is always required,
-- `@OrDefault()` is on a field that is always required (no default, not nullable and not a `Maybe`),
-- a rule that reads another key (like `@RequiredIf`, `@Same`, `@Different`, `@ExcludeIf` or `@GreaterThanField`) names a Dart field (like `accountType`) instead of its input key (`account_type`),
-- `@After`, `@Before`, `@AfterOrEqual` or `@BeforeOrEqual` has a text that is not a date, a word or another `DateTime` field,
+- a required, present, prohibited or exclude rule, or `@OrDefault()`, is on a field that is always required,
+- a rule that reads another key names a Dart field (like `accountType`) instead of its input key (`account_type`),
+- a date rule has a text that is not a date, a word or another date field,
 - `@DateFormatted` has a letter it does not know,
+- `@Regex` has a bad pattern, or a size text is bad,
 - two `@Dto` classes in the app have the same name,
 - the class is generic, or extends another class (other than `Object`).
+
+## Next steps
+
+- [Validation](validation.md): messages, custom rules and checks across fields.
+- [DTOs](dto.md): make and use a DTO.
+- [Validation package](../packages/validation.md): fluent schemas.

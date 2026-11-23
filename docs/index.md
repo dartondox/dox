@@ -9,16 +9,17 @@ hide:
 
 <div class="dox-hero__text" markdown>
 
-<img class="dox-hero__mascot" src="assets/mascot.png" alt="Doxie, the Dox mascot" width="140" height="137">
+<img class="dox-hero__mascot" src="assets/mascot.png" alt="Doxie, the Dox mascot" width="110" height="108">
 
 # Fast backends<br>in Dart
 
 <p class="dox-hero__lead"><strong>Everything your Dart backend needs.</strong></p>
 
 <p class="dox-hero__lead">
-Dox is a web backend framework for Dart.
-It has routing, an ORM, migrations, validation, auth and a CLI in one place.
-It runs one isolate per CPU core and builds to a small native binary.
+Build APIs and full web apps in Dart, with batteries included.
+Routing, an ORM, validation, auth and a CLI work from the first command.
+One command adds the rest: queues, mail, GraphQL and more.
+Your app uses every CPU core and ships as one small native binary.
 </p>
 
 <p class="dox-hero__actions" markdown>
@@ -32,34 +33,32 @@ It runs one isolate per CPU core and builds to a small native binary.
 <div class="dox-hero__code" markdown>
 
 ```dart
-Route.get('/blogs', BlogController.index); // (1)!
+Route.post('/blogs', (BlogController c) => c.store);
 
-enum Status { active, draft }
+@Inject() // (1)!
+class BlogController {
+  BlogController(this.blogs);
+  final BlogService blogs;
 
-@Dto() // (2)!
-class BlogFilter {
-  final Status status; // ?status=active, else 422
-  const BlogFilter({required this.status});
-  static const DtoSchema<BlogFilter> schema =
-      $BlogFilterDto; // (3)!
+  Future<Blog> store(CreateBlog input) { // (2)!
+    return blogs.create(input);
+  }
 }
 
-class BlogController {
-  static Future<List<Blog>> index(
-    BlogFilter query, // (4)!
-  ) async {
-    return Blog()
-        .where('status', query.status.name)
-        .get(); // (5)!
-  }
+@Dto() // (3)!
+class CreateBlog {
+  @Length(min: 3, max: 100)
+  final String title;
+
+  @MinLength(10)
+  final String body;
+  ...
 }
 ```
 
-1.  A route points to a static method. Dox needs no reflection and no list of controllers.
-2.  `@Dto()` marks an input class. `build_runner` makes the checks from the fields and their types.
-3.  The generated schema. The OpenAPI docs use the same schema.
-4.  Ask for the DTO as a parameter. Dox reads the query (or the body), checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
-5.  The ORM. The same code runs on Postgres, MySQL and SQLite. Postgres and MySQL use native drivers.
+1.  Dox makes the controller and gives it the service it asks for. There is no reflection and no list of classes to keep.
+2.  Ask for the DTO as a parameter. Dox reads the JSON body, checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
+3.  `@Dto()` marks an input class. The code generator writes the checks from the fields, their types and their rules.
 
 </div>
 
@@ -203,11 +202,11 @@ at a time.
 
 -   :material-folder-outline: **File storage**
 
-    Local disk and S3 behind one API, with signed URLs. See [`dox_storage`](packages/storage.md).
+    Local disk and S3 behind one API, with signed URLs. See [`dox_storage`](digging-deeper/file-storage.md).
 
 -   :material-cached: **Cache**
 
-    Memory, file and Redis cache with tags and locks. See [`dox_cache`](packages/cache.md).
+    Memory, file and Redis cache with tags and locks. See [`dox_cache`](digging-deeper/cache.md).
 
 -   :material-access-point: **Real time**
 
