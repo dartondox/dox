@@ -54,7 +54,17 @@ Some features are not built yet. This is what to do today:
 
 ## Planned
 
-Localization is planned for later. Changes that are done but not released are in the Unreleased section of the CHANGELOG of a package.
+These features are planned. They are not built yet:
+
+| Feature | What it will do | What to do today |
+| --- | --- | --- |
+| Sentry | Send the errors, traces and logs of a Dox app to Sentry. | Send errors from the `report` method of your exception handler. See [Error handling](../the-basic/errors.md#your-own-handler). |
+| HTTPS | Serve HTTPS with no reverse proxy. | Put Caddy or nginx in front. See [Deployment](../digging-deeper/deployment.md#https-put-a-proxy-in-front). |
+| WebSocket compression | Compress WebSocket messages with permessage-deflate. | Messages are sent with no compression. |
+| OpenAPI SDK generation | Make a typed client from the OpenAPI document of your app. | Run an OpenAPI generator on `openapi.json`. See [OpenAPI](../packages/openapi.md#write-the-files). |
+| Localization | A general translation helper. | Keep your own message maps. |
+
+Changes that are done but not released are in the Unreleased section of the CHANGELOG of a package.
 
 ## How to help
 
