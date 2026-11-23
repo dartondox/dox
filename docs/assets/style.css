@@ -176,7 +176,14 @@ body {
 @media screen and (min-width: 76.25em) {
   /* only on pages that show the table of contents. The home page hides it
      and uses the full width. */
-  .md-sidebar--secondary:not([hidden]) ~ .md-content {
+  /* a blog post has its own inner layout (the author column), so it is left alone */
+  .md-sidebar--secondary:not([hidden]) ~ .md-content:not(.md-content--post) {
+    max-width: 36.8rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  /* in a post, the article gets the same width and the same side space */
+  [dir] .md-content--post > .md-content__inner {
     max-width: 36.8rem;
     margin-left: auto;
     margin-right: auto;
