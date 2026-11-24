@@ -24,10 +24,16 @@ if [ "${GITHUB_REF_TYPE:-}" = tag ]; then
 fi
 root=$(cd "$(dirname "$0")/.." && pwd)
 parent=$(cd "$root/.." && pwd)
+# dox_http_native is at the root of its repo, or in packages/ (a pub
+# workspace)
+native="$parent/dox-http-native"
+if [ -f "$native/packages/dox-http-native/pubspec.yaml" ]; then
+  native="$native/packages/dox-http-native"
+fi
 
 if [ "${1:-}" = build ]; then
   start=$SECONDS
-  cargo build --release --manifest-path "$parent/dox-http-native/native/Cargo.toml"
+  cargo build --release --manifest-path "$native/native/Cargo.toml"
   echo "dox-http-native: built in $((SECONDS - start))s"
   exit 0
 fi
@@ -42,6 +48,6 @@ dependency_overrides:
   ioredis:
     path: $parent/ioredis
   dox_http_native:
-    path: $parent/dox-http-native
+    path: $native
 YAML
 echo "dox_openapi, dox_validation, ioredis and dox_http_native come from $parent"

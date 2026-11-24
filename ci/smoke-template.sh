@@ -29,9 +29,11 @@ overrides() {
     "$root"/../dox-socketio/ "$root"/../dox-storage/ \
     "$root"/../dox-queue/packages/*/ "$root"/../dox-mailer/ "$root"/../dox-view/ \
     "$root"/../dox-scheduler/ "$root"/../ioredis/ \
-    "$root"/../dox-http-native/ \
+    "$root"/../dox-http-native/ "$root"/../dox-http-native/packages/*/ \
     "$root"/../dox-postgres-native/ "$root"/../dox-mysql-native/; do
     [ -f "$dir/pubspec.yaml" ] || continue
+    # the root of a pub workspace is not a package
+    if grep -q '^workspace:' "$dir/pubspec.yaml"; then continue; fi
     name=$(sed -nE 's/^name:[[:space:]]*([a-z0-9_]+).*/\1/p' "$dir/pubspec.yaml")
     printf '  %s:\n    path: %s\n' "$name" "${dir%/}"
   done
