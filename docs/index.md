@@ -11,7 +11,7 @@ hide:
 
 ![Doxie, the Dox mascot](assets/mascot.png){ .dox-top__mascot width="110" height="108" }
 
-# Fast backends<br>in Dart
+# Fast backends in Dart
 
 <p class="dox-top__slogan">Everything your Dart backend needs.</p>
 
