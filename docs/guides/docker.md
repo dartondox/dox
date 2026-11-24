@@ -82,10 +82,7 @@ RUN dart compile exe bin/health.dart -o build/bundle/bin/health
 RUN mkdir -p /out/app/storage /out/app/public /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  && cp -r public/. /out/app/public/ \
-  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
-  && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
-  && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
+  && cp -r public/. /out/app/public/
 
 # Stage 2: the Dart AOT runtime and the bundle only. No SDK, no source.
 FROM scratch
@@ -100,7 +97,9 @@ HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
 CMD ["/app/bin/server"]
 ```
 
-Delete the `public` lines if your app has no `public` folder. Keep the `libgcc_s` lines. Without them, Dox stops at start with `dox_http_native did not load`.
+Delete the `public` lines if your app has no `public` folder.
+
+The image has no copy of `libgcc_s.so.1`. The native libraries do not need it from `dox_http_native` 3.2.4, `dox_postgres_native` 3.2.2 and `dox_mysql_native` 3.2.2. With an older version, Dox stops at start with `dox_http_native did not load`. Run `dart pub upgrade` to get the new versions.
 
 When the container starts, the start log must end with `(native)`:
 
