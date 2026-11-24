@@ -8,11 +8,11 @@ Run the blog API on your own Linux server (a VPS), with systemd to keep it runni
 
 systemd starts the app again after a crash. Caddy gets the TLS certificate and sends the requests to the app:
 
-```mermaid
-flowchart LR
-  client[Browser or app] -- "HTTPS :443" --> caddy[Caddy]
-  caddy -- "HTTP 127.0.0.1:3000" --> dox["/opt/blog/bin/server (systemd)"]
-```
+<ol class="dox-flow dox-flow--labels dox-flow--plain" style="--dox-flow-gap:6rem" aria-label="Caddy in front of the app">
+  <li><strong>Browser or app</strong></li>
+  <li data-via="HTTPS :443"><strong>Caddy</strong><span>the TLS certificate</span></li>
+  <li data-via="HTTP 127.0.0.1:3000" class="dox-flow__end" style="flex-grow:1.4"><strong>The app</strong><span>systemd runs /opt/blog/bin/server</span></li>
+</ol>
 
 ## What you need
 

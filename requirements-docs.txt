@@ -8,3 +8,4 @@ pillow==13.0.0
 mike==2.2.0
 mkdocs-redirects==1.2.3
 mkdocs-rss-plugin==1.19.0 # the blog feed (blog/mkdocs.yml)
+jsx-lexer==2.0.1 # highlights ```jsx code blocks; Pygments has no JSX lexer

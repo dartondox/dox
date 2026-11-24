@@ -134,10 +134,14 @@ It also takes out the subtypes of the type, so use a specific type.
 
 Middleware runs in this order. If one returns a value or throws, the rest do not run:
 
-```mermaid
-flowchart LR
-    K["Package"] --> G["Global"] --> R["Router"] --> P["Group"] --> T["Route"] --> C["Controller"]
-```
+<ol class="dox-flow" aria-label="The order of middleware">
+  <li><strong>Package</strong><span>from a provider</span></li>
+  <li><strong>Global</strong><span>all routes</span></li>
+  <li><strong>Router</strong><span>one router</span></li>
+  <li><strong>Group</strong><span>a route group</span></li>
+  <li><strong>Route</strong><span>one route</span></li>
+  <li class="dox-flow__end"><strong>Controller</strong><span>handles the request</span></li>
+</ol>
 
 ## Run code after the controller
 

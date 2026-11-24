@@ -127,11 +127,11 @@ Requests per second on `GET /` at 64, 256 and 512 connections:
 | ------------------- | ------: | ------: | ------: | ---------: | ------: |
 | Dox                 | 541,489 | 652,400 | 669,691 | 0.74 ms    | 21      |
 | Dox server only     | 576,078 | 685,300 | 701,441 | 0.70 ms    | 20      |
-| Rust (hyper)        | 499,992 | 572,132 | 559,617 | 0.77 ms    | 14      |
-| Bun (`Bun.serve`)   | 496,865 | 504,672 | 521,648 | 1.02 ms    | 40      |
-| Relic 2 (`relic_native`) | 461,710 | 471,005 | 494,225 | 0.71 ms | 40 |
-| Node (`node:http`)  | 263,438 | 282,130 | 278,923 | 1.73 ms    | 199     |
-| Go (`net/http`)     | 245,400 | 237,146 | 230,919 | 3.32 ms    | 36      |
+| Rust<br>hyper | 499,992 | 572,132 | 559,617 | 0.77 ms    | 14      |
+| Bun<br>`Bun.serve` | 496,865 | 504,672 | 521,648 | 1.02 ms    | 40      |
+| Relic 2<br>`relic_native` | 461,710 | 471,005 | 494,225 | 0.71 ms | 40 |
+| Node<br>`node:http` | 263,438 | 282,130 | 278,923 | 1.73 ms    | 199     |
+| Go<br>`net/http` | 245,400 | 237,146 | 230,919 | 3.32 ms    | 36      |
 | `dart:io`           | 115,790 | 124,996 | 132,746 | 4.82 ms    | 56      |
 
 The other two routes at 256 connections:
@@ -140,7 +140,7 @@ The other two routes at 256 connections:
 | ----------------- | --------------: | -----------: |
 | Dox               | 582,861         | 576,435      |
 | Dox server only   | 666,149         | 676,363      |
-| Rust (hyper)      | 553,689         | 563,347      |
+| Rust<br>hyper | 553,689         | 563,347      |
 | Bun               | 488,315         | 496,905      |
 | Relic 2           | 432,465         | 376,030      |
 | Node              | 268,959         | 291,521      |
@@ -241,12 +241,12 @@ All three routes at 256 connections, requests per second:
 
 | Server                           | `/json` | `/db`   | `/queries?n=20` | peak MB |
 | -------------------------------- | ------: | ------: | --------------: | ------: |
-| Dox (`dox_postgres_native`)      | 592,900 | 297,000 | 18,015          | 93      |
-| Bun (`Bun.sql`)                  | 564,362 | 198,296 | 18,994          | 64      |
-| Rust (hyper + `tokio-postgres`)  | 667,718 | 128,065 | 9,312           | 11      |
-| Node (`node:http` + `pg`)        | 205,774 | 75,447  | 7,458           | 232     |
-| Go (`net/http` + pgx)            | 206,398 | 55,903  | 6,635           | 31      |
-| `dart:io` (+ `package:postgres`) | 89,480  | 28,598  | 2,269           | 47      |
+| Dox<br>`dox_postgres_native` | 592,900 | 297,000 | 18,015          | 93      |
+| Bun<br>`Bun.sql` | 564,362 | 198,296 | 18,994          | 64      |
+| Rust<br>hyper + `tokio-postgres` | 667,718 | 128,065 | 9,312           | 11      |
+| Node<br>`node:http` + `pg` | 205,774 | 75,447  | 7,458           | 232     |
+| Go<br>`net/http` + pgx | 206,398 | 55,903  | 6,635           | 31      |
+| `dart:io`<br>`package:postgres` | 89,480  | 28,598  | 2,269           | 47      |
 
 - On one query per request, Dox is the fastest: 1.5 times Bun.
 - On 20 queries per request, Dox and Bun are about the same. Postgres is
@@ -257,11 +257,11 @@ MySQL version.
 
 | Server                           | `/json` | `/db`   | `/queries?n=20` | peak MB |
 | -------------------------------- | ------: | ------: | --------------: | ------: |
-| Dox (`dox_mysql_native`)         | 558,886 | 247,242 | 12,347          | 70      |
-| Bun (`Bun.sql`)                  | 561,340 | 201,923 | 12,676          | 65      |
-| Rust (hyper + `mysql_async`)     | 653,244 | 46,795  | 3,158           | 10      |
-| Node (`node:http` + `mysql2`)    | 205,630 | 74,809  | 6,001           | 239     |
-| Go (`net/http` + `go-sql-driver`)| 211,713 | 55,322  | 5,520           | 27      |
+| Dox<br>`dox_mysql_native` | 558,886 | 247,242 | 12,347          | 70      |
+| Bun<br>`Bun.sql` | 561,340 | 201,923 | 12,676          | 65      |
+| Rust<br>hyper + `mysql_async` | 653,244 | 46,795  | 3,158           | 10      |
+| Node<br>`node:http` + `mysql2` | 205,630 | 74,809  | 6,001           | 239     |
+| Go<br>`net/http` + `go-sql-driver` | 211,713 | 55,322  | 5,520           | 27      |
 
 How it was run: the same rig as the [benchmark](#how-it-was-run) above.
 The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4.
@@ -274,9 +274,9 @@ One find-by-id query, AOT build (`dart build cli`), database on the same machine
 
 | Database | One query at a time | Many queries in flight | App CPU time per query |
 | --- | --- | --- | --- |
-| Postgres 14 (4 connections) | 60 µs | 12.5 µs each (64 in flight) | |
-| MySQL 8.4 (10 connections) | 67 µs | 11 µs each (32 in flight) | 13.5 µs |
-| MariaDB 11 (10 connections) | 63 µs | 9.7 µs each (32 in flight) | 12.4 µs |
+| Postgres 14<br>4 connections | 60 µs | 12.5 µs each<br>64 in flight | |
+| MySQL 8.4<br>10 connections | 67 µs | 11 µs each<br>32 in flight | 13.5 µs |
+| MariaDB 11<br>10 connections | 63 µs | 9.7 µs each<br>32 in flight | 12.4 µs |
 
 The CPU time counts the Dart thread and the Rust thread. For MySQL, it is about 75,000 queries per second on one core. Many requests at the same time, like in a web server, get the most out of the driver.
 
