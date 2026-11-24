@@ -117,6 +117,7 @@ jobs:
         with:
           workspaces: |
             ../dox-http-native/native -> target
+            ../dox-http-native/packages/dox-http-native/native -> target
       # Builds the native library of the clone, for this machine only.
       - run: ci/use-siblings.sh build
       - name: Start services
@@ -201,6 +202,7 @@ jobs:
         with:
           workspaces: |
             ../dox-http-native/native -> target
+            ../dox-http-native/packages/dox-http-native/native -> target
       - run: ci/use-siblings.sh build
       - run: ci/run-examples.sh ${{ matrix.example }}
 
@@ -241,6 +243,7 @@ jobs:
         with:
           workspaces: |
             ../dox-http-native/native -> target
+            ../dox-http-native/packages/dox-http-native/native -> target
       - run: ci/use-siblings.sh build
       - run: ci/smoke-template.sh
         env:

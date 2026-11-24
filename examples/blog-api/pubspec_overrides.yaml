@@ -15,7 +15,7 @@ dependency_overrides:
   dox_core:
     path: ../../packages/dox-core
   dox_http_native:
-    path: ../../../dox-http-native
+    path: ../../../dox-http-native/packages/dox-http-native
   dox_mailer:
     path: ../../../dox-mailer
   dox_migration:
