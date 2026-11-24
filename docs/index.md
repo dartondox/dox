@@ -24,9 +24,6 @@ Your app uses every CPU core and ships as one small native binary.
 
 <p class="dox-top__actions" markdown>
 [:simple-dart: Build your first API](tutorial/index.md){ .md-button .md-button--primary }
-</p>
-
-<p class="dox-top__actions" markdown>
 [:octicons-star-16: Star on GitHub](https://github.com/dartondox/dox){ .md-button }
 </p>
 
