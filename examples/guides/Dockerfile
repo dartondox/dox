@@ -24,10 +24,7 @@ RUN dart compile exe bin/health.dart -o build/bundle/bin/health
 RUN mkdir -p /out/app/storage /out/app/public /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  && cp -r public/. /out/app/public/ \
-  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
-  && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
-  && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
+  && cp -r public/. /out/app/public/
 
 # Stage 2: the Dart AOT runtime and the bundle only. No SDK, no source.
 FROM scratch

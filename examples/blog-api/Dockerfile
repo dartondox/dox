@@ -34,10 +34,7 @@ RUN dart build cli --target bin/queue.dart --output build/queue \
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
   && cp -r build/bundle/. /out/app/ \
-  && cp -r db /out/app/db \
-  # the native HTTP server (Rust) needs libgcc_s, which /runtime/ does not have
-  && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
-  && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
+  && cp -r db /out/app/db
 
 # Minimal serving image: the AOT runtime files from the dart image
 # (`/runtime/`) plus our bundle. No Dart SDK, no source code.

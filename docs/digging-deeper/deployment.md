@@ -46,7 +46,7 @@ A real environment variable wins over the `.env` file. A new Dox app runs the mi
 
 ## Docker
 
-A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle, `libgcc_s` and an empty `/tmp`.
+A new Dox app has this multi-stage `Dockerfile`. The final image is `FROM scratch`: only the Dart AOT runtime, the bundle and an empty `/tmp`.
 
 ```dockerfile
 FROM dart:stable AS build
@@ -68,10 +68,7 @@ RUN /root/.pub-cache/bin/dox build
 # a writable /tmp (uploads bigger than 1 MB go to a temp file).
 RUN mkdir -p /out/app/storage /out/tmp \
   && chmod 1777 /out/tmp \
-  && cp -r build/bundle/. /out/app/ \
-  # the native HTTP server (Rust) needs libgcc_s
-  && LIBGCC=$(find / -name libgcc_s.so.1 -path '*lib*' | head -n 1) \
-  && mkdir -p /out$(dirname $LIBGCC) && cp $LIBGCC /out$LIBGCC
+  && cp -r build/bundle/. /out/app/
 
 # The AOT runtime files of the dart image plus the bundle.
 FROM scratch
