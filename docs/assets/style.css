@@ -915,6 +915,7 @@ svg.lucide {
 }
 .md-typeset .dox-top__slogan { font-size: 1.05rem; font-weight: 650; color: var(--md-default-fg-color); margin: 0 0 0.5em; }
 .md-typeset .dox-top__lead { max-width: 27rem; margin: 0 0 1.4em; color: var(--md-default-fg-color--light); }
+.md-typeset .dox-top__lead strong { color: var(--md-default-fg-color); }
 /* one button per row; both get the width of the wider one */
 .md-typeset .dox-top__actions { display: inline-grid; gap: 0.6rem; margin: 0; }
 .md-typeset .dox-top__actions .md-button { margin: 0; text-align: center; }

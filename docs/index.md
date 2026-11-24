@@ -16,7 +16,7 @@ hide:
 <p class="dox-top__slogan">Everything your Dart backend needs.</p>
 
 <p class="dox-top__lead">
-Build APIs and full web apps in Dart, with batteries included.
+Build APIs and full web apps in <strong>Dart</strong>, with <strong>batteries included</strong>.
 Routing, an ORM, validation, auth and a CLI work from the first command.
 One command adds the rest: queues, mail, GraphQL and more.
 Your app uses every CPU core and ships as one small native binary.
