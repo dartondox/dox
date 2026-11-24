@@ -1001,7 +1001,7 @@
   <span class="md-ellipsis">
     
   
-    Step 5: Login with dox_auth
+    Step 5: Authentication
   
 
     
@@ -7200,15 +7200,25 @@
 <h1 id="isolate">Isolate</h1>
 <p>Dox runs your app on many isolates (threads) at once, so it can use every CPU core.</p>
 <p>Each isolate runs its own <a href="../native-server/">native server</a> on the same port, and the operating system spreads the connections between them:</p>
-<pre class="mermaid"><code>flowchart TD
-    OS["Port 3000&lt;br&gt;the OS spreads the connections"] --&gt; A1["Rust acceptor"]
-    OS --&gt; A2["Rust acceptor"]
-    OS --&gt; A3["Rust acceptor"]
-    A1 --&gt; I1["Isolate 1, main&lt;br&gt;own memory cache"]
-    A2 --&gt; I2["Isolate 2&lt;br&gt;own memory cache"]
-    A3 --&gt; I3["Isolate N&lt;br&gt;own memory cache"]
-    I2 -. "crash: started again after 1 second" .-&gt; I2
-    I1 -. "crash: the process exits" .-&gt; S["Supervisor restarts the process&lt;br&gt;Docker, systemd"]</code></pre>
+<div class="dox-fan" role="group" aria-label="One port, one native server and one isolate per CPU">
+  <div class="dox-fan__top"><strong>Port 3000</strong><span>the OS spreads the connections</span></div>
+  <div class="dox-fan__cols">
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate 1, main</strong><span>own memory cache</span></li>
+      <li data-via="crash: the process exits"><strong>Supervisor</strong><span>restarts the process: Docker, systemd</span></li>
+    </ol>
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate 2</strong><span>own memory cache</span><em>crash: started again after 1 second</em></li>
+    </ol>
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate N</strong><span>own memory cache</span><em>crash: started again after 1 second</em></li>
+    </ol>
+  </div>
+</div>
+
 <h2 id="setup">Setup</h2>
 <p>Dox starts one isolate per CPU the process may use. In a container, it uses the CPU limit, and a quota rounds up: 1.5 CPUs gives 2 isolates. On Windows only one isolate serves HTTP.</p>
 <p>To change the number, set <code>totalIsolate</code> in the app config. A new app reads it from <code>APP_TOTAL_ISOLATE</code>:</p>

@@ -1000,7 +1000,7 @@
   <span class="md-ellipsis">
     
   
-    Step 5: Login with dox_auth
+    Step 5: Authentication
   
 
     
@@ -7889,6 +7889,7 @@
 </tbody>
 </table>
 <p>Each isolate has its own memory store. If all isolates and servers must see the same data, use Redis or the database.</p>
+<p>Use the memory store for local development and tests only. In production, use the file store on one server, or use Redis or the database.</p>
 <h3 id="adding-a-redis-store">Adding a Redis store</h3>
 <p>Add a store in the config file. This example adds a Redis store:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/cache.dart</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_core/dox_core.dart'</span><span class="p">;</span>

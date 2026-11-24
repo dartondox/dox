@@ -1001,7 +1001,7 @@
   <span class="md-ellipsis">
     
   
-    Step 5: Login with dox_auth
+    Step 5: Authentication
   
 
     
@@ -7547,10 +7547,13 @@ production.</p>
 <p>A small app can run the jobs and the schedule inside the server, with <code>QueueConfig(inProcess: true)</code> and <code>ScheduleConfig(inProcess: true)</code>. See <a href="../queue/#running-jobs-in-the-web-server">Running jobs in the web server</a>.</p>
 <h2 id="https-put-a-proxy-in-front">HTTPS: put a proxy in front</h2>
 <p>Dox serves plain HTTP only. Run it on a private port, and put <a href="https://caddyserver.com">Caddy</a> or nginx in front of it for TLS and gzip. When the proxy is on the same machine, set <code>APP_HOST=127.0.0.1</code>:</p>
-<pre class="mermaid"><code>flowchart LR
-    C["Client"] --&gt;|HTTPS| X["Caddy or nginx"]
-    X --&gt;|HTTP| D["Dox"]
-    D --&gt; DB[("Database")]</code></pre>
+<ol class="dox-flow dox-flow--labels dox-flow--plain" aria-label="A proxy in front of Dox">
+  <li><strong>Client</strong></li>
+  <li data-via="HTTPS"><strong>Caddy or nginx</strong><span>TLS and gzip</span></li>
+  <li data-via="HTTP" class="dox-flow__end"><strong>Dox</strong><span>a private port</span></li>
+  <li><strong>Database</strong></li>
+</ol>
+
 <h3 id="trusting-the-proxy">Trusting the proxy</h3>
 <p>Tell Dox to trust the proxy, so <code>req.ip()</code> and <code>req.scheme()</code> show the real client:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="n">AppConfig</span><span class="p">(</span>

@@ -1001,7 +1001,7 @@
   <span class="md-ellipsis">
     
   
-    Step 5: Login with dox_auth
+    Step 5: Authentication
   
 
     
@@ -7164,10 +7164,14 @@
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  app/               # the Flutter app
 </span></code></pre></div>
 <p>The app and the server use the same DTO:</p>
-<pre class="mermaid"><code>flowchart LR
-    S[packages/blog_shared&lt;br&gt;SaveBlog + SaveBlog.schema] --&gt; A[app: Flutter&lt;br&gt;checks the form]
-    S --&gt; B[server: Dox&lt;br&gt;checks the request]
-    A -- "POST /api/blogs (JSON)" --&gt; B</code></pre>
+<div class="dox-fan dox-fan--via" role="group" aria-label="The app and the server use the shared package">
+  <div class="dox-fan__top"><strong>packages/blog_shared</strong><span>SaveBlog and SaveBlog.schema</span></div>
+  <div class="dox-fan__cols">
+    <ol><li><strong>app: Flutter</strong><span>checks the form</span></li></ol>
+    <ol data-via="POST /api/blogs (JSON)"><li><strong>server: Dox</strong><span>checks the request</span></li></ol>
+  </div>
+</div>
+
 <h2 id="1-the-shared-package">1. The shared package</h2>
 <p>Make a plain Dart package for the DTOs:</p>
 <div class="language-yaml highlight"><span class="filename">packages/blog_shared/pubspec.yaml</span><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">blog_shared</span>

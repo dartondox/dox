@@ -1002,7 +1002,7 @@
   <span class="md-ellipsis">
     
   
-    Step 5: Login with dox_auth
+    Step 5: Authentication
   
 
     
@@ -7268,9 +7268,12 @@
 <h1 id="deploy-to-a-linux-server">Deploy to a Linux server</h1>
 <p>Run the blog API on your own Linux server (a VPS), with systemd to keep it running and Caddy in front for HTTPS.</p>
 <p>systemd starts the app again after a crash. Caddy gets the TLS certificate and sends the requests to the app:</p>
-<pre class="mermaid"><code>flowchart LR
-  client[Browser or app] -- "HTTPS :443" --&gt; caddy[Caddy]
-  caddy -- "HTTP 127.0.0.1:3000" --&gt; dox["/opt/blog/bin/server (systemd)"]</code></pre>
+<ol class="dox-flow dox-flow--labels dox-flow--plain" style="--dox-flow-gap:6rem" aria-label="Caddy in front of the app">
+  <li><strong>Browser or app</strong></li>
+  <li data-via="HTTPS :443"><strong>Caddy</strong><span>the TLS certificate</span></li>
+  <li data-via="HTTP 127.0.0.1:3000" class="dox-flow__end" style="flex-grow:1.4"><strong>The app</strong><span>systemd runs /opt/blog/bin/server</span></li>
+</ol>
+
 <h2 id="what-you-need">What you need</h2>
 <ul>
 <li>A Linux server (Debian 12, Ubuntu 22.04 or newer) with SSH and <code>sudo</code>.</li>

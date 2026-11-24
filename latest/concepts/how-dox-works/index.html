@@ -1007,7 +1007,7 @@
   <span class="md-ellipsis">
     
   
-    Step 5: Login with dox_auth
+    Step 5: Authentication
   
 
     
@@ -7278,9 +7278,14 @@
 <p>This page shows the path of a request, how isolates work and what each folder of an app is for.</p>
 <h2 id="the-life-of-a-request">The life of a request</h2>
 <p>Each request takes the same path. The pages in "The basics" follow this order:</p>
-<pre class="mermaid"><code>flowchart LR
-    A["Route"] --&gt; B["Middleware"] --&gt; C["DTO"] --&gt; D["Controller"] --&gt; E["View"] --&gt; F["Response"]</code></pre>
-<p><a href="../../the-basic/routing/">Routing</a> → <a href="../../the-basic/middleware/">Middleware</a> → <a href="../../the-basic/dto/">DTOs</a> → <a href="../../the-basic/controller/">Controller</a> → <a href="../../the-basic/views/">Views</a> → <a href="../../the-basic/response/">Response</a></p>
+<ol aria-label="The path of a request" class="dox-flow">
+<li><strong><a href="../../the-basic/routing/">Route</a></strong><span>match the URL</span></li>
+<li><strong><a href="../../the-basic/middleware/">Middleware</a></strong><span>go on or stop</span></li>
+<li><strong><a href="../../the-basic/dto/">DTO</a></strong><span>check the input</span></li>
+<li><strong><a href="../../the-basic/controller/">Controller</a></strong><span>your code</span></li>
+<li><strong><a href="../../the-basic/views/">View</a></strong><span>render a page</span></li>
+<li class="dox-flow__end"><strong><a href="../../the-basic/response/">Response</a></strong><span>send the answer</span></li>
+</ol>
 <p>Dox has two parts. The native server (<code>dox_http_native</code>) owns the sockets and parses HTTP. Your Dart app runs the routes, middleware, DTOs, controllers and the ORM.</p>
 <p>A request goes through these steps:</p>
 <ol>
@@ -7297,26 +7302,25 @@
 <li>Dart gives the answers of the batch back to the native server, which writes them to the socket.</li>
 </ol>
 <p>If a step throws, Dox catches the error. An <code>IHttpException</code> gives its own status. Any other error gives 500 and goes to the <code>report</code> method of your <code>ExceptionHandler</code>.</p>
-<pre class="mermaid"><code>sequenceDiagram
-    participant C as Client
-    participant R as Native server
-    participant D as Dart isolate
-    participant M as Middleware
-    participant K as Controller
+<div class="dox-seq" style="--lanes:5" role="group" aria-label="The steps of a request, from the client to the controller and back">
+  <div class="dox-seq__head"><strong>Client</strong><strong>Native server</strong><strong>Dart isolate</strong><strong>Middleware</strong><strong>Controller</strong></div>
+  <ol>
+    <li style="--a:1;--b:2">TCP connection, HTTP request</li>
+    <li style="--a:2" class="dox-seq__self">parse request, check size limits</li>
+    <li style="--a:2;--b:3">batch of requests (one message)</li>
+    <li style="--a:3" class="dox-seq__self">router: method, host, path</li>
+    <li style="--a:3" class="dox-seq__self">CORS headers, read body</li>
+    <li style="--a:3;--b:4">global, router, group, route middleware</li>
+    <li style="--a:3;--b:4" class="dox-seq__back dox-seq__reply">request (go on) or a response</li>
+    <li style="--a:3" class="dox-seq__self">path params, DTO check</li>
+    <li style="--a:3;--b:5">call with typed parameters</li>
+    <li style="--a:3;--b:5" class="dox-seq__back dox-seq__reply">return value</li>
+    <li style="--a:3" class="dox-seq__self">response handler, build the response</li>
+    <li style="--a:2;--b:3" class="dox-seq__back">batch of answers (one call)</li>
+    <li style="--a:1;--b:2" class="dox-seq__back">bytes</li>
+  </ol>
+</div>
 
-    C-&gt;&gt;R: TCP connection, HTTP request
-    R-&gt;&gt;R: parse request, check size limits
-    R-&gt;&gt;D: batch of requests (one message)
-    D-&gt;&gt;D: router: method, host, path
-    D-&gt;&gt;D: CORS headers, read body
-    D-&gt;&gt;M: global, router, group, route middleware
-    M--&gt;&gt;D: request (go on) or a response
-    D-&gt;&gt;D: path params, DTO check
-    D-&gt;&gt;K: call with typed parameters
-    K--&gt;&gt;D: return value
-    D-&gt;&gt;D: responseHandler, build the response
-    D-&gt;&gt;R: batch of answers (one call)
-    R-&gt;&gt;C: bytes</code></pre>
 <p>Dox uses no reflection. DTOs come from a generated list, so <code>dox build</code> can make a native binary.</p>
 <h3 id="where-things-are-decided">Where things are decided</h3>
 <table>

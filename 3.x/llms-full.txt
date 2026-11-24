@@ -9,70 +9,33 @@ Source: https://dartondox.dev/latest/
 
 Source: https://dartondox.dev/latest/
 
-<div class="dox-hero" markdown>
+<div class="dox-top" markdown>
 
-<div class="dox-hero__text" markdown>
+<div class="dox-top__text" markdown>
 
-<img class="dox-hero__mascot" src="assets/mascot.png" alt="Doxie, the Dox mascot" width="110" height="108">
+![Doxie, the Dox mascot](assets/mascot.png){ .dox-top__mascot width="110" height="108" }
 
-# Fast backends<br>in Dart
+# Fast backends in Dart
 
-<p class="dox-hero__lead"><strong>Everything your Dart backend needs.</strong></p>
+<p class="dox-top__slogan">Everything your Dart backend needs.</p>
 
-<p class="dox-hero__lead">
-Build APIs and full web apps in Dart, with batteries included.
+<p class="dox-top__lead">
+Build APIs and full web apps in <strong>Dart</strong>, with <strong>batteries included</strong>.
 Routing, an ORM, validation, auth and a CLI work from the first command.
 One command adds the rest: queues, mail, GraphQL and more.
 Your app uses every CPU core and ships as one small native binary.
 </p>
 
-<p class="dox-hero__actions" markdown>
-[Build your first API](tutorial/index.md){ .md-button .md-button--primary }
-[GitHub](https://github.com/dartondox/dox){ .md-button }
-[Blog](/blog/){ .md-button }
+<p class="dox-top__actions" markdown>
+[:simple-dart: Build your first API](tutorial/index.md){ .md-button .md-button--primary }
+[:octicons-star-16: Star on GitHub](https://github.com/dartondox/dox){ .md-button }
 </p>
 
 </div>
 
-<div class="dox-hero__code" markdown>
-
-```dart
-Route.post('/blogs', (BlogController c) => c.store);
-
-@Inject() // (1)!
-class BlogController {
-  BlogController(this.blogs);
-  final BlogService blogs;
-
-  Future<Blog> store(CreateBlog input) { // (2)!
-    return blogs.create(input);
-  }
-}
-
-@Dto() // (3)!
-class CreateBlog {
-  @Length(min: 3, max: 100)
-  final String title;
-
-  @MinLength(10)
-  final String body;
-  ...
-}
-```
-
-1.  Dox makes the controller and gives it the service it asks for. There is no reflection and no list of classes to keep.
-2.  Ask for the DTO as a parameter. Dox reads the JSON body, checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
-3.  `@Dto()` marks an input class. The code generator writes the checks from the fields, their types and their rules.
-
-</div>
-
-</div>
-
-## How fast
+<div class="dox-top__side" markdown>
 
 <div class="dox-bench" markdown>
-
-<p class="dox-bench__sub">A full Dox app answers <code>GET /</code>, with the rules of <a href="https://github.com/the-benchmarker/web-frameworks">the-benchmarker</a>. Requests per second on two CPU cores, higher is better.</p>
 
 <div class="dox-bench__grid">
   <span></span><span></span>
@@ -131,58 +94,21 @@ class CreateBlog {
   </div>
 </div>
 
-<p class="dox-bench__foot"><span>Dox · Rust 1.99 · Bun 1.4 · Relic 2.0 · Node 26 · Go 1.26 · Dart 3.13 · 2 cores · 256 connections · wrk</span><a href="digging-deeper/performance/#benchmark">All results</a></p>
+<p class="dox-bench__foot" markdown>[All results](digging-deeper/performance.md#benchmark)</p>
 
 </div>
 
-Your code is plain Dart. The speed comes from the native server. It runs
-on the isolate's own thread, so a request never waits for another thread.
-See [Performance](digging-deeper/performance.md) for every route and how
-it was run.
+</div>
 
-## Run it in two minutes
+</div>
 
-You need [Dart](https://dart.dev/get-dart) 3.13 or newer, and nothing else.
-The starter project uses SQLite, so there is no database to install.
-
-```bash
-dart pub global activate dox             # install the CLI
-dox create my_app                            # download the starter project
-cd my_app
-dart pub get
-dox s                                        # start the server
-```
-
-Open a second terminal and call the first route:
-
-```bash
-curl localhost:3000/ping
-```
-
-```text
-pong
-```
-
-That is a Dox app. Next, follow the [tutorial](tutorial/index.md). It adds a
-model, a database table, validation, login and a Docker image, one short step
-at a time.
-
-!!! note "The CLI is not found?"
-    `dart pub global activate` puts `dox` in `$HOME/.pub-cache/bin`.
-    Add that folder to your `PATH`. See [Installation](getting-started/installation.md).
-
-## Pick your path
-
-| You are... | Start here | Then |
-| --- | --- | --- |
-| New to Dox | [Tutorial: build a blog API](tutorial/index.md) | [Routing](the-basic/routing.md), [Request](the-basic/request.md), [Validation](the-basic/validation.md) |
-| Coming from Laravel | [Coming from Laravel](concepts/coming-from-laravel.md) | [How Dox works](concepts/how-dox-works.md) |
-| Looking for one answer | [Guides](guides/index.md) (uploads, auth, Docker, pagination...) | [Reference](reference/index.md) |
-| Going to production | [Deployment](digging-deeper/deployment.md) | [Docker](guides/docker.md), [Troubleshooting](reference/troubleshooting.md) |
+The speed comes from the native server. It runs on the isolate's own thread,
+so a request never waits for another thread. See
+[Performance](digging-deeper/performance.md) for every route and how it was run.
 
 ## What you get
 
-<div class="grid cards" markdown>
+<div class="dox-feat" markdown>
 
 -   :material-lightning-bolt: **Fast by default**
 
@@ -228,11 +154,137 @@ at a time.
 
 </div>
 
+## One path for every request
+
+<ol class="dox-flow" aria-label="The path of a request" markdown="block">
+  <li markdown="span">**[Route](the-basic/routing.md)**<span>match the URL</span></li>
+  <li markdown="span">**[Middleware](the-basic/middleware.md)**<span>go on or stop</span></li>
+  <li markdown="span">**[DTO](the-basic/dto.md)**<span>check the input</span></li>
+  <li markdown="span">**[Controller](the-basic/controller.md)**<span>your code</span></li>
+  <li markdown="span">**[View](the-basic/views.md)**<span>render a page</span></li>
+  <li markdown="span" class="dox-flow__end">**[Response](the-basic/response.md)**<span>send the answer</span></li>
+</ol>
+
+Each card is a page in "The basics". See [How Dox works](concepts/how-dox-works.md) for every step.
+
+## What the code looks like
+
+<div class="dox-sample" markdown>
+
+<div class="dox-sample__code" markdown>
+
+```dart
+Route.post('/blogs', (BlogController c) => c.store);
+
+@Inject() // 1
+class BlogController {
+  BlogController(this.blogs);
+  final BlogService blogs;
+
+  Future<Blog> store(CreateBlog input) { // 2
+    return blogs.create(input);
+  }
+}
+
+@Dto() // 3
+class CreateBlog {
+  @Length(min: 3, max: 100)
+  final String title;
+
+  @MinLength(10)
+  final String body;
+  ...
+}
+```
+
+</div>
+
+1.  Dox makes the controller and gives it the service it asks for. There is no reflection and no list of classes to keep.
+2.  Ask for the DTO as a parameter. Dox reads the JSON body, checks it, and gives you a typed object. Bad input gets a `422` before your code runs.
+3.  `@Dto()` marks an input class. The code generator writes the checks from the fields, their types and their rules.
+
+</div>
+
+## Run it in two minutes
+
+You need [Dart](https://dart.dev/get-dart) 3.13 or newer, and nothing else.
+The starter project uses SQLite, so there is no database to install.
+
+<div class="dox-start" markdown>
+
+<div markdown>
+
+```bash title="Start the app"
+dart pub global activate dox   # install the CLI
+dox create my_app              # download the starter project
+cd my_app
+dart pub get
+dox s                          # start the server
+```
+
+</div>
+
+<div markdown>
+
+```bash title="In a second terminal, call the first route"
+curl localhost:3000/ping
+```
+
+```text
+pong
+```
+
+</div>
+
+</div>
+
+That is a Dox app. Next, follow the [tutorial](tutorial/index.md). It adds a
+model, a database table, validation, login and a Docker image, one short step
+at a time.
+
+??? note "The CLI is not found?"
+    `dart pub global activate` puts `dox` in `$HOME/.pub-cache/bin`.
+    Add that folder to your `PATH`. See [Installation](getting-started/installation.md).
+
+## Pick your path
+
+<div class="dox-paths" markdown>
+
+-   New to Dox
+
+    **[Tutorial: build a blog API](tutorial/index.md)**
+
+    Then [Routing](the-basic/routing.md), [Request](the-basic/request.md), [Validation](the-basic/validation.md)
+
+-   Coming from Laravel
+
+    **[Coming from Laravel](concepts/coming-from-laravel.md)**
+
+    Then [How Dox works](concepts/how-dox-works.md)
+
+-   Looking for one answer
+
+    **[Guides](guides/index.md)**
+
+    Uploads, auth, Docker, pagination. Then [Reference](reference/index.md)
+
+-   Going to production
+
+    **[Deployment](digging-deeper/deployment.md)**
+
+    Then [Docker](guides/docker.md), [Troubleshooting](reference/troubleshooting.md)
+
+</div>
+
 ## Get help
+
+<div class="dox-help" markdown>
 
 - Found a bug or have a question? Open an [issue on GitHub](https://github.com/dartondox/dox/issues).
 - Using an AI assistant? Install the package skills, or give it [llms-full.txt](https://dartondox.dev/llms-full.txt): all of these docs as one plain text file. See [AI agents](getting-started/ai-agents.md).
 - Want to help? Read [Contribute](community/contribute.md).
+
+</div>
 
 
 ---
@@ -636,7 +688,7 @@ You do not need Docker or a database server. The app uses SQLite, which keeps th
 2. [Model and migration](02-model-and-migration.md)
 3. [Routes and controller](03-routes-and-controller.md)
 4. [Validation](04-validation.md)
-5. [Login with dox_auth](05-auth.md)
+5. [Authentication](05-auth.md)
 6. [Test](06-test.md)
 7. [Build and deploy](07-build-and-deploy.md)
 
@@ -1255,16 +1307,16 @@ curl -X PUT http://localhost:3000/api/posts/1 \
 
 ## Next steps
 
-- [Step 5: Login with dox_auth](05-auth.md): protect the write routes.
+- [Step 5: Authentication](05-auth.md): protect the write routes.
 
 
 ---
 
-# Step 5: Login with dox_auth
+# Step 5: Authentication
 
 Source: https://dartondox.dev/latest/tutorial/05-auth/
 
-# Step 5: Login with dox_auth
+# Step 5: Authentication
 
 In this step you add register and login with a JWT token, so only a logged in user can create or change posts.
 
@@ -1860,12 +1912,14 @@ This page shows the path of a request, how isolates work and what each folder of
 
 Each request takes the same path. The pages in "The basics" follow this order:
 
-```mermaid
-flowchart LR
-    A["Route"] --> B["Middleware"] --> C["DTO"] --> D["Controller"] --> E["View"] --> F["Response"]
-```
-
-[Routing](../the-basic/routing.md) → [Middleware](../the-basic/middleware.md) → [DTOs](../the-basic/dto.md) → [Controller](../the-basic/controller.md) → [Views](../the-basic/views.md) → [Response](../the-basic/response.md)
+<ol class="dox-flow" aria-label="The path of a request" markdown="block">
+  <li markdown="span">**[Route](../the-basic/routing.md)**<span>match the URL</span></li>
+  <li markdown="span">**[Middleware](../the-basic/middleware.md)**<span>go on or stop</span></li>
+  <li markdown="span">**[DTO](../the-basic/dto.md)**<span>check the input</span></li>
+  <li markdown="span">**[Controller](../the-basic/controller.md)**<span>your code</span></li>
+  <li markdown="span">**[View](../the-basic/views.md)**<span>render a page</span></li>
+  <li markdown="span" class="dox-flow__end">**[Response](../the-basic/response.md)**<span>send the answer</span></li>
+</ol>
 
 Dox has two parts. The native server (`dox_http_native`) owns the sockets and parses HTTP. Your Dart app runs the routes, middleware, DTOs, controllers and the ORM.
 
@@ -1885,28 +1939,24 @@ A request goes through these steps:
 
 If a step throws, Dox catches the error. An `IHttpException` gives its own status. Any other error gives 500 and goes to the `report` method of your `ExceptionHandler`.
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant R as Native server
-    participant D as Dart isolate
-    participant M as Middleware
-    participant K as Controller
-
-    C->>R: TCP connection, HTTP request
-    R->>R: parse request, check size limits
-    R->>D: batch of requests (one message)
-    D->>D: router: method, host, path
-    D->>D: CORS headers, read body
-    D->>M: global, router, group, route middleware
-    M-->>D: request (go on) or a response
-    D->>D: path params, DTO check
-    D->>K: call with typed parameters
-    K-->>D: return value
-    D->>D: responseHandler, build the response
-    D->>R: batch of answers (one call)
-    R->>C: bytes
-```
+<div class="dox-seq" style="--lanes:5" role="group" aria-label="The steps of a request, from the client to the controller and back">
+  <div class="dox-seq__head"><strong>Client</strong><strong>Native server</strong><strong>Dart isolate</strong><strong>Middleware</strong><strong>Controller</strong></div>
+  <ol>
+    <li style="--a:1;--b:2">TCP connection, HTTP request</li>
+    <li style="--a:2" class="dox-seq__self">parse request, check size limits</li>
+    <li style="--a:2;--b:3">batch of requests (one message)</li>
+    <li style="--a:3" class="dox-seq__self">router: method, host, path</li>
+    <li style="--a:3" class="dox-seq__self">CORS headers, read body</li>
+    <li style="--a:3;--b:4">global, router, group, route middleware</li>
+    <li style="--a:3;--b:4" class="dox-seq__back dox-seq__reply">request (go on) or a response</li>
+    <li style="--a:3" class="dox-seq__self">path params, DTO check</li>
+    <li style="--a:3;--b:5">call with typed parameters</li>
+    <li style="--a:3;--b:5" class="dox-seq__back dox-seq__reply">return value</li>
+    <li style="--a:3" class="dox-seq__self">response handler, build the response</li>
+    <li style="--a:2;--b:3" class="dox-seq__back">batch of answers (one call)</li>
+    <li style="--a:1;--b:2" class="dox-seq__back">bytes</li>
+  </ol>
+</div>
 
 Dox uses no reflection. DTOs come from a generated list, so `dox build` can make a native binary.
 
@@ -3743,10 +3793,14 @@ It also takes out the subtypes of the type, so use a specific type.
 
 Middleware runs in this order. If one returns a value or throws, the rest do not run:
 
-```mermaid
-flowchart LR
-    K["Package"] --> G["Global"] --> R["Router"] --> P["Group"] --> T["Route"] --> C["Controller"]
-```
+<ol class="dox-flow" aria-label="The order of middleware">
+  <li><strong>Package</strong><span>from a provider</span></li>
+  <li><strong>Global</strong><span>all routes</span></li>
+  <li><strong>Router</strong><span>one router</span></li>
+  <li><strong>Group</strong><span>a route group</span></li>
+  <li><strong>Route</strong><span>one route</span></li>
+  <li class="dox-flow__end"><strong>Controller</strong><span>handles the request</span></li>
+</ol>
 
 ## Run code after the controller
 
@@ -7815,6 +7869,8 @@ A store uses one driver:
 | `null` | nowhere. It stores nothing | - |
 
 Each isolate has its own memory store. If all isolates and servers must see the same data, use Redis or the database.
+
+Use the memory store for local development and tests only. In production, use the file store on one server, or use Redis or the database.
 
 ### Adding a Redis store
 
@@ -12701,17 +12757,24 @@ Dox runs your app on many isolates (threads) at once, so it can use every CPU co
 
 Each isolate runs its own [native server](native-server.md) on the same port, and the operating system spreads the connections between them:
 
-```mermaid
-flowchart TD
-    OS["Port 3000<br>the OS spreads the connections"] --> A1["Rust acceptor"]
-    OS --> A2["Rust acceptor"]
-    OS --> A3["Rust acceptor"]
-    A1 --> I1["Isolate 1, main<br>own memory cache"]
-    A2 --> I2["Isolate 2<br>own memory cache"]
-    A3 --> I3["Isolate N<br>own memory cache"]
-    I2 -. "crash: started again after 1 second" .-> I2
-    I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
-```
+<div class="dox-fan" role="group" aria-label="One port, one native server and one isolate per CPU">
+  <div class="dox-fan__top"><strong>Port 3000</strong><span>the OS spreads the connections</span></div>
+  <div class="dox-fan__cols">
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate 1, main</strong><span>own memory cache</span></li>
+      <li data-via="crash: the process exits"><strong>Supervisor</strong><span>restarts the process: Docker, systemd</span></li>
+    </ol>
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate 2</strong><span>own memory cache</span><em>crash: started again after 1 second</em></li>
+    </ol>
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate N</strong><span>own memory cache</span><em>crash: started again after 1 second</em></li>
+    </ol>
+  </div>
+</div>
 
 ## Setup
 
@@ -13491,12 +13554,12 @@ A small app can run the jobs and the schedule inside the server, with `QueueConf
 
 Dox serves plain HTTP only. Run it on a private port, and put [Caddy](https://caddyserver.com) or nginx in front of it for TLS and gzip. When the proxy is on the same machine, set `APP_HOST=127.0.0.1`:
 
-```mermaid
-flowchart LR
-    C["Client"] -->|HTTPS| X["Caddy or nginx"]
-    X -->|HTTP| D["Dox"]
-    D --> DB[("Database")]
-```
+<ol class="dox-flow dox-flow--labels dox-flow--plain" aria-label="A proxy in front of Dox">
+  <li><strong>Client</strong></li>
+  <li data-via="HTTPS"><strong>Caddy or nginx</strong><span>TLS and gzip</span></li>
+  <li data-via="HTTP" class="dox-flow__end"><strong>Dox</strong><span>a private port</span></li>
+  <li><strong>Database</strong></li>
+</ol>
 
 ### Trusting the proxy
 
@@ -14056,11 +14119,11 @@ Requests per second on `GET /` at 64, 256 and 512 connections:
 | ------------------- | ------: | ------: | ------: | ---------: | ------: |
 | Dox                 | 541,489 | 652,400 | 669,691 | 0.74 ms    | 21      |
 | Dox server only     | 576,078 | 685,300 | 701,441 | 0.70 ms    | 20      |
-| Rust (hyper)        | 499,992 | 572,132 | 559,617 | 0.77 ms    | 14      |
-| Bun (`Bun.serve`)   | 496,865 | 504,672 | 521,648 | 1.02 ms    | 40      |
-| Relic 2 (`relic_native`) | 461,710 | 471,005 | 494,225 | 0.71 ms | 40 |
-| Node (`node:http`)  | 263,438 | 282,130 | 278,923 | 1.73 ms    | 199     |
-| Go (`net/http`)     | 245,400 | 237,146 | 230,919 | 3.32 ms    | 36      |
+| Rust<br>hyper | 499,992 | 572,132 | 559,617 | 0.77 ms    | 14      |
+| Bun<br>`Bun.serve` | 496,865 | 504,672 | 521,648 | 1.02 ms    | 40      |
+| Relic 2<br>`relic_native` | 461,710 | 471,005 | 494,225 | 0.71 ms | 40 |
+| Node<br>`node:http` | 263,438 | 282,130 | 278,923 | 1.73 ms    | 199     |
+| Go<br>`net/http` | 245,400 | 237,146 | 230,919 | 3.32 ms    | 36      |
 | `dart:io`           | 115,790 | 124,996 | 132,746 | 4.82 ms    | 56      |
 
 The other two routes at 256 connections:
@@ -14069,7 +14132,7 @@ The other two routes at 256 connections:
 | ----------------- | --------------: | -----------: |
 | Dox               | 582,861         | 576,435      |
 | Dox server only   | 666,149         | 676,363      |
-| Rust (hyper)      | 553,689         | 563,347      |
+| Rust<br>hyper | 553,689         | 563,347      |
 | Bun               | 488,315         | 496,905      |
 | Relic 2           | 432,465         | 376,030      |
 | Node              | 268,959         | 291,521      |
@@ -14170,12 +14233,12 @@ All three routes at 256 connections, requests per second:
 
 | Server                           | `/json` | `/db`   | `/queries?n=20` | peak MB |
 | -------------------------------- | ------: | ------: | --------------: | ------: |
-| Dox (`dox_postgres_native`)      | 592,900 | 297,000 | 18,015          | 93      |
-| Bun (`Bun.sql`)                  | 564,362 | 198,296 | 18,994          | 64      |
-| Rust (hyper + `tokio-postgres`)  | 667,718 | 128,065 | 9,312           | 11      |
-| Node (`node:http` + `pg`)        | 205,774 | 75,447  | 7,458           | 232     |
-| Go (`net/http` + pgx)            | 206,398 | 55,903  | 6,635           | 31      |
-| `dart:io` (+ `package:postgres`) | 89,480  | 28,598  | 2,269           | 47      |
+| Dox<br>`dox_postgres_native` | 592,900 | 297,000 | 18,015          | 93      |
+| Bun<br>`Bun.sql` | 564,362 | 198,296 | 18,994          | 64      |
+| Rust<br>hyper + `tokio-postgres` | 667,718 | 128,065 | 9,312           | 11      |
+| Node<br>`node:http` + `pg` | 205,774 | 75,447  | 7,458           | 232     |
+| Go<br>`net/http` + pgx | 206,398 | 55,903  | 6,635           | 31      |
+| `dart:io`<br>`package:postgres` | 89,480  | 28,598  | 2,269           | 47      |
 
 - On one query per request, Dox is the fastest: 1.5 times Bun.
 - On 20 queries per request, Dox and Bun are about the same. Postgres is
@@ -14186,11 +14249,11 @@ MySQL version.
 
 | Server                           | `/json` | `/db`   | `/queries?n=20` | peak MB |
 | -------------------------------- | ------: | ------: | --------------: | ------: |
-| Dox (`dox_mysql_native`)         | 558,886 | 247,242 | 12,347          | 70      |
-| Bun (`Bun.sql`)                  | 561,340 | 201,923 | 12,676          | 65      |
-| Rust (hyper + `mysql_async`)     | 653,244 | 46,795  | 3,158           | 10      |
-| Node (`node:http` + `mysql2`)    | 205,630 | 74,809  | 6,001           | 239     |
-| Go (`net/http` + `go-sql-driver`)| 211,713 | 55,322  | 5,520           | 27      |
+| Dox<br>`dox_mysql_native` | 558,886 | 247,242 | 12,347          | 70      |
+| Bun<br>`Bun.sql` | 561,340 | 201,923 | 12,676          | 65      |
+| Rust<br>hyper + `mysql_async` | 653,244 | 46,795  | 3,158           | 10      |
+| Node<br>`node:http` + `mysql2` | 205,630 | 74,809  | 6,001           | 239     |
+| Go<br>`net/http` + `go-sql-driver` | 211,713 | 55,322  | 5,520           | 27      |
 
 How it was run: the same rig as the [benchmark](#how-it-was-run) above.
 The server gets 2 CPUs, the database gets 2 CPUs and wrk gets the other 4.
@@ -14203,9 +14266,9 @@ One find-by-id query, AOT build (`dart build cli`), database on the same machine
 
 | Database | One query at a time | Many queries in flight | App CPU time per query |
 | --- | --- | --- | --- |
-| Postgres 14 (4 connections) | 60 µs | 12.5 µs each (64 in flight) | |
-| MySQL 8.4 (10 connections) | 67 µs | 11 µs each (32 in flight) | 13.5 µs |
-| MariaDB 11 (10 connections) | 63 µs | 9.7 µs each (32 in flight) | 12.4 µs |
+| Postgres 14<br>4 connections | 60 µs | 12.5 µs each<br>64 in flight | |
+| MySQL 8.4<br>10 connections | 67 µs | 11 µs each<br>32 in flight | 13.5 µs |
+| MariaDB 11<br>10 connections | 63 µs | 9.7 µs each<br>32 in flight | 12.4 µs |
 
 The CPU time counts the Dart thread and the Rust thread. For MySQL, it is about 75,000 queries per second on one core. Many requests at the same time, like in a web server, get the most out of the driver.
 
@@ -21415,7 +21478,7 @@ The status codes: 401 means the user is not logged in. 403 means the user may no
 
 - [Authorization](authorization.md): decide what a user can do.
 - [JWT authentication](../guides/jwt-auth.md): register, login and logout, step by step.
-- [Step 5: Login with dox_auth](../tutorial/05-auth.md): auth in the tutorial app.
+- [Step 5: Authentication](../tutorial/05-auth.md): auth in the tutorial app.
 
 
 ---
@@ -29162,12 +29225,13 @@ my_blog/
 
 The app and the server use the same DTO:
 
-```mermaid
-flowchart LR
-    S[packages/blog_shared<br>SaveBlog + SaveBlog.schema] --> A[app: Flutter<br>checks the form]
-    S --> B[server: Dox<br>checks the request]
-    A -- "POST /api/blogs (JSON)" --> B
-```
+<div class="dox-fan dox-fan--via" role="group" aria-label="The app and the server use the shared package">
+  <div class="dox-fan__top"><strong>packages/blog_shared</strong><span>SaveBlog and SaveBlog.schema</span></div>
+  <div class="dox-fan__cols">
+    <ol><li><strong>app: Flutter</strong><span>checks the form</span></li></ol>
+    <ol data-via="POST /api/blogs (JSON)"><li><strong>server: Dox</strong><span>checks the request</span></li></ol>
+  </div>
+</div>
 
 ## 1. The shared package
 
@@ -30002,11 +30066,11 @@ Run the blog API on your own Linux server (a VPS), with systemd to keep it runni
 
 systemd starts the app again after a crash. Caddy gets the TLS certificate and sends the requests to the app:
 
-```mermaid
-flowchart LR
-  client[Browser or app] -- "HTTPS :443" --> caddy[Caddy]
-  caddy -- "HTTP 127.0.0.1:3000" --> dox["/opt/blog/bin/server (systemd)"]
-```
+<ol class="dox-flow dox-flow--labels dox-flow--plain" style="--dox-flow-gap:6rem" aria-label="Caddy in front of the app">
+  <li><strong>Browser or app</strong></li>
+  <li data-via="HTTPS :443"><strong>Caddy</strong><span>the TLS certificate</span></li>
+  <li data-via="HTTP 127.0.0.1:3000" class="dox-flow__end" style="flex-grow:1.4"><strong>The app</strong><span>systemd runs /opt/blog/bin/server</span></li>
+</ol>
 
 ## What you need
 

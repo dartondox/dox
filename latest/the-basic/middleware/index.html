@@ -1001,7 +1001,7 @@
   <span class="md-ellipsis">
     
   
-    Step 5: Login with dox_auth
+    Step 5: Authentication
   
 
     
@@ -7621,8 +7621,15 @@
 <p>It also takes out the subtypes of the type, so use a specific type.</p>
 <h3 id="the-order">The order</h3>
 <p>Middleware runs in this order. If one returns a value or throws, the rest do not run:</p>
-<pre class="mermaid"><code>flowchart LR
-    K["Package"] --&gt; G["Global"] --&gt; R["Router"] --&gt; P["Group"] --&gt; T["Route"] --&gt; C["Controller"]</code></pre>
+<ol class="dox-flow" aria-label="The order of middleware">
+  <li><strong>Package</strong><span>from a provider</span></li>
+  <li><strong>Global</strong><span>all routes</span></li>
+  <li><strong>Router</strong><span>one router</span></li>
+  <li><strong>Group</strong><span>a route group</span></li>
+  <li><strong>Route</strong><span>one route</span></li>
+  <li class="dox-flow__end"><strong>Controller</strong><span>handles the request</span></li>
+</ol>
+
 <h2 id="run-code-after-the-controller">Run code after the controller</h2>
 <p>Implement <code>IDoxNextMiddleware</code> to change the response. <code>await next()</code> runs the rest of the middleware and the controller:</p>
 <div class="language-dart highlight"><span class="filename">lib/app/http/middleware/see_other.middleware.dart</span><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">class</span><span class="w"> </span><span class="nc">SeeOtherMiddleware</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">IDoxNextMiddleware</span><span class="w"> </span><span class="p">{</span>
