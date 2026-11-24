@@ -906,8 +906,7 @@ svg.lucide {
   margin: 0.1rem 0 2.4rem;
 }
 .md-typeset .dox-top h1 {
-  /* as big as fits on one line beside Doxie */
-  font-size: min(2.3rem, 3.55vw);
+  font-size: 2.3rem;
   white-space: nowrap;
   margin: 0;
   font-weight: 750;
@@ -920,11 +919,10 @@ svg.lucide {
 .md-typeset .dox-top__actions { display: inline-grid; gap: 0.6rem; margin: 0; }
 .md-typeset .dox-top__actions .md-button { margin: 0; text-align: center; }
 .md-typeset .dox-top__actions .md-button .twemoji { margin-right: 0.25em; vertical-align: -0.15em; }
-/* The title is on one line. Doxie is at the right end of that line, out
-   of the flow, so it takes no width from the title. */
+/* Doxie stands in the empty space at the right of the buttons */
 .dox-top__text { position: relative; }
-.md-typeset .dox-top__text > p:first-child { position: absolute; top: -0.3rem; right: -0.3rem; margin: 0; }
-.md-typeset .dox-top__mascot { display: block; width: 64px; height: auto; }
+.md-typeset .dox-top__text > p:first-child { position: absolute; right: 1.6rem; bottom: 0; margin: 0; }
+.md-typeset .dox-top__mascot { display: block; width: 112px; height: auto; }
 .md-typeset .dox-top__slogan { padding-top: 0.8rem; }
 /* the chart in the hero is narrow: it shows the name, the bar and req/s */
 .dox-top .dox-bench { margin: 0; padding: 0.8rem 1.2rem 0.55rem; }
@@ -1037,8 +1035,9 @@ svg.lucide {
 
 @media screen and (max-width: 59.9375em) {
   .dox-top { grid-template-columns: minmax(0, 1fr); gap: 1.8rem; }
-  .md-typeset .dox-top h1 { font-size: min(2.3rem, 7vw); }
-  .md-typeset .dox-top__mascot { width: 56px; }
+  .md-typeset .dox-top h1 { font-size: min(2.3rem, 8.2vw); }
+  .md-typeset .dox-top__text > p:first-child { right: 0.4rem; }
+  .md-typeset .dox-top__mascot { width: 96px; }
   .md-typeset .dox-paths > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media screen and (max-width: 44.9375em) {
