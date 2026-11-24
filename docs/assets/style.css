@@ -916,8 +916,9 @@ svg.lucide {
 }
 .md-typeset .dox-top__slogan { font-size: 1.05rem; font-weight: 650; color: var(--md-default-fg-color); margin: 0 0 0.5em; }
 .md-typeset .dox-top__lead { max-width: 27rem; margin: 0 0 1.4em; color: var(--md-default-fg-color--light); }
-.md-typeset .dox-top__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
+.md-typeset .dox-top__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0 0 0.6rem; }
 .md-typeset .dox-top__actions .md-button { margin: 0; }
+.md-typeset .dox-top__actions .md-button .twemoji { margin-right: 0.25em; vertical-align: -0.15em; }
 /* The title is on one line. Doxie is at the right end of that line, out
    of the flow, so it takes no width from the title. */
 .dox-top__text { position: relative; }
