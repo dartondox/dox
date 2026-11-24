@@ -27,12 +27,13 @@ my_blog/
 
 The app and the server use the same DTO:
 
-```mermaid
-flowchart LR
-    S[packages/blog_shared<br>SaveBlog + SaveBlog.schema] --> A[app: Flutter<br>checks the form]
-    S --> B[server: Dox<br>checks the request]
-    A -- "POST /api/blogs (JSON)" --> B
-```
+<div class="dox-fan dox-fan--via" role="group" aria-label="The app and the server use the shared package">
+  <div class="dox-fan__top"><strong>packages/blog_shared</strong><span>SaveBlog and SaveBlog.schema</span></div>
+  <div class="dox-fan__cols">
+    <ol><li><strong>app: Flutter</strong><span>checks the form</span></li></ol>
+    <ol data-via="POST /api/blogs (JSON)"><li><strong>server: Dox</strong><span>checks the request</span></li></ol>
+  </div>
+</div>
 
 ## 1. The shared package
 

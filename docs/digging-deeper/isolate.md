@@ -8,17 +8,24 @@ Dox runs your app on many isolates (threads) at once, so it can use every CPU co
 
 Each isolate runs its own [native server](native-server.md) on the same port, and the operating system spreads the connections between them:
 
-```mermaid
-flowchart TD
-    OS["Port 3000<br>the OS spreads the connections"] --> A1["Rust acceptor"]
-    OS --> A2["Rust acceptor"]
-    OS --> A3["Rust acceptor"]
-    A1 --> I1["Isolate 1, main<br>own memory cache"]
-    A2 --> I2["Isolate 2<br>own memory cache"]
-    A3 --> I3["Isolate N<br>own memory cache"]
-    I2 -. "crash: started again after 1 second" .-> I2
-    I1 -. "crash: the process exits" .-> S["Supervisor restarts the process<br>Docker, systemd"]
-```
+<div class="dox-fan" role="group" aria-label="One port, one native server and one isolate per CPU">
+  <div class="dox-fan__top"><strong>Port 3000</strong><span>the OS spreads the connections</span></div>
+  <div class="dox-fan__cols">
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate 1, main</strong><span>own memory cache</span></li>
+      <li data-via="crash: the process exits"><strong>Supervisor</strong><span>restarts the process: Docker, systemd</span></li>
+    </ol>
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate 2</strong><span>own memory cache</span><em>crash: started again after 1 second</em></li>
+    </ol>
+    <ol>
+      <li><strong>Rust acceptor</strong></li>
+      <li><strong>Isolate N</strong><span>own memory cache</span><em>crash: started again after 1 second</em></li>
+    </ol>
+  </div>
+</div>
 
 ## Setup
 

@@ -47,12 +47,12 @@ That is why every fact about another project links to its own docs, GitHub or pu
 The options are not all the same kind of thing.
 You can put them on one line, from "you pick every part" to "most parts come with it":
 
-```mermaid
-flowchart LR
-  lib["Library<br/>Shelf, Relic"] --> small["Small framework<br/>Dart Frog"]
-  small --> fullstack["Full-stack with a client<br/>Serverpod"]
-  fullstack --> full["Full backend framework<br/>Dox, Vania"]
-```
+<ol class="dox-flow" aria-label="The four kinds of Dart backend">
+  <li><strong>Library</strong><span>Shelf, Relic</span></li>
+  <li><strong>Small framework</strong><span>Dart Frog</span></li>
+  <li><strong>Full-stack with a client</strong><span>Serverpod</span></li>
+  <li><strong>Full backend framework</strong><span>Dox, Vania</span></li>
+</ol>
 
 1. **A library** is the base layer. It gives you the request, the response and middleware. You add the router, the database and the rest.
 2. **A small framework** is a library plus routing, a CLI and a dev server. You still add the database and other parts.

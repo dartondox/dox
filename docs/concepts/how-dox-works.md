@@ -10,12 +10,14 @@ This page shows the path of a request, how isolates work and what each folder of
 
 Each request takes the same path. The pages in "The basics" follow this order:
 
-```mermaid
-flowchart LR
-    A["Route"] --> B["Middleware"] --> C["DTO"] --> D["Controller"] --> E["View"] --> F["Response"]
-```
-
-[Routing](../the-basic/routing.md) → [Middleware](../the-basic/middleware.md) → [DTOs](../the-basic/dto.md) → [Controller](../the-basic/controller.md) → [Views](../the-basic/views.md) → [Response](../the-basic/response.md)
+<ol class="dox-flow" aria-label="The path of a request" markdown="block">
+  <li markdown="span">**[Route](../the-basic/routing.md)**<span>match the URL</span></li>
+  <li markdown="span">**[Middleware](../the-basic/middleware.md)**<span>go on or stop</span></li>
+  <li markdown="span">**[DTO](../the-basic/dto.md)**<span>check the input</span></li>
+  <li markdown="span">**[Controller](../the-basic/controller.md)**<span>your code</span></li>
+  <li markdown="span">**[View](../the-basic/views.md)**<span>render a page</span></li>
+  <li markdown="span" class="dox-flow__end">**[Response](../the-basic/response.md)**<span>send the answer</span></li>
+</ol>
 
 Dox has two parts. The native server (`dox_http_native`) owns the sockets and parses HTTP. Your Dart app runs the routes, middleware, DTOs, controllers and the ORM.
 
@@ -35,28 +37,24 @@ A request goes through these steps:
 
 If a step throws, Dox catches the error. An `IHttpException` gives its own status. Any other error gives 500 and goes to the `report` method of your `ExceptionHandler`.
 
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant R as Native server
-    participant D as Dart isolate
-    participant M as Middleware
-    participant K as Controller
-
-    C->>R: TCP connection, HTTP request
-    R->>R: parse request, check size limits
-    R->>D: batch of requests (one message)
-    D->>D: router: method, host, path
-    D->>D: CORS headers, read body
-    D->>M: global, router, group, route middleware
-    M-->>D: request (go on) or a response
-    D->>D: path params, DTO check
-    D->>K: call with typed parameters
-    K-->>D: return value
-    D->>D: responseHandler, build the response
-    D->>R: batch of answers (one call)
-    R->>C: bytes
-```
+<div class="dox-seq" style="--lanes:5" role="group" aria-label="The steps of a request, from the client to the controller and back">
+  <div class="dox-seq__head"><strong>Client</strong><strong>Native server</strong><strong>Dart isolate</strong><strong>Middleware</strong><strong>Controller</strong></div>
+  <ol>
+    <li style="--a:1;--b:2">TCP connection, HTTP request</li>
+    <li style="--a:2" class="dox-seq__self">parse request, check size limits</li>
+    <li style="--a:2;--b:3">batch of requests (one message)</li>
+    <li style="--a:3" class="dox-seq__self">router: method, host, path</li>
+    <li style="--a:3" class="dox-seq__self">CORS headers, read body</li>
+    <li style="--a:3;--b:4">global, router, group, route middleware</li>
+    <li style="--a:3;--b:4" class="dox-seq__back dox-seq__reply">request (go on) or a response</li>
+    <li style="--a:3" class="dox-seq__self">path params, DTO check</li>
+    <li style="--a:3;--b:5">call with typed parameters</li>
+    <li style="--a:3;--b:5" class="dox-seq__back dox-seq__reply">return value</li>
+    <li style="--a:3" class="dox-seq__self">response handler, build the response</li>
+    <li style="--a:2;--b:3" class="dox-seq__back">batch of answers (one call)</li>
+    <li style="--a:1;--b:2" class="dox-seq__back">bytes</li>
+  </ol>
+</div>
 
 Dox uses no reflection. DTOs come from a generated list, so `dox build` can make a native binary.
 

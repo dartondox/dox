@@ -130,12 +130,12 @@ A small app can run the jobs and the schedule inside the server, with `QueueConf
 
 Dox serves plain HTTP only. Run it on a private port, and put [Caddy](https://caddyserver.com) or nginx in front of it for TLS and gzip. When the proxy is on the same machine, set `APP_HOST=127.0.0.1`:
 
-```mermaid
-flowchart LR
-    C["Client"] -->|HTTPS| X["Caddy or nginx"]
-    X -->|HTTP| D["Dox"]
-    D --> DB[("Database")]
-```
+<ol class="dox-flow dox-flow--labels dox-flow--plain" aria-label="A proxy in front of Dox">
+  <li><strong>Client</strong></li>
+  <li data-via="HTTPS"><strong>Caddy or nginx</strong><span>TLS and gzip</span></li>
+  <li data-via="HTTP" class="dox-flow__end"><strong>Dox</strong><span>a private port</span></li>
+  <li><strong>Database</strong></li>
+</ol>
 
 ### Trusting the proxy
 

@@ -182,6 +182,11 @@ body {
     margin-left: auto;
     margin-right: auto;
   }
+  /* a page with no table of contents, like the home page, starts at the
+     same place as the other pages: it gets the same space on its left */
+  .md-sidebar--secondary[hidden] ~ .md-content:not(.md-content--post) {
+    margin-left: max(0px, calc((min(100vw, 1300px) - 24.2rem - 36.8rem) / 2));
+  }
   /* in a post, the article gets the same width and the same side space */
   [dir] .md-content--post > .md-content__inner {
     max-width: 36.8rem;
@@ -469,37 +474,6 @@ svg.lucide {
   border-radius: 4px;
 }
 
-/* ---------- Home page ---------- */
-.dox-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
-  gap: 2.4rem;
-  align-items: start;
-  margin: 0 0 2rem;
-}
-/* Doxie sits at the left of the title, on the same row */
-.md-typeset .dox-hero__mascot { float: left; width: 110px; height: auto; margin: 0 0.8rem 0.6rem 0; }
-.md-typeset .dox-hero__lead { clear: both; }
-.md-typeset .dox-hero h1 {
-  font-size: 2.15rem;
-  line-height: 1.08;
-  letter-spacing: -0.03em;
-  font-weight: 700;
-  margin: 0 0 0.5em;
-}
-.md-typeset .dox-hero__lead {
-  font-size: 1.05em;
-  color: var(--md-default-fg-color--light);
-  max-width: 30rem;
-  margin: 0 0 1.4em;
-}
-.md-typeset .dox-hero__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
-.md-typeset .dox-hero__actions .md-button { margin: 0; }
-.md-typeset .dox-hero__code .highlight { margin: 0; }
-/* the hero sample is not a full file, so it has no copy button */
-.md-typeset .dox-hero__code .md-code__nav { display: none; }
-.md-typeset .dox-hero__code pre > code { font-size: 0.76em; padding: 1.1em 1.3em; }
-
 .md-typeset .grid.cards > ul > li,
 .md-typeset .grid > .card {
   border: 1px solid var(--dox-line);
@@ -516,12 +490,6 @@ svg.lucide {
 .md-typeset .grid.cards svg { color: var(--md-typeset-a-color); }
 .md-typeset .grid.cards p { margin: 0.4em 0; font-size: 0.95em; }
 .md-typeset .grid.cards hr { display: none; }
-
-@media screen and (max-width: 59.9375em) {
-  .dox-hero { grid-template-columns: minmax(0, 1fr); gap: 1.6rem; }
-  .md-typeset .dox-hero h1 { font-size: 1.8rem; }
-  .md-typeset .dox-hero__mascot { width: 88px; }
-}
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
@@ -567,7 +535,7 @@ svg.lucide {
   position: relative;
   display: flex;
   align-items: center;
-  height: 1.7rem;
+  height: 1.3rem;
   border-radius: 5px;
   background: var(--dox-line);
   overflow: hidden;
@@ -621,6 +589,461 @@ svg.lucide {
   .dox-bench--simple .dox-bench__grid { grid-template-columns: 5.4rem minmax(0, 1fr) 4.8rem; column-gap: 0.6rem; }
   .dox-bench__p99, .dox-bench__ram, .dox-bench__head:nth-child(4), .dox-bench__head--ram { display: none; }
   .md-typeset .dox-bench__foot { flex-direction: column; }
+}
+
+/* Diagrams. Three kinds share one panel and one card style:
+   - "dox-flow": an <ol> of cards in a row, with arrows between them.
+   - "dox-fan": one top card, then columns of cards under it.
+   - "dox-seq": lanes with messages between them.
+   A card holds a <strong> name, a <span> caption and an <em> note.
+   data-via="text" on a card puts a label on the arrow that points to it. */
+[data-md-color-scheme="default"] :is(.dox-flow, .dox-fan, .dox-seq, .dox-sample__code) {
+  --dox-flow-accent: var(--dox-blue);
+  --dox-flow-panel: #fafbfd;
+  --dox-flow-card: #ffffff;
+}
+[data-md-color-scheme="slate"] :is(.dox-flow, .dox-fan, .dox-seq, .dox-sample__code) {
+  --dox-flow-accent: var(--dox-cyan);
+  --dox-flow-panel: #172038;
+  --dox-flow-card: #212c4a;
+  --dox-line: #2f3b5c;
+}
+.md-typeset ol.dox-flow,
+.md-typeset .dox-fan,
+.md-typeset .dox-seq {
+  --dox-flow-gap: 0.9rem;   /* space for an arrow that points right */
+  --dox-flow-vgap: 0.9rem;  /* space for an arrow that points down */
+  margin: 0.4rem 0 1.6rem;
+  padding: 1.3rem 1rem;
+  border: 1px solid var(--dox-line);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle, var(--dox-line) 1px, transparent 1.5px) 0 0 / 16px 16px,
+    var(--dox-flow-panel);
+}
+/* the card */
+.md-typeset ol.dox-flow > li,
+.dox-fan__top,
+.md-typeset .dox-fan__cols > ol > li {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  padding: 0.55rem 0.4rem 0.6rem;
+  overflow-wrap: normal;
+  border: 1px solid var(--dox-line);
+  border-radius: var(--dox-radius);
+  background: var(--dox-flow-card);
+  box-shadow: 0 1px 2px rgba(11, 27, 54, 0.06), 0 6px 16px rgba(11, 27, 54, 0.06);
+  line-height: 1.3;
+  transition: border-color 0.15s;
+}
+.md-typeset ol.dox-flow > li:hover,
+.dox-fan__top:hover,
+.md-typeset .dox-fan__cols > ol > li:hover { border-color: var(--dox-flow-accent); }
+:is(.dox-flow, .dox-fan) strong { display: block; font-size: 0.64rem; font-weight: 650; color: var(--md-default-fg-color); }
+:is(.dox-flow, .dox-fan) span {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.56rem;
+  overflow-wrap: break-word;
+  color: var(--md-default-fg-color--light);
+}
+:is(.dox-flow, .dox-fan) em {
+  display: block;
+  margin-top: 0.45rem;
+  padding: 0.2rem 0.35rem;
+  border-radius: 5px;
+  font-size: 0.52rem;
+  font-style: normal;
+  color: var(--md-default-fg-color--light);
+  background: color-mix(in srgb, var(--dox-flow-accent) 11%, transparent);
+}
+
+/* Flow: <ol class="dox-flow">. The cards get a number. Class
+   "dox-flow--labels" makes room for arrow labels, "dox-flow--plain" hides
+   the numbers and "dox-flow__end" fills one card. */
+.md-typeset ol.dox-flow {
+  display: flex;
+  gap: var(--dox-flow-gap);
+  list-style: none;
+  counter-reset: dox-flow;
+}
+.md-typeset ol.dox-flow.dox-flow--labels { --dox-flow-gap: 4.6rem; --dox-flow-vgap: 1.7rem; }
+.md-typeset ol.dox-flow > li { flex: 1 1 0; counter-increment: dox-flow; }
+.dox-flow strong::before {
+  content: counter(dox-flow);
+  display: grid;
+  place-items: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-bottom: 0.45rem;
+  border-radius: 5px;
+  font: 600 0.55rem/1 var(--md-code-font-family);
+  color: var(--dox-flow-accent);
+  background: color-mix(in srgb, var(--dox-flow-accent) 13%, transparent);
+}
+.dox-flow--plain strong::before { content: none; }
+.md-typeset ol.dox-flow--plain > li { display: flex; flex-direction: column; justify-content: center; }
+/* a link in the name makes the whole card a link */
+.md-typeset .dox-flow strong a { color: inherit; }
+.dox-flow strong a::after { content: ""; position: absolute; inset: 0; }
+.md-typeset ol.dox-flow > li.dox-flow__end {
+  border-color: transparent;
+  background: linear-gradient(155deg, #1272d6, #0a5fc2);
+}
+.dox-flow__end strong, .dox-flow__end span { color: #ffffff; }
+.dox-flow__end strong::before { color: #ffffff; background: rgba(255, 255, 255, 0.2); }
+
+/* An arrow that points right, in the gap on the left of its box: a moving
+   dashed line with the label above it, and a head. */
+.dox-flow > li + li::before,
+.dox-fan__cols > ol[data-via]::before {
+  content: attr(data-via);
+  position: absolute;
+  right: calc(100% + 5px);
+  bottom: calc(50% - 0.75px);
+  box-sizing: border-box;
+  width: calc(var(--dox-flow-gap) - 5px);
+  padding: 0 0.15rem 0.25rem;
+  font-size: 0.52rem;
+  line-height: 1.25;
+  text-align: center;
+  color: var(--md-default-fg-color--light);
+  background: linear-gradient(90deg, var(--dox-flow-accent) 50%, transparent 0) 0 100% / 6px 1.5px repeat-x;
+}
+.dox-flow > li + li::after,
+.dox-fan__cols > ol[data-via]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 1px);
+  width: 5px;
+  height: 7px;
+  transform: translateY(-50%);
+  background: var(--dox-flow-accent);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+@keyframes dox-flow-x { to { background-position: 6px 100%; } }
+@keyframes dox-flow-y { to { background-position: 0 6px; } }
+@media (prefers-reduced-motion: no-preference) {
+  .dox-flow > li + li::before,
+  .dox-fan__cols > ol[data-via]::before { animation: dox-flow-x 0.7s linear infinite; }
+  .dox-fan__cols > ol > li::before { animation: dox-flow-y 0.7s linear infinite; }
+}
+
+/* Fan: <div class="dox-fan"> holds a "dox-fan__top" card and a
+   "dox-fan__cols" row of <ol> columns. Every card in a column has an arrow
+   from the card above it. data-via on an <ol> draws an arrow from the
+   column on its left; add class "dox-fan--via" to make room for it. */
+.dox-fan { text-align: center; }
+.md-typeset .dox-fan.dox-fan--via { --dox-flow-gap: 9rem; }
+.md-typeset .dox-fan__cols {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  column-gap: var(--dox-flow-gap);
+}
+.md-typeset .dox-fan__cols > ol {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.md-typeset .dox-fan__cols > ol > li { margin-top: var(--dox-flow-vgap); }
+.md-typeset .dox-fan__cols > ol > li[data-via] { --dox-flow-vgap: 2.7rem; }
+.dox-fan--via .dox-fan__cols > ol > li { flex: 1; }
+/* an arrow that points down, in the gap above its card */
+.dox-fan__cols > ol > li::before {
+  content: attr(data-via);
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  right: 0;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: calc(var(--dox-flow-vgap) - 5px);
+  margin-left: -0.75px;
+  padding-left: 0.45rem;
+  font-size: 0.52rem;
+  line-height: 1.25;
+  text-align: left;
+  color: var(--md-default-fg-color--light);
+  background: linear-gradient(180deg, var(--dox-flow-accent) 50%, transparent 0) 0 0 / 1.5px 6px repeat-y;
+}
+.dox-fan__cols > ol > li::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  width: 7px;
+  height: 5px;
+  transform: translateX(-50%);
+  background: var(--dox-flow-accent);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+/* narrow screens: the flow cards stack and the arrows point down */
+@media screen and (max-width: 44.9375em) {
+  .md-typeset ol.dox-flow { flex-direction: column; gap: var(--dox-flow-vgap); padding: 1rem 0.9rem; }
+  .md-typeset .dox-fan { padding: 1rem 0.6rem; }
+  .md-typeset .dox-fan.dox-fan--via { --dox-flow-gap: 5.4rem; }
+  .dox-flow > li + li::before {
+    right: 0;
+    bottom: calc(100% + 5px);
+    left: 0.95rem;
+    display: flex;
+    align-items: center;
+    width: auto;
+    height: calc(var(--dox-flow-vgap) - 5px);
+    margin-left: -0.75px;
+    padding: 0 0 0 0.45rem;
+    text-align: left;
+    background: linear-gradient(180deg, var(--dox-flow-accent) 50%, transparent 0) 0 0 / 1.5px 6px repeat-y;
+    animation-name: dox-flow-y;
+  }
+  .dox-flow > li + li::after {
+    top: auto;
+    right: auto;
+    bottom: calc(100% + 1px);
+    left: 0.95rem;
+    width: 7px;
+    height: 5px;
+    transform: translateX(-50%);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+}
+
+/* Sequence diagram: <div class="dox-seq" style="--lanes:5"> holds a
+   "dox-seq__head" row of <strong> lane names and an <ol> of messages.
+   A message is <li style="--a:1;--b:2">: an arrow from lane a to lane b,
+   a is the left lane. Class "dox-seq__back" points the arrow left,
+   "dox-seq__reply" makes it dashed, and "dox-seq__self" with only --a is
+   a step inside one lane. */
+.md-typeset .dox-seq { overflow-x: auto; }
+.dox-seq__head,
+.md-typeset .dox-seq > ol { min-width: 31rem; }
+.dox-seq__head { display: grid; grid-template-columns: repeat(var(--lanes), 1fr); }
+.dox-seq__head strong {
+  margin: 0 0.3rem;
+  padding: 0.5rem 0.3rem;
+  border: 1px solid var(--dox-line);
+  border-radius: var(--dox-radius);
+  background: var(--dox-flow-card);
+  box-shadow: 0 1px 2px rgba(11, 27, 54, 0.06), 0 6px 16px rgba(11, 27, 54, 0.06);
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--md-default-fg-color);
+}
+/* the list draws one line down the middle of every lane */
+.md-typeset .dox-seq > ol {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem 0 0.9rem;
+  background: linear-gradient(90deg, transparent calc(50% - 1px), var(--dox-bar) calc(50% - 1px), var(--dox-bar) 50%, transparent 50%)
+    0 0 / calc(100% / var(--lanes)) 100%;
+}
+.md-typeset .dox-seq > ol > li {
+  position: relative;
+  margin: 0.55rem 0 0 calc((var(--a) - 0.5) * 100% / var(--lanes));
+  width: calc((var(--b) - var(--a)) * 100% / var(--lanes));
+  padding: 0 0.6rem 0.3rem;
+  font-size: 0.6rem;
+  line-height: 1.3;
+  text-align: center;
+  overflow-wrap: normal;
+  color: var(--md-default-fg-color);
+}
+.dox-seq li::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 6px;
+  height: 2px;
+  background: var(--dox-flow-accent);
+}
+.dox-seq li::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  right: 0;
+  width: 7px;
+  height: 10px;
+  background: var(--dox-flow-accent);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.dox-seq li.dox-seq__back::before { left: 6px; right: 0; }
+.dox-seq li.dox-seq__back::after { left: 0; right: auto; clip-path: polygon(100% 0, 0 50%, 100% 100%); }
+.dox-seq li.dox-seq__reply::before {
+  background: repeating-linear-gradient(90deg, var(--dox-flow-accent) 0 4px, transparent 4px 8px);
+}
+.md-typeset .dox-seq > ol > li.dox-seq__self {
+  box-sizing: border-box;
+  margin-left: calc((var(--a) - 1) * 100% / var(--lanes) + 0.5rem);
+  width: calc(100% / var(--lanes) - 1rem);
+  padding: 0.3rem 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--dox-flow-accent) 35%, var(--dox-line));
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--dox-flow-accent) 9%, var(--dox-flow-card));
+  color: var(--md-default-fg-color--light);
+}
+.dox-seq li.dox-seq__self::before,
+.dox-seq li.dox-seq__self::after { content: none; }
+
+/* ---------- Home page ----------
+   Layout: Doxie and the text on the left, the speed chart on the right. Under it, sections with little space
+   between them. Only the panels and the path cards have a frame. */
+.dox-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 2rem;
+  align-items: start;
+  margin: 0.1rem 0 2.4rem;
+}
+.md-typeset .dox-top h1 {
+  font-size: 2.3rem;
+  font-weight: 750;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+}
+.md-typeset .dox-top__slogan { font-size: 1.05rem; font-weight: 650; color: var(--md-default-fg-color); margin: 0 0 0.5em; }
+.md-typeset .dox-top__lead { max-width: 27rem; margin: 0 0 1.4em; color: var(--md-default-fg-color--light); }
+.md-typeset .dox-top__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
+.md-typeset .dox-top__actions .md-button { margin: 0; }
+/* Doxie sits at the left of the title, on the same row */
+.dox-top__text { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.7rem; align-items: center; }
+.md-typeset .dox-top__text > * { grid-column: 1 / -1; }
+.md-typeset .dox-top__text > p:first-child { grid-column: 1; margin: 0; }
+.md-typeset .dox-top__text > h1 { grid-column: 2; margin: 0; }
+.md-typeset .dox-top__mascot { display: block; width: 84px; height: auto; }
+.md-typeset .dox-top__slogan { padding-top: 1.1rem; }
+/* the chart in the hero is narrow: it shows the name, the bar and req/s */
+.dox-top .dox-bench { margin: 0; padding: 0.8rem 1.2rem 0.55rem; }
+.dox-top .dox-bench__grid { grid-template-columns: 5.4rem minmax(0, 1fr) 4.8rem; column-gap: 0.7rem; row-gap: 0.25rem; }
+.md-typeset .dox-top .dox-bench__foot { justify-content: flex-end; margin-top: 0.55rem; padding-top: 0.45rem; }
+.dox-top :is(.dox-bench__p99, .dox-bench__ram, .dox-bench__head:nth-child(4), .dox-bench__head--ram) { display: none; }
+
+/* The code sample: the code on a dotted panel, its three notes beside it */
+.dox-sample { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 2rem; align-items: center; }
+.dox-sample__code {
+  padding: 0.9rem;
+  border: 1px solid var(--dox-line);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle, var(--dox-line) 1px, transparent 1.5px) 0 0 / 16px 16px,
+    radial-gradient(90% 70% at 100% 0%, var(--md-accent-fg-color--transparent), transparent 70%),
+    var(--dox-flow-panel);
+}
+.md-typeset .dox-sample__code .highlight { margin: 0; box-shadow: 0 12px 32px rgba(11, 27, 54, 0.16); }
+/* the sample is not a full file, so it has no copy button */
+.md-typeset .dox-sample__code .md-code__nav { display: none; }
+.md-typeset .dox-sample__code pre > code { font-size: 0.76em; padding: 1.1em 1.3em; }
+.md-typeset .dox-sample > ol { list-style: none; counter-reset: dox-sample; margin: 0; padding: 0; }
+.md-typeset .dox-sample > ol > li {
+  position: relative;
+  margin: 0;
+  padding: 0.75rem 0 0.75rem 2rem;
+  counter-increment: dox-sample;
+  border-top: 1px solid var(--dox-line);
+}
+.md-typeset .dox-sample > ol > li:first-child { border-top: 0; }
+.md-typeset .dox-sample > ol > li p { margin: 0; }
+.dox-sample > ol > li::before {
+  content: counter(dox-sample);
+  position: absolute;
+  left: 0;
+  top: 0.85rem;
+  display: grid;
+  place-items: center;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 5px;
+  font: 600 0.6rem/1 var(--md-code-font-family);
+  color: var(--md-typeset-a-color);
+  background: var(--md-accent-fg-color--transparent);
+}
+
+/* What you get: one frame, thin lines between the items */
+.md-typeset .dox-feat > ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--dox-line);
+  border-radius: 14px;
+  background: var(--dox-line);
+}
+.md-typeset .dox-feat > ul > li { margin: 0; padding: 0.85rem 1rem 0.9rem; background: var(--md-default-bg-color); }
+.md-typeset .dox-feat li p { margin: 0; font-size: 0.92em; }
+.md-typeset .dox-feat li p:first-child { margin-bottom: 0.25em; font-size: 1em; color: var(--md-default-fg-color); }
+.md-typeset .dox-feat .twemoji { margin-right: 0.15em; color: var(--md-typeset-a-color); }
+
+/* Run it: two terminals side by side */
+.dox-start { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+.md-typeset .dox-start .highlight { margin: 0 0 0.6rem; }
+
+/* Pick your path: four link cards */
+.md-typeset .dox-paths > ul {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.md-typeset .dox-paths > ul > li {
+  position: relative;
+  margin: 0;
+  padding: 0.8rem 0.9rem 0.9rem;
+  border: 1px solid var(--dox-line);
+  border-radius: var(--dox-radius);
+  transition: border-color 0.15s;
+}
+.md-typeset .dox-paths > ul > li:hover { border-color: var(--md-typeset-a-color); }
+.md-typeset .dox-paths li p { margin: 0; font-size: 0.88em; }
+.md-typeset .dox-paths li p:first-child {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--md-default-fg-color--light);
+}
+.md-typeset .dox-paths li p:nth-child(2) { margin: 0.35em 0 0.3em; font-size: 1em; }
+.md-typeset .dox-paths li p:nth-child(2) a::after { content: " \2192"; }
+
+/* Get help: three short columns */
+.md-typeset .dox-help > ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.9rem 0 0;
+  border-top: 1px solid var(--dox-line);
+}
+.md-typeset .dox-help > ul > li { margin: 0; font-size: 0.92em; }
+
+@media screen and (max-width: 59.9375em) {
+  .dox-top { grid-template-columns: minmax(0, 1fr); gap: 1.8rem; }
+  .md-typeset .dox-top h1 { font-size: 2rem; }
+  .md-typeset .dox-top__mascot { width: 68px; }
+  .md-typeset .dox-paths > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media screen and (max-width: 44.9375em) {
+  .md-typeset .dox-feat > ul,
+  .dox-sample,
+  .dox-start,
+  .md-typeset .dox-paths > ul,
+  .md-typeset .dox-help > ul { grid-template-columns: minmax(0, 1fr); }
+  .md-typeset .dox-help > ul { gap: 0.6rem; }
 }
 
 /* Blog list: a thin line between the posts. */
