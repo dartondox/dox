@@ -915,11 +915,11 @@ svg.lucide {
 .md-typeset .dox-top__lead { max-width: 27rem; margin: 0 0 1.4em; color: var(--md-default-fg-color--light); }
 .md-typeset .dox-top__actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
 .md-typeset .dox-top__actions .md-button { margin: 0; }
-/* Doxie sits at the left of the title, on the same row */
-.dox-top__text { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.7rem; align-items: center; }
+/* Doxie sits at the right of the title, on the same row */
+.dox-top__text { display: grid; grid-template-columns: max-content max-content minmax(0, 1fr); column-gap: 0.7rem; align-items: center; }
 .md-typeset .dox-top__text > * { grid-column: 1 / -1; }
-.md-typeset .dox-top__text > p:first-child { grid-column: 1; margin: 0; }
-.md-typeset .dox-top__text > h1 { grid-column: 2; margin: 0; }
+.md-typeset .dox-top__text > p:first-child { grid-column: 2; grid-row: 1; margin: 0; }
+.md-typeset .dox-top__text > h1 { grid-column: 1; grid-row: 1; margin: 0; }
 .md-typeset .dox-top__mascot { display: block; width: 84px; height: auto; }
 .md-typeset .dox-top__slogan { padding-top: 1.1rem; }
 /* the chart in the hero is narrow: it shows the name, the bar and req/s */
