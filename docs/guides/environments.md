@@ -64,7 +64,7 @@ abstract class AppEnv {
   /// memory, file or redis
   String get cacheStore => 'file';
 
-  /// local, s3 or memory
+  /// local, s3, azure or memory
   String get storageDisk => 'local';
 
   /// sqlite, postgres or mysql

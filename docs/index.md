@@ -128,7 +128,7 @@ so a request never waits for another thread. See
 
 -   :material-folder-outline: **File storage**
 
-    Local disk and S3 behind one API, with signed URLs. See [`dox_storage`](digging-deeper/file-storage.md).
+    Local disk, S3 and Azure Blob Storage behind one API, with signed URLs. See [`dox_storage`](digging-deeper/file-storage.md).
 
 -   :material-cached: **Cache**
 

@@ -179,7 +179,7 @@ Options of each driver:
 
 | Driver | Option | Type | Default | Meaning |
 | --- | --- | --- | --- | --- |
-| all | `driver` | `String` | required | `local`, `s3` or `memory` |
+| all | `driver` | `String` | required | `local`, `s3`, `azure` or `memory` |
 | `local` | `root` | `String` | `storage` | Folder of the files. |
 | `local` | `url` | `String` | none | Base of the public URLs, like `http://localhost:3000/files`. |
 | `local` | `app_key` | `String` | `AppConfig.appKey` | Key that signs the URLs. |
@@ -197,6 +197,11 @@ Options of each driver:
 | `s3` | `visibility` | `String` | `private` | `public` or `private`. |
 | `s3` | `acl` | `bool` | `true` | The service supports ACLs. |
 | `s3` | `batch_delete` | `bool` | `true` | The service supports batch delete. |
+| `azure` | `account` | `String` | required | Name of the storage account. |
+| `azure` | `key` | `String` | required | Account key (base64). |
+| `azure` | `container` | `String` | required | Blob container. The driver does not create it. |
+| `azure` | `endpoint` | `String` | none | URL of the blob service, without the container. For Azurite: `http://127.0.0.1:10000/devstoreaccount1`. |
+| `azure` | `url` | `String` | none | Base of the public URLs. |
 
 ## OpenApiConfig
 

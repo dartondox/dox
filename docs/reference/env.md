@@ -45,7 +45,7 @@ A new project reads these keys with its typed env class in `lib/config/env.dart`
 | `APP_TOTAL_ISOLATE` | `appTotalIsolate` | `int?` | not set: one per CPU the process may use (cpuset and CPU quota) | `AppConfig.totalIsolate`. |
 | `LOG_LEVEL` | `logLevel` | `String` | `info` | `LoggerConfig.level`. |
 | `CACHE_STORE` | `cacheStore` | `String` | `file` | `CacheConfig.defaultStore`. A new project has the stores `file` and `memory`. Add a `redis` store in `lib/config/cache.dart` before you use it. |
-| `STORAGE_DISK` | `storageDisk` | `String` | `local` | `StorageConfig.defaultDisk`. A new project has the disk `local`. Add an `s3` or `memory` disk in `lib/config/storage.dart` before you use it. |
+| `STORAGE_DISK` | `storageDisk` | `String` | `local` | `StorageConfig.defaultDisk`. A new project has the disk `local`. Add an `s3`, `azure` or `memory` disk in `lib/config/storage.dart` before you use it. |
 | `DB_CONNECTION` | `dbConnection` | `String` | `sqlite` | `DatabaseConfig.connection`: `sqlite`, `postgres` or `mysql`. |
 | `DB_NAME` | `dbName` | `String` | `db/dox.sqlite` | The database name. For SQLite: the file path. |
 | `DB_HOST` | `dbHost` | `String` | `localhost` | Database host. |

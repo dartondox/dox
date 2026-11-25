@@ -53,7 +53,7 @@ Go through each table one time before your first deploy. An item marked "Dox lim
 | Shared state across isolates | Use a `redis` cache, not `memory`. For Socket.IO, use `transports: ['websocket']` on the client, and a Redis adapter with many servers. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Use Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
 | Writable temp folder | Uploads over 1 MB go to a temp file. A `FROM scratch` image needs `/tmp` with mode `1777`. | [Docker](../guides/docker.md) |
-| Uploads live on a volume or S3 | The `local` disk writes to `storage/`. Mount it as a volume, or use the `s3` disk. | [File storage](../digging-deeper/file-storage.md) |
+| Uploads live on a volume, S3 or Azure | The `local` disk writes to `storage/`. Mount it as a volume, or use the `s3` or `azure` disk. | [File storage](../digging-deeper/file-storage.md) |
 
 ## Database
 

@@ -432,7 +432,7 @@ A value must be a JSON type. The `memory` store is per isolate. See [Cache](../d
 | `Storage::temporaryUrl($path, now()->addMinutes(10))` | `await Storage().signedUrl(path, expiresIn: Duration(minutes: 10))` |
 | `Storage::disk('s3')` | `Storage().disk('s3')` |
 | `Storage::download($path, $name)` | `return Storage().download(path, name: name);` |
-| drivers: local, s3, ftp, sftp | drivers: `local`, `s3` (also R2, MinIO, Spaces), `memory` |
+| drivers: local, s3, ftp, sftp | drivers: `local`, `s3` (also R2, MinIO, Spaces), `azure`, `memory` |
 
 Three things are different from Laravel:
 
