@@ -22,7 +22,7 @@ This release has a security fix for the native HTTP server and for the native HT
 > - **Security fix: request smuggling.** The server accepted a lone line feed in parts of a chunked request body. A proxy in front of the server could read the same bytes as two requests.
 > - **The same fix in the client.** `dox_http_client` now refuses such bytes in a chunked answer.
 > - **The Dart SDK server tests now run against the server.** They found 10 differences from `dart:io`, and each one is fixed.
-> - **Easy to update.** Patch versions only. Run `dart pub upgrade`.
+> - **Easy to update.** Patch versions only. Run `dart pub upgrade dox_http_native dox_http_client`.
 
 ## Versions
 
@@ -35,11 +35,13 @@ No change: all the other packages, the `dox` CLI and the app template.
 
 ## How to update
 
-1. Get the new versions:
+1. Get the new versions of the 2 packages:
 
     ```bash
-    dart pub upgrade
+    dart pub upgrade dox_http_native dox_http_client
     ```
+
+    This changes only these 2 packages. It also works when your app gets them through other Dox packages.
 
 2. Build or start the app again. The new native libraries download automatically.
 
