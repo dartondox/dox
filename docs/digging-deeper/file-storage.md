@@ -478,6 +478,8 @@ On Azure, the copy runs inside the storage account. The copy keeps the content t
 
 ## Deleting files
 
+Delete a file with `delete`. A missing file is not an error:
+
 ```dart
 await Storage().delete(path);
 ```
