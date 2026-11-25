@@ -11,7 +11,7 @@ tags:
 slug: dox-patch-release-2026-11-25
 ---
 
-# Dox patch release: 25 November 2026
+# Security fixes release: 25 November 2026
 
 This release has a security fix for the native HTTP server and for the native HTTP client. We recommend that you update. The server also has 10 more fixes, which the HTTP server tests of the Dart SDK found.
 
