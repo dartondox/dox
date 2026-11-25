@@ -7939,7 +7939,7 @@
 <td><code>driver</code></td>
 <td><code>String</code></td>
 <td>required</td>
-<td><code>local</code>, <code>s3</code> or <code>memory</code></td>
+<td><code>local</code>, <code>s3</code>, <code>azure</code> or <code>memory</code></td>
 </tr>
 <tr>
 <td><code>local</code></td>
@@ -8059,6 +8059,41 @@
 <td><code>bool</code></td>
 <td><code>true</code></td>
 <td>The service supports batch delete.</td>
+</tr>
+<tr>
+<td><code>azure</code></td>
+<td><code>account</code></td>
+<td><code>String</code></td>
+<td>required</td>
+<td>Name of the storage account.</td>
+</tr>
+<tr>
+<td><code>azure</code></td>
+<td><code>key</code></td>
+<td><code>String</code></td>
+<td>required</td>
+<td>Account key (base64).</td>
+</tr>
+<tr>
+<td><code>azure</code></td>
+<td><code>container</code></td>
+<td><code>String</code></td>
+<td>required</td>
+<td>Blob container. The driver does not create it.</td>
+</tr>
+<tr>
+<td><code>azure</code></td>
+<td><code>endpoint</code></td>
+<td><code>String</code></td>
+<td>none</td>
+<td>URL of the blob service, without the container. For Azurite: <code>http://127.0.0.1:10000/devstoreaccount1</code>.</td>
+</tr>
+<tr>
+<td><code>azure</code></td>
+<td><code>url</code></td>
+<td><code>String</code></td>
+<td>none</td>
+<td>Base of the public URLs.</td>
 </tr>
 </tbody>
 </table>

@@ -7646,13 +7646,13 @@
 </tr>
 <tr>
 <td><code>Invalid argument(s): Storage disk "&lt;name&gt;" has unknown driver "&lt;type&gt;"</code></td>
-<td>A disk in <code>StorageConfig</code> has a <code>driver</code> other than <code>local</code>, <code>s3</code> or <code>memory</code>.</td>
+<td>A disk in <code>StorageConfig</code> has a <code>driver</code> other than <code>local</code>, <code>s3</code>, <code>azure</code> or <code>memory</code>.</td>
 <td>Fix the driver name.</td>
 </tr>
 <tr>
 <td><code>Invalid argument(s): Storage disk "&lt;name&gt;" needs the "&lt;setting&gt;" setting. It is missing or empty.</code></td>
-<td>An <code>s3</code> disk without <code>bucket</code>, <code>key</code> or <code>secret</code>, on its first use.</td>
-<td>Set <code>AWS_BUCKET</code>, <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code>.</td>
+<td>An <code>s3</code> disk without <code>bucket</code>, <code>key</code> or <code>secret</code>, or an <code>azure</code> disk without <code>account</code>, <code>key</code> or <code>container</code>. The app stops at start.</td>
+<td>For S3, set <code>AWS_BUCKET</code>, <code>AWS_ACCESS_KEY_ID</code> and <code>AWS_SECRET_ACCESS_KEY</code>. For Azure, set <code>AZURE_STORAGE_ACCOUNT</code>, <code>AZURE_STORAGE_KEY</code> and <code>AZURE_STORAGE_CONTAINER</code>.</td>
 </tr>
 <tr>
 <td><code>Invalid argument(s): invalid file</code></td>
@@ -7977,8 +7977,8 @@
 </tr>
 <tr>
 <td><code>PermissionDeniedException: Permission denied</code></td>
-<td>The OS (local) or S3 (<code>403</code>) refused it.</td>
-<td>Check file rights, or the S3 key and bucket policy.</td>
+<td>The OS (local), S3 (<code>403</code>) or Azure (<code>403</code>) refused it.</td>
+<td>Check file rights, the S3 key and bucket policy, or the Azure account key.</td>
 </tr>
 <tr>
 <td><code>InvalidKeyException: Invalid key: path traversal is not allowed</code></td>
@@ -8006,6 +8006,16 @@
 <td>Use a time up to 7 days.</td>
 </tr>
 <tr>
+<td><code>UnsupportedOperationException: Azure signed URLs must expire in the future</code></td>
+<td><code>signedUrl()</code> on Azure with an <code>expiresIn</code> of zero or less.</td>
+<td>Use a time more than zero.</td>
+</tr>
+<tr>
+<td><code>UnsupportedOperationException: Azure Blob sets public access per container, not per file</code></td>
+<td><code>setVisibility()</code> on an <code>azure</code> disk.</td>
+<td>Set the access level on the container in Azure.</td>
+</tr>
+<tr>
 <td><code>UnsupportedOperationException: Disk "&lt;name&gt;" is not registered</code></td>
 <td><code>Storage().disk('&lt;name&gt;')</code> with a missing disk.</td>
 <td>Add the disk to <code>StorageConfig.disks</code>.</td>
@@ -8014,6 +8024,31 @@
 <td><code>DriverException: &lt;S3 error&gt;</code></td>
 <td>Any other S3 error (network, <code>500</code>, wrong bucket).</td>
 <td>Read the S3 code in the text.</td>
+</tr>
+<tr>
+<td><code>DriverException: Azure 404 ContainerNotFound: &lt;Azure message&gt;</code></td>
+<td>The container of an <code>azure</code> disk does not exist.</td>
+<td>Create the container, or fix <code>AZURE_STORAGE_CONTAINER</code>. The driver does not create it.</td>
+</tr>
+<tr>
+<td><code>DriverException: Azure copy was still pending after 0:05:00.000000</code></td>
+<td><code>copy()</code> or <code>move()</code> on Azure was not complete after <code>copyTimeout</code> (5 minutes). The driver stopped the copy.</td>
+<td>Do the copy again.</td>
+</tr>
+<tr>
+<td><code>DriverException: Azure copy ended with status &lt;status&gt;</code></td>
+<td>Azure stopped the copy with a status other than <code>success</code>.</td>
+<td>Do the copy again.</td>
+</tr>
+<tr>
+<td><code>DriverException: File is larger than 50,000 blocks</code></td>
+<td><code>putStream()</code> on Azure with more than 50,000 blocks.</td>
+<td>Use a larger <code>blockSize</code> in <code>AzureBlobDriverConfig</code>.</td>
+</tr>
+<tr>
+<td><code>DriverException: Azure &lt;status&gt; &lt;code&gt;: &lt;Azure message&gt;</code></td>
+<td>Any other Azure error (<code>500</code>, wrong account).</td>
+<td>Read the Azure code in the text.</td>
 </tr>
 </tbody>
 </table>

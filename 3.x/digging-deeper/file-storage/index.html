@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Storage() saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), or memory.">
+        <meta name="description" content="Storage() saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), Azure Blob Storage, or memory.">
       
       
       
@@ -83,7 +83,7 @@
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Dox">
   <meta property="og:title" content="File Storage | Dox">
-  <meta property="og:description" content="Storage() saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), or memory.">
+  <meta property="og:description" content="Storage() saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), Azure Blob Storage, or memory.">
   <meta property="og:url" content="https://dartondox.dev/latest/digging-deeper/file-storage/">
   <meta property="og:image" content="https://dartondox.dev/latest/assets/social-card.png">
   <meta property="og:image:width" content="1200">
@@ -92,7 +92,7 @@
   <meta property="og:locale" content="en_US">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="File Storage | Dox">
-  <meta name="twitter:description" content="Storage() saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), or memory.">
+  <meta name="twitter:description" content="Storage() saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), Azure Blob Storage, or memory.">
   <meta name="twitter:image" content="https://dartondox.dev/latest/assets/social-card.png">
   
   <script type="application/ld+json">
@@ -2932,11 +2932,40 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#the-s3-disk" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The S3 disk
+        Drivers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Drivers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local disk
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Local disk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#atomic-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Atomic writes
       
     </span>
   </a>
@@ -2944,10 +2973,126 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#atomic-writes" class="md-nav__link">
+  <a href="#visibility-on-a-local-disk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Atomic writes
+        Visibility on a local disk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-file-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom file modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloudflare-r2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloudflare R2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MinIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#digitalocean-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DigitalOcean Spaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-cloud-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Cloud Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-blob-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Blob Storage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Azure Blob Storage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azurite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azurite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory disk
       
     </span>
   </a>
@@ -3162,34 +3307,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="File visibility">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#visibility-on-a-local-disk" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visibility on a local disk
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#custom-file-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom file modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -3297,67 +3414,6 @@
     <span class="md-ellipsis">
       
         Signed upload URLs
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#s3-compatible-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        S3-compatible services
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="S3-compatible services">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cloudflare-r2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cloudflare R2
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minio" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MinIO
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#digitalocean-spaces" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DigitalOcean Spaces
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#google-cloud-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Google Cloud Storage
       
     </span>
   </a>
@@ -7524,11 +7580,40 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#the-s3-disk" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        The S3 disk
+        Drivers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Drivers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Local disk
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Local disk">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#atomic-writes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Atomic writes
       
     </span>
   </a>
@@ -7536,10 +7621,126 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#atomic-writes" class="md-nav__link">
+  <a href="#visibility-on-a-local-disk" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Atomic writes
+        Visibility on a local disk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-file-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom file modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S3
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S3">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cloudflare-r2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cloudflare R2
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#minio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MinIO
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#digitalocean-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DigitalOcean Spaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#google-cloud-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Google Cloud Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#azure-blob-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azure Blob Storage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Azure Blob Storage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#azurite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Azurite
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#memory-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory disk
       
     </span>
   </a>
@@ -7754,34 +7955,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="File visibility">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#visibility-on-a-local-disk" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Visibility on a local disk
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#custom-file-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Custom file modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -7901,67 +8074,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#s3-compatible-services" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        S3-compatible services
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="S3-compatible services">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#cloudflare-r2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cloudflare R2
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minio" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        MinIO
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#digitalocean-spaces" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        DigitalOcean Spaces
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#google-cloud-storage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Google Cloud Storage
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#custom-drivers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -8054,8 +8166,8 @@
 
 
 <h1 id="file-storage">File Storage</h1>
-<p><code>Storage()</code> saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), or memory.</p>
-<p>All disks have the same methods. So you can use a local folder in development and S3 in production, with the same code. Storage is in the <code>dox_storage</code> package. You can also use it <a href="#without-dox">without Dox</a>.</p>
+<p><code>Storage()</code> saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), Azure Blob Storage, or memory.</p>
+<p>All disks have the same methods. So you can use a local folder in development and S3 or Azure in production, with the same code. Storage is in the <code>dox_storage</code> package. You can also use it <a href="#without-dox">without Dox</a>.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">Route</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="s1">'/avatar'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
@@ -8070,6 +8182,7 @@
 </span></code></pre></div>
 <p>It writes <code>lib/config/storage.dart</code>, the provider, the <code>storage</code> folder and the <code>STORAGE_DISK=local</code> key. It never overwrites a file.</p>
 <p>Add <code>--disk=s3</code> to also add an <code>s3</code> disk and the <code>AWS_*</code> keys. <code>STORAGE_DISK</code> stays <code>local</code>, so fill in the keys first, then set <code>STORAGE_DISK=s3</code>.</p>
+<p>Add <code>--disk=azure</code> to also add an <code>azure</code> disk and the <code>AZURE_STORAGE_*</code> keys. See <a href="#azure-blob-storage">Azure Blob Storage</a>.</p>
 <h3 id="configuration">Configuration</h3>
 <p>The disks are in <code>lib/config/storage.dart</code>. <code>STORAGE_DISK</code> in <code>.env</code> picks the default disk. This example adds a <code>url</code> to the local disk, an <code>s3</code> disk and a <code>memory</code> disk:</p>
 <div class="language-dart highlight"><span class="filename">lib/config/storage.dart</span><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
@@ -8119,13 +8232,18 @@
 <td><code>bucket</code>, <code>region</code>, <code>key</code>, <code>secret</code>, <code>token</code>, <code>endpoint</code>, <code>path_style</code> (MinIO), <code>url</code> (CDN), <code>visibility</code>, <code>acl</code>, <code>batch_delete</code>, <code>unsigned_payload</code></td>
 </tr>
 <tr>
+<td><code>azure</code></td>
+<td>Azure Blob Storage, Azurite</td>
+<td><code>account</code>, <code>key</code>, <code>container</code>, <code>endpoint</code> (Azurite), <code>url</code> (CDN)</td>
+</tr>
+<tr>
 <td><code>memory</code></td>
 <td>tests</td>
 <td>none</td>
 </tr>
 </tbody>
 </table>
-<p>Signed upload URLs work only on S3. The memory disk gives fake URLs.</p>
+<p>Signed upload URLs work only on S3 and Azure.</p>
 <p>The provider in <code>lib/providers/</code> sets up these disks in every isolate:</p>
 <div class="language-dart highlight"><span class="filename">lib/providers/storage_provider.dart</span><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
 </span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:my_app/config/storage.dart'</span><span class="p">;</span>
@@ -8134,288 +8252,380 @@
 </span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="n">AppStorageProvider</span><span class="p">()</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="k">super</span><span class="p">(</span><span class="n">storageConfig</span><span class="p">);</span>
 </span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">}</span>
 </span></code></pre></div>
-<h3 id="the-s3-disk">The S3 disk</h3>
-<p>Add the S3 keys to <code>lib/config/env.dart</code>, then run <code>dart run build_runner build</code>. The <code>s3</code> disk is added only when <code>AWS_BUCKET</code> is set:</p>
-<div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsBucket</span><span class="p">;</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsDefaultRegion</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">;</span>
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsAccessKeyId</span><span class="p">;</span>
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsSecretAccessKey</span><span class="p">;</span>
-</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
-</span><span id="__span-4-9"><a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="c1">/// R2, MinIO or Spaces. Null for AWS.</span>
-</span><span id="__span-4-10"><a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsEndpoint</span><span class="p">;</span>
-</span></code></pre></div>
-<p>Without <code>bucket</code>, <code>key</code> or <code>secret</code>, the app stops at start with an ArgumentError. To save CPU on big uploads, set <code>'unsigned_payload': true</code>. The signature then does not cover the body, so use it only over HTTPS.</p>
-<h3 id="atomic-writes">Atomic writes</h3>
+<h2 id="drivers">Drivers</h2>
+<h3 id="local-disk">Local disk</h3>
+<p>The local disk saves files in the <code>root</code> folder on the server.</p>
+<h4 id="atomic-writes">Atomic writes</h4>
 <p>A local disk writes a file in place. With <code>atomic_writes</code>, it writes a temp file and renames it, so a failed upload never leaves a partial file:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="s1">'atomic_writes'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="p">},</span>
+</span></code></pre></div>
+<p>The rename makes a new file, so the file gets the default mode and owner.</p>
+<h4 id="visibility-on-a-local-disk">Visibility on a local disk</h4>
+<p>Add <code>'permissions': true</code> to use file modes. Then <code>setVisibility</code> runs <code>chmod</code>, and <code>getVisibility</code> reads the mode:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="s1">'atomic_writes'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
 </span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="p">},</span>
 </span></code></pre></div>
-<p>The rename makes a new file, so the file gets the default mode and owner.</p>
+<p>The modes are: public file <code>0644</code>, private file <code>0600</code>, public folder <code>0755</code>, private folder <code>0700</code>. On Windows, <code>permissions</code> does nothing.</p>
+<h4 id="custom-file-modes">Custom file modes</h4>
+<p>Give <code>permissions</code> a map with a <code>file</code> and a <code>dir</code> key. Dart has no octal numbers, so write the modes in hex: <code>0x1a0</code> is <code>0640</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage-private'</span><span class="p">,</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">  </span><span class="s1">'visibility'</span><span class="o">:</span><span class="w"> </span><span class="s1">'private'</span><span class="p">,</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">  </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a4</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a0</span><span class="p">},</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a><span class="w">    </span><span class="s1">'dir'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1ed</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1e8</span><span class="p">},</span>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="p">},</span>
+</span></code></pre></div>
+<p>A mode you leave out keeps its default. A mode that is not an int from 0 to 0x1ff throws an ArgumentError.</p>
+<h3 id="s3">S3</h3>
+<p>Add the S3 keys to <code>lib/config/env.dart</code>, then run <code>dart run build_runner build</code>. The <code>s3</code> disk is added only when <code>AWS_BUCKET</code> is set:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsBucket</span><span class="p">;</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="kt">String</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsDefaultRegion</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">;</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsAccessKeyId</span><span class="p">;</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsSecretAccessKey</span><span class="p">;</span>
+</span><span id="__span-7-8"><a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+</span><span id="__span-7-9"><a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="w">  </span><span class="c1">/// R2, MinIO or Spaces. Null for AWS.</span>
+</span><span id="__span-7-10"><a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">awsEndpoint</span><span class="p">;</span>
+</span></code></pre></div>
+<p>Without <code>bucket</code>, <code>key</code> or <code>secret</code>, the app stops at start with an ArgumentError. To save CPU on big uploads, set <code>'unsigned_payload': true</code>. The signature then does not cover the body, so use it only over HTTPS.</p>
+<p>These examples use <code>S3DriverConfig</code>, the class behind an <code>s3</code> disk. In a Dox config, the same settings are the disk keys <code>endpoint</code>, <code>path_style</code>, <code>acl</code> and <code>batch_delete</code>. See <a href="#configuration">Configuration</a>.</p>
+<h4 id="cloudflare-r2">Cloudflare R2</h4>
+<p>R2 does not take ACL headers, so set <code>supportsAcl: false</code>:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'auto'</span><span class="p">,</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://&lt;account-id&gt;.r2.cloudflarestorage.com'</span><span class="p">,</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="w">  </span><span class="nl">supportsAcl:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="p">);</span>
+</span></code></pre></div>
+<h4 id="minio">MinIO</h4>
+<p>MinIO needs path style URLs:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
+</span><span id="__span-9-2"><a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
+</span><span id="__span-9-3"><a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">,</span>
+</span><span id="__span-9-4"><a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'http://localhost:9000'</span><span class="p">,</span>
+</span><span id="__span-9-5"><a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="w">  </span><span class="nl">forcePathStyle:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+</span><span id="__span-9-6"><a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'minioadmin'</span><span class="p">,</span>
+</span><span id="__span-9-7"><a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'minioadmin'</span><span class="p">,</span>
+</span><span id="__span-9-8"><a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="p">);</span>
+</span></code></pre></div>
+<h4 id="digitalocean-spaces">DigitalOcean Spaces</h4>
+<p>Put the region of your space in <code>region</code> and in the endpoint:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
+</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-space'</span><span class="p">,</span>
+</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'nyc3'</span><span class="p">,</span>
+</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://nyc3.digitaloceanspaces.com'</span><span class="p">,</span>
+</span><span id="__span-10-5"><a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
+</span><span id="__span-10-6"><a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
+</span><span id="__span-10-7"><a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="p">);</span>
+</span></code></pre></div>
+<h4 id="google-cloud-storage">Google Cloud Storage</h4>
+<p>GCS does not take ACL headers or the S3 batch delete call:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
+</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
+</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'auto'</span><span class="p">,</span>
+</span><span id="__span-11-4"><a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://storage.googleapis.com'</span><span class="p">,</span>
+</span><span id="__span-11-5"><a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'GOOG...'</span><span class="p">,</span>
+</span><span id="__span-11-6"><a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
+</span><span id="__span-11-7"><a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="w">  </span><span class="nl">supportsAcl:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-11-8"><a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a><span class="w">  </span><span class="nl">supportsBatchDelete:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
+</span><span id="__span-11-9"><a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<h3 id="azure-blob-storage">Azure Blob Storage</h3>
+<p>Use the <code>azure</code> disk when your files are in an Azure storage account. The driver stores each file as a block blob in one container.</p>
+<p>Run <code>dox add storage --disk=azure</code> to add the <code>azure</code> disk, the <code>AppEnv</code> getters and the <code>AZURE_STORAGE_*</code> keys. <code>STORAGE_DISK</code> stays <code>local</code>, so fill in the keys first, then set <code>STORAGE_DISK=azure</code>.</p>
+<p>To add the disk by hand, add the Azure keys to <code>lib/config/env.dart</code>, then run <code>dart run build_runner build</code>:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/env.dart</span><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">azureStorageAccount</span><span class="p">;</span>
+</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+</span><span id="__span-12-3"><a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">azureStorageKey</span><span class="p">;</span>
+</span><span id="__span-12-4"><a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+</span><span id="__span-12-5"><a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">azureStorageContainer</span><span class="p">;</span>
+</span><span id="__span-12-6"><a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>
+</span><span id="__span-12-7"><a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a><span class="w">  </span><span class="c1">/// Azurite or a custom domain. Null for Azure.</span>
+</span><span id="__span-12-8"><a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">azureStorageEndpoint</span><span class="p">;</span>
+</span><span id="__span-12-9"><a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>
+</span><span id="__span-12-10"><a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="w">  </span><span class="kt">String</span><span class="o">?</span><span class="w"> </span><span class="kd">get</span><span class="w"> </span><span class="n">azureStorageUrl</span><span class="p">;</span>
+</span></code></pre></div>
+<p>Then add the disk to <code>lib/config/storage.dart</code>. The <code>azure</code> disk is added only when <code>AZURE_STORAGE_CONTAINER</code> is set:</p>
+<div class="language-dart highlight"><span class="filename">lib/config/storage.dart</span><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="w">    </span><span class="c1">/// only when AZURE_STORAGE_CONTAINER is set</span>
+</span><span id="__span-13-2"><a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">env</span><span class="p">.</span><span class="n">azureStorageContainer</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">)</span>
+</span><span id="__span-13-3"><a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">      </span><span class="s1">'azure'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-13-4"><a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">        </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'azure'</span><span class="p">,</span>
+</span><span id="__span-13-5"><a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">        </span><span class="s1">'account'</span><span class="o">:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">azureStorageAccount</span><span class="p">,</span>
+</span><span id="__span-13-6"><a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">        </span><span class="s1">'key'</span><span class="o">:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">azureStorageKey</span><span class="p">,</span>
+</span><span id="__span-13-7"><a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="w">        </span><span class="s1">'container'</span><span class="o">:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">azureStorageContainer</span><span class="p">,</span>
+</span><span id="__span-13-8"><a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="w">        </span><span class="s1">'endpoint'</span><span class="o">:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">azureStorageEndpoint</span><span class="p">,</span><span class="w"> </span><span class="c1">// Azurite, custom domain</span>
+</span><span id="__span-13-9"><a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="w">        </span><span class="s1">'url'</span><span class="o">:</span><span class="w"> </span><span class="n">env</span><span class="p">.</span><span class="n">azureStorageUrl</span><span class="p">,</span>
+</span><span id="__span-13-10"><a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="w">      </span><span class="p">},</span>
+</span></code></pre></div>
+<table>
+<thead>
+<tr>
+<th><code>.env</code> key</th>
+<th>Disk option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AZURE_STORAGE_ACCOUNT</code></td>
+<td><code>account</code></td>
+<td>The name of the storage account. Required.</td>
+</tr>
+<tr>
+<td><code>AZURE_STORAGE_KEY</code></td>
+<td><code>key</code></td>
+<td>The base64 account key from the Azure portal. Required.</td>
+</tr>
+<tr>
+<td><code>AZURE_STORAGE_CONTAINER</code></td>
+<td><code>container</code></td>
+<td>The blob container. Required.</td>
+</tr>
+<tr>
+<td><code>AZURE_STORAGE_ENDPOINT</code></td>
+<td><code>endpoint</code></td>
+<td>The URL of the blob service, without the container. The default is <code>https://&lt;account&gt;.blob.core.windows.net</code>.</td>
+</tr>
+<tr>
+<td><code>AZURE_STORAGE_URL</code></td>
+<td><code>url</code></td>
+<td>The base of the URLs that <code>url</code> returns, for example a CDN. The default is the container URL.</td>
+</tr>
+</tbody>
+</table>
+<p>The driver does not create the container. Create the container before you use the disk. Without <code>account</code>, <code>key</code> or <code>container</code>, the app stops with an ArgumentError.</p>
+<h4 id="azurite">Azurite</h4>
+<p>Azurite is the Azure Storage emulator. Use it for local development, so you do not need an Azure account. Start it with Docker:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>docker<span class="w"> </span>run<span class="w"> </span>-d<span class="w"> </span>--rm<span class="w"> </span>--name<span class="w"> </span>dox-storage-azurite<span class="w"> </span>-p<span class="w"> </span><span class="m">10000</span>:10000<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">  </span>mcr.microsoft.com/azure-storage/azurite:3.38.0<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-14-3"><a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">  </span>azurite-blob<span class="w"> </span>--blobHost<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>--skipApiVersionCheck<span class="w"> </span>--loose
+</span></code></pre></div>
+<p>Then point the <code>azure</code> disk to Azurite. <code>devstoreaccount1</code> is the default account of Azurite. Its key is in the Azurite documentation:</p>
+<div class="language-ini highlight"><span class="filename">.env</span><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="na">STORAGE_DISK</span><span class="o">=</span><span class="s">azure</span>
+</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="na">AZURE_STORAGE_ACCOUNT</span><span class="o">=</span><span class="s">devstoreaccount1</span>
+</span><span id="__span-15-3"><a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="na">AZURE_STORAGE_KEY</span><span class="o">=</span><span class="s">&lt;the Azurite account key&gt;</span>
+</span><span id="__span-15-4"><a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="na">AZURE_STORAGE_CONTAINER</span><span class="o">=</span><span class="s">files</span>
+</span><span id="__span-15-5"><a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="na">AZURE_STORAGE_ENDPOINT</span><span class="o">=</span><span class="s">http://127.0.0.1:10000/devstoreaccount1</span>
+</span></code></pre></div>
+<p>Azurite starts with no containers. Create the <code>files</code> container before you use the disk, for example with Azure Storage Explorer or the Azure CLI.</p>
+<h3 id="memory-disk">Memory disk</h3>
+<p>Use the memory disk in tests. It gives fake URLs. See <a href="#testing">Testing</a>.</p>
 <h2 id="using-another-disk">Using another disk</h2>
 <p><code>Storage()</code> uses the default disk. Use <code>disk</code> to pick another one:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'reports/2026.pdf'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'reports/2026.pdf'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="storing-files">Storing files</h2>
 <p><code>putFile</code> saves a file in a folder with a new uuid name, and returns the path. It takes a <code>RequestFile</code> or bytes. For bytes, give <code>extension:</code>, or Dox finds it from the bytes:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1">// returns '/images/&lt;uuid&gt;.png'</span>
-</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span><span class="w"> </span><span class="c1">// a RequestFile</span>
-</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Uint8List</span><span class="p">.</span><span class="n">fromList</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span>
-</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">path2</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span>
-</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="kt">String</span><span class="w"> </span><span class="n">path3</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span><span class="w"> </span><span class="c1">// like putFile</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1">// returns '/images/&lt;uuid&gt;.png'</span>
+</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span><span class="w"> </span><span class="c1">// a RequestFile</span>
+</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="n">Uint8List</span><span class="w"> </span><span class="n">bytes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Uint8List</span><span class="p">.</span><span class="n">fromList</span><span class="p">(</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">[</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="m">3</span><span class="p">]);</span>
+</span><span id="__span-17-4"><a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">path2</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-17-5"><a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span>
+</span><span id="__span-17-6"><a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="kt">String</span><span class="w"> </span><span class="n">path3</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-17-7"><a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">bytes</span><span class="p">,</span><span class="w"> </span><span class="nl">extension:</span><span class="w"> </span><span class="s1">'png'</span><span class="p">);</span><span class="w"> </span><span class="c1">// like putFile</span>
 </span></code></pre></div>
 <p>When the bytes are a known format, like png, the extension of the bytes wins over the file name. So a png sent as <code>a.html</code> is saved as <code>.png</code>.</p>
 <h3 id="storing-with-your-own-name">Storing with your own name</h3>
 <p><code>putFileAs</code> uses your file name. It replaces an old file with that name:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">path4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFileAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">path4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putFileAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Do not use the file name from the client, because the name is used as it is.</p>
 <h3 id="storing-at-an-exact-path">Storing at an exact path</h3>
 <p><code>put</code> with <code>exact: true</code> writes to an exact path. It takes a string, a <code>List&lt;int&gt;</code> or a <code>Stream&lt;List&lt;int&gt;&gt;</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-9-1"><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="storing-uploaded-files">Storing uploaded files</h3>
 <p>An uploaded file can store itself. <code>store</code> works like <code>putFile</code>, and <code>storeAs</code> works like <code>putFileAs</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-10-1"><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'image'</span><span class="p">);</span>
-</span><span id="__span-10-2"><a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
-</span><span id="__span-10-3"><a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">onS3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'s3'</span><span class="p">);</span>
-</span><span id="__span-10-4"><a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">avatar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">storeAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">RequestFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'image'</span><span class="p">);</span>
+</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">onS3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'s3'</span><span class="p">);</span>
+</span><span id="__span-20-4"><a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a><span class="kt">String</span><span class="w"> </span><span class="n">avatar</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">file</span><span class="p">.</span><span class="n">storeAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>putRequestFile</code> and <code>putRequestFileAs</code> on <code>Storage()</code> do the same:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-11-1"><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putRequestFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span>
-</span><span id="__span-11-2"><a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">avatar</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-11-3"><a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putRequestFileAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putRequestFile</span><span class="p">(</span><span class="s1">'images'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span>
+</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="kt">String</span><span class="w"> </span><span class="n">avatar</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">putRequestFileAs</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span><span class="w"> </span><span class="s1">'user-1.png'</span><span class="p">,</span><span class="w"> </span><span class="n">file</span><span class="p">);</span>
 </span></code></pre></div>
 <p>On a local disk, the upload temp file is moved, not read into memory.</p>
 <h3 id="prepending-and-appending">Prepending and appending</h3>
 <p>Add text to the end or the start of a file. A missing file is made:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-12-1"><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">append</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'new line'</span><span class="p">);</span>
-</span><span id="__span-12-2"><a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">prepend</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'first line'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">append</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'new line'</span><span class="p">);</span>
+</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">prepend</span><span class="p">(</span><span class="s1">'logs/app.log'</span><span class="p">,</span><span class="w"> </span><span class="s1">'first line'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>A new line goes between the old and the new text. Change it with <code>separator</code>. Two writers at the same time can lose a write.</p>
 <h2 id="retrieving-files">Retrieving files</h2>
 <p><code>get</code> gives the bytes of a file, or null when the file is missing:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-13-1"><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="n">Uint8List</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">Uint8List</span><span class="o">?</span><span class="w"> </span><span class="n">found</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="kd">get</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="checking-if-a-file-exists">Checking if a file exists</h3>
 <p><code>exists</code> checks for a file. <code>missing</code> is the opposite:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-14-1"><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
-</span><span id="__span-14-2"><a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">gone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">missing</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+</span><span id="__span-24-2"><a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">gone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">missing</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="file-metadata">File metadata</h3>
 <p><code>size</code> gives the size in bytes, and <code>lastModified</code> gives the time of the last change. Both throw <code>FileNotFoundException</code> when the file is missing:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-15-1"><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">size</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
-</span><span id="__span-15-2"><a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="n">DateTime</span><span class="w"> </span><span class="n">changed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">lastModified</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="kt">int</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">size</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">DateTime</span><span class="w"> </span><span class="n">changed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">lastModified</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="downloading-files">Downloading files</h2>
 <p><code>stream</code> shows a file in the browser, and <code>download</code> makes the browser save it. Both stream the file, and a missing file answers 404:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-16-1"><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/photo'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-16-2"><a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">stream</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'path'</span><span class="p">));</span>
-</span><span id="__span-16-3"><a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="p">});</span>
-</span><span id="__span-16-4"><a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>
-</span><span id="__span-16-5"><a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/report'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-16-6"><a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">download</span><span class="p">(</span><span class="s1">'reports/2024.pdf'</span><span class="p">);</span>
-</span><span id="__span-16-7"><a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/photo'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-2"><a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">stream</span><span class="p">(</span><span class="n">req</span><span class="p">.</span><span class="n">input</span><span class="p">(</span><span class="s1">'path'</span><span class="p">));</span>
+</span><span id="__span-26-3"><a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="p">});</span>
+</span><span id="__span-26-4"><a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>
+</span><span id="__span-26-5"><a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/report'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-26-6"><a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">).</span><span class="n">download</span><span class="p">(</span><span class="s1">'reports/2024.pdf'</span><span class="p">);</span>
+</span><span id="__span-26-7"><a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a><span class="p">});</span>
 </span></code></pre></div>
 <p><code>download</code> uses the last part of the path as the file name. Give <code>name:</code> to use another name:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-17-1"><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-17-2"><a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">,</span><span class="w"> </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'Invoice 42.pdf'</span><span class="p">);</span>
-</span><span id="__span-17-3"><a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-27-2"><a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">,</span><span class="w"> </span><span class="nl">name:</span><span class="w"> </span><span class="s1">'Invoice 42.pdf'</span><span class="p">);</span>
+</span><span id="__span-27-3"><a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="p">});</span>
 </span></code></pre></div>
 <p>To add headers, put the download in a <code>response()</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-18-1"><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-18-2"><a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">  </span><span class="n">DownloadableFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">);</span>
-</span><span id="__span-18-3"><a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">file</span><span class="p">).</span><span class="n">header</span><span class="p">(</span><span class="s1">'Cache-Control'</span><span class="p">,</span><span class="w"> </span><span class="s1">'no-store'</span><span class="p">);</span>
-</span><span id="__span-18-4"><a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="p">});</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">Route</span><span class="p">.</span><span class="kd">get</span><span class="p">(</span><span class="s1">'/invoice'</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">DoxRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="kd">async</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-28-2"><a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">  </span><span class="n">DownloadableFile</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">download</span><span class="p">(</span><span class="s1">'invoices/42.pdf'</span><span class="p">);</span>
+</span><span id="__span-28-3"><a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="n">file</span><span class="p">).</span><span class="n">header</span><span class="p">(</span><span class="s1">'Cache-Control'</span><span class="p">,</span><span class="w"> </span><span class="s1">'no-store'</span><span class="p">);</span>
+</span><span id="__span-28-4"><a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="p">});</span>
 </span></code></pre></div>
 <h2 id="file-urls">File URLs</h2>
 <p><code>url</code> gives the URL of a file. On a local disk with no <code>url</code> option, it gives <code>/storage/&lt;path&gt;</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-19-1"><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">url</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">url</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
 <p>Dox serves that URL only with <code>Storage.route('storage', signed: false)</code>. See <a href="#serving-local-files">Serving local files</a>.</p>
 <h3 id="signed-urls">Signed URLs</h3>
 <p>A signed URL opens a file for a short time, like a private invoice. <code>temporaryUrl</code> is the same as <code>signedUrl</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-20-1"><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">signed</span><span class="w"> </span><span class="o">=</span>
-</span><span id="__span-20-2"><a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="nl">expiresIn:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">));</span>
-</span><span id="__span-20-3"><a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">temporaryUrl</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">signed</span><span class="w"> </span><span class="o">=</span>
+</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">    </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="nl">expiresIn:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">));</span>
+</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="kt">String</span><span class="w"> </span><span class="n">same</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">temporaryUrl</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
 <p>On a local disk, <code>signedUrl</code> needs the disk <code>url</code> option: the full URL of the route, like <code>https://app.test/files</code>.</p>
 <h3 id="serving-local-files">Serving local files</h3>
 <p><code>Storage.route</code> adds a route that serves the files of a disk:</p>
-<div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-21-1"><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span><span class="w">                  </span><span class="c1">// GET /files/{key*}, signed only</span>
-</span><span id="__span-21-2"><a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// any file of the disk</span>
-</span><span id="__span-21-3"><a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'docs'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// another disk</span>
-</span><span id="__span-21-4"><a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'uploads'</span><span class="p">,</span><span class="w"> </span><span class="nl">download:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="c1">// every file is a download</span>
+<div class="language-dart highlight"><span class="filename">lib/routes/web.dart</span><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'files'</span><span class="p">);</span><span class="w">                  </span><span class="c1">// GET /files/{key*}, signed only</span>
+</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'public'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w">  </span><span class="c1">// any file of the disk</span>
+</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'docs'</span><span class="p">,</span><span class="w"> </span><span class="nl">disk:</span><span class="w"> </span><span class="s1">'memory'</span><span class="p">,</span><span class="w"> </span><span class="nl">signed:</span><span class="w"> </span><span class="kc">false</span><span class="p">);</span><span class="w"> </span><span class="c1">// another disk</span>
+</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="n">Storage</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s1">'uploads'</span><span class="p">,</span><span class="w"> </span><span class="nl">download:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span><span class="w"> </span><span class="c1">// every file is a download</span>
 </span></code></pre></div>
 <p>A signed URL of the <code>files</code> route looks like this:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-22-1"><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="s1">'invoices/1.pdf'</span><span class="p">);</span>
-</span><span id="__span-22-2"><a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="c1">// https://app.test/files/invoices/1.pdf?expires=...&amp;signature=...</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">signedUrl</span><span class="p">(</span><span class="s1">'invoices/1.pdf'</span><span class="p">);</span>
+</span><span id="__span-32-2"><a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="c1">// https://app.test/files/invoices/1.pdf?expires=...&amp;signature=...</span>
 </span></code></pre></div>
 <p>A missing, wrong or expired signature answers 403. Signed routes work only on a <code>local</code> disk. An html, svg, xml or javascript file is always sent as a download in a sandbox, so its script cannot run on your site.</p>
 <h2 id="copying-and-moving-files">Copying and moving files</h2>
 <p><code>copy</code> and <code>move</code> replace an old file at the new path:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-23-1"><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">copy</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'backup/a.txt'</span><span class="p">);</span>
-</span><span id="__span-23-2"><a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">move</span><span class="p">(</span><span class="s1">'backup/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'old/a.txt'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">copy</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'backup/a.txt'</span><span class="p">);</span>
+</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">move</span><span class="p">(</span><span class="s1">'backup/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'old/a.txt'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>On S3, the copy runs inside S3. A missing source file answers 404.</p>
+<p>On Azure, the copy runs inside the storage account. The copy keeps the content type of the source, unless you set <code>contentType</code> in <code>WriteOptions</code>. Azure can leave a copy pending. Then the driver waits up to 5 minutes, stops the copy and throws <code>DriverException</code>.</p>
 <h2 id="deleting-files">Deleting files</h2>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-24-1"><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">delete</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<p>Delete a file with <code>delete</code>. A missing file is not an error:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">delete</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
+<p>On Azure, <code>delete</code> also deletes the snapshots of the blob.</p>
 <h2 id="directories">Directories</h2>
 <p><code>files</code> gives the files in a folder, <code>allFiles</code> also gives the files in sub-folders, and <code>directories</code> gives the sub-folders. Each path starts with <code>/</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-25-1"><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">files</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
-</span><span id="__span-25-2"><a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">allFiles</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
-</span><span id="__span-25-3"><a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">folders</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directories</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">files</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">allFiles</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="n">List</span><span class="o">&lt;</span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">folders</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directories</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>directoryExists</code> checks for a folder. On S3 and memory disks, a folder exists when a file is in it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-26-1"><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directoryExists</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="kt">bool</span><span class="w"> </span><span class="n">folder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">directoryExists</span><span class="p">(</span><span class="s1">'images'</span><span class="p">);</span>
 </span></code></pre></div>
+<p>On Azure, a folder exists when a blob name starts with the folder name and <code>/</code>. A folder marker blob, like <code>images/</code>, also counts.</p>
 <p><code>makeDirectory</code> makes a folder. It works only on a local disk:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-27-1"><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">makeDirectory</span><span class="p">(</span><span class="s1">'reports'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">makeDirectory</span><span class="p">(</span><span class="s1">'reports'</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>deleteDirectory</code> deletes a folder and all files in it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-28-1"><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">deleteDirectory</span><span class="p">(</span><span class="s1">'old'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">deleteDirectory</span><span class="p">(</span><span class="s1">'old'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>The root (<code>''</code> or <code>/</code>) throws <code>InvalidKeyException</code>. To empty a full disk, use <code>Storage().use().deleteAll()</code>.</p>
 <h2 id="file-visibility">File visibility</h2>
 <p>A file is public or private. Use <code>setVisibility</code> and <code>getVisibility</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-29-1"><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">setVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">Visibility</span><span class="p">.</span><span class="n">private</span><span class="p">);</span>
-</span><span id="__span-29-2"><a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="n">Visibility</span><span class="w"> </span><span class="n">visibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">getVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">setVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="w"> </span><span class="n">Visibility</span><span class="p">.</span><span class="n">private</span><span class="p">);</span>
+</span><span id="__span-39-2"><a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a><span class="n">Visibility</span><span class="w"> </span><span class="n">visibility</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">getVisibility</span><span class="p">(</span><span class="n">path</span><span class="p">);</span>
 </span></code></pre></div>
-<p>On S3, <code>setVisibility</code> sets the ACL. With <code>'acl': false</code> (R2 and similar), it does nothing, and <code>getVisibility</code> gives the disk <code>visibility</code>. On a local disk it is the same, unless you turn on <code>permissions</code>.</p>
-<h3 id="visibility-on-a-local-disk">Visibility on a local disk</h3>
-<p>Add <code>'permissions': true</code> to use file modes. Then <code>setVisibility</code> runs <code>chmod</code>, and <code>getVisibility</code> reads the mode:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-30-1"><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-30-2"><a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
-</span><span id="__span-30-3"><a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a><span class="w">  </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span>
-</span><span id="__span-30-4"><a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a><span class="w">  </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-30-5"><a id="__codelineno-30-5" name="__codelineno-30-5" href="#__codelineno-30-5"></a><span class="p">},</span>
-</span></code></pre></div>
-<p>The modes are: public file <code>0644</code>, private file <code>0600</code>, public folder <code>0755</code>, private folder <code>0700</code>. On Windows, <code>permissions</code> does nothing.</p>
-<h3 id="custom-file-modes">Custom file modes</h3>
-<p>Give <code>permissions</code> a map with a <code>file</code> and a <code>dir</code> key. Dart has no octal numbers, so write the modes in hex: <code>0x1a0</code> is <code>0640</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-31-1"><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-31-2"><a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">  </span><span class="s1">'driver'</span><span class="o">:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
-</span><span id="__span-31-3"><a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">  </span><span class="s1">'root'</span><span class="o">:</span><span class="w"> </span><span class="s1">'storage-private'</span><span class="p">,</span>
-</span><span id="__span-31-4"><a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a><span class="w">  </span><span class="s1">'visibility'</span><span class="o">:</span><span class="w"> </span><span class="s1">'private'</span><span class="p">,</span>
-</span><span id="__span-31-5"><a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a><span class="w">  </span><span class="s1">'permissions'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">dynamic</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-31-6"><a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a><span class="w">    </span><span class="s1">'file'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a4</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1a0</span><span class="p">},</span>
-</span><span id="__span-31-7"><a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a><span class="w">    </span><span class="s1">'dir'</span><span class="o">:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="o">&gt;</span><span class="p">{</span><span class="s1">'public'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1ed</span><span class="p">,</span><span class="w"> </span><span class="s1">'private'</span><span class="o">:</span><span class="w"> </span><span class="mh">0x1e8</span><span class="p">},</span>
-</span><span id="__span-31-8"><a id="__codelineno-31-8" name="__codelineno-31-8" href="#__codelineno-31-8"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-31-9"><a id="__codelineno-31-9" name="__codelineno-31-9" href="#__codelineno-31-9"></a><span class="p">},</span>
-</span></code></pre></div>
-<p>A mode you leave out keeps its default. A mode that is not an int from 0 to 0x1ff throws an ArgumentError.</p>
+<p>On S3, <code>setVisibility</code> sets the ACL. With <code>'acl': false</code> (R2 and similar), it does nothing, and <code>getVisibility</code> gives the disk <code>visibility</code>. On a local disk it is the same, unless you turn on <code>permissions</code>. See <a href="#visibility-on-a-local-disk">Visibility on a local disk</a>.</p>
+<p>Azure sets public access for each container, not for each file. So on Azure, <code>getVisibility</code> gives the level of the container, the same for all files. <code>setVisibility</code> throws <code>UnsupportedOperationException</code>. The driver ignores the <code>visibility</code> of <code>WriteOptions</code>. Set the access level on the container in Azure.</p>
 <h2 id="the-disk-api">The disk API</h2>
 <p><code>Storage()</code> has short methods for common work. For more control, get a <code>Disk</code> with <code>use</code>. With no name, you get the default disk:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-32-1"><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">Disk</span><span class="w"> </span><span class="n">disk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">use</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">Disk</span><span class="w"> </span><span class="n">disk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">use</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">);</span>
 </span></code></pre></div>
 <p>A <code>Disk</code> also has <code>get</code>, <code>exists</code>, <code>missing</code>, <code>delete</code>, <code>copy</code>, <code>move</code>, <code>size</code>, <code>lastModified</code>, <code>append</code>, <code>prepend</code>, <code>files</code>, <code>allFiles</code>, <code>directories</code>, <code>directoryExists</code>, <code>makeDirectory</code>, <code>deleteDirectory</code>, <code>getVisibility</code> and <code>setVisibility</code>. Its <code>get</code> throws <code>FileNotFoundException</code> when the file is missing.</p>
 <h3 id="write-options">Write options</h3>
 <p><code>put</code> on a <code>Disk</code> writes to the exact key. <code>WriteOptions</code> sets the content type and the visibility. <code>copy</code> and <code>move</code> also take <code>options:</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-33-1"><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'a.json'</span><span class="p">,</span><span class="w"> </span><span class="s1">'{}'</span><span class="p">,</span>
-</span><span id="__span-33-2"><a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">    </span><span class="nl">options:</span><span class="w"> </span><span class="n">WriteOptions</span><span class="p">(</span>
-</span><span id="__span-33-3"><a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">        </span><span class="nl">contentType:</span><span class="w"> </span><span class="s1">'application/json'</span><span class="p">,</span><span class="w"> </span><span class="nl">visibility:</span><span class="w"> </span><span class="n">Visibility</span><span class="p">.</span><span class="n">public</span><span class="p">));</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">put</span><span class="p">(</span><span class="s1">'a.json'</span><span class="p">,</span><span class="w"> </span><span class="s1">'{}'</span><span class="p">,</span>
+</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="w">    </span><span class="nl">options:</span><span class="w"> </span><span class="n">WriteOptions</span><span class="p">(</span>
+</span><span id="__span-41-3"><a id="__codelineno-41-3" name="__codelineno-41-3" href="#__codelineno-41-3"></a><span class="w">        </span><span class="nl">contentType:</span><span class="w"> </span><span class="s1">'application/json'</span><span class="p">,</span><span class="w"> </span><span class="nl">visibility:</span><span class="w"> </span><span class="n">Visibility</span><span class="p">.</span><span class="n">public</span><span class="p">));</span>
 </span></code></pre></div>
 <h3 id="storing-big-files">Storing big files</h3>
 <p><code>putStream</code> writes a stream, so the file is not loaded into memory:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-34-1"><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">putStream</span><span class="p">(</span><span class="s1">'videos/big.mp4'</span><span class="p">,</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'big.mp4'</span><span class="p">).</span><span class="n">openRead</span><span class="p">());</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">putStream</span><span class="p">(</span><span class="s1">'videos/big.mp4'</span><span class="p">,</span><span class="w"> </span><span class="n">File</span><span class="p">(</span><span class="s1">'big.mp4'</span><span class="p">).</span><span class="n">openRead</span><span class="p">());</span>
 </span></code></pre></div>
 <p>On S3, <code>put</code> has a limit of 5 GiB. <code>putStream</code> uses a multipart upload with parts of <code>multipartPartSize</code> (8 MiB, a field of <code>S3DriverConfig</code>), up to about 78 GiB.</p>
+<p>On Azure, a stream smaller than <code>blockSize</code> goes up as one Put Blob request. A stream of <code>blockSize</code> bytes or more goes up as blocks, then one Put Block List request. <code>blockSize</code> is a field of <code>AzureBlobDriverConfig</code>, 8 MiB by default. Only one block is in memory at a time. If an upload fails, Azure removes the blocks after 7 days.</p>
 <h3 id="reading-text-and-streams">Reading text and streams</h3>
 <p><code>getString</code> reads a file as text. For a big file, use <code>getStream</code>. Both throw <code>FileNotFoundException</code> when the file is missing:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-35-1"><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">);</span>
-</span><span id="__span-35-2"><a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>
-</span><span id="__span-35-3"><a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getStream</span><span class="p">(</span><span class="s1">'videos/big.mp4'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">);</span>
+</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>
+</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="n">Stream</span><span class="o">&lt;</span><span class="n">List</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">stream</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getStream</span><span class="p">(</span><span class="s1">'videos/big.mp4'</span><span class="p">);</span>
 </span></code></pre></div>
-<p><code>getStreamWithMetaData</code> gives the stream and the metadata together. On S3 it is one request:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-36-1"><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="n">ObjectStream</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getStreamWithMetaData</span><span class="p">(</span><span class="s1">'videos/big.mp4'</span><span class="p">);</span>
-</span><span id="__span-36-2"><a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a><span class="c1">// file.stream, file.metaData</span>
+<p><code>getStreamWithMetaData</code> gives the stream and the metadata together. On S3 it is one request. On Azure it is two requests:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="n">ObjectStream</span><span class="w"> </span><span class="n">file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getStreamWithMetaData</span><span class="p">(</span><span class="s1">'videos/big.mp4'</span><span class="p">);</span>
+</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="c1">// file.stream, file.metaData</span>
 </span></code></pre></div>
 <h3 id="all-metadata-in-one-call">All metadata in one call</h3>
 <p><code>getMetaData</code> gives the size, content type, last change time and etag:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-37-1"><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="n">ObjectMetaData</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getMetaData</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">ObjectMetaData</span><span class="w"> </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getMetaData</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="public-urls">Public URLs</h3>
 <p><code>getUrl</code> gives the public URL of a file:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-38-1"><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getUrl</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">url</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getUrl</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="deleting-many-files">Deleting many files</h3>
 <p><code>deleteAll</code> removes all files under a prefix. With <code>''</code> or no argument, it empties the disk:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-39-1"><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">deleteAll</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">deleteAll</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">);</span>
 </span></code></pre></div>
 <h3 id="listing-page-by-page">Listing page by page</h3>
 <p>For a big folder, read one page at a time with <code>listAll</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-40-1"><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">ListResult</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">listAll</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span>
-</span><span id="__span-40-2"><a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="w">    </span><span class="n">ListOptions</span><span class="p">(</span><span class="nl">recursive:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">limit:</span><span class="w"> </span><span class="m">100</span><span class="p">));</span>
-</span><span id="__span-40-3"><a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="c1">// next page: ListOptions(paginationToken: page.paginationToken)</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="n">ListResult</span><span class="w"> </span><span class="n">page</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">listAll</span><span class="p">(</span><span class="s1">'avatars'</span><span class="p">,</span>
+</span><span id="__span-48-2"><a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="w">    </span><span class="n">ListOptions</span><span class="p">(</span><span class="nl">recursive:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="nl">limit:</span><span class="w"> </span><span class="m">100</span><span class="p">));</span>
+</span><span id="__span-48-3"><a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="c1">// next page: ListOptions(paginationToken: page.paginationToken)</span>
 </span></code></pre></div>
 <h3 id="signed-url-options">Signed URL options</h3>
-<p><code>getSignedUrl</code> takes <code>SignedUrlOptions</code>. <code>expiresIn</code> is 30 minutes by default, and on S3 the maximum is 7 days. <code>contentDisposition</code> sets the header of the download:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-41-1"><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">signed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getSignedUrl</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">,</span>
-</span><span id="__span-41-2"><a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="w">    </span><span class="nl">options:</span><span class="w"> </span><span class="n">SignedUrlOptions</span><span class="p">(</span><span class="nl">expiresIn:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">)));</span>
+<p><code>getSignedUrl</code> takes <code>SignedUrlOptions</code>. <code>expiresIn</code> is 30 minutes by default, and on S3 the maximum is 7 days. Azure has no such limit, but the expiry must be in the future. <code>contentDisposition</code> sets the header of the download:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">signed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getSignedUrl</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">,</span>
+</span><span id="__span-49-2"><a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="w">    </span><span class="nl">options:</span><span class="w"> </span><span class="n">SignedUrlOptions</span><span class="p">(</span><span class="nl">expiresIn:</span><span class="w"> </span><span class="n">Duration</span><span class="p">(</span><span class="nl">minutes:</span><span class="w"> </span><span class="m">10</span><span class="p">)));</span>
 </span></code></pre></div>
 <h3 id="signed-upload-urls">Signed upload URLs</h3>
-<p>On S3, the browser can upload a file directly to the bucket with a signed upload URL:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-42-1"><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">upload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getSignedUploadUrl</span><span class="p">(</span><span class="s1">'avatars/2.png'</span><span class="p">,</span>
-</span><span id="__span-42-2"><a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="w">    </span><span class="nl">options:</span><span class="w"> </span><span class="n">SignedUrlOptions</span><span class="p">(</span><span class="nl">contentType:</span><span class="w"> </span><span class="s1">'image/png'</span><span class="p">));</span>
+<p>On S3 and Azure, the browser can upload a file directly to the bucket or container with a signed upload URL:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="kt">String</span><span class="w"> </span><span class="n">upload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kd">await</span><span class="w"> </span><span class="n">disk</span><span class="p">.</span><span class="n">getSignedUploadUrl</span><span class="p">(</span><span class="s1">'avatars/2.png'</span><span class="p">,</span>
+</span><span id="__span-50-2"><a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a><span class="w">    </span><span class="nl">options:</span><span class="w"> </span><span class="n">SignedUrlOptions</span><span class="p">(</span><span class="nl">contentType:</span><span class="w"> </span><span class="s1">'image/png'</span><span class="p">));</span>
 </span></code></pre></div>
-<h2 id="s3-compatible-services">S3-compatible services</h2>
-<p>These examples use <code>S3DriverConfig</code>, the class behind an <code>s3</code> disk. In a Dox config, the same settings are the disk keys <code>endpoint</code>, <code>path_style</code>, <code>acl</code> and <code>batch_delete</code>. See <a href="#configuration">Configuration</a>.</p>
-<h3 id="cloudflare-r2">Cloudflare R2</h3>
-<p>R2 does not take ACL headers, so set <code>supportsAcl: false</code>:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-43-1"><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
-</span><span id="__span-43-2"><a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
-</span><span id="__span-43-3"><a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'auto'</span><span class="p">,</span>
-</span><span id="__span-43-4"><a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://&lt;account-id&gt;.r2.cloudflarestorage.com'</span><span class="p">,</span>
-</span><span id="__span-43-5"><a id="__codelineno-43-5" name="__codelineno-43-5" href="#__codelineno-43-5"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
-</span><span id="__span-43-6"><a id="__codelineno-43-6" name="__codelineno-43-6" href="#__codelineno-43-6"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
-</span><span id="__span-43-7"><a id="__codelineno-43-7" name="__codelineno-43-7" href="#__codelineno-43-7"></a><span class="w">  </span><span class="nl">supportsAcl:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-43-8"><a id="__codelineno-43-8" name="__codelineno-43-8" href="#__codelineno-43-8"></a><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="minio">MinIO</h3>
-<p>MinIO needs path style URLs:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-44-1"><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
-</span><span id="__span-44-2"><a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
-</span><span id="__span-44-3"><a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">,</span>
-</span><span id="__span-44-4"><a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'http://localhost:9000'</span><span class="p">,</span>
-</span><span id="__span-44-5"><a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a><span class="w">  </span><span class="nl">forcePathStyle:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
-</span><span id="__span-44-6"><a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'minioadmin'</span><span class="p">,</span>
-</span><span id="__span-44-7"><a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'minioadmin'</span><span class="p">,</span>
-</span><span id="__span-44-8"><a id="__codelineno-44-8" name="__codelineno-44-8" href="#__codelineno-44-8"></a><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="digitalocean-spaces">DigitalOcean Spaces</h3>
-<p>Put the region of your space in <code>region</code> and in the endpoint:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-45-1"><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
-</span><span id="__span-45-2"><a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-space'</span><span class="p">,</span>
-</span><span id="__span-45-3"><a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'nyc3'</span><span class="p">,</span>
-</span><span id="__span-45-4"><a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://nyc3.digitaloceanspaces.com'</span><span class="p">,</span>
-</span><span id="__span-45-5"><a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
-</span><span id="__span-45-6"><a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
-</span><span id="__span-45-7"><a id="__codelineno-45-7" name="__codelineno-45-7" href="#__codelineno-45-7"></a><span class="p">);</span>
-</span></code></pre></div>
-<h3 id="google-cloud-storage">Google Cloud Storage</h3>
-<p>GCS does not take ACL headers or the S3 batch delete call:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-46-1"><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="n">S3DriverConfig</span><span class="p">(</span>
-</span><span id="__span-46-2"><a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a><span class="w">  </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
-</span><span id="__span-46-3"><a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a><span class="w">  </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'auto'</span><span class="p">,</span>
-</span><span id="__span-46-4"><a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a><span class="w">  </span><span class="nl">endpoint:</span><span class="w"> </span><span class="s1">'https://storage.googleapis.com'</span><span class="p">,</span>
-</span><span id="__span-46-5"><a id="__codelineno-46-5" name="__codelineno-46-5" href="#__codelineno-46-5"></a><span class="w">  </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="s1">'GOOG...'</span><span class="p">,</span>
-</span><span id="__span-46-6"><a id="__codelineno-46-6" name="__codelineno-46-6" href="#__codelineno-46-6"></a><span class="w">  </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="s1">'...'</span><span class="p">,</span>
-</span><span id="__span-46-7"><a id="__codelineno-46-7" name="__codelineno-46-7" href="#__codelineno-46-7"></a><span class="w">  </span><span class="nl">supportsAcl:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-46-8"><a id="__codelineno-46-8" name="__codelineno-46-8" href="#__codelineno-46-8"></a><span class="w">  </span><span class="nl">supportsBatchDelete:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span>
-</span><span id="__span-46-9"><a id="__codelineno-46-9" name="__codelineno-46-9" href="#__codelineno-46-9"></a><span class="p">);</span>
+<p>On Azure, the client must send the header <code>x-ms-blob-type: BlockBlob</code> with the PUT. Azure does not enforce the <code>contentType</code> of <code>SignedUrlOptions</code>. A successful upload answers 201:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span>-H<span class="w"> </span><span class="s1">'x-ms-blob-type: BlockBlob'</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-51-2"><a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="w">  </span>--data-binary<span class="w"> </span>@2.png<span class="w"> </span><span class="s2">"</span><span class="nv">$UPLOAD_URL</span><span class="s2">"</span>
 </span></code></pre></div>
 <h2 id="custom-drivers">Custom drivers</h2>
 <p>Implement <code>DriverContract</code>, and register it in a <a href="../providers/">provider</a> so every isolate has it:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-47-1"><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">,</span><span class="w"> </span><span class="n">DropboxDriver</span><span class="p">());</span>
-</span><span id="__span-47-2"><a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-52-1"><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a><span class="n">Storage</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">register</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">,</span><span class="w"> </span><span class="n">DropboxDriver</span><span class="p">());</span>
+</span><span id="__span-52-2"><a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">Storage</span><span class="p">().</span><span class="n">disk</span><span class="p">(</span><span class="s1">'dropbox'</span><span class="p">).</span><span class="n">put</span><span class="p">(</span><span class="s1">'notes/a.txt'</span><span class="p">,</span><span class="w"> </span><span class="s1">'hello'</span><span class="p">,</span><span class="w"> </span><span class="nl">exact:</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
 </span></code></pre></div>
 <h2 id="errors">Errors</h2>
 <p>All errors extend <code>StorageException</code> and have the <code>key</code>:</p>
@@ -8433,7 +8643,7 @@
 </tr>
 <tr>
 <td><code>PermissionDeniedException</code></td>
-<td>a file system permission error, or S3 403</td>
+<td>a file system permission error, or a 403 from S3 or Azure</td>
 </tr>
 <tr>
 <td><code>InvalidKeyException</code></td>
@@ -8441,61 +8651,67 @@
 </tr>
 <tr>
 <td><code>UnsupportedOperationException</code></td>
-<td>the driver cannot do this</td>
+<td>the driver cannot do this, like <code>setVisibility</code> on Azure</td>
 </tr>
 <tr>
 <td><code>DriverException</code></td>
-<td>any other error. The first error is in <code>cause</code></td>
+<td>any other error. The first error is in <code>cause</code>. On Azure, a missing container and a copy that stays pending also give it</td>
 </tr>
 </tbody>
 </table>
 <p>A key with <code>..</code>, an absolute path like <code>/etc/passwd</code>, or a null byte throws <code>InvalidKeyException</code>. So a user cannot get files outside the disk.</p>
 <h2 id="testing">Testing</h2>
 <p>To replace a disk with a memory disk in tests, see <a href="../testing/#test-file-storage">Testing</a>. A disk also has <code>assertExists</code> and <code>assertMissing</code>. They throw a StateError when the check fails:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-48-1"><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="n">Disk</span><span class="w"> </span><span class="n">fake</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Storage</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">fake</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">);</span>
-</span><span id="__span-48-2"><a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">fake</span><span class="p">.</span><span class="n">assertExists</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">);</span>
-</span><span id="__span-48-3"><a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">fake</span><span class="p">.</span><span class="n">assertMissing</span><span class="p">(</span><span class="s1">'avatars/old.png'</span><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-53-1"><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a><span class="n">Disk</span><span class="w"> </span><span class="n">fake</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Storage</span><span class="p">.</span><span class="n">manager</span><span class="p">.</span><span class="n">fake</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">);</span>
+</span><span id="__span-53-2"><a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a><span class="kd">await</span><span class="w"> </span><span class="n">fake</span><span class="p">.</span><span class="n">assertExists</span><span class="p">(</span><span class="s1">'avatars/1.png'</span><span class="p">);</span>
+</span><span id="__span-53-3"><a id="__codelineno-53-3" name="__codelineno-53-3" href="#__codelineno-53-3"></a><span class="kd">await</span><span class="w"> </span><span class="n">fake</span><span class="p">.</span><span class="n">assertMissing</span><span class="p">(</span><span class="s1">'avatars/old.png'</span><span class="p">);</span>
 </span></code></pre></div>
 <p><code>Storage.manager.restore('s3')</code> removes one fake, and <code>Storage.manager.restoreAll()</code> removes all fakes.</p>
 <h2 id="without-dox">Without Dox</h2>
 <p><code>dox_storage</code> also works on its own:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-49-1"><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_storage
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-54-1"><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>dart<span class="w"> </span>pub<span class="w"> </span>add<span class="w"> </span>dox_storage
 </span></code></pre></div>
 <p>Make a <code>DriveManager</code> with your disks:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-50-1"><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
-</span><span id="__span-50-2"><a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>
-</span><span id="__span-50-3"><a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
-</span><span id="__span-50-4"><a id="__codelineno-50-4" name="__codelineno-50-4" href="#__codelineno-50-4"></a>
-</span><span id="__span-50-5"><a id="__codelineno-50-5" name="__codelineno-50-5" href="#__codelineno-50-5"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Platform</span><span class="p">.</span><span class="n">environment</span><span class="p">;</span>
-</span><span id="__span-50-6"><a id="__codelineno-50-6" name="__codelineno-50-6" href="#__codelineno-50-6"></a>
-</span><span id="__span-50-7"><a id="__codelineno-50-7" name="__codelineno-50-7" href="#__codelineno-50-7"></a><span class="n">DriveManager</span><span class="w"> </span><span class="n">drive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriveManager</span><span class="p">(</span>
-</span><span id="__span-50-8"><a id="__codelineno-50-8" name="__codelineno-50-8" href="#__codelineno-50-8"></a><span class="w">  </span><span class="nl">defaultDisk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
-</span><span id="__span-50-9"><a id="__codelineno-50-9" name="__codelineno-50-9" href="#__codelineno-50-9"></a><span class="w">  </span><span class="nl">disks:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">DriverContract</span><span class="o">&gt;</span><span class="p">{</span>
-</span><span id="__span-50-10"><a id="__codelineno-50-10" name="__codelineno-50-10" href="#__codelineno-50-10"></a><span class="w">    </span><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="n">LocalDriver</span><span class="p">(</span><span class="n">LocalDriverConfig</span><span class="p">(</span>
-</span><span id="__span-50-11"><a id="__codelineno-50-11" name="__codelineno-50-11" href="#__codelineno-50-11"></a><span class="w">      </span><span class="nl">root:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span>
-</span><span id="__span-50-12"><a id="__codelineno-50-12" name="__codelineno-50-12" href="#__codelineno-50-12"></a><span class="w">      </span><span class="nl">urlBase:</span><span class="w"> </span><span class="s1">'https://app.test/uploads'</span><span class="p">,</span>
-</span><span id="__span-50-13"><a id="__codelineno-50-13" name="__codelineno-50-13" href="#__codelineno-50-13"></a><span class="w">      </span><span class="nl">atomicWrites:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// off by default</span>
-</span><span id="__span-50-14"><a id="__codelineno-50-14" name="__codelineno-50-14" href="#__codelineno-50-14"></a><span class="w">      </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'APP_KEY'</span><span class="p">],</span><span class="w"> </span><span class="c1">// signs local URLs</span>
-</span><span id="__span-50-15"><a id="__codelineno-50-15" name="__codelineno-50-15" href="#__codelineno-50-15"></a><span class="w">    </span><span class="p">)),</span>
-</span><span id="__span-50-16"><a id="__codelineno-50-16" name="__codelineno-50-16" href="#__codelineno-50-16"></a><span class="w">    </span><span class="s1">'s3'</span><span class="o">:</span><span class="w"> </span><span class="n">S3Driver</span><span class="p">(</span><span class="n">S3DriverConfig</span><span class="p">(</span>
-</span><span id="__span-50-17"><a id="__codelineno-50-17" name="__codelineno-50-17" href="#__codelineno-50-17"></a><span class="w">      </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
-</span><span id="__span-50-18"><a id="__codelineno-50-18" name="__codelineno-50-18" href="#__codelineno-50-18"></a><span class="w">      </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">,</span>
-</span><span id="__span-50-19"><a id="__codelineno-50-19" name="__codelineno-50-19" href="#__codelineno-50-19"></a><span class="w">      </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'AWS_ACCESS_KEY_ID'</span><span class="p">]</span><span class="o">!</span><span class="p">,</span>
-</span><span id="__span-50-20"><a id="__codelineno-50-20" name="__codelineno-50-20" href="#__codelineno-50-20"></a><span class="w">      </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'AWS_SECRET_ACCESS_KEY'</span><span class="p">]</span><span class="o">!</span><span class="p">,</span>
-</span><span id="__span-50-21"><a id="__codelineno-50-21" name="__codelineno-50-21" href="#__codelineno-50-21"></a><span class="w">    </span><span class="p">)),</span>
-</span><span id="__span-50-22"><a id="__codelineno-50-22" name="__codelineno-50-22" href="#__codelineno-50-22"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-50-23"><a id="__codelineno-50-23" name="__codelineno-50-23" href="#__codelineno-50-23"></a><span class="p">);</span>
-</span><span id="__span-50-24"><a id="__codelineno-50-24" name="__codelineno-50-24" href="#__codelineno-50-24"></a>
-</span><span id="__span-50-25"><a id="__codelineno-50-25" name="__codelineno-50-25" href="#__codelineno-50-25"></a><span class="n">Disk</span><span class="w"> </span><span class="n">disk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">drive</span><span class="p">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">);</span><span class="w"> </span><span class="c1">// or drive.use() for the default disk</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-55-1"><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a><span class="k">import</span><span class="w"> </span><span class="s1">'dart:io'</span><span class="p">;</span>
+</span><span id="__span-55-2"><a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>
+</span><span id="__span-55-3"><a id="__codelineno-55-3" name="__codelineno-55-3" href="#__codelineno-55-3"></a><span class="k">import</span><span class="w"> </span><span class="s1">'package:dox_storage/dox_storage.dart'</span><span class="p">;</span>
+</span><span id="__span-55-4"><a id="__codelineno-55-4" name="__codelineno-55-4" href="#__codelineno-55-4"></a>
+</span><span id="__span-55-5"><a id="__codelineno-55-5" name="__codelineno-55-5" href="#__codelineno-55-5"></a><span class="n">Map</span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="kt">String</span><span class="o">&gt;</span><span class="w"> </span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Platform</span><span class="p">.</span><span class="n">environment</span><span class="p">;</span>
+</span><span id="__span-55-6"><a id="__codelineno-55-6" name="__codelineno-55-6" href="#__codelineno-55-6"></a>
+</span><span id="__span-55-7"><a id="__codelineno-55-7" name="__codelineno-55-7" href="#__codelineno-55-7"></a><span class="n">DriveManager</span><span class="w"> </span><span class="n">drive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriveManager</span><span class="p">(</span>
+</span><span id="__span-55-8"><a id="__codelineno-55-8" name="__codelineno-55-8" href="#__codelineno-55-8"></a><span class="w">  </span><span class="nl">defaultDisk:</span><span class="w"> </span><span class="s1">'local'</span><span class="p">,</span>
+</span><span id="__span-55-9"><a id="__codelineno-55-9" name="__codelineno-55-9" href="#__codelineno-55-9"></a><span class="w">  </span><span class="nl">disks:</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">String</span><span class="p">,</span><span class="w"> </span><span class="n">DriverContract</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span id="__span-55-10"><a id="__codelineno-55-10" name="__codelineno-55-10" href="#__codelineno-55-10"></a><span class="w">    </span><span class="s1">'local'</span><span class="o">:</span><span class="w"> </span><span class="n">LocalDriver</span><span class="p">(</span><span class="n">LocalDriverConfig</span><span class="p">(</span>
+</span><span id="__span-55-11"><a id="__codelineno-55-11" name="__codelineno-55-11" href="#__codelineno-55-11"></a><span class="w">      </span><span class="nl">root:</span><span class="w"> </span><span class="s1">'storage'</span><span class="p">,</span>
+</span><span id="__span-55-12"><a id="__codelineno-55-12" name="__codelineno-55-12" href="#__codelineno-55-12"></a><span class="w">      </span><span class="nl">urlBase:</span><span class="w"> </span><span class="s1">'https://app.test/uploads'</span><span class="p">,</span>
+</span><span id="__span-55-13"><a id="__codelineno-55-13" name="__codelineno-55-13" href="#__codelineno-55-13"></a><span class="w">      </span><span class="nl">atomicWrites:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w"> </span><span class="c1">// off by default</span>
+</span><span id="__span-55-14"><a id="__codelineno-55-14" name="__codelineno-55-14" href="#__codelineno-55-14"></a><span class="w">      </span><span class="nl">appKey:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'APP_KEY'</span><span class="p">],</span><span class="w"> </span><span class="c1">// signs local URLs</span>
+</span><span id="__span-55-15"><a id="__codelineno-55-15" name="__codelineno-55-15" href="#__codelineno-55-15"></a><span class="w">    </span><span class="p">)),</span>
+</span><span id="__span-55-16"><a id="__codelineno-55-16" name="__codelineno-55-16" href="#__codelineno-55-16"></a><span class="w">    </span><span class="s1">'s3'</span><span class="o">:</span><span class="w"> </span><span class="n">S3Driver</span><span class="p">(</span><span class="n">S3DriverConfig</span><span class="p">(</span>
+</span><span id="__span-55-17"><a id="__codelineno-55-17" name="__codelineno-55-17" href="#__codelineno-55-17"></a><span class="w">      </span><span class="nl">bucket:</span><span class="w"> </span><span class="s1">'my-bucket'</span><span class="p">,</span>
+</span><span id="__span-55-18"><a id="__codelineno-55-18" name="__codelineno-55-18" href="#__codelineno-55-18"></a><span class="w">      </span><span class="nl">region:</span><span class="w"> </span><span class="s1">'us-east-1'</span><span class="p">,</span>
+</span><span id="__span-55-19"><a id="__codelineno-55-19" name="__codelineno-55-19" href="#__codelineno-55-19"></a><span class="w">      </span><span class="nl">accessKeyId:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'AWS_ACCESS_KEY_ID'</span><span class="p">]</span><span class="o">!</span><span class="p">,</span>
+</span><span id="__span-55-20"><a id="__codelineno-55-20" name="__codelineno-55-20" href="#__codelineno-55-20"></a><span class="w">      </span><span class="nl">secretAccessKey:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'AWS_SECRET_ACCESS_KEY'</span><span class="p">]</span><span class="o">!</span><span class="p">,</span>
+</span><span id="__span-55-21"><a id="__codelineno-55-21" name="__codelineno-55-21" href="#__codelineno-55-21"></a><span class="w">    </span><span class="p">)),</span>
+</span><span id="__span-55-22"><a id="__codelineno-55-22" name="__codelineno-55-22" href="#__codelineno-55-22"></a><span class="w">    </span><span class="s1">'azure'</span><span class="o">:</span><span class="w"> </span><span class="n">AzureBlobDriver</span><span class="p">(</span><span class="n">AzureBlobDriverConfig</span><span class="p">(</span>
+</span><span id="__span-55-23"><a id="__codelineno-55-23" name="__codelineno-55-23" href="#__codelineno-55-23"></a><span class="w">      </span><span class="nl">accountName:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'AZURE_STORAGE_ACCOUNT'</span><span class="p">]</span><span class="o">!</span><span class="p">,</span>
+</span><span id="__span-55-24"><a id="__codelineno-55-24" name="__codelineno-55-24" href="#__codelineno-55-24"></a><span class="w">      </span><span class="nl">accountKey:</span><span class="w"> </span><span class="n">env</span><span class="p">[</span><span class="s1">'AZURE_STORAGE_KEY'</span><span class="p">]</span><span class="o">!</span><span class="p">,</span>
+</span><span id="__span-55-25"><a id="__codelineno-55-25" name="__codelineno-55-25" href="#__codelineno-55-25"></a><span class="w">      </span><span class="nl">container:</span><span class="w"> </span><span class="s1">'files'</span><span class="p">,</span>
+</span><span id="__span-55-26"><a id="__codelineno-55-26" name="__codelineno-55-26" href="#__codelineno-55-26"></a><span class="w">    </span><span class="p">)),</span>
+</span><span id="__span-55-27"><a id="__codelineno-55-27" name="__codelineno-55-27" href="#__codelineno-55-27"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-55-28"><a id="__codelineno-55-28" name="__codelineno-55-28" href="#__codelineno-55-28"></a><span class="p">);</span>
+</span><span id="__span-55-29"><a id="__codelineno-55-29" name="__codelineno-55-29" href="#__codelineno-55-29"></a>
+</span><span id="__span-55-30"><a id="__codelineno-55-30" name="__codelineno-55-30" href="#__codelineno-55-30"></a><span class="n">Disk</span><span class="w"> </span><span class="n">disk</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">drive</span><span class="p">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'s3'</span><span class="p">);</span><span class="w"> </span><span class="c1">// or drive.use() for the default disk</span>
 </span></code></pre></div>
 <p>To add your own driver, call <code>drive.register('dropbox', DropboxDriver())</code>. For file modes, give <code>LocalDriverConfig(permissions: LocalPermissions())</code>.</p>
+<p><code>AzureBlobDriverConfig</code> also has <code>endpoint</code>, <code>urlBase</code>, <code>blockSize</code> (8 MiB by default) and <code>copyTimeout</code> (5 minutes by default). <code>blockSize</code> must be from 1 byte to 4000 MiB, or the driver throws an ArgumentError. In a Dox config, only <code>endpoint</code> and <code>url</code> are disk options.</p>
 <h3 id="checking-a-local-signed-url">Checking a local signed URL</h3>
 <p>Check a local signed URL in the route that serves the file:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-51-1"><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a><span class="n">LocalDriver</span><span class="w"> </span><span class="n">local</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDriver</span><span class="p">(</span><span class="n">localConfig</span><span class="p">);</span>
-</span><span id="__span-51-2"><a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">local</span><span class="p">.</span><span class="n">verifySignedUrl</span><span class="p">(</span><span class="n">keyFromPath</span><span class="p">,</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">uri</span><span class="p">.</span><span class="n">queryParameters</span><span class="p">);</span>
-</span><span id="__span-51-3"><a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-51-4"><a id="__codelineno-51-4" name="__codelineno-51-4" href="#__codelineno-51-4"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'Forbidden'</span><span class="p">).</span><span class="n">statusCode</span><span class="p">(</span><span class="m">403</span><span class="p">);</span>
-</span><span id="__span-51-5"><a id="__codelineno-51-5" name="__codelineno-51-5" href="#__codelineno-51-5"></a><span class="p">}</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-56-1"><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a><span class="n">LocalDriver</span><span class="w"> </span><span class="n">local</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LocalDriver</span><span class="p">(</span><span class="n">localConfig</span><span class="p">);</span>
+</span><span id="__span-56-2"><a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a><span class="kt">bool</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">local</span><span class="p">.</span><span class="n">verifySignedUrl</span><span class="p">(</span><span class="n">keyFromPath</span><span class="p">,</span><span class="w"> </span><span class="n">req</span><span class="p">.</span><span class="n">uri</span><span class="p">.</span><span class="n">queryParameters</span><span class="p">);</span>
+</span><span id="__span-56-3"><a id="__codelineno-56-3" name="__codelineno-56-3" href="#__codelineno-56-3"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-56-4"><a id="__codelineno-56-4" name="__codelineno-56-4" href="#__codelineno-56-4"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="n">response</span><span class="p">(</span><span class="s1">'Forbidden'</span><span class="p">).</span><span class="n">statusCode</span><span class="p">(</span><span class="m">403</span><span class="p">);</span>
+</span><span id="__span-56-5"><a id="__codelineno-56-5" name="__codelineno-56-5" href="#__codelineno-56-5"></a><span class="p">}</span>
 </span></code></pre></div>
 <h2 id="next-steps">Next steps</h2>
 <ul>
