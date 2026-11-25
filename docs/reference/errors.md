@@ -79,8 +79,8 @@ An HTTP exception with a text message answers `{"code":"<errorCode>","message":"
 | --- | --- | --- |
 | `Bad state: This request has no session. Add SessionMiddleware() to globalMiddleware or to the route.` | `req.session` on a route with no `SessionMiddleware`. | Do what the text says. See [Session](../the-basic/session.md). |
 | `Bad state: <T> is not a known DTO. Add @Dto() to it, run `dart run build_runner build` and set `dtos: dtos` (lib/generated/dtos.g.dart) in AppConfig.` | `req.validate<T>()` can not find `T`. | Do what the text says. |
-| `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3` or `memory`. | Fix the driver name. |
-| `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, on its first use. | Set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. |
+| `Invalid argument(s): Storage disk "<name>" has unknown driver "<type>"` | A disk in `StorageConfig` has a `driver` other than `local`, `s3`, `azure` or `memory`. | Fix the driver name. |
+| `Invalid argument(s): Storage disk "<name>" needs the "<setting>" setting. It is missing or empty.` | An `s3` disk without `bucket`, `key` or `secret`, or an `azure` disk without `account`, `key` or `container`, on its first use. | For S3, set `AWS_BUCKET`, `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`. For Azure, set `AZURE_STORAGE_ACCOUNT`, `AZURE_STORAGE_KEY` and `AZURE_STORAGE_CONTAINER`. |
 | `Invalid argument(s): invalid file` | `Storage().putFile()` with bytes and no `extension:`, and Dox can not find the type from the bytes. | Pass `extension: 'pdf'`. |
 | `403` `invalid or expired signature` | A `Storage.route()` URL without a valid `signature`, or after `expires`. | Make a new link with `Storage().signedUrl()`. |
 | `404` `file not found` | `Storage().stream()`, `download()`, `copy()`, `move()`, `getVisibility()`, `setVisibility()`, `size()` or `lastModified()` of a missing file. | Check the path. |
@@ -168,14 +168,21 @@ The text has the form `<Exception>: <message> (key: "<key>")`.
 | Text | When | What to do |
 | --- | --- | --- |
 | `FileNotFoundException: File not found` | The file is not on the disk. | Check the path. `Storage()` paths start with `/`, `Disk` keys do not. |
-| `PermissionDeniedException: Permission denied` | The OS (local) or S3 (`403`) refused it. | Check file rights, or the S3 key and bucket policy. |
+| `PermissionDeniedException: Permission denied` | The OS (local), S3 (`403`) or Azure (`403`) refused it. | Check file rights, the S3 key and bucket policy, or the Azure account key. |
 | `InvalidKeyException: Invalid key: path traversal is not allowed` | A key with `..`. | Do not build keys from user input. |
 | `InvalidKeyException: Invalid key: absolute paths are not allowed` | A `Disk` key that starts with `/` or a drive letter. | Remove the first `/`. |
 | `InvalidKeyException: Invalid key: key is empty` | An empty key. `Storage().deleteDirectory()` with `''`, `'/'` or `'.'` also gives it, because the root is refused. | Pass a file or folder name. |
 | `UnsupportedOperationException: urlBase and appKey are needed for signed URLs` | `signedUrl()` on a local disk with no `url`, or no `APP_KEY`. | Set both. |
 | `UnsupportedOperationException: S3 signed URLs must expire within 1 second and 7 days` | `signedUrl()` on S3 with a bad `expiresIn`. | Use a time up to 7 days. |
+| `UnsupportedOperationException: Azure signed URLs must expire in the future` | `signedUrl()` on Azure with an `expiresIn` of zero or less. | Use a time more than zero. |
+| `UnsupportedOperationException: Azure Blob sets public access per container, not per file` | `setVisibility()` on an `azure` disk. | Set the access level on the container in Azure. |
 | `UnsupportedOperationException: Disk "<name>" is not registered` | `Storage().disk('<name>')` with a missing disk. | Add the disk to `StorageConfig.disks`. |
 | `DriverException: <S3 error>` | Any other S3 error (network, `500`, wrong bucket). | Read the S3 code in the text. |
+| `DriverException: Azure 404 ContainerNotFound: <Azure message>` | The container of an `azure` disk does not exist. | Create the container, or fix `AZURE_STORAGE_CONTAINER`. The driver does not create it. |
+| `DriverException: Azure copy was still pending after 0:05:00.000000` | `copy()` or `move()` on Azure was not complete after `copyTimeout` (5 minutes). The driver stopped the copy. | Do the copy again. |
+| `DriverException: Azure copy ended with status <status>` | Azure stopped the copy with a status other than `success`. | Do the copy again. |
+| `DriverException: File is larger than 50,000 blocks` | `putStream()` on Azure with more than 50,000 blocks. | Use a larger `blockSize` in `AzureBlobDriverConfig`. |
+| `DriverException: Azure <status> <code>: <Azure message>` | Any other Azure error (`500`, wrong account). | Read the Azure code in the text. |
 
 See [File storage](../digging-deeper/file-storage.md).
 

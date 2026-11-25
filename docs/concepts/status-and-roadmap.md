@@ -24,7 +24,7 @@ Each package has its own version, and some packages are in their own repos. See 
 | `dox_auth` | JWT and session auth guards and middleware, access tokens you can revoke, gates and policies | Stable | 201 tests in 8 files |
 | `dox_cache` | Memory, file and Redis cache, tags, locks, encryption | Stable | 126 tests in 7 files, with Redis in CI |
 | `dox_cache_database` | The database cache store, for `dox_cache` | New | 78 tests in 4 files, with SQLite, Postgres, MariaDB and MySQL in CI |
-| `dox_storage` | Local disk and S3 (and S3-compatible) storage | Stable | 153 tests in 10 files, with MinIO in CI |
+| `dox_storage` | Local disk, S3 (and S3-compatible) and Azure Blob storage | Stable | 456 tests in 14 files, with MinIO and Azurite in CI |
 | `dox_openapi` | OpenAPI 3.1 document and a docs page | Stable | 63 tests in 4 files |
 | `dox_socketio` | Socket.IO v4 server with a Redis adapter | Stable | 119 tests in 11 files, with Redis and the real `socket.io-client` in CI |
 | `dox_queue` | Queues and jobs, the Redis and sync drivers, chains, batches, workers | New | 46 tests in 7 files. Most queue tests run in `dox_queue_database`, on every store. |

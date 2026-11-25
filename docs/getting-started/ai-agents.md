@@ -28,7 +28,7 @@ These packages ship a skill:
 | `dox_cache` | `dox-cache-guide` | cache stores, `remember`, tags, cache locks, the cache in tests |
 | `dox_queue` | `dox-queue-guide` | queue jobs, the worker, the Redis and database drivers, failed jobs, chains and batches |
 | `dox_scheduler` | `dox-scheduler-guide` | scheduled tasks, cron frequencies, no double runs on many servers |
-| `dox_storage` | `dox-storage-guide` | files and uploads, local, S3 and memory disks, signed URLs |
+| `dox_storage` | `dox-storage-guide` | files and uploads, local, S3, Azure and memory disks, signed URLs |
 | `dox_mailer` | `dox-mailer-guide` | mail config, mailables, Markdown mail, queued mail, transports, mail in tests |
 | `dox_socketio` | `dox-socketio-guide` | realtime events, rooms, socket login, the Redis adapter, broadcasts |
 | `dox_view` | `dox-view-guide` | HTML pages with `.dox.html` templates, layouts, components, forms with CSRF |

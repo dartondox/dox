@@ -4,9 +4,9 @@ icon: lucide/hard-drive
 
 # File Storage
 
-`Storage()` saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), or memory.
+`Storage()` saves and reads files on a disk: a local folder, AWS S3 (and R2, MinIO, Spaces), Azure Blob Storage, or memory.
 
-All disks have the same methods. So you can use a local folder in development and S3 in production, with the same code. Storage is in the `dox_storage` package. You can also use it [without Dox](#without-dox).
+All disks have the same methods. So you can use a local folder in development and S3 or Azure in production, with the same code. Storage is in the `dox_storage` package. You can also use it [without Dox](#without-dox).
 
 ```dart
 import 'package:dox_storage/dox_storage.dart';
@@ -29,6 +29,8 @@ dox add storage
 It writes `lib/config/storage.dart`, the provider, the `storage` folder and the `STORAGE_DISK=local` key. It never overwrites a file.
 
 Add `--disk=s3` to also add an `s3` disk and the `AWS_*` keys. `STORAGE_DISK` stays `local`, so fill in the keys first, then set `STORAGE_DISK=s3`.
+
+Add `--disk=azure` to also add an `azure` disk and the `AZURE_STORAGE_*` keys. See [The Azure disk](#the-azure-disk).
 
 ### Configuration
 
@@ -67,9 +69,10 @@ StorageConfig storageConfig = StorageConfig(
 | --- | --- | --- |
 | `local` | a folder on the server | `root` (default `storage`), `url`, `app_key` (default: your APP_KEY), `visibility`, `atomic_writes`, `permissions` |
 | `s3` | AWS S3, Cloudflare R2, MinIO, DigitalOcean Spaces, GCS | `bucket`, `region`, `key`, `secret`, `token`, `endpoint`, `path_style` (MinIO), `url` (CDN), `visibility`, `acl`, `batch_delete`, `unsigned_payload` |
+| `azure` | Azure Blob Storage, Azurite | `account`, `key`, `container`, `endpoint` (Azurite), `url` (CDN) |
 | `memory` | tests | none |
 
-Signed upload URLs work only on S3. The memory disk gives fake URLs.
+Signed upload URLs work only on S3 and Azure. The memory disk gives fake URLs.
 
 The provider in `lib/providers/` sets up these disks in every isolate:
 
@@ -100,6 +103,90 @@ Add the S3 keys to `lib/config/env.dart`, then run `dart run build_runner build`
 ```
 
 Without `bucket`, `key` or `secret`, the app stops at start with an ArgumentError. To save CPU on big uploads, set `'unsigned_payload': true`. The signature then does not cover the body, so use it only over HTTPS.
+
+### The Azure disk
+
+Use the `azure` disk when your files are in an Azure storage account. The driver stores each file as a block blob in one container.
+
+Run `dox add storage --disk=azure` to add the `azure` disk, the `AppEnv` getters and the `AZURE_STORAGE_*` keys. `STORAGE_DISK` stays `local`, so fill in the keys first, then set `STORAGE_DISK=azure`.
+
+To add the disk by hand, add the Azure keys to `lib/config/env.dart`, then run `dart run build_runner build`:
+
+```dart title="lib/config/env.dart"
+  String? get azureStorageAccount;
+
+  String? get azureStorageKey;
+
+  String? get azureStorageContainer;
+
+  /// Azurite or a custom domain. Null for Azure.
+  String? get azureStorageEndpoint;
+
+  String? get azureStorageUrl;
+```
+
+Then add the disk to `lib/config/storage.dart`. The `azure` disk is added only when `AZURE_STORAGE_CONTAINER` is set:
+
+```dart title="lib/config/storage.dart"
+    /// only when AZURE_STORAGE_CONTAINER is set
+    if (env.azureStorageContainer != null)
+      'azure': <String, dynamic>{
+        'driver': 'azure',
+        'account': env.azureStorageAccount,
+        'key': env.azureStorageKey,
+        'container': env.azureStorageContainer,
+        'endpoint': env.azureStorageEndpoint, // Azurite, custom domain
+        'url': env.azureStorageUrl,
+      },
+```
+
+| `.env` key | Disk option | Meaning |
+| --- | --- | --- |
+| `AZURE_STORAGE_ACCOUNT` | `account` | The name of the storage account. Required. |
+| `AZURE_STORAGE_KEY` | `key` | The base64 account key from the Azure portal. Required. |
+| `AZURE_STORAGE_CONTAINER` | `container` | The blob container. Required. |
+| `AZURE_STORAGE_ENDPOINT` | `endpoint` | The URL of the blob service, without the container. The default is `https://<account>.blob.core.windows.net`. |
+| `AZURE_STORAGE_URL` | `url` | The base of the URLs that `url` returns, for example a CDN. The default is the container URL. |
+
+The driver does not create the container. Create the container before you use the disk. Without `account`, `key` or `container`, the app stops with an ArgumentError.
+
+The driver signs each request with the account key. It does not use an Azure SDK. The tests of the driver run against Azurite only, not against a real Azure account.
+
+### Differences between Azure and S3
+
+Azure Blob Storage does not work the same as S3 in all operations. Read this list before you move a disk from S3 to Azure:
+
+| Operation | On Azure |
+| --- | --- |
+| Visibility | Azure sets public access for each container, not for each file. See [File visibility](#file-visibility). |
+| Signed upload URL | The client must send the header `x-ms-blob-type: BlockBlob`. See [Signed upload URLs](#signed-upload-urls). |
+| Signed URL expiry | There is no limit of 7 days. The expiry must be in the future. |
+| `putStream` | A big stream goes up as blocks. See [Storing big files](#storing-big-files). |
+| `copy` and `move` | The copy keeps the content type of the source. The driver waits for a pending copy. See [Copying and moving files](#copying-and-moving-files). |
+| `delete` | The driver also deletes the snapshots of the blob. |
+| `directoryExists` | A folder marker blob, like `photos/`, counts as a folder. |
+
+### Azurite
+
+Azurite is the Azure Storage emulator. Use it for local development, so you do not need an Azure account. Start it with Docker:
+
+```bash
+docker run -d --rm --name dox-storage-azurite -p 10000:10000 \
+  mcr.microsoft.com/azure-storage/azurite:3.38.0 \
+  azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck --loose
+```
+
+Then point the `azure` disk to Azurite. `devstoreaccount1` is the default account of Azurite. Its key is in the Azurite documentation:
+
+```ini title=".env"
+STORAGE_DISK=azure
+AZURE_STORAGE_ACCOUNT=devstoreaccount1
+AZURE_STORAGE_KEY=<the Azurite account key>
+AZURE_STORAGE_CONTAINER=files
+AZURE_STORAGE_ENDPOINT=http://127.0.0.1:10000/devstoreaccount1
+```
+
+Azurite starts with no containers. Create the `files` container before you use the disk, for example with Azure Storage Explorer or the Azure CLI.
 
 ### Atomic writes
 
@@ -299,11 +386,15 @@ await Storage().move('backup/a.txt', 'old/a.txt');
 
 On S3, the copy runs inside S3. A missing source file answers 404.
 
+On Azure, the copy runs inside the storage account. The copy keeps the content type of the source, unless you set `contentType` in `WriteOptions`. Azure can leave a copy pending. Then the driver waits up to 5 minutes, stops the copy and throws `DriverException`.
+
 ## Deleting files
 
 ```dart
 await Storage().delete(path);
 ```
+
+On Azure, `delete` also deletes the snapshots of the blob.
 
 ## Directories
 
@@ -320,6 +411,8 @@ List<String> folders = await Storage().directories('images');
 ```dart
 bool folder = await Storage().directoryExists('images');
 ```
+
+On Azure, a folder exists when a blob name starts with the folder name and `/`. A folder marker blob, like `images/`, also counts.
 
 `makeDirectory` makes a folder. It works only on a local disk:
 
@@ -345,6 +438,8 @@ Visibility visibility = await Storage().getVisibility(path);
 ```
 
 On S3, `setVisibility` sets the ACL. With `'acl': false` (R2 and similar), it does nothing, and `getVisibility` gives the disk `visibility`. On a local disk it is the same, unless you turn on `permissions`.
+
+Azure sets public access for each container, not for each file. So on Azure, `getVisibility` gives the level of the container, the same for all files. `setVisibility` throws `UnsupportedOperationException`. The driver ignores the `visibility` of `WriteOptions`. Set the access level on the container in Azure.
 
 ### Visibility on a local disk
 
@@ -408,6 +503,8 @@ await disk.putStream('videos/big.mp4', File('big.mp4').openRead());
 
 On S3, `put` has a limit of 5 GiB. `putStream` uses a multipart upload with parts of `multipartPartSize` (8 MiB, a field of `S3DriverConfig`), up to about 78 GiB.
 
+On Azure, a stream smaller than `blockSize` goes up as one Put Blob request. A stream of `blockSize` bytes or more goes up as blocks, then one Put Block List request. `blockSize` is a field of `AzureBlobDriverConfig`, 8 MiB by default. Only one block is in memory at a time. If an upload fails, Azure removes the blocks after 7 days.
+
 ### Reading text and streams
 
 `getString` reads a file as text. For a big file, use `getStream`. Both throw `FileNotFoundException` when the file is missing:
@@ -418,7 +515,7 @@ String text = await disk.getString('notes/a.txt');
 Stream<List<int>> stream = await disk.getStream('videos/big.mp4');
 ```
 
-`getStreamWithMetaData` gives the stream and the metadata together. On S3 it is one request:
+`getStreamWithMetaData` gives the stream and the metadata together. On S3 it is one request. On Azure it is two requests:
 
 ```dart
 ObjectStream file = await disk.getStreamWithMetaData('videos/big.mp4');
@@ -461,7 +558,7 @@ ListResult page = await disk.listAll('avatars',
 
 ### Signed URL options
 
-`getSignedUrl` takes `SignedUrlOptions`. `expiresIn` is 30 minutes by default, and on S3 the maximum is 7 days. `contentDisposition` sets the header of the download:
+`getSignedUrl` takes `SignedUrlOptions`. `expiresIn` is 30 minutes by default, and on S3 the maximum is 7 days. Azure has no such limit, but the expiry must be in the future. `contentDisposition` sets the header of the download:
 
 ```dart
 String signed = await disk.getSignedUrl('avatars/1.png',
@@ -470,11 +567,17 @@ String signed = await disk.getSignedUrl('avatars/1.png',
 
 ### Signed upload URLs
 
-On S3, the browser can upload a file directly to the bucket with a signed upload URL:
+On S3 and Azure, the browser can upload a file directly to the bucket or container with a signed upload URL:
 
 ```dart
 String upload = await disk.getSignedUploadUrl('avatars/2.png',
     options: SignedUrlOptions(contentType: 'image/png'));
+```
+
+On Azure, the client must send the header `x-ms-blob-type: BlockBlob` with the PUT. Azure does not enforce the `contentType` of `SignedUrlOptions`. A successful upload answers 201:
+
+```bash
+curl -X PUT -H 'x-ms-blob-type: BlockBlob' --data-binary @2.png "$UPLOAD_URL"
 ```
 
 ## S3-compatible services
@@ -557,10 +660,10 @@ All errors extend `StorageException` and have the `key`:
 | Error | When |
 | --- | --- |
 | `FileNotFoundException` | the file does not exist |
-| `PermissionDeniedException` | a file system permission error, or S3 403 |
+| `PermissionDeniedException` | a file system permission error, or a 403 from S3 or Azure |
 | `InvalidKeyException` | an unsafe key |
-| `UnsupportedOperationException` | the driver cannot do this |
-| `DriverException` | any other error. The first error is in `cause` |
+| `UnsupportedOperationException` | the driver cannot do this, like `setVisibility` on Azure |
+| `DriverException` | any other error. The first error is in `cause`. On Azure, a missing container and a copy that stays pending also give it |
 
 A key with `..`, an absolute path like `/etc/passwd`, or a null byte throws `InvalidKeyException`. So a user cannot get files outside the disk.
 
@@ -608,6 +711,11 @@ DriveManager drive = DriveManager(
       accessKeyId: env['AWS_ACCESS_KEY_ID']!,
       secretAccessKey: env['AWS_SECRET_ACCESS_KEY']!,
     )),
+    'azure': AzureBlobDriver(AzureBlobDriverConfig(
+      accountName: env['AZURE_STORAGE_ACCOUNT']!,
+      accountKey: env['AZURE_STORAGE_KEY']!,
+      container: 'files',
+    )),
   },
 );
 
@@ -615,6 +723,8 @@ Disk disk = drive.use('s3'); // or drive.use() for the default disk
 ```
 
 To add your own driver, call `drive.register('dropbox', DropboxDriver())`. For file modes, give `LocalDriverConfig(permissions: LocalPermissions())`.
+
+`AzureBlobDriverConfig` also has `endpoint`, `urlBase`, `blockSize` (8 MiB by default) and `copyTimeout` (5 minutes by default). `blockSize` must be from 1 byte to 4000 MiB, or the driver throws an ArgumentError. In a Dox config, only `endpoint` and `url` are disk options.
 
 ### Checking a local signed URL
 
