@@ -83,8 +83,4 @@ The Dart SDK has tests for its own HTTP server in `dart:io`. These tests now run
 - `NativeWebSocket.upgrade(protocol:)` sent a protocol that the client did not offer. Now the request gets `500`, as in `dart:io`.
 - When the stream of `addStream` failed before the head went out, the request got no answer. Now it gets `500`.
 
-## Speed
-
-The new checks run for each request. We compared 3.2.4 and 3.2.5 on the same machine with 3 routes and 64, 256 and 512 connections. The results of the 2 versions were in the same range, so there is no measurable change in speed or memory.
-
 Full list: the CHANGELOG of [`dox_http_native`](https://pub.dev/packages/dox_http_native/changelog) and of [`dox_http_client`](https://pub.dev/packages/dox_http_client/changelog).
