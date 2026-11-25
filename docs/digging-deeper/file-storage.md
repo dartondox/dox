@@ -30,7 +30,7 @@ It writes `lib/config/storage.dart`, the provider, the `storage` folder and the 
 
 Add `--disk=s3` to also add an `s3` disk and the `AWS_*` keys. `STORAGE_DISK` stays `local`, so fill in the keys first, then set `STORAGE_DISK=s3`.
 
-Add `--disk=azure` to also add an `azure` disk and the `AZURE_STORAGE_*` keys. See [The Azure disk](#the-azure-disk).
+Add `--disk=azure` to also add an `azure` disk and the `AZURE_STORAGE_*` keys. See [Azure Blob Storage](#azure-blob-storage).
 
 ### Configuration
 
@@ -72,7 +72,7 @@ StorageConfig storageConfig = StorageConfig(
 | `azure` | Azure Blob Storage, Azurite | `account`, `key`, `container`, `endpoint` (Azurite), `url` (CDN) |
 | `memory` | tests | none |
 
-Signed upload URLs work only on S3 and Azure. The memory disk gives fake URLs.
+Signed upload URLs work only on S3 and Azure.
 
 The provider in `lib/providers/` sets up these disks in every isolate:
 
@@ -85,7 +85,59 @@ class AppStorageProvider extends StorageProvider {
 }
 ```
 
-### The S3 disk
+## Drivers
+
+### Local disk
+
+The local disk saves files in the `root` folder on the server.
+
+#### Atomic writes
+
+A local disk writes a file in place. With `atomic_writes`, it writes a temp file and renames it, so a failed upload never leaves a partial file:
+
+```dart
+'local': <String, dynamic>{
+  'driver': 'local',
+  'root': 'storage',
+  'atomic_writes': true,
+},
+```
+
+The rename makes a new file, so the file gets the default mode and owner.
+
+#### Visibility on a local disk
+
+Add `'permissions': true` to use file modes. Then `setVisibility` runs `chmod`, and `getVisibility` reads the mode:
+
+```dart
+'local': <String, dynamic>{
+  'driver': 'local',
+  'root': 'storage',
+  'permissions': true,
+},
+```
+
+The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`. On Windows, `permissions` does nothing.
+
+#### Custom file modes
+
+Give `permissions` a map with a `file` and a `dir` key. Dart has no octal numbers, so write the modes in hex: `0x1a0` is `0640`:
+
+```dart
+'private': <String, dynamic>{
+  'driver': 'local',
+  'root': 'storage-private',
+  'visibility': 'private',
+  'permissions': <String, dynamic>{
+    'file': <String, int>{'public': 0x1a4, 'private': 0x1a0},
+    'dir': <String, int>{'public': 0x1ed, 'private': 0x1e8},
+  },
+},
+```
+
+A mode you leave out keeps its default. A mode that is not an int from 0 to 0x1ff throws an ArgumentError.
+
+### S3
 
 Add the S3 keys to `lib/config/env.dart`, then run `dart run build_runner build`. The `s3` disk is added only when `AWS_BUCKET` is set:
 
@@ -104,7 +156,69 @@ Add the S3 keys to `lib/config/env.dart`, then run `dart run build_runner build`
 
 Without `bucket`, `key` or `secret`, the app stops at start with an ArgumentError. To save CPU on big uploads, set `'unsigned_payload': true`. The signature then does not cover the body, so use it only over HTTPS.
 
-### The Azure disk
+These examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are the disk keys `endpoint`, `path_style`, `acl` and `batch_delete`. See [Configuration](#configuration).
+
+#### Cloudflare R2
+
+R2 does not take ACL headers, so set `supportsAcl: false`:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://<account-id>.r2.cloudflarestorage.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+);
+```
+
+#### MinIO
+
+MinIO needs path style URLs:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'us-east-1',
+  endpoint: 'http://localhost:9000',
+  forcePathStyle: true,
+  accessKeyId: 'minioadmin',
+  secretAccessKey: 'minioadmin',
+);
+```
+
+#### DigitalOcean Spaces
+
+Put the region of your space in `region` and in the endpoint:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-space',
+  region: 'nyc3',
+  endpoint: 'https://nyc3.digitaloceanspaces.com',
+  accessKeyId: '...',
+  secretAccessKey: '...',
+);
+```
+
+#### Google Cloud Storage
+
+GCS does not take ACL headers or the S3 batch delete call:
+
+```dart
+S3DriverConfig(
+  bucket: 'my-bucket',
+  region: 'auto',
+  endpoint: 'https://storage.googleapis.com',
+  accessKeyId: 'GOOG...',
+  secretAccessKey: '...',
+  supportsAcl: false,
+  supportsBatchDelete: false,
+);
+```
+
+### Azure Blob Storage
 
 Use the `azure` disk when your files are in an Azure storage account. The driver stores each file as a block blob in one container.
 
@@ -150,23 +264,7 @@ Then add the disk to `lib/config/storage.dart`. The `azure` disk is added only w
 
 The driver does not create the container. Create the container before you use the disk. Without `account`, `key` or `container`, the app stops with an ArgumentError.
 
-The driver signs each request with the account key. It does not use an Azure SDK. The tests of the driver run against Azurite only, not against a real Azure account.
-
-### Differences between Azure and S3
-
-Azure Blob Storage does not work the same as S3 in all operations. Read this list before you move a disk from S3 to Azure:
-
-| Operation | On Azure |
-| --- | --- |
-| Visibility | Azure sets public access for each container, not for each file. See [File visibility](#file-visibility). |
-| Signed upload URL | The client must send the header `x-ms-blob-type: BlockBlob`. See [Signed upload URLs](#signed-upload-urls). |
-| Signed URL expiry | There is no limit of 7 days. The expiry must be in the future. |
-| `putStream` | A big stream goes up as blocks. See [Storing big files](#storing-big-files). |
-| `copy` and `move` | The copy keeps the content type of the source. The driver waits for a pending copy. See [Copying and moving files](#copying-and-moving-files). |
-| `delete` | The driver also deletes the snapshots of the blob. |
-| `directoryExists` | A folder marker blob, like `photos/`, counts as a folder. |
-
-### Azurite
+#### Azurite
 
 Azurite is the Azure Storage emulator. Use it for local development, so you do not need an Azure account. Start it with Docker:
 
@@ -188,19 +286,9 @@ AZURE_STORAGE_ENDPOINT=http://127.0.0.1:10000/devstoreaccount1
 
 Azurite starts with no containers. Create the `files` container before you use the disk, for example with Azure Storage Explorer or the Azure CLI.
 
-### Atomic writes
+### Memory disk
 
-A local disk writes a file in place. With `atomic_writes`, it writes a temp file and renames it, so a failed upload never leaves a partial file:
-
-```dart
-'local': <String, dynamic>{
-  'driver': 'local',
-  'root': 'storage',
-  'atomic_writes': true,
-},
-```
-
-The rename makes a new file, so the file gets the default mode and owner.
+Use the memory disk in tests. It gives fake URLs. See [Testing](#testing).
 
 ## Using another disk
 
@@ -437,41 +525,9 @@ await Storage().setVisibility(path, Visibility.private);
 Visibility visibility = await Storage().getVisibility(path);
 ```
 
-On S3, `setVisibility` sets the ACL. With `'acl': false` (R2 and similar), it does nothing, and `getVisibility` gives the disk `visibility`. On a local disk it is the same, unless you turn on `permissions`.
+On S3, `setVisibility` sets the ACL. With `'acl': false` (R2 and similar), it does nothing, and `getVisibility` gives the disk `visibility`. On a local disk it is the same, unless you turn on `permissions`. See [Visibility on a local disk](#visibility-on-a-local-disk).
 
 Azure sets public access for each container, not for each file. So on Azure, `getVisibility` gives the level of the container, the same for all files. `setVisibility` throws `UnsupportedOperationException`. The driver ignores the `visibility` of `WriteOptions`. Set the access level on the container in Azure.
-
-### Visibility on a local disk
-
-Add `'permissions': true` to use file modes. Then `setVisibility` runs `chmod`, and `getVisibility` reads the mode:
-
-```dart
-'local': <String, dynamic>{
-  'driver': 'local',
-  'root': 'storage',
-  'permissions': true,
-},
-```
-
-The modes are: public file `0644`, private file `0600`, public folder `0755`, private folder `0700`. On Windows, `permissions` does nothing.
-
-### Custom file modes
-
-Give `permissions` a map with a `file` and a `dir` key. Dart has no octal numbers, so write the modes in hex: `0x1a0` is `0640`:
-
-```dart
-'private': <String, dynamic>{
-  'driver': 'local',
-  'root': 'storage-private',
-  'visibility': 'private',
-  'permissions': <String, dynamic>{
-    'file': <String, int>{'public': 0x1a4, 'private': 0x1a0},
-    'dir': <String, int>{'public': 0x1ed, 'private': 0x1e8},
-  },
-},
-```
-
-A mode you leave out keeps its default. A mode that is not an int from 0 to 0x1ff throws an ArgumentError.
 
 ## The disk API
 
@@ -577,71 +633,8 @@ String upload = await disk.getSignedUploadUrl('avatars/2.png',
 On Azure, the client must send the header `x-ms-blob-type: BlockBlob` with the PUT. Azure does not enforce the `contentType` of `SignedUrlOptions`. A successful upload answers 201:
 
 ```bash
-curl -X PUT -H 'x-ms-blob-type: BlockBlob' --data-binary @2.png "$UPLOAD_URL"
-```
-
-## S3-compatible services
-
-These examples use `S3DriverConfig`, the class behind an `s3` disk. In a Dox config, the same settings are the disk keys `endpoint`, `path_style`, `acl` and `batch_delete`. See [Configuration](#configuration).
-
-### Cloudflare R2
-
-R2 does not take ACL headers, so set `supportsAcl: false`:
-
-```dart
-S3DriverConfig(
-  bucket: 'my-bucket',
-  region: 'auto',
-  endpoint: 'https://<account-id>.r2.cloudflarestorage.com',
-  accessKeyId: '...',
-  secretAccessKey: '...',
-  supportsAcl: false,
-);
-```
-
-### MinIO
-
-MinIO needs path style URLs:
-
-```dart
-S3DriverConfig(
-  bucket: 'my-bucket',
-  region: 'us-east-1',
-  endpoint: 'http://localhost:9000',
-  forcePathStyle: true,
-  accessKeyId: 'minioadmin',
-  secretAccessKey: 'minioadmin',
-);
-```
-
-### DigitalOcean Spaces
-
-Put the region of your space in `region` and in the endpoint:
-
-```dart
-S3DriverConfig(
-  bucket: 'my-space',
-  region: 'nyc3',
-  endpoint: 'https://nyc3.digitaloceanspaces.com',
-  accessKeyId: '...',
-  secretAccessKey: '...',
-);
-```
-
-### Google Cloud Storage
-
-GCS does not take ACL headers or the S3 batch delete call:
-
-```dart
-S3DriverConfig(
-  bucket: 'my-bucket',
-  region: 'auto',
-  endpoint: 'https://storage.googleapis.com',
-  accessKeyId: 'GOOG...',
-  secretAccessKey: '...',
-  supportsAcl: false,
-  supportsBatchDelete: false,
-);
+curl -X PUT -H 'x-ms-blob-type: BlockBlob' \
+  --data-binary @2.png "$UPLOAD_URL"
 ```
 
 ## Custom drivers
