@@ -41,27 +41,67 @@ class FormDataVisitor {
   /// fails when the body stream fails (eg. 413). the mime parser only
   /// reports body errors on the outer stream, never on the open part,
   /// so a part reader must also watch this or it waits forever.
-  final Completer<bool> _failed = Completer<bool>();
+  /// made in the zone of [process]: an error of a future does not pass
+  /// to a listener in another error zone.
+  late final Completer<bool> _failed;
 
   /// the multipart boundary. read from the request when null.
   final String? boundary;
 
-  FormDataVisitor(this.request, this.body, {this.boundary}) {
-    _failed.future.ignore();
-  }
+  FormDataVisitor(this.request, this.body, {this.boundary});
 
   /// read the parts one by one. a part must be fully read before the
   /// next one arrives, so the whole body is never held in memory.
+  /// A body that is not valid multipart throws a [BadRequestException].
   Future<void> process() async {
     String? separator =
         boundary ?? request.headers.contentType?.parameters['boundary'];
     if (separator == null || separator.isEmpty) {
       throw BadRequestException(message: 'Multipart body has no boundary');
     }
+
+    /// The mime parser throws some errors (eg. a space in a header name)
+    /// in its stream callback. No `await` gets such an error: it goes to
+    /// the zone, and the parser stops, so the request would wait for
+    /// ever. This zone gets the error and fails the body with it, which
+    /// ends the open reads. The completer `done` is made outside the
+    /// zone, because an error of a future does not leave an error zone.
+    Completer<void> done = Completer<void>();
+    runZonedGuarded(
+      () {
+        _failed = Completer<bool>()..future.ignore();
+        _process(separator).then(
+          done.complete,
+          onError: (Object error, StackTrace stackTrace) {
+            done.completeError(_badBody(error), stackTrace);
+          },
+        );
+      },
+      (Object error, StackTrace stackTrace) {
+        if (!_failed.isCompleted) {
+          _failed.completeError(_badBody(error), stackTrace);
+        }
+      },
+    );
+    return done.future;
+  }
+
+  /// an error of the mime parser is the fault of the client: a 400.
+  /// A `FormatException` is a part header that is not UTF-8.
+  static Object _badBody(Object error) {
+    if (error is MimeMultipartException || error is FormatException) {
+      return BadRequestException(message: 'Multipart body is not valid');
+    }
+    return error;
+  }
+
+  Future<void> _process(String separator) async {
     MimeMultipartTransformer transformer = MimeMultipartTransformer(separator);
     _closing = utf8.encode('\r\n--$separator--');
 
-    await for (MimeMultipart formItem in _watch(body).transform(transformer)) {
+    await for (MimeMultipart formItem in _guard<MimeMultipart>(
+      _watch(body).transform(transformer),
+    )) {
       String? partHeaders = formItem.headers['content-disposition'];
       if (partHeaders == null) {
         throw BadRequestException(
@@ -70,7 +110,14 @@ class FormDataVisitor {
       }
       String? contentType = formItem.headers['content-type'];
 
-      Map<String, String> data = _parseFormDataContentDisposition(partHeaders);
+      Map<String, String> data;
+      try {
+        data = _parseFormDataContentDisposition(partHeaders);
+      } on FormatException {
+        throw BadRequestException(
+          message: 'Multipart part has a bad Content-Disposition',
+        );
+      }
 
       String? inputName = data['name'];
       if (inputName != null) {
@@ -157,13 +204,18 @@ class FormDataVisitor {
   /// the end only after a line break (or at the start of the body).
   List<int> _closing = const <int>[];
 
-  /// pass the body through, and mark [_failed] when it fails.
-  /// A body that ends with no closing boundary (a cut upload) also fails:
-  /// the mime parser reports it on the outer stream only, so a reader
-  /// that waits for the open part would wait for ever.
+  /// pass the body through up to the end mark, and mark [_failed] when it
+  /// fails. A body that ends with no closing boundary (a cut upload) also
+  /// fails: the mime parser reports it on the outer stream only, so a
+  /// reader that waits for the open part would wait for ever.
+  ///
+  /// The bytes after the end mark (the epilogue) are read, so the size
+  /// limit still counts them, but the parser does not get them. When a
+  /// body has no parts, the parser stops at the first byte after the end
+  /// mark and never ends, so the request would wait for ever.
   Stream<List<int>> _watch(Stream<List<int>> source) async* {
     /// the end mark can be split between two chunks, so the last bytes of
-    /// the chunk before are kept. any epilogue may follow the mark.
+    /// the chunk before are kept.
 
     /// the body start counts as after a line break
     List<int> carry = const <int>[0x0D, 0x0A];
@@ -171,11 +223,18 @@ class FormDataVisitor {
     try {
       /// `await for`, not `yield*`: yield* forwards errors without throwing
       await for (List<int> chunk in source) {
-        if (!closed) {
-          closed = _holdsClosing(carry, chunk);
-          if (!closed) carry = _lastOf(carry, chunk);
+        if (closed) continue;
+        int end = _closingEnd(carry, chunk);
+        if (end < 0) {
+          carry = _lastOf(carry, chunk);
+          yield chunk;
+          continue;
         }
-        yield chunk;
+        closed = true;
+        if (end > 0) yield chunk.sublist(0, end);
+
+        /// the line break that ends the mark, for the parser
+        yield const <int>[0x0D, 0x0A];
       }
       if (!closed && !_failed.isCompleted) {
         _failed.completeError(
@@ -189,8 +248,9 @@ class FormDataVisitor {
     }
   }
 
-  /// true when [carry] then [chunk] hold the end mark
-  bool _holdsClosing(List<int> carry, List<int> chunk) {
+  /// where the end mark ends in [chunk], when [carry] then [chunk] hold
+  /// it. -1 when they do not.
+  int _closingEnd(List<int> carry, List<int> chunk) {
     List<int> mark = _closing;
     int total = carry.length + chunk.length;
     int first = mark.first;
@@ -201,9 +261,9 @@ class FormDataVisitor {
       while (j < mark.length && at(i + j) == mark[j]) {
         j++;
       }
-      if (j == mark.length) return true;
+      if (j == mark.length) return i + mark.length - carry.length;
     }
-    return false;
+    return -1;
   }
 
   /// the last `mark.length - 1` bytes of [carry] then [chunk]
@@ -214,11 +274,11 @@ class FormDataVisitor {
     return all.length <= keep ? all : all.sublist(all.length - keep);
   }
 
-  /// read a part, but stop with the body error if the body fails.
-  /// a body error cancels the iterator, which ends a waiting `moveNext`.
-  /// so there is no race per chunk.
-  Stream<List<int>> _guard(Stream<List<int>> part) async* {
-    StreamIterator<List<int>> iterator = StreamIterator<List<int>>(part);
+  /// read a part (or the parts), but stop with the body error if the
+  /// body fails. a body error cancels the iterator, which ends a waiting
+  /// `moveNext`. so there is no race per chunk.
+  Stream<T> _guard<T>(Stream<T> part) async* {
+    StreamIterator<T> iterator = StreamIterator<T>(part);
     Object? error;
     StackTrace? stackTrace;
     _failed.future
@@ -254,9 +314,10 @@ class FormDataVisitor {
     Map<String, String> params = <String, String>{};
 
     while (scanner.scan(';')) {
+      /// `expect`, not `scan`: with no name there is no match to read
       scanner
         ..scan(_whitespace)
-        ..scan(_token);
+        ..expect(_token);
       String key = scanner.lastMatch![0]!;
       scanner.expect('=');
 

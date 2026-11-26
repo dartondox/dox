@@ -1,14 +1,16 @@
 name: Fuzz
 
 # Runs each fuzz target in packages/dox-core/fuzz (one file is one target).
-# A target gives changed inputs to a parser of client input: first 2
-# million random changes of the seeds, then 60 s where an input that
-# reaches new code is kept and changed again (package covfuzz, coverage
-# from the Dart VM service). See CONTRIBUTING.md.
-# A run fails when the parser throws an error that is not a 400 or a 422,
-# or when its result is wrong. The log shows the smallest input that
-# fails and the random seed. The failed inputs of the 60 s part are
-# uploaded.
+# A target gives changed inputs to a parser of client input. See
+# CONTRIBUTING.md.
+# - A synchronous target (package covfuzz): first 2 million random changes
+#   of the seeds, then 60 s where an input that reaches new code is kept
+#   and changed again (coverage from the Dart VM service).
+# - A stream target (multipart): 60 s of random changes.
+# A run fails when the parser throws an error that is not a 4xx answer,
+# when its result is wrong, or when it does not end. The log shows the
+# input that fails and the random seed. The failed inputs are uploaded,
+# but not those of the first part of a synchronous target.
 
 on:
   push:
@@ -70,5 +72,6 @@ jobs:
         with:
           name: fuzz-inputs
           path: packages/dox-core/fuzz/artifacts
-          # a failure in the first part writes no files. Its input is in the log.
+          # a failure in the first part of a synchronous target writes no
+          # files. Its input is in the log.
           if-no-files-found: ignore
