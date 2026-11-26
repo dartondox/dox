@@ -22,7 +22,9 @@ class TrustedProxy {
 
   /// The scheme of a request with no trusted proxy in front: `https` when
   /// the server has `AppConfig.tls`, else `http`. `DoxServer.listen` sets
-  /// it, once per isolate.
+  /// it, once per isolate, and sets it back to `http` when the server is
+  /// closed. An isolate has one server. With more than one (only in
+  /// tests), the last `listen` or close wins.
   static String directScheme = 'http';
 
   /// the answer of [readClient] per request. the socket call is slow, and

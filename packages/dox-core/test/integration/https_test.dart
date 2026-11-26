@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -64,6 +65,18 @@ String putSession(DoxRequest req) {
   return req.scheme();
 }
 
+/// `/slow` tells [slowEntered] that it runs, then waits for [slowGate]
+Completer<void> slowEntered = Completer<void>();
+Completer<void> slowGate = Completer<void>();
+
+Future<String> slow(DoxRequest req) async {
+  slowEntered.complete();
+  await slowGate.future;
+  // the first read of the scheme of this request
+  req.session.put('name', 'dox');
+  return '${req.scheme()} ${req.fullUrl()}';
+}
+
 String isolateId(DoxRequest req) => '${Dox().isolateId}';
 
 String signed(DoxRequest req) => 'signed';
@@ -73,6 +86,13 @@ void main() {
   String? problem = makeCertificate(made, 1) ?? makeCertificate(made, 2);
 
   tearDownAll(() => made.deleteSync(recursive: true));
+
+  // a CI runner must not pass with the group skipped
+  if (problem != null && Platform.environment['CI'] != null) {
+    test('openssl makes the test certificate', () {
+      fail('openssl can not make the test certificate: $problem');
+    });
+  }
 
   group(
     'https',
@@ -93,6 +113,8 @@ void main() {
           const SessionMiddleware(),
           putSession,
         ]);
+        // no SecurityHeaders: it reads the scheme before the handler
+        Route.get('/slow', <dynamic>[const SessionMiddleware(), slow]);
         Route.get('/isolate', isolateId);
         Route.get('/signed', <dynamic>[
           const ValidateSignature(),
@@ -324,6 +346,43 @@ void main() {
         await Dox().server.close(force: true);
         expect(TrustedProxy.directScheme, 'http');
         await expectLater(Dox().server.reloadCertificate(), throwsStateError);
+      });
+
+      test('a request open during shutdown stays https', () async {
+        await start(config(tls: tls));
+        int port = Dox().server.httpServer.port;
+        slowEntered = Completer<void>();
+        slowGate = Completer<void>();
+        Future<HttpClientResponse> open = get('https', '/slow');
+        await slowEntered.future.timeout(_wait);
+
+        Future<void> stopped = Dox().server.shutdown(_wait);
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+        // the server drains: no reload, but the open request is still https
+        await expectLater(Dox().server.reloadCertificate(), throwsStateError);
+        slowGate.complete();
+
+        HttpClientResponse res = await open;
+        expect(await body(res), 'https https://localhost:$port/slow');
+        expect(res.headers.value('set-cookie'), contains('; Secure'));
+        client.close(force: true);
+        await stopped.timeout(_wait);
+        expect(TrustedProxy.directScheme, 'http');
+      });
+
+      test('DoxTestClient.certificateOf: no certificate in the file', () async {
+        expect(DoxTestClient.certificateOf(tls.certificatePath), isNotEmpty);
+        File bad = File('${dir.path}/bad.pem')..writeAsStringSync('junk');
+        expect(
+          () => DoxTestClient.certificateOf(bad.path),
+          throwsA(
+            isA<ArgumentError>().having(
+              (ArgumentError e) => '$e',
+              'text',
+              contains(bad.path),
+            ),
+          ),
+        );
       });
 
       test('reloadCertificate: new certificate, a bad file keeps it', () async {

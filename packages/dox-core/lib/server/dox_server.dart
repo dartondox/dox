@@ -101,17 +101,22 @@ class DoxServer {
   /// finish. Then every connection is closed.
   Future<void> shutdown(Duration timeout) async {
     StrictMode.stopWatchdog();
-    _closed();
+    // from now on `reloadCertificate` throws a StateError
+    _native = null;
     HttpServer server = httpServer;
-    // completes when the open requests are done. WebSockets get 1001.
-    await server.close().then(_ignore).timeout(timeout, onTimeout: _nothing);
-    await server.close(force: true);
+    try {
+      // completes when the open requests are done. WebSockets get 1001.
+      await server.close().then(_ignore).timeout(timeout, onTimeout: _nothing);
+      await server.close(force: true);
+    } finally {
+      _closed();
+    }
   }
 
-  /// no server any more: the next request object of this isolate (eg. in
-  /// a unit test) is plain http again
+  /// No server any more: the next request object of this isolate (eg. in
+  /// a unit test) is plain http again. Call it after the server closed:
+  /// a request that is still open reads its scheme on first use.
   void _closed() {
-    _native = null;
     TrustedProxy.directScheme = 'http';
   }
 
@@ -143,8 +148,12 @@ class DoxServer {
   /// ```
   Future<void> close({bool force = false}) async {
     StrictMode.stopWatchdog();
-    _closed();
-    await httpServer.close(force: force);
+    _native = null;
+    try {
+      await httpServer.close(force: force);
+    } finally {
+      _closed();
+    }
   }
 
   /// Reads the certificate and key files of `AppConfig.tls` again, for
