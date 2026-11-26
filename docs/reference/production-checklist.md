@@ -32,7 +32,7 @@ Go through each table one time before your first deploy. An item marked "Dox lim
 
 | Check | How | Read more |
 | --- | --- | --- |
-| HTTPS at the proxy | Dox has no TLS server. Run Caddy or nginx in front. Keep the app port private. | [Deployment](../digging-deeper/deployment.md) |
+| HTTPS is on | Run Caddy or nginx in front and keep the app port private. Or set `AppConfig.tls`, and Dox serves HTTPS with no proxy. | [Deployment](../digging-deeper/deployment.md) |
 | `trustedProxies` is set behind a proxy | Set `AppConfig(trustedProxies: <String>['127.0.0.1', '::1'])`, or the proxy network, like `'172.16.0.0/12'`. Without it, `req.ip()` is the proxy and `req.scheme()` is `http`. Do not use `['*']` when the app port is public. | [App config](app-config.md) |
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
 | CORS has real origins | Use `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. | [CORS](../security/cors.md) |

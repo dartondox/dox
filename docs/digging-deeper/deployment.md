@@ -123,9 +123,154 @@ In compose, use `command: ["/app/bin/queue", "work"]`. With no Docker, run `./bi
 
 A small app can run the jobs and the schedule inside the server, with `QueueConfig(inProcess: true)` and `ScheduleConfig(inProcess: true)`. See [Running jobs in the web server](queue.md#running-jobs-in-the-web-server).
 
+## HTTPS without a proxy
+
+Dox can serve HTTPS itself, so a small server needs no proxy for TLS. The TLS work is in Rust (rustls), in the [native server](native-server.md). TLS is off by default.
+
+Use a proxy when you also want gzip, automatic certificates or more than one app on a server. See [HTTPS: put a proxy in front](#https-put-a-proxy-in-front).
+
+### Turn on TLS
+
+Set `tls` in the app config. Give the certificate file and the key file:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  serverPort: 443,
+  tls: TlsOptions(
+    certificatePath: '/etc/letsencrypt/live/example.com/fullchain.pem',
+    keyPath: '/etc/letsencrypt/live/example.com/privkey.pem',
+  ),
+  // ...
+);
+```
+
+| Option | What it is |
+| --- | --- |
+| `certificatePath` | A PEM file. The certificate is first, then the intermediate certificates. An example is `fullchain.pem` of certbot. |
+| `keyPath` | A PEM file with the private key of the certificate (PKCS #8, PKCS #1 or SEC1). An example is `privkey.pem` of certbot. |
+
+- Dox reads the two files when the server starts. A bad file, or a key of a different certificate, throws a `TlsException`, and the server does not start.
+- The user of the app must have permission to read the two files.
+- The server uses TLS 1.2 and TLS 1.3. There are no cipher options.
+- The TLS handshake must end in `idleTimeout`.
+- Your routes stay the same. WebSocket (`wss://`) and streamed responses work on the TLS port.
+- `req.scheme()` is `https` and `req.isSecure()` is true. Thus the session cookie and other cookies get `Secure`, and `SecurityHeaders` sends HSTS.
+- Set `APP_URL` to the `https://` address, because signed URLs and absolute URLs use it.
+- gzip is off by default. With no proxy, set `compress: true` if you want gzip.
+
+On Linux, a port below 1024 needs a permission. With systemd, add `AmbientCapabilities=CAP_NET_BIND_SERVICE` to the `[Service]` part of the unit file.
+
+### Read the files from the env
+
+Keep the file paths out of the code, so each machine can use its own files. Add two optional getters to your `AppEnv`, then run `dart run build_runner build`:
+
+```dart title="lib/config/env.dart"
+/// the certificate file (PEM). Not set: plain HTTP.
+String? get tlsCert;
+
+/// the private key file (PEM) of the certificate
+String? get tlsKey;
+```
+
+The getters hold only the keys. The config file makes the `TlsOptions`:
+
+```dart title="lib/config/app.dart"
+String? tlsCert = env.tlsCert;
+String? tlsKey = env.tlsKey;
+
+AppConfig appConfig = AppConfig(
+  tls: tlsCert == null || tlsKey == null
+      ? null
+      : TlsOptions(certificatePath: tlsCert, keyPath: tlsKey),
+  // ...
+);
+```
+
+```bash title=".env"
+TLS_CERT=/etc/letsencrypt/live/example.com/fullchain.pem
+TLS_KEY=/etc/letsencrypt/live/example.com/privkey.pem
+```
+
+An empty value (`TLS_CERT=`) is the same as no key, so TLS stays off. Keep the two keys empty on your own machine and in tests.
+
+### One port, one mode
+
+A port with `tls` accepts only TLS. A plain HTTP client gets no answer, and the connection closes. A port without `tls` accepts only plain HTTP.
+
+Dox does not send `http://` visitors to `https://`. See [Not included](#not-included).
+
+### HTTP/2 and gRPC over TLS
+
+Browsers use HTTP/2 only with TLS. Set `http2: true` together with `tls`, and browsers and gRPC clients use HTTP/2 with no proxy:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  http2: true,
+  tls: TlsOptions(certificatePath: 'fullchain.pem', keyPath: 'privkey.pem'),
+  // ...
+);
+```
+
+The client selects the protocol in the TLS handshake (ALPN):
+
+| `http2` | The server offers |
+| --- | --- |
+| `true` | `h2` and `http/1.1` |
+| `false` | `http/1.1` only |
+
+A client with no ALPN gets HTTP/1.1. `grpcurl` works without `-plaintext`. See [HTTP/2](http2.md) and [gRPC](grpc.md).
+
+### reloadCertificate
+
+A certificate has an end date, and a tool such as certbot writes a new one before that date. Call `reloadCertificate()` to use the new certificate without a restart:
+
+```dart
+await Dox().server.reloadCertificate();
+```
+
+- The method reads the same two files again.
+- New connections get the new certificate. Open connections keep the old certificate until they close.
+- One call is sufficient. All isolates of the process get the new certificate.
+- If a file is bad, the method throws a `TlsException`. The server keeps the old certificate.
+- If `tls` is off, the method throws a `StateError`.
+
+Dox does not watch the files and has no signal for this. Your app decides when to call the method. This example calls it on `SIGHUP`:
+
+```dart title="bin/server.dart"
+Future<void> main() async {
+  // ...
+  await Dox().startServer();
+  ProcessSignal.sighup.watch().listen(reloadCertificate);
+}
+
+Future<void> reloadCertificate(ProcessSignal signal) async {
+  try {
+    await Dox().server.reloadCertificate();
+    Logger.info('The server has the new certificate');
+  } on TlsException catch (error) {
+    Logger.danger('The server keeps the old certificate: $error');
+  }
+}
+```
+
+Then let certbot send the signal after each renewal. With the systemd unit of [Keep it running](#keep-it-running):
+
+```bash
+certbot renew --deploy-hook "systemctl kill --signal=HUP dox"
+```
+
+Windows has no `SIGHUP`. There, call the method from a scheduled task or a timer in the server process, for example one time each day.
+
+### Not included
+
+- ACME: Dox does not get or renew a certificate (for example from Let's Encrypt). Use certbot or a similar tool, then call `reloadCertificate()`.
+- Redirect from port 80: Dox does not send `http://` visitors to `https://`. Use a proxy for this.
+- mTLS: Dox does not ask the client for a certificate.
+- SNI: one port has one certificate. Dox does not select a certificate for each domain.
+
 ## HTTPS: put a proxy in front
 
-Dox serves plain HTTP only. Run it on a private port, and put [Caddy](https://caddyserver.com) or nginx in front of it for TLS and gzip. When the proxy is on the same machine, set `APP_HOST=127.0.0.1`:
+A proxy gets and renews the certificate, does gzip and sends `http://` visitors to `https://`. Run Dox on a private port with plain HTTP, and put [Caddy](https://caddyserver.com) or nginx in front of it. When the proxy is on the same machine, set `APP_HOST=127.0.0.1`:
 
 <ol class="dox-flow dox-flow--labels dox-flow--plain" aria-label="A proxy in front of Dox">
   <li><strong>Client</strong></li>
@@ -211,7 +356,7 @@ server {
 
 ### HTTP/2 and gRPC
 
-gRPC needs HTTP/2 between the proxy and Dox. Set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Dox speaks h2c, so the proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port.
+gRPC needs HTTP/2 between the proxy and Dox. Set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Without `tls`, Dox speaks h2c, so the proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port.
 
 With Caddy, `h2c://` sends HTTP/2 with no TLS to the app:
 

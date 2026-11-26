@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_request_handler.dart';
+import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:dox_core/utils/log_buffer.dart';
 import 'package:dox_core/utils/strict_mode.dart';
 import 'package:dox_http_native/dox_http_native.dart';
@@ -58,7 +59,11 @@ class DoxServer {
       maxConnections: config.maxConnections,
       http2: config.http2,
       maxConcurrentStreams: config.maxConcurrentStreams,
+      tls: config.tls,
     );
+
+    /// on a TLS port every request came over https
+    TrustedProxy.directScheme = config.tls == null ? 'http' : 'https';
     server.autoCompress = config.compress;
 
     /// `X-XSS-Protection: 1; mode=block` (the default of dart:io) turns
@@ -109,6 +114,21 @@ class DoxServer {
   Future<void> close({bool force = false}) async {
     StrictMode.stopWatchdog();
     await httpServer.close(force: force);
+  }
+
+  /// Reads the certificate and key files of `AppConfig.tls` again, for
+  /// example after `certbot` renewed them. New connections get the new
+  /// certificate. Open connections keep the old one until they close.
+  /// One call is enough: every isolate of the process gets it. When a
+  /// file is bad, it throws a `TlsException` and the server keeps the old
+  /// certificate. It throws a `StateError` when `tls` is off or the
+  /// server is closed. Dox does not watch the files: the app decides when
+  /// to call it (eg. on `SIGHUP`).
+  /// ```
+  /// await Dox().server.reloadCertificate();
+  /// ```
+  Future<void> reloadCertificate() {
+    return (httpServer as NativeHttpServer).reloadCertificate();
   }
 
   /// set response handler

@@ -70,6 +70,10 @@ export 'http/response/stream_file.dart';
 
 /// interfaces
 export 'interfaces/app_config.dart';
+
+// `AppConfig.tls`: the certificate files of an HTTPS server
+export 'package:dox_http_native/dox_http_native.dart' show TlsOptions;
+
 export 'interfaces/auth_middleware.dart';
 export 'interfaces/core_flags.dart';
 export 'interfaces/next_middleware.dart';

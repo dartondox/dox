@@ -20,6 +20,11 @@ class TrustedProxy {
   static List<String>? _cachedList;
   static TrustedProxy _cached = TrustedProxy(const <String>[]);
 
+  /// The scheme of a request with no trusted proxy in front: `https` when
+  /// the server has `AppConfig.tls`, else `http`. `DoxServer.listen` sets
+  /// it, once per isolate.
+  static String directScheme = 'http';
+
   /// the answer of [readClient] per request. the socket call is slow, and
   /// a request can ask twice (`req.ip()`, then the cookies of the answer).
   static final Expando<({String? ip, String scheme})> _perRequest =
@@ -43,7 +48,9 @@ class TrustedProxy {
   static ({String? ip, String scheme}) _read(HttpRequest req) {
     String? address = req.connectionInfo?.remoteAddress.address;
     String? remote = address == null ? null : normalize(address);
-    if (remote == null || !_cached.enabled) return (ip: remote, scheme: 'http');
+    if (remote == null || !_cached.enabled) {
+      return (ip: remote, scheme: directScheme);
+    }
     return (
       ip: _cached.clientIp(remote, req.headers.value('x-forwarded-for')),
       scheme: _cached.scheme(remote, req.headers.value('x-forwarded-proto')),
@@ -104,9 +111,10 @@ class TrustedProxy {
     return normalize(remote);
   }
 
-  /// `https` when a trusted proxy says the client used https
+  /// `https` when a trusted proxy says the client used https. With no
+  /// word from a trusted proxy: [directScheme].
   String scheme(String remote, String? forwardedProto) {
-    if (forwardedProto == null || !trusts(remote)) return 'http';
+    if (forwardedProto == null || !trusts(remote)) return directScheme;
     String proto = forwardedProto.split(',').first.trim().toLowerCase();
     return proto == 'https' ? 'https' : 'http';
   }

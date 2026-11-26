@@ -292,13 +292,14 @@ class Dox {
   }
 
   /// the real address of [server], like `http://127.0.0.1:3000` or
-  /// `http://[::]:3000` (all interfaces)
+  /// `http://[::]:3000` (all interfaces). `https://` for a TLS server.
   static String serverUrl(HttpServer server) {
     InternetAddress address = server.address;
     String host = address.type == InternetAddressType.IPv6
         ? '[${address.address}]'
         : address.address;
-    return 'http://$host:${server.port}';
+    bool tls = server is NativeHttpServer && server.tls != null;
+    return '${tls ? 'https' : 'http'}://$host:${server.port}';
   }
 
   bool _warnedWebSocketOrigin = false;
