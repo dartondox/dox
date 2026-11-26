@@ -70,3 +70,5 @@ jobs:
         with:
           name: fuzz-inputs
           path: packages/dox-core/fuzz/artifacts
+          # a failure in the first part writes no files. Its input is in the log.
+          if-no-files-found: ignore

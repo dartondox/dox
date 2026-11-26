@@ -118,10 +118,19 @@ class FormInput {
     return pairs;
   }
 
+  /// The number of [key] when it is a list index: plain digits, the text
+  /// of the number itself. `int.tryParse` also takes `01`, `+1`, ` 1` and
+  /// `0x10`. Those are map keys: read back as `'$index'` they would be a
+  /// different key, and the value would be lost.
+  static int? _listIndex(String key) {
+    int? index = int.tryParse(key);
+    return index?.toString() == key ? index : null;
+  }
+
   /// `[]` adds a new item: its index is the next free one.
   String _index(Map<String, dynamic> node, String part) {
     if (part.isNotEmpty) {
-      int? index = int.tryParse(part);
+      int? index = _listIndex(part);
       if (index != null && (index < 0 || index >= maxItems)) _tooBig();
       return part;
     }
@@ -159,10 +168,7 @@ class FormInput {
     if (value is! Map<String, dynamic>) return value;
     bool numbers = value.isNotEmpty;
     for (String key in value.keys) {
-      /// only plain digits are an index. `int.tryParse` also takes `01`,
-      /// `+1`, ` 1` and `0x10`, but those keys are not `'$index'`, so
-      /// their values would be lost below.
-      if (int.tryParse(key)?.toString() != key) {
+      if (_listIndex(key) == null) {
         numbers = false;
         break;
       }
