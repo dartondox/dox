@@ -191,7 +191,7 @@ TLS_CERT=/etc/letsencrypt/live/example.com/fullchain.pem
 TLS_KEY=/etc/letsencrypt/live/example.com/privkey.pem
 ```
 
-An empty value (`TLS_CERT=`) is the same as no key, so TLS stays off. Keep the two keys empty on your own machine and in tests.
+An empty value (`TLS_CERT=`) is the same as no key, so TLS stays off. Keep the two keys empty on your own machine, where you have no certificate.
 
 ### One port, one mode
 

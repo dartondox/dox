@@ -160,6 +160,10 @@ class Dox {
     /// not run. The error says why and how to fix it.
     NativeHttpServer.ensureAvailable();
 
+    /// a bad certificate file stops the start here, once. Else every
+    /// isolate fails on it and is started again, in a loop.
+    await DoxServer().checkCertificate();
+
     /// Windows has no SO_REUSEPORT: one isolate owns the native listener.
     if (Platform.isWindows && isolatesToSpawn > 1) {
       Logger.info(

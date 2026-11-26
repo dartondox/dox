@@ -18,6 +18,9 @@ class DoxServer {
   /// the sockets and parses HTTP. It has the `dart:io` `HttpServer` API.
   late HttpServer httpServer;
 
+  /// the server of [listen], null before it and after a close
+  NativeHttpServer? _native;
+
   /// set responseHandler
   ResponseHandlerInterface? responseHandler;
 
@@ -49,7 +52,7 @@ class DoxServer {
 
     /// Rust stops a multipart form over maxMultipartSize and any other
     /// body over maxBodySize. Dart checks the limits again.
-    HttpServer server = await NativeHttpServer.bind(
+    NativeHttpServer server = await NativeHttpServer.bind(
       port,
       address: address,
       maxBodySize: config.maxBodySize,
@@ -89,6 +92,7 @@ class DoxServer {
       },
     );
     httpServer = server;
+    _native = server;
     StrictMode.startWatchdog();
     return server;
   }
@@ -97,10 +101,36 @@ class DoxServer {
   /// finish. Then every connection is closed.
   Future<void> shutdown(Duration timeout) async {
     StrictMode.stopWatchdog();
+    _closed();
     HttpServer server = httpServer;
     // completes when the open requests are done. WebSockets get 1001.
     await server.close().then(_ignore).timeout(timeout, onTimeout: _nothing);
     await server.close(force: true);
+  }
+
+  /// no server any more: the next request object of this isolate (eg. in
+  /// a unit test) is plain http again
+  void _closed() {
+    _native = null;
+    TrustedProxy.directScheme = 'http';
+  }
+
+  /// Stops the start when the files of `AppConfig.tls` are bad: it throws
+  /// a `TlsException`. `Dox().startServer()` runs it once, before any
+  /// isolate starts. Else each isolate fails on its own and is started
+  /// again, in a loop. It does nothing when `tls` is off.
+  // ponytail: the native server reads the files only in `bind`, so the
+  // check binds a server on a free loopback port and closes it at once.
+  // Use a check-only call when dox_http_native has one.
+  Future<void> checkCertificate() async {
+    TlsOptions? tls = Dox().config.tls;
+    if (tls == null) return;
+    NativeHttpServer probe = await NativeHttpServer.bind(
+      0,
+      address: InternetAddress.loopbackIPv4,
+      tls: tls,
+    );
+    await probe.close(force: true);
   }
 
   static void _nothing() {}
@@ -113,6 +143,7 @@ class DoxServer {
   /// ```
   Future<void> close({bool force = false}) async {
     StrictMode.stopWatchdog();
+    _closed();
     await httpServer.close(force: force);
   }
 
@@ -121,14 +152,18 @@ class DoxServer {
   /// certificate. Open connections keep the old one until they close.
   /// One call is enough: every isolate of the process gets it. When a
   /// file is bad, it throws a `TlsException` and the server keeps the old
-  /// certificate. It throws a `StateError` when `tls` is off or the
-  /// server is closed. Dox does not watch the files: the app decides when
-  /// to call it (eg. on `SIGHUP`).
+  /// certificate. It throws a `StateError` when `tls` is off, before the
+  /// server starts and after it is closed. Dox does not watch the files:
+  /// the app decides when to call it (eg. on `SIGHUP`).
   /// ```
   /// await Dox().server.reloadCertificate();
   /// ```
-  Future<void> reloadCertificate() {
-    return (httpServer as NativeHttpServer).reloadCertificate();
+  Future<void> reloadCertificate() async {
+    NativeHttpServer? server = _native;
+    if (server == null) {
+      throw StateError('reloadCertificate: the server does not run');
+    }
+    await server.reloadCertificate();
   }
 
   /// set response handler
