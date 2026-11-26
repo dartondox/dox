@@ -315,6 +315,17 @@ Keep it shorter than the time your platform waits before it kills the process:
 await Dox().stop();
 ```
 
+## More than 8 CPU cores
+
+The Dart VM runs 8 isolates at the same time by default. On a server with more than 8 cores, set `DART_VM_OPTIONS` to 2 MB for each isolate:
+
+```dockerfile
+# 16 cores: 16 x 2 = 32
+ENV DART_VM_OPTIONS=--new_gen_semi_max_size=32
+```
+
+Dox prints a warning at the start when the value is too small. A larger value lets the app use more memory.
+
 ## Many processes or machines
 
 One Dox process uses every core. Run more processes only for more machines, or to restart one process with no downtime. List them in the proxy:

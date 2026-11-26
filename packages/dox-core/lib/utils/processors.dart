@@ -188,3 +188,44 @@ class ProcFileReader {
     }
   }
 }
+
+/// How many isolates the Dart VM runs at the same time. Not exported.
+///
+/// All isolates of an app share the young space of the VM. The VM gives
+/// out `young space MB / 2` run slots (16 MB = 8 slots by default). An
+/// isolate with no slot waits, so more isolates than slots do not use
+/// more CPU cores.
+class IsolateSlots {
+  IsolateSlots._();
+
+  /// The VM flag that sets the size of the young space, in MB.
+  static const String flag = '--new_gen_semi_max_size';
+
+  /// The size the VM uses when the flag is not set.
+  // ponytail: 16 is the 64-bit default; a 32-bit VM uses 8.
+  static const int defaultMegabytes = 16;
+
+  static final RegExp _size = RegExp('$flag=(\\d+)');
+
+  /// The slots of this process: from `DART_VM_OPTIONS` and the VM
+  /// arguments of the command line.
+  static int get available {
+    String env = Platform.environment['DART_VM_OPTIONS'] ?? '';
+    return fromOptions('$env,${Platform.executableArguments.join(',')}');
+  }
+
+  /// The slots for the VM [options] text. The last flag wins.
+  static int fromOptions(String options) {
+    int megabytes = defaultMegabytes;
+    for (RegExpMatch match in _size.allMatches(options)) {
+      megabytes = int.parse(match.group(1)!);
+    }
+    int slots = megabytes ~/ 2;
+    return slots < 1 ? 1 : slots;
+  }
+
+  /// The young space size in MB that gives [isolates] slots.
+  static int megabytesFor(int isolates) {
+    return isolates * 2;
+  }
+}

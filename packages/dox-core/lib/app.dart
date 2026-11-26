@@ -9,6 +9,7 @@ import 'package:dox_core/isolate/dox_isolate.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/log_buffer.dart';
+import 'package:dox_core/utils/processors.dart';
 import 'package:dox_core/utils/strict_mode.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 
@@ -171,6 +172,7 @@ class Dox {
 
     isolateCount = isolatesToSpawn;
     isWebServer = true;
+    warnIsolateSlots(isolatesToSpawn, IsolateSlots.available);
     if (isolatesToSpawn > 1) {
       await DoxIsolate().spawn(isolatesToSpawn);
     }
@@ -321,6 +323,25 @@ class Dox {
     _warnedWebSocketOrigin = true;
     // stderr, not Logger: the logger is off by default
     stderr.writeln(webSocketOriginWarning);
+  }
+
+  /// the text of the warning of [warnIsolateSlots]
+  static String isolateSlotsWarning(int isolates, int slots) {
+    return '[server] $isolates isolates, but the Dart VM runs only $slots '
+        'of them at the same time, so the server uses about $slots CPU '
+        'cores. To use all of them, start the app with the environment '
+        'variable DART_VM_OPTIONS=${IsolateSlots.flag}='
+        '${IsolateSlots.megabytesFor(isolates)}. See '
+        'https://dartondox.dev/latest/digging-deeper/deployment/'
+        '#more-than-8-cpu-cores';
+  }
+
+  /// print one warning when the app has more [isolates] than the Dart
+  /// VM runs at the same time ([slots]).
+  void warnIsolateSlots(int isolates, int slots) {
+    if (isolates <= slots) return;
+    // stderr, not Logger: the logger is off by default
+    stderr.writeln(isolateSlotsWarning(isolates, slots));
   }
 
   bool _warnedCorsCredentials = false;
