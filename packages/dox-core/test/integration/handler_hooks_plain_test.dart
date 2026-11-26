@@ -86,13 +86,14 @@ void main() {
     String bad = '--abc\r\nContent-Disposition: form-data; name="a"\r\n';
     TestResponse res = await client.post('/body', body: bad, headers: form);
     res.expectStatus(299);
-    expect(errors.reported, hasLength(1));
+
+    /// a body that is not valid is a 400, and a 400 is not reported
+    expect(errors.reported, isEmpty);
     TestResponse plain = await client.post(
       '/body-plain',
       body: bad,
       headers: form,
     );
-    expect(plain.status, isNot(299));
-    expect(plain.status, greaterThanOrEqualTo(400));
+    expect(plain.status, 400);
   });
 }

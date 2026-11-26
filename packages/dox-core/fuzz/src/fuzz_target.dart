@@ -10,8 +10,8 @@ import 'package:dox_core/dox_core.dart';
 /// 2. Coverage: an input that reaches new code of [library] is kept and
 ///    changed again. This part reads the coverage from the VM service.
 ///
-/// A run fails when [check] throws an error that is not a documented
-/// answer to bad input (400 or 422).
+/// A run fails when [check] throws an error that is not a 4xx answer to
+/// bad input.
 abstract class FuzzTarget {
   const FuzzTarget();
 
@@ -27,10 +27,8 @@ abstract class FuzzTarget {
   /// Give [input] to the parser. Throw when the result is wrong.
   void check(String input);
 
-  /// true when [error] is a documented answer to bad input
-  bool isClean(Object error) {
-    return error is BadRequestException || error is ValidationException;
-  }
+  /// true when [error] is an answer to bad input (a 4xx), not a 500
+  bool isClean(Object error) => error is IHttpException && error.code < 500;
 
   /// Throw when a list in [value] holds null: an input value was lost.
   void noNull(Object? value) {
@@ -55,6 +53,11 @@ abstract class FuzzTarget {
         : DateTime.now().millisecondsSinceEpoch ~/ 1000;
     int seconds = args.length > 1 ? int.parse(args[1]) : 60;
     stdout.writeln('$name: seed $seed');
+
+    /// the seeds are valid inputs: an error here is a broken target
+    for (String input in seeds) {
+      check(input);
+    }
 
     /// exit code 2 (a slow parse) is not a failure: a shared CI runner
     /// can pause for longer than the limit.

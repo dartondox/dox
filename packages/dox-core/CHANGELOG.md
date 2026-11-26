@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Fix: a multipart body (`multipart/form-data`) that is not valid made the request wait with no answer. The server then also did not stop on shutdown. Three kinds of body did this: a part header that is not valid (a space in the header name, a line with no `:`, bytes that are not UTF-8), text on the line of the first boundary, and a body with no parts and bytes after the end mark (`--boundary--`). Now the first two get a 400, and the third is an empty body. The fuzz tests found this.
+- Fix: a multipart part with a `Content-Disposition` that is not valid (a param with no name or no value, a quote that does not end, text after the params) gave a 500. A multipart body that stops in the part headers gave a 500 too. Now they get a 400, and the `ExceptionHandler` does not report them.
 - Fix: a bracket key with an index that is not plain digits lost its value. `k[01]=z`, `k[+1]=z`, `k[0x10]=z` and `k[%201]=z` gave `{k: [null]}` in `req.body`, `req.query` and a DTO, and `k[01]=a&k[1]=b` gave `{k: [b, b]}`. Now only plain digits like `3` are a list index. Any other key is a map key and keeps its value: `k[01]=z` gives `{k: {01: z}}`. A key like `k[+5000]` was refused with 422 as an index past the limit. Now it is a map key too. The fuzz tests found this.
 - New: a warning at the start when the app has more isolates than the Dart VM runs at the same time. The VM runs 8 by default, so a server with more than 8 CPU cores used only about 8 of them. The warning gives the `DART_VM_OPTIONS` value that lets every isolate run. See the Deployment page.
 
