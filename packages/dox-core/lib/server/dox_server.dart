@@ -124,18 +124,8 @@ class DoxServer {
   /// a `TlsException`. `Dox().startServer()` runs it once, before any
   /// isolate starts. Else each isolate fails on its own and is started
   /// again, in a loop. It does nothing when `tls` is off.
-  // ponytail: the native server reads the files only in `bind`, so the
-  // check binds a server on a free loopback port and closes it at once.
-  // Use a check-only call when dox_http_native has one.
   Future<void> checkCertificate() async {
-    TlsOptions? tls = Dox().config.tls;
-    if (tls == null) return;
-    NativeHttpServer probe = await NativeHttpServer.bind(
-      0,
-      address: InternetAddress.loopbackIPv4,
-      tls: tls,
-    );
-    await probe.close(force: true);
+    Dox().config.tls?.check();
   }
 
   static void _nothing() {}
