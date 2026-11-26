@@ -38,7 +38,8 @@ class DoxTestClient {
 
   DoxTestClient._copy(this.baseUri, this.headers, this._http, this._jar);
 
-  /// the url of the server, eg. `http://127.0.0.1:53211`
+  /// the url of the server, eg. `http://127.0.0.1:53211` (`https://` when
+  /// the app has `AppConfig.tls`)
   final Uri baseUri;
 
   /// headers sent with every request of this client
@@ -56,7 +57,9 @@ class DoxTestClient {
   /// Start the app of [config] in this isolate and give a client for it.
   ///
   /// It runs the providers (eg. the ORM provider) and registers the routes,
-  /// like the real start. It always listens on `127.0.0.1` and a free
+  /// like the real start. With `AppConfig.tls` the server speaks HTTPS, and
+  /// the client trusts only the certificate of that config. It always
+  /// listens on `127.0.0.1` and a free
   /// port, and runs one isolate. `serverPort` and `totalIsolate` of
   /// [config] are not used.
   static Future<DoxTestClient> start(AppConfig config) async {
@@ -70,8 +73,65 @@ class DoxTestClient {
       0,
       address: InternetAddress.loopbackIPv4,
     );
-    return DoxTestClient(Uri.parse('http://127.0.0.1:${http.port}'));
+    TlsOptions? tls = config.tls;
+    if (tls == null) {
+      return DoxTestClient(Uri.parse('http://127.0.0.1:${http.port}'));
+    }
+    return DoxTestClient._copy(
+      Uri.parse('https://127.0.0.1:${http.port}'),
+      const <String, String>{},
+      _clientFor(tls),
+      null,
+    );
   }
+
+  /// A client for the HTTPS server of [tls]. It accepts the certificate
+  /// of `tls.certificatePath` and no other one, so a self-signed test
+  /// certificate and a certificate of another host name both work.
+  static HttpClient _clientFor(TlsOptions tls) {
+    Uint8List der = _certificateOf(tls.certificatePath);
+    bool isServerCertificate(X509Certificate cert, String host, int port) {
+      Uint8List got = cert.der;
+      if (got.length != der.length) return false;
+      for (int i = 0; i < der.length; i++) {
+        if (got[i] != der[i]) return false;
+      }
+      return true;
+    }
+
+    return HttpClient()..badCertificateCallback = isServerCertificate;
+  }
+
+  /// The bytes (DER) of the first certificate of the PEM file [path]: the
+  /// certificate of the server. It throws an `ArgumentError` when the
+  /// file has no certificate.
+  static Uint8List _certificateOf(String path) {
+    String pem = File(path).readAsStringSync();
+    int begin = pem.indexOf(_pemBegin);
+    int end = pem.indexOf(_pemEnd, begin + 1);
+    if (begin < 0 || end < 0) {
+      throw ArgumentError.value(
+        path,
+        'certificatePath',
+        'The file has no PEM certificate ($_pemBegin ... $_pemEnd)',
+      );
+    }
+    try {
+      return base64.decode(
+        pem.substring(begin + _pemBegin.length, end).replaceAll(_space, ''),
+      );
+    } on FormatException {
+      throw ArgumentError.value(
+        path,
+        'certificatePath',
+        'The PEM certificate of the file is not valid base64',
+      );
+    }
+  }
+
+  static const String _pemBegin = '-----BEGIN CERTIFICATE-----';
+  static const String _pemEnd = '-----END CERTIFICATE-----';
+  static final RegExp _space = RegExp(r'\s');
 
   /// Stop the server of [start] (and `shutdown()` of its providers), and
   /// close this client.

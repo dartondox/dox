@@ -160,6 +160,10 @@ class Dox {
     /// not run. The error says why and how to fix it.
     NativeHttpServer.ensureAvailable();
 
+    /// a bad certificate file stops the start here, once. Else every
+    /// isolate fails on it and is started again, in a loop.
+    await DoxServer().checkCertificate();
+
     /// Windows has no SO_REUSEPORT: one isolate owns the native listener.
     if (Platform.isWindows && isolatesToSpawn > 1) {
       Logger.info(
@@ -292,13 +296,14 @@ class Dox {
   }
 
   /// the real address of [server], like `http://127.0.0.1:3000` or
-  /// `http://[::]:3000` (all interfaces)
+  /// `http://[::]:3000` (all interfaces). `https://` for a TLS server.
   static String serverUrl(HttpServer server) {
     InternetAddress address = server.address;
     String host = address.type == InternetAddressType.IPv6
         ? '[${address.address}]'
         : address.address;
-    return 'http://$host:${server.port}';
+    bool tls = server is NativeHttpServer && server.tls != null;
+    return '${tls ? 'https' : 'http'}://$host:${server.port}';
   }
 
   bool _warnedWebSocketOrigin = false;

@@ -394,7 +394,10 @@ class GreeterService extends GreeterServiceBase {
 
 Build your app with `dox build`. See [Deployment](deployment.md#build).
 
-Dox has no TLS, so put a proxy in front of the app. The proxy does the TLS and sends h2c to Dox. With nginx, use `grpc_pass`. With Caddy, use `h2c://` in `reverse_proxy`. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
+gRPC clients on the internet use TLS. There are two ways:
+
+- Dox does the TLS. Set `tls` together with `http2: true` in `AppConfig`. Then `grpcurl` works without `-plaintext`. See [Deployment: HTTPS without a proxy](deployment.md#https-without-a-proxy).
+- A proxy does the TLS and sends h2c to Dox. With nginx, use `grpc_pass`. With Caddy, use `h2c://` in `reverse_proxy`. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
 
 ## Benchmark
 
@@ -462,4 +465,4 @@ For small calls, both servers stop at approximately 57,000 calls a second. This 
 ## Next steps
 
 - [HTTP/2](http2.md): gRPC runs on HTTP/2.
-- [Deployment](deployment.md): put a proxy in front.
+- [Deployment](deployment.md): HTTPS with or without a proxy.

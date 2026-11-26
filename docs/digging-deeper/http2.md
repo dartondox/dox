@@ -6,7 +6,7 @@ icon: lucide/arrow-right-left
 
 Dox serves HTTP/2 on the same port as HTTP/1.1, so one connection can send many requests at the same time.
 
-Turn it on to serve [gRPC](grpc.md), or when your proxy sends HTTP/2 to the app. HTTP/2 is off by default.
+Turn it on to serve [gRPC](grpc.md), when your proxy sends HTTP/2 to the app, or when Dox serves HTTPS itself. HTTP/2 is off by default.
 
 ## Setup
 
@@ -47,9 +47,27 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
+## Use TLS
+
+Browsers use HTTP/2 only with TLS. Dox can do the TLS itself. Set `tls` together with `http2`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  http2: true,
+  tls: TlsOptions(certificatePath: 'fullchain.pem', keyPath: 'privkey.pem'),
+  // ...
+);
+```
+
+```text
+browser  --HTTP/2 + TLS-->  Dox
+```
+
+The client selects HTTP/2 or HTTP/1.1 in the TLS handshake (ALPN `h2` or `http/1.1`). See [Deployment: HTTPS without a proxy](deployment.md#https-without-a-proxy).
+
 ## Use a proxy
 
-Dox speaks **h2c**: HTTP/2 over plain TCP, with no TLS. Browsers use HTTP/2 only with TLS, so your proxy does the TLS:
+Without `tls`, Dox speaks **h2c**: HTTP/2 over plain TCP. Then your proxy does the TLS:
 
 ```text
 browser  --HTTP/2 + TLS-->  proxy  --h2c or HTTP/1.1-->  Dox
@@ -142,4 +160,4 @@ NativeHttpServer server = await NativeHttpServer.bind(
 
 - [gRPC](grpc.md): gRPC services on the same server.
 - [Native server](native-server.md): the server below Dox.
-- [Deployment](deployment.md): put a proxy in front.
+- [Deployment](deployment.md): HTTPS with or without a proxy.

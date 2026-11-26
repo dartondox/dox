@@ -99,7 +99,7 @@ await Future.any(<Future<void>>[res.gone, res.done]);
 
 ## Security notes
 
-- On the internet, run the app behind a reverse proxy like Caddy or nginx. The proxy does HTTPS and buffers slow clients.
+- On the internet, run the app behind a reverse proxy like Caddy or nginx. The proxy does HTTPS and buffers slow clients. Without a proxy, turn on [TLS](deployment.md#https-without-a-proxy).
 - Set `maxConnections` when the app port is open to the internet.
 - Another process of the same OS user can bind the same port. Do not run untrusted code as the user of the app.
 - `req.uri` resolves `..` in the path. Never build a file path from the raw path. Use the storage helpers.

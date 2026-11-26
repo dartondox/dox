@@ -113,16 +113,33 @@ class AppConfig {
   /// only. Default null: no limit.
   final int? maxConnections;
 
-  /// Let the same port also speak HTTP/2 over plain TCP (h2c, no TLS).
-  /// HTTP/1.1 clients keep working on that port. Use it behind a proxy
-  /// that speaks h2c to the app (Caddy, nginx), eg. for gRPC. TLS stays
-  /// at the proxy. Native server only. Default false.
+  /// Let the same port also speak HTTP/2. HTTP/1.1 clients keep working
+  /// on that port. Without [tls] it is HTTP/2 over plain TCP (h2c): use
+  /// it behind a proxy that speaks h2c to the app (Caddy, nginx), eg. for
+  /// gRPC. With [tls], browsers and gRPC clients use HTTP/2 with no
+  /// proxy. Native server only. Default false.
   final bool http2;
 
   /// The most open requests one HTTP/2 connection can have. Must be 1 or
   /// more. 0 or less throws an `ArgumentError` when the server starts.
   /// Only used when [http2] is true. Native server only. Default 250.
   final int maxConcurrentStreams;
+
+  /// Serve HTTPS on the port, with no proxy: the certificate chain and its
+  /// private key, as PEM files. The port then speaks only TLS (1.2 and
+  /// 1.3). A plain HTTP client gets no answer. With [http2] on, the client
+  /// picks HTTP/2 or HTTP/1.1 in the handshake (ALPN). `req.scheme()` is
+  /// `https`, so cookies get `Secure`. A bad file throws a `TlsException`
+  /// when the server starts. `Dox().server.reloadCertificate()` reads the
+  /// files again, with no restart. Native server only. Default null: plain
+  /// HTTP.
+  /// ```
+  /// tls: TlsOptions(
+  ///   certificatePath: '/etc/letsencrypt/live/example.com/fullchain.pem',
+  ///   keyPath: '/etc/letsencrypt/live/example.com/privkey.pem',
+  /// ),
+  /// ```
+  final TlsOptions? tls;
 
   /// IPs or CIDR ranges of reverse proxies (nginx, Caddy, load balancer)
   /// that Dox trusts. Only when the direct client is in this list does Dox
@@ -227,6 +244,7 @@ class AppConfig {
     this.maxConnections,
     this.http2 = false,
     this.maxConcurrentStreams = 250,
+    this.tls,
     this.trustedProxies = const <String>[],
     this.compress = false,
     this.shutdownTimeout = const Duration(seconds: 8),
