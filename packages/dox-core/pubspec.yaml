@@ -30,3 +30,4 @@ dev_dependencies:
   yaml: ^3.1.4
   dox_builder: ^3.2.1
   build_runner: ^2.17.1
+  covfuzz: 0.1.1

@@ -193,6 +193,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.16.0"
+  covfuzz:
+    dependency: transitive
+    description:
+      name: covfuzz
+      sha256: fdd664943c6efa21d676c0f145b106d17afebcd3ae3da6415474f46417c86205
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   crypto:
     dependency: transitive
     description:
@@ -221,18 +229,18 @@ packages:
     dependency: transitive
     description:
       name: dox_http_native
-      sha256: "5433e514a5faea4e57ceee9175c9734d4b9e8f9334e4acbaf35b7f428caebcaf"
+      sha256: "1c6a823a9057b42dd6b3301a473189d3de0891c0c25b1c0357acadd619ed3810"
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.1"
+    version: "3.2.5"
   dox_openapi:
     dependency: transitive
     description:
       name: dox_openapi
-      sha256: "2b8e3a2719abf5320c8af8aa103a1f857628e4a2a69a5e95b723aadb6d098dcd"
+      sha256: "0ff19aa1a4d5d294af20683fd30cc2dffd7897d7f2396f668d8d01297b370c51"
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.0"
+    version: "3.2.1"
   dox_validation:
     dependency: transitive
     description:
@@ -313,6 +321,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.0"
+  http2:
+    dependency: transitive
+    description:
+      name: http2
+      sha256: "27348caf6edf1a0dc12cf328fdbec5656ffd61ba8fbd0ebb1473edb04b1f0336"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.0"
   http_multi_server:
     dependency: transitive
     description:

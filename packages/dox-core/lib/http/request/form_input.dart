@@ -6,6 +6,7 @@ import 'package:dox_core/dox_core.dart';
 /// - A repeated key gives a list: `tags=a&tags=b`.
 /// - Bracket keys nest: `address[city]=x`, `tags[]=a`, `items[0][name]=x`.
 /// - List indexes are sorted and packed: `items[3]` alone is one item.
+/// - An index is plain digits. A key like `01`, `+1` or `0x10` is a map key.
 ///
 /// At most [maxItems] items in a list and [maxDepth] levels, else 422.
 class FormInput {
@@ -117,10 +118,19 @@ class FormInput {
     return pairs;
   }
 
+  /// The number of [key] when it is a list index: plain digits, the text
+  /// of the number itself. `int.tryParse` also takes `01`, `+1`, ` 1` and
+  /// `0x10`. Those are map keys: read back as `'$index'` they would be a
+  /// different key, and the value would be lost.
+  static int? _listIndex(String key) {
+    int? index = int.tryParse(key);
+    return index?.toString() == key ? index : null;
+  }
+
   /// `[]` adds a new item: its index is the next free one.
   String _index(Map<String, dynamic> node, String part) {
     if (part.isNotEmpty) {
-      int? index = int.tryParse(part);
+      int? index = _listIndex(part);
       if (index != null && (index < 0 || index >= maxItems)) _tooBig();
       return part;
     }
@@ -158,7 +168,7 @@ class FormInput {
     if (value is! Map<String, dynamic>) return value;
     bool numbers = value.isNotEmpty;
     for (String key in value.keys) {
-      if (int.tryParse(key) == null) {
+      if (_listIndex(key) == null) {
         numbers = false;
         break;
       }
