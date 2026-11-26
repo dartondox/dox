@@ -51,7 +51,7 @@ A controller and an `IDoxNextMiddleware` get a `DoxRequest`. An `IDoxMiddleware`
 | `bearerToken()` | `String?` | The token of `Authorization: Bearer <token>`, or `null`. | no |
 | `cookie(String key, {bool decrypt = true})` | `String?` | One cookie. Decrypted with `appKey` unless `decrypt: false`. | yes |
 | `ip()` | `String` | The client IP, or `unknown`. From `X-Forwarded-For` only behind a trusted proxy. | yes |
-| `scheme()` | `String` | `http` or `https`. From `X-Forwarded-Proto` only behind a trusted proxy. | no |
+| `scheme()` | `String` | `http` or `https`. It is `https` when `AppConfig.tls` is set. Behind a trusted proxy, it comes from `X-Forwarded-Proto`. | no |
 | `isSecure()` | `bool` | `scheme()` is `https`. | no |
 | `clientIp` | `String?` | The client IP, or `null`. | no |
 | `userAgent()` | `String` | The `User-Agent` header, or `unknown`. | yes |

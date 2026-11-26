@@ -235,8 +235,9 @@ class DoxRequest implements IDoxRequest {
     return httpRequest.protocolVersion;
   }
 
-  /// `http` or `https`. Behind a proxy listed in `trustedProxies` this
-  /// comes from `X-Forwarded-Proto`. Dart itself only serves plain http.
+  /// `http` or `https`. It is `https` when the server has `AppConfig.tls`.
+  /// Behind a proxy listed in `trustedProxies` this comes from
+  /// `X-Forwarded-Proto`.
   /// ```
   /// req.scheme();
   /// ```

@@ -64,7 +64,7 @@ const SecurityHeaders(
 
 ## HSTS behind a proxy
 
-Dox sends `Strict-Transport-Security` only when a trusted proxy sends `X-Forwarded-Proto: https`. Add your proxy to `AppConfig.trustedProxies`, or Dox never sends HSTS:
+Dox sends `Strict-Transport-Security` only on an https request. With `AppConfig.tls`, each request is https. Behind a proxy, a request is https only when a trusted proxy sends `X-Forwarded-Proto: https`. Add your proxy to `AppConfig.trustedProxies`, or Dox never sends HSTS:
 
 ```dart
 AppConfig(trustedProxies: <String>['127.0.0.1', '::1']);
