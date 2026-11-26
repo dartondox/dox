@@ -1,6 +1,6 @@
 name: dox_core
 description: A perfect solution for your web backend development with dart that offers a wide range of features to help you build powerful and scalable web applications.
-version: 3.2.5
+version: 3.2.6
 repository: https://github.com/dartondox/dox
 
 environment:
@@ -17,7 +17,7 @@ dependencies:
   uuid: ^4.6.0
   dox_annotation: ^3.2.0
   dox_cache: ^3.2.0
-  dox_http_native: ^3.2.3
+  dox_http_native: ^3.2.6
   dox_openapi: ^3.2.1
   dox_validation: ^3.2.0
 
