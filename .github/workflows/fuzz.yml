@@ -1,0 +1,72 @@
+name: Fuzz
+
+# Runs each fuzz target in packages/dox-core/fuzz (one file is one target).
+# A target gives changed inputs to a parser of client input: first 2
+# million random changes of the seeds, then 60 s where an input that
+# reaches new code is kept and changed again (package covfuzz, coverage
+# from the Dart VM service). See CONTRIBUTING.md.
+# A run fails when the parser throws an error that is not a 400 or a 422,
+# or when its result is wrong. The log shows the smallest input that
+# fails and the random seed. The failed inputs of the 60 s part are
+# uploaded.
+
+on:
+  push:
+    branches: [main]
+    paths: ['packages/dox-core/**', '.github/workflows/fuzz.yml']
+  pull_request:
+    paths: ['packages/dox-core/**', '.github/workflows/fuzz.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # dox_openapi, dox_validation, ioredis and dox_http_native from the
+      # clones of their repos, like the unit tests (see test.yaml)
+      - run: ci/clone-siblings.sh && ci/use-siblings.sh
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: |
+            ../dox-http-native/native -> target
+            ../dox-http-native/packages/dox-http-native/native -> target
+      # dox_core loads the native library of dox_http_native
+      - run: ci/use-siblings.sh build
+      - uses: dart-lang/setup-dart@2286a0c042b44434fe26d292bbce8d34f7ec662b # v1.8.2
+        with:
+          sdk: stable
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.pub-cache
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: pub-${{ runner.os }}-
+      - run: ci/pub-get-retry.sh
+      # every target runs, also after one fails
+      - name: Fuzz
+        working-directory: packages/dox-core
+        run: |
+          failed=0
+          for target in fuzz/*.dart; do
+            echo "::group::$target"
+            dart run --enable-vm-service=0 --no-pause-isolates-on-exit "$target" || {
+              failed=1
+              echo "::error::$target failed"
+            }
+            echo "::endgroup::"
+          done
+          exit $failed
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: fuzz-inputs
+          path: packages/dox-core/fuzz/artifacts
