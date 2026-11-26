@@ -26,6 +26,22 @@ Every new feature and every bug fix must add tests.
 
 Run the tests with `melos run test`. CI runs them on every push and pull request.
 
+## Fuzz tests
+
+A fuzz target gives many changed inputs to a parser of client input. It fails when the parser throws an error that is not a 400 or a 422, or when the result is wrong. The targets are in `packages/dox-core/fuzz`. One file is one target. They use the [covfuzz](https://pub.dev/packages/covfuzz) package.
+
+Run one target from `packages/dox-core`:
+
+```sh
+dart run --enable-vm-service=0 --no-pause-isolates-on-exit fuzz/form_body.dart
+```
+
+The run prints its random seed. To run the same inputs again, give the seed as the first argument. The second argument is the time of the coverage part in seconds (default 60).
+
+CI runs all targets when `packages/dox-core` changes (`.github/workflows/fuzz.yml`). When a target fails, the log shows the smallest input that fails. Add that input to the unit tests with the fix.
+
+To add a target, add a file with a class that extends `FuzzTarget`. A target can only call synchronous code.
+
 ## Code style
 
 Follow the lints in each package's `analysis_options.yaml`.

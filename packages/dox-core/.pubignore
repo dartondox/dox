@@ -1,0 +1,11 @@
+# This file replaces .gitignore for `dart pub publish`, so it repeats
+# the rules of .gitignore.
+.dart_tool/
+.DS_Store
+pubspec.lock
+coverage
+/storage
+/build
+
+# not part of the published package
+fuzz/
