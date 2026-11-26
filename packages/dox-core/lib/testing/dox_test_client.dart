@@ -89,7 +89,7 @@ class DoxTestClient {
   /// of `tls.certificatePath` and no other one, so a self-signed test
   /// certificate and a certificate of another host name both work.
   static HttpClient _clientFor(TlsOptions tls) {
-    Uint8List der = certificateOf(tls.certificatePath);
+    Uint8List der = _certificateOf(tls.certificatePath);
     bool isServerCertificate(X509Certificate cert, String host, int port) {
       Uint8List got = cert.der;
       if (got.length != der.length) return false;
@@ -105,7 +105,7 @@ class DoxTestClient {
   /// The bytes (DER) of the first certificate of the PEM file [path]: the
   /// certificate of the server. It throws an `ArgumentError` when the
   /// file has no certificate.
-  static Uint8List certificateOf(String path) {
+  static Uint8List _certificateOf(String path) {
     String pem = File(path).readAsStringSync();
     int begin = pem.indexOf(_pemBegin);
     int end = pem.indexOf(_pemEnd, begin + 1);

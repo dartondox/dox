@@ -370,21 +370,6 @@ void main() {
         expect(TrustedProxy.directScheme, 'http');
       });
 
-      test('DoxTestClient.certificateOf: no certificate in the file', () async {
-        expect(DoxTestClient.certificateOf(tls.certificatePath), isNotEmpty);
-        File bad = File('${dir.path}/bad.pem')..writeAsStringSync('junk');
-        expect(
-          () => DoxTestClient.certificateOf(bad.path),
-          throwsA(
-            isA<ArgumentError>().having(
-              (ArgumentError e) => '$e',
-              'text',
-              contains(bad.path),
-            ),
-          ),
-        );
-      });
-
       test('reloadCertificate: new certificate, a bad file keeps it', () async {
         await start(config(tls: tls));
         SecureSocket old = await open(<String>['http/1.1']);
