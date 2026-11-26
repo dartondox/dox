@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: a warning at the start when the app has more isolates than the Dart VM runs at the same time. The VM runs 8 by default, so a server with more than 8 CPU cores used only about 8 of them. The warning gives the `DART_VM_OPTIONS` value that lets every isolate run. See the Deployment page.
+
 ## 3.2.5
 
 - Fix: a route part can have text and params together, like `/v{id}/{name}`, `/v{id}` and `/{a}-{b}`. Before, `/v{id}/{name}` gave the value of `id` for `req.param['name']`, `/v{id}` matched only the text `/v{id}`, and `/{a}-{b}` was one param with the name `a}-{b`. Now each param has its own name and value. This changes the match of two rare routes: `/v{id}` now matches `/v5`, and `/{a}-{b}` matches `/x-y` but not `/x`. `Route.url` also fills the params of such a route.
