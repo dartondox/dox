@@ -123,6 +123,9 @@ class CoreFlags {
   /// it at `<executable>.aot`), or the script of `dart run`. When there
   /// is none, Dox logs one warning and runs as if the flag is off.
   ///
+  /// Turn it on only in production: with `dart run` the app starts
+  /// slower and uses more memory with this flag.
+  ///
   /// `Dox().compute` has one pool per isolate. `Dox().isolateId` is
   /// right from the start of `main()`. `CoreFlags.all()` does not turn
   /// this flag on.

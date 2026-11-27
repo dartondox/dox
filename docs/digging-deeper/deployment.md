@@ -480,9 +480,11 @@ By default, all isolates share one heap and one garbage collector. Turn on `isol
 ```dart
 AppConfig(
   appKey: env.appKey,
-  flags: const CoreFlags(isolateGroups: true),
+  flags: CoreFlags(isolateGroups: env.appEnv == 'production'),
 );
 ```
+
+Turn it on only in production. In development the app starts slower and uses more memory with this flag, and one group is sufficient there.
 
 Each isolate then runs `main()` of `bin/server.dart` from the start. The migrations in `main()` need no change: the first isolate runs them before the other isolates start, and the other isolates find none to run.
 
