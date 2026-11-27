@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 /// Writes one JSON object, one piece at a time, with no `Map` in between.
 ///
 /// The JSON encoder of dox_core gives it to [JsonWritable.writeJson].
@@ -24,10 +27,56 @@ abstract interface class JsonWriter {
   /// of `DateTime.toIso8601String()`.
   void dateTime(DateTime? value);
 
+  /// Writes `true`, `false` or `null`.
+  void boolean(bool? value);
+
   /// Writes any other value, with the rules of `JSON.bytes()`: a `double`,
   /// a `bool`, `null`, a `List`, a `Map`, a [JsonWritable] or an object
   /// with `toJson()`.
   void value(Object? value);
+
+  /// Writes the bytes of [run] as they are, with no check and no comma.
+  ///
+  /// It is for generated code: the generator of `@Dto` puts the fixed
+  /// parts of the JSON of a DTO (like `{"id":` and `,"name":`) into runs.
+  /// A run must be a part of valid JSON at that place.
+  void run(JsonRun run);
+}
+
+/// A fixed part of JSON, as UTF-8 bytes, ready to write.
+///
+/// The bytes are also kept as 64 bit words. The JSON encoder of dox_core
+/// writes a run 8 bytes at a time.
+final class JsonRun {
+  /// The run of the JSON text [json].
+  JsonRun(String json) : this._(Uint8List.fromList(utf8.encode(json)));
+
+  JsonRun._(this.bytes) : words = _words(bytes), length = bytes.length;
+
+  /// the UTF-8 bytes
+  final Uint8List bytes;
+
+  /// the count of [bytes]
+  final int length;
+
+  /// [bytes] as little-endian words. The bytes after the end of the last
+  /// word are 0.
+  final Int64List words;
+
+  /// At least one word, so the encoder can write the first one with no
+  /// check: an empty run writes a word of zeros and moves 0 bytes.
+  static Int64List _words(Uint8List bytes) {
+    Int64List words = Int64List(bytes.isEmpty ? 1 : (bytes.length + 7) ~/ 8);
+    Uint8List padded = Uint8List(words.length * 8)..setAll(0, bytes);
+    ByteData data = ByteData.sublistView(padded);
+    for (int i = 0; i < words.length; i++) {
+      words[i] = data.getInt64(i * 8, Endian.little);
+    }
+    return words;
+  }
+
+  /// `,`: between the items of a list
+  static final JsonRun comma = JsonRun(',');
 }
 
 /// A class that writes its own JSON.

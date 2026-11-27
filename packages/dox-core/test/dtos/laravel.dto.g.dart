@@ -21,6 +21,20 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
     'first_name': 'first name',
   };
 
+  static final JsonRun _j0 = JsonRun('{"first_name":');
+  static final JsonRun _j1 = JsonRun(',"age":');
+  static final JsonRun _j2 = JsonRun(',"terms":');
+  static final JsonRun _j3 = JsonRun(',"start":');
+  static final JsonRun _j4 = JsonRun(',"end":');
+  static final JsonRun _j5 = JsonRun(',"type":');
+  static final JsonRun _j6 = JsonRun(',"company":');
+  static final JsonRun _j7 = JsonRun(',"vat":');
+  static final JsonRun _j8 = JsonRun(',"debug":');
+  static final JsonRun _j9 = JsonRun(',"nick":');
+  static final JsonRun _j10 = JsonRun(',"id":');
+  static final JsonRun _j11 = JsonRun(',"max":');
+  static final JsonRun _j12 = JsonRun('}');
+
   @override
   Type get type => LaravelRules;
 
@@ -205,36 +219,8 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    LaravelRules o = object as LaravelRules;
-    w.startObject();
-    w.key('first_name');
-    w.string(o.firstName);
-    w.key('age');
-    w.integer(o.age);
-    w.key('terms');
-    w.value(o.terms);
-    w.key('start');
-    w.dateTime(o.start);
-    w.key('end');
-    w.dateTime(o.end);
-    w.key('type');
-    w.string(o.type);
-    w.key('company');
-    w.string(o.company);
-    w.key('vat');
-    w.string(o.vat);
-    w.key('debug');
-    w.string(o.debug);
-    w.key('nick');
-    w.string(o.nick);
-    w.key('id');
-    w.string(o.id);
-    w.key('max');
-    w.integer(o.max);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeLaravelRules(object as LaravelRules, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     Map<String, dynamic> j = <String, dynamic>{
@@ -289,4 +275,33 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
     ], const GreaterThanField('age').toJsonSchema());
     return j;
   }
+}
+
+/// Writes the JSON of [LaravelRules], as `toMap()` gives it.
+void $writeLaravelRules(LaravelRules o, JsonWriter w) {
+  w.run(_$LaravelRulesDto._j0);
+  w.string(o.firstName);
+  w.run(_$LaravelRulesDto._j1);
+  w.integer(o.age);
+  w.run(_$LaravelRulesDto._j2);
+  w.boolean(o.terms);
+  w.run(_$LaravelRulesDto._j3);
+  w.dateTime(o.start);
+  w.run(_$LaravelRulesDto._j4);
+  w.dateTime(o.end);
+  w.run(_$LaravelRulesDto._j5);
+  w.string(o.type);
+  w.run(_$LaravelRulesDto._j6);
+  w.string(o.company);
+  w.run(_$LaravelRulesDto._j7);
+  w.string(o.vat);
+  w.run(_$LaravelRulesDto._j8);
+  w.string(o.debug);
+  w.run(_$LaravelRulesDto._j9);
+  w.string(o.nick);
+  w.run(_$LaravelRulesDto._j10);
+  w.string(o.id);
+  w.run(_$LaravelRulesDto._j11);
+  w.integer(o.max);
+  w.run(_$LaravelRulesDto._j12);
 }

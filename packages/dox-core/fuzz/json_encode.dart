@@ -191,7 +191,7 @@ class _Reader {
   }
 }
 
-/// Writes a date, a whole number and a text with the writer. The SDK
+/// Writes a date, whole numbers, a text, a bool and a run with the writer. The SDK
 /// encoder uses [toJson], which gives the same JSON.
 class _Dated implements JsonWritable {
   _Dated(this.at, this.n, this.text);
@@ -208,11 +208,24 @@ class _Dated implements JsonWritable {
     writer.integer(n);
     writer.key('text');
     writer.string(text);
+    writer.key('odd');
+    writer.boolean(n.isOdd ? true : (n % 4 == 0 ? false : null));
+    // a run after a value: `,"m":`, as generated code writes it
+    writer.run(_m);
+    writer.integer(-n);
     writer.endObject();
   }
 
+  static final JsonRun _m = JsonRun(',"m":');
+
   Map<String, dynamic> toJson() {
-    return <String, dynamic>{'at': at.toIso8601String(), 'n': n, 'text': text};
+    return <String, dynamic>{
+      'at': at.toIso8601String(),
+      'n': n,
+      'text': text,
+      'odd': n.isOdd ? true : (n % 4 == 0 ? false : null),
+      'm': -n,
+    };
   }
 }
 

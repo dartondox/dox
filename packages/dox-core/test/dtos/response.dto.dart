@@ -58,3 +58,31 @@ class MixedView {
     this.product,
   });
 }
+
+/// Lists and a nested DTO that the generated code writes directly, and a
+/// key that JSON must escape.
+@Dto()
+class RunsView {
+  final int id;
+  final List<String> tags;
+  final List<String?> notes;
+  final List<int> numbers;
+  final List<bool> flags;
+  final ProductView main;
+  final List<ProductView> products;
+  @Name('a "key" é \\ \$x')
+  final String odd;
+  final bool active;
+
+  const RunsView({
+    required this.id,
+    required this.tags,
+    required this.notes,
+    required this.numbers,
+    required this.flags,
+    required this.main,
+    required this.products,
+    required this.odd,
+    required this.active,
+  });
+}

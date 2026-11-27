@@ -117,6 +117,14 @@ bool seesAnnotationClass(LibraryFragment library, String name) {
       found.library.uri.toString().startsWith('package:dox_annotation/');
 }
 
+/// `true` when [library] sees the classes of dox_annotation that the
+/// `writeObject()` and the `$write` function of a DTO use.
+bool seesDtoWriter(LibraryFragment library) {
+  return seesAnnotationClass(library, 'JsonObjectWriter') &&
+      seesAnnotationClass(library, 'JsonWriter') &&
+      seesAnnotationClass(library, 'JsonRun');
+}
+
 /// `true` when [element] has the method [name]: its own, or one from a
 /// class or a mixin above it.
 bool hasMethod(InterfaceElement element, String name) {

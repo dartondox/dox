@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 
@@ -71,6 +73,7 @@ class DtoWriter {
   final List<String> _statics = <String>[];
   int _regexes = 0;
   int _dates = 0;
+  int _runs = 0;
 
   String get _class => '_\$${dto.name}Dto';
 
@@ -83,6 +86,8 @@ class DtoWriter {
     DtoFlags flags = own;
     String name = dto.name;
     String convert = _convert();
+    // before the statics are written: it adds the runs of the JSON
+    String writer = _writesJson ? _writeFunction() : '';
     String cross = flags.checks ? _crossCheck(flags) : '';
     String async = flags.async ? _checkAsync() : '';
     StringBuffer out = StringBuffer()
@@ -164,7 +169,8 @@ class DtoWriter {
       ..writeln(_toMap())
       ..writeln(_writesJson ? _writeObject() : '')
       ..writeln(_toJsonSchema())
-      ..writeln('}');
+      ..writeln('}')
+      ..writeln(writer);
     return out.toString();
   }
 
@@ -1082,31 +1088,123 @@ class DtoWriter {
   }
 
   /// `writeObject()` writes the JSON of toMap() with no map in between.
-  /// The JSON encoder of dox_core calls it for a DTO in a response.
+  /// The JSON encoder of dox_core calls it for a DTO in a response. It
+  /// calls the function of [_writeFunction].
   String _writeObject() {
+    return '@override\n'
+        'void writeObject(Object object, JsonWriter w) => '
+        '\$write${dto.name}(object as ${dto.name}, w);';
+  }
+
+  /// The name of the function that writes the JSON of the DTO [type].
+  String _writeRef(DtoType type) => '${type.prefix}\$write${type.name}';
+
+  /// A function `$writeName(Name o, JsonWriter w)` that writes the JSON of
+  /// the DTO. It is public, so a DTO in another file calls it directly for
+  /// a nested DTO, with no look up of the writer.
+  ///
+  /// The fixed parts of the JSON (`{"id":`, `,"name":`, `],"tags":[`) are
+  /// put together into [JsonRun]s, written 8 bytes at a time. A `Maybe`
+  /// field can be left out, so the place of its comma is not fixed: a DTO
+  /// with one writes each key with `w.key()`.
+  String _writeFunction() {
     StringBuffer out = StringBuffer()
-      ..writeln('@override')
-      ..writeln('void writeObject(Object object, JsonWriter w) {')
-      ..writeln('${dto.name} o = object as ${dto.name};')
-      ..writeln('w.startObject();');
-    for (int i = 0; i < dto.fields.length; i++) {
-      DtoField field = dto.fields[i];
-      String key = 'w.key(${_keyLiteral(field)});';
-      if (field.maybe) {
-        String type = field.type.code;
-        out.writeln(
-          'if (o.${field.name} case '
-          'Maybe<$type>(isPresent: true, value: $type g$i)) '
-          '{ $key ${_writeValue(field.type, 'g$i')} }',
-        );
-      } else {
-        out.writeln('$key ${_writeValue(field.type, 'o.${field.name}')}');
+      ..writeln('/// Writes the JSON of [${dto.name}], as `toMap()` gives it.')
+      ..writeln('void \$write${dto.name}(${dto.name} o, JsonWriter w) {');
+    if (dto.fields.any((DtoField field) => field.maybe)) {
+      out.writeln('w.startObject();');
+      for (int i = 0; i < dto.fields.length; i++) {
+        DtoField field = dto.fields[i];
+        String key = 'w.key(${_keyLiteral(field)});';
+        if (field.maybe) {
+          String type = field.type.code;
+          out.writeln(
+            'if (o.${field.name} case '
+            'Maybe<$type>(isPresent: true, value: $type g$i)) '
+            '{ $key ${_writeOne(field.type, 'g$i')} }',
+          );
+        } else {
+          out.writeln('$key ${_writeOne(field.type, 'o.${field.name}')}');
+        }
       }
+      out.writeln('w.endObject();');
+    } else {
+      _JsonRuns runs = _JsonRuns(this, out)..text('{');
+      for (int i = 0; i < dto.fields.length; i++) {
+        DtoField field = dto.fields[i];
+        runs.text('${i > 0 ? ',' : ''}${jsonEncode(field.key)}:');
+        _writeFast(runs, field.type, 'o.${field.name}', i);
+      }
+      runs
+        ..text('}')
+        ..flush();
     }
-    out
-      ..writeln('w.endObject();')
-      ..writeln('}');
+    out.writeln('}');
     return out.toString();
+  }
+
+  /// Writes [value] (of [type]) with [runs]: a list and a nested DTO get
+  /// direct calls. Other values go to [_writeValue].
+  void _writeFast(_JsonRuns runs, DtoType type, String value, int field) {
+    String? item = type.kind == DtoKind.list && !type.nullable
+        ? _writeItem(type.item!, 'l$field[i]')
+        : null;
+    if (item != null) {
+      runs
+        ..text('[')
+        ..code(
+          '{ ${type.code} l$field = $value; '
+          'for (int i = 0; i < l$field.length; i++) { '
+          'if (i > 0) w.run(JsonRun.comma); $item } }',
+        )
+        ..text(']');
+      return;
+    }
+    runs.code(_writeOne(type, value));
+  }
+
+  /// `true` when the nested DTO [type] has a `$write` function that this
+  /// build makes: it has no `toJson()`, it is in the same package, and its
+  /// file sees the classes the function needs. A DTO of another package
+  /// can come from an older dox_builder. Else the encoder finds its writer.
+  ///
+  /// A direct call does not look for a cycle. A DTO that holds itself
+  /// (`List<Node> children`) with cyclic data ends in a stack overflow,
+  /// which the encoder gives as a JSON error. `toMap()` does the same.
+  bool _hasWriteFunction(DtoType type) {
+    if (!_encoderWrites(type)) return false;
+    return switch (type.type.element) {
+      InterfaceElement e =>
+        _package(e.library.uri) == _package(dto.element.library.uri) &&
+            seesDtoWriter(e.library.firstFragment),
+      _ => false,
+    };
+  }
+
+  static String _package(Uri uri) {
+    return '${uri.scheme}:${uri.pathSegments.firstOrNull}';
+  }
+
+  /// The direct call for [value] (of [type]), else the call of
+  /// [_writeValue].
+  String _writeOne(DtoType type, String value) {
+    return _writeItem(type, value) ?? _writeValue(type, value);
+  }
+
+  /// The direct call for [value] (of [type]), or `null` when there is
+  /// none.
+  String? _writeItem(DtoType type, String value) {
+    String dot = type.nullable ? '?.' : '.';
+    return switch (type.kind) {
+      DtoKind.string => 'w.string($value);',
+      DtoKind.integer => 'w.integer($value);',
+      DtoKind.boolean => 'w.boolean($value);',
+      DtoKind.date => 'w.dateTime($value);',
+      DtoKind.enumName => 'w.string($value${dot}name);',
+      DtoKind.dto when !type.nullable && _hasWriteFunction(type) =>
+        '${_writeRef(type)}($value, w);',
+      _ => null,
+    };
   }
 
   /// The writer call for [value] (of [type]). It gives the JSON of
@@ -1205,4 +1303,35 @@ class _Check {
 
   final String condition;
   final String fail;
+}
+
+/// Puts the fixed parts of the JSON of a DTO together into runs, between
+/// the lines of code that write the values.
+class _JsonRuns {
+  _JsonRuns(this.writer, this.out);
+
+  final DtoWriter writer;
+  final StringBuffer out;
+  final StringBuffer _text = StringBuffer();
+
+  /// Adds the JSON [json] to the run.
+  void text(String json) => _text.write(json);
+
+  /// Writes the run so far, then the [line] of code.
+  void code(String line) {
+    flush();
+    out.writeln(line);
+  }
+
+  /// Writes the run so far as a [JsonRun] of the class.
+  void flush() {
+    if (_text.isEmpty) return;
+    int index = writer._runs++;
+    writer._statics.add(
+      'static final JsonRun _j$index = '
+      'JsonRun(${writer.literal.string(_text.toString())});',
+    );
+    out.writeln('w.run(${writer._class}._j$index);');
+    _text.clear();
+  }
 }
