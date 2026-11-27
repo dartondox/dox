@@ -54,6 +54,8 @@ await Dox().startServer();
 
 A static value, a singleton and the `memory` cache store exist one time per isolate. To share data between isolates or servers, use a database, Redis or files.
 
+To give each isolate its own heap and garbage collector too, see [Give each isolate its own memory](deployment.md#give-each-isolate-its-own-memory).
+
 ## Finding the current isolate
 
 `Dox().isolateId` is the id of the isolate that runs your code. The first isolate is 1. `Dox().isolateCount` is the number of running isolates:
@@ -61,6 +63,14 @@ A static value, a singleton and the `memory` cache store exist one time per isol
 ```dart
 int id = Dox().isolateId;
 int count = Dox().isolateCount;
+```
+
+`Dox().isPrimary` is true in the first isolate only:
+
+```dart
+if (Dox().isPrimary) {
+  // runs one time, not in each isolate
+}
 ```
 
 ## Sending a message to the other isolates

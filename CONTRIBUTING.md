@@ -38,7 +38,7 @@ dart run --enable-vm-service=0 --no-pause-isolates-on-exit fuzz/form_body.dart
 
 The run prints its random seed. To run the same inputs again, give the seed as the first argument. The second argument is the time of the coverage part in seconds (default 60).
 
-CI runs all targets when `packages/dox-core` changes (`.github/workflows/fuzz.yml`). When a target fails, the log shows the smallest input that fails. Add that input to the unit tests with the fix.
+CI runs all targets when `packages/dox-core` changes (`.github/workflows/fuzz.yml`). Each target runs in its own job, at the same time. When a target fails, the log shows the smallest input that fails. Add that input to the unit tests with the fix.
 
 To add a target, add a file with a class that extends one of these:
 

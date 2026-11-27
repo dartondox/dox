@@ -464,16 +464,51 @@ Keep it shorter than the time your platform waits before it kills the process:
 await Dox().stop();
 ```
 
-## More than 8 CPU cores
+## Give each isolate its own memory
 
-The Dart VM runs 8 isolates at the same time by default. On a server with more than 8 cores, set `DART_VM_OPTIONS` to 2 MB for each isolate:
+By default, all isolates share one heap and one garbage collector, and the Dart VM runs only 8 of them at the same time. Turn on `isolateGroups` to give each isolate its own heap, with no such limit:
 
-```dockerfile
-# 16 cores: 16 x 2 = 32
-ENV DART_VM_OPTIONS=--new_gen_semi_max_size=32
+```dart
+AppConfig(
+  appKey: env.appKey,
+  flags: CoreFlags(isolateGroups: env.appEnv == 'production'),
+);
 ```
 
-Dox prints a warning at the start when the value is too small. A larger value lets the app use more memory.
+Turn it on only in production. In development the app starts slower and uses more memory with this flag, and one group is sufficient there.
+
+Each isolate then runs `main()` of `bin/server.dart` from the start. The migrations in `main()` need no change: the first isolate runs them before the other isolates start, and the other isolates find none to run.
+
+For other work that must run only one time, use `Dox().isPrimary`:
+
+```dart
+if (Dox().isPrimary) {
+  await warmUpReports();
+}
+```
+
+Each isolate builds the config again, so read your settings and the app key from the env, not from command line arguments.
+
+### Build
+
+On Linux, the bundle of `dox build` works with no change. On macOS, also make a snapshot file with the name of the executable and `.aot`:
+
+```bash
+dart compile aot-snapshot bin/server.dart -o build/bundle/bin/server.aot
+```
+
+If Dox finds no file to start, it prints a warning and the isolates share memory.
+
+### Memory for each isolate
+
+The Dart VM keeps free memory pages for one isolate only. To keep them for all isolates, set 32 MB for each isolate:
+
+```dockerfile
+# 4 isolates: 4 x 32 = 128
+ENV DART_VM_OPTIONS=--new_gen_semi_max_size=128,--new_gen_semi_initial_size=32,--new_gen_garbage_threshold=0
+```
+
+The app is faster and uses more memory, approximately 30 MB for each isolate.
 
 ## Many processes or machines
 
