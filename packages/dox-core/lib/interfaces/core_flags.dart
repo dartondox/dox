@@ -19,10 +19,12 @@ class CoreFlags {
     this.envExpand = false,
     this.rateLimitIpv6Prefix = false,
     this.isolateGroups = false,
+    this.sdkJsonEncoder = false,
   });
 
-  /// Every flag on, but not `isolateGroups`: that one changes how the
-  /// app starts, so turn it on by name.
+  /// Every flag on, but not `isolateGroups` and `sdkJsonEncoder`: the
+  /// first changes how the app starts, and the second turns a faster path
+  /// off. Turn them on by name.
   const CoreFlags.all()
     : laravelErrors = true,
       onlyPresent = true,
@@ -36,7 +38,9 @@ class CoreFlags {
       rateLimitIpv6Prefix = true,
       // not a default of the next major, and it runs `main()` in each
       // isolate: an app turns it on by name.
-      isolateGroups = false;
+      isolateGroups = false,
+      // not a default of the next major: it turns a faster path off
+      sdkJsonEncoder = false;
 
   /// A 422 answer is `{"message": "...", "errors": {"field": ["..."]}}`,
   /// with all messages of each field. Off: `{"field": "first message"}`.
@@ -132,4 +136,14 @@ class CoreFlags {
   // ponytail: a plain opt-in. Make it the default when it is proven in
   // production.
   final bool isolateGroups;
+
+  /// Dox encodes JSON with `JsonUtf8Encoder` of the Dart SDK, as it did
+  /// before it had its own encoder. A model and a DTO then make a `Map`
+  /// again, and a JSON response has its own copy of the bytes.
+  ///
+  /// The JSON is the same with and without this flag. It is slower. Turn
+  /// it on only if you think the Dox encoder gives a wrong response, and
+  /// tell us. A class that only has `writeJson()` also needs a `toJson()`
+  /// with this flag. `CoreFlags.all()` does not turn this flag on.
+  final bool sdkJsonEncoder;
 }

@@ -14,6 +14,7 @@ import 'package:dox_core/isolate/isolate_spawner.dart';
 import 'package:dox_core/isolate/snapshot_locator.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
+import 'package:dox_core/utils/json.dart' show useSdkJsonEncoder;
 import 'package:dox_core/utils/log_buffer.dart';
 import 'package:dox_core/utils/processors.dart';
 import 'package:dox_core/utils/strict_mode.dart';
@@ -124,6 +125,7 @@ class Dox {
   void initialize(AppConfig appConfig) async {
     config = appConfig;
     _initialized = true;
+    useSdkJsonEncoder = appConfig.flags.sdkJsonEncoder;
     ComputePool.instance.size = appConfig.computeWorkers;
     StrictMode.configure(appConfig.strict);
     if (appConfig.flags.envExpand && !Env().expanded) {

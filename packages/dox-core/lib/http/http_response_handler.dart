@@ -5,7 +5,7 @@ import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
-import 'package:dox_core/utils/json.dart' show jsonBytesView;
+import 'package:dox_core/utils/json.dart' show giveBackJsonBytes, jsonBytesView;
 import 'package:dox_http_native/dox_http_native.dart' show NativeResponse;
 
 dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
@@ -180,6 +180,10 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
 
   List<int> bytes;
 
+  /// the response, when [bytes] is a part of the buffer of the JSON
+  /// encoder
+  NativeResponse? view;
+
   /// if payload is Map or List, parse into json
   /// and response as json
   if (payload is String) {
@@ -194,25 +198,38 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     // The native response copies the body into the memory of the server
     // when it ends, a few lines down. So the encoder does not make its
     // own copy first.
-    bytes = res is NativeResponse
-        ? jsonBytesView(payload)
-        : JSON.bytes(payload);
-    res.headers.contentType = ContentType.json;
+    if (res is NativeResponse) {
+      bytes = jsonBytesView(payload);
+      view = res;
+    } else {
+      bytes = JSON.bytes(payload);
+      res.headers.contentType = ContentType.json;
+    }
   }
 
   /// finally write and close http connection.
   /// known length lets the client skip chunked decoding.
   /// dart:io only gzips when the length is not set, so skip it then.
-  if (!Dox().config.compress) res.contentLength = bytes.length;
-  res.add(bytes);
-  try {
+  if (view == null) {
+    if (!Dox().config.compress) res.contentLength = bytes.length;
+    res.add(bytes);
     endResponse(res);
-  } catch (_) {
-    // The end failed and the response still has the body. Take it out:
-    // the bytes can be a part of the encoder buffer, and the next encode
-    // writes over them.
-    if (res is NativeResponse) res.takeBody();
-    rethrow;
+    return;
+  }
+  // The bytes are a part of the encoder buffer, which is lent to this
+  // response: until it is given back, any other JSON encode (also one
+  // from code that runs inside end(), like the toString() of a cookie)
+  // writes into a new buffer. The response copies the body when it ends.
+  // On every path out of here, also an error or a closed server, the
+  // response lets go of the bytes, and the buffer is given back.
+  try {
+    res.headers.contentType = ContentType.json;
+    if (!Dox().config.compress) res.contentLength = bytes.length;
+    res.add(bytes);
+    endResponse(res);
+  } finally {
+    view.takeBody();
+    giveBackJsonBytes(bytes);
   }
 }
 

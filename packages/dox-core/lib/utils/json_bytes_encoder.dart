@@ -82,20 +82,35 @@ class JsonBytesEncoder implements JsonWriter {
   /// Throws a `JsonUnsupportedObjectError` for a value that is not a JSON
   /// value, and a `JsonCyclicError` for a value that holds itself.
   Uint8List convert(Object? value) {
-    if (_busy) return _fresh().convert(value);
+    if (_busy || _lent != null) return _fresh().convert(value);
     return Uint8List.fromList(_encode(value));
   }
 
   /// [value] as JSON bytes, with no copy: the result is a part of the
-  /// buffer of this encoder.
+  /// buffer of this encoder. The buffer is then lent to the caller.
   ///
-  /// The next [convert] or [convertView] writes over these bytes. So use
-  /// the result only when it is copied or sent before any other code can
-  /// encode JSON. If you are not sure, use [convert].
+  /// While the buffer is lent, every other call of this encoder writes
+  /// into a new buffer, so it can not change the lent bytes. Give the
+  /// buffer back with [giveBack] when the bytes are copied. A buffer that
+  /// is never given back only makes the next calls slower.
   Uint8List convertView(Object? value) {
-    if (_busy) return _fresh().convert(value);
-    return _encode(value);
+    if (_busy || _lent != null) return _fresh().convert(value);
+    Uint8List view = _encode(value);
+    _lent = view;
+    return view;
   }
+
+  /// Gives back the buffer that [convertView] lent with [view]. Another
+  /// list (eg. a copy) does nothing.
+  void giveBack(List<int> view) {
+    if (identical(view, _lent)) _lent = null;
+  }
+
+  /// the result of [convertView] that is lent now, or null
+  Uint8List? _lent;
+
+  /// true while a result of [convertView] is lent
+  bool get isLent => _lent != null;
 
   /// A new encoder with the same settings, for a call from inside a call.
   JsonBytesEncoder _fresh() {
