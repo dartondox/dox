@@ -48,7 +48,7 @@ For a 6.7 kB JSON body:
 | 1 (default) | 13.5 µs | 1,421 bytes |
 | 6 | 32.6 µs | 1,270 bytes |
 
-Use a low level when the server CPU is the limit, as for most APIs. Use a higher level when the network is slow and the bodies are big. The client reads every level the same way.
+Use a low level when the server CPU is the limit, as for most APIs. Use a higher level when the network is slow and the bodies are big. The client reads every level the same way. Levels 10 to 12 are slow and use 9 MB of memory each. One thread gzips all answers of a server, so a slow level makes the other gzipped answers wait.
 
 ## Logging
 

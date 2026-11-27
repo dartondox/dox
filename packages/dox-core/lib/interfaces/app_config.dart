@@ -160,7 +160,8 @@ class AppConfig {
   /// A low level is fast, and the body is a little bigger. A high level
   /// takes more CPU for a smaller body. For a 6.7 kB JSON body, level 1
   /// took 13.5 us for 1,421 bytes, and level 6 took 32.6 us for 1,270
-  /// bytes. The client reads every level the same way.
+  /// bytes. The client reads every level the same way. Levels 10 to 12
+  /// are slow and use 9 MB of memory each.
   final int compressLevel;
 
   /// On SIGTERM or SIGINT the server stops taking new connections, and
