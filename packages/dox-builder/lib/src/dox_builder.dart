@@ -585,18 +585,9 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       return false;
     }
 
-    /// the class, its mixins and what those mixins are made of
-    List<InterfaceElement> own = <InterfaceElement>[
-      element,
-      for (InterfaceType mixin in element.mixins) ...<InterfaceElement>[
-        mixin.element,
-        for (InterfaceType above in mixin.element.allSupertypes) above.element,
-      ],
-    ];
+    /// its own method, or one from a class or a mixin above it
     for (String name in _jsonMethods) {
-      if (own.any((InterfaceElement e) => e.getMethod(name) != null)) {
-        return false;
-      }
+      if (hasMethod(element, name)) return false;
     }
 
     /// the value of a column with beforeSave needs the whole map

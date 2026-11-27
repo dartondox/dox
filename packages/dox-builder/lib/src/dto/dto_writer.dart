@@ -2,6 +2,7 @@ import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import '../openapi/dart_literal.dart';
+import '../util.dart';
 import 'dto_model.dart';
 
 /// Facts about a DTO that depend on its nested DTOs too.
@@ -64,7 +65,8 @@ class DtoWriter {
   final bool jsonWriter;
 
   /// A DTO with its own `toJson()` keeps it: dox_core calls that method.
-  bool get _writesJson => jsonWriter && dto.element.getMethod('toJson') == null;
+  /// The method can also come from a class or a mixin above the DTO.
+  bool get _writesJson => jsonWriter && !hasMethod(dto.element, 'toJson');
 
   final List<String> _statics = <String>[];
   int _regexes = 0;
@@ -1130,7 +1132,7 @@ class DtoWriter {
     return switch (type.kind) {
       DtoKind.date || DtoKind.enumName => false,
       DtoKind.dto => switch (type.type.element) {
-        InterfaceElement e => e.getMethod('toJson') == null,
+        InterfaceElement e => !hasMethod(e, 'toJson'),
         _ => false,
       },
       DtoKind.list || DtoKind.map => _encoderWrites(type.item!),

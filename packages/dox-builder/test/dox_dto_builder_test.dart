@@ -1462,6 +1462,39 @@ class View {
         expect('writeObject('.allMatches(out).length, 2);
       });
 
+      test('a toJson() from a mixin: not made', () async {
+        String out = (await _generate(
+          r'''
+mixin Loud {
+  Map<String, dynamic> toJson() => <String, dynamic>{};
+}
+
+@Dto()
+class FromMixin with Loud {
+  final int id;
+  FromMixin({required this.id});
+}
+
+@Dto()
+class Holder {
+  final FromMixin inner;
+  const Holder({required this.inner});
+}
+''',
+          imports: import,
+          packages: annotation,
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(
+          out,
+          contains(r'class_$FromMixinDtoextendsDtoSchema<FromMixin>{'),
+        );
+        // inside another DTO it is the map of its schema, as in toMap()
+        expect(
+          out,
+          contains(r"w.key('inner');w.value($FromMixinDto.toMap(o.inner));"),
+        );
+      });
+
       test('an older dox_annotation: not made', () async {
         String out = await _generate(source);
         expect(out, isNot(contains('ERROR')));

@@ -116,3 +116,13 @@ bool seesAnnotationClass(LibraryFragment library, String name) {
   return found is ClassElement &&
       found.library.uri.toString().startsWith('package:dox_annotation/');
 }
+
+/// `true` when [element] has the method [name]: its own, or one from a
+/// class or a mixin above it.
+bool hasMethod(InterfaceElement element, String name) {
+  if (element.getMethod(name) != null) return true;
+  for (InterfaceType above in element.allSupertypes) {
+    if (above.element.getMethod(name) != null) return true;
+  }
+  return false;
+}
