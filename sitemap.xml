@@ -557,6 +557,10 @@
          <lastmod>2026-11-27</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/blog/isolate-groups/</loc>
+         <lastmod>2026-11-27</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/blog/live-updates-with-socketio/</loc>
          <lastmod>2026-11-27</lastmod>
     </url>
@@ -577,11 +581,11 @@
          <lastmod>2026-11-27</lastmod>
     </url>
     <url>
-         <loc>https://dartondox.dev/blog/category/guides/</loc>
+         <loc>https://dartondox.dev/blog/category/performance/</loc>
          <lastmod>2026-11-27</lastmod>
     </url>
     <url>
-         <loc>https://dartondox.dev/blog/category/performance/</loc>
+         <loc>https://dartondox.dev/blog/category/guides/</loc>
          <lastmod>2026-11-27</lastmod>
     </url>
     <url>
@@ -593,7 +597,15 @@
          <lastmod>2026-11-27</lastmod>
     </url>
     <url>
+         <loc>https://dartondox.dev/blog/page/3/</loc>
+         <lastmod>2026-11-27</lastmod>
+    </url>
+    <url>
          <loc>https://dartondox.dev/blog/archive/2026/page/2/</loc>
+         <lastmod>2026-11-27</lastmod>
+    </url>
+    <url>
+         <loc>https://dartondox.dev/blog/archive/2026/page/3/</loc>
          <lastmod>2026-11-27</lastmod>
     </url>
 </urlset>

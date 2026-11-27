@@ -855,6 +855,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#isolate-groups-each-isolate-gets-its-own-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Isolate groups: each isolate gets its own memory
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#security-fixes-release-25-november-2026" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -942,17 +953,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#dox-32-patches-faster-less-memory-fewer-leaks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Dox 3.2 patches: faster, less memory, fewer leaks
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1010,6 +1010,55 @@
     
       <nav class="md-post__action">
         <a href="https-without-a-proxy/">
+          Continue reading
+        </a>
+      </nav>
+    
+    
+  </div>
+</article>
+      
+        <article class="md-post md-post--excerpt">
+  <header class="md-post__header">
+    
+      <nav class="md-post__authors md-typeset">
+        
+          <span class="md-author">
+            <img src="assets/logo.svg" alt="Dox team">
+          </span>
+        
+      </nav>
+    
+    <div class="md-post__meta md-meta">
+      <ul class="md-meta__list">
+        <li class="md-meta__item">
+          <time datetime="2026-11-27 00:00:00+00:00">November 27, 2026</time></li>
+        
+          <li class="md-meta__item">
+            in
+            
+              <a href="category/performance/" class="md-meta__link">Performance</a></li>
+        
+        
+          
+          <li class="md-meta__item">
+            
+              4 min read
+            
+          </li>
+        
+        
+      </ul>
+      
+    </div>
+  </header>
+  <div class="md-post__content md-typeset">
+    <h2 id="isolate-groups-each-isolate-gets-its-own-memory"><a class="toclink" href="isolate-groups/">Isolate groups: each isolate gets its own memory</a></h2>
+<p>Dox can now give each server isolate its own heap and its own garbage collector. One flag turns it on. In our test, the same app did 9% more requests a second, and 18% more with three settings of the Dart VM. The flag is off by default, so an app that does not turn it on works the same as before.</p>
+
+    
+      <nav class="md-post__action">
+        <a href="isolate-groups/">
           Continue reading
         </a>
       </nav>
@@ -1410,55 +1459,6 @@
   </div>
 </article>
       
-        <article class="md-post md-post--excerpt">
-  <header class="md-post__header">
-    
-      <nav class="md-post__authors md-typeset">
-        
-          <span class="md-author">
-            <img src="assets/logo.svg" alt="Dox team">
-          </span>
-        
-      </nav>
-    
-    <div class="md-post__meta md-meta">
-      <ul class="md-meta__list">
-        <li class="md-meta__item">
-          <time datetime="2026-11-17 00:00:00+00:00">November 17, 2026</time></li>
-        
-          <li class="md-meta__item">
-            in
-            
-              <a href="category/releases/" class="md-meta__link">Releases</a></li>
-        
-        
-          
-          <li class="md-meta__item">
-            
-              13 min read
-            
-          </li>
-        
-        
-      </ul>
-      
-    </div>
-  </header>
-  <div class="md-post__content md-typeset">
-    <h2 id="dox-32-patches-faster-less-memory-fewer-leaks"><a class="toclink" href="dox-3-2-patches/">Dox 3.2 patches: faster, less memory, fewer leaks</a></h2>
-<p>This release is patch versions only. It makes Dox faster, uses less memory, and fixes memory leaks in long-running apps. There are no API changes. A few defaults changed, so read <a href="dox-3-2-patches/#read-before-you-update">Read before you update</a>.</p>
-
-    
-      <nav class="md-post__action">
-        <a href="dox-3-2-patches/">
-          Continue reading
-        </a>
-      </nav>
-    
-    
-  </div>
-</article>
-      
       
         
           
@@ -1466,7 +1466,7 @@
 
 
 <nav class="md-pagination">
-  <span class="md-pagination__current">1</span> <a class="md-pagination__link" href="page/2/">2</a>
+  <span class="md-pagination__current">1</span> <a class="md-pagination__link" href="page/2/">2</a> <a class="md-pagination__link" href="page/3/">3</a>
 </nav>
         
       
