@@ -78,12 +78,18 @@ Future<String> _generate(
   String imports = '',
   Map<String, String> files = const <String, String>{},
   String modelClass = 'class Model<T> {}',
+  bool jsonWriter = false,
 }) async {
   String output = '';
   await testBuilder(
     buildDoxModel(BuilderOptions.empty),
     <String, String>{
-      'dox_annotation|lib/dox_annotation.dart': "export 'src/dox_model.dart';",
+      'dox_annotation|lib/dox_annotation.dart':
+          "export 'src/dox_model.dart';"
+          "${jsonWriter ? "export 'src/json_writer.dart';" : ''}",
+      'dox_annotation|lib/src/json_writer.dart': File(
+        '../dox-annotation/lib/src/json_writer.dart',
+      ).readAsStringSync(),
       'dox_annotation|lib/src/dox_model.dart': File(
         '../dox-annotation/lib/src/dox_model.dart',
       ).readAsStringSync(),
@@ -829,6 +835,245 @@ class Item {
 }
 ''', modelClass: r'class Model<T> { dynamic $columnValue(String c) => null; }');
         expect(out, isNot(contains(r'$columnValue')));
+      });
+    });
+
+    group('writeJson |', () {
+      /// a dox_orm and a dox_annotation that have what writeJson() uses
+      const String modelClass =
+          r'class Model<T> { List<String>? get $jsonHidden => null; }';
+
+      const String model = r"""
+@DoxModel()
+class Post {
+  @Column()
+  String? title;
+
+  @Column()
+  String name = '';
+
+  @Column()
+  int? views;
+
+  @Column()
+  double? score;
+
+  @Column(name: 'is_live')
+  bool? live;
+
+  @Column()
+  DateTime? publishedAt;
+
+  @Column()
+  DateTime endsAt = DateTime(2024);
+
+  @Column(cast: JsonCast())
+  Map<String, dynamic>? meta;
+
+  @HasMany(Post, eager: true)
+  List<Post> children = <Post>[];
+
+  @BelongsTo(Post)
+  Post? parentPost;
+
+  @Computed()
+  String get label => 'x';
+}
+""";
+
+      test('columns, relations and computed values, in the order of '
+          'toJson()', () async {
+        String out = await _generate(
+          model,
+          modelClass: modelClass,
+          jsonWriter: true,
+        );
+        String flat = out.replaceAll(RegExp(r'\s'), '');
+        expect(
+          flat,
+          contains(
+            'classPostGeneratorextendsModel<Post>implementsJsonWritable{',
+          ),
+        );
+        expect(flat, contains(r'List<String>?hide=$jsonHidden;'));
+        expect(
+          flat,
+          contains(
+            'if(hide==null||runtimeType!=Post){w.value(toJson());return;}',
+          ),
+        );
+        List<String> writes = <String>[
+          "if(all||!hide.contains('id')){w.key('id');w.integer(instance.id);}",
+          "{w.key('title');w.string(instance.title);}",
+          "{w.key('name');w.string(instance.name);}",
+          "{w.key('views');w.integer(instance.views);}",
+          "{w.key('score');w.value(instance.score);}",
+          "{w.key('is_live');w.value(_liveCast.set(instance.live));}",
+          "{w.key('published_at');w.dateTime(instance.publishedAt);}",
+          "{w.key('ends_at');w.dateTime(instance.endsAt);}",
+          "{w.key('meta');w.value(_metaCast.set(instance.meta));}",
+          "{w.key('created_at');w.dateTime(instance.createdAt);}",
+          "{w.key('updated_at');",
+          "if(all||!hide.contains('children'))"
+              "{w.key('children');w.value(instance.children);}",
+          "List<String>preload=getPreload();",
+          "if(preload.contains('parentPost')&&"
+              "(all||!hide.contains('parent_post')))"
+              "{w.key('parent_post');w.value(instance.parentPost);}",
+          "if(all||!hide.contains('label'))"
+              "{w.key('label');w.value(instance.label);}",
+          'w.endObject();',
+        ];
+        int at = flat.indexOf('voidwriteJson(JsonWriterw)');
+        expect(at, isNot(-1));
+        for (String write in writes) {
+          int next = flat.indexOf(write, at);
+          expect(next, isNot(-1), reason: write);
+          at = next;
+        }
+      });
+
+      test('with soft deletes', () async {
+        String out = await _generate(
+          '''
+@DoxModel(softDelete: true)
+class Note {
+  @Column()
+  String? name;
+}
+''',
+          modelClass: modelClass,
+          jsonWriter: true,
+        );
+        expect(
+          out.replaceAll(RegExp(r'\s'), ''),
+          contains(
+            'extendsModel<Note>withSoftDeletes<Note>implementsJsonWritable{',
+          ),
+        );
+      });
+
+      test('an older dox_orm or dox_annotation: not made', () async {
+        /// (the Model class, a dox_annotation with JsonWriter)
+        for ((String, bool) older in <(String, bool)>[
+          ('class Model<T> {}', false),
+          ('class Model<T> {}', true),
+          (modelClass, false),
+          // classes of the app with the same names do not count
+          ('class JsonWriter {} class JsonWritable {} $modelClass', false),
+        ]) {
+          String out = await _generate(
+            model,
+            modelClass: older.$1,
+            jsonWriter: older.$2,
+          );
+          expect(out, isNot(contains('writeJson')), reason: '$older');
+          expect(out, isNot(contains('JsonWritable')), reason: '$older');
+        }
+      });
+
+      test('a model with its own JSON method: not made', () async {
+        for (String method in <String>[
+          'Map<String, dynamic> toJson() => <String, dynamic>{};',
+          'Map<String, dynamic> toMap() => <String, dynamic>{};',
+          'Map<String, dynamic> columnsToMap() => <String, dynamic>{};',
+          'Map<String, dynamic> convertToMap(dynamic i) => <String, dynamic>{};',
+          'void setComputedValues(Map<String, dynamic> map) {}',
+          'void writeJson(Object w) {}',
+        ]) {
+          String out = await _generate(
+            '''
+@DoxModel()
+class Tag {
+  @Column()
+  String? name;
+
+  $method
+}
+''',
+            modelClass: modelClass,
+            jsonWriter: true,
+          );
+          expect(out, isNot(contains('void writeJson')), reason: method);
+          expect(out, isNot(contains('JsonWritable')), reason: method);
+        }
+      });
+
+      test('a JSON method from a mixin of a mixin: not made', () async {
+        String out = await _generate(
+          '''
+mixin Loud {
+  Map<String, dynamic> toJson() => <String, dynamic>{};
+}
+
+mixin Louder on Object implements Loud {}
+
+mixin Top on Loud {}
+
+@DoxModel()
+class Tag with Loud, Top {
+  @Column()
+  String? name;
+}
+''',
+          modelClass: modelClass,
+          jsonWriter: true,
+        );
+        expect(out, isNot(contains('writeJson')));
+      });
+
+      test('a JSON method from a mixin: not made', () async {
+        String out = await _generate(
+          '''
+mixin Loud {
+  Map<String, dynamic> toJson() => <String, dynamic>{};
+}
+
+@DoxModel()
+class Tag with Loud {
+  @Column()
+  String? name;
+}
+''',
+          modelClass: modelClass,
+          jsonWriter: true,
+        );
+        expect(out, isNot(contains('writeJson')));
+      });
+
+      test('a column with beforeSave: not made', () async {
+        String out = await _generate(
+          '''
+@DoxModel()
+class Tag {
+  @Column(beforeSave: slug)
+  String? name;
+
+  static String? slug(Map<String, dynamic> map) => null;
+}
+''',
+          modelClass: modelClass,
+          jsonWriter: true,
+        );
+        expect(out, isNot(contains('writeJson')));
+      });
+
+      test('the same key two times: not made', () async {
+        String out = await _generate(
+          '''
+@DoxModel()
+class Tag {
+  @Column()
+  String? name;
+
+  @Computed(name: 'name')
+  String get shown => 'x';
+}
+''',
+          modelClass: modelClass,
+          jsonWriter: true,
+        );
+        expect(out, isNot(contains('writeJson')));
       });
     });
   });

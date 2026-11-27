@@ -107,3 +107,22 @@ bool mayHave(String text, List<String> words) {
 bool isGenerated(AssetId id) {
   return id.path.endsWith('.g.dart');
 }
+
+/// `true` when the name [name] in the scope of [library] is a class of
+/// dox_annotation. A newer generator asks this before it writes code that
+/// uses the class, so the code still compiles with an older package.
+bool seesAnnotationClass(LibraryFragment library, String name) {
+  Element? found = library.scope.lookup(name).getter;
+  return found is ClassElement &&
+      found.library.uri.toString().startsWith('package:dox_annotation/');
+}
+
+/// `true` when [element] has the method [name]: its own, or one from a
+/// class or a mixin above it.
+bool hasMethod(InterfaceElement element, String name) {
+  if (element.getMethod(name) != null) return true;
+  for (InterfaceType above in element.allSupertypes) {
+    if (above.element.getMethod(name) != null) return true;
+  }
+  return false;
+}

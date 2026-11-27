@@ -46,9 +46,11 @@ Future<String> _generate(
   String source, {
   String imports = '',
   Map<String, String> files = const <String, String>{},
+  Map<String, String> packages = const <String, String>{},
 }) async {
   Map<String, String> sources = <String, String>{
     ..._validation,
+    ...packages,
     ...files,
     'a|lib/a.dart': '$imports\n$_header$source',
   };
@@ -1339,6 +1341,175 @@ abstract class A implements Rule<String> {}
         generateFor: <String>{r'a|lib/$lib$'},
         outputs: <String, Object>{},
       );
+    });
+    group('writeObject |', () {
+      /// a dox_annotation with JsonWriter and JsonObjectWriter
+      final Map<String, String> annotation = <String, String>{
+        'dox_annotation|lib/dox_annotation.dart':
+            "export 'src/json_writer.dart';",
+        'dox_annotation|lib/src/json_writer.dart': File(
+          '../dox-annotation/lib/src/json_writer.dart',
+        ).readAsStringSync(),
+      };
+      const String import =
+          "import 'package:dox_annotation/dox_annotation.dart';";
+
+      const String source = '''
+enum Role { admin, user }
+
+@Dto()
+class Inner {
+  final int id;
+  const Inner({required this.id});
+}
+
+@Dto()
+class OwnJson {
+  final int id;
+  const OwnJson({required this.id});
+  Map<String, dynamic> toJson() => <String, dynamic>{};
+}
+
+@Dto()
+class View {
+  final int id;
+  final String firstName;
+  final String? note;
+  final double price;
+  final bool active;
+  final DateTime? soldAt;
+  final Role role;
+  final Role? other;
+  final List<int> numbers;
+  final List<DateTime> dates;
+  final Inner inner;
+  final List<Inner> inners;
+  final OwnJson own;
+  final List<OwnJson> owns;
+  final Maybe<int> age;
+
+  const View({
+    required this.id,
+    required this.firstName,
+    required this.price,
+    required this.active,
+    required this.role,
+    required this.numbers,
+    required this.dates,
+    required this.inner,
+    required this.inners,
+    required this.own,
+    required this.owns,
+    this.note,
+    this.soldAt,
+    this.other,
+    this.age = const Maybe<int>.missing(),
+  });
+}
+''';
+
+      test('each field is written with the writer of its type', () async {
+        String out = (await _generate(
+          source,
+          imports: import,
+          packages: annotation,
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(
+          out,
+          contains(
+            r'class_$ViewDtoextendsDtoSchema<View>implementsJsonObjectWriter{',
+          ),
+        );
+        expect(
+          out,
+          contains(
+            '@overridevoidwriteObject(Objectobject,JsonWriterw){'
+            'Viewo=objectasView;'
+            'w.startObject();'
+            "w.key('id');w.integer(o.id);"
+            "w.key('first_name');w.string(o.firstName);"
+            "w.key('note');w.string(o.note);"
+            "w.key('price');w.value(o.price);"
+            "w.key('active');w.value(o.active);"
+            "w.key('sold_at');w.dateTime(o.soldAt);"
+            "w.key('role');w.string(o.role.name);"
+            "w.key('other');w.string(o.other?.name);"
+            "w.key('numbers');w.value(o.numbers);"
+            // a date in a list: the value of toMap()
+            "w.key('dates');w.value(<dynamic>[for(DateTimex0ino.dates)"
+            'x0.toIso8601String()]);'
+            // a nested DTO: the encoder finds its writer
+            "w.key('inner');w.value(o.inner);"
+            "w.key('inners');w.value(o.inners);"
+            // a nested DTO with its own toJson(): the map of its schema
+            "w.key('own');w.value(\$OwnJsonDto.toMap(o.own));"
+            "w.key('owns');w.value(<dynamic>[for(OwnJsonx0ino.owns)"
+            '\$OwnJsonDto.toMap(x0)]);'
+            "if(o.agecaseMaybe<int>(isPresent:true,value:intg14))"
+            "{w.key('age');w.integer(g14);}"
+            'w.endObject();}',
+          ),
+        );
+      });
+
+      test('a DTO with its own toJson(): not made', () async {
+        String out = (await _generate(
+          source,
+          imports: import,
+          packages: annotation,
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(out, contains(r'class_$OwnJsonDtoextendsDtoSchema<OwnJson>{'));
+        expect('writeObject('.allMatches(out).length, 2);
+      });
+
+      test('a toJson() from a mixin: not made', () async {
+        String out = (await _generate(
+          r'''
+mixin Loud {
+  Map<String, dynamic> toJson() => <String, dynamic>{};
+}
+
+@Dto()
+class FromMixin with Loud {
+  final int id;
+  FromMixin({required this.id});
+}
+
+@Dto()
+class Holder {
+  final FromMixin inner;
+  const Holder({required this.inner});
+}
+''',
+          imports: import,
+          packages: annotation,
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(
+          out,
+          contains(r'class_$FromMixinDtoextendsDtoSchema<FromMixin>{'),
+        );
+        // inside another DTO it is the map of its schema, as in toMap()
+        expect(
+          out,
+          contains(r"w.key('inner');w.value($FromMixinDto.toMap(o.inner));"),
+        );
+      });
+
+      test('an older dox_annotation: not made', () async {
+        String out = await _generate(source);
+        expect(out, isNot(contains('ERROR')));
+        expect(out, isNot(contains('writeObject')));
+        expect(out, isNot(contains('JsonObjectWriter')));
+      });
+
+      test('a class of the app with the same name: not made', () async {
+        String out = await _generate('''
+class JsonWriter {}
+class JsonObjectWriter {}
+$source
+''');
+        expect(out, isNot(contains('writeObject')));
+      });
     });
   });
 }

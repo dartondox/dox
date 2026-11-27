@@ -6,4 +6,5 @@ export 'src/dox_model.dart';
 export 'src/env_annotation.dart';
 export 'src/global_middleware.dart';
 export 'src/inject_annotation.dart';
+export 'src/json_writer.dart';
 export 'src/openapi_annotation.dart';

@@ -11,7 +11,8 @@ part of 'rules.dto.dart';
 /// The checks, the converter and the JSON Schema of [CreateUser].
 const DtoSchema<CreateUser> $CreateUserDto = _$CreateUserDto();
 
-class _$CreateUserDto extends DtoSchema<CreateUser> {
+class _$CreateUserDto extends DtoSchema<CreateUser>
+    implements JsonObjectWriter {
   const _$CreateUserDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -171,6 +172,23 @@ class _$CreateUserDto extends DtoSchema<CreateUser> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    CreateUser o = object as CreateUser;
+    w.startObject();
+    w.key('name');
+    w.string(o.name);
+    w.key('email');
+    w.string(o.email);
+    w.key('age');
+    w.integer(o.age);
+    w.key('role');
+    w.string(o.role.name);
+    w.key('tags');
+    w.value(o.tags);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -206,7 +224,7 @@ class _$CreateUserDto extends DtoSchema<CreateUser> {
 /// The checks, the converter and the JSON Schema of [TextRules].
 const DtoSchema<TextRules> $TextRulesDto = _$TextRulesDto();
 
-class _$TextRulesDto extends DtoSchema<TextRules> {
+class _$TextRulesDto extends DtoSchema<TextRules> implements JsonObjectWriter {
   const _$TextRulesDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -565,6 +583,47 @@ class _$TextRulesDto extends DtoSchema<TextRules> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    TextRules o = object as TextRules;
+    w.startObject();
+    w.key('len');
+    w.string(o.len);
+    w.key('exact');
+    w.string(o.exact);
+    w.key('len_min');
+    w.string(o.lenMin);
+    w.key('min_len');
+    w.string(o.minLen);
+    w.key('max_len');
+    w.string(o.maxLen);
+    w.key('email');
+    w.string(o.email);
+    w.key('url');
+    w.string(o.url);
+    w.key('uuid');
+    w.string(o.uuid);
+    w.key('ip');
+    w.string(o.ip);
+    w.key('regex');
+    w.string(o.regex);
+    w.key('in_list');
+    w.string(o.inList);
+    w.key('not_in');
+    w.string(o.notIn);
+    w.key('starts');
+    w.string(o.starts);
+    w.key('ends');
+    w.string(o.ends);
+    w.key('alpha');
+    w.string(o.alpha);
+    w.key('alnum');
+    w.string(o.alnum);
+    w.key('dash');
+    w.string(o.dash);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -653,7 +712,8 @@ class _$TextRulesDto extends DtoSchema<TextRules> {
 /// The checks, the converter and the JSON Schema of [ChangeText].
 const DtoSchema<ChangeText> $ChangeTextDto = _$ChangeTextDto();
 
-class _$ChangeTextDto extends DtoSchema<ChangeText> {
+class _$ChangeTextDto extends DtoSchema<ChangeText>
+    implements JsonObjectWriter {
   const _$ChangeTextDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -735,6 +795,23 @@ class _$ChangeTextDto extends DtoSchema<ChangeText> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    ChangeText o = object as ChangeText;
+    w.startObject();
+    w.key('trimmed');
+    w.string(o.trimmed);
+    w.key('lower');
+    w.string(o.lower);
+    w.key('upper');
+    w.string(o.upper);
+    w.key('keep');
+    w.string(o.keep);
+    w.key('blank');
+    w.string(o.blank);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -763,7 +840,8 @@ class _$ChangeTextDto extends DtoSchema<ChangeText> {
 /// The checks, the converter and the JSON Schema of [NumberRules].
 const DtoSchema<NumberRules> $NumberRulesDto = _$NumberRulesDto();
 
-class _$NumberRulesDto extends DtoSchema<NumberRules> {
+class _$NumberRulesDto extends DtoSchema<NumberRules>
+    implements JsonObjectWriter {
   const _$NumberRulesDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -964,6 +1042,29 @@ class _$NumberRulesDto extends DtoSchema<NumberRules> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    NumberRules o = object as NumberRules;
+    w.startObject();
+    w.key('min');
+    w.integer(o.min);
+    w.key('max');
+    w.integer(o.max);
+    w.key('range');
+    w.value(o.range);
+    w.key('positive');
+    w.integer(o.positive);
+    w.key('gt');
+    w.value(o.gt);
+    w.key('lt');
+    w.value(o.lt);
+    w.key('in_num');
+    w.integer(o.inNum);
+    w.key('not_in_num');
+    w.integer(o.notInNum);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1012,7 +1113,7 @@ class _$NumberRulesDto extends DtoSchema<NumberRules> {
 /// The checks, the converter and the JSON Schema of [ListRules].
 const DtoSchema<ListRules> $ListRulesDto = _$ListRulesDto();
 
-class _$ListRulesDto extends DtoSchema<ListRules> {
+class _$ListRulesDto extends DtoSchema<ListRules> implements JsonObjectWriter {
   const _$ListRulesDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -1211,6 +1312,21 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    ListRules o = object as ListRules;
+    w.startObject();
+    w.key('min_items');
+    w.value(o.minItems);
+    w.key('max_items');
+    w.value(o.maxItems);
+    w.key('unique');
+    w.value(o.unique);
+    w.key('emails');
+    w.value(o.emails);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1243,7 +1359,7 @@ class _$ListRulesDto extends DtoSchema<ListRules> {
 /// The checks, the converter and the JSON Schema of [DateRules].
 const DtoSchema<DateRules> $DateRulesDto = _$DateRulesDto();
 
-class _$DateRulesDto extends DtoSchema<DateRules> {
+class _$DateRulesDto extends DtoSchema<DateRules> implements JsonObjectWriter {
   const _$DateRulesDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -1332,6 +1448,17 @@ class _$DateRulesDto extends DtoSchema<DateRules> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    DateRules o = object as DateRules;
+    w.startObject();
+    w.key('after');
+    w.dateTime(o.after);
+    w.key('before');
+    w.dateTime(o.before);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1353,7 +1480,7 @@ class _$DateRulesDto extends DtoSchema<DateRules> {
 /// The checks, the converter and the JSON Schema of [AllTypes].
 const DtoSchema<AllTypes> $AllTypesDto = _$AllTypesDto();
 
-class _$AllTypesDto extends DtoSchema<AllTypes> {
+class _$AllTypesDto extends DtoSchema<AllTypes> implements JsonObjectWriter {
   const _$AllTypesDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -1523,6 +1650,35 @@ class _$AllTypesDto extends DtoSchema<AllTypes> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    AllTypes o = object as AllTypes;
+    w.startObject();
+    w.key('s');
+    w.string(o.s);
+    w.key('i');
+    w.integer(o.i);
+    w.key('d');
+    w.value(o.d);
+    w.key('n');
+    w.value(o.n);
+    w.key('b');
+    w.value(o.b);
+    w.key('dt');
+    w.dateTime(o.dt);
+    w.key('role');
+    w.string(o.role?.name);
+    w.key('list');
+    w.value(o.list);
+    w.key('map');
+    w.value(o.map);
+    w.key('any');
+    w.value(o.any);
+    w.key('raw');
+    w.value(o.raw);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1576,7 +1732,8 @@ class _$AllTypesDto extends DtoSchema<AllTypes> {
 /// The checks, the converter and the JSON Schema of [SearchUsers].
 const DtoSchema<SearchUsers> $SearchUsersDto = _$SearchUsersDto();
 
-class _$SearchUsersDto extends DtoSchema<SearchUsers> {
+class _$SearchUsersDto extends DtoSchema<SearchUsers>
+    implements JsonObjectWriter {
   const _$SearchUsersDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -1657,6 +1814,19 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    SearchUsers o = object as SearchUsers;
+    w.startObject();
+    w.key('q');
+    w.string(o.q);
+    w.key('page');
+    w.integer(o.page);
+    w.key('tags');
+    w.value(o.tags);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1679,7 +1849,8 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers> {
 /// The checks, the converter and the JSON Schema of [StrictInput].
 const DtoSchema<StrictInput> $StrictInputDto = _$StrictInputDto();
 
-class _$StrictInputDto extends DtoSchema<StrictInput> {
+class _$StrictInputDto extends DtoSchema<StrictInput>
+    implements JsonObjectWriter {
   const _$StrictInputDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -1735,6 +1906,15 @@ class _$StrictInputDto extends DtoSchema<StrictInput> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    StrictInput o = object as StrictInput;
+    w.startObject();
+    w.key('name');
+    w.string(o.name);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1751,7 +1931,8 @@ class _$StrictInputDto extends DtoSchema<StrictInput> {
 /// The checks, the converter and the JSON Schema of [WithMessages].
 const DtoSchema<WithMessages> $WithMessagesDto = _$WithMessagesDto();
 
-class _$WithMessagesDto extends DtoSchema<WithMessages> {
+class _$WithMessagesDto extends DtoSchema<WithMessages>
+    implements JsonObjectWriter {
   const _$WithMessagesDto();
 
   static const Map<String, String> _m = <String, String>{
@@ -1834,6 +2015,21 @@ class _$WithMessagesDto extends DtoSchema<WithMessages> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    WithMessages o = object as WithMessages;
+    w.startObject();
+    w.key('email');
+    w.string(o.email);
+    w.key('name');
+    w.string(o.name);
+    w.key('age');
+    w.integer(o.age);
+    w.key('nick');
+    w.string(o.nick);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1857,7 +2053,8 @@ class _$WithMessagesDto extends DtoSchema<WithMessages> {
 /// The checks, the converter and the JSON Schema of [SignUpKeys].
 const DtoSchema<SignUpKeys> $SignUpKeysDto = _$SignUpKeysDto();
 
-class _$SignUpKeysDto extends DtoSchema<SignUpKeys> {
+class _$SignUpKeysDto extends DtoSchema<SignUpKeys>
+    implements JsonObjectWriter {
   const _$SignUpKeysDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -1907,6 +2104,17 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    SignUpKeys o = object as SignUpKeys;
+    w.startObject();
+    w.key('first_name');
+    w.string(o.firstName);
+    w.key('emailAddress');
+    w.string(o.email);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1923,7 +2131,7 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys> {
 /// The checks, the converter and the JSON Schema of [CamelKeys].
 const DtoSchema<CamelKeys> $CamelKeysDto = _$CamelKeysDto();
 
-class _$CamelKeysDto extends DtoSchema<CamelKeys> {
+class _$CamelKeysDto extends DtoSchema<CamelKeys> implements JsonObjectWriter {
   const _$CamelKeysDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -1965,6 +2173,15 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    CamelKeys o = object as CamelKeys;
+    w.startObject();
+    w.key('firstName');
+    w.string(o.firstName);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -1980,7 +2197,8 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> {
 /// The checks, the converter and the JSON Schema of [UpdateUser].
 const DtoSchema<UpdateUser> $UpdateUserDto = _$UpdateUserDto();
 
-class _$UpdateUserDto extends DtoSchema<UpdateUser> {
+class _$UpdateUserDto extends DtoSchema<UpdateUser>
+    implements JsonObjectWriter {
   const _$UpdateUserDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -2054,6 +2272,21 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    UpdateUser o = object as UpdateUser;
+    w.startObject();
+    if (o.bio case Maybe<String?>(isPresent: true, value: String? g0)) {
+      w.key('bio');
+      w.string(g0);
+    }
+    if (o.age case Maybe<int>(isPresent: true, value: int g1)) {
+      w.key('age');
+      w.integer(g1);
+    }
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -2072,7 +2305,7 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser> {
 /// The checks, the converter and the JSON Schema of [MoreRules].
 const DtoSchema<MoreRules> $MoreRulesDto = _$MoreRulesDto();
 
-class _$MoreRulesDto extends DtoSchema<MoreRules> {
+class _$MoreRulesDto extends DtoSchema<MoreRules> implements JsonObjectWriter {
   const _$MoreRulesDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -2360,6 +2593,49 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    MoreRules o = object as MoreRules;
+    w.startObject();
+    w.key('password');
+    w.string(o.password);
+    w.key('email_again');
+    w.string(o.emailAgain);
+    w.key('email');
+    w.string(o.email);
+    w.key('type');
+    w.string(o.type);
+    w.key('company');
+    w.string(o.company);
+    if (o.countryCode case Maybe<String>(isPresent: true, value: String g5)) {
+      w.key('country_code');
+      w.string(g5);
+    }
+    w.key('phone');
+    w.string(o.phone);
+    w.key('meta');
+    w.string(o.meta);
+    w.key('role');
+    w.string(o.role?.name);
+    w.key('admin_code');
+    w.string(o.adminCode);
+    w.key('tags');
+    w.value(o.tags);
+    w.key('pin');
+    w.string(o.pin);
+    w.key('code');
+    w.string(o.code);
+    w.key('day');
+    w.string(o.day);
+    w.key('secret');
+    w.string(o.secret);
+    w.key('plan_note');
+    w.string(o.planNote);
+    w.key('plan');
+    w.string(o.plan);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     Map<String, dynamic> j = <String, dynamic>{
       'type': 'object',
@@ -2458,7 +2734,8 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> {
 /// The checks, the converter and the JSON Schema of [StrictPassword].
 const DtoSchema<StrictPassword> $StrictPasswordDto = _$StrictPasswordDto();
 
-class _$StrictPasswordDto extends DtoSchema<StrictPassword> {
+class _$StrictPasswordDto extends DtoSchema<StrictPassword>
+    implements JsonObjectWriter {
   const _$StrictPasswordDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -2519,6 +2796,15 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword> {
   Map<String, dynamic> toMap(StrictPassword o) {
     String f0 = o.password;
     return <String, dynamic>{'password': f0};
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter w) {
+    StrictPassword o = object as StrictPassword;
+    w.startObject();
+    w.key('password');
+    w.string(o.password);
+    w.endObject();
   }
 
   @override

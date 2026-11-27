@@ -93,6 +93,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
     String computedCode = _getCodeForComputedAndHooks(visitor);
 
     String softDeleteString = softDelete ? 'with SoftDeletes<$className>' : '';
+    String writeJson = _getCodeForWriteJson(visitor, element);
+    if (writeJson.isNotEmpty) softDeleteString += ' implements JsonWritable';
 
     return """
     // ignore_for_file: always_specify_types
@@ -165,6 +167,7 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
       ${_getCodeForSetColumnValue(visitor)}
       ${_getCodeForCopyColumns(visitor)}
       $computedCode
+      $writeJson
     }
     ${_getCodeForScopeExtension(visitor)}
     """;
@@ -550,6 +553,128 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         (this as $className)
           $content;
         return true;
+      }
+    """;
+  }
+
+  /// methods of `Model` that change what toJson() gives. A model with its
+  /// own one gets no writeJson(), so its method is still used.
+  static const List<String> _jsonMethods = <String>[
+    'toJson',
+    'toMap',
+    'columnsToMap',
+    'convertToMap',
+    'setComputedValues',
+    'writeJson',
+  ];
+
+  /// `true` when the generator can write a `writeJson()` that gives the
+  /// same JSON as toJson() of the model.
+  ///
+  /// The dox_orm and the dox_annotation that the model sees must have the
+  /// parts it uses. With an older one it is not made, so the code still
+  /// compiles.
+  bool _canWriteJson(ModelVisitor visitor, ClassElement element) {
+    LibraryFragment library = element.firstFragment.libraryFragment;
+    Element? model = library.scope.lookup('Model').getter;
+    if (model is! ClassElement || model.getGetter(r'$jsonHidden') == null) {
+      return false;
+    }
+    if (!seesAnnotationClass(library, 'JsonWriter') ||
+        !seesAnnotationClass(library, 'JsonWritable')) {
+      return false;
+    }
+
+    /// its own method, or one from a class or a mixin above it
+    for (String name in _jsonMethods) {
+      if (hasMethod(element, name)) return false;
+    }
+
+    /// the value of a column with beforeSave needs the whole map
+    if (visitor.columns.values.any((c) => c['beforeSave'] != null)) {
+      return false;
+    }
+
+    /// a map keeps one value for a key that is there two times.
+    /// writeJson() would write the key two times.
+    List<String> keys = <String>[
+      for (Map<String, dynamic> c in visitor.columns.values) c['jsonKey'],
+      for (String relation in visitor.relations.keys) toSnakeCase(relation),
+      ...visitor.computed.values,
+    ];
+    return keys.toSet().length == keys.length;
+  }
+
+  /// `writeJson()` writes the JSON of the model with no map in between.
+  /// The JSON encoder of dox_core calls it, and not toJson().
+  ///
+  /// The keys have the order of toJson(): the columns, the eager
+  /// relations, the preloaded relations, then the computed values. When
+  /// the JSON of a row needs more than that (see `Model.$jsonHidden`), or
+  /// the row is of a class that extends the model, it writes the map of
+  /// toJson().
+  String _getCodeForWriteJson(ModelVisitor visitor, ClassElement element) {
+    if (!_canWriteJson(visitor, element)) return '';
+    String className = visitor.className;
+
+    /// one field: its key and its value, when the key is not hidden
+    String field(String key, String write, {String? when}) {
+      String shown = 'all || !hide.contains(${_str(key)})';
+      if (when != null) shown = '$when && ($shown)';
+      return 'if ($shown) { w.key(${_str(key)}); $write; }\n';
+    }
+
+    String content = '';
+    visitor.columns.forEach((fieldName, values) {
+      String value = _toMapValue(fieldName, values);
+      bool cast = values['cast'] != null && values['beforeGet'] == null;
+      String type = values['type'].toString().replaceFirst('?', '');
+      String write = cast
+          ? 'w.value($value)'
+          : type == 'DateTime'
+          ? 'w.dateTime(instance.$fieldName)'
+          : type == 'int'
+          ? 'w.integer($value)'
+          : type == 'String'
+          ? 'w.string($value)'
+          : 'w.value($value)';
+      content += field(values['jsonKey'], write);
+    });
+
+    String preloaded = '';
+    visitor.relations.forEach((key, value) {
+      String write = 'w.value(instance.$key)';
+      if (value['eager'] == true) {
+        content += field(toSnakeCase(key), write);
+      } else {
+        preloaded += field(
+          toSnakeCase(key),
+          write,
+          when: 'preload.contains(${_str(key)})',
+        );
+      }
+    });
+    if (preloaded.isNotEmpty) {
+      content += 'List<String> preload = getPreload();\n$preloaded';
+    }
+    visitor.computed.forEach((getter, jsonKey) {
+      content += field(jsonKey, 'w.value(instance.$getter)');
+    });
+
+    return """
+      @override
+      void writeJson(JsonWriter w) {
+        List<String>? hide = \$jsonHidden;
+        // a class that extends the model can have its own toJson()
+        if (hide == null || runtimeType != $className) {
+          w.value(toJson());
+          return;
+        }
+        bool all = hide.isEmpty;
+        $className instance = this as $className;
+        w.startObject();
+        $content
+        w.endObject();
       }
     """;
   }

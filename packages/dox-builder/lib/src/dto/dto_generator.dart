@@ -4,6 +4,7 @@ import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
 import '../schema/json_schema_reader.dart';
+import '../util.dart';
 import 'dto_model.dart';
 import 'dto_writer.dart';
 
@@ -24,6 +25,11 @@ class DoxDtoGenerator extends Generator {
         .getter;
     bool runtimeFlags =
         state is ClassElement && state.getGetter('allErrors') != null;
+    // writeObject() needs a dox_annotation with JsonObjectWriter
+    LibraryFragment scope = library.element.firstFragment;
+    bool jsonWriter =
+        seesAnnotationClass(scope, 'JsonObjectWriter') &&
+        seesAnnotationClass(scope, 'JsonWriter');
     for (ClassElement element in library.classes) {
       if (!reader.isDto(element)) continue;
       DtoClass dto = reader.read(element);
@@ -48,6 +54,7 @@ class DoxDtoGenerator extends Generator {
           flags,
           schema,
           runtimeFlags: runtimeFlags,
+          jsonWriter: jsonWriter,
         ).write(flags.of(element)),
       );
     }

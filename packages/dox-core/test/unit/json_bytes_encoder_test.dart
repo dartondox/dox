@@ -156,6 +156,79 @@ class _Values {
   }
 }
 
+/// writes its own JSON, and has a toJson() that must not be used
+class _Point implements JsonWritable {
+  _Point(this.x, this.name, [this.inner]);
+  final int? x;
+  final String? name;
+  final Object? inner;
+
+  @override
+  void writeJson(JsonWriter writer) {
+    writer.startObject();
+    writer.key('x');
+    writer.integer(x);
+    writer.key('name');
+    writer.string(name);
+    writer.key('inner');
+    writer.value(inner);
+    writer.endObject();
+  }
+
+  Map<String, dynamic> toJson() => <String, dynamic>{'wrong': true};
+}
+
+/// writes one date
+class _At implements JsonWritable {
+  _At(this.at);
+  final DateTime? at;
+
+  @override
+  void writeJson(JsonWriter writer) {
+    writer.startObject();
+    writer.key('at');
+    writer.dateTime(at);
+    writer.endObject();
+  }
+}
+
+/// writes the keys it gets, each with the value 1
+class _Keys implements JsonWritable {
+  _Keys(this.keys);
+  final List<String> keys;
+
+  @override
+  void writeJson(JsonWriter writer) {
+    writer.startObject();
+    for (String key in keys) {
+      writer.key(key);
+      writer.integer(1);
+    }
+    writer.endObject();
+  }
+}
+
+/// throws after it wrote a part of its JSON
+class _Broken implements JsonWritable {
+  @override
+  void writeJson(JsonWriter writer) {
+    writer.startObject();
+    writer.key('a');
+    throw StateError('broken');
+  }
+}
+
+/// has itself as a value
+class _Loop implements JsonWritable {
+  @override
+  void writeJson(JsonWriter writer) {
+    writer.startObject();
+    writer.key('me');
+    writer.value(this);
+    writer.endObject();
+  }
+}
+
 void main() {
   group('JsonBytesEncoder |', () {
     test('same bytes and same kind of error as the SDK, random values', () {
@@ -698,6 +771,177 @@ void main() {
         utf8.decode(JSON.bytes(<String, Object?>{'a': _Reenter(), 'b': 'x'})),
         r'{"a":{"in":"{\"k\":1}","z":2},"b":"x"}',
       );
+    });
+
+    group('JsonWritable |', () {
+      test('an object writes its own JSON, toJson() is not called', () {
+        expect(_text(_Point(1, 'a')), '{"x":1,"name":"a","inner":null}');
+        expect(
+          _text(_Point(null, null)),
+          '{"x":null,"name":null,"inner":null}',
+        );
+        expect(
+          _text(_Point(-42, 'é "q" \n 😀')),
+          jsonEncode(<String, dynamic>{
+            'x': -42,
+            'name': 'é "q" \n 😀',
+            'inner': null,
+          }),
+        );
+        expect(utf8.decode(JSON.bytes(_Point(1, 'a'))), contains('"x":1'));
+      });
+
+      test('in a list, in a map and in another object', () {
+        Object? value = <String, dynamic>{
+          'list': <_Point>[_Point(1, 'a'), _Point(2, 'b')],
+          'one': _Point(3, 'c', _Point(4, 'd', <int>[1, 2])),
+        };
+        expect(
+          _text(value),
+          '{"list":[{"x":1,"name":"a","inner":null},'
+          '{"x":2,"name":"b","inner":null}],'
+          '"one":{"x":3,"name":"c","inner":'
+          '{"x":4,"name":"d","inner":[1,2]}}}',
+        );
+      });
+
+      test('value() takes every kind of value', () {
+        for (Object? inner in <Object?>[
+          null,
+          true,
+          false,
+          1.5,
+          'text',
+          <String, dynamic>{},
+          <dynamic>[],
+          <String, dynamic>{
+            'a': <int>[1],
+          },
+          DateTime.utc(2024),
+        ]) {
+          expect(
+            _text(_Point(1, 'a', inner)),
+            jsonEncode(<String, dynamic>{
+              'x': 1,
+              'name': 'a',
+              'inner': inner,
+            }, toEncodable: advanceEncode),
+          );
+        }
+      });
+
+      test('dateTime() gives the text of toIso8601String()', () {
+        String want(DateTime? at) =>
+            '{"at":${at == null ? 'null' : '"${at.toIso8601String()}"'}}';
+        List<DateTime?> dates = <DateTime?>[
+          null,
+          DateTime.utc(2024, 5, 17, 3, 4, 5, 6),
+          DateTime.utc(2024, 5, 17, 3, 4, 5, 6, 7),
+          DateTime.utc(2024, 12, 31, 23, 59, 59, 999, 999),
+          DateTime(2024, 5, 17, 3, 4, 5, 6),
+          DateTime(2024, 5, 17, 3, 4, 5, 6, 7),
+          DateTime.utc(0),
+          DateTime.utc(1),
+          DateTime.utc(999, 9, 9),
+          DateTime.utc(9999, 12, 31, 23, 59, 59, 999, 999),
+          // a sign or 6 digits for the year
+          DateTime.utc(10000),
+          DateTime.utc(-1),
+          DateTime.utc(-10000),
+          DateTime.utc(275760, 9, 13),
+          DateTime.fromMicrosecondsSinceEpoch(0, isUtc: true),
+          DateTime.fromMicrosecondsSinceEpoch(-1, isUtc: true),
+          DateTime.fromMicrosecondsSinceEpoch(-1),
+        ];
+        for (DateTime? at in dates) {
+          expect(_text(_At(at)), want(at), reason: '$at');
+        }
+        Random random = Random(11);
+        for (int i = 0; i < 20000; i++) {
+          // years 0 to 9999 and some more on each side
+          int micros =
+              -65000000000000000 +
+              (random.nextDouble() * 330000000000000000).floor();
+          DateTime at = DateTime.fromMicrosecondsSinceEpoch(
+            random.nextInt(3) == 0 ? micros ~/ 1000 * 1000 : micros,
+            isUtc: random.nextBool(),
+          );
+          expect(_text(_At(at)), want(at), reason: '$at');
+        }
+        // many dates, larger than the first buffer
+        List<_At> list = <_At>[
+          for (int i = 0; i < 500; i++) _At(DateTime.utc(2024, 1, 1, 0, i)),
+        ];
+        expect(_text(list), '[${list.map((_At a) => want(a.at)).join(',')}]');
+      });
+
+      test('keys: none, long ones and ones with an escape', () {
+        expect(_text(_Keys(<String>[])), '{}');
+        expect(_text(<_Keys>[_Keys(<String>[]), _Keys(<String>[])]), '[{},{}]');
+        for (int length = 1; length <= 70; length++) {
+          List<String> keys = <String>['k' * length, 'é' * length, 'z'];
+          String want = jsonEncode(<String, int>{for (String k in keys) k: 1});
+          expect(_text(_Keys(keys)), want, reason: 'length $length');
+          // again, now from the key cache
+          expect(_text(_Keys(keys)), want, reason: 'length $length');
+        }
+        List<String> odd = <String>['a"b', 'a\\b', 'a\nb', '{', '}', ',', ''];
+        expect(
+          _text(_Keys(odd)),
+          jsonEncode(<String, int>{for (String k in odd) k: 1}),
+        );
+      });
+
+      test('the same keys as a map: one key cache for both', () {
+        Map<String, dynamic> map = <String, dynamic>{
+          'x': 1,
+          'name': 'a',
+          'inner': null,
+        };
+        for (int i = 0; i < 3; i++) {
+          expect(_text(map), _text(_Point(1, 'a')));
+        }
+      });
+
+      test('an error in writeJson()', () {
+        expect(
+          () => _own.convert(<Object>[1, _Broken()]),
+          throwsA(isA<JsonUnsupportedObjectError>()),
+        );
+        // the encoder works again
+        expect(_text(_Point(1, 'a')), '{"x":1,"name":"a","inner":null}');
+        expect(
+          () => _own.convert(_Point(1, 'a', double.nan)),
+          throwsA(isA<JsonUnsupportedObjectError>()),
+        );
+        expect(_text(<int>[1]), '[1]');
+      });
+
+      test('an object that has itself as a value', () {
+        expect(
+          () => _own.convert(_Loop()),
+          throwsA(isA<JsonUnsupportedObjectError>()),
+        );
+        // the same object two times, not in itself, is fine
+        _Point point = _Point(1, 'a');
+        expect(
+          _text(<_Point>[point, point]),
+          '[{"x":1,"name":"a","inner":null},{"x":1,"name":"a","inner":null}]',
+        );
+      });
+
+      test('many objects, larger than the first buffer', () {
+        List<_Point> points = <_Point>[
+          for (int i = 0; i < 2000; i++) _Point(i, 'name $i'),
+        ];
+        expect(
+          _text(points),
+          jsonEncode(<Map<String, dynamic>>[
+            for (int i = 0; i < 2000; i++)
+              <String, dynamic>{'x': i, 'name': 'name $i', 'inner': null},
+          ]),
+        );
+      });
     });
 
     test('a body larger than the first buffer', () {

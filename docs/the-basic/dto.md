@@ -220,6 +220,44 @@ Get the JSON Schema of the DTO:
 Map<String, dynamic> json = CreateUser.schema.toJsonSchema();
 ```
 
+## Returning a DTO
+
+A DTO can also be the response. Return the object, or a list of them, from a controller. Dox writes the fields as JSON, with the same keys that the DTO reads:
+
+```dart
+@Dto()
+class ProductView {
+  final int id;
+  final String productName;
+  final DateTime? soldAt;
+
+  const ProductView({required this.id, required this.productName, this.soldAt});
+}
+```
+
+```dart
+ProductView show(DoxRequest req) {
+  return const ProductView(id: 1, productName: 'Book');
+}
+```
+
+The client gets this JSON:
+
+```json
+{"id": 1, "product_name": "Book", "sold_at": null}
+```
+
+Dox writes the fields directly into the bytes of the response and makes no `Map`. Thus a DTO is a fast type to return.
+
+These rules apply:
+
+- The DTO must be in `AppConfig(dtos: dtos)`. See [Registering DTOs](#registering-dtos).
+- A `DateTime` becomes ISO 8601 text. An enum becomes its name.
+- A `Maybe` field with no value is not in the JSON.
+- A DTO class with its own `toJson()` keeps it. The response is then the map of that method.
+
+Run `dart run build_runner build` after you change a field.
+
 ## Using a DTO in other places
 
 - [OpenAPI docs](../guides/api-docs-with-openapi.md#5-see-how-a-dto-becomes-a-schema): each DTO becomes a schema. A `///` comment or `@Describe('...')` on a field becomes its description.

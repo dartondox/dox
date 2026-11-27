@@ -11,7 +11,8 @@ part of 'custom.dto.dart';
 /// The checks, the converter and the JSON Schema of [CreatePost].
 const DtoSchema<CreatePost> $CreatePostDto = _$CreatePostDto();
 
-class _$CreatePostDto extends DtoSchema<CreatePost> {
+class _$CreatePostDto extends DtoSchema<CreatePost>
+    implements JsonObjectWriter {
   const _$CreatePostDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -152,6 +153,21 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    CreatePost o = object as CreatePost;
+    w.startObject();
+    w.key('slug');
+    w.string(o.slug);
+    w.key('scores');
+    w.value(o.scores);
+    w.key('handle');
+    w.string(o.handle);
+    w.key('handles');
+    w.value(o.handles);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     Map<String, dynamic> j = <String, dynamic>{
       'type': 'object',
@@ -199,7 +215,7 @@ class _$CreatePostDto extends DtoSchema<CreatePost> {
 /// The checks, the converter and the JSON Schema of [ListPosts].
 const DtoSchema<ListPosts> $ListPostsDto = _$ListPostsDto();
 
-class _$ListPostsDto extends DtoSchema<ListPosts> {
+class _$ListPostsDto extends DtoSchema<ListPosts> implements JsonObjectWriter {
   const _$ListPostsDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -308,6 +324,25 @@ class _$ListPostsDto extends DtoSchema<ListPosts> {
       'color': f3,
       'note': f4,
     };
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter w) {
+    ListPosts o = object as ListPosts;
+    w.startObject();
+    w.key('page');
+    w.integer(o.page);
+    if (o.days case Maybe<int>(isPresent: true, value: int g1)) {
+      w.key('days');
+      w.integer(g1);
+    }
+    w.key('handle');
+    w.string(o.handle);
+    w.key('color');
+    w.string(o.color);
+    w.key('note');
+    w.string(o.note);
+    w.endObject();
   }
 
   @override

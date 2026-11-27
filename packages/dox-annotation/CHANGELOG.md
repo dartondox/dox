@@ -1,3 +1,7 @@
+## Unreleased
+
+- New: `JsonWriter`, `JsonWritable` and `JsonObjectWriter`. A class that implements `JsonWritable` writes its own JSON with a `JsonWriter` (`startObject`, `key`, `string`, `integer`, `dateTime`, `value`, `endObject`), with no `Map` in between. The JSON encoder of dox_core is the writer. The generator of dox_builder makes `writeJson()` for a model and a `JsonObjectWriter` for a `@Dto`. They are here so that a package below dox_core, like dox_orm, can use them.
+
 ## 3.2.0
 
 - New: `package:dox_annotation/install.dart` with `Installer`, the steps of a `<package>:install` command that `dox add` runs. `writeFile` (only when the file is not there), `makeFolder`, `addEnv` (to `.env` and `.env.example`, only when the key is missing), `addEnvGetter` (to `AppEnv` in `lib/config/env.dart`), `addDependency` (`dart pub add`, also `dev`), `buildRunner`, `note` (add your own summary line) and `printSummary`. `lines` is read only. Every step is safe to run twice. It is not in the `dox_annotation.dart` barrel.
