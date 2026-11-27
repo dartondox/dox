@@ -1,4 +1,5 @@
 import 'package:analyzer/dart/constant/value.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../openapi/dart_literal.dart';
 import 'dto_model.dart';
@@ -42,6 +43,7 @@ class DtoWriter {
     this.jsonSchema, {
     this.literal = const DartLiteral(),
     this.runtimeFlags = false,
+    this.jsonWriter = false,
   });
 
   final DtoClass dto;
@@ -55,6 +57,14 @@ class DtoWriter {
   /// (`DtoState.allErrors`). Then the code reads them at run time. An
   /// older dox_validation gets the old code, so it still compiles.
   final bool runtimeFlags;
+
+  /// `true` when the dox_annotation of the app has `JsonObjectWriter`.
+  /// Then the schema gets `writeObject()`, and dox_core writes the DTO
+  /// in a response with no map. An older dox_annotation does not get it.
+  final bool jsonWriter;
+
+  /// A DTO with its own `toJson()` keeps it: dox_core calls that method.
+  bool get _writesJson => jsonWriter && dto.element.getMethod('toJson') == null;
 
   final List<String> _statics = <String>[];
   int _regexes = 0;
@@ -77,7 +87,10 @@ class DtoWriter {
       ..writeln('/// The checks, the converter and the JSON Schema of [$name].')
       ..writeln('const DtoSchema<$name> \$${name}Dto = $_class();')
       ..writeln()
-      ..writeln('class $_class extends DtoSchema<$name> {')
+      ..writeln(
+        'class $_class extends DtoSchema<$name> '
+        '${_writesJson ? 'implements JsonObjectWriter ' : ''}{',
+      )
       ..writeln('const $_class();')
       ..writeln()
       ..writeln(
@@ -147,6 +160,7 @@ class DtoWriter {
       ..writeln(async)
       ..writeln(_fromMap())
       ..writeln(_toMap())
+      ..writeln(_writesJson ? _writeObject() : '')
       ..writeln(_toJsonSchema())
       ..writeln('}');
     return out.toString();
@@ -1063,6 +1077,65 @@ class DtoWriter {
       ..writeln('return <String, dynamic>{${entries.join(', ')}};')
       ..writeln('}');
     return out.toString();
+  }
+
+  /// `writeObject()` writes the JSON of toMap() with no map in between.
+  /// The JSON encoder of dox_core calls it for a DTO in a response.
+  String _writeObject() {
+    StringBuffer out = StringBuffer()
+      ..writeln('@override')
+      ..writeln('void writeObject(Object object, JsonWriter w) {')
+      ..writeln('${dto.name} o = object as ${dto.name};')
+      ..writeln('w.startObject();');
+    for (int i = 0; i < dto.fields.length; i++) {
+      DtoField field = dto.fields[i];
+      String key = 'w.key(${_keyLiteral(field)});';
+      if (field.maybe) {
+        String type = field.type.code;
+        out.writeln(
+          'if (o.${field.name} case '
+          'Maybe<$type>(isPresent: true, value: $type g$i)) '
+          '{ $key ${_writeValue(field.type, 'g$i')} }',
+        );
+      } else {
+        out.writeln('$key ${_writeValue(field.type, 'o.${field.name}')}');
+      }
+    }
+    out
+      ..writeln('w.endObject();')
+      ..writeln('}');
+    return out.toString();
+  }
+
+  /// The writer call for [value] (of [type]). It gives the JSON of
+  /// [_toValue].
+  String _writeValue(DtoType type, String value) {
+    String dot = type.nullable ? '?.' : '.';
+    return switch (type.kind) {
+      DtoKind.string => 'w.string($value);',
+      DtoKind.integer => 'w.integer($value);',
+      DtoKind.date => 'w.dateTime($value);',
+      DtoKind.enumName => 'w.string($value${dot}name);',
+      _ when _encoderWrites(type) => 'w.value($value);',
+      _ => 'w.value(${_toValue(type, value, 0)});',
+    };
+  }
+
+  /// `true` when the JSON encoder writes a value of [type] as toMap()
+  /// gives it. A date or an enum in a list is not: toMap() changes it
+  /// first. A nested DTO is, because the encoder finds its writer. But a
+  /// nested DTO with its own `toJson()` is not: toMap() does not call that
+  /// method, and the encoder does.
+  bool _encoderWrites(DtoType type) {
+    return switch (type.kind) {
+      DtoKind.date || DtoKind.enumName => false,
+      DtoKind.dto => switch (type.type.element) {
+        InterfaceElement e => e.getMethod('toJson') == null,
+        _ => false,
+      },
+      DtoKind.list || DtoKind.map => _encoderWrites(type.item!),
+      _ => true,
+    };
   }
 
   /// [value] (of [type]) as a JSON-like value.

@@ -1,11 +1,24 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:dox_annotation/dox_annotation.dart';
+import 'package:dox_core/app.dart';
 import 'package:dox_core/utils/json_bytes_encoder.dart';
+import 'package:dox_validation/dox_validation.dart' show DtoSchema;
 
 /// encodes json straight to utf8 bytes, without building a String first.
 /// One encoder for the isolate: it keeps its buffer between calls.
-final JsonBytesEncoder _jsonBytesEncoder = JsonBytesEncoder(advanceEncode);
+final JsonBytesEncoder _jsonBytesEncoder = JsonBytesEncoder(
+  advanceEncode,
+  writerOf: _dtoWriter,
+);
+
+/// The schema of a DTO (`AppConfig(dtos: dtos)`) that can write the JSON
+/// of [object], or null. A DTO class with its own `toJson()` has none.
+JsonObjectWriter? _dtoWriter(Object object) {
+  DtoSchema<Object>? schema = Dox().dtos.ofType(object.runtimeType);
+  return schema is JsonObjectWriter ? schema as JsonObjectWriter : null;
+}
 
 /// [value] as JSON bytes with no copy, for the response of the native
 /// server. The next JSON encode in this isolate writes over the result,
@@ -96,6 +109,11 @@ class JSON {
 dynamic advanceEncode(dynamic object) {
   if (object is DateTime) {
     return object.toIso8601String();
+  }
+  // a DTO in a response has no toJson(): its schema makes the map
+  DtoSchema<Object>? schema = Dox().dtos.ofType(object.runtimeType);
+  if (schema != null && schema is JsonObjectWriter) {
+    return schema.toMap(object as Object);
   }
   return object.toJson();
 }

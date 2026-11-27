@@ -27,6 +27,8 @@ This is what the client gets for each type:
 | a `String` | the text |
 | a `Map` or a `List` | JSON |
 | a model, a list of models, a [serializer](serializer.md) | JSON (from `toJson()`) |
+| a [DTO](dto.md#returning-a-dto) or a list of DTOs | JSON (from its fields) |
+| an object with `writeJson()` | JSON, see [Write the JSON yourself](#write-the-json-yourself) |
 | a `DateTime` | the ISO 8601 text |
 | an `IHttpException`, like `NotFoundHttpException()` | its status code and JSON: `{"code": ..., "message": ...}` |
 | a `File` (from `dart:io`) | the file, streamed |
@@ -35,6 +37,45 @@ This is what the client gets for each type:
 | `response(...)` | full control: status, headers, cookies |
 
 The `htmlStrings` flag sends a string as HTML. See [Core flags](../reference/app-config.md#core-flags).
+
+### Write the JSON yourself
+
+A class with `toJson()` makes a `Map` for each response. To make no map, implement `JsonWritable`. Dox then calls `writeJson()`, and the class writes its fields directly into the bytes of the response:
+
+```dart
+class Item implements JsonWritable {
+  Item(this.id, this.name);
+  final int id;
+  final String name;
+
+  @override
+  void writeJson(JsonWriter writer) {
+    writer.startObject();
+    writer.key('id');
+    writer.integer(id);
+    writer.key('name');
+    writer.string(name);
+    writer.endObject();
+  }
+}
+```
+
+The writer has these methods:
+
+| Method | It writes |
+| --- | --- |
+| `startObject()` and `endObject()` | `{` and `}` |
+| `key(name)` | the name of the next field |
+| `string(value)` | a text, or `null` |
+| `integer(value)` | a whole number, or `null` |
+| `dateTime(value)` | a date as ISO 8601 text, or `null` |
+| `value(value)` | any other value: a `double`, a `bool`, a `List`, a `Map` or an object |
+
+Write one value after each `key()`. The writer adds the commas.
+
+You do not write this method for a model or for a [DTO](dto.md#returning-a-dto). The generator writes it.
+
+`JSON.stringify()` and `jsonEncode()` do not call `writeJson()`. If you use them with the class, also give it a `toJson()`.
 
 ## Errors
 

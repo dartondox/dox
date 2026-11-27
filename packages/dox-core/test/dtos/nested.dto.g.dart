@@ -11,7 +11,7 @@ part of 'nested.dto.dart';
 /// The checks, the converter and the JSON Schema of [Address].
 const DtoSchema<Address> $AddressDto = _$AddressDto();
 
-class _$AddressDto extends DtoSchema<Address> {
+class _$AddressDto extends DtoSchema<Address> implements JsonObjectWriter {
   const _$AddressDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -82,6 +82,17 @@ class _$AddressDto extends DtoSchema<Address> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    Address o = object as Address;
+    w.startObject();
+    w.key('city');
+    w.string(o.city);
+    w.key('post_code');
+    w.string(o.postCode);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -102,7 +113,7 @@ class _$AddressDto extends DtoSchema<Address> {
 /// The checks, the converter and the JSON Schema of [OrderItem].
 const DtoSchema<OrderItem> $OrderItemDto = _$OrderItemDto();
 
-class _$OrderItemDto extends DtoSchema<OrderItem> {
+class _$OrderItemDto extends DtoSchema<OrderItem> implements JsonObjectWriter {
   const _$OrderItemDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -165,6 +176,17 @@ class _$OrderItemDto extends DtoSchema<OrderItem> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    OrderItem o = object as OrderItem;
+    w.startObject();
+    w.key('name');
+    w.string(o.name);
+    w.key('quantity');
+    w.integer(o.quantity);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -181,7 +203,8 @@ class _$OrderItemDto extends DtoSchema<OrderItem> {
 /// The checks, the converter and the JSON Schema of [CreateOrder].
 const DtoSchema<CreateOrder> $CreateOrderDto = _$CreateOrderDto();
 
-class _$CreateOrderDto extends DtoSchema<CreateOrder> {
+class _$CreateOrderDto extends DtoSchema<CreateOrder>
+    implements JsonObjectWriter {
   const _$CreateOrderDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -306,6 +329,19 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    CreateOrder o = object as CreateOrder;
+    w.startObject();
+    w.key('address');
+    w.value(o.address);
+    w.key('items');
+    w.value(o.items);
+    w.key('billing');
+    w.value(o.billing);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -359,7 +395,7 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder> {
 /// The checks, the converter and the JSON Schema of [SignUp].
 const DtoSchema<SignUp> $SignUpDto = _$SignUpDto();
 
-class _$SignUpDto extends DtoSchema<SignUp> {
+class _$SignUpDto extends DtoSchema<SignUp> implements JsonObjectWriter {
   const _$SignUpDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -460,6 +496,21 @@ class _$SignUpDto extends DtoSchema<SignUp> {
   }
 
   @override
+  void writeObject(Object object, JsonWriter w) {
+    SignUp o = object as SignUp;
+    w.startObject();
+    w.key('password');
+    w.string(o.password);
+    w.key('password_confirmation');
+    w.string(o.passwordConfirmation);
+    w.key('starts_at');
+    w.dateTime(o.startsAt);
+    w.key('ends_at');
+    w.dateTime(o.endsAt);
+    w.endObject();
+  }
+
+  @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
       'type': 'object',
@@ -484,7 +535,8 @@ class _$SignUpDto extends DtoSchema<SignUp> {
 /// The checks, the converter and the JSON Schema of [AsyncCheck].
 const DtoSchema<AsyncCheck> $AsyncCheckDto = _$AsyncCheckDto();
 
-class _$AsyncCheckDto extends DtoSchema<AsyncCheck> {
+class _$AsyncCheckDto extends DtoSchema<AsyncCheck>
+    implements JsonObjectWriter {
   const _$AsyncCheckDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -534,6 +586,15 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck> {
   Map<String, dynamic> toMap(AsyncCheck o) {
     String f0 = o.code;
     return <String, dynamic>{'code': f0};
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter w) {
+    AsyncCheck o = object as AsyncCheck;
+    w.startObject();
+    w.key('code');
+    w.string(o.code);
+    w.endObject();
   }
 
   @override

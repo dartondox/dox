@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:dox_annotation/dox_annotation.dart';
+
 /// Encodes a value to JSON as UTF-8 bytes, in one pass, into one buffer.
 ///
 /// It gives the same bytes and the same errors as `JsonUtf8Encoder`. That
@@ -11,12 +13,21 @@ import 'dart:typed_data';
 /// wrote, because an app writes the same few keys again and again.
 ///
 /// One encoder keeps its buffer between calls, so use one per isolate.
-class JsonBytesEncoder {
-  JsonBytesEncoder(this._toEncodable);
+class JsonBytesEncoder implements JsonWriter {
+  JsonBytesEncoder(
+    this._toEncodable, {
+    JsonObjectWriter? Function(Object)? writerOf,
+    // ignore: prefer_initializing_formals
+  }) : _writerOf = writerOf;
 
   /// called for a value that is not a JSON value. It gets one chance to
   /// return one.
   final dynamic Function(dynamic object) _toEncodable;
+
+  /// gives the writer of an object that is not a JSON value and not a
+  /// [JsonWritable], or null. Such an object does not go to
+  /// [_toEncodable].
+  final JsonObjectWriter? Function(Object object)? _writerOf;
 
   /// the first size of the buffer
   static const int _startSize = 4096;
@@ -71,7 +82,7 @@ class JsonBytesEncoder {
   /// Throws a `JsonUnsupportedObjectError` for a value that is not a JSON
   /// value, and a `JsonCyclicError` for a value that holds itself.
   Uint8List convert(Object? value) {
-    if (_busy) return JsonBytesEncoder(_toEncodable).convert(value);
+    if (_busy) return _fresh().convert(value);
     return Uint8List.fromList(_encode(value));
   }
 
@@ -82,8 +93,13 @@ class JsonBytesEncoder {
   /// the result only when it is copied or sent before any other code can
   /// encode JSON. If you are not sure, use [convert].
   Uint8List convertView(Object? value) {
-    if (_busy) return JsonBytesEncoder(_toEncodable).convert(value);
+    if (_busy) return _fresh().convert(value);
     return _encode(value);
+  }
+
+  /// A new encoder with the same settings, for a call from inside a call.
+  JsonBytesEncoder _fresh() {
+    return JsonBytesEncoder(_toEncodable, writerOf: _writerOf);
   }
 
   /// Writes [value] into the buffer and gives the written part of it.
@@ -131,13 +147,129 @@ class JsonBytesEncoder {
     if (_writeJsonValue(object)) return;
     _checkCycle(object);
     try {
-      dynamic custom = _toEncodable(object);
-      if (!_writeJsonValue(custom)) throw JsonUnsupportedObjectError(object);
+      if (object is JsonWritable) {
+        // the object writes its fields itself: no map is made
+        object.writeJson(this);
+      } else if (_writerOf?.call(object!) case JsonObjectWriter writer) {
+        writer.writeObject(object!, this);
+      } else {
+        dynamic custom = _toEncodable(object);
+        if (!_writeJsonValue(custom)) throw JsonUnsupportedObjectError(object);
+      }
       _seen.removeLast();
     } catch (error) {
       throw JsonUnsupportedObjectError(object, cause: error);
     }
   }
+
+  @override
+  void startObject() {
+    _reserve(1);
+    _buffer[_length++] = 0x7B;
+  }
+
+  /// A comma goes before each key but the first. The byte before the
+  /// first key is the `{` of [startObject]: no value ends with that byte.
+  @override
+  void key(String key) {
+    bool comma = _length > 0 && _buffer[_length - 1] != 0x7B;
+    if (key.length <= _cacheKeyLength) {
+      _writeCachedKey(key, key.hashCode & (_cacheSize - 1), comma);
+      return;
+    }
+    _reserve(1);
+    if (comma) _buffer[_length++] = _comma;
+    _writeString(key);
+    _reserve(1);
+    _buffer[_length++] = _colon;
+  }
+
+  @override
+  void endObject() {
+    _reserve(1);
+    _buffer[_length++] = 0x7D;
+  }
+
+  @override
+  void string(String? value) {
+    if (value == null) {
+      _writeAscii('null');
+    } else {
+      _writeString(value);
+    }
+  }
+
+  @override
+  void integer(int? value) {
+    if (value == null) {
+      _writeAscii('null');
+    } else {
+      _writeInt(value);
+    }
+  }
+
+  /// The same text as `toIso8601String()`, with no `String` in between:
+  /// `2024-05-17T03:04:05.006Z`. The 3 digits of the microseconds are
+  /// there only when they are not 0, and the `Z` only for a UTC time.
+  @override
+  void dateTime(DateTime? value) {
+    if (value == null) {
+      _writeAscii('null');
+      return;
+    }
+    int year = value.year;
+    if (year < 0 || year > 9999) {
+      // a sign or 6 digits: rare, so the SDK makes the text
+      _writeString(value.toIso8601String());
+      return;
+    }
+    // the longest text: 2 quotes, 26 characters and the Z
+    _reserve(29);
+    Uint8List buffer = _buffer;
+    int at = _length;
+    buffer[at++] = _quote;
+    buffer[at++] = _zero + year ~/ 1000;
+    buffer[at++] = _zero + year ~/ 100 % 10;
+    buffer[at++] = _zero + year ~/ 10 % 10;
+    buffer[at++] = _zero + year % 10;
+    buffer[at++] = _minus;
+    int part = value.month;
+    buffer[at++] = _zero + part ~/ 10;
+    buffer[at++] = _zero + part % 10;
+    buffer[at++] = _minus;
+    part = value.day;
+    buffer[at++] = _zero + part ~/ 10;
+    buffer[at++] = _zero + part % 10;
+    buffer[at++] = 0x54; // T
+    part = value.hour;
+    buffer[at++] = _zero + part ~/ 10;
+    buffer[at++] = _zero + part % 10;
+    buffer[at++] = _colon;
+    part = value.minute;
+    buffer[at++] = _zero + part ~/ 10;
+    buffer[at++] = _zero + part % 10;
+    buffer[at++] = _colon;
+    part = value.second;
+    buffer[at++] = _zero + part ~/ 10;
+    buffer[at++] = _zero + part % 10;
+    buffer[at++] = 0x2E; // .
+    part = value.millisecond;
+    buffer[at++] = _zero + part ~/ 100;
+    buffer[at++] = _zero + part ~/ 10 % 10;
+    buffer[at++] = _zero + part % 10;
+    part = value.microsecond;
+    if (part != 0) {
+      buffer[at++] = _zero + part ~/ 100;
+      buffer[at++] = _zero + part ~/ 10 % 10;
+      buffer[at++] = _zero + part % 10;
+    }
+    if (value.isUtc) buffer[at++] = 0x5A; // Z
+    buffer[at++] = _quote;
+    _length = at;
+  }
+
+  @override
+  void value(Object? value) => _writeObject(value);
 
   /// Writes a number, a `String`, a `bool`, `null`, a `List` or a `Map`.
   /// Returns false for any other value, and for a map with a key that is

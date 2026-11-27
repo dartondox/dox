@@ -5,6 +5,8 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_http_native/dox_http_native.dart';
 import 'package:test/test.dart';
 
+import '../dtos/dtos.dart';
+import '../dtos/response.dto.dart';
 import '../utils/start_http_server.dart';
 import '../utils/test_app_key.dart';
 
@@ -18,6 +20,7 @@ AppConfig _config({bool compress = false}) {
     serverPort: 0,
     totalIsolate: 1,
     compress: compress,
+    dtos: testDtos,
   );
 }
 
@@ -31,6 +34,16 @@ Map<String, dynamic> _item(int n) {
     'tags': List<String>.generate(n % 7, (int i) => 'tag-$n-$i'),
     'text': 'x$n' * ((n * 37) % 15000),
   };
+}
+
+ProductView _product(int id) {
+  return ProductView(
+    id: id,
+    productName: 'product $id',
+    price: id / 2,
+    inStock: true,
+    soldAt: DateTime.utc(2024, 5, id),
+  );
 }
 
 Future<String> _get(HttpClient client, String path) async {
@@ -57,6 +70,12 @@ void _routes() {
   });
   Route.get('/bad', (DoxRequest req) {
     return <String, dynamic>{'ok': true, 'bad': _NoToJson()};
+  });
+  Route.get('/dto', (DoxRequest req) {
+    return _product(1);
+  });
+  Route.get('/dtos', (DoxRequest req) {
+    return <ProductView>[_product(1), _product(2)];
   });
   Route.get('/huge', (DoxRequest req) {
     return <String, dynamic>{'text': 'é' * (1 << 20)};
@@ -92,6 +111,20 @@ void main() {
   test('the same with gzip', () async {
     await startHttpServer(_config(compress: true));
     await _manyAtOnce();
+  });
+
+  test('a DTO and a list of DTOs as the response', () async {
+    await startHttpServer(_config());
+    HttpClient client = HttpClient();
+    String one =
+        '{"id":1,"product_name":"product 1","price":0.5,"in_stock":true,'
+        '"sold_at":"2024-05-01T00:00:00.000Z"}';
+    String two =
+        '{"id":2,"product_name":"product 2","price":1.0,"in_stock":true,'
+        '"sold_at":"2024-05-02T00:00:00.000Z"}';
+    expect(await _get(client, '/dto'), one);
+    expect(await _get(client, '/dtos'), '[$one,$two]');
+    client.close();
   });
 
   test('a small body after a very large one', () async {

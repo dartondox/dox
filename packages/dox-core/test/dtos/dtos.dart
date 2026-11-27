@@ -3,6 +3,7 @@ import 'package:dox_core/dox_core.dart';
 import 'custom.dto.dart';
 import 'files.dto.dart';
 import 'nested.dto.dart';
+import 'response.dto.dart';
 import 'rules.dto.dart';
 
 /// Every test DTO, like `lib/generated/dtos.g.dart` in an app.
@@ -28,4 +29,7 @@ const List<DtoSchema<Object>> testDtos = <DtoSchema<Object>>[
   $CreatePostDto,
   $ListPostsDto,
   $UploadAvatarDto,
+  $OwnJsonDto,
+  $ProductViewDto,
+  $MixedViewDto,
 ];

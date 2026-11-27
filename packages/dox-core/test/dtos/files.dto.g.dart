@@ -11,7 +11,8 @@ part of 'files.dto.dart';
 /// The checks, the converter and the JSON Schema of [UploadAvatar].
 const DtoSchema<UploadAvatar> $UploadAvatarDto = _$UploadAvatarDto();
 
-class _$UploadAvatarDto extends DtoSchema<UploadAvatar> {
+class _$UploadAvatarDto extends DtoSchema<UploadAvatar>
+    implements JsonObjectWriter {
   const _$UploadAvatarDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -140,6 +141,19 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar> {
     List<RequestFile> f1 = o.documents;
     String? f2 = o.title;
     return <String, dynamic>{'avatar': f0, 'documents': f1, 'title': f2};
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter w) {
+    UploadAvatar o = object as UploadAvatar;
+    w.startObject();
+    w.key('avatar');
+    w.value(o.avatar);
+    w.key('documents');
+    w.value(o.documents);
+    w.key('title');
+    w.string(o.title);
+    w.endObject();
   }
 
   @override

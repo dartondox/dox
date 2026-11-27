@@ -11,7 +11,8 @@ part of 'laravel.dto.dart';
 /// The checks, the converter and the JSON Schema of [LaravelRules].
 const DtoSchema<LaravelRules> $LaravelRulesDto = _$LaravelRulesDto();
 
-class _$LaravelRulesDto extends DtoSchema<LaravelRules> {
+class _$LaravelRulesDto extends DtoSchema<LaravelRules>
+    implements JsonObjectWriter {
   const _$LaravelRulesDto();
 
   static const Map<String, String> _m = <String, String>{};
@@ -201,6 +202,37 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules> {
       'id': f10,
       'max': f11,
     };
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter w) {
+    LaravelRules o = object as LaravelRules;
+    w.startObject();
+    w.key('first_name');
+    w.string(o.firstName);
+    w.key('age');
+    w.integer(o.age);
+    w.key('terms');
+    w.value(o.terms);
+    w.key('start');
+    w.dateTime(o.start);
+    w.key('end');
+    w.dateTime(o.end);
+    w.key('type');
+    w.string(o.type);
+    w.key('company');
+    w.string(o.company);
+    w.key('vat');
+    w.string(o.vat);
+    w.key('debug');
+    w.string(o.debug);
+    w.key('nick');
+    w.string(o.nick);
+    w.key('id');
+    w.string(o.id);
+    w.key('max');
+    w.integer(o.max);
+    w.endObject();
   }
 
   @override

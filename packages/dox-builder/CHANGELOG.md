@@ -1,3 +1,8 @@
+## Unreleased
+
+- Faster: a model gets a `writeJson()` method. The JSON encoder of dox_core calls it for a response, and the model writes its JSON with no `Map` in between. The keys have the order of `toJson()`: the columns, the eager relations, the preloaded relations, then the computed values. `hidden` is applied. For a row that needs more (`makeHidden`, `makeVisible`, `visibleFields`, a `with...()` aggregate, a `pivot` key, or a class that extends the model), `writeJson()` writes the map of `toJson()`. A model gets no `writeJson()` when it has its own `toJson()`, `toMap()`, `columnsToMap()`, `convertToMap()` or `setComputedValues()`, a column with `beforeSave`, or the same key two times. It is made only when the dox_orm of the app has `Model.$jsonHidden` and the dox_annotation has `JsonWriter`, so the code still compiles with older packages. Run `dart run build_runner build` to get the new code.
+- New: the schema of a `@Dto` gets a `writeObject()` method, so a controller can return the DTO. It writes the JSON of `toMap()` with no `Map` in between. A DTO class with its own `toJson()` gets none. It is made only when the dox_annotation of the app has `JsonObjectWriter`.
+
 ## 3.2.2
 
 - Faster: a model gets a `$columnValue(column)` method, a switch that gives one value of `columnsToMap()` without making the whole map. dox_orm reads the relation keys of each row with it. It is made only when the dox_orm of the app has `Model.$columnValue`, so the code still compiles with an older dox_orm. A column with `beforeSave` is not in the switch: it falls back to `columnsToMap()`. A model with its own `columnsToMap()` gets no switch.
