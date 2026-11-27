@@ -46,14 +46,31 @@ class JsonBytesEncoder {
   /// value, and a `JsonCyclicError` for a value that holds itself.
   Uint8List convert(Object? value) {
     if (_busy) return JsonBytesEncoder(_toEncodable).convert(value);
+    return Uint8List.fromList(_encode(value));
+  }
+
+  /// [value] as JSON bytes, with no copy: the result is a part of the
+  /// buffer of this encoder.
+  ///
+  /// The next [convert] or [convertView] writes over these bytes. So use
+  /// the result only when it is copied or sent before any other code can
+  /// encode JSON. If you are not sure, use [convert].
+  Uint8List convertView(Object? value) {
+    if (_busy) return JsonBytesEncoder(_toEncodable).convert(value);
+    return _encode(value);
+  }
+
+  /// Writes [value] into the buffer and gives the written part of it.
+  Uint8List _encode(Object? value) {
     _busy = true;
     _length = 0;
     try {
       _writeObject(value);
-      return Uint8List.fromList(Uint8List.sublistView(_buffer, 0, _length));
+      return Uint8List.sublistView(_buffer, 0, _length);
     } finally {
       _busy = false;
       _seen.clear();
+      // the result keeps the large buffer until it is not used any more
       if (_buffer.length > _keepSize) _buffer = Uint8List(_startSize);
     }
   }

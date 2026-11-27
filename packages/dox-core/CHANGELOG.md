@@ -1,6 +1,6 @@
 ## Unreleased
 
-- Faster: Dox encodes a JSON response with its own encoder, not with `JsonUtf8Encoder` of the Dart SDK. For a body of 6.7 kB, the encode time goes from 41.9 µs to 18.5 µs. For a small body, it is 2.4 to 2.8 times faster. Measured on 2 server cores, a route that returns 40 items does 42% more requests a second, and 37% more with gzip. The bytes of the response do not change. `JSON.bytes` uses the same encoder. One error detail changes: if a map has a key that is not a `String` and also a value that is not JSON, the error can name the value and not the map.
+- Faster: Dox encodes a JSON response with its own encoder, not with `JsonUtf8Encoder` of the Dart SDK. For a body of 6.7 kB, the encode time goes from 41.9 µs to 18.5 µs. For a small body, it is 2.4 to 2.8 times faster. Measured on 2 server cores, a route that returns 40 items does 42% more requests a second, and 37% more with gzip. The bytes of the response do not change. `JSON.bytes` uses the same encoder. A JSON response of the native server also does not copy the encoded bytes before the server takes them: the same route does 4% to 6% more requests a second (3% with gzip), and each response makes less garbage. One error detail changes: if a map has a key that is not a `String` and also a value that is not JSON, the error can name the value and not the map.
 
 ## 3.2.6
 

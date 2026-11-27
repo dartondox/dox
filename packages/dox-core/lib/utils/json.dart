@@ -1,10 +1,19 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:dox_core/utils/json_bytes_encoder.dart';
 
 /// encodes json straight to utf8 bytes, without building a String first.
 /// One encoder for the isolate: it keeps its buffer between calls.
 final JsonBytesEncoder _jsonBytesEncoder = JsonBytesEncoder(advanceEncode);
+
+/// [value] as JSON bytes with no copy, for the response of the native
+/// server. The next JSON encode in this isolate writes over the result,
+/// so the caller must give the bytes to the response at once. All other
+/// code uses `JSON.bytes`.
+Uint8List jsonBytesView(Object? value) {
+  return _jsonBytesEncoder.convertView(value);
+}
 
 /// decodes utf8 bytes straight into json, without a middle String.
 final Converter<List<int>, Object?> _jsonUtf8Decoder = utf8.decoder.fuse(

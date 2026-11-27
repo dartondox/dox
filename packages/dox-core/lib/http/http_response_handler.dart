@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/server/dox_server.dart';
+import 'package:dox_core/utils/json.dart' show jsonBytesView;
 import 'package:dox_http_native/dox_http_native.dart' show NativeResponse;
 
 dynamic httpResponseHandler(dynamic payload, HttpRequest request) {
@@ -190,7 +191,12 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     bytes = payload.bytes;
     res.headers.contentType = ContentType.json;
   } else {
-    bytes = JSON.bytes(payload);
+    // The native response copies the body into the memory of the server
+    // when it ends, a few lines down. So the encoder does not make its
+    // own copy first.
+    bytes = res is NativeResponse
+        ? jsonBytesView(payload)
+        : JSON.bytes(payload);
     res.headers.contentType = ContentType.json;
   }
 
@@ -199,7 +205,15 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   /// dart:io only gzips when the length is not set, so skip it then.
   if (!Dox().config.compress) res.contentLength = bytes.length;
   res.add(bytes);
-  endResponse(res);
+  try {
+    endResponse(res);
+  } catch (_) {
+    // The end failed and the response still has the body. Take it out:
+    // the bytes can be a part of the encoder buffer, and the next encode
+    // writes over them.
+    if (res is NativeResponse) res.takeBody();
+    rethrow;
+  }
 }
 
 /// true when the head of [res] already went out (a flush or a streamed
