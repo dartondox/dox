@@ -175,13 +175,17 @@ String? get tlsKey;
 The getters hold only the keys. The config file makes the `TlsOptions`:
 
 ```dart title="lib/config/app.dart"
-String? tlsCert = env.tlsCert;
-String? tlsKey = env.tlsKey;
+TlsOptions? tlsOptions() {
+  String? cert = env.tlsCert;
+  String? key = env.tlsKey;
+  if (cert == null || key == null) {
+    return null;
+  }
+  return TlsOptions(certificatePath: cert, keyPath: key);
+}
 
 AppConfig appConfig = AppConfig(
-  tls: tlsCert == null || tlsKey == null
-      ? null
-      : TlsOptions(certificatePath: tlsCert, keyPath: tlsKey),
+  tls: tlsOptions(),
   // ...
 );
 ```
