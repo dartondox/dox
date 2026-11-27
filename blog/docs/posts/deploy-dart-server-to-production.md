@@ -182,7 +182,7 @@ So a deploy with a new migration needs no extra step.
 When you run many machines, run the migrations in one place only.
 For example, run `dox migrate` one time in CI before the new version starts.
 Then two machines can not migrate at the same time.
-See [Migration](/latest/database/migration/).
+See [Migration](/latest/database/migration/), or the post [Dart ORM with migrations in Dox](dart-orm-models-relations-migrations.md).
 
 ## 5. Turn on HTTPS
 

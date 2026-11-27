@@ -100,6 +100,7 @@ dox migration:run
 
 Then start `dox s` again.
 The server also runs new migrations each time it starts.
+For relations and more queries, read [Dart ORM with migrations in Dox](dart-orm-models-relations-migrations.md).
 
 Docs: [Step 2: Model and migration](/latest/tutorial/02-model-and-migration/), [Model](/latest/database/model/)
 
