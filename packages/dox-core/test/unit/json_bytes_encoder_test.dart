@@ -415,6 +415,263 @@ void main() {
       expect(utf8.decode(own.convert(values[1])), '{"a":1,"2":3}');
     });
 
+    test('text of each length with a special character at each place', () {
+      // the encoder writes 8 characters at a time and must stop at these
+      List<String> specials = <String>[
+        '"',
+        '\\',
+        '\n',
+        '\u001f',
+        '\u007f',
+        '\u0080',
+        'é',
+        'မ',
+        '😀',
+        String.fromCharCode(0xD83D),
+      ];
+      for (int length = 0; length <= 40; length++) {
+        String plain = String.fromCharCodes(<int>[
+          for (int i = 0; i < length; i++) 0x61 + i % 26,
+        ]);
+        expect(_own.convert(plain), _sdk.convert(plain), reason: plain);
+        for (int at = 0; at < length; at++) {
+          for (String special in specials) {
+            String text =
+                plain.substring(0, at) + special + plain.substring(at + 1);
+            expect(
+              _own.convert(text),
+              _sdk.convert(text),
+              reason: 'length $length, ${special.codeUnits} at $at',
+            );
+          }
+        }
+      }
+    });
+
+    test('8 characters at a time: the edge values of a character', () {
+      // 0x1f and 0x20, 0x21 to 0x23, 0x5b to 0x5d, 0x7f and 0x80
+      for (int unit in <int>[
+        0x1F,
+        0x20,
+        0x21,
+        0x22,
+        0x23,
+        0x5B,
+        0x5C,
+        0x5D,
+        0x7E,
+        0x7F,
+        0x80,
+        0xFF,
+        0x100,
+        0x2022,
+        0x5C5C,
+      ]) {
+        for (int at = 0; at < 8; at++) {
+          List<int> units = List<int>.filled(16, 0x61)..[at] = unit;
+          String text = String.fromCharCodes(units);
+          expect(
+            _own.convert(text),
+            _sdk.convert(text),
+            reason: '$unit at $at',
+          );
+        }
+      }
+    });
+
+    group('key cache |', () {
+      // keys made at run time: equal to each other, but not the same object
+      String key(String text) => String.fromCharCodes(text.codeUnits);
+
+      void same(Object? value) {
+        expect(
+          utf8.decode(_own.convert(value)),
+          utf8.decode(_sdk.convert(value)),
+        );
+      }
+
+      test('a list of maps with the same keys', () {
+        same(<Object?>[
+          for (int i = 0; i < 50; i++)
+            <String, Object?>{
+              key('id'): i,
+              key('name'): 'row $i',
+              key('rating'): <String, Object?>{
+                key('score'): i,
+                key('count'): 2,
+              },
+              key('tags'): <String>['a', 'b'],
+            },
+        ]);
+      });
+
+      test('maps with other keys at the same place', () {
+        same(<Object?>[
+          <String, int>{'a': 1, 'b': 2},
+          <String, int>{'b': 1, 'a': 2},
+          <String, int>{'a': 1},
+          <String, int>{'ab': 1, 'b': 2},
+          <String, int>{'a': 1, 'bc': 2, 'c': 3},
+          <String, int>{},
+          <String, int>{'a': 1, 'b': 2},
+        ]);
+      });
+
+      test('a key that is the start of the key before it', () {
+        same(<Object?>[
+          <String, int>{'category_name': 1},
+          <String, int>{'category': 1},
+          <String, int>{'cat': 1},
+          <String, int>{'category_name': 1},
+          <String, int>{'': 1},
+          <String, int>{'c': 1},
+        ]);
+      });
+
+      test('keys of 28 to 34 characters, and an empty key', () {
+        for (int length in <int>[
+          0,
+          1,
+          5,
+          6,
+          7,
+          13,
+          14,
+          21,
+          22,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          100,
+        ]) {
+          String long = 'k' * length;
+          same(<Object?>[
+            for (int i = 0; i < 4; i++) <String, int>{long: i, 'z': i},
+          ]);
+        }
+      });
+
+      test('keys with an escape or with text that is not ASCII', () {
+        for (String text in <String>[
+          'a"b',
+          'a\\b',
+          'a\nb',
+          'é',
+          'မြန်မာ',
+          '😀',
+          'a\u007fb',
+        ]) {
+          same(<Object?>[
+            for (int i = 0; i < 4; i++) <String, int>{key(text): i, 'z': i},
+          ]);
+        }
+      });
+
+      test('a map with many keys', () {
+        same(<Object?>[
+          for (int i = 0; i < 3; i++)
+            <String, int>{for (int k = 0; k < 40; k++) 'key$k': k + i},
+        ]);
+      });
+
+      test('two keys that use the same place of the cache', () {
+        // the place of a key is the low 10 bits of its hash code
+        Map<int, String> seen = <int, String>{};
+        String? first;
+        String? second;
+        for (int i = 0; second == null; i++) {
+          String name = 'key$i';
+          String? other = seen[name.hashCode & 1023];
+          if (other == null) {
+            seen[name.hashCode & 1023] = name;
+          } else {
+            first = other;
+            second = name;
+          }
+        }
+        same(<Object?>[
+          for (int i = 0; i < 6; i++)
+            <String, int>{first!: i, second: i, first + second: i},
+        ]);
+        same(<String, int>{second: 1, first!: 2, second + first: 3});
+      });
+
+      test('maps in maps', () {
+        Object? deep(int level) {
+          if (level == 0) return <String, int>{'leaf': 1};
+          return <String, Object?>{'level$level': deep(level - 1), 'n': level};
+        }
+
+        same(<Object?>[deep(12), deep(12), deep(3)]);
+      });
+
+      test('right after a map with a bad key, and after an error', () {
+        Map<String, int> row = <String, int>{'id': 1, 'name': 2};
+        same(<Object?>[row, row]);
+        expect(
+          () => _own.convert(<Object?>[
+            row,
+            <Object, int>{'id': 1, 2: 2},
+          ]),
+          throwsA(isA<JsonUnsupportedObjectError>()),
+        );
+        expect(
+          () => _own.convert(<String, Object?>{
+            'a': <String, Object?>{'id': 1, 'bad': _NoToJson()},
+          }),
+          throwsA(isA<JsonUnsupportedObjectError>()),
+        );
+        same(<Object?>[row, row]);
+        same(<String, Object?>{'a': row, 'b': row});
+      });
+
+      test('random lists of maps from a few keys, same bytes as the SDK', () {
+        Random random = Random(11);
+        List<String> pool = <String>[
+          'id',
+          'name',
+          'n',
+          '',
+          'category',
+          'category_name',
+          'created_at',
+          'a_key_of_29_characters_xxxxxx',
+          'a_key_of_30_characters_xxxxxxx',
+          'a_longer_key_than_the_cache_keeps_in_its_words',
+          'é',
+          'a"b',
+          'မြန်',
+        ];
+        Object? make(int depth) {
+          int kind = random.nextInt(depth > 5 ? 3 : 8);
+          if (kind == 0) return random.nextInt(1000);
+          if (kind == 1) return 'text ${random.nextInt(99)}';
+          if (kind == 2) return random.nextBool();
+          if (kind < 5) {
+            return <Object?>[
+              for (int i = random.nextInt(5); i > 0; i--) make(depth + 1),
+            ];
+          }
+          // most maps of a call have the same keys in the same order
+          int first = random.nextInt(4) == 0 ? random.nextInt(pool.length) : 0;
+          int count = random.nextInt(4) == 0 ? random.nextInt(6) : 4;
+          return <String, Object?>{
+            for (int i = 0; i < count; i++)
+              key(pool[(first + i) % pool.length]): make(depth + 1),
+          };
+        }
+
+        for (int i = 0; i < 5000; i++) {
+          Object? value = make(0);
+          expect(_own.convert(value), _sdk.convert(value), reason: 'value $i');
+        }
+      });
+    });
+
     test('a value that holds itself is an error', () {
       List<Object?> list = <Object?>[];
       list.add(list);
