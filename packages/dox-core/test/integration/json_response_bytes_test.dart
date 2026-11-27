@@ -27,7 +27,7 @@ class _NoToJson {}
 Map<String, dynamic> _item(int n) {
   return <String, dynamic>{
     'id': n,
-    'name': 'item $n é 日本',
+    'name': 'item $n é 日本 မြန်မာစာ 😀 👨‍👩‍👧‍👦',
     'tags': List<String>.generate(n % 7, (int i) => 'tag-$n-$i'),
     'text': 'x$n' * ((n * 37) % 15000),
   };

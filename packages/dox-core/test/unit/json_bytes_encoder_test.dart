@@ -232,6 +232,118 @@ void main() {
       expect(_own.convert('plain then é'), utf8.encode('"plain then é"'));
     });
 
+    test('text in many languages, same bytes as the SDK and round trip', () {
+      List<String> texts = <String>[
+        'မြန်မာစာ ကို JSON အဖြစ် ပြောင်းသည်',
+        '日本語のテキスト',
+        '中文文本，带标点。',
+        '한국어 텍스트',
+        'ข้อความภาษาไทย',
+        'हिन्दी पाठ',
+        'نص عربي',
+        'טקסט בעברית',
+        'Русский текст',
+        'Ελληνικό κείμενο',
+        'Tiếng Việt có dấu',
+        'café, naïve, Zürich, Ærø',
+        // emoji: 4 bytes, a skin tone, a family joined with U+200D, a flag
+        '😀 👍🏽 👨‍👩‍👧‍👦 🇲🇲',
+        // a letter with a combining mark, and the same letter as one char
+        'é é',
+        // old scripts and symbols outside the first plane
+        '𝒳 𐍈 𝄞',
+        'mixed: abc မြန် 日本 😀 "quoted" \\ end\n',
+      ];
+      for (String text in texts) {
+        Map<String, Object?> value = <String, Object?>{
+          text: <Object?>[text, text],
+        };
+        List<int> bytes = _own.convert(value);
+        expect(bytes, _sdk.convert(value), reason: text);
+        expect(bytes, utf8.encode(jsonEncode(value)), reason: text);
+        expect(JSON.parse(bytes), value, reason: text);
+      }
+    });
+
+    test('each Unicode character, same bytes as the SDK and round trip', () {
+      // all code points from U+0000 to U+10FFFF, without the surrogates,
+      // in strings of 4096 characters
+      StringBuffer part = StringBuffer();
+      int count = 0;
+      void check() {
+        String text = part.toString();
+        List<int> bytes = _own.convert(text);
+        expect(bytes, _sdk.convert(text), reason: 'ends before $count');
+        expect(JSON.parse(bytes), text, reason: 'ends before $count');
+        part.clear();
+      }
+
+      for (int rune = 0; rune <= 0x10FFFF; rune++) {
+        if (rune >= 0xD800 && rune <= 0xDFFF) continue;
+        part.writeCharCode(rune);
+        count++;
+        if (count % 4096 == 0) check();
+      }
+      check();
+      expect(count, 0x110000 - 0x800);
+    });
+
+    test('each UTF-16 unit alone, also the halves of a pair', () {
+      for (int unit = 0; unit <= 0xFFFF; unit++) {
+        String text = String.fromCharCode(unit);
+        expect(_own.convert(text), _sdk.convert(text), reason: 'unit $unit');
+      }
+    });
+
+    test('the edges of 1, 2, 3 and 4 byte UTF-8', () {
+      Map<int, List<int>> edges = <int, List<int>>{
+        0x7F: <int>[0x7F],
+        0x80: <int>[0xC2, 0x80],
+        0x7FF: <int>[0xDF, 0xBF],
+        0x800: <int>[0xE0, 0xA0, 0x80],
+        0xFFFF: <int>[0xEF, 0xBF, 0xBF],
+        0x10000: <int>[0xF0, 0x90, 0x80, 0x80],
+        0x10FFFF: <int>[0xF4, 0x8F, 0xBF, 0xBF],
+      };
+      edges.forEach((int rune, List<int> utf8Bytes) {
+        expect(_own.convert(String.fromCharCode(rune)), <int>[
+          0x22,
+          ...utf8Bytes,
+          0x22,
+        ], reason: 'U+${rune.toRadixString(16)}');
+      });
+    });
+
+    test('a character that is not ASCII at each place of a long text', () {
+      // the fast path stops at the first such character
+      for (int at = 0; at < 70; at++) {
+        String text = '${'a' * at}မ${'b' * (69 - at)}';
+        expect(_own.convert(text), utf8.encode('"$text"'), reason: 'at $at');
+      }
+    });
+
+    test('random values come back equal after parse', () {
+      _Values values = _Values();
+      int checked = 0;
+      for (int i = 0; i < 20000; i++) {
+        Object? value = values.value(0);
+        List<int> bytes;
+        try {
+          bytes = _sdk.convert(value);
+        } catch (_) {
+          continue;
+        }
+        // the text that the SDK decoder reads from the SDK bytes
+        expect(
+          JSON.parse(_own.convert(value)),
+          JSON.parse(bytes),
+          reason: 'value number $i',
+        );
+        checked++;
+      }
+      expect(checked, greaterThan(10000));
+    });
+
     test('half of a surrogate pair is written as an escape', () {
       expect(_text(String.fromCharCode(0xD83D)), r'"\ud83d"');
       expect(_text(String.fromCharCode(0xDE00)), r'"\ude00"');
