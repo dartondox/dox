@@ -70,7 +70,7 @@ AppConfig(
 );
 ```
 
-`CoreFlags.all()` turns on every flag:
+`CoreFlags.all()` turns on every flag but `isolateGroups`:
 
 ```dart
 AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
@@ -87,6 +87,7 @@ AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
 | `decryptServerError` | A `DecryptException` gives a `500` `server_error`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. |
 | `envExpand` | `.env` values can use `${OTHER}`, and a `"..."` value reads `\n`, `\t`, `\"`, `\\` and `\$`. Also set `Env.flags = flags;` at the top of `main()` in `bin/server.dart` and in your tests, because `.env` is read before `AppConfig` exists. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another). Off: values are read as written. |
 | `rateLimitIpv6Prefix` | The default key of `RateLimit` counts an IPv6 client by its /64 prefix. One home or server gets a whole /64, so with one count per address a client gets a new count with each new address. Clients in one /64 share a count. A `key` you give is used as it is. Off: each full ip has its own count. See [Rate limiting](../security/rate-limiting.md#ipv6-clients). |
+| `isolateGroups` | Each server isolate has its own heap and its own garbage collector. Each isolate runs `main()` again. See [Give each isolate its own memory](../digging-deeper/deployment.md#give-each-isolate-its-own-memory). Off: all isolates share one heap. |
 | `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
 
 The cache has its own flag class, `CacheFlags`, in [`CacheConfig`](#cacheconfig).
