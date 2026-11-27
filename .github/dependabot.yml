@@ -4,6 +4,11 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    # all steps of codeql-action must have the same version: one PR for all
+    groups:
+      codeql-action:
+        patterns:
+          - "github/codeql-action/*"
   - package-ecosystem: pub
     directory: "/"
     schedule:
