@@ -484,20 +484,13 @@ AppConfig(
 );
 ```
 
-Each isolate then runs `main()` of `bin/server.dart` from the start. Use `Dox().isPrimary` for work that must run only one time:
+Each isolate then runs `main()` of `bin/server.dart` from the start. The migrations in `main()` need no change: the first isolate runs them before the other isolates start, and the other isolates find none to run.
+
+For other work that must run only one time, use `Dox().isPrimary`:
 
 ```dart
-void main() async {
-  Dox().initialize(appConfig);
-
-  if (Dox().isPrimary) {
-    await Migrator(
-      migrations: migrations,
-      config: databaseConfig.getConnectionConfig(),
-    ).migrate();
-  }
-
-  await Dox().startServer();
+if (Dox().isPrimary) {
+  await warmUpReports();
 }
 ```
 

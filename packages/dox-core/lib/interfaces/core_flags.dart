@@ -112,7 +112,8 @@ class CoreFlags {
   ///
   /// Each isolate starts the app again from `main()`, so `main()` must be
   /// safe to run more than once, and code after `startServer()` runs in
-  /// each isolate (use `Dox().isPrimary` to run it once). The command line
+  /// each isolate (use `Dox().isPrimary` to run it once). `Migrator.migrate()`
+  /// is safe: it runs each migration one time. The command line
   /// arguments are not passed on, so read settings from the environment.
   /// The config,
   /// providers and routes are built by `main()` in each isolate.
