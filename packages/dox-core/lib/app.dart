@@ -254,8 +254,10 @@ class Dox {
           await groups.spawn(count);
           _spawner = groups;
           return true;
-        } on IsolateSpawnException catch (error) {
-          groups.killAll(now: true);
+        } catch (error) {
+          // the bus of this isolate stays: the app may listen on it
+          groups.killIsolates(now: true);
+          if (error is! IsolateSpawnException) rethrow;
           stderr.writeln(
             isolateGroupsWarning(
               'the VM could not start $snapshot: ${error.message}',

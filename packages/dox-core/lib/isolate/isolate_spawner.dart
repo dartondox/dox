@@ -77,6 +77,15 @@ abstract class IsolateSpawner {
   /// kill all the isolate. With [now] they stop at once, not at their
   /// next event.
   void killAll({bool now = false}) {
+    killIsolates(now: now);
+    RateLimitCounter.instance.close();
+    SessionMemoryStore.instance.close();
+    IsolateBus.instance.close();
+  }
+
+  /// [killAll] for the isolates and their ports only. The counter, the
+  /// session store and the bus of this isolate stay as they are.
+  void killIsolates({bool now = false}) {
     stopped = true;
     isolates.forEach((int id, Isolate isolate) {
       isolate.kill(priority: now ? Isolate.immediate : Isolate.beforeNextEvent);
@@ -90,9 +99,7 @@ abstract class IsolateSpawner {
     isolates.clear();
     receivePorts.clear();
     sendPorts.clear();
-    RateLimitCounter.instance.close();
-    SessionMemoryStore.instance.close();
-    IsolateBus.instance.close();
+    ready.clear();
   }
 
   /// create a thread.
@@ -131,7 +138,7 @@ abstract class IsolateSpawner {
       IsolateBus.instance.drop(isolateId);
       bool early = !isReady.isCompleted;
       if (early) isReady.complete(false);
-      if (stopped || firstStart) return;
+      if (stopped || (firstStart && early)) return;
       int? limit = maxEarlyExits;
       if (early && limit != null) {
         int count = (_earlyExits[isolateId] ?? 0) + 1;

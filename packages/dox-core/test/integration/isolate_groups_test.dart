@@ -160,8 +160,8 @@ void main() {
     });
   });
 
-  test('isolate groups | main() that does not reach startServer in a group: '
-      'one warning, then one group', () async {
+  /// [mode] `1`: `main()` of a group ends. `hang`: it waits for ever.
+  Future<void> brokenApp(String mode) async {
     StringBuffer out = StringBuffer();
     Completer<void> done = Completer<void>();
     Process app = await Process.start(
@@ -171,7 +171,7 @@ void main() {
         'GROUPS_PORT': '${await freePort()}',
         'GROUPS_ISOLATES': '3',
         'GROUPS_KEY': testAppKey,
-        'GROUPS_BROKEN': '1',
+        'GROUPS_BROKEN': mode,
       },
     );
     void onText(String text) {
@@ -198,5 +198,17 @@ void main() {
     } finally {
       app.kill(ProcessSignal.sigkill);
     }
-  });
+  }
+
+  test(
+    'isolate groups | main() of a group ends before startServer: one '
+    'warning, then one group',
+    () => brokenApp('1'),
+  );
+
+  test(
+    'isolate groups | main() of a group never reaches startServer: one '
+    'warning, then one group',
+    () => brokenApp('hang'),
+  );
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:isolate';
 
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/isolate/dox_isolate_groups.dart';
 import 'package:dox_core/middleware/rate_limit_counter.dart';
 import 'package:dox_core/session/session_memory_store.dart';
 
@@ -14,9 +15,12 @@ import 'package:dox_core/session/session_memory_store.dart';
 /// `ready`, `size`, `pongs`, `boot` and `session` lines.
 void main() async {
   // GROUPS_BROKEN: an app where `main()` of an isolate group does not
-  // reach `startServer()`
-  if (Platform.environment['GROUPS_BROKEN'] == '1' &&
+  // reach `startServer()`: `1` ends, `hang` waits for ever
+  String broken = Platform.environment['GROUPS_BROKEN'] ?? '';
+  DoxIsolateGroups.startTimeout = Duration(seconds: broken == 'hang' ? 3 : 60);
+  if (broken.isNotEmpty &&
       (Isolate.current.debugName ?? '').startsWith('dox-group-')) {
+    if (broken == 'hang') await Completer<void>().future;
     return;
   }
   Dox().initialize(

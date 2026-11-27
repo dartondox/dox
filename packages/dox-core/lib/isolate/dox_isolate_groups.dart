@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 import 'dart:isolate';
 
@@ -23,6 +24,11 @@ class DoxIsolateGroups extends IsolateSpawner {
   /// the file to start, see `SnapshotLocator`
   final Uri snapshot;
 
+  /// The most time an isolate has to serve after its start. `main()` of
+  /// the app and the boot of the providers run in this time. After it,
+  /// [spawn] fails.
+  static Duration startTimeout = const Duration(seconds: 60);
+
   /// create the isolates 2 to [count]
   /// ```
   /// await DoxIsolateGroups(snapshot).spawn(3)
@@ -38,7 +44,16 @@ class DoxIsolateGroups extends IsolateSpawner {
       // a group runs `main()` of the app. When that does not reach
       // `startServer()`, the isolate ends and the caller must know.
       for (int id in ready.keys.toList()) {
-        if (!await ready[id]!.future) {
+        bool serves;
+        try {
+          serves = await ready[id]!.future.timeout(startTimeout);
+        } on TimeoutException {
+          throw IsolateSpawnException(
+            'isolate $id did not serve in ${startTimeout.inSeconds} '
+            'seconds. main() must reach startServer() in every isolate',
+          );
+        }
+        if (!serves) {
           throw IsolateSpawnException(
             'isolate $id ended before it served. See its error above. '
             'main() must reach startServer() in every isolate',
