@@ -10748,7 +10748,7 @@ Source: https://dartondox.dev/latest/digging-deeper/http2/
 
 Dox serves HTTP/2 on the same port as HTTP/1.1, so one connection can send many requests at the same time.
 
-Turn it on to serve [gRPC](grpc.md), or when your proxy sends HTTP/2 to the app. HTTP/2 is off by default.
+Turn it on to serve [gRPC](grpc.md), when your proxy sends HTTP/2 to the app, or when Dox serves HTTPS itself. HTTP/2 is off by default.
 
 ## Setup
 
@@ -10789,9 +10789,27 @@ AppConfig appConfig = AppConfig(
 );
 ```
 
+## Use TLS
+
+Browsers use HTTP/2 only with TLS. Dox can do the TLS itself. Set `tls` together with `http2`:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  http2: true,
+  tls: TlsOptions(certificatePath: 'fullchain.pem', keyPath: 'privkey.pem'),
+  // ...
+);
+```
+
+```text
+browser  --HTTP/2 + TLS-->  Dox
+```
+
+The client selects HTTP/2 or HTTP/1.1 in the TLS handshake (ALPN `h2` or `http/1.1`). See [Deployment: HTTPS without a proxy](deployment.md#https-without-a-proxy).
+
 ## Use a proxy
 
-Dox speaks **h2c**: HTTP/2 over plain TCP, with no TLS. Browsers use HTTP/2 only with TLS, so your proxy does the TLS:
+Without `tls`, Dox speaks **h2c**: HTTP/2 over plain TCP. Then your proxy does the TLS:
 
 ```text
 browser  --HTTP/2 + TLS-->  proxy  --h2c or HTTP/1.1-->  Dox
@@ -10884,7 +10902,7 @@ NativeHttpServer server = await NativeHttpServer.bind(
 
 - [gRPC](grpc.md): gRPC services on the same server.
 - [Native server](native-server.md): the server below Dox.
-- [Deployment](deployment.md): put a proxy in front.
+- [Deployment](deployment.md): HTTPS with or without a proxy.
 
 
 ---
@@ -11285,7 +11303,10 @@ class GreeterService extends GreeterServiceBase {
 
 Build your app with `dox build`. See [Deployment](deployment.md#build).
 
-Dox has no TLS, so put a proxy in front of the app. The proxy does the TLS and sends h2c to Dox. With nginx, use `grpc_pass`. With Caddy, use `h2c://` in `reverse_proxy`. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
+gRPC clients on the internet use TLS. There are two ways:
+
+- Dox does the TLS. Set `tls` together with `http2: true` in `AppConfig`. Then `grpcurl` works without `-plaintext`. See [Deployment: HTTPS without a proxy](deployment.md#https-without-a-proxy).
+- A proxy does the TLS and sends h2c to Dox. With nginx, use `grpc_pass`. With Caddy, use `h2c://` in `reverse_proxy`. See [Deployment: HTTP/2 and gRPC](deployment.md#http2-and-grpc).
 
 ## Benchmark
 
@@ -11353,7 +11374,7 @@ For small calls, both servers stop at approximately 57,000 calls a second. This 
 ## Next steps
 
 - [HTTP/2](http2.md): gRPC runs on HTTP/2.
-- [Deployment](deployment.md): put a proxy in front.
+- [Deployment](deployment.md): HTTPS with or without a proxy.
 
 
 ---
@@ -12904,6 +12925,8 @@ await Dox().startServer();
 
 A static value, a singleton and the `memory` cache store exist one time per isolate. To share data between isolates or servers, use a database, Redis or files.
 
+To give each isolate its own heap and garbage collector too, see [Give each isolate its own memory](deployment.md#give-each-isolate-its-own-memory).
+
 ## Finding the current isolate
 
 `Dox().isolateId` is the id of the isolate that runs your code. The first isolate is 1. `Dox().isolateCount` is the number of running isolates:
@@ -12911,6 +12934,14 @@ A static value, a singleton and the `memory` cache store exist one time per isol
 ```dart
 int id = Dox().isolateId;
 int count = Dox().isolateCount;
+```
+
+`Dox().isPrimary` is true in the first isolate only:
+
+```dart
+if (Dox().isPrimary) {
+  // runs one time, not in each isolate
+}
 ```
 
 ## Sending a message to the other isolates
@@ -13648,9 +13679,158 @@ In compose, use `command: ["/app/bin/queue", "work"]`. With no Docker, run `./bi
 
 A small app can run the jobs and the schedule inside the server, with `QueueConfig(inProcess: true)` and `ScheduleConfig(inProcess: true)`. See [Running jobs in the web server](queue.md#running-jobs-in-the-web-server).
 
+## HTTPS without a proxy
+
+Dox can serve HTTPS itself, so a small server needs no proxy for TLS. The TLS work is in Rust (rustls), in the [native server](native-server.md). TLS is off by default.
+
+Use a proxy when you also want gzip, automatic certificates or more than one app on a server. See [HTTPS: put a proxy in front](#https-put-a-proxy-in-front).
+
+### Turn on TLS
+
+Set `tls` in the app config. Give the certificate file and the key file:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  serverPort: 443,
+  tls: TlsOptions(
+    certificatePath: '/etc/letsencrypt/live/example.com/fullchain.pem',
+    keyPath: '/etc/letsencrypt/live/example.com/privkey.pem',
+  ),
+  // ...
+);
+```
+
+| Option | What it is |
+| --- | --- |
+| `certificatePath` | A PEM file. The certificate is first, then the intermediate certificates. An example is `fullchain.pem` of certbot. |
+| `keyPath` | A PEM file with the private key of the certificate (PKCS #8, PKCS #1 or SEC1). An example is `privkey.pem` of certbot. |
+
+- Dox reads the two files when the server starts. A bad file, or a key of a different certificate, throws a `TlsException`, and the server does not start.
+- The user of the app must have permission to read the two files.
+- The server uses TLS 1.2 and TLS 1.3. There are no cipher options.
+- The TLS handshake must end in `idleTimeout`.
+- Your routes stay the same. WebSocket (`wss://`) and streamed responses work on the TLS port.
+- `req.scheme()` is `https` and `req.isSecure()` is true. Thus the session cookie and other cookies get `Secure`, and `SecurityHeaders` sends HSTS.
+- Set `APP_URL` to the `https://` address, because signed URLs and absolute URLs use it.
+- gzip is off by default. With no proxy, set `compress: true` if you want gzip.
+
+On Linux, a port below 1024 needs a permission. With systemd, add `AmbientCapabilities=CAP_NET_BIND_SERVICE` to the `[Service]` part of the unit file.
+
+### Read the files from the env
+
+Keep the file paths out of the code, so each machine can use its own files. Add two optional getters to your `AppEnv`, then run `dart run build_runner build`:
+
+```dart title="lib/config/env.dart"
+/// the certificate file (PEM). Not set: plain HTTP.
+String? get tlsCert;
+
+/// the private key file (PEM) of the certificate
+String? get tlsKey;
+```
+
+The getters hold only the keys. The config file makes the `TlsOptions`:
+
+```dart title="lib/config/app.dart"
+TlsOptions? tlsOptions() {
+  String? cert = env.tlsCert;
+  String? key = env.tlsKey;
+  if (cert == null || key == null) {
+    return null;
+  }
+  return TlsOptions(certificatePath: cert, keyPath: key);
+}
+
+AppConfig appConfig = AppConfig(
+  tls: tlsOptions(),
+  // ...
+);
+```
+
+```bash title=".env"
+TLS_CERT=/etc/letsencrypt/live/example.com/fullchain.pem
+TLS_KEY=/etc/letsencrypt/live/example.com/privkey.pem
+```
+
+An empty value (`TLS_CERT=`) is the same as no key, so TLS stays off. Keep the two keys empty on your own machine, where you have no certificate.
+
+### One port, one mode
+
+A port with `tls` accepts only TLS. A plain HTTP client gets no answer, and the connection closes. A port without `tls` accepts only plain HTTP.
+
+Dox does not send `http://` visitors to `https://`. See [Not included](#not-included).
+
+### HTTP/2 and gRPC over TLS
+
+Browsers use HTTP/2 only with TLS. Set `http2: true` together with `tls`, and browsers and gRPC clients use HTTP/2 with no proxy:
+
+```dart title="lib/config/app.dart"
+AppConfig appConfig = AppConfig(
+  http2: true,
+  tls: TlsOptions(certificatePath: 'fullchain.pem', keyPath: 'privkey.pem'),
+  // ...
+);
+```
+
+The client selects the protocol in the TLS handshake (ALPN):
+
+| `http2` | The server offers |
+| --- | --- |
+| `true` | `h2` and `http/1.1` |
+| `false` | `http/1.1` only |
+
+A client with no ALPN gets HTTP/1.1. `grpcurl` works without `-plaintext`. See [HTTP/2](http2.md) and [gRPC](grpc.md).
+
+### reloadCertificate
+
+A certificate has an end date, and a tool such as certbot writes a new one before that date. Call `reloadCertificate()` to use the new certificate without a restart:
+
+```dart
+await Dox().server.reloadCertificate();
+```
+
+- The method reads the same two files again.
+- New connections get the new certificate. Open connections keep the old certificate until they close.
+- One call is sufficient. All isolates of the process get the new certificate.
+- If a file is bad, the method throws a `TlsException`. The server keeps the old certificate.
+- If `tls` is off, the method throws a `StateError`.
+
+Dox does not watch the files and has no signal for this. Your app decides when to call the method. This example calls it on `SIGHUP`:
+
+```dart title="bin/server.dart"
+Future<void> main() async {
+  // ...
+  await Dox().startServer();
+  ProcessSignal.sighup.watch().listen(reloadCertificate);
+}
+
+Future<void> reloadCertificate(ProcessSignal signal) async {
+  try {
+    await Dox().server.reloadCertificate();
+    Logger.info('The server has the new certificate');
+  } on TlsException catch (error) {
+    Logger.danger('The server keeps the old certificate: $error');
+  }
+}
+```
+
+Then let certbot send the signal after each renewal. With the systemd unit of [Keep it running](#keep-it-running):
+
+```bash
+certbot renew --deploy-hook "systemctl kill --signal=HUP dox"
+```
+
+Windows has no `SIGHUP`. There, call the method from a scheduled task or a timer in the server process, for example one time each day.
+
+### Not included
+
+- ACME: Dox does not get or renew a certificate (for example from Let's Encrypt). Use certbot or a similar tool, then call `reloadCertificate()`.
+- Redirect from port 80: Dox does not send `http://` visitors to `https://`. Use a proxy for this.
+- mTLS: Dox does not ask the client for a certificate.
+- SNI: one port has one certificate. Dox does not select a certificate for each domain.
+
 ## HTTPS: put a proxy in front
 
-Dox serves plain HTTP only. Run it on a private port, and put [Caddy](https://caddyserver.com) or nginx in front of it for TLS and gzip. When the proxy is on the same machine, set `APP_HOST=127.0.0.1`:
+A proxy gets and renews the certificate, does gzip and sends `http://` visitors to `https://`. Run Dox on a private port with plain HTTP, and put [Caddy](https://caddyserver.com) or nginx in front of it. When the proxy is on the same machine, set `APP_HOST=127.0.0.1`:
 
 <ol class="dox-flow dox-flow--labels dox-flow--plain" aria-label="A proxy in front of Dox">
   <li><strong>Client</strong></li>
@@ -13736,7 +13916,7 @@ server {
 
 ### HTTP/2 and gRPC
 
-gRPC needs HTTP/2 between the proxy and Dox. Set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Dox speaks h2c, so the proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port.
+gRPC needs HTTP/2 between the proxy and Dox. Set `http2: true` in `AppConfig` (see [HTTP/2](http2.md)). Without `tls`, Dox speaks h2c, so the proxy keeps the TLS. HTTP/1.1 and HTTP/2 use the same port.
 
 With Caddy, `h2c://` sends HTTP/2 with no TLS to the app:
 
@@ -13839,6 +14019,52 @@ Keep it shorter than the time your platform waits before it kills the process:
 ```dart
 await Dox().stop();
 ```
+
+## Give each isolate its own memory
+
+By default, all isolates share one heap and one garbage collector, and the Dart VM runs only 8 of them at the same time. Turn on `isolateGroups` to give each isolate its own heap, with no such limit:
+
+```dart
+AppConfig(
+  appKey: env.appKey,
+  flags: CoreFlags(isolateGroups: env.appEnv == 'production'),
+);
+```
+
+Turn it on only in production. In development the app starts slower and uses more memory with this flag, and one group is sufficient there.
+
+Each isolate then runs `main()` of `bin/server.dart` from the start. The migrations in `main()` need no change: the first isolate runs them before the other isolates start, and the other isolates find none to run.
+
+For other work that must run only one time, use `Dox().isPrimary`:
+
+```dart
+if (Dox().isPrimary) {
+  await warmUpReports();
+}
+```
+
+Each isolate builds the config again, so read your settings and the app key from the env, not from command line arguments.
+
+### Build
+
+On Linux, the bundle of `dox build` works with no change. On macOS, also make a snapshot file with the name of the executable and `.aot`:
+
+```bash
+dart compile aot-snapshot bin/server.dart -o build/bundle/bin/server.aot
+```
+
+If Dox finds no file to start, it prints a warning and the isolates share memory.
+
+### Memory for each isolate
+
+The Dart VM keeps free memory pages for one isolate only. To keep them for all isolates, set 32 MB for each isolate:
+
+```dockerfile
+# 4 isolates: 4 x 32 = 128
+ENV DART_VM_OPTIONS=--new_gen_semi_max_size=128,--new_gen_semi_initial_size=32,--new_gen_garbage_threshold=0
+```
+
+The app is faster and uses more memory, approximately 30 MB for each isolate.
 
 ## Many processes or machines
 
@@ -13966,7 +14192,7 @@ await Future.any(<Future<void>>[res.gone, res.done]);
 
 ## Security notes
 
-- On the internet, run the app behind a reverse proxy like Caddy or nginx. The proxy does HTTPS and buffers slow clients.
+- On the internet, run the app behind a reverse proxy like Caddy or nginx. The proxy does HTTPS and buffers slow clients. Without a proxy, turn on [TLS](deployment.md#https-without-a-proxy).
 - Set `maxConnections` when the app port is open to the internet.
 - Another process of the same OS user can bind the same port. Do not run untrusted code as the user of the app.
 - `req.uri` resolves `..` in the path. Never build a file path from the raw path. Use the storage helpers.
@@ -22539,7 +22765,7 @@ const SecurityHeaders(
 
 ## HSTS behind a proxy
 
-Dox sends `Strict-Transport-Security` only when a trusted proxy sends `X-Forwarded-Proto: https`. Add your proxy to `AppConfig.trustedProxies`, or Dox never sends HSTS:
+Dox sends `Strict-Transport-Security` only on an https request. With `AppConfig.tls`, each request is https. Behind a proxy, a request is https only when a trusted proxy sends `X-Forwarded-Proto: https`. Add your proxy to `AppConfig.trustedProxies`, or Dox never sends HSTS:
 
 ```dart
 AppConfig(trustedProxies: <String>['127.0.0.1', '::1']);
@@ -31510,10 +31736,11 @@ You give `AppConfig` to `Dox().initialize()` in `lib/config/app.dart`. Each fiel
 | `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. |
 | `idleTimeout` | `Duration` | `Duration(seconds: 30)` | A keep-alive connection with no new request for this long is closed. Behind a load balancer, set it longer than the balancer's idle timeout. See [Behind a load balancer](../digging-deeper/deployment.md#behind-a-load-balancer). |
 | `maxConnections` | `int?` | `null` (no limit) | The most connections one isolate holds open at once (1 or more). When it is full, new clients wait in the OS queue. The app holds up to `maxConnections * totalIsolate`, so keep that below `ulimit -n`. |
-| `http2` | `bool` | `false` | The same port also speaks HTTP/2 over plain TCP (h2c). HTTP/1.1 keeps working. See [HTTP/2](../digging-deeper/http2.md). |
+| `http2` | `bool` | `false` | The same port also speaks HTTP/2. HTTP/1.1 keeps working. Without `tls` it is HTTP/2 over plain TCP (h2c). See [HTTP/2](../digging-deeper/http2.md). |
 | `maxConcurrentStreams` | `int` | `250` | The most open requests one HTTP/2 connection can have (1 or more). Used only when `http2` is `true`. |
+| `tls` | `TlsOptions?` | `null` (plain HTTP) | Serve HTTPS with no proxy. `TlsOptions(certificatePath: ..., keyPath: ...)` gives the two PEM files. The port then accepts only TLS. `Dox().server.reloadCertificate()` reads the files again. See [HTTPS without a proxy](../digging-deeper/deployment.md#https-without-a-proxy). |
 | `shutdownTimeout` | `Duration` | `Duration(seconds: 8)` | On `SIGTERM` or `SIGINT`, how long open requests may run before Dox closes them. Keep it below the kill timeout of your platform. See [Graceful shutdown](../digging-deeper/deployment.md#graceful-shutdown). |
-| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of your reverse proxies. Dox reads `X-Forwarded-For` (for `req.ip()`) and `X-Forwarded-Proto` (for `req.scheme()`) only from these. `['*']` trusts any direct client, but only the last hop. Use it only when the app port is not open to the outside. |
+| `trustedProxies` | `List<String>` | `[]` | IPs or CIDR ranges of your reverse proxies. Dox reads `X-Forwarded-For` (for `req.ip()`) and `X-Forwarded-Proto` (for `req.scheme()`) only from these. Without such a header, `req.scheme()` is `https` when `tls` is set, else `http`. `['*']` trusts any direct client, but only the last hop. Use it only when the app port is not open to the outside. |
 | `isDevelopment` | `bool` (getter) | | True when `APP_ENV` is development. It reads the env at each call, so it works before the server starts. Use it in config, like a database `debug` flag. |
 
 ## Routing and request handling
@@ -31555,7 +31782,7 @@ AppConfig(
 );
 ```
 
-`CoreFlags.all()` turns on every flag:
+`CoreFlags.all()` turns on every flag but `isolateGroups`:
 
 ```dart
 AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
@@ -31572,6 +31799,7 @@ AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
 | `decryptServerError` | A `DecryptException` gives a `500` `server_error`, and the `ExceptionHandler` reports it. Off: `400` `decrypt_failed`, not reported. |
 | `envExpand` | `.env` values can use `${OTHER}`, and a `"..."` value reads `\n`, `\t`, `\"`, `\\` and `\$`. Also set `Env.flags = flags;` at the top of `main()` in `bin/server.dart` and in your tests, because `.env` is read before `AppConfig` exists. See [Use one value in another](../digging-deeper/env.md#use-one-value-in-another). Off: values are read as written. |
 | `rateLimitIpv6Prefix` | The default key of `RateLimit` counts an IPv6 client by its /64 prefix. One home or server gets a whole /64, so with one count per address a client gets a new count with each new address. Clients in one /64 share a count. A `key` you give is used as it is. Off: each full ip has its own count. See [Rate limiting](../security/rate-limiting.md#ipv6-clients). |
+| `isolateGroups` | Each server isolate has its own heap and its own garbage collector. Each isolate runs `main()` again. See [Give each isolate its own memory](../digging-deeper/deployment.md#give-each-isolate-its-own-memory). Off: all isolates share one heap. |
 | `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
 
 The cache has its own flag class, `CacheFlags`, in [`CacheConfig`](#cacheconfig).
@@ -32710,7 +32938,7 @@ A controller and an `IDoxNextMiddleware` get a `DoxRequest`. An `IDoxMiddleware`
 | `bearerToken()` | `String?` | The token of `Authorization: Bearer <token>`, or `null`. | no |
 | `cookie(String key, {bool decrypt = true})` | `String?` | One cookie. Decrypted with `appKey` unless `decrypt: false`. | yes |
 | `ip()` | `String` | The client IP, or `unknown`. From `X-Forwarded-For` only behind a trusted proxy. | yes |
-| `scheme()` | `String` | `http` or `https`. From `X-Forwarded-Proto` only behind a trusted proxy. | no |
+| `scheme()` | `String` | `http` or `https`. It is `https` when `AppConfig.tls` is set. Behind a trusted proxy, it comes from `X-Forwarded-Proto`. | no |
 | `isSecure()` | `bool` | `scheme()` is `https`. | no |
 | `clientIp` | `String?` | The client IP, or `null`. | no |
 | `userAgent()` | `String` | The `User-Agent` header, or `unknown`. | yes |
@@ -32975,7 +33203,7 @@ Go through each table one time before your first deploy. An item marked "Dox lim
 
 | Check | How | Read more |
 | --- | --- | --- |
-| HTTPS at the proxy | Dox has no TLS server. Run Caddy or nginx in front. Keep the app port private. | [Deployment](../digging-deeper/deployment.md) |
+| HTTPS is on | Run Caddy or nginx in front and keep the app port private. Or set `AppConfig.tls`, and Dox serves HTTPS with no proxy. | [Deployment](../digging-deeper/deployment.md) |
 | `trustedProxies` is set behind a proxy | Set `AppConfig(trustedProxies: <String>['127.0.0.1', '::1'])`, or the proxy network, like `'172.16.0.0/12'`. Without it, `req.ip()` is the proxy and `req.scheme()` is `http`. Do not use `['*']` when the app port is public. | [App config](app-config.md) |
 | Body limits are on | Keep `maxBodySize` (10 MB) and `maxMultipartSize` (100 MB), or lower them. Set the same limit in the proxy: `client_max_body_size 100m;` | [Request](../the-basic/request.md) |
 | CORS has real origins | Use `CORSConfig(origin: 'https://my.app')`, or a list like `<String>['https://my.app', 'https://admin.my.app']`. | [CORS](../security/cors.md) |
@@ -32993,6 +33221,7 @@ Go through each table one time before your first deploy. An item marked "Dox lim
 | Native server loads | The start line says `(native)`. If the library does not load, the app stops and prints the fix. | [Native server](../digging-deeper/native-server.md) |
 | Native database driver loads | The database works. If the library does not load, the app stops and prints the fix. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate`. It uses the CPUs the container allows (cpuset and CPU quota). Use fewer when the database runs on the same machine. With SQLite, 1-2 isolates are enough. | [Isolate](../digging-deeper/isolate.md) |
+| More than 8 cores | Turn on `CoreFlags(isolateGroups: true)`. Each isolate then has its own heap and garbage collector. If not, the Dart VM runs only 8 isolates at the same time. | [Deployment](../digging-deeper/deployment.md#give-each-isolate-its-own-memory) |
 | Shared state across isolates | Use a `redis` cache, not `memory`. For Socket.IO, use `transports: ['websocket']` on the client, and a Redis adapter with many servers. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Use Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
 | Writable temp folder | Uploads over 1 MB go to a temp file. A `FROM scratch` image needs `/tmp` with mode `1777`. | [Docker](../guides/docker.md) |
