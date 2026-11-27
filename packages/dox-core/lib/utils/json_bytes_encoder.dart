@@ -155,8 +155,11 @@ class JsonBytesEncoder {
   ///
   /// `forEach` is the fastest way through a map: it took 4.4 us where two
   /// iterators took 10.7 us (40 maps of 10 entries). It can not stop early,
-  /// so after a bad key the other entries are skipped.
+  /// so after a bad key the other entries are skipped. The part of the
+  /// map that is already in the buffer is then taken out again: the caller
+  /// writes what `toEncodable` gives for the map in its place.
   bool _writeMap(Map<Object?, Object?> map) {
+    int start = _length;
     _reserve(2);
     _buffer[_length++] = 0x7B;
     bool first = true;
@@ -178,9 +181,13 @@ class JsonBytesEncoder {
       _buffer[_length++] = _colon;
       _writeObject(value);
     });
+    if (!stringKeys) {
+      _length = start;
+      return false;
+    }
     _reserve(1);
     _buffer[_length++] = 0x7D;
-    return stringKeys;
+    return true;
   }
 
   /// Writes [text], which has only ASCII characters and needs no escape.

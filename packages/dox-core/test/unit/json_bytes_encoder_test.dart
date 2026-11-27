@@ -272,6 +272,37 @@ void main() {
       );
     });
 
+    test('toEncodable can replace a map with a key that is not a String', () {
+      dynamic stringKeys(dynamic object) {
+        Map<Object?, Object?> map = object as Map<Object?, Object?>;
+        return <String, Object?>{
+          for (MapEntry<Object?, Object?> entry in map.entries)
+            '${entry.key}': entry.value,
+        };
+      }
+
+      JsonBytesEncoder own = JsonBytesEncoder(stringKeys);
+      JsonUtf8Encoder sdk = JsonUtf8Encoder(null, stringKeys);
+      List<Object?> values = <Object?>[
+        <Object, int>{1: 2},
+        // the bad key comes after a good one: nothing of the map may stay
+        <Object, int>{'a': 1, 2: 3},
+        <Object?>[
+          <String, Object?>{
+            'a': <Object, int>{'b': 1, 2: 3},
+          },
+          4,
+        ],
+      ];
+      for (Object? value in values) {
+        expect(
+          utf8.decode(own.convert(value)),
+          utf8.decode(sdk.convert(value)),
+        );
+      }
+      expect(utf8.decode(own.convert(values[1])), '{"a":1,"2":3}');
+    });
+
     test('a value that holds itself is an error', () {
       List<Object?> list = <Object?>[];
       list.add(list);
