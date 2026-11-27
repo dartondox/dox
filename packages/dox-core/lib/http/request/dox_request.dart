@@ -132,10 +132,38 @@ class DoxRequest implements IDoxRequest {
 
   /// the query string, read on first use. bracket keys nest, like the
   /// body: `?tags[]=a&tags[]=b` gives `{'tags': ['a', 'b']}`.
-  late Map<String, dynamic> query = const FormInput().nested(
-    uri.queryParameters,
-    () => const FormInput().queryPairs(uri),
-  );
+  late Map<String, dynamic> query =
+      _plainQuery(uri.query) ??
+      const FormInput().nested(
+        uri.queryParameters,
+        () => const FormInput().queryPairs(uri),
+      );
+
+  /// The map of a query with no `%`, `+` or `[`: it needs no decoding and
+  /// has no nested keys, so a split gives the map of `Uri.queryParameters`
+  /// (the last value of a key wins, a key with no `=` is `''`, an empty
+  /// key is left out). Null for any other query.
+  static Map<String, dynamic>? _plainQuery(String text) {
+    for (int i = 0; i < text.length; i++) {
+      int c = text.codeUnitAt(i);
+      if (c == 0x25 || c == 0x2B || c == 0x5B) return null;
+    }
+    Map<String, dynamic> map = <String, dynamic>{};
+    int start = 0;
+    while (start < text.length) {
+      int end = text.indexOf('&', start);
+      if (end < 0) end = text.length;
+      int eq = text.indexOf('=', start);
+      if (eq < 0 || eq > end) eq = end;
+      if (eq > start) {
+        map[text.substring(start, eq)] = eq < end
+            ? text.substring(eq + 1, end)
+            : '';
+      }
+      start = end + 1;
+    }
+    return map;
+  }
 
   /// cookies from the header, read on first use
   late final Map<String, dynamic> _cookies = _getCookies();
@@ -453,9 +481,11 @@ class DoxRequest implements IDoxRequest {
   /// the value of [key] in the input. a key that is there as it is wins,
   /// else a dot key reads inside maps and lists.
   ({bool found, dynamic value}) _find(String key) {
-    if (_allRequest.containsKey(key)) {
-      return (found: true, value: _allRequest[key]);
-    }
+    // the body wins, as in [_allRequest]: one key needs no merged map
+    Map<String, dynamic> body = this.body;
+    if (body.containsKey(key)) return (found: true, value: body[key]);
+    Map<String, dynamic> query = this.query;
+    if (query.containsKey(key)) return (found: true, value: query[key]);
     if (!key.contains('.')) return (found: false, value: null);
     dynamic current = _allRequest;
     for (String part in key.split('.')) {
