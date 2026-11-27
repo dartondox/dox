@@ -1,3 +1,7 @@
+## Unreleased
+
+- Faster: Dox encodes a JSON response with its own encoder, not with `JsonUtf8Encoder` of the Dart SDK. For a body of 6.7 kB, the encode time goes from 41.9 µs to 18.5 µs. For a small body, it is 2.4 to 2.8 times faster. Measured on 2 server cores, a route that returns 40 items does 42% more requests a second, and 37% more with gzip. The bytes of the response do not change. `JSON.bytes` uses the same encoder. One error detail changes: if a map has a key that is not a `String` and also a value that is not JSON, the error can name the value and not the map.
+
 ## 3.2.6
 
 - New: `CoreFlags.isolateGroups` (off by default) starts each server isolate in its own isolate group, so each one has its own heap and its own garbage collector. A GC pause in one isolate no longer stops the others. Each isolate runs `main()` again, so `main()` must be safe to run more than once (the migrations of `Migrator` are), the app key must be the same in each run (set it in `.env`), and the app reads its settings from the environment, not from the command line. It needs a `dart build cli` bundle (Linux), a `<executable>.aot` file from `dart compile aot-snapshot`, or `dart run`. When none is found, Dox logs one warning and runs as before. `Dox().compute` has one pool in each isolate. The warning about the 8 isolate limit of the VM is not shown in this mode. `CoreFlags.all()` does not turn it on.

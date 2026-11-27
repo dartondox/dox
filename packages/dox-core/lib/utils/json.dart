@@ -1,14 +1,10 @@
 import 'dart:convert';
 
+import 'package:dox_core/utils/json_bytes_encoder.dart';
+
 /// encodes json straight to utf8 bytes, without building a String first.
-/// Each call makes a new buffer of this size, even for a small body.
-/// An 8 KB buffer made a 30 byte body 2x slower to encode than 1 KB.
-/// A big body (17 KB) is only about 1% slower with 1 KB chunks.
-final JsonUtf8Encoder _jsonUtf8Encoder = JsonUtf8Encoder(
-  null,
-  advanceEncode,
-  1024,
-);
+/// One encoder for the isolate: it keeps its buffer between calls.
+final JsonBytesEncoder _jsonBytesEncoder = JsonBytesEncoder(advanceEncode);
 
 /// decodes utf8 bytes straight into json, without a middle String.
 final Converter<List<int>, Object?> _jsonUtf8Decoder = utf8.decoder.fuse(
@@ -54,7 +50,7 @@ class JSON {
   /// await File('data.json').writeAsBytes(body);
   /// ```
   static List<int> bytes(Object? value) {
-    return _jsonUtf8Encoder.convert(value);
+    return _jsonBytesEncoder.convert(value);
   }
 
   /// Reads JSON from a `String` or from UTF-8 bytes.
