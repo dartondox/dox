@@ -68,6 +68,7 @@ class DoxServer {
     /// on a TLS port every request came over https
     TrustedProxy.directScheme = config.tls == null ? 'http' : 'https';
     server.autoCompress = config.compress;
+    server.compressLevel = config.compressLevel;
 
     /// `X-XSS-Protection: 1; mode=block` (the default of dart:io) turns
     /// on an old browser filter that can make holes. OWASP says send 0.

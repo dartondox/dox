@@ -200,6 +200,14 @@ class Dox {
     /// isolate fails on it and is started again, in a loop.
     await DoxServer().checkCertificate();
 
+    /// a bad gzip level stops the start here, before a port is open
+    RangeError.checkValueInInterval(
+      config.compressLevel,
+      1,
+      12,
+      'compressLevel',
+    );
+
     /// Windows has no SO_REUSEPORT: one isolate owns the native listener.
     if (Platform.isWindows && isolatesToSpawn > 1) {
       Logger.info(

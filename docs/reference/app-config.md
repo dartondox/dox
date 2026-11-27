@@ -19,6 +19,7 @@ You give `AppConfig` to `Dox().initialize()` in `lib/config/app.dart`. Each fiel
 | `totalIsolate` | `int?` | the CPUs the container allows | How many isolates serve HTTP, all on the same port. The default is the number of CPUs this process can use, with the container cpuset and CPU quota. A quota rounds up (1.5 CPUs gives 2 isolates). Windows always uses one. |
 | `computeWorkers` | `int` | `AppConfig.defaultComputeWorkers` (4) | How many worker isolates run `Dox().compute`, `Hash.makeAsync` and `Hash.verifyAsync`, in one pool for the process. It must be 1 or more. See [Heavy CPU work](../digging-deeper/isolate.md#heavy-cpu-work). |
 | `compress` | `bool` | `false` | gzip the responses, but not streamed responses. It costs CPU on each response, so let a proxy do it if you have one. |
+| `compressLevel` | `int` | `1` | The gzip level of `compress`, from 1 (fast) to 12 (small). The server does not start with any other level. See [gzip](../digging-deeper/performance.md#gzip). |
 | `maxBodySize` | `int` | `10 * 1024 * 1024` (10 MB) | Biggest JSON or urlencoded body in bytes. Bigger gets `413`. |
 | `maxMultipartSize` | `int` | `100 * 1024 * 1024` (100 MB) | Biggest `multipart/form-data` body (file uploads) in bytes. Bigger gets `413`. |
 | `bodyTimeout` | `Duration` | `Duration(seconds: 120)` | A client that sends no body bytes for this long gets `408`. A slow but steady upload is fine. |

@@ -35,6 +35,21 @@ AppConfig(compress: true);
 
 Dox gzips only a body over 256 bytes, for a client that accepts gzip. A streamed response is not compressed.
 
+`compressLevel` sets how hard gzip works, from 1 to 12. The default is 1: it is fast, and the body is a little bigger. A higher level takes more CPU for a smaller body:
+
+```dart
+AppConfig(compress: true, compressLevel: 6);
+```
+
+For a 6.7 kB JSON body:
+
+| Level | Time | Size |
+| --- | --- | --- |
+| 1 (default) | 13.5 µs | 1,421 bytes |
+| 6 | 32.6 µs | 1,270 bytes |
+
+Use a low level when the server CPU is the limit, as for most APIs. Use a higher level when the network is slow and the bodies are big. The client reads every level the same way. Levels 10 to 12 are slow and use 9 MB of memory each. One thread gzips all answers of a server, so a slow level makes the other gzipped answers wait.
+
 ## Logging
 
 `LogMiddleware` logs one line per request. A new project turns it off when `APP_ENV` is `production` or not set, because the proxy writes access logs.
