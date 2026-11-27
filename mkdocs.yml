@@ -44,6 +44,11 @@ extra:
     - icon: fontawesome/brands/github
       name: Github
       link: https://github.com/dartondox
+    - icon: fontawesome/brands/discord
+      name: Discord
+      link: https://discord.gg/MbEZWTTMXq
+  # the Discord button in the header (overrides/partials/source.html)
+  discord_url: https://discord.gg/MbEZWTTMXq
 theme:
   features:
     - navigation.instant

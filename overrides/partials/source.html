@@ -1,0 +1,22 @@
+{#-
+  Material's repo button (partials/source.html, 9.7.7) plus a Discord link.
+  Shown in the header and in the mobile drawer. The Discord link has no
+  data-md-component="source": that one loads the GitHub star count.
+-#}
+<a href="{{ config.repo_url }}" title="{{ lang.t('source') }}" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    {% set icon = config.theme.icon.repo or "fontawesome/brands/git-alt" %}
+    {% include ".icons/" ~ icon ~ ".svg" %}
+  </div>
+  <div class="md-source__repository">
+    {{ config.repo_name }}
+  </div>
+</a>
+<a href="{{ config.extra.discord_url }}" title="Join the Dox Discord" aria-label="Join the Dox Discord" class="md-source md-source--discord" target="_blank" rel="noopener">
+  <div class="md-source__icon md-icon">
+    {% include ".icons/fontawesome/brands/discord.svg" %}
+  </div>
+  <div class="md-source__repository">
+    Discord
+  </div>
+</a>
