@@ -1,6 +1,7 @@
 name: Fuzz
 
-# Runs each fuzz target in packages/dox-core/fuzz (one file is one target).
+# Runs each fuzz target in packages/dox-core/fuzz (one file is one target),
+# each in its own job.
 # A target gives changed inputs to a parser of client input. See
 # CONTRIBUTING.md.
 # - A synchronous target (package covfuzz): first 2 million random changes
@@ -27,9 +28,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  fuzz:
+  # one job for each file in packages/dox-core/fuzz, so the targets run
+  # at the same time
+  targets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      targets: ${{ steps.list.outputs.targets }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: list
+        working-directory: packages/dox-core/fuzz
+        run: echo "targets=$(printf '%s\n' ./*.dart | sed 's|^\./||; s/\.dart$//' | jq -R . | jq -sc .)" >> "$GITHUB_OUTPUT"
+
+  target:
+    needs: targets
+    name: fuzz (${{ matrix.target }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    strategy:
+      # every target runs, also after one fails
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.targets.outputs.targets) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -53,25 +76,27 @@ jobs:
           key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
           restore-keys: pub-${{ runner.os }}-
       - run: ci/pub-get-retry.sh
-      # every target runs, also after one fails
       - name: Fuzz
         working-directory: packages/dox-core
-        run: |
-          failed=0
-          for target in fuzz/*.dart; do
-            echo "::group::$target"
-            dart run --enable-vm-service=0 --no-pause-isolates-on-exit "$target" || {
-              failed=1
-              echo "::error::$target failed"
-            }
-            echo "::endgroup::"
-          done
-          exit $failed
+        env:
+          TARGET: ${{ matrix.target }}
+        run: dart run --enable-vm-service=0 --no-pause-isolates-on-exit "fuzz/$TARGET.dart"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure()
         with:
-          name: fuzz-inputs
+          name: fuzz-inputs-${{ matrix.target }}
           path: packages/dox-core/fuzz/artifacts
           # a failure in the first part of a synchronous target writes no
           # files. Its input is in the log.
           if-no-files-found: ignore
+
+  # one result for all the targets
+  fuzz:
+    needs: target
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - env:
+          RESULT: ${{ needs.target.result }}
+        run: test "$RESULT" = success
