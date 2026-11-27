@@ -1,11 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate' show IsolateSpawnException;
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_static_handler.dart';
 import 'package:dox_core/isolate/compute_pool.dart';
 import 'package:dox_core/isolate/dox_isolate.dart';
+import 'package:dox_core/isolate/dox_isolate_groups.dart';
+import 'package:dox_core/isolate/group_identity.dart';
+import 'package:dox_core/isolate/group_worker.dart';
+import 'package:dox_core/isolate/isolate_spawner.dart';
+import 'package:dox_core/isolate/snapshot_locator.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
 import 'package:dox_core/utils/log_buffer.dart';
@@ -27,7 +33,22 @@ class Dox {
     return _singleton!;
   }
 
-  Dox._internal();
+  Dox._internal() {
+    // a server isolate in its own group knows who it is before `main()`
+    // runs, see `CoreFlags.isolateGroups`
+    GroupIdentity? group = GroupIdentity.current;
+    if (group != null) {
+      _group = group;
+      isolateId = group.isolateId;
+      isolateCount = group.isolateCount;
+      isPrimary = false;
+    }
+  }
+
+  GroupIdentity? _group;
+
+  /// starts and stops the other server isolates
+  IsolateSpawner _spawner = DoxIsolate();
 
   /// get dox http server
   DoxServer get server => DoxServer();
@@ -40,6 +61,11 @@ class Dox {
 
   /// isolate Id
   int isolateId = 1;
+
+  /// True in the first isolate, the one that runs `main()` and starts
+  /// the server. False in the isolates it starts. It is the same as
+  /// `isolateId == 1`.
+  bool isPrimary = true;
 
   /// True only in the web server process (`startServer()` and its
   /// isolates). It is false in `bin/queue.dart`, the scheduler and tests
@@ -153,6 +179,14 @@ class Dox {
   Future<void> startServer() async {
     checkAppKey();
     addProviders(config.providers);
+    GroupIdentity? group = _group;
+    if (group != null) {
+      // an isolate of its own group: the primary started it, so it only
+      // serves. It does not start isolates, watch signals or exit.
+      isWebServer = true;
+      await GroupWorker.run(group);
+      return;
+    }
     _totalIsolate ??= Dox().config.totalIsolate;
     int isolatesToSpawn = _totalIsolate!;
 
@@ -176,9 +210,15 @@ class Dox {
 
     isolateCount = isolatesToSpawn;
     isWebServer = true;
-    warnIsolateSlots(isolatesToSpawn, IsolateSlots.available);
+    // each isolate group has its own slots, so there the warning is only
+    // for the fallback
+    bool tryGroups = config.flags.isolateGroups && isolatesToSpawn > 1;
+    if (!tryGroups) warnIsolateSlots(isolatesToSpawn, IsolateSlots.available);
     if (isolatesToSpawn > 1) {
-      await DoxIsolate().spawn(isolatesToSpawn);
+      bool groups = await _spawnIsolates(isolatesToSpawn);
+      if (tryGroups && !groups) {
+        warnIsolateSlots(isolatesToSpawn, IsolateSlots.available);
+      }
     }
 
     await startProviders();
@@ -197,6 +237,46 @@ class Dox {
       'server',
     );
     _watchSignals();
+  }
+
+  /// Start the isolates 2 to [count]. With `CoreFlags.isolateGroups`
+  /// each one gets its own isolate group. True when they did. When there
+  /// is no file to start, or the VM refuses, it logs why and starts them
+  /// the usual way.
+  Future<bool> _spawnIsolates(int count) async {
+    if (config.flags.isolateGroups) {
+      Uri? snapshot = SnapshotLocator().find();
+      if (snapshot == null) {
+        stderr.writeln(isolateGroupsWarning(_noSnapshot));
+      } else {
+        IsolateSpawner groups = DoxIsolateGroups(snapshot);
+        try {
+          await groups.spawn(count);
+          _spawner = groups;
+          return true;
+        } on IsolateSpawnException catch (error) {
+          groups.killAll(now: true);
+          stderr.writeln(
+            isolateGroupsWarning(
+              'the VM could not start $snapshot: ${error.message}',
+            ),
+          );
+        }
+      }
+    }
+    _spawner = DoxIsolate();
+    await _spawner.spawn(count);
+    return false;
+  }
+
+  static const String _noSnapshot =
+      'no file to start was found (no dart build cli bundle, no .aot '
+      'file next to the executable, no script)';
+
+  /// the text of the warning when `CoreFlags.isolateGroups` can not run
+  static String isolateGroupsWarning(String why) {
+    return '[server] CoreFlags.isolateGroups is on, but $why. The '
+        'isolates share one group, as without the flag.';
   }
 
   final List<StreamSubscription<ProcessSignal>> _signals =
@@ -248,7 +328,7 @@ class Dox {
     _cancelSignals();
     try {
       await Future.wait(<Future<void>>[
-        DoxIsolate().stopAll(config.shutdownTimeout),
+        _spawner.stopAll(config.shutdownTimeout),
         stopIsolate(),
       ]);
       // close the bus again: `killAll` closes it while the providers of the
@@ -289,8 +369,9 @@ class Dox {
     // after the providers too: they may still publish
     if (isolateId != 1) IsolateBus.instance.close();
     // the main isolate owns the pool. it closes it in [stop], once the
-    // other isolates are done, or here when there are none.
-    if (isolateId != 1 || DoxIsolate().isolates.isEmpty) {
+    // other isolates are done, or here when there are none. An isolate of
+    // its own group owns its pool and closes it here.
+    if (isolateId != 1 || _spawner.isolates.isEmpty) {
       ComputePool.instance.close();
     }
   }

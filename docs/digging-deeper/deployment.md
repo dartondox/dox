@@ -471,6 +471,59 @@ ENV DART_VM_OPTIONS=--new_gen_semi_max_size=32
 
 Dox prints a warning at the start when the value is too small. A larger value lets the app use more memory.
 
+With [`isolateGroups`](#give-each-isolate-its-own-memory), this limit does not apply.
+
+## Give each isolate its own memory
+
+By default, all isolates share one heap and one garbage collector. Turn on `isolateGroups` to give each isolate its own:
+
+```dart
+AppConfig(
+  appKey: env.appKey,
+  flags: const CoreFlags(isolateGroups: true),
+);
+```
+
+Each isolate then runs `main()` of `bin/server.dart` from the start. Use `Dox().isPrimary` for work that must run only one time:
+
+```dart
+void main() async {
+  Dox().initialize(appConfig);
+
+  if (Dox().isPrimary) {
+    await Migrator(
+      migrations: migrations,
+      config: databaseConfig.getConnectionConfig(),
+    ).migrate();
+  }
+
+  await Dox().startServer();
+}
+```
+
+Each isolate builds the config again, so read your settings and the app key from the env, not from command line arguments.
+
+### Build
+
+On Linux, the bundle of `dox build` works with no change. On macOS, also make a snapshot file with the name of the executable and `.aot`:
+
+```bash
+dart compile aot-snapshot bin/server.dart -o build/bundle/bin/server.aot
+```
+
+If Dox finds no file to start, it prints a warning and the isolates share memory.
+
+### Memory for each isolate
+
+The Dart VM keeps free memory pages for one isolate only. To keep them for all isolates, set 32 MB for each isolate:
+
+```dockerfile
+# 4 isolates: 4 x 32 = 128
+ENV DART_VM_OPTIONS=--new_gen_semi_max_size=128,--new_gen_semi_initial_size=32,--new_gen_garbage_threshold=0
+```
+
+The app is faster and uses more memory, approximately 30 MB for each isolate.
+
 ## Many processes or machines
 
 One Dox process uses every core. Run more processes only for more machines, or to restart one process with no downtime. List them in the proxy:

@@ -18,9 +18,11 @@ class CoreFlags {
     this.cacheCopies = false,
     this.envExpand = false,
     this.rateLimitIpv6Prefix = false,
+    this.isolateGroups = false,
   });
 
-  /// Every flag on.
+  /// Every flag on, but not `isolateGroups`: that one changes how the
+  /// app starts, so turn it on by name.
   const CoreFlags.all()
     : laravelErrors = true,
       onlyPresent = true,
@@ -31,7 +33,10 @@ class CoreFlags {
       decryptServerError = true,
       cacheCopies = true,
       envExpand = true,
-      rateLimitIpv6Prefix = true;
+      rateLimitIpv6Prefix = true,
+      // not a default of the next major, and it runs `main()` in each
+      // isolate: an app turns it on by name.
+      isolateGroups = false;
 
   /// A 422 answer is `{"message": "...", "errors": {"field": ["..."]}}`,
   /// with all messages of each field. Off: `{"field": "first message"}`.
@@ -100,4 +105,27 @@ class CoreFlags {
   /// it is. Off: each full ip has its own count.
   // NEXT MAJOR: make this the default, then remove the flag.
   final bool rateLimitIpv6Prefix;
+
+  /// Each server isolate runs in its own isolate group, so it has its own
+  /// heap and its own garbage collector. A pause of the GC in one isolate
+  /// does not stop the others. Off: all isolates share one group.
+  ///
+  /// Each isolate starts the app again from `main()`, so `main()` must be
+  /// safe to run more than once, and code after `startServer()` runs in
+  /// each isolate (use `Dox().isPrimary` to run it once). The command line
+  /// arguments are not passed on, so read settings from the environment.
+  /// The config,
+  /// providers and routes are built by `main()` in each isolate.
+  ///
+  /// It needs a file that the VM can start again: a `dart build cli`
+  /// bundle on Linux, a file made with `dart compile aot-snapshot` (put
+  /// it at `<executable>.aot`), or the script of `dart run`. When there
+  /// is none, Dox logs one warning and runs as if the flag is off.
+  ///
+  /// `Dox().compute` has one pool per isolate. `Dox().isolateId` is
+  /// right from the start of `main()`. `CoreFlags.all()` does not turn
+  /// this flag on.
+  // ponytail: a plain opt-in. Make it the default when it is proven in
+  // production.
+  final bool isolateGroups;
 }

@@ -51,6 +51,7 @@ Go through each table one time before your first deploy. An item marked "Dox lim
 | Native database driver loads | The database works. If the library does not load, the app stops and prints the fix. | [Postgres native](../database/postgres-native.md) |
 | Isolates = cores | Keep the default `totalIsolate`. It uses the CPUs the container allows (cpuset and CPU quota). Use fewer when the database runs on the same machine. With SQLite, 1-2 isolates are enough. | [Isolate](../digging-deeper/isolate.md) |
 | More than 8 cores | Set `DART_VM_OPTIONS=--new_gen_semi_max_size` to 2 MB for each isolate. If not, the Dart VM runs only 8 isolates at the same time. | [Deployment](../digging-deeper/deployment.md#more-than-8-cpu-cores) |
+| Many cores | Turn on `CoreFlags(isolateGroups: true)`. Each isolate then has its own heap and garbage collector. | [Deployment](../digging-deeper/deployment.md#give-each-isolate-its-own-memory) |
 | Shared state across isolates | Use a `redis` cache, not `memory`. For Socket.IO, use `transports: ['websocket']` on the client, and a Redis adapter with many servers. | [Isolate](../digging-deeper/isolate.md) |
 | A supervisor restarts the process | Use Docker `restart: unless-stopped`, or systemd `Restart=always`. Dox restarts a dead worker isolate, but not the main isolate. | [Deployment](../digging-deeper/deployment.md) |
 | Writable temp folder | Uploads over 1 MB go to a temp file. A `FROM scratch` image needs `/tmp` with mode `1777`. | [Docker](../guides/docker.md) |
