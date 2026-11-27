@@ -70,7 +70,7 @@ AppConfig(
 );
 ```
 
-`CoreFlags.all()` turns on every flag but `isolateGroups`:
+`CoreFlags.all()` turns on every flag but `isolateGroups` and `sdkJsonEncoder`:
 
 ```dart
 AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
@@ -89,6 +89,7 @@ AppConfig(appKey: env.appKey, flags: const CoreFlags.all());
 | `rateLimitIpv6Prefix` | The default key of `RateLimit` counts an IPv6 client by its /64 prefix. One home or server gets a whole /64, so with one count per address a client gets a new count with each new address. Clients in one /64 share a count. A `key` you give is used as it is. Off: each full ip has its own count. See [Rate limiting](../security/rate-limiting.md#ipv6-clients). |
 | `isolateGroups` | Each server isolate has its own heap and its own garbage collector. Each isolate runs `main()` again. See [Give each isolate its own memory](../digging-deeper/deployment.md#give-each-isolate-its-own-memory). Off: all isolates share one heap. |
 | `cacheCopies` | `Cache().store('x')`, `.tag()` and `.tags()` give a new `Cache`, and the first one does not change. Off: they change the same object and give it back. |
+| `sdkJsonEncoder` | Dox encodes JSON with `JsonUtf8Encoder` of the Dart SDK, as it did before it had its own encoder. The JSON is the same, but it is slower. Turn it on only if you think that the Dox encoder gives a wrong response, and tell us. A class that only has `writeJson()` then also needs a `toJson()`. Off: the Dox encoder. |
 
 The cache has its own flag class, `CacheFlags`, in [`CacheConfig`](#cacheconfig).
 

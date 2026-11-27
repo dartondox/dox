@@ -20,13 +20,37 @@ JsonObjectWriter? _dtoWriter(Object object) {
   return schema is JsonObjectWriter ? schema as JsonObjectWriter : null;
 }
 
+/// `CoreFlags.sdkJsonEncoder` of this isolate. `Dox().initialize` sets
+/// it, so an encode does not read the flags each time.
+bool useSdkJsonEncoder = false;
+
+/// The encoder of the Dart SDK, for `CoreFlags.sdkJsonEncoder`. It calls
+/// `toJson()` for a model and makes the map of a DTO: see [advanceEncode].
+final JsonUtf8Encoder _sdkEncoder = JsonUtf8Encoder(null, advanceEncode, 1024);
+
 /// [value] as JSON bytes with no copy, for the response of the native
-/// server. The next JSON encode in this isolate writes over the result,
-/// so the caller must give the bytes to the response at once. All other
-/// code uses `JSON.bytes`.
+/// server. The result is a part of the encoder buffer: call
+/// [giveBackJsonBytes] when it is copied. All other code uses
+/// `JSON.bytes`.
+///
+/// With `CoreFlags.sdkJsonEncoder` the result is a list of its own.
 Uint8List jsonBytesView(Object? value) {
+  if (useSdkJsonEncoder) return _sdkBytes(value);
   return _jsonBytesEncoder.convertView(value);
 }
+
+Uint8List _sdkBytes(Object? value) {
+  List<int> bytes = _sdkEncoder.convert(value);
+  return bytes is Uint8List ? bytes : Uint8List.fromList(bytes);
+}
+
+/// Gives back the buffer of [jsonBytesView]: call it when [view] is
+/// copied. Until then, every JSON encode of this isolate writes into a new
+/// buffer, so it can not change [view].
+void giveBackJsonBytes(List<int> view) => _jsonBytesEncoder.giveBack(view);
+
+/// true while a result of [jsonBytesView] is not given back. For tests.
+bool get jsonBytesLent => _jsonBytesEncoder.isLent;
 
 /// decodes utf8 bytes straight into json, without a middle String.
 final Converter<List<int>, Object?> _jsonUtf8Decoder = utf8.decoder.fuse(
@@ -72,6 +96,7 @@ class JSON {
   /// await File('data.json').writeAsBytes(body);
   /// ```
   static List<int> bytes(Object? value) {
+    if (useSdkJsonEncoder) return _sdkBytes(value);
     return _jsonBytesEncoder.convert(value);
   }
 

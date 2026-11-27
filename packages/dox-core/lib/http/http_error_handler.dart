@@ -29,8 +29,12 @@ void httpErrorHandler(HttpRequest req, Object error, StackTrace stackTrace) {
   }
 }
 
-/// a bare 500 with none of the headers set so far. When the head is
-/// already sent, it only closes the response.
+/// a bare 500 with none of the headers and cookies set so far. When the
+/// head is already sent, it only closes the response.
+///
+/// The cookies go too: a cookie that the server refuses (eg. a line break
+/// in its domain) made the first answer fail, and it would make this one
+/// fail the same way. Then the client got no answer at all.
 void _plainError(HttpResponse res) {
   if (headSent(res)) {
     _endQuietly(res);
@@ -38,6 +42,7 @@ void _plainError(HttpResponse res) {
   }
   try {
     res.headers.clear();
+    res.cookies.clear();
     res.statusCode = HttpStatus.internalServerError;
     res.headers.contentType = ContentType.text;
     res.add(_plainErrorBody);
