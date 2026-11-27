@@ -21,4 +21,4 @@ dev_dependencies:
   test: ^1.33.0
   build_test: ^3.5.23
   # the tests read the real DTO annotations
-  dox_validation: ^3.2.0
+  dox_validation: ^3.2.1

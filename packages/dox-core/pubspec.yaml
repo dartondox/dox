@@ -19,7 +19,7 @@ dependencies:
   dox_cache: ^3.2.0
   dox_http_native: ^3.2.6
   dox_openapi: ^3.2.1
-  dox_validation: ^3.2.0
+  dox_validation: ^3.2.1
 
 dev_dependencies:
   lints: ^6.1.0

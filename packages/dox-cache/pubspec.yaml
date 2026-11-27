@@ -11,7 +11,7 @@ resolution: workspace
 dependencies:
   dox_annotation: ^3.2.0
   crypto: ^3.0.8
-  ioredis: ^3.2.1
+  ioredis: ^3.2.2
 
 dev_dependencies:
   lints: ^6.1.0
