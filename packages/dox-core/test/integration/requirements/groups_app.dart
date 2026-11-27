@@ -44,9 +44,15 @@ void main() async {
   );
   // isolateId is right before startServer
   stdout.writeln('start ${Dox().isolateId} ${Dox().isPrimary}');
+  // the primary listens on the bus before the start: a fallback to one
+  // group must keep this
+  GroupsProbe? probe = Dox().isPrimary ? (GroupsProbe()..listen()) : null;
   await Dox().startServer();
-  if (!Dox().isPrimary) return;
-  await GroupsProbe().run(Dox().isolateCount);
+  if (probe == null) return;
+  await probe.run(Dox().isolateCount);
+  if (Platform.environment['GROUPS_CRASH'] == '1') {
+    await probe.crash(Dox().isolateCount);
+  }
 }
 
 class GroupsRouter extends Router {
@@ -92,6 +98,9 @@ class GroupsProvider extends DoxProvider {
     }, const Duration(minutes: 5));
     Object? back = await store.get(null, 'boot:$id');
     if (back is! Map || back['id'] != id) throw StateError('bad session');
+    IsolateBus.instance.on('die').listen((Object? _) {
+      Isolate.current.kill(priority: Isolate.immediate);
+    });
     IsolateBus.instance.on('ping').listen((Object? _) {
       IsolateBus.instance.publish('pong', <Object>[
         id,
@@ -108,12 +117,30 @@ class GroupsProvider extends DoxProvider {
 
 /// what the primary isolate checks after the start
 class GroupsProbe {
-  Future<void> run(int count) async {
-    Map<int, String> pongs = <int, String>{};
+  final Map<int, String> pongs = <int, String>{};
+
+  void listen() {
     IsolateBus.instance.on('pong').listen((Object? m) {
       List<Object?> pong = m as List<Object?>;
       pongs[pong[0] as int] = pong[1] as String;
     });
+  }
+
+  /// The other isolates end. The primary starts them again, and they
+  /// join the bus a second time.
+  Future<void> crash(int count) async {
+    IsolateBus.instance.publish('die', 1);
+    for (int i = 0; i < 100 && IsolateBus.instance.size == count; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    }
+    stdout.writeln('down ${IsolateBus.instance.size}');
+    for (int i = 0; i < 600 && IsolateBus.instance.size < count; i++) {
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+    }
+    stdout.writeln('again ${IsolateBus.instance.size}');
+  }
+
+  Future<void> run(int count) async {
     // wait until all the other isolates joined the bus
     for (int i = 0; i < 600 && IsolateBus.instance.size < count; i++) {
       await Future<void>.delayed(const Duration(milliseconds: 100));

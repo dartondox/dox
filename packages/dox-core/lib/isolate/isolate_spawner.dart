@@ -56,6 +56,13 @@ abstract class IsolateSpawner {
   /// open requests finish (up to [timeout]) and runs `shutdown()` of its
   /// providers. Isolates still busy after that are killed.
   Future<void> stopAll(Duration timeout) async {
+    await stopServing(timeout);
+    killAll();
+  }
+
+  /// The first part of [stopAll]: every isolate that serves stops
+  /// gracefully. The isolates are not killed.
+  Future<void> stopServing(Duration timeout) async {
     stopped = true;
     List<Future<void>> waits = <Future<void>>[];
     for (SendPort port in sendPorts.values) {
@@ -69,7 +76,6 @@ abstract class IsolateSpawner {
       );
     }
     await Future.wait(waits);
-    killAll();
   }
 
   static bool _no() => false;
@@ -96,6 +102,10 @@ abstract class IsolateSpawner {
         port.close();
       }
     });
+    // the exit ports are closed, so the bus is told here
+    for (int id in receivePorts.keys) {
+      IsolateBus.instance.drop(id);
+    }
     isolates.clear();
     receivePorts.clear();
     sendPorts.clear();
@@ -157,6 +167,7 @@ abstract class IsolateSpawner {
       try {
         await spawnOne(isolateId);
       } on IsolateSpawnException catch (error) {
+        if (maxEarlyExits == null) rethrow;
         // ponytail: no more tries. The app runs with one isolate less.
         stderr.writeln('[server] isolate $isolateId did not start: $error');
       }

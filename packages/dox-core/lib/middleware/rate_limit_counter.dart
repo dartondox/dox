@@ -85,6 +85,7 @@ class RateLimitCounter {
     try {
       // from another isolate group a list arrives as `List<dynamic>`
       Object? counts = await _calls.send(owner, <Object?>[key, ttlMs, other]);
+      if (counts is List<int>) return counts;
       return List<int>.of((counts as List<Object?>).cast<int>());
     } on Object {
       // no answer in time (eg. during shutdown): count here, so a

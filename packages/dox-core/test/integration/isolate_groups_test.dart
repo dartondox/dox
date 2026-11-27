@@ -160,44 +160,63 @@ void main() {
     });
   });
 
-  /// [mode] `1`: `main()` of a group ends. `hang`: it waits for ever.
-  Future<void> brokenApp(String mode) async {
-    StringBuffer out = StringBuffer();
-    Completer<void> done = Completer<void>();
-    Process app = await Process.start(
-      Platform.resolvedExecutable,
-      <String>['run', 'test/integration/requirements/groups_app.dart'],
-      environment: <String, String>{
-        'GROUPS_PORT': '${await freePort()}',
-        'GROUPS_ISOLATES': '3',
-        'GROUPS_KEY': testAppKey,
-        'GROUPS_BROKEN': mode,
-      },
-    );
-    void onText(String text) {
-      out.write(text);
-      if (out.toString().contains('session ') && !done.isCompleted) {
-        done.complete();
+  /// Run the app with [env] until its output has [until]. It tries again
+  /// when the port was taken after `freePort` gave it.
+  Future<String> runApp(Map<String, String> env, String until) async {
+    for (int tries = 0; ; tries++) {
+      StringBuffer out = StringBuffer();
+      Completer<bool> done = Completer<bool>();
+      Process app = await Process.start(
+        Platform.resolvedExecutable,
+        <String>['run', 'test/integration/requirements/groups_app.dart'],
+        environment: <String, String>{
+          'GROUPS_PORT': '${await freePort()}',
+          'GROUPS_ISOLATES': '3',
+          'GROUPS_KEY': testAppKey,
+          ...env,
+        },
+      );
+      void onText(String text) {
+        out.write(text);
+        if (out.toString().contains(until) && !done.isCompleted) {
+          done.complete(true);
+        }
+      }
+
+      app.stdout.transform(utf8.decoder).listen(onText);
+      app.stderr.transform(utf8.decoder).listen(onText);
+      // the app ended before [until]: the port was taken
+      unawaited(
+        app.exitCode.then((int _) {
+          if (!done.isCompleted) done.complete(false);
+        }),
+      );
+      try {
+        bool ok = await done.future.timeout(
+          const Duration(seconds: 120),
+          onTimeout: () => throw StateError('the app did not finish: $out'),
+        );
+        if (!ok && tries < 2) continue;
+        expect(ok, isTrue, reason: '$out');
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+        return out.toString();
+      } finally {
+        app.kill(ProcessSignal.sigkill);
       }
     }
+  }
 
-    app.stdout.transform(utf8.decoder).listen(onText);
-    app.stderr.transform(utf8.decoder).listen(onText);
-    try {
-      await done.future.timeout(
-        const Duration(seconds: 120),
-        onTimeout: () => throw StateError('the app did not finish: $out'),
-      );
-      await Future<void>.delayed(const Duration(milliseconds: 300));
-      String text = out.toString();
-      expect(text, contains('CoreFlags.isolateGroups is on, but'));
-      // the 3 isolates run, in the group of the primary
-      expect(text, contains('pongs 2,3'));
-      expect(text, contains('names false'));
-      expect(text, isNot(contains('exited, restarting')));
-    } finally {
-      app.kill(ProcessSignal.sigkill);
-    }
+  /// [mode] `1`: `main()` of a group ends. `hang`: it waits for ever.
+  Future<void> brokenApp(String mode) async {
+    String text = await runApp(<String, String>{
+      'GROUPS_BROKEN': mode,
+    }, 'session ');
+    expect(text, contains('CoreFlags.isolateGroups is on, but'));
+    // the 3 isolates run, in the group of the primary. The primary
+    // listened on the bus before the start, and it still gets the pongs.
+    expect(text, contains('pongs 2,3'));
+    expect(text, contains('names false'));
+    expect(text, isNot(contains('exited, restarting')));
   }
 
   test(
@@ -211,4 +230,11 @@ void main() {
     'warning, then one group',
     () => brokenApp('hang'),
   );
+
+  test('isolate groups | a group that ends is started again', () async {
+    String text = await runApp(<String, String>{'GROUPS_CRASH': '1'}, 'again ');
+    expect(text, contains('exited, restarting'));
+    expect(text, contains('again 3'));
+    expect(text, isNot(contains('CoreFlags.isolateGroups is on, but')));
+  });
 }

@@ -24,9 +24,9 @@ class DoxIsolateGroups extends IsolateSpawner {
   /// the file to start, see `SnapshotLocator`
   final Uri snapshot;
 
-  /// The most time an isolate has to serve after its start. `main()` of
-  /// the app and the boot of the providers run in this time. After it,
-  /// [spawn] fails.
+  /// The most time the isolates have to serve after their start, all
+  /// together. `main()` of the app and the boot of the providers run in
+  /// this time. After it, [spawn] fails.
   static Duration startTimeout = const Duration(seconds: 60);
 
   /// create the isolates 2 to [count]
@@ -43,15 +43,24 @@ class DoxIsolateGroups extends IsolateSpawner {
       }
       // a group runs `main()` of the app. When that does not reach
       // `startServer()`, the isolate ends and the caller must know.
-      for (int id in ready.keys.toList()) {
-        bool serves;
-        try {
-          serves = await ready[id]!.future.timeout(startTimeout);
-        } on TimeoutException {
-          throw IsolateSpawnException(
-            'isolate $id did not serve in ${startTimeout.inSeconds} '
-            'seconds. main() must reach startServer() in every isolate',
-          );
+      // one time limit for all of them, they start at the same time
+      DateTime end = DateTime.now().add(startTimeout);
+      for (int id = 2; id <= count; id++) {
+        // null: it ended, and it could not start again
+        Completer<bool>? isReady = ready[id];
+        bool serves = false;
+        if (isReady != null) {
+          Duration left = end.difference(DateTime.now());
+          try {
+            serves = await isReady.future.timeout(
+              left.isNegative ? Duration.zero : left,
+            );
+          } on TimeoutException {
+            throw IsolateSpawnException(
+              'isolate $id did not serve in ${startTimeout.inSeconds} '
+              'seconds. main() must reach startServer() in every isolate',
+            );
+          }
         }
         if (!serves) {
           throw IsolateSpawnException(

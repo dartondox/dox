@@ -255,6 +255,9 @@ class Dox {
           _spawner = groups;
           return true;
         } catch (error) {
+          // a group that serves already ends its requests and runs the
+          // `shutdown()` of its providers
+          await groups.stopServing(config.shutdownTimeout);
           // the bus of this isolate stays: the app may listen on it
           groups.killIsolates(now: true);
           if (error is! IsolateSpawnException) rethrow;
