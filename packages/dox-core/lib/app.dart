@@ -420,11 +420,12 @@ class Dox {
   static String isolateSlotsWarning(int isolates, int slots) {
     return '[server] $isolates isolates, but the Dart VM runs only $slots '
         'of them at the same time, so the server uses about $slots CPU '
-        'cores. To use all of them, start the app with the environment '
-        'variable DART_VM_OPTIONS=${IsolateSlots.flag}='
+        'cores. To use all of them, turn on CoreFlags(isolateGroups: true), '
+        'or start the app with the environment variable '
+        'DART_VM_OPTIONS=${IsolateSlots.flag}='
         '${IsolateSlots.megabytesFor(isolates)}. See '
         'https://dartondox.dev/latest/digging-deeper/deployment/'
-        '#more-than-8-cpu-cores';
+        '#give-each-isolate-its-own-memory';
   }
 
   /// print one warning when the app has more [isolates] than the Dart

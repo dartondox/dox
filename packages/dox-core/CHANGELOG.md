@@ -9,7 +9,7 @@
 - New: `DoxTestClient.start` speaks HTTPS when the config has `tls`. The client accepts only the certificate of the config, so a self-signed test certificate works.
 - New: with `AppConfig.tls`, `req.scheme()` is `https` and `req.isSecure()` is true. Thus cookies with no `secure` value (also the session cookie) get `Secure`, `SecurityHeaders` sends HSTS, and `req.fullUrl()` starts with `https://`. The start log shows `https://`. Without `tls`, nothing changes.
 - Fix: a bracket key with an index that is not plain digits lost its value. `k[01]=z`, `k[+1]=z`, `k[0x10]=z` and `k[%201]=z` gave `{k: [null]}` in `req.body`, `req.query` and a DTO, and `k[01]=a&k[1]=b` gave `{k: [b, b]}`. Now only plain digits like `3` are a list index. Any other key is a map key and keeps its value: `k[01]=z` gives `{k: {01: z}}`. A key like `k[+5000]` was refused with 422 as an index past the limit. Now it is a map key too. The fuzz tests found this.
-- New: a warning at the start when the app has more isolates than the Dart VM runs at the same time. The VM runs 8 by default, so a server with more than 8 CPU cores used only about 8 of them. The warning gives the `DART_VM_OPTIONS` value that lets every isolate run. See the Deployment page.
+- New: a warning at the start when the app has more isolates than the Dart VM runs at the same time. The VM runs 8 by default, so a server with more than 8 CPU cores used only about 8 of them. The warning gives the `DART_VM_OPTIONS` value that lets every isolate run. It also names `CoreFlags.isolateGroups`, which has no such limit. See the Deployment page.
 
 ## 3.2.5
 
