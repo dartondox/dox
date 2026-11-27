@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Faster: the JSON encoder inlines `string()`, `integer()` and `run()` into the generated code, and three writers do not check bounds. Each of these three makes room for all its bytes first, in the same method. On the HttpArena data, a `@Dto` list encodes in 2.8 µs, not 3.4 µs. On the same data and machine, `JSON.stringify` of Bun takes 3.3 µs.
 - Faster: the JSON encoder writes a whole number two digits at a time, and it writes a `JsonRun` 8 bytes at a time. With the new dox_builder, a `@Dto` in a response is 2.2 times faster to encode. Run `dart run build_runner build` to get the new code.
 - Fix: a cookie that the native server refuses (for example a line break in its domain) made the request get no answer. The first answer failed because of the cookie, and the plain 500 that Dox then sends kept the cookie and failed the same way. The plain 500 now also removes the cookies, so the client gets the 500.
 - New: `CoreFlags.sdkJsonEncoder` (off by default). Dox then encodes JSON with `JsonUtf8Encoder` of the Dart SDK, as it did before it had its own encoder. The JSON is the same, but it is slower. Turn it on only if you think that the Dox encoder gives a wrong response. A class that only has `writeJson()` then also needs a `toJson()`. `CoreFlags.all()` does not turn it on.
