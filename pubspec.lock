@@ -357,10 +357,10 @@ packages:
     dependency: transitive
     description:
       name: ioredis
-      sha256: "2cfdb47cc5e630f8cc1cb3e6e0d8897830ee39421d6750db77d32196bcc3b38f"
+      sha256: c595dc57196b6910e70753aa9558667ba105643932380ffd56882e3fa288d054
       url: "https://pub.dev"
     source: hosted
-    version: "3.2.1"
+    version: "3.2.2"
   json_annotation:
     dependency: transitive
     description:
