@@ -421,18 +421,15 @@ void main() {
   });
 
   /// end() throws for a bad cookie, before it copied the body. The
-  /// buffer must still be given back. (That request gets no answer: an
-  /// old bug of a bad cookie, not of the encoder.)
-  test('end() throws: the buffer is given back', () async {
+  /// buffer must still be given back, and the client gets a 500.
+  test('end() throws: a 500, and the buffer is given back', () async {
     await startHttpServer(_config());
-    int port = Dox().server.httpServer.port;
-    for (int n = 0; n < 5; n++) {
-      Socket socket = await Socket.connect('127.0.0.1', port);
-      socket.add(utf8.encode('GET /bad-cookie/$n HTTP/1.1\r\nHost: x\r\n\r\n'));
-      await Future<void>.delayed(const Duration(milliseconds: 50));
-      socket.destroy();
-    }
     HttpClient client = HttpClient();
+    for (int n = 0; n < 5; n++) {
+      (int, String) got = await _fetch(client, '/bad-cookie/$n');
+      expect(got.$1, 500);
+      expect(got.$2, isNot(contains('item $n')));
+    }
     await _nothingLent(client);
     expect(await _get(client, '/item/7'), JSON.stringify(_item(7)));
     client.close();
