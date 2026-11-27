@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dox_core/dox_core.dart';
@@ -59,6 +60,35 @@ void main() {
     expect(found?.id, user.id);
     expect(found?.name, 'Ann');
     expect(Hash.verify('secret123', found!.password!), isTrue);
+  });
+
+  /// The generator gives the model a writeJson(). Dox calls it for a
+  /// response, and the model makes no Map. The JSON must be the JSON of
+  /// toJson().
+  test('a user writes its own JSON, the same as toJson()', () async {
+    for (String name in <String>['Ann', 'Bob "é" 😀']) {
+      await User().create(<String, dynamic>{
+        'name': name,
+        'email': '$name@example.com',
+        'password': 'x',
+      });
+    }
+    List<User> users = await User().get();
+    expect(users.length, 2);
+    expect(users.first, isA<JsonWritable>());
+
+    String json = utf8.decode(JSON.bytes(users));
+    expect(
+      json,
+      jsonEncode(<Map<String, dynamic>>[for (User u in users) u.toJson()]),
+    );
+    expect(json, contains('"created_at":"'));
+    expect(json, isNot(contains('password')));
+
+    /// a row with makeVisible() uses the map of toJson()
+    User shown = users.first.makeVisible(<String>['password']) as User;
+    expect(utf8.decode(JSON.bytes(shown)), jsonEncode(shown.toJson()));
+    expect(utf8.decode(JSON.bytes(shown)), contains('"password":"x"'));
   });
 
   test('the tables are empty again', () async {

@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/testing.dart';
 import 'package:dox_migration/dox_migration.dart';
 import 'package:dox_orm/dox_orm.dart';
 import 'package:dox_queue/dox_queue.dart';
 import 'package:dox_scheduler/dox_scheduler.dart';
 import 'package:http/http.dart' as http;
+import 'package:my_app/app/dtos/login_user/login_user.dto.dart';
 import 'package:my_app/config/app.dart';
 import 'package:my_app/config/database.dart';
 import 'package:my_app/config/env.dart';
@@ -47,6 +49,21 @@ void main() {
   tearDownAll(() async {
     await client.close();
     await deleteDbFile();
+  });
+
+  /// The schema of a DTO has a writeObject(), so a controller can return
+  /// the DTO. The JSON has the keys that the DTO reads.
+  test('a DTO writes its JSON', () {
+    expect(LoginUser.schema, isA<JsonObjectWriter>());
+    LoginUser login = const LoginUser(email: 'a@dox.dev', password: 'secret');
+    expect(
+      utf8.decode(JSON.bytes(login)),
+      '{"email":"a@dox.dev","password":"secret"}',
+    );
+    expect(
+      utf8.decode(JSON.bytes(<LoginUser>[login])),
+      jsonEncode(<Map<String, dynamic>>[LoginUser.schema.toMap(login)]),
+    );
   });
 
   group('jwt-auth.md', () {
