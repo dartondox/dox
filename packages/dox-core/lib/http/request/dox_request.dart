@@ -7,6 +7,7 @@ import 'package:dox_core/http/request/form_input.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/http/request/trusted_proxy.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_http_native/dox_http_native.dart' show NativeRequest;
 import 'package:dox_core/utils/utils.dart';
 
 class DoxRequest implements IDoxRequest {
@@ -22,7 +23,12 @@ class DoxRequest implements IDoxRequest {
 
   /// made from [httpRequest] on first use, unless the constructor got one
   @override
-  late Uri uri = httpRequest.uri;
+  Uri get uri => _uri ??= httpRequest.uri;
+  @override
+  set uri(Uri value) => _uri = value;
+
+  /// null until [uri] is read or set
+  Uri? _uri;
 
   final String? _givenIp;
   final String _givenScheme;
@@ -135,11 +141,23 @@ class DoxRequest implements IDoxRequest {
   /// body: `?tags[]=a&tags[]=b` gives `{'tags': ['a', 'b']}`.
   /// A bad escape, like `?a=%ff` (not UTF-8), throws a
   /// [BadRequestException]: Dox answers with 400.
-  late Map<String, dynamic> query = _readQuery(uri);
+  late Map<String, dynamic> query = _readQuery();
 
-  static Map<String, dynamic> _readQuery(Uri uri) {
-    Map<String, dynamic>? plain = _plainQuery(uri.query);
+  /// A plain target on the native server gives its query text as it came,
+  /// the same text as `uri.query`, so no [Uri] is made.
+  Map<String, dynamic> _readQuery() {
+    HttpRequest req = httpRequest;
+    String? text = _uri == null && req is NativeRequest
+        ? req.plainQuery()
+        : null;
+    Map<String, dynamic>? plain = _plainQuery(text ?? uri.query);
     if (plain != null) return plain;
+    return _nestedQuery(uri);
+  }
+
+  /// A query that needs decoding or has nested keys. Its own function:
+  /// the closure here would make a context on every [_readQuery] call.
+  static Map<String, dynamic> _nestedQuery(Uri uri) {
     try {
       return const FormInput().nested(
         uri.queryParameters,
@@ -312,7 +330,7 @@ class DoxRequest implements IDoxRequest {
   /// ```
   @override
   dynamic input(String key, [dynamic defaultValue]) {
-    return _find(key).value ?? defaultValue;
+    return _valueOf(key) ?? defaultValue;
   }
 
   /// The input without [keys].
@@ -347,7 +365,7 @@ class DoxRequest implements IDoxRequest {
   /// req.filled('name');
   /// ```
   bool filled(String key) {
-    dynamic val = _find(key).value;
+    dynamic val = _valueOf(key);
     if (val == null) return false;
     if (val is String) return val.trim().isNotEmpty;
     if (val is Iterable) return val.isNotEmpty;
@@ -362,7 +380,7 @@ class DoxRequest implements IDoxRequest {
   /// req.boolean('remember');
   /// ```
   bool boolean(String key, [bool defaultValue = false]) {
-    dynamic val = _find(key).value;
+    dynamic val = _valueOf(key);
     if (val == null) return defaultValue;
     if (val is bool) return val;
     return _trueWords.contains(val.toString().trim().toLowerCase());
@@ -376,7 +394,7 @@ class DoxRequest implements IDoxRequest {
   /// req.integer('page', 1);
   /// ```
   int integer(String key, [int defaultValue = 0]) {
-    dynamic val = _find(key).value;
+    dynamic val = _valueOf(key);
     if (val == null) return defaultValue;
     num? number = val is num ? val : num.tryParse(val.toString().trim());
     // NaN, Infinity and 1e400 have no int value
@@ -390,13 +408,13 @@ class DoxRequest implements IDoxRequest {
   /// RequestFile? photo = req.file('photo');
   /// ```
   RequestFile? file(String key) {
-    dynamic val = _find(key).value;
+    dynamic val = _valueOf(key);
     return val is RequestFile ? val : null;
   }
 
   /// True when the key holds an uploaded file, or a list of files.
   bool hasFile(String key) {
-    dynamic val = _find(key).value;
+    dynamic val = _valueOf(key);
     if (val is RequestFile) return true;
     return val is List && val.isNotEmpty && val.every(_isFile);
   }
@@ -497,8 +515,8 @@ class DoxRequest implements IDoxRequest {
   /// the value of [key] in the input. a key that is there as it is wins,
   /// else a dot key reads inside maps and lists.
   ({bool found, dynamic value}) _find(String key) {
-    ({bool found, dynamic value}) plain = _plain(key);
-    if (plain.found) return plain;
+    Object? plain = _plainOr(key);
+    if (!identical(plain, _absent)) return (found: true, value: plain);
     if (!key.contains('.')) return (found: false, value: null);
     dynamic current = _allRequest;
     for (String part in key.split('.')) {
@@ -517,15 +535,30 @@ class DoxRequest implements IDoxRequest {
     return (found: true, value: current);
   }
 
-  /// [key] in [_allRequest] as it is. before the merged map is made, the
-  /// body and the query give the same answer, so one key needs no merge.
-  ({bool found, dynamic value}) _plain(String key) {
+  /// The value of [_find], null when the key is not there. A key that is
+  /// in the input as it is makes no record.
+  dynamic _valueOf(String key) {
+    Object? plain = _plainOr(key);
+    if (!identical(plain, _absent)) return plain;
+    if (!key.contains('.')) return null;
+    return _find(key).value;
+  }
+
+  /// marks a key that is not in the input
+  static const Object _absent = Object();
+
+  /// [key] in [_allRequest] as it is, or [_absent]. before the merged map
+  /// is made, the body and the query give the same answer, so one key
+  /// needs no merge.
+  Object? _plainOr(String key) {
     Map<String, dynamic>? all = _all;
-    if (all != null) return (found: all.containsKey(key), value: all[key]);
-    Map<String, dynamic> body = this.body;
-    if (body.containsKey(key)) return (found: true, value: body[key]);
+    if (all != null) return all.containsKey(key) ? all[key] : _absent;
+
+    /// an empty body that made no map yet has no key: no map is made
+    Map<String, dynamic>? body = _body ?? madeBodyMap(requestBody);
+    if (body != null && body.containsKey(key)) return body[key];
     Map<String, dynamic> query = this.query;
-    return (found: query.containsKey(key), value: query[key]);
+    return query.containsKey(key) ? query[key] : _absent;
   }
 
   /// Check if input is present
@@ -537,7 +570,8 @@ class DoxRequest implements IDoxRequest {
   @override
   bool has(String key) {
     if (Dox().flags.hasKeyOnly) return exists(key);
-    dynamic val = _plain(key).value;
+    dynamic val = _plainOr(key);
+    if (identical(val, _absent)) val = null;
     if (val == null) {
       return false;
     }
