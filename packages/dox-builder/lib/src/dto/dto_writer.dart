@@ -78,6 +78,8 @@ class DtoWriter {
   /// Names that `convert()` declares or uses. A field local must not
   /// take one of them.
   static const Set<String> _emittedNames = <String>{
+    r'$n',
+    r'$v',
     'num',
     'int',
     'double',
