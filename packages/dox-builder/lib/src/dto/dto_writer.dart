@@ -73,7 +73,93 @@ class DtoWriter {
   final List<String> _statics = <String>[];
   int _regexes = 0;
   int _dates = 0;
-  int _runs = 0;
+  final Set<String> _runNames = <String>{};
+
+  /// Names that `convert()` declares or uses. A field local must not
+  /// take one of them.
+  static const Set<String> _emittedNames = <String>{
+    r'$n',
+    r'$v',
+    'num',
+    'int',
+    'double',
+    'bool',
+    'String',
+    'Object',
+    'List',
+    'Map',
+    'MapEntry',
+    'Set',
+    'DateTime',
+    'RegExp',
+    'Undefined',
+    'Invalid',
+    'Maybe',
+    'IssueCodes',
+    'DefaultMessages',
+    'Patterns',
+    'JsonRun',
+    'JsonWriter',
+    'DtoState',
+    'DtoErrors',
+    'DtoChecks',
+    'DtoSchema',
+    'FileTypes',
+    'ImageSize',
+    'SchemaConstants',
+    'JsonSchemaTools',
+    'Type',
+    'Source',
+  };
+
+  static const Set<String> _convertNames = <String>{
+    'input',
+    'state',
+    'path',
+    'issuesBefore',
+    'undefined',
+    'invalid',
+    // the loop variables of the rules and of the strict check
+    'k',
+    'q',
+    'i',
+    'v',
+    '_messages',
+    '_attributes',
+    '_keys',
+  };
+
+  /// Names that code from the user puts into the generated code: rules,
+  /// defaults and types. A local with such a name would hide them.
+  late final Set<String> _foreignNames = _readForeignNames();
+
+  Set<String> _readForeignNames() {
+    // text in quotes and a name after a dot are not looked up in the scope
+    RegExp skip = RegExp(r"""'[^']*'|"[^"]*"|\.\s*[A-Za-z_$][A-Za-z0-9_$]*""");
+    RegExp word = RegExp(r'[A-Za-z_$][A-Za-z0-9_$]*');
+    Set<String> names = <String>{};
+    void add(String? code) {
+      if (code == null) return;
+      for (RegExpMatch match in word.allMatches(code.replaceAll(skip, ' '))) {
+        names.add(match[0]!);
+      }
+    }
+
+    add(dto.name);
+    for (DtoField field in dto.fields) {
+      add(field.fieldCode);
+      add(field.type.code);
+      add(field.defaultCode);
+      for (DtoRule rule in <DtoRule>[
+        ...field.rules,
+        ...field.exclude,
+        ...field.requiredWhen,
+      ]) {
+        add(rule.source);
+      }
+    }
+    return names;
+  }
 
   String get _class => '_\$${dto.name}Dto';
 
@@ -101,13 +187,13 @@ class DtoWriter {
       ..writeln('const $_class();')
       ..writeln()
       ..writeln(
-        'static const Map<String, String> _m = ${literal.stringMap(dto.messages)};',
+        'static const Map<String, String> _messages = ${literal.stringMap(dto.messages)};',
       )
       ..writeln();
     if (dto.attributes.isNotEmpty) {
       out
         ..writeln(
-          'static const Map<String, String> _a = ${literal.stringMap(dto.attributes)};',
+          'static const Map<String, String> _attributes = ${literal.stringMap(dto.attributes)};',
         )
         ..writeln();
     }
@@ -182,26 +268,40 @@ class DtoWriter {
   // Steps 1 and 2
   // ---------------------------------------------------------------------------
 
+  /// The names of the locals in `convert()`, one for each field. A field
+  /// local has the name of its field, unless that name is taken.
+  List<String> _locals = <String>[];
+
   String _convert() {
+    Set<String> taken = <String>{
+      ..._emittedNames,
+      ..._convertNames,
+      ..._foreignNames,
+    };
+    _locals = <String>[
+      for (DtoField field in dto.fields) safeLocal(field.name, taken),
+    ];
     StringBuffer out = StringBuffer()
       ..writeln('@override')
       ..writeln(
-        '${dto.name}? convert(Object? input, DtoState s, List<Object> p) {',
+        '${dto.name}? convert(Object? input, DtoState state, List<Object> path) {',
       );
     // @Dto(attributes:): the names for {field} in this DTO
-    if (dto.attributes.isNotEmpty) out.writeln('s.attributes(p, _a);');
+    if (dto.attributes.isNotEmpty) {
+      out.writeln('state.attributes(path, _attributes);');
+    }
     out
       ..writeln('if (input is! Map) {')
-      ..writeln('s.notObject(input, p, _m);')
+      ..writeln('state.notObject(input, path, _messages);')
       ..writeln('return null;')
       ..writeln('}')
-      ..writeln('int e = s.issues.length;');
+      ..writeln('int issuesBefore = state.issues.length;');
     if (dto.strict) {
       out
         ..writeln('for (Object? k in input.keys) {')
         ..writeln('if (!_keys.contains(k)) {')
         ..writeln(
-          "s.fail(p, '\$k', IssueCodes.unrecognizedKeys, DefaultMessages.notAllowed, input[k], messages: _m);",
+          "state.fail(path, '\$k', IssueCodes.unrecognizedKeys, DefaultMessages.notAllowed, input[k], messages: _messages);",
         )
         ..writeln('}')
         ..writeln('}');
@@ -209,64 +309,74 @@ class DtoWriter {
     StringBuffer requiredWhen = StringBuffer();
     for (int i = 0; i < dto.fields.length; i++) {
       DtoField field = dto.fields[i];
-      String c = 'c$i';
+      String c = _locals[i];
       String key = _keyLiteral(field);
-      out
-        ..writeln('// ${field.name}: ${field.fieldCode}')
-        ..writeln('Object? $c;');
+      out.writeln('// ${field.name}: ${field.fieldCode}');
       // @ExcludeIf / @ExcludeUnless: the field is not read, as if it was
       // not sent
       String excluded = <String>[
         for (DtoRule rule in field.exclude) '${rule.source}.appliesTo(input)',
       ].join(' || ');
-      if (excluded.isNotEmpty) {
+      bool split = excluded.isNotEmpty;
+      String skip = split ? safeLocal('${c}Excluded', taken) : '';
+      if (split) {
         out
-          ..writeln('bool x$i = $excluded;')
-          ..writeln('if (x$i) {')
+          ..writeln('Object? $c;')
+          ..writeln('bool $skip = $excluded;')
+          ..writeln('if ($skip) {')
           ..writeln('$c = undefined;')
           ..writeln('} else {');
       }
-      if (field.orDefault) out.writeln('int f$i = s.issues.length;');
+      String before = field.orDefault
+          ? safeLocal('${c}IssuesBefore', taken)
+          : '';
+      if (field.orDefault) out.writeln('int $before = state.issues.length;');
       String read = dto.emptyStringsToNull
           ? dto.trim
-                ? 's.read(input, $key, emptyToNull: true, trim: true)'
-                : 's.read(input, $key, emptyToNull: true)'
-          : 's.read(input, $key)';
-      _conv(out, field, field.type, read, 'p', key, c, 0);
+                ? 'state.read(input, $key, emptyToNull: true, trim: true)'
+                : 'state.read(input, $key, emptyToNull: true)'
+          : 'state.read(input, $key)';
+      _conv(out, field, field.type, read, 'path', key, c, 0, declare: !split);
       if (field.maybe) {
         if (!field.type.nullable) {
           // ValidationFlags.dtoMaybeRejectsEmpty: a key sent with ""
-          String sent = runtimeFlags ? ' || s.sentEmpty($c, input, $key)' : '';
-          out.writeln('if ($c == null$sent) s.required(p, $key, _m);');
+          String sent = runtimeFlags
+              ? ' || state.sentEmpty($c, input, $key)'
+              : '';
+          out.writeln(
+            'if ($c == null$sent) state.required(path, $key, _messages);',
+          );
         }
       } else if (field.required) {
         if (runtimeFlags && field.type.kind == DtoKind.list) {
           // ValidationFlags.dtoRejectEmptyList: `[]`. A list that fails
           // `required` is bad, so its other rules do not run.
           out
-            ..writeln('if ($c == null || $c is Undefined || s.emptyList($c)) {')
-            ..writeln('s.required(p, $key, _m);')
+            ..writeln(
+              'if ($c == null || $c is Undefined || state.emptyList($c)) {',
+            )
+            ..writeln('state.required(path, $key, _messages);')
             ..writeln('$c = invalid;')
             ..writeln('}');
         } else {
           out.writeln(
-            'if ($c == null || $c is Undefined) s.required(p, $key, _m);',
+            'if ($c == null || $c is Undefined) state.required(path, $key, _messages);',
           );
         }
       } else if (!field.type.nullable) {
-        out.writeln('if ($c == null) s.required(p, $key, _m);');
+        out.writeln('if ($c == null) state.required(path, $key, _messages);');
       }
       // @OrDefault: a type error (or null) gives the default
       if (field.orDefault) {
-        out.writeln('if (s.dropIssuesAfter(f$i)) $c = undefined;');
+        out.writeln('if (state.dropIssuesAfter($before)) $c = undefined;');
       }
-      if (excluded.isNotEmpty) out.writeln('}');
+      if (split) out.writeln('}');
       // requiredWhen checks if the value is missing (blank text and an
       // empty list count as missing too). It runs after all fields are
       // converted, so it reads the converted value of a later field too.
       for (DtoRule rule in field.requiredWhen) {
         requiredWhen.writeln(
-          '${excluded.isEmpty ? '' : 'if (!x$i) '}s.requiredWhen(${rule.source}, $c, input, p, $key, _m);',
+          '${split ? 'if (!$skip) ' : ''}state.requiredWhen(${rule.source}, $c, input, path, $key, _messages);',
         );
       }
     }
@@ -276,20 +386,22 @@ class DtoWriter {
       ..write(requiredWhen)
       ..writeln(
         runtimeFlags
-            ? 'if (s.issues.length != e && !s.allErrors) return null;'
-            : 'if (s.issues.length != e) return null;',
+            ? 'if (state.issues.length != issuesBefore && !state.allErrors) return null;'
+            : 'if (state.issues.length != issuesBefore) return null;',
       );
     StringBuffer rules = StringBuffer();
     for (int i = 0; i < dto.fields.length; i++) {
       DtoField field = dto.fields[i];
       StringBuffer one = StringBuffer();
-      _fieldRules(one, field, 'c$i');
+      String c = _locals[i];
+      _fieldRules(one, field, c);
       if (field.orDefault && one.isNotEmpty) {
         // @OrDefault: a failed rule gives the default too
+        String before = safeLocal('${c}IssuesBeforeRules', taken);
         rules
-          ..writeln('int r$i = s.issues.length;')
+          ..writeln('int $before = state.issues.length;')
           ..write(one)
-          ..writeln('if (s.dropIssuesAfter(r$i)) c$i = undefined;');
+          ..writeln('if (state.dropIssuesAfter($before)) $c = undefined;');
       } else {
         rules.write(one);
       }
@@ -298,7 +410,7 @@ class DtoWriter {
     if (rules.isNotEmpty || runtimeFlags) {
       out
         ..write(rules)
-        ..writeln('if (s.issues.length != e) return null;');
+        ..writeln('if (state.issues.length != issuesBefore) return null;');
     }
     out.writeln('return ${dto.name}(${_arguments()});');
     out.writeln('}');
@@ -309,7 +421,7 @@ class DtoWriter {
     List<String> args = <String>[];
     for (DtoField field in dto.parameters) {
       int i = dto.fields.indexOf(field);
-      String value = _value(field, 'c$i');
+      String value = _value(field, _locals[i]);
       args.add(field.positional ? value : '${field.name}: $value');
     }
     return args.join(', ');
@@ -341,9 +453,12 @@ class DtoWriter {
     String path,
     String key,
     String target,
-    int depth,
-  ) {
-    String args = '$raw, $path, $key, _m';
+    int depth, {
+    required bool declare,
+  }) {
+    // the first statement can declare the variable
+    String set = declare ? 'Object? $target = ' : '$target = ';
+    String args = '$raw, $path, $key, _messages';
     // @Dto(coerce: true): JSON text becomes a number or a bool
     String coerce = dto.coerce ? ', coerce: true' : '';
     switch (type.kind) {
@@ -354,27 +469,27 @@ class DtoWriter {
           if (field.allowEmpty) 'allowEmpty: true',
         ];
         String extra = options.isEmpty ? '' : ', ${options.join(', ')}';
-        out.writeln('$target = s.string($args$extra);');
+        out.writeln('${set}state.string($args$extra);');
       case DtoKind.integer:
-        out.writeln('$target = s.integer($args$coerce);');
+        out.writeln('${set}state.integer($args$coerce);');
       case DtoKind.decimal:
-        out.writeln('$target = s.decimal($args$coerce);');
+        out.writeln('${set}state.decimal($args$coerce);');
       case DtoKind.number:
-        out.writeln('$target = s.number($args$coerce);');
+        out.writeln('${set}state.number($args$coerce);');
       case DtoKind.boolean:
-        out.writeln('$target = s.boolean($args$coerce);');
+        out.writeln('${set}state.boolean($args$coerce);');
       case DtoKind.date:
-        out.writeln('$target = s.date($args);');
+        out.writeln('${set}state.date($args);');
       case DtoKind.file:
-        out.writeln('$target = s.file($args);');
+        out.writeln('${set}state.file($args);');
       case DtoKind.any:
-        out.writeln('$target = $raw;');
+        out.writeln('$set$raw;');
       case DtoKind.anyMap:
-        out.writeln('$target = s.object($args);');
+        out.writeln('${set}state.object($args);');
       case DtoKind.enumName:
         String names = literal.strings(type.enumNames);
         out
-          ..writeln('$target = s.enumName($args, const $names);')
+          ..writeln('${set}state.enumName($args, const $names);')
           ..writeln('if ($target is String) {')
           ..writeln('$target = switch ($target) {');
         String enumType = type.nonNullCode;
@@ -390,10 +505,10 @@ class DtoWriter {
           ..writeln('}');
       case DtoKind.dto:
         out
-          ..writeln('$target = s.object($args);')
+          ..writeln('${set}state.object($args);')
           ..writeln('if ($target is Map) {')
           ..writeln(
-            '$target = ${_ref(type)}.convert($target, s, <Object>[...$path, $key]) ?? invalid;',
+            '$target = ${_ref(type)}.convert($target, state, <Object>[...$path, $key]) ?? invalid;',
           )
           ..writeln('}');
       case DtoKind.list:
@@ -403,14 +518,23 @@ class DtoWriter {
         String i = 'i$depth';
         String x = 'x$depth';
         out
-          ..writeln('$target = s.list($args);')
+          ..writeln('${set}state.list($args);')
           ..writeln('if ($target is List) {')
           ..write(_countIssues(depth))
           ..writeln('List<Object> $q = <Object>[...$path, $key];')
           ..writeln('List<${item.code}> $o = <${item.code}>[];')
-          ..writeln('for (int $i = 0; $i < $target.length; $i++) {')
-          ..writeln('Object? $x;');
-        _conv(out, field, item, '$target[$i]', q, i, x, depth + 1);
+          ..writeln('for (int $i = 0; $i < $target.length; $i++) {');
+        _conv(
+          out,
+          field,
+          item,
+          '$target[$i]',
+          q,
+          i,
+          x,
+          depth + 1,
+          declare: true,
+        );
         _add(
           out,
           item,
@@ -432,7 +556,7 @@ class DtoWriter {
         String x = 'x$depth';
         String entry = 'n$depth';
         out
-          ..writeln('$target = s.object($args);')
+          ..writeln('${set}state.object($args);')
           ..writeln('if ($target is Map) {')
           ..write(_countIssues(depth))
           ..writeln('List<Object> $q = <Object>[...$path, $key];')
@@ -440,9 +564,18 @@ class DtoWriter {
           ..writeln(
             'for (MapEntry<dynamic, dynamic> $entry in $target.entries) {',
           )
-          ..writeln("String $k = '\${$entry.key}';")
-          ..writeln('Object? $x;');
-        _conv(out, field, item, '$entry.value', q, k, x, depth + 1);
+          ..writeln("String $k = '\${$entry.key}';");
+        _conv(
+          out,
+          field,
+          item,
+          '$entry.value',
+          q,
+          k,
+          x,
+          depth + 1,
+          declare: true,
+        );
         _add(
           out,
           item,
@@ -461,15 +594,15 @@ class DtoWriter {
 
   /// The issue count before the items of a list or map are read.
   String _countIssues(int depth) {
-    return runtimeFlags ? 'int b$depth = s.issues.length;\n' : '';
+    return runtimeFlags ? 'int b$depth = state.issues.length;\n' : '';
   }
 
   /// Set [target] to the new list or map [o]. With the DTO flags, a list
-  /// or map with a bad item is [invalid], so `s.emptyList()` and the
+  /// or map with a bad item is [invalid], so `state.emptyList()` and the
   /// rules of the field do not run on what is left of it.
   String _badOr(int depth, String target, String o) {
     if (!runtimeFlags) return '$target = $o;';
-    return '$target = s.issues.length != b$depth ? invalid : $o;';
+    return '$target = state.issues.length != b$depth ? invalid : $o;';
   }
 
   /// Add a converted item [x] to its list or map.
@@ -493,7 +626,7 @@ class DtoWriter {
     }
     out
       ..writeln('if ($x == null || $x is Undefined) {')
-      ..writeln('s.required($path, $key, _m);')
+      ..writeln('state.required($path, $key, _messages);')
       ..writeln('} else if ($x is! Invalid) {')
       ..writeln(add)
       ..writeln('}');
@@ -516,7 +649,7 @@ class DtoWriter {
       StringBuffer items = StringBuffer();
       if (valueRules.isNotEmpty) {
         items
-          ..writeln('List<Object> q = <Object>[...p, $key];')
+          ..writeln('List<Object> q = <Object>[...path, $key];')
           ..writeln('for (int i = 0; i < $c.length; i++) {')
           ..writeln('${item.code} v = $c[i];');
         if (item.nullable) items.writeln('if (v != null) {');
@@ -524,14 +657,14 @@ class DtoWriter {
         if (item.nullable) items.writeln('}');
         items.writeln('}');
       }
-      _chain(out, listRules, type, c, 'p', key, items.toString());
+      _chain(out, listRules, type, c, 'path', key, items.toString());
     } else {
       _chain(
         out,
         <DtoRule>[...listRules, ...valueRules],
         type,
         c,
-        'p',
+        'path',
         key,
         '',
       );
@@ -584,7 +717,7 @@ class DtoWriter {
     String paramText = params.isEmpty
         ? ''
         : ', params: const ${_params(params)}';
-    return 's.fail($path, $key, IssueCodes.$code, DefaultMessages.$fallback, $v$paramText$message, messages: _m);';
+    return 'state.fail($path, $key, IssueCodes.$code, DefaultMessages.$fallback, $v$paramText$message, messages: _messages);';
   }
 
   String _params(Map<String, Object?> params) {
@@ -623,7 +756,7 @@ class DtoWriter {
   }
 
   DtoRule? _rule;
-  String _path = 'p';
+  String _path = 'path';
   String _key = '';
   String _v = '';
 
@@ -639,8 +772,8 @@ class DtoWriter {
   _Check _check(DtoRule rule, DtoType type, String v, String path, String key) {
     if (rule.custom) {
       return _Check(
-        '${rule.source}.check($v, s.context($path, $key, $v))',
-        's.failRule(${rule.source}, $path, $key, $v, _m);',
+        '${rule.source}.check($v, state.context($path, $key, $v))',
+        'state.failRule(${rule.source}, $path, $key, $v, _messages);',
       );
     }
     _rule = rule;
@@ -809,14 +942,17 @@ class DtoWriter {
             : DtoReader.dateField(dto, date);
         if (field != null) {
           // another field: no value (or a bad one) passes
-          String c = 'c${dto.fields.indexOf(field)}';
+          String c = _locals[dto.fields.indexOf(field)];
           return _Check('$c is! DateTime || $not$v.$method($c)', fail);
         }
         String other = switch (date) {
-          'now' => 's.now',
-          'today' => 'DateTime.utc(s.now.year, s.now.month, s.now.day)',
-          'tomorrow' => 'DateTime.utc(s.now.year, s.now.month, s.now.day + 1)',
-          'yesterday' => 'DateTime.utc(s.now.year, s.now.month, s.now.day - 1)',
+          'now' => 'state.now',
+          'today' =>
+            'DateTime.utc(state.now.year, state.now.month, state.now.day)',
+          'tomorrow' =>
+            'DateTime.utc(state.now.year, state.now.month, state.now.day + 1)',
+          'yesterday' =>
+            'DateTime.utc(state.now.year, state.now.month, state.now.day - 1)',
           _ => '_d${_dates++}',
         };
         if (other.startsWith('_d')) {
@@ -884,8 +1020,8 @@ class DtoWriter {
       ..writeln('@override')
       ..writeln(
         async
-            ? 'Future<void> crossCheck(${dto.name} o, DtoState s, List<Object> p) async {'
-            : 'void crossCheck(${dto.name} o, DtoState s, List<Object> p) {',
+            ? 'Future<void> crossCheck(${dto.name} dto, DtoState state, List<Object> path) async {'
+            : 'void crossCheck(${dto.name} dto, DtoState state, List<Object> path) {',
       );
     String wait = async ? 'await ' : '';
     for (DtoField field in dto.fields) {
@@ -893,7 +1029,7 @@ class DtoWriter {
     }
     if (dto.validate != null) {
       out.writeln(
-        '${dto.validateIsAsync ? wait : ''}o.validate(DtoErrors(s, p));',
+        '${dto.validateIsAsync ? wait : ''}dto.validate(DtoErrors(state, path));',
       );
     }
     out.writeln('}');
@@ -911,15 +1047,15 @@ class DtoWriter {
     String key = _keyLiteral(field);
     String call = '$wait${_ref(dtoType)}.$method';
     out.writeln('{');
-    out.writeln('${field.fieldCode} f = o.${field.name};');
-    String value = 'f';
+    out.writeln('${field.fieldCode} value = dto.${field.name};');
+    String value = 'value';
     if (field.maybe) {
-      out.writeln('if (f.isPresent) {');
-      out.writeln('${type.code} g = f.value;');
-      value = 'g';
+      out.writeln('if (value.isPresent) {');
+      out.writeln('${type.code} inner = value.value;');
+      value = 'inner';
     }
     if (type.nullable) out.writeln('if ($value != null) {');
-    _walk(out, type, value, <String>['...p', key], call, 0);
+    _walk(out, type, value, <String>['...path', key], call, 0);
     if (type.nullable) out.writeln('}');
     if (field.maybe) out.writeln('}');
     out.writeln('}');
@@ -937,7 +1073,7 @@ class DtoWriter {
     int depth,
   ) {
     if (type.kind == DtoKind.dto) {
-      out.writeln("$call($value, s, <Object>[${path.join(', ')}]);");
+      out.writeln("$call($value, state, <Object>[${path.join(', ')}]);");
       return;
     }
     DtoType item = type.item!;
@@ -971,7 +1107,7 @@ class DtoWriter {
     StringBuffer out = StringBuffer()
       ..writeln('@override')
       ..writeln(
-        'Future<void> checkAsync(${dto.name} o, DtoState s, List<Object> p) async {',
+        'Future<void> checkAsync(${dto.name} dto, DtoState state, List<Object> path) async {',
       );
     for (DtoField field in dto.fields) {
       List<DtoRule> rules = <DtoRule>[
@@ -983,18 +1119,20 @@ class DtoWriter {
         DtoType type = field.type;
         out
           ..writeln('{')
-          ..writeln('${field.fieldCode} f = o.${field.name};');
-        String value = 'f';
+          ..writeln('${field.fieldCode} value = dto.${field.name};');
+        String value = 'value';
         if (field.maybe) {
           out
-            ..writeln('if (f.isPresent) {')
-            ..writeln('${type.code} g = f.value;');
-          value = 'g';
+            ..writeln('if (value.isPresent) {')
+            ..writeln('${type.code} inner = value.value;');
+          value = 'inner';
         }
         if (type.nullable) out.writeln('if ($value != null) {');
         for (DtoRule rule in rules) {
           String method = rule.onItems ? 'asyncItems' : 'asyncRule';
-          out.writeln('await s.$method(${rule.source}, $value, p, $key, _m);');
+          out.writeln(
+            'await state.$method(${rule.source}, $value, path, $key, _messages);',
+          );
         }
         if (type.nullable) out.writeln('}');
         if (field.maybe) out.writeln('}');
@@ -1014,19 +1152,19 @@ class DtoWriter {
     List<String> args = <String>[];
     for (DtoField field in dto.parameters) {
       String key = _keyLiteral(field);
-      String read = 'm[$key]';
+      String read = 'map[$key]';
       String value = _from(field.type, read, 0);
       if (field.maybe) {
         String type = field.type.code;
         value =
-            'm.containsKey($key) ? Maybe<$type>($value) : const Maybe<$type>.missing()';
+            'map.containsKey($key) ? Maybe<$type>($value) : const Maybe<$type>.missing()';
       } else if (field.hasDefault) {
-        value = 'm.containsKey($key) ? $value : ${field.defaultCode}';
+        value = 'map.containsKey($key) ? $value : ${field.defaultCode}';
       }
       args.add(field.positional ? value : '${field.name}: $value');
     }
     return '@override\n'
-        '${dto.name} fromMap(Map<String, dynamic> m) {\n'
+        '${dto.name} fromMap(Map<String, dynamic> map) {\n'
         'return ${dto.name}(${args.join(', ')});\n'
         '}\n';
   }
@@ -1063,23 +1201,29 @@ class DtoWriter {
   String _toMap() {
     StringBuffer out = StringBuffer()
       ..writeln('@override')
-      ..writeln('Map<String, dynamic> toMap(${dto.name} o) {');
+      ..writeln('Map<String, dynamic> toMap(${dto.name} dto) {');
+    Set<String> taken = <String>{'dto', ..._emittedNames, ..._foreignNames};
     List<String> entries = <String>[];
-    for (int i = 0; i < dto.fields.length; i++) {
-      DtoField field = dto.fields[i];
+    for (DtoField field in dto.fields) {
       String key = _keyLiteral(field);
-      String local = 'f$i';
+      String read = 'dto.${field.name}';
       if (field.maybe) {
         String type = field.type.code;
-        out.writeln('${field.fieldCode} $local = o.${field.name};');
+        String local = safeLocal(field.name, taken);
         entries.add(
-          'if ($local case Maybe<$type>(isPresent: true, value: $type g$i)) '
-          '$key: ${_toValue(field.type, 'g$i', 0)}',
+          'if ($read case Maybe<$type>(isPresent: true, value: $type $local)) '
+          '$key: ${_toValue(field.type, local, 0)}',
         );
-      } else {
-        out.writeln('${field.fieldCode} $local = o.${field.name};');
-        entries.add('$key: ${_toValue(field.type, local, 0)}');
+        continue;
       }
+      String value = _toValue(field.type, read, 0);
+      // a conversion that reads the value two times gets a local
+      if (read.allMatches(value).length > 1) {
+        String local = safeLocal(field.name, taken);
+        out.writeln('${field.fieldCode} $local = $read;');
+        value = _toValue(field.type, local, 0);
+      }
+      entries.add('$key: $value');
     }
     out
       ..writeln('return <String, dynamic>{${entries.join(', ')}};')
@@ -1092,8 +1236,8 @@ class DtoWriter {
   /// calls the function of [_writeFunction].
   String _writeObject() {
     return '@override\n'
-        'void writeObject(Object object, JsonWriter w) => '
-        '\$write${dto.name}(object as ${dto.name}, w);';
+        'void writeObject(Object object, JsonWriter writer) => '
+        '\$write${dto.name}(object as ${dto.name}, writer);\n';
   }
 
   /// The name of the function that writes the JSON of the DTO [type].
@@ -1110,30 +1254,55 @@ class DtoWriter {
   String _writeFunction() {
     StringBuffer out = StringBuffer()
       ..writeln('/// Writes the JSON of [${dto.name}], as `toMap()` gives it.')
-      ..writeln('void \$write${dto.name}(${dto.name} o, JsonWriter w) {');
+      ..writeln(
+        'void \$write${dto.name}(${dto.name} dto, JsonWriter writer) {',
+      );
+    // the locals of the list loops and of the `Maybe` values
+    Set<String> taken = <String>{
+      'dto',
+      'writer',
+      'i',
+      ..._emittedNames,
+      ..._foreignNames,
+    };
+    List<String> locals = <String>[
+      for (DtoField field in dto.fields) safeLocal(field.name, taken),
+    ];
     if (dto.fields.any((DtoField field) => field.maybe)) {
-      out.writeln('w.startObject();');
+      out.writeln('writer.startObject();');
       for (int i = 0; i < dto.fields.length; i++) {
         DtoField field = dto.fields[i];
-        String key = 'w.key(${_keyLiteral(field)});';
+        String key = 'writer.key(${_keyLiteral(field)});';
         if (field.maybe) {
           String type = field.type.code;
           out.writeln(
-            'if (o.${field.name} case '
-            'Maybe<$type>(isPresent: true, value: $type g$i)) '
-            '{ $key ${_writeOne(field.type, 'g$i')} }',
+            'if (dto.${field.name} case '
+            'Maybe<$type>(isPresent: true, value: $type ${locals[i]})) '
+            '{ $key ${_writeOne(field.type, locals[i])} }',
           );
         } else {
-          out.writeln('$key ${_writeOne(field.type, 'o.${field.name}')}');
+          String write = _writeOnce(
+            field.type,
+            'dto.${field.name}',
+            locals[i],
+            field.fieldCode,
+          );
+          out.writeln('$key $write');
         }
       }
-      out.writeln('w.endObject();');
+      out.writeln('writer.endObject();');
     } else {
       _JsonRuns runs = _JsonRuns(this, out)..text('{');
       for (int i = 0; i < dto.fields.length; i++) {
         DtoField field = dto.fields[i];
-        runs.text('${i > 0 ? ',' : ''}${jsonEncode(field.key)}:');
-        _writeFast(runs, field.type, 'o.${field.name}', i);
+        runs.text('${i > 0 ? ',' : ''}${jsonEncode(field.key)}:', field.name);
+        _writeFast(
+          runs,
+          field.type,
+          'dto.${field.name}',
+          locals[i],
+          field.fieldCode,
+        );
       }
       runs
         ..text('}')
@@ -1145,22 +1314,28 @@ class DtoWriter {
 
   /// Writes [value] (of [type]) with [runs]: a list and a nested DTO get
   /// direct calls. Other values go to [_writeValue].
-  void _writeFast(_JsonRuns runs, DtoType type, String value, int field) {
+  void _writeFast(
+    _JsonRuns runs,
+    DtoType type,
+    String value,
+    String local,
+    String typeCode,
+  ) {
     String? item = type.kind == DtoKind.list && !type.nullable
-        ? _writeItem(type.item!, 'l$field[i]')
+        ? _writeItem(type.item!, '$local[i]')
         : null;
     if (item != null) {
       runs
         ..text('[')
         ..code(
-          '{ ${type.code} l$field = $value; '
-          'for (int i = 0; i < l$field.length; i++) { '
-          'if (i > 0) w.run(JsonRun.comma); $item } }',
+          '{ ${type.code} $local = $value; '
+          'for (int i = 0; i < $local.length; i++) { '
+          'if (i > 0) writer.run(JsonRun.comma); $item } }',
         )
         ..text(']');
       return;
     }
-    runs.code(_writeOne(type, value));
+    runs.code(_writeOnce(type, value, local, typeCode));
   }
 
   /// `true` when the nested DTO [type] has a `$write` function that this
@@ -1185,10 +1360,19 @@ class DtoWriter {
     return '${uri.scheme}:${uri.pathSegments.firstOrNull}';
   }
 
+  /// [_writeOne] for a field read. When the call reads [value] two times
+  /// (a nullable list that is converted), the value is read once into
+  /// [local] of [typeCode].
+  String _writeOnce(DtoType type, String value, String local, String typeCode) {
+    String call = _writeOne(type, value, local: local);
+    if (value.allMatches(call).length < 2) return call;
+    return '{ $typeCode $local = $value; ${_writeOne(type, local)} }';
+  }
+
   /// The direct call for [value] (of [type]), else the call of
   /// [_writeValue].
-  String _writeOne(DtoType type, String value) {
-    return _writeItem(type, value) ?? _writeValue(type, value);
+  String _writeOne(DtoType type, String value, {String local = r'$n'}) {
+    return _writeItem(type, value) ?? _writeValue(type, value, local: local);
   }
 
   /// The direct call for [value] (of [type]), or `null` when there is
@@ -1196,35 +1380,37 @@ class DtoWriter {
   String? _writeItem(DtoType type, String value) {
     String dot = type.nullable ? '?.' : '.';
     return switch (type.kind) {
-      DtoKind.string => 'w.string($value);',
-      DtoKind.integer => 'w.integer($value);',
-      DtoKind.boolean => 'w.boolean($value);',
-      DtoKind.date => 'w.dateTime($value);',
-      DtoKind.enumName => 'w.string($value${dot}name);',
+      DtoKind.string => 'writer.string($value);',
+      DtoKind.integer => 'writer.integer($value);',
+      DtoKind.boolean => 'writer.boolean($value);',
+      DtoKind.date => 'writer.dateTime($value);',
+      DtoKind.enumName => 'writer.string($value${dot}name);',
       DtoKind.dto when _hasWriteFunction(type) =>
         type.nullable
-            ? 'if ($value case final \$v?) { ${_writeRef(type)}(\$v, w); } '
-                  'else { w.value(null); }'
-            : '${_writeRef(type)}($value, w);',
+            ? 'if ($value case final \$v?) { ${_writeRef(type)}(\$v, writer); } '
+                  'else { writer.value(null); }'
+            : '${_writeRef(type)}($value, writer);',
       _ => null,
     };
   }
 
   /// The writer call for [value] (of [type]). It gives the JSON of
-  /// [_toValue].
-  String _writeValue(DtoType type, String value) {
+  /// [_toValue]. A nullable value that toMap() changes is read once into
+  /// [local] first.
+  String _writeValue(DtoType type, String value, {String local = r'$n'}) {
     String dot = type.nullable ? '?.' : '.';
     return switch (type.kind) {
-      DtoKind.string => 'w.string($value);',
-      DtoKind.integer => 'w.integer($value);',
-      DtoKind.date => 'w.dateTime($value);',
-      DtoKind.enumName => 'w.string($value${dot}name);',
-      _ when _encoderWrites(type) && !_holdsDto(type) => 'w.value($value);',
+      DtoKind.string => 'writer.string($value);',
+      DtoKind.integer => 'writer.integer($value);',
+      DtoKind.date => 'writer.dateTime($value);',
+      DtoKind.enumName => 'writer.string($value${dot}name);',
+      _ when _encoderWrites(type) && !_holdsDto(type) =>
+        'writer.value($value);',
       // a field read does not promote to non-null: read it into a local
       _ when type.nullable =>
-        '{ ${type.code} \$n = $value; '
-            'w.value(${_toValue(type, r'$n', 0)}); }',
-      _ => 'w.value(${_toValue(type, value, 0)});',
+        '{ ${type.code} $local = $value; '
+            'writer.value(${_toValue(type, local, 0)}); }',
+      _ => 'writer.value(${_toValue(type, value, 0)});',
     };
   }
 
@@ -1304,18 +1490,20 @@ class DtoWriter {
             ? "<String>['properties', $key, 'items']"
             : "<String>['properties', $key]";
         patches.add(
-          'JsonSchemaTools.merge(j, $path, ${rule.source}.toJsonSchema());',
+          'JsonSchemaTools.merge(schema, $path, ${rule.source}.toJsonSchema());',
         );
       }
     }
     if (patches.isEmpty) {
       out.writeln('return ${literal.write(jsonSchema)};');
     } else {
-      out.writeln('Map<String, dynamic> j = ${literal.write(jsonSchema)};');
+      out.writeln(
+        'Map<String, dynamic> schema = ${literal.write(jsonSchema)};',
+      );
       for (String patch in patches) {
         out.writeln(patch);
       }
-      out.writeln('return j;');
+      out.writeln('return schema;');
     }
     out.writeln('}');
     return out.toString();
@@ -1338,8 +1526,15 @@ class _JsonRuns {
   final StringBuffer out;
   final StringBuffer _text = StringBuffer();
 
-  /// Adds the JSON [json] to the run.
-  void text(String json) => _text.write(json);
+  /// The field of the last key in the run, for its name.
+  String? _field;
+
+  /// Adds the JSON [json] to the run. [field] is the Dart name of the field
+  /// when [json] ends with its key.
+  void text(String json, [String? field]) {
+    _text.write(json);
+    if (field != null) _field = field;
+  }
 
   /// Writes the run so far, then the [line] of code.
   void code(String line) {
@@ -1350,12 +1545,17 @@ class _JsonRuns {
   /// Writes the run so far as a [JsonRun] of the class.
   void flush() {
     if (_text.isEmpty) return;
-    int index = writer._runs++;
+    String base = _field == null ? '_end' : '_${_field}Key';
+    String name = base;
+    for (int n = 2; !writer._runNames.add(name); n++) {
+      name = '$base$n';
+    }
     writer._statics.add(
-      'static final JsonRun _j$index = '
+      'static final JsonRun $name = '
       'JsonRun(${writer.literal.string(_text.toString())});',
     );
-    out.writeln('w.run(${writer._class}._j$index);');
+    out.writeln('writer.run(${writer._class}.$name);');
     _text.clear();
+    _field = null;
   }
 }

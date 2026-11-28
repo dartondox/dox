@@ -15,14 +15,14 @@ class _$CreateUserDto extends DtoSchema<CreateUser>
     implements JsonObjectWriter {
   const _$CreateUserDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"name":');
-  static final JsonRun _j1 = JsonRun(',"email":');
-  static final JsonRun _j2 = JsonRun(',"age":');
-  static final JsonRun _j3 = JsonRun(',"role":');
-  static final JsonRun _j4 = JsonRun(',"tags":[');
-  static final JsonRun _j5 = JsonRun(']}');
+  static final JsonRun _nameKey = JsonRun('{"name":');
+  static final JsonRun _emailKey = JsonRun(',"email":');
+  static final JsonRun _ageKey = JsonRun(',"age":');
+  static final JsonRun _roleKey = JsonRun(',"role":');
+  static final JsonRun _tagsKey = JsonRun(',"tags":[');
+  static final JsonRun _end = JsonRun(']}');
 
   @override
   Type get type => CreateUser;
@@ -34,153 +34,169 @@ class _$CreateUserDto extends DtoSchema<CreateUser>
   bool get usesRequiredWhen => false;
 
   @override
-  CreateUser? convert(Object? input, DtoState s, List<Object> p) {
+  CreateUser? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // name: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'name'), p, 'name', _m, trim: true);
-    if (c0 == null || c0 is Undefined) s.required(p, 'name', _m);
+    Object? name = state.string(
+      state.read(input, 'name'),
+      path,
+      'name',
+      _messages,
+      trim: true,
+    );
+    if (name == null || name is Undefined)
+      state.required(path, 'name', _messages);
     // email: String
-    Object? c1;
-    c1 = s.string(s.read(input, 'email'), p, 'email', _m);
-    if (c1 == null || c1 is Undefined) s.required(p, 'email', _m);
+    Object? email = state.string(
+      state.read(input, 'email'),
+      path,
+      'email',
+      _messages,
+    );
+    if (email == null || email is Undefined)
+      state.required(path, 'email', _messages);
     // age: int?
-    Object? c2;
-    c2 = s.integer(s.read(input, 'age'), p, 'age', _m);
+    Object? age = state.integer(
+      state.read(input, 'age'),
+      path,
+      'age',
+      _messages,
+    );
     // role: Role
-    Object? c3;
-    c3 = s.enumName(s.read(input, 'role'), p, 'role', _m, const <String>[
-      'admin',
-      'user',
-    ]);
-    if (c3 is String) {
-      c3 = switch (c3) {
+    Object? role = state.enumName(
+      state.read(input, 'role'),
+      path,
+      'role',
+      _messages,
+      const <String>['admin', 'user'],
+    );
+    if (role is String) {
+      role = switch (role) {
         'admin' => Role.admin,
         _ => Role.user,
       };
     }
-    if (c3 == null) s.required(p, 'role', _m);
+    if (role == null) state.required(path, 'role', _messages);
     // tags: List<String>
-    Object? c4;
-    c4 = s.list(s.read(input, 'tags'), p, 'tags', _m);
-    if (c4 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'tags'];
+    Object? tags = state.list(
+      state.read(input, 'tags'),
+      path,
+      'tags',
+      _messages,
+    );
+    if (tags is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'tags'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c4.length; i0++) {
-        Object? x0;
-        x0 = s.string(c4[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < tags.length; i0++) {
+        Object? x0 = state.string(tags[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c4 = s.issues.length != b0 ? invalid : o0;
+      tags = state.issues.length != b0 ? invalid : o0;
     }
-    if (c4 == null) s.required(p, 'tags', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is String) {
-      if (!(c0.runes.length >= 3 && c0.runes.length <= 50)) {
-        s.fail(
-          p,
+    if (tags == null) state.required(path, 'tags', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (name is String) {
+      if (!(name.runes.length >= 3 && name.runes.length <= 50)) {
+        state.fail(
+          path,
           'name',
           IssueCodes.lengthBetween,
           DefaultMessages.lengthBetween,
-          c0,
+          name,
           params: const <String, Object?>{'min': 3, 'max': 50},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c1 is String) {
-      if (!(Patterns.email.hasMatch(c1))) {
-        s.fail(
-          p,
+    if (email is String) {
+      if (!(Patterns.email.hasMatch(email))) {
+        state.fail(
+          path,
           'email',
           IssueCodes.email,
           DefaultMessages.email,
-          c1,
-          messages: _m,
+          email,
+          messages: _messages,
         );
       }
     }
-    if (c2 is int) {
-      if (!(c2 >= 18)) {
-        s.fail(
-          p,
+    if (age is int) {
+      if (!(age >= 18)) {
+        state.fail(
+          path,
           'age',
           IssueCodes.min,
           DefaultMessages.min,
-          c2,
+          age,
           params: const <String, Object?>{'min': 18},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c4 is List<String>) {
-      if (!(c4.length <= 5)) {
-        s.fail(
-          p,
+    if (tags is List<String>) {
+      if (!(tags.length <= 5)) {
+        state.fail(
+          path,
           'tags',
           IssueCodes.maxItems,
           DefaultMessages.maxItems,
-          c4,
+          tags,
           params: const <String, Object?>{'max': 5},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return CreateUser(
-      name: c0 as String,
-      email: c1 as String,
-      age: c2 is Undefined ? null : c2 as int?,
-      role: c3 is Undefined ? Role.user : c3 as Role,
-      tags: c4 is Undefined ? const <String>[] : c4 as List<String>,
+      name: name as String,
+      email: email as String,
+      age: age is Undefined ? null : age as int?,
+      role: role is Undefined ? Role.user : role as Role,
+      tags: tags is Undefined ? const <String>[] : tags as List<String>,
     );
   }
 
   @override
-  CreateUser fromMap(Map<String, dynamic> m) {
+  CreateUser fromMap(Map<String, dynamic> map) {
     return CreateUser(
-      name: m['name'] as String,
-      email: m['email'] as String,
-      age: m['age'] == null ? null : ((m['age'] as num).toInt()),
-      role: m.containsKey('role')
-          ? Role.values.byName(m['role'] as String)
+      name: map['name'] as String,
+      email: map['email'] as String,
+      age: map['age'] == null ? null : ((map['age'] as num).toInt()),
+      role: map.containsKey('role')
+          ? Role.values.byName(map['role'] as String)
           : Role.user,
-      tags: m.containsKey('tags')
+      tags: map.containsKey('tags')
           ? <String>[
-              for (Object? x0 in m['tags'] as List<dynamic>) x0 as String,
+              for (Object? x0 in map['tags'] as List<dynamic>) x0 as String,
             ]
           : const <String>[],
     );
   }
 
   @override
-  Map<String, dynamic> toMap(CreateUser o) {
-    String f0 = o.name;
-    String f1 = o.email;
-    int? f2 = o.age;
-    Role f3 = o.role;
-    List<String> f4 = o.tags;
+  Map<String, dynamic> toMap(CreateUser dto) {
     return <String, dynamic>{
-      'name': f0,
-      'email': f1,
-      'age': f2,
-      'role': f3.name,
-      'tags': f4,
+      'name': dto.name,
+      'email': dto.email,
+      'age': dto.age,
+      'role': dto.role.name,
+      'tags': dto.tags,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeCreateUser(object as CreateUser, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeCreateUser(object as CreateUser, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -215,24 +231,24 @@ class _$CreateUserDto extends DtoSchema<CreateUser>
 }
 
 /// Writes the JSON of [CreateUser], as `toMap()` gives it.
-void $writeCreateUser(CreateUser o, JsonWriter w) {
-  w.run(_$CreateUserDto._j0);
-  w.string(o.name);
-  w.run(_$CreateUserDto._j1);
-  w.string(o.email);
-  w.run(_$CreateUserDto._j2);
-  w.integer(o.age);
-  w.run(_$CreateUserDto._j3);
-  w.string(o.role.name);
-  w.run(_$CreateUserDto._j4);
+void $writeCreateUser(CreateUser dto, JsonWriter writer) {
+  writer.run(_$CreateUserDto._nameKey);
+  writer.string(dto.name);
+  writer.run(_$CreateUserDto._emailKey);
+  writer.string(dto.email);
+  writer.run(_$CreateUserDto._ageKey);
+  writer.integer(dto.age);
+  writer.run(_$CreateUserDto._roleKey);
+  writer.string(dto.role.name);
+  writer.run(_$CreateUserDto._tagsKey);
   {
-    List<String> l4 = o.tags;
-    for (int i = 0; i < l4.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.string(l4[i]);
+    List<String> tags = dto.tags;
+    for (int i = 0; i < tags.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.string(tags[i]);
     }
   }
-  w.run(_$CreateUserDto._j5);
+  writer.run(_$CreateUserDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [TextRules].
@@ -241,27 +257,27 @@ const DtoSchema<TextRules> $TextRulesDto = _$TextRulesDto();
 class _$TextRulesDto extends DtoSchema<TextRules> implements JsonObjectWriter {
   const _$TextRulesDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   static final RegExp _r0 = RegExp('^(?:[a-z]+)\$');
-  static final JsonRun _j0 = JsonRun('{"len":');
-  static final JsonRun _j1 = JsonRun(',"exact":');
-  static final JsonRun _j2 = JsonRun(',"len_min":');
-  static final JsonRun _j3 = JsonRun(',"min_len":');
-  static final JsonRun _j4 = JsonRun(',"max_len":');
-  static final JsonRun _j5 = JsonRun(',"email":');
-  static final JsonRun _j6 = JsonRun(',"url":');
-  static final JsonRun _j7 = JsonRun(',"uuid":');
-  static final JsonRun _j8 = JsonRun(',"ip":');
-  static final JsonRun _j9 = JsonRun(',"regex":');
-  static final JsonRun _j10 = JsonRun(',"in_list":');
-  static final JsonRun _j11 = JsonRun(',"not_in":');
-  static final JsonRun _j12 = JsonRun(',"starts":');
-  static final JsonRun _j13 = JsonRun(',"ends":');
-  static final JsonRun _j14 = JsonRun(',"alpha":');
-  static final JsonRun _j15 = JsonRun(',"alnum":');
-  static final JsonRun _j16 = JsonRun(',"dash":');
-  static final JsonRun _j17 = JsonRun('}');
+  static final JsonRun _lenKey = JsonRun('{"len":');
+  static final JsonRun _exactKey = JsonRun(',"exact":');
+  static final JsonRun _lenMinKey = JsonRun(',"len_min":');
+  static final JsonRun _minLenKey = JsonRun(',"min_len":');
+  static final JsonRun _maxLenKey = JsonRun(',"max_len":');
+  static final JsonRun _emailKey = JsonRun(',"email":');
+  static final JsonRun _urlKey = JsonRun(',"url":');
+  static final JsonRun _uuidKey = JsonRun(',"uuid":');
+  static final JsonRun _ipKey = JsonRun(',"ip":');
+  static final JsonRun _regexKey = JsonRun(',"regex":');
+  static final JsonRun _inListKey = JsonRun(',"in_list":');
+  static final JsonRun _notInKey = JsonRun(',"not_in":');
+  static final JsonRun _startsKey = JsonRun(',"starts":');
+  static final JsonRun _endsKey = JsonRun(',"ends":');
+  static final JsonRun _alphaKey = JsonRun(',"alpha":');
+  static final JsonRun _alnumKey = JsonRun(',"alnum":');
+  static final JsonRun _dashKey = JsonRun(',"dash":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => TextRules;
@@ -273,350 +289,411 @@ class _$TextRulesDto extends DtoSchema<TextRules> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  TextRules? convert(Object? input, DtoState s, List<Object> p) {
+  TextRules? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // len: String?
-    Object? c0;
-    c0 = s.string(s.read(input, 'len'), p, 'len', _m);
+    Object? len = state.string(
+      state.read(input, 'len'),
+      path,
+      'len',
+      _messages,
+    );
     // exact: String?
-    Object? c1;
-    c1 = s.string(s.read(input, 'exact'), p, 'exact', _m);
+    Object? exact = state.string(
+      state.read(input, 'exact'),
+      path,
+      'exact',
+      _messages,
+    );
     // lenMin: String?
-    Object? c2;
-    c2 = s.string(s.read(input, 'len_min'), p, 'len_min', _m);
+    Object? lenMin = state.string(
+      state.read(input, 'len_min'),
+      path,
+      'len_min',
+      _messages,
+    );
     // minLen: String?
-    Object? c3;
-    c3 = s.string(s.read(input, 'min_len'), p, 'min_len', _m);
+    Object? minLen = state.string(
+      state.read(input, 'min_len'),
+      path,
+      'min_len',
+      _messages,
+    );
     // maxLen: String?
-    Object? c4;
-    c4 = s.string(s.read(input, 'max_len'), p, 'max_len', _m);
+    Object? maxLen = state.string(
+      state.read(input, 'max_len'),
+      path,
+      'max_len',
+      _messages,
+    );
     // email: String?
-    Object? c5;
-    c5 = s.string(s.read(input, 'email'), p, 'email', _m);
+    Object? email = state.string(
+      state.read(input, 'email'),
+      path,
+      'email',
+      _messages,
+    );
     // url: String?
-    Object? c6;
-    c6 = s.string(s.read(input, 'url'), p, 'url', _m);
+    Object? url = state.string(
+      state.read(input, 'url'),
+      path,
+      'url',
+      _messages,
+    );
     // uuid: String?
-    Object? c7;
-    c7 = s.string(s.read(input, 'uuid'), p, 'uuid', _m);
+    Object? uuid = state.string(
+      state.read(input, 'uuid'),
+      path,
+      'uuid',
+      _messages,
+    );
     // ip: String?
-    Object? c8;
-    c8 = s.string(s.read(input, 'ip'), p, 'ip', _m);
+    Object? ip = state.string(state.read(input, 'ip'), path, 'ip', _messages);
     // regex: String?
-    Object? c9;
-    c9 = s.string(s.read(input, 'regex'), p, 'regex', _m);
+    Object? regex = state.string(
+      state.read(input, 'regex'),
+      path,
+      'regex',
+      _messages,
+    );
     // inList: String?
-    Object? c10;
-    c10 = s.string(s.read(input, 'in_list'), p, 'in_list', _m);
+    Object? inList = state.string(
+      state.read(input, 'in_list'),
+      path,
+      'in_list',
+      _messages,
+    );
     // notIn: String?
-    Object? c11;
-    c11 = s.string(s.read(input, 'not_in'), p, 'not_in', _m);
+    Object? notIn = state.string(
+      state.read(input, 'not_in'),
+      path,
+      'not_in',
+      _messages,
+    );
     // starts: String?
-    Object? c12;
-    c12 = s.string(s.read(input, 'starts'), p, 'starts', _m);
+    Object? starts = state.string(
+      state.read(input, 'starts'),
+      path,
+      'starts',
+      _messages,
+    );
     // ends: String?
-    Object? c13;
-    c13 = s.string(s.read(input, 'ends'), p, 'ends', _m);
+    Object? ends = state.string(
+      state.read(input, 'ends'),
+      path,
+      'ends',
+      _messages,
+    );
     // alpha: String?
-    Object? c14;
-    c14 = s.string(s.read(input, 'alpha'), p, 'alpha', _m);
+    Object? alpha = state.string(
+      state.read(input, 'alpha'),
+      path,
+      'alpha',
+      _messages,
+    );
     // alnum: String?
-    Object? c15;
-    c15 = s.string(s.read(input, 'alnum'), p, 'alnum', _m);
+    Object? alnum = state.string(
+      state.read(input, 'alnum'),
+      path,
+      'alnum',
+      _messages,
+    );
     // dash: String?
-    Object? c16;
-    c16 = s.string(s.read(input, 'dash'), p, 'dash', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is String) {
-      if (!(c0.runes.length >= 2 && c0.runes.length <= 4)) {
-        s.fail(
-          p,
+    Object? dash = state.string(
+      state.read(input, 'dash'),
+      path,
+      'dash',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (len is String) {
+      if (!(len.runes.length >= 2 && len.runes.length <= 4)) {
+        state.fail(
+          path,
           'len',
           IssueCodes.lengthBetween,
           DefaultMessages.lengthBetween,
-          c0,
+          len,
           params: const <String, Object?>{'min': 2, 'max': 4},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c1 is String) {
-      if (!(c1.runes.length == 3)) {
-        s.fail(
-          p,
+    if (exact is String) {
+      if (!(exact.runes.length == 3)) {
+        state.fail(
+          path,
           'exact',
           IssueCodes.length,
           DefaultMessages.length,
-          c1,
+          exact,
           params: const <String, Object?>{'length': 3},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c2 is String) {
-      if (!(c2.runes.length >= 2)) {
-        s.fail(
-          p,
+    if (lenMin is String) {
+      if (!(lenMin.runes.length >= 2)) {
+        state.fail(
+          path,
           'len_min',
           IssueCodes.minLength,
           DefaultMessages.minLength,
-          c2,
+          lenMin,
           params: const <String, Object?>{'min': 2},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c3 is String) {
-      if (!(c3.runes.length >= 2)) {
-        s.fail(
-          p,
+    if (minLen is String) {
+      if (!(minLen.runes.length >= 2)) {
+        state.fail(
+          path,
           'min_len',
           IssueCodes.minLength,
           DefaultMessages.minLength,
-          c3,
+          minLen,
           params: const <String, Object?>{'min': 2},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c4 is String) {
-      if (!(c4.runes.length <= 3)) {
-        s.fail(
-          p,
+    if (maxLen is String) {
+      if (!(maxLen.runes.length <= 3)) {
+        state.fail(
+          path,
           'max_len',
           IssueCodes.maxLength,
           DefaultMessages.maxLength,
-          c4,
+          maxLen,
           params: const <String, Object?>{'max': 3},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c5 is String) {
-      if (!(Patterns.email.hasMatch(c5))) {
-        s.fail(
-          p,
+    if (email is String) {
+      if (!(Patterns.email.hasMatch(email))) {
+        state.fail(
+          path,
           'email',
           IssueCodes.email,
           DefaultMessages.email,
-          c5,
-          messages: _m,
+          email,
+          messages: _messages,
         );
       }
     }
-    if (c6 is String) {
-      if (!(DtoChecks.url(c6))) {
-        s.fail(p, 'url', IssueCodes.url, DefaultMessages.url, c6, messages: _m);
+    if (url is String) {
+      if (!(DtoChecks.url(url))) {
+        state.fail(
+          path,
+          'url',
+          IssueCodes.url,
+          DefaultMessages.url,
+          url,
+          messages: _messages,
+        );
       }
     }
-    if (c7 is String) {
-      if (!(Patterns.uuid.hasMatch(c7))) {
-        s.fail(
-          p,
+    if (uuid is String) {
+      if (!(Patterns.uuid.hasMatch(uuid))) {
+        state.fail(
+          path,
           'uuid',
           IssueCodes.uuid,
           DefaultMessages.uuid,
-          c7,
-          messages: _m,
+          uuid,
+          messages: _messages,
         );
       }
     }
-    if (c8 is String) {
-      if (!(DtoChecks.ip(c8))) {
-        s.fail(p, 'ip', IssueCodes.ip, DefaultMessages.ip, c8, messages: _m);
+    if (ip is String) {
+      if (!(DtoChecks.ip(ip))) {
+        state.fail(
+          path,
+          'ip',
+          IssueCodes.ip,
+          DefaultMessages.ip,
+          ip,
+          messages: _messages,
+        );
       }
     }
-    if (c9 is String) {
-      if (!(_r0.hasMatch(c9))) {
-        s.fail(
-          p,
+    if (regex is String) {
+      if (!(_r0.hasMatch(regex))) {
+        state.fail(
+          path,
           'regex',
           IssueCodes.regex,
           DefaultMessages.regex,
-          c9,
-          messages: _m,
+          regex,
+          messages: _messages,
         );
       }
     }
-    if (c10 is String) {
-      if (!(const <String>{'a', 'b'}.contains(c10))) {
-        s.fail(
-          p,
+    if (inList is String) {
+      if (!(const <String>{'a', 'b'}.contains(inList))) {
+        state.fail(
+          path,
           'in_list',
           IssueCodes.inList,
           DefaultMessages.inList,
-          c10,
+          inList,
           params: const <String, Object?>{'values': 'a, and b'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c11 is String) {
-      if (!(!const <String>{'root'}.contains(c11))) {
-        s.fail(
-          p,
+    if (notIn is String) {
+      if (!(!const <String>{'root'}.contains(notIn))) {
+        state.fail(
+          path,
           'not_in',
           IssueCodes.notIn,
           DefaultMessages.notIn,
-          c11,
-          messages: _m,
+          notIn,
+          messages: _messages,
         );
       }
     }
-    if (c12 is String) {
-      if (!(c12.startsWith('dox'))) {
-        s.fail(
-          p,
+    if (starts is String) {
+      if (!(starts.startsWith('dox'))) {
+        state.fail(
+          path,
           'starts',
           IssueCodes.startWith,
           DefaultMessages.startWith,
-          c12,
+          starts,
           params: const <String, Object?>{'prefix': 'dox'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c13 is String) {
-      if (!(c13.endsWith('.dev'))) {
-        s.fail(
-          p,
+    if (ends is String) {
+      if (!(ends.endsWith('.dev'))) {
+        state.fail(
+          path,
           'ends',
           IssueCodes.endWith,
           DefaultMessages.endWith,
-          c13,
+          ends,
           params: const <String, Object?>{'suffix': '.dev'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c14 is String) {
-      if (!(Patterns.alpha.hasMatch(c14))) {
-        s.fail(
-          p,
+    if (alpha is String) {
+      if (!(Patterns.alpha.hasMatch(alpha))) {
+        state.fail(
+          path,
           'alpha',
           IssueCodes.alpha,
           DefaultMessages.alpha,
-          c14,
-          messages: _m,
+          alpha,
+          messages: _messages,
         );
       }
     }
-    if (c15 is String) {
-      if (!(Patterns.alphaNumeric.hasMatch(c15))) {
-        s.fail(
-          p,
+    if (alnum is String) {
+      if (!(Patterns.alphaNumeric.hasMatch(alnum))) {
+        state.fail(
+          path,
           'alnum',
           IssueCodes.alphaNumeric,
           DefaultMessages.alphaNumeric,
-          c15,
-          messages: _m,
+          alnum,
+          messages: _messages,
         );
       }
     }
-    if (c16 is String) {
-      if (!(Patterns.alphaDash.hasMatch(c16))) {
-        s.fail(
-          p,
+    if (dash is String) {
+      if (!(Patterns.alphaDash.hasMatch(dash))) {
+        state.fail(
+          path,
           'dash',
           IssueCodes.alphaDash,
           DefaultMessages.alphaDash,
-          c16,
-          messages: _m,
+          dash,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return TextRules(
-      len: c0 is Undefined ? null : c0 as String?,
-      exact: c1 is Undefined ? null : c1 as String?,
-      lenMin: c2 is Undefined ? null : c2 as String?,
-      minLen: c3 is Undefined ? null : c3 as String?,
-      maxLen: c4 is Undefined ? null : c4 as String?,
-      email: c5 is Undefined ? null : c5 as String?,
-      url: c6 is Undefined ? null : c6 as String?,
-      uuid: c7 is Undefined ? null : c7 as String?,
-      ip: c8 is Undefined ? null : c8 as String?,
-      regex: c9 is Undefined ? null : c9 as String?,
-      inList: c10 is Undefined ? null : c10 as String?,
-      notIn: c11 is Undefined ? null : c11 as String?,
-      starts: c12 is Undefined ? null : c12 as String?,
-      ends: c13 is Undefined ? null : c13 as String?,
-      alpha: c14 is Undefined ? null : c14 as String?,
-      alnum: c15 is Undefined ? null : c15 as String?,
-      dash: c16 is Undefined ? null : c16 as String?,
+      len: len is Undefined ? null : len as String?,
+      exact: exact is Undefined ? null : exact as String?,
+      lenMin: lenMin is Undefined ? null : lenMin as String?,
+      minLen: minLen is Undefined ? null : minLen as String?,
+      maxLen: maxLen is Undefined ? null : maxLen as String?,
+      email: email is Undefined ? null : email as String?,
+      url: url is Undefined ? null : url as String?,
+      uuid: uuid is Undefined ? null : uuid as String?,
+      ip: ip is Undefined ? null : ip as String?,
+      regex: regex is Undefined ? null : regex as String?,
+      inList: inList is Undefined ? null : inList as String?,
+      notIn: notIn is Undefined ? null : notIn as String?,
+      starts: starts is Undefined ? null : starts as String?,
+      ends: ends is Undefined ? null : ends as String?,
+      alpha: alpha is Undefined ? null : alpha as String?,
+      alnum: alnum is Undefined ? null : alnum as String?,
+      dash: dash is Undefined ? null : dash as String?,
     );
   }
 
   @override
-  TextRules fromMap(Map<String, dynamic> m) {
+  TextRules fromMap(Map<String, dynamic> map) {
     return TextRules(
-      len: m['len'] == null ? null : (m['len'] as String),
-      exact: m['exact'] == null ? null : (m['exact'] as String),
-      lenMin: m['len_min'] == null ? null : (m['len_min'] as String),
-      minLen: m['min_len'] == null ? null : (m['min_len'] as String),
-      maxLen: m['max_len'] == null ? null : (m['max_len'] as String),
-      email: m['email'] == null ? null : (m['email'] as String),
-      url: m['url'] == null ? null : (m['url'] as String),
-      uuid: m['uuid'] == null ? null : (m['uuid'] as String),
-      ip: m['ip'] == null ? null : (m['ip'] as String),
-      regex: m['regex'] == null ? null : (m['regex'] as String),
-      inList: m['in_list'] == null ? null : (m['in_list'] as String),
-      notIn: m['not_in'] == null ? null : (m['not_in'] as String),
-      starts: m['starts'] == null ? null : (m['starts'] as String),
-      ends: m['ends'] == null ? null : (m['ends'] as String),
-      alpha: m['alpha'] == null ? null : (m['alpha'] as String),
-      alnum: m['alnum'] == null ? null : (m['alnum'] as String),
-      dash: m['dash'] == null ? null : (m['dash'] as String),
+      len: map['len'] == null ? null : (map['len'] as String),
+      exact: map['exact'] == null ? null : (map['exact'] as String),
+      lenMin: map['len_min'] == null ? null : (map['len_min'] as String),
+      minLen: map['min_len'] == null ? null : (map['min_len'] as String),
+      maxLen: map['max_len'] == null ? null : (map['max_len'] as String),
+      email: map['email'] == null ? null : (map['email'] as String),
+      url: map['url'] == null ? null : (map['url'] as String),
+      uuid: map['uuid'] == null ? null : (map['uuid'] as String),
+      ip: map['ip'] == null ? null : (map['ip'] as String),
+      regex: map['regex'] == null ? null : (map['regex'] as String),
+      inList: map['in_list'] == null ? null : (map['in_list'] as String),
+      notIn: map['not_in'] == null ? null : (map['not_in'] as String),
+      starts: map['starts'] == null ? null : (map['starts'] as String),
+      ends: map['ends'] == null ? null : (map['ends'] as String),
+      alpha: map['alpha'] == null ? null : (map['alpha'] as String),
+      alnum: map['alnum'] == null ? null : (map['alnum'] as String),
+      dash: map['dash'] == null ? null : (map['dash'] as String),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(TextRules o) {
-    String? f0 = o.len;
-    String? f1 = o.exact;
-    String? f2 = o.lenMin;
-    String? f3 = o.minLen;
-    String? f4 = o.maxLen;
-    String? f5 = o.email;
-    String? f6 = o.url;
-    String? f7 = o.uuid;
-    String? f8 = o.ip;
-    String? f9 = o.regex;
-    String? f10 = o.inList;
-    String? f11 = o.notIn;
-    String? f12 = o.starts;
-    String? f13 = o.ends;
-    String? f14 = o.alpha;
-    String? f15 = o.alnum;
-    String? f16 = o.dash;
+  Map<String, dynamic> toMap(TextRules dto) {
     return <String, dynamic>{
-      'len': f0,
-      'exact': f1,
-      'len_min': f2,
-      'min_len': f3,
-      'max_len': f4,
-      'email': f5,
-      'url': f6,
-      'uuid': f7,
-      'ip': f8,
-      'regex': f9,
-      'in_list': f10,
-      'not_in': f11,
-      'starts': f12,
-      'ends': f13,
-      'alpha': f14,
-      'alnum': f15,
-      'dash': f16,
+      'len': dto.len,
+      'exact': dto.exact,
+      'len_min': dto.lenMin,
+      'min_len': dto.minLen,
+      'max_len': dto.maxLen,
+      'email': dto.email,
+      'url': dto.url,
+      'uuid': dto.uuid,
+      'ip': dto.ip,
+      'regex': dto.regex,
+      'in_list': dto.inList,
+      'not_in': dto.notIn,
+      'starts': dto.starts,
+      'ends': dto.ends,
+      'alpha': dto.alpha,
+      'alnum': dto.alnum,
+      'dash': dto.dash,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeTextRules(object as TextRules, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeTextRules(object as TextRules, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -704,42 +781,42 @@ class _$TextRulesDto extends DtoSchema<TextRules> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [TextRules], as `toMap()` gives it.
-void $writeTextRules(TextRules o, JsonWriter w) {
-  w.run(_$TextRulesDto._j0);
-  w.string(o.len);
-  w.run(_$TextRulesDto._j1);
-  w.string(o.exact);
-  w.run(_$TextRulesDto._j2);
-  w.string(o.lenMin);
-  w.run(_$TextRulesDto._j3);
-  w.string(o.minLen);
-  w.run(_$TextRulesDto._j4);
-  w.string(o.maxLen);
-  w.run(_$TextRulesDto._j5);
-  w.string(o.email);
-  w.run(_$TextRulesDto._j6);
-  w.string(o.url);
-  w.run(_$TextRulesDto._j7);
-  w.string(o.uuid);
-  w.run(_$TextRulesDto._j8);
-  w.string(o.ip);
-  w.run(_$TextRulesDto._j9);
-  w.string(o.regex);
-  w.run(_$TextRulesDto._j10);
-  w.string(o.inList);
-  w.run(_$TextRulesDto._j11);
-  w.string(o.notIn);
-  w.run(_$TextRulesDto._j12);
-  w.string(o.starts);
-  w.run(_$TextRulesDto._j13);
-  w.string(o.ends);
-  w.run(_$TextRulesDto._j14);
-  w.string(o.alpha);
-  w.run(_$TextRulesDto._j15);
-  w.string(o.alnum);
-  w.run(_$TextRulesDto._j16);
-  w.string(o.dash);
-  w.run(_$TextRulesDto._j17);
+void $writeTextRules(TextRules dto, JsonWriter writer) {
+  writer.run(_$TextRulesDto._lenKey);
+  writer.string(dto.len);
+  writer.run(_$TextRulesDto._exactKey);
+  writer.string(dto.exact);
+  writer.run(_$TextRulesDto._lenMinKey);
+  writer.string(dto.lenMin);
+  writer.run(_$TextRulesDto._minLenKey);
+  writer.string(dto.minLen);
+  writer.run(_$TextRulesDto._maxLenKey);
+  writer.string(dto.maxLen);
+  writer.run(_$TextRulesDto._emailKey);
+  writer.string(dto.email);
+  writer.run(_$TextRulesDto._urlKey);
+  writer.string(dto.url);
+  writer.run(_$TextRulesDto._uuidKey);
+  writer.string(dto.uuid);
+  writer.run(_$TextRulesDto._ipKey);
+  writer.string(dto.ip);
+  writer.run(_$TextRulesDto._regexKey);
+  writer.string(dto.regex);
+  writer.run(_$TextRulesDto._inListKey);
+  writer.string(dto.inList);
+  writer.run(_$TextRulesDto._notInKey);
+  writer.string(dto.notIn);
+  writer.run(_$TextRulesDto._startsKey);
+  writer.string(dto.starts);
+  writer.run(_$TextRulesDto._endsKey);
+  writer.string(dto.ends);
+  writer.run(_$TextRulesDto._alphaKey);
+  writer.string(dto.alpha);
+  writer.run(_$TextRulesDto._alnumKey);
+  writer.string(dto.alnum);
+  writer.run(_$TextRulesDto._dashKey);
+  writer.string(dto.dash);
+  writer.run(_$TextRulesDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [ChangeText].
@@ -749,14 +826,14 @@ class _$ChangeTextDto extends DtoSchema<ChangeText>
     implements JsonObjectWriter {
   const _$ChangeTextDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"trimmed":');
-  static final JsonRun _j1 = JsonRun(',"lower":');
-  static final JsonRun _j2 = JsonRun(',"upper":');
-  static final JsonRun _j3 = JsonRun(',"keep":');
-  static final JsonRun _j4 = JsonRun(',"blank":');
-  static final JsonRun _j5 = JsonRun('}');
+  static final JsonRun _trimmedKey = JsonRun('{"trimmed":');
+  static final JsonRun _lowerKey = JsonRun(',"lower":');
+  static final JsonRun _upperKey = JsonRun(',"upper":');
+  static final JsonRun _keepKey = JsonRun(',"keep":');
+  static final JsonRun _blankKey = JsonRun(',"blank":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => ChangeText;
@@ -768,75 +845,90 @@ class _$ChangeTextDto extends DtoSchema<ChangeText>
   bool get usesRequiredWhen => false;
 
   @override
-  ChangeText? convert(Object? input, DtoState s, List<Object> p) {
+  ChangeText? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // trimmed: String?
-    Object? c0;
-    c0 = s.string(s.read(input, 'trimmed'), p, 'trimmed', _m, trim: true);
+    Object? trimmed = state.string(
+      state.read(input, 'trimmed'),
+      path,
+      'trimmed',
+      _messages,
+      trim: true,
+    );
     // lower: String?
-    Object? c1;
-    c1 = s.string(
-      s.read(input, 'lower'),
-      p,
+    Object? lower = state.string(
+      state.read(input, 'lower'),
+      path,
       'lower',
-      _m,
+      _messages,
       trim: true,
       textCase: 1,
     );
     // upper: String?
-    Object? c2;
-    c2 = s.string(s.read(input, 'upper'), p, 'upper', _m, textCase: 2);
+    Object? upper = state.string(
+      state.read(input, 'upper'),
+      path,
+      'upper',
+      _messages,
+      textCase: 2,
+    );
     // keep: String?
-    Object? c3;
-    c3 = s.string(s.read(input, 'keep'), p, 'keep', _m, allowEmpty: true);
+    Object? keep = state.string(
+      state.read(input, 'keep'),
+      path,
+      'keep',
+      _messages,
+      allowEmpty: true,
+    );
     // blank: String?
-    Object? c4;
-    c4 = s.string(s.read(input, 'blank'), p, 'blank', _m, trim: true);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
+    Object? blank = state.string(
+      state.read(input, 'blank'),
+      path,
+      'blank',
+      _messages,
+      trim: true,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
     return ChangeText(
-      trimmed: c0 is Undefined ? null : c0 as String?,
-      lower: c1 is Undefined ? null : c1 as String?,
-      upper: c2 is Undefined ? null : c2 as String?,
-      keep: c3 is Undefined ? null : c3 as String?,
-      blank: c4 is Undefined ? null : c4 as String?,
+      trimmed: trimmed is Undefined ? null : trimmed as String?,
+      lower: lower is Undefined ? null : lower as String?,
+      upper: upper is Undefined ? null : upper as String?,
+      keep: keep is Undefined ? null : keep as String?,
+      blank: blank is Undefined ? null : blank as String?,
     );
   }
 
   @override
-  ChangeText fromMap(Map<String, dynamic> m) {
+  ChangeText fromMap(Map<String, dynamic> map) {
     return ChangeText(
-      trimmed: m['trimmed'] == null ? null : (m['trimmed'] as String),
-      lower: m['lower'] == null ? null : (m['lower'] as String),
-      upper: m['upper'] == null ? null : (m['upper'] as String),
-      keep: m['keep'] == null ? null : (m['keep'] as String),
-      blank: m['blank'] == null ? null : (m['blank'] as String),
+      trimmed: map['trimmed'] == null ? null : (map['trimmed'] as String),
+      lower: map['lower'] == null ? null : (map['lower'] as String),
+      upper: map['upper'] == null ? null : (map['upper'] as String),
+      keep: map['keep'] == null ? null : (map['keep'] as String),
+      blank: map['blank'] == null ? null : (map['blank'] as String),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(ChangeText o) {
-    String? f0 = o.trimmed;
-    String? f1 = o.lower;
-    String? f2 = o.upper;
-    String? f3 = o.keep;
-    String? f4 = o.blank;
+  Map<String, dynamic> toMap(ChangeText dto) {
     return <String, dynamic>{
-      'trimmed': f0,
-      'lower': f1,
-      'upper': f2,
-      'keep': f3,
-      'blank': f4,
+      'trimmed': dto.trimmed,
+      'lower': dto.lower,
+      'upper': dto.upper,
+      'keep': dto.keep,
+      'blank': dto.blank,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeChangeText(object as ChangeText, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeChangeText(object as ChangeText, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -864,18 +956,18 @@ class _$ChangeTextDto extends DtoSchema<ChangeText>
 }
 
 /// Writes the JSON of [ChangeText], as `toMap()` gives it.
-void $writeChangeText(ChangeText o, JsonWriter w) {
-  w.run(_$ChangeTextDto._j0);
-  w.string(o.trimmed);
-  w.run(_$ChangeTextDto._j1);
-  w.string(o.lower);
-  w.run(_$ChangeTextDto._j2);
-  w.string(o.upper);
-  w.run(_$ChangeTextDto._j3);
-  w.string(o.keep);
-  w.run(_$ChangeTextDto._j4);
-  w.string(o.blank);
-  w.run(_$ChangeTextDto._j5);
+void $writeChangeText(ChangeText dto, JsonWriter writer) {
+  writer.run(_$ChangeTextDto._trimmedKey);
+  writer.string(dto.trimmed);
+  writer.run(_$ChangeTextDto._lowerKey);
+  writer.string(dto.lower);
+  writer.run(_$ChangeTextDto._upperKey);
+  writer.string(dto.upper);
+  writer.run(_$ChangeTextDto._keepKey);
+  writer.string(dto.keep);
+  writer.run(_$ChangeTextDto._blankKey);
+  writer.string(dto.blank);
+  writer.run(_$ChangeTextDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [NumberRules].
@@ -885,17 +977,17 @@ class _$NumberRulesDto extends DtoSchema<NumberRules>
     implements JsonObjectWriter {
   const _$NumberRulesDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"min":');
-  static final JsonRun _j1 = JsonRun(',"max":');
-  static final JsonRun _j2 = JsonRun(',"range":');
-  static final JsonRun _j3 = JsonRun(',"positive":');
-  static final JsonRun _j4 = JsonRun(',"gt":');
-  static final JsonRun _j5 = JsonRun(',"lt":');
-  static final JsonRun _j6 = JsonRun(',"in_num":');
-  static final JsonRun _j7 = JsonRun(',"not_in_num":');
-  static final JsonRun _j8 = JsonRun('}');
+  static final JsonRun _minKey = JsonRun('{"min":');
+  static final JsonRun _maxKey = JsonRun(',"max":');
+  static final JsonRun _rangeKey = JsonRun(',"range":');
+  static final JsonRun _positiveKey = JsonRun(',"positive":');
+  static final JsonRun _gtKey = JsonRun(',"gt":');
+  static final JsonRun _ltKey = JsonRun(',"lt":');
+  static final JsonRun _inNumKey = JsonRun(',"in_num":');
+  static final JsonRun _notInNumKey = JsonRun(',"not_in_num":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => NumberRules;
@@ -907,194 +999,211 @@ class _$NumberRulesDto extends DtoSchema<NumberRules>
   bool get usesRequiredWhen => false;
 
   @override
-  NumberRules? convert(Object? input, DtoState s, List<Object> p) {
+  NumberRules? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // min: int?
-    Object? c0;
-    c0 = s.integer(s.read(input, 'min'), p, 'min', _m);
+    Object? min = state.integer(
+      state.read(input, 'min'),
+      path,
+      'min',
+      _messages,
+    );
     // max: int?
-    Object? c1;
-    c1 = s.integer(s.read(input, 'max'), p, 'max', _m);
+    Object? max = state.integer(
+      state.read(input, 'max'),
+      path,
+      'max',
+      _messages,
+    );
     // range: num?
-    Object? c2;
-    c2 = s.number(s.read(input, 'range'), p, 'range', _m);
+    Object? range = state.number(
+      state.read(input, 'range'),
+      path,
+      'range',
+      _messages,
+    );
     // positive: int?
-    Object? c3;
-    c3 = s.integer(s.read(input, 'positive'), p, 'positive', _m);
+    Object? positive = state.integer(
+      state.read(input, 'positive'),
+      path,
+      'positive',
+      _messages,
+    );
     // gt: double?
-    Object? c4;
-    c4 = s.decimal(s.read(input, 'gt'), p, 'gt', _m);
+    Object? gt = state.decimal(state.read(input, 'gt'), path, 'gt', _messages);
     // lt: num?
-    Object? c5;
-    c5 = s.number(s.read(input, 'lt'), p, 'lt', _m);
+    Object? lt = state.number(state.read(input, 'lt'), path, 'lt', _messages);
     // inNum: int?
-    Object? c6;
-    c6 = s.integer(s.read(input, 'in_num'), p, 'in_num', _m);
+    Object? inNum = state.integer(
+      state.read(input, 'in_num'),
+      path,
+      'in_num',
+      _messages,
+    );
     // notInNum: int?
-    Object? c7;
-    c7 = s.integer(s.read(input, 'not_in_num'), p, 'not_in_num', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is int) {
-      if (!(c0 >= 18)) {
-        s.fail(
-          p,
+    Object? notInNum = state.integer(
+      state.read(input, 'not_in_num'),
+      path,
+      'not_in_num',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (min is int) {
+      if (!(min >= 18)) {
+        state.fail(
+          path,
           'min',
           IssueCodes.min,
           DefaultMessages.min,
-          c0,
+          min,
           params: const <String, Object?>{'min': 18},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c1 is int) {
-      if (!(c1 <= 100)) {
-        s.fail(
-          p,
+    if (max is int) {
+      if (!(max <= 100)) {
+        state.fail(
+          path,
           'max',
           IssueCodes.max,
           DefaultMessages.max,
-          c1,
+          max,
           params: const <String, Object?>{'max': 100},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c2 is num) {
-      if (!(c2 >= 1 && c2 <= 10)) {
-        s.fail(
-          p,
+    if (range is num) {
+      if (!(range >= 1 && range <= 10)) {
+        state.fail(
+          path,
           'range',
           IssueCodes.between,
           DefaultMessages.between,
-          c2,
+          range,
           params: const <String, Object?>{'min': 1, 'max': 10},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c3 is int) {
-      if (!(c3 > 0)) {
-        s.fail(
-          p,
+    if (positive is int) {
+      if (!(positive > 0)) {
+        state.fail(
+          path,
           'positive',
           IssueCodes.greaterThan,
           DefaultMessages.greaterThan,
-          c3,
+          positive,
           params: const <String, Object?>{'min': 0},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c4 is double) {
-      if (!(c4 > 0.5)) {
-        s.fail(
-          p,
+    if (gt is double) {
+      if (!(gt > 0.5)) {
+        state.fail(
+          path,
           'gt',
           IssueCodes.greaterThan,
           DefaultMessages.greaterThan,
-          c4,
+          gt,
           params: const <String, Object?>{'min': 0.5},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c5 is num) {
-      if (!(c5 < 100)) {
-        s.fail(
-          p,
+    if (lt is num) {
+      if (!(lt < 100)) {
+        state.fail(
+          path,
           'lt',
           IssueCodes.lessThan,
           DefaultMessages.lessThan,
-          c5,
+          lt,
           params: const <String, Object?>{'max': 100},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c6 is int) {
-      if (!(const <num>{1, 2, 3}.contains(c6))) {
-        s.fail(
-          p,
+    if (inNum is int) {
+      if (!(const <num>{1, 2, 3}.contains(inNum))) {
+        state.fail(
+          path,
           'in_num',
           IssueCodes.inList,
           DefaultMessages.inList,
-          c6,
+          inNum,
           params: const <String, Object?>{'values': '1, 2, and 3'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c7 is int) {
-      if (!(!const <num>{0}.contains(c7))) {
-        s.fail(
-          p,
+    if (notInNum is int) {
+      if (!(!const <num>{0}.contains(notInNum))) {
+        state.fail(
+          path,
           'not_in_num',
           IssueCodes.notIn,
           DefaultMessages.notIn,
-          c7,
-          messages: _m,
+          notInNum,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return NumberRules(
-      min: c0 is Undefined ? null : c0 as int?,
-      max: c1 is Undefined ? null : c1 as int?,
-      range: c2 is Undefined ? null : c2 as num?,
-      positive: c3 is Undefined ? null : c3 as int?,
-      gt: c4 is Undefined ? null : c4 as double?,
-      lt: c5 is Undefined ? null : c5 as num?,
-      inNum: c6 is Undefined ? null : c6 as int?,
-      notInNum: c7 is Undefined ? null : c7 as int?,
+      min: min is Undefined ? null : min as int?,
+      max: max is Undefined ? null : max as int?,
+      range: range is Undefined ? null : range as num?,
+      positive: positive is Undefined ? null : positive as int?,
+      gt: gt is Undefined ? null : gt as double?,
+      lt: lt is Undefined ? null : lt as num?,
+      inNum: inNum is Undefined ? null : inNum as int?,
+      notInNum: notInNum is Undefined ? null : notInNum as int?,
     );
   }
 
   @override
-  NumberRules fromMap(Map<String, dynamic> m) {
+  NumberRules fromMap(Map<String, dynamic> map) {
     return NumberRules(
-      min: m['min'] == null ? null : ((m['min'] as num).toInt()),
-      max: m['max'] == null ? null : ((m['max'] as num).toInt()),
-      range: m['range'] == null ? null : (m['range'] as num),
-      positive: m['positive'] == null ? null : ((m['positive'] as num).toInt()),
-      gt: m['gt'] == null ? null : ((m['gt'] as num).toDouble()),
-      lt: m['lt'] == null ? null : (m['lt'] as num),
-      inNum: m['in_num'] == null ? null : ((m['in_num'] as num).toInt()),
-      notInNum: m['not_in_num'] == null
+      min: map['min'] == null ? null : ((map['min'] as num).toInt()),
+      max: map['max'] == null ? null : ((map['max'] as num).toInt()),
+      range: map['range'] == null ? null : (map['range'] as num),
+      positive: map['positive'] == null
           ? null
-          : ((m['not_in_num'] as num).toInt()),
+          : ((map['positive'] as num).toInt()),
+      gt: map['gt'] == null ? null : ((map['gt'] as num).toDouble()),
+      lt: map['lt'] == null ? null : (map['lt'] as num),
+      inNum: map['in_num'] == null ? null : ((map['in_num'] as num).toInt()),
+      notInNum: map['not_in_num'] == null
+          ? null
+          : ((map['not_in_num'] as num).toInt()),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(NumberRules o) {
-    int? f0 = o.min;
-    int? f1 = o.max;
-    num? f2 = o.range;
-    int? f3 = o.positive;
-    double? f4 = o.gt;
-    num? f5 = o.lt;
-    int? f6 = o.inNum;
-    int? f7 = o.notInNum;
+  Map<String, dynamic> toMap(NumberRules dto) {
     return <String, dynamic>{
-      'min': f0,
-      'max': f1,
-      'range': f2,
-      'positive': f3,
-      'gt': f4,
-      'lt': f5,
-      'in_num': f6,
-      'not_in_num': f7,
+      'min': dto.min,
+      'max': dto.max,
+      'range': dto.range,
+      'positive': dto.positive,
+      'gt': dto.gt,
+      'lt': dto.lt,
+      'in_num': dto.inNum,
+      'not_in_num': dto.notInNum,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeNumberRules(object as NumberRules, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeNumberRules(object as NumberRules, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -1142,24 +1251,24 @@ class _$NumberRulesDto extends DtoSchema<NumberRules>
 }
 
 /// Writes the JSON of [NumberRules], as `toMap()` gives it.
-void $writeNumberRules(NumberRules o, JsonWriter w) {
-  w.run(_$NumberRulesDto._j0);
-  w.integer(o.min);
-  w.run(_$NumberRulesDto._j1);
-  w.integer(o.max);
-  w.run(_$NumberRulesDto._j2);
-  w.value(o.range);
-  w.run(_$NumberRulesDto._j3);
-  w.integer(o.positive);
-  w.run(_$NumberRulesDto._j4);
-  w.value(o.gt);
-  w.run(_$NumberRulesDto._j5);
-  w.value(o.lt);
-  w.run(_$NumberRulesDto._j6);
-  w.integer(o.inNum);
-  w.run(_$NumberRulesDto._j7);
-  w.integer(o.notInNum);
-  w.run(_$NumberRulesDto._j8);
+void $writeNumberRules(NumberRules dto, JsonWriter writer) {
+  writer.run(_$NumberRulesDto._minKey);
+  writer.integer(dto.min);
+  writer.run(_$NumberRulesDto._maxKey);
+  writer.integer(dto.max);
+  writer.run(_$NumberRulesDto._rangeKey);
+  writer.value(dto.range);
+  writer.run(_$NumberRulesDto._positiveKey);
+  writer.integer(dto.positive);
+  writer.run(_$NumberRulesDto._gtKey);
+  writer.value(dto.gt);
+  writer.run(_$NumberRulesDto._ltKey);
+  writer.value(dto.lt);
+  writer.run(_$NumberRulesDto._inNumKey);
+  writer.integer(dto.inNum);
+  writer.run(_$NumberRulesDto._notInNumKey);
+  writer.integer(dto.notInNum);
+  writer.run(_$NumberRulesDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [ListRules].
@@ -1168,13 +1277,13 @@ const DtoSchema<ListRules> $ListRulesDto = _$ListRulesDto();
 class _$ListRulesDto extends DtoSchema<ListRules> implements JsonObjectWriter {
   const _$ListRulesDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"min_items":');
-  static final JsonRun _j1 = JsonRun(',"max_items":');
-  static final JsonRun _j2 = JsonRun(',"unique":');
-  static final JsonRun _j3 = JsonRun(',"emails":');
-  static final JsonRun _j4 = JsonRun('}');
+  static final JsonRun _minItemsKey = JsonRun('{"min_items":');
+  static final JsonRun _maxItemsKey = JsonRun(',"max_items":');
+  static final JsonRun _uniqueKey = JsonRun(',"unique":');
+  static final JsonRun _emailsKey = JsonRun(',"emails":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => ListRules;
@@ -1186,192 +1295,202 @@ class _$ListRulesDto extends DtoSchema<ListRules> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  ListRules? convert(Object? input, DtoState s, List<Object> p) {
+  ListRules? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // minItems: List<int>?
-    Object? c0;
-    c0 = s.list(s.read(input, 'min_items'), p, 'min_items', _m);
-    if (c0 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'min_items'];
+    Object? minItems = state.list(
+      state.read(input, 'min_items'),
+      path,
+      'min_items',
+      _messages,
+    );
+    if (minItems is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'min_items'];
       List<int> o0 = <int>[];
-      for (int i0 = 0; i0 < c0.length; i0++) {
-        Object? x0;
-        x0 = s.integer(c0[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < minItems.length; i0++) {
+        Object? x0 = state.integer(minItems[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as int);
         }
       }
-      c0 = s.issues.length != b0 ? invalid : o0;
+      minItems = state.issues.length != b0 ? invalid : o0;
     }
     // maxItems: List<String>?
-    Object? c1;
-    c1 = s.list(s.read(input, 'max_items'), p, 'max_items', _m);
-    if (c1 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'max_items'];
+    Object? maxItems = state.list(
+      state.read(input, 'max_items'),
+      path,
+      'max_items',
+      _messages,
+    );
+    if (maxItems is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'max_items'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c1.length; i0++) {
-        Object? x0;
-        x0 = s.string(c1[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < maxItems.length; i0++) {
+        Object? x0 = state.string(maxItems[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c1 = s.issues.length != b0 ? invalid : o0;
+      maxItems = state.issues.length != b0 ? invalid : o0;
     }
     // unique: List<String>?
-    Object? c2;
-    c2 = s.list(s.read(input, 'unique'), p, 'unique', _m);
-    if (c2 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'unique'];
+    Object? unique = state.list(
+      state.read(input, 'unique'),
+      path,
+      'unique',
+      _messages,
+    );
+    if (unique is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'unique'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c2.length; i0++) {
-        Object? x0;
-        x0 = s.string(c2[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < unique.length; i0++) {
+        Object? x0 = state.string(unique[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c2 = s.issues.length != b0 ? invalid : o0;
+      unique = state.issues.length != b0 ? invalid : o0;
     }
     // emails: List<String>?
-    Object? c3;
-    c3 = s.list(s.read(input, 'emails'), p, 'emails', _m);
-    if (c3 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'emails'];
+    Object? emails = state.list(
+      state.read(input, 'emails'),
+      path,
+      'emails',
+      _messages,
+    );
+    if (emails is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'emails'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c3.length; i0++) {
-        Object? x0;
-        x0 = s.string(c3[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < emails.length; i0++) {
+        Object? x0 = state.string(emails[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c3 = s.issues.length != b0 ? invalid : o0;
+      emails = state.issues.length != b0 ? invalid : o0;
     }
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is List<int>) {
-      if (!(c0.length >= 1)) {
-        s.fail(
-          p,
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (minItems is List<int>) {
+      if (!(minItems.length >= 1)) {
+        state.fail(
+          path,
           'min_items',
           IssueCodes.minItems,
           DefaultMessages.minItems,
-          c0,
+          minItems,
           params: const <String, Object?>{'min': 1},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c1 is List<String>) {
-      if (!(c1.length <= 2)) {
-        s.fail(
-          p,
+    if (maxItems is List<String>) {
+      if (!(maxItems.length <= 2)) {
+        state.fail(
+          path,
           'max_items',
           IssueCodes.maxItems,
           DefaultMessages.maxItems,
-          c1,
+          maxItems,
           params: const <String, Object?>{'max': 2},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c2 is List<String>) {
-      if (!(!DtoChecks.hasDuplicates(c2))) {
-        s.fail(
-          p,
+    if (unique is List<String>) {
+      if (!(!DtoChecks.hasDuplicates(unique))) {
+        state.fail(
+          path,
           'unique',
           IssueCodes.uniqueItems,
           DefaultMessages.uniqueItems,
-          c2,
-          messages: _m,
+          unique,
+          messages: _messages,
         );
       }
     }
-    if (c3 is List<String>) {
-      List<Object> q = <Object>[...p, 'emails'];
-      for (int i = 0; i < c3.length; i++) {
-        String v = c3[i];
+    if (emails is List<String>) {
+      List<Object> q = <Object>[...path, 'emails'];
+      for (int i = 0; i < emails.length; i++) {
+        String v = emails[i];
         if (!(Patterns.email.hasMatch(v))) {
-          s.fail(
+          state.fail(
             q,
             i,
             IssueCodes.email,
             DefaultMessages.email,
             v,
-            messages: _m,
+            messages: _messages,
           );
         }
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return ListRules(
-      minItems: c0 is Undefined ? null : c0 as List<int>?,
-      maxItems: c1 is Undefined ? null : c1 as List<String>?,
-      unique: c2 is Undefined ? null : c2 as List<String>?,
-      emails: c3 is Undefined ? null : c3 as List<String>?,
+      minItems: minItems is Undefined ? null : minItems as List<int>?,
+      maxItems: maxItems is Undefined ? null : maxItems as List<String>?,
+      unique: unique is Undefined ? null : unique as List<String>?,
+      emails: emails is Undefined ? null : emails as List<String>?,
     );
   }
 
   @override
-  ListRules fromMap(Map<String, dynamic> m) {
+  ListRules fromMap(Map<String, dynamic> map) {
     return ListRules(
-      minItems: m['min_items'] == null
+      minItems: map['min_items'] == null
           ? null
           : (<int>[
-              for (Object? x0 in m['min_items'] as List<dynamic>)
+              for (Object? x0 in map['min_items'] as List<dynamic>)
                 (x0 as num).toInt(),
             ]),
-      maxItems: m['max_items'] == null
+      maxItems: map['max_items'] == null
           ? null
           : (<String>[
-              for (Object? x0 in m['max_items'] as List<dynamic>) x0 as String,
+              for (Object? x0 in map['max_items'] as List<dynamic>)
+                x0 as String,
             ]),
-      unique: m['unique'] == null
+      unique: map['unique'] == null
           ? null
           : (<String>[
-              for (Object? x0 in m['unique'] as List<dynamic>) x0 as String,
+              for (Object? x0 in map['unique'] as List<dynamic>) x0 as String,
             ]),
-      emails: m['emails'] == null
+      emails: map['emails'] == null
           ? null
           : (<String>[
-              for (Object? x0 in m['emails'] as List<dynamic>) x0 as String,
+              for (Object? x0 in map['emails'] as List<dynamic>) x0 as String,
             ]),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(ListRules o) {
-    List<int>? f0 = o.minItems;
-    List<String>? f1 = o.maxItems;
-    List<String>? f2 = o.unique;
-    List<String>? f3 = o.emails;
+  Map<String, dynamic> toMap(ListRules dto) {
     return <String, dynamic>{
-      'min_items': f0,
-      'max_items': f1,
-      'unique': f2,
-      'emails': f3,
+      'min_items': dto.minItems,
+      'max_items': dto.maxItems,
+      'unique': dto.unique,
+      'emails': dto.emails,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeListRules(object as ListRules, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeListRules(object as ListRules, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -1403,16 +1522,16 @@ class _$ListRulesDto extends DtoSchema<ListRules> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [ListRules], as `toMap()` gives it.
-void $writeListRules(ListRules o, JsonWriter w) {
-  w.run(_$ListRulesDto._j0);
-  w.value(o.minItems);
-  w.run(_$ListRulesDto._j1);
-  w.value(o.maxItems);
-  w.run(_$ListRulesDto._j2);
-  w.value(o.unique);
-  w.run(_$ListRulesDto._j3);
-  w.value(o.emails);
-  w.run(_$ListRulesDto._j4);
+void $writeListRules(ListRules dto, JsonWriter writer) {
+  writer.run(_$ListRulesDto._minItemsKey);
+  writer.value(dto.minItems);
+  writer.run(_$ListRulesDto._maxItemsKey);
+  writer.value(dto.maxItems);
+  writer.run(_$ListRulesDto._uniqueKey);
+  writer.value(dto.unique);
+  writer.run(_$ListRulesDto._emailsKey);
+  writer.value(dto.emails);
+  writer.run(_$ListRulesDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [DateRules].
@@ -1421,15 +1540,15 @@ const DtoSchema<DateRules> $DateRulesDto = _$DateRulesDto();
 class _$DateRulesDto extends DtoSchema<DateRules> implements JsonObjectWriter {
   const _$DateRulesDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   static final DateTime _d0 = DateTime.fromMicrosecondsSinceEpoch(
     946684800000000,
     isUtc: true,
   );
-  static final JsonRun _j0 = JsonRun('{"after":');
-  static final JsonRun _j1 = JsonRun(',"before":');
-  static final JsonRun _j2 = JsonRun('}');
+  static final JsonRun _afterKey = JsonRun('{"after":');
+  static final JsonRun _beforeKey = JsonRun(',"before":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => DateRules;
@@ -1441,77 +1560,86 @@ class _$DateRulesDto extends DtoSchema<DateRules> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  DateRules? convert(Object? input, DtoState s, List<Object> p) {
+  DateRules? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // after: DateTime?
-    Object? c0;
-    c0 = s.date(s.read(input, 'after'), p, 'after', _m);
+    Object? after = state.date(
+      state.read(input, 'after'),
+      path,
+      'after',
+      _messages,
+    );
     // before: DateTime?
-    Object? c1;
-    c1 = s.date(s.read(input, 'before'), p, 'before', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is DateTime) {
-      if (!(c0.isAfter(_d0))) {
-        s.fail(
-          p,
+    Object? before = state.date(
+      state.read(input, 'before'),
+      path,
+      'before',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (after is DateTime) {
+      if (!(after.isAfter(_d0))) {
+        state.fail(
+          path,
           'after',
           IssueCodes.after,
           DefaultMessages.after,
-          c0,
+          after,
           params: const <String, Object?>{'date': '2000-01-01'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c1 is DateTime) {
-      if (!(c1.isBefore(s.now))) {
-        s.fail(
-          p,
+    if (before is DateTime) {
+      if (!(before.isBefore(state.now))) {
+        state.fail(
+          path,
           'before',
           IssueCodes.before,
           DefaultMessages.before,
-          c1,
+          before,
           params: const <String, Object?>{'date': 'now'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return DateRules(
-      after: c0 is Undefined ? null : c0 as DateTime?,
-      before: c1 is Undefined ? null : c1 as DateTime?,
+      after: after is Undefined ? null : after as DateTime?,
+      before: before is Undefined ? null : before as DateTime?,
     );
   }
 
   @override
-  DateRules fromMap(Map<String, dynamic> m) {
+  DateRules fromMap(Map<String, dynamic> map) {
     return DateRules(
-      after: m['after'] == null
+      after: map['after'] == null
           ? null
-          : (DateTime.parse(m['after'] as String).toUtc()),
-      before: m['before'] == null
+          : (DateTime.parse(map['after'] as String).toUtc()),
+      before: map['before'] == null
           ? null
-          : (DateTime.parse(m['before'] as String).toUtc()),
+          : (DateTime.parse(map['before'] as String).toUtc()),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(DateRules o) {
-    DateTime? f0 = o.after;
-    DateTime? f1 = o.before;
+  Map<String, dynamic> toMap(DateRules dto) {
+    DateTime? after = dto.after;
+    DateTime? before = dto.before;
     return <String, dynamic>{
-      'after': f0 == null ? null : f0.toIso8601String(),
-      'before': f1 == null ? null : f1.toIso8601String(),
+      'after': after == null ? null : after.toIso8601String(),
+      'before': before == null ? null : before.toIso8601String(),
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeDateRules(object as DateRules, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeDateRules(object as DateRules, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -1532,12 +1660,12 @@ class _$DateRulesDto extends DtoSchema<DateRules> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [DateRules], as `toMap()` gives it.
-void $writeDateRules(DateRules o, JsonWriter w) {
-  w.run(_$DateRulesDto._j0);
-  w.dateTime(o.after);
-  w.run(_$DateRulesDto._j1);
-  w.dateTime(o.before);
-  w.run(_$DateRulesDto._j2);
+void $writeDateRules(DateRules dto, JsonWriter writer) {
+  writer.run(_$DateRulesDto._afterKey);
+  writer.dateTime(dto.after);
+  writer.run(_$DateRulesDto._beforeKey);
+  writer.dateTime(dto.before);
+  writer.run(_$DateRulesDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [AllTypes].
@@ -1546,20 +1674,20 @@ const DtoSchema<AllTypes> $AllTypesDto = _$AllTypesDto();
 class _$AllTypesDto extends DtoSchema<AllTypes> implements JsonObjectWriter {
   const _$AllTypesDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"s":');
-  static final JsonRun _j1 = JsonRun(',"i":');
-  static final JsonRun _j2 = JsonRun(',"d":');
-  static final JsonRun _j3 = JsonRun(',"n":');
-  static final JsonRun _j4 = JsonRun(',"b":');
-  static final JsonRun _j5 = JsonRun(',"dt":');
-  static final JsonRun _j6 = JsonRun(',"role":');
-  static final JsonRun _j7 = JsonRun(',"list":');
-  static final JsonRun _j8 = JsonRun(',"map":');
-  static final JsonRun _j9 = JsonRun(',"any":');
-  static final JsonRun _j10 = JsonRun(',"raw":');
-  static final JsonRun _j11 = JsonRun('}');
+  static final JsonRun _sKey = JsonRun('{"s":');
+  static final JsonRun _iKey = JsonRun(',"i":');
+  static final JsonRun _dKey = JsonRun(',"d":');
+  static final JsonRun _nKey = JsonRun(',"n":');
+  static final JsonRun _bKey = JsonRun(',"b":');
+  static final JsonRun _dtKey = JsonRun(',"dt":');
+  static final JsonRun _roleKey = JsonRun(',"role":');
+  static final JsonRun _listKey = JsonRun(',"list":');
+  static final JsonRun _mapKey = JsonRun(',"map":');
+  static final JsonRun _anyKey = JsonRun(',"any":');
+  static final JsonRun _rawKey = JsonRun(',"raw":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => AllTypes;
@@ -1571,163 +1699,167 @@ class _$AllTypesDto extends DtoSchema<AllTypes> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  AllTypes? convert(Object? input, DtoState s, List<Object> p) {
+  AllTypes? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // s: String?
-    Object? c0;
-    c0 = s.string(s.read(input, 's'), p, 's', _m);
+    Object? s = state.string(state.read(input, 's'), path, 's', _messages);
     // i: int?
-    Object? c1;
-    c1 = s.integer(s.read(input, 'i'), p, 'i', _m);
+    Object? iValue = state.integer(
+      state.read(input, 'i'),
+      path,
+      'i',
+      _messages,
+    );
     // d: double?
-    Object? c2;
-    c2 = s.decimal(s.read(input, 'd'), p, 'd', _m);
+    Object? d = state.decimal(state.read(input, 'd'), path, 'd', _messages);
     // n: num?
-    Object? c3;
-    c3 = s.number(s.read(input, 'n'), p, 'n', _m);
+    Object? n = state.number(state.read(input, 'n'), path, 'n', _messages);
     // b: bool?
-    Object? c4;
-    c4 = s.boolean(s.read(input, 'b'), p, 'b', _m);
+    Object? b = state.boolean(state.read(input, 'b'), path, 'b', _messages);
     // dt: DateTime?
-    Object? c5;
-    c5 = s.date(s.read(input, 'dt'), p, 'dt', _m);
+    Object? dt = state.date(state.read(input, 'dt'), path, 'dt', _messages);
     // role: Role?
-    Object? c6;
-    c6 = s.enumName(s.read(input, 'role'), p, 'role', _m, const <String>[
-      'admin',
-      'user',
-    ]);
-    if (c6 is String) {
-      c6 = switch (c6) {
+    Object? role = state.enumName(
+      state.read(input, 'role'),
+      path,
+      'role',
+      _messages,
+      const <String>['admin', 'user'],
+    );
+    if (role is String) {
+      role = switch (role) {
         'admin' => Role.admin,
         _ => Role.user,
       };
     }
     // list: List<int>?
-    Object? c7;
-    c7 = s.list(s.read(input, 'list'), p, 'list', _m);
-    if (c7 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'list'];
+    Object? list = state.list(
+      state.read(input, 'list'),
+      path,
+      'list',
+      _messages,
+    );
+    if (list is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'list'];
       List<int> o0 = <int>[];
-      for (int i0 = 0; i0 < c7.length; i0++) {
-        Object? x0;
-        x0 = s.integer(c7[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < list.length; i0++) {
+        Object? x0 = state.integer(list[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as int);
         }
       }
-      c7 = s.issues.length != b0 ? invalid : o0;
+      list = state.issues.length != b0 ? invalid : o0;
     }
     // map: Map<String, int>?
-    Object? c8;
-    c8 = s.object(s.read(input, 'map'), p, 'map', _m);
-    if (c8 is Map) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'map'];
+    Object? map = state.object(
+      state.read(input, 'map'),
+      path,
+      'map',
+      _messages,
+    );
+    if (map is Map) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'map'];
       Map<String, int> o0 = <String, int>{};
-      for (MapEntry<dynamic, dynamic> n0 in c8.entries) {
+      for (MapEntry<dynamic, dynamic> n0 in map.entries) {
         String k0 = '${n0.key}';
-        Object? x0;
-        x0 = s.integer(n0.value, q0, k0, _m);
+        Object? x0 = state.integer(n0.value, q0, k0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, k0, _m);
+          state.required(q0, k0, _messages);
         } else if (x0 is! Invalid) {
           o0[k0] = x0 as int;
         }
       }
-      c8 = s.issues.length != b0 ? invalid : o0;
+      map = state.issues.length != b0 ? invalid : o0;
     }
     // any: Object?
-    Object? c9;
-    c9 = s.read(input, 'any');
+    Object? any = state.read(input, 'any');
     // raw: Map<String, dynamic>?
-    Object? c10;
-    c10 = s.object(s.read(input, 'raw'), p, 'raw', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
+    Object? raw = state.object(
+      state.read(input, 'raw'),
+      path,
+      'raw',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
     return AllTypes(
-      s: c0 is Undefined ? null : c0 as String?,
-      i: c1 is Undefined ? null : c1 as int?,
-      d: c2 is Undefined ? null : c2 as double?,
-      n: c3 is Undefined ? null : c3 as num?,
-      b: c4 is Undefined ? null : c4 as bool?,
-      dt: c5 is Undefined ? null : c5 as DateTime?,
-      role: c6 is Undefined ? null : c6 as Role?,
-      list: c7 is Undefined ? null : c7 as List<int>?,
-      map: c8 is Undefined ? null : c8 as Map<String, int>?,
-      any: c9 is Undefined ? null : c9,
-      raw: c10 is Undefined ? null : c10 as Map<String, dynamic>?,
+      s: s is Undefined ? null : s as String?,
+      i: iValue is Undefined ? null : iValue as int?,
+      d: d is Undefined ? null : d as double?,
+      n: n is Undefined ? null : n as num?,
+      b: b is Undefined ? null : b as bool?,
+      dt: dt is Undefined ? null : dt as DateTime?,
+      role: role is Undefined ? null : role as Role?,
+      list: list is Undefined ? null : list as List<int>?,
+      map: map is Undefined ? null : map as Map<String, int>?,
+      any: any is Undefined ? null : any,
+      raw: raw is Undefined ? null : raw as Map<String, dynamic>?,
     );
   }
 
   @override
-  AllTypes fromMap(Map<String, dynamic> m) {
+  AllTypes fromMap(Map<String, dynamic> map) {
     return AllTypes(
-      s: m['s'] == null ? null : (m['s'] as String),
-      i: m['i'] == null ? null : ((m['i'] as num).toInt()),
-      d: m['d'] == null ? null : ((m['d'] as num).toDouble()),
-      n: m['n'] == null ? null : (m['n'] as num),
-      b: m['b'] == null ? null : (m['b'] as bool),
-      dt: m['dt'] == null ? null : (DateTime.parse(m['dt'] as String).toUtc()),
-      role: m['role'] == null
+      s: map['s'] == null ? null : (map['s'] as String),
+      i: map['i'] == null ? null : ((map['i'] as num).toInt()),
+      d: map['d'] == null ? null : ((map['d'] as num).toDouble()),
+      n: map['n'] == null ? null : (map['n'] as num),
+      b: map['b'] == null ? null : (map['b'] as bool),
+      dt: map['dt'] == null
           ? null
-          : (Role.values.byName(m['role'] as String)),
-      list: m['list'] == null
+          : (DateTime.parse(map['dt'] as String).toUtc()),
+      role: map['role'] == null
+          ? null
+          : (Role.values.byName(map['role'] as String)),
+      list: map['list'] == null
           ? null
           : (<int>[
-              for (Object? x0 in m['list'] as List<dynamic>)
+              for (Object? x0 in map['list'] as List<dynamic>)
                 (x0 as num).toInt(),
             ]),
-      map: m['map'] == null
+      map: map['map'] == null
           ? null
           : (<String, int>{
               for (MapEntry<dynamic, dynamic> x0
-                  in (m['map'] as Map<dynamic, dynamic>).entries)
+                  in (map['map'] as Map<dynamic, dynamic>).entries)
                 x0.key as String: (x0.value as num).toInt(),
             }),
-      any: m['any'],
-      raw: m['raw'] == null ? null : (m['raw'] as Map<String, dynamic>),
+      any: map['any'],
+      raw: map['raw'] == null ? null : (map['raw'] as Map<String, dynamic>),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(AllTypes o) {
-    String? f0 = o.s;
-    int? f1 = o.i;
-    double? f2 = o.d;
-    num? f3 = o.n;
-    bool? f4 = o.b;
-    DateTime? f5 = o.dt;
-    Role? f6 = o.role;
-    List<int>? f7 = o.list;
-    Map<String, int>? f8 = o.map;
-    Object? f9 = o.any;
-    Map<String, dynamic>? f10 = o.raw;
+  Map<String, dynamic> toMap(AllTypes dto) {
+    DateTime? dt = dto.dt;
+    Role? role = dto.role;
     return <String, dynamic>{
-      's': f0,
-      'i': f1,
-      'd': f2,
-      'n': f3,
-      'b': f4,
-      'dt': f5 == null ? null : f5.toIso8601String(),
-      'role': f6 == null ? null : f6.name,
-      'list': f7,
-      'map': f8,
-      'any': f9,
-      'raw': f10,
+      's': dto.s,
+      'i': dto.i,
+      'd': dto.d,
+      'n': dto.n,
+      'b': dto.b,
+      'dt': dt == null ? null : dt.toIso8601String(),
+      'role': role == null ? null : role.name,
+      'list': dto.list,
+      'map': dto.map,
+      'any': dto.any,
+      'raw': dto.raw,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeAllTypes(object as AllTypes, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeAllTypes(object as AllTypes, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -1780,30 +1912,30 @@ class _$AllTypesDto extends DtoSchema<AllTypes> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [AllTypes], as `toMap()` gives it.
-void $writeAllTypes(AllTypes o, JsonWriter w) {
-  w.run(_$AllTypesDto._j0);
-  w.string(o.s);
-  w.run(_$AllTypesDto._j1);
-  w.integer(o.i);
-  w.run(_$AllTypesDto._j2);
-  w.value(o.d);
-  w.run(_$AllTypesDto._j3);
-  w.value(o.n);
-  w.run(_$AllTypesDto._j4);
-  w.boolean(o.b);
-  w.run(_$AllTypesDto._j5);
-  w.dateTime(o.dt);
-  w.run(_$AllTypesDto._j6);
-  w.string(o.role?.name);
-  w.run(_$AllTypesDto._j7);
-  w.value(o.list);
-  w.run(_$AllTypesDto._j8);
-  w.value(o.map);
-  w.run(_$AllTypesDto._j9);
-  w.value(o.any);
-  w.run(_$AllTypesDto._j10);
-  w.value(o.raw);
-  w.run(_$AllTypesDto._j11);
+void $writeAllTypes(AllTypes dto, JsonWriter writer) {
+  writer.run(_$AllTypesDto._sKey);
+  writer.string(dto.s);
+  writer.run(_$AllTypesDto._iKey);
+  writer.integer(dto.i);
+  writer.run(_$AllTypesDto._dKey);
+  writer.value(dto.d);
+  writer.run(_$AllTypesDto._nKey);
+  writer.value(dto.n);
+  writer.run(_$AllTypesDto._bKey);
+  writer.boolean(dto.b);
+  writer.run(_$AllTypesDto._dtKey);
+  writer.dateTime(dto.dt);
+  writer.run(_$AllTypesDto._roleKey);
+  writer.string(dto.role?.name);
+  writer.run(_$AllTypesDto._listKey);
+  writer.value(dto.list);
+  writer.run(_$AllTypesDto._mapKey);
+  writer.value(dto.map);
+  writer.run(_$AllTypesDto._anyKey);
+  writer.value(dto.any);
+  writer.run(_$AllTypesDto._rawKey);
+  writer.value(dto.raw);
+  writer.run(_$AllTypesDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [SearchUsers].
@@ -1813,12 +1945,12 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers>
     implements JsonObjectWriter {
   const _$SearchUsersDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"q":');
-  static final JsonRun _j1 = JsonRun(',"page":');
-  static final JsonRun _j2 = JsonRun(',"tags":[');
-  static final JsonRun _j3 = JsonRun(']}');
+  static final JsonRun _qKey = JsonRun('{"q":');
+  static final JsonRun _pageKey = JsonRun(',"page":');
+  static final JsonRun _tagsKey = JsonRun(',"tags":[');
+  static final JsonRun _end = JsonRun(']}');
 
   @override
   Type get type => SearchUsers;
@@ -1833,71 +1965,75 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers>
   bool get usesRequiredWhen => false;
 
   @override
-  SearchUsers? convert(Object? input, DtoState s, List<Object> p) {
+  SearchUsers? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // q: String?
-    Object? c0;
-    c0 = s.string(s.read(input, 'q'), p, 'q', _m);
+    Object? qValue = state.string(state.read(input, 'q'), path, 'q', _messages);
     // page: int
-    Object? c1;
-    c1 = s.integer(s.read(input, 'page'), p, 'page', _m);
-    if (c1 == null) s.required(p, 'page', _m);
+    Object? page = state.integer(
+      state.read(input, 'page'),
+      path,
+      'page',
+      _messages,
+    );
+    if (page == null) state.required(path, 'page', _messages);
     // tags: List<String>
-    Object? c2;
-    c2 = s.list(s.read(input, 'tags'), p, 'tags', _m);
-    if (c2 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'tags'];
+    Object? tags = state.list(
+      state.read(input, 'tags'),
+      path,
+      'tags',
+      _messages,
+    );
+    if (tags is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'tags'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c2.length; i0++) {
-        Object? x0;
-        x0 = s.string(c2[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < tags.length; i0++) {
+        Object? x0 = state.string(tags[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c2 = s.issues.length != b0 ? invalid : o0;
+      tags = state.issues.length != b0 ? invalid : o0;
     }
-    if (c2 == null) s.required(p, 'tags', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
+    if (tags == null) state.required(path, 'tags', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
     return SearchUsers(
-      q: c0 is Undefined ? null : c0 as String?,
-      page: c1 is Undefined ? 1 : c1 as int,
-      tags: c2 is Undefined ? const <String>[] : c2 as List<String>,
+      q: qValue is Undefined ? null : qValue as String?,
+      page: page is Undefined ? 1 : page as int,
+      tags: tags is Undefined ? const <String>[] : tags as List<String>,
     );
   }
 
   @override
-  SearchUsers fromMap(Map<String, dynamic> m) {
+  SearchUsers fromMap(Map<String, dynamic> map) {
     return SearchUsers(
-      q: m['q'] == null ? null : (m['q'] as String),
-      page: m.containsKey('page') ? (m['page'] as num).toInt() : 1,
-      tags: m.containsKey('tags')
+      q: map['q'] == null ? null : (map['q'] as String),
+      page: map.containsKey('page') ? (map['page'] as num).toInt() : 1,
+      tags: map.containsKey('tags')
           ? <String>[
-              for (Object? x0 in m['tags'] as List<dynamic>) x0 as String,
+              for (Object? x0 in map['tags'] as List<dynamic>) x0 as String,
             ]
           : const <String>[],
     );
   }
 
   @override
-  Map<String, dynamic> toMap(SearchUsers o) {
-    String? f0 = o.q;
-    int f1 = o.page;
-    List<String> f2 = o.tags;
-    return <String, dynamic>{'q': f0, 'page': f1, 'tags': f2};
+  Map<String, dynamic> toMap(SearchUsers dto) {
+    return <String, dynamic>{'q': dto.q, 'page': dto.page, 'tags': dto.tags};
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeSearchUsers(object as SearchUsers, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeSearchUsers(object as SearchUsers, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -1919,20 +2055,20 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers>
 }
 
 /// Writes the JSON of [SearchUsers], as `toMap()` gives it.
-void $writeSearchUsers(SearchUsers o, JsonWriter w) {
-  w.run(_$SearchUsersDto._j0);
-  w.string(o.q);
-  w.run(_$SearchUsersDto._j1);
-  w.integer(o.page);
-  w.run(_$SearchUsersDto._j2);
+void $writeSearchUsers(SearchUsers dto, JsonWriter writer) {
+  writer.run(_$SearchUsersDto._qKey);
+  writer.string(dto.q);
+  writer.run(_$SearchUsersDto._pageKey);
+  writer.integer(dto.page);
+  writer.run(_$SearchUsersDto._tagsKey);
   {
-    List<String> l2 = o.tags;
-    for (int i = 0; i < l2.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.string(l2[i]);
+    List<String> tags = dto.tags;
+    for (int i = 0; i < tags.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.string(tags[i]);
     }
   }
-  w.run(_$SearchUsersDto._j3);
+  writer.run(_$SearchUsersDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [StrictInput].
@@ -1942,11 +2078,11 @@ class _$StrictInputDto extends DtoSchema<StrictInput>
     implements JsonObjectWriter {
   const _$StrictInputDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   static const Set<String> _keys = <String>{'name'};
-  static final JsonRun _j0 = JsonRun('{"name":');
-  static final JsonRun _j1 = JsonRun('}');
+  static final JsonRun _nameKey = JsonRun('{"name":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => StrictInput;
@@ -1958,47 +2094,52 @@ class _$StrictInputDto extends DtoSchema<StrictInput>
   bool get usesRequiredWhen => false;
 
   @override
-  StrictInput? convert(Object? input, DtoState s, List<Object> p) {
+  StrictInput? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     for (Object? k in input.keys) {
       if (!_keys.contains(k)) {
-        s.fail(
-          p,
+        state.fail(
+          path,
           '$k',
           IssueCodes.unrecognizedKeys,
           DefaultMessages.notAllowed,
           input[k],
-          messages: _m,
+          messages: _messages,
         );
       }
     }
     // name: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'name'), p, 'name', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'name', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
-    return StrictInput(name: c0 as String);
+    Object? name = state.string(
+      state.read(input, 'name'),
+      path,
+      'name',
+      _messages,
+    );
+    if (name == null || name is Undefined)
+      state.required(path, 'name', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return StrictInput(name: name as String);
   }
 
   @override
-  StrictInput fromMap(Map<String, dynamic> m) {
-    return StrictInput(name: m['name'] as String);
+  StrictInput fromMap(Map<String, dynamic> map) {
+    return StrictInput(name: map['name'] as String);
   }
 
   @override
-  Map<String, dynamic> toMap(StrictInput o) {
-    String f0 = o.name;
-    return <String, dynamic>{'name': f0};
+  Map<String, dynamic> toMap(StrictInput dto) {
+    return <String, dynamic>{'name': dto.name};
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeStrictInput(object as StrictInput, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeStrictInput(object as StrictInput, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -2014,10 +2155,10 @@ class _$StrictInputDto extends DtoSchema<StrictInput>
 }
 
 /// Writes the JSON of [StrictInput], as `toMap()` gives it.
-void $writeStrictInput(StrictInput o, JsonWriter w) {
-  w.run(_$StrictInputDto._j0);
-  w.string(o.name);
-  w.run(_$StrictInputDto._j1);
+void $writeStrictInput(StrictInput dto, JsonWriter writer) {
+  writer.run(_$StrictInputDto._nameKey);
+  writer.string(dto.name);
+  writer.run(_$StrictInputDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [WithMessages].
@@ -2027,17 +2168,17 @@ class _$WithMessagesDto extends DtoSchema<WithMessages>
     implements JsonObjectWriter {
   const _$WithMessagesDto();
 
-  static const Map<String, String> _m = <String, String>{
+  static const Map<String, String> _messages = <String, String>{
     'email.required': 'We need your email',
     'required': 'Please fill in {field}',
     'integer': 'The {field} must be a number',
   };
 
-  static final JsonRun _j0 = JsonRun('{"email":');
-  static final JsonRun _j1 = JsonRun(',"name":');
-  static final JsonRun _j2 = JsonRun(',"age":');
-  static final JsonRun _j3 = JsonRun(',"nick":');
-  static final JsonRun _j4 = JsonRun('}');
+  static final JsonRun _emailKey = JsonRun('{"email":');
+  static final JsonRun _nameKey = JsonRun(',"name":');
+  static final JsonRun _ageKey = JsonRun(',"age":');
+  static final JsonRun _nickKey = JsonRun(',"nick":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => WithMessages;
@@ -2049,72 +2190,92 @@ class _$WithMessagesDto extends DtoSchema<WithMessages>
   bool get usesRequiredWhen => false;
 
   @override
-  WithMessages? convert(Object? input, DtoState s, List<Object> p) {
+  WithMessages? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // email: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'email'), p, 'email', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'email', _m);
+    Object? email = state.string(
+      state.read(input, 'email'),
+      path,
+      'email',
+      _messages,
+    );
+    if (email == null || email is Undefined)
+      state.required(path, 'email', _messages);
     // name: String
-    Object? c1;
-    c1 = s.string(s.read(input, 'name'), p, 'name', _m);
-    if (c1 == null || c1 is Undefined) s.required(p, 'name', _m);
+    Object? name = state.string(
+      state.read(input, 'name'),
+      path,
+      'name',
+      _messages,
+    );
+    if (name == null || name is Undefined)
+      state.required(path, 'name', _messages);
     // age: int?
-    Object? c2;
-    c2 = s.integer(s.read(input, 'age'), p, 'age', _m);
+    Object? age = state.integer(
+      state.read(input, 'age'),
+      path,
+      'age',
+      _messages,
+    );
     // nick: String?
-    Object? c3;
-    c3 = s.string(s.read(input, 'nick'), p, 'nick', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c3 is String) {
-      if (!(c3.runes.length >= 3)) {
-        s.fail(
-          p,
+    Object? nick = state.string(
+      state.read(input, 'nick'),
+      path,
+      'nick',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (nick is String) {
+      if (!(nick.runes.length >= 3)) {
+        state.fail(
+          path,
           'nick',
           IssueCodes.minLength,
           DefaultMessages.minLength,
-          c3,
+          nick,
           params: const <String, Object?>{'min': 3},
           message: 'At least {min} letters, please',
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return WithMessages(
-      email: c0 as String,
-      name: c1 as String,
-      age: c2 is Undefined ? null : c2 as int?,
-      nick: c3 is Undefined ? null : c3 as String?,
+      email: email as String,
+      name: name as String,
+      age: age is Undefined ? null : age as int?,
+      nick: nick is Undefined ? null : nick as String?,
     );
   }
 
   @override
-  WithMessages fromMap(Map<String, dynamic> m) {
+  WithMessages fromMap(Map<String, dynamic> map) {
     return WithMessages(
-      email: m['email'] as String,
-      name: m['name'] as String,
-      age: m['age'] == null ? null : ((m['age'] as num).toInt()),
-      nick: m['nick'] == null ? null : (m['nick'] as String),
+      email: map['email'] as String,
+      name: map['name'] as String,
+      age: map['age'] == null ? null : ((map['age'] as num).toInt()),
+      nick: map['nick'] == null ? null : (map['nick'] as String),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(WithMessages o) {
-    String f0 = o.email;
-    String f1 = o.name;
-    int? f2 = o.age;
-    String? f3 = o.nick;
-    return <String, dynamic>{'email': f0, 'name': f1, 'age': f2, 'nick': f3};
+  Map<String, dynamic> toMap(WithMessages dto) {
+    return <String, dynamic>{
+      'email': dto.email,
+      'name': dto.name,
+      'age': dto.age,
+      'nick': dto.nick,
+    };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeWithMessages(object as WithMessages, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeWithMessages(object as WithMessages, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -2137,16 +2298,16 @@ class _$WithMessagesDto extends DtoSchema<WithMessages>
 }
 
 /// Writes the JSON of [WithMessages], as `toMap()` gives it.
-void $writeWithMessages(WithMessages o, JsonWriter w) {
-  w.run(_$WithMessagesDto._j0);
-  w.string(o.email);
-  w.run(_$WithMessagesDto._j1);
-  w.string(o.name);
-  w.run(_$WithMessagesDto._j2);
-  w.integer(o.age);
-  w.run(_$WithMessagesDto._j3);
-  w.string(o.nick);
-  w.run(_$WithMessagesDto._j4);
+void $writeWithMessages(WithMessages dto, JsonWriter writer) {
+  writer.run(_$WithMessagesDto._emailKey);
+  writer.string(dto.email);
+  writer.run(_$WithMessagesDto._nameKey);
+  writer.string(dto.name);
+  writer.run(_$WithMessagesDto._ageKey);
+  writer.integer(dto.age);
+  writer.run(_$WithMessagesDto._nickKey);
+  writer.string(dto.nick);
+  writer.run(_$WithMessagesDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [SignUpKeys].
@@ -2156,11 +2317,11 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys>
     implements JsonObjectWriter {
   const _$SignUpKeysDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"first_name":');
-  static final JsonRun _j1 = JsonRun(',"emailAddress":');
-  static final JsonRun _j2 = JsonRun('}');
+  static final JsonRun _firstNameKey = JsonRun('{"first_name":');
+  static final JsonRun _emailKey = JsonRun(',"emailAddress":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => SignUpKeys;
@@ -2172,43 +2333,55 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys>
   bool get usesRequiredWhen => false;
 
   @override
-  SignUpKeys? convert(Object? input, DtoState s, List<Object> p) {
+  SignUpKeys? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // firstName: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'first_name'), p, 'first_name', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'first_name', _m);
+    Object? firstName = state.string(
+      state.read(input, 'first_name'),
+      path,
+      'first_name',
+      _messages,
+    );
+    if (firstName == null || firstName is Undefined)
+      state.required(path, 'first_name', _messages);
     // email: String
-    Object? c1;
-    c1 = s.string(s.read(input, 'emailAddress'), p, 'emailAddress', _m);
-    if (c1 == null || c1 is Undefined) s.required(p, 'emailAddress', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
-    return SignUpKeys(firstName: c0 as String, email: c1 as String);
+    Object? email = state.string(
+      state.read(input, 'emailAddress'),
+      path,
+      'emailAddress',
+      _messages,
+    );
+    if (email == null || email is Undefined)
+      state.required(path, 'emailAddress', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return SignUpKeys(firstName: firstName as String, email: email as String);
   }
 
   @override
-  SignUpKeys fromMap(Map<String, dynamic> m) {
+  SignUpKeys fromMap(Map<String, dynamic> map) {
     return SignUpKeys(
-      firstName: m['first_name'] as String,
-      email: m['emailAddress'] as String,
+      firstName: map['first_name'] as String,
+      email: map['emailAddress'] as String,
     );
   }
 
   @override
-  Map<String, dynamic> toMap(SignUpKeys o) {
-    String f0 = o.firstName;
-    String f1 = o.email;
-    return <String, dynamic>{'first_name': f0, 'emailAddress': f1};
+  Map<String, dynamic> toMap(SignUpKeys dto) {
+    return <String, dynamic>{
+      'first_name': dto.firstName,
+      'emailAddress': dto.email,
+    };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeSignUpKeys(object as SignUpKeys, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeSignUpKeys(object as SignUpKeys, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -2224,12 +2397,12 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys>
 }
 
 /// Writes the JSON of [SignUpKeys], as `toMap()` gives it.
-void $writeSignUpKeys(SignUpKeys o, JsonWriter w) {
-  w.run(_$SignUpKeysDto._j0);
-  w.string(o.firstName);
-  w.run(_$SignUpKeysDto._j1);
-  w.string(o.email);
-  w.run(_$SignUpKeysDto._j2);
+void $writeSignUpKeys(SignUpKeys dto, JsonWriter writer) {
+  writer.run(_$SignUpKeysDto._firstNameKey);
+  writer.string(dto.firstName);
+  writer.run(_$SignUpKeysDto._emailKey);
+  writer.string(dto.email);
+  writer.run(_$SignUpKeysDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [CamelKeys].
@@ -2238,10 +2411,10 @@ const DtoSchema<CamelKeys> $CamelKeysDto = _$CamelKeysDto();
 class _$CamelKeysDto extends DtoSchema<CamelKeys> implements JsonObjectWriter {
   const _$CamelKeysDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"firstName":');
-  static final JsonRun _j1 = JsonRun('}');
+  static final JsonRun _firstNameKey = JsonRun('{"firstName":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => CamelKeys;
@@ -2253,35 +2426,40 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  CamelKeys? convert(Object? input, DtoState s, List<Object> p) {
+  CamelKeys? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // firstName: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'firstName'), p, 'firstName', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'firstName', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
-    return CamelKeys(firstName: c0 as String);
+    Object? firstName = state.string(
+      state.read(input, 'firstName'),
+      path,
+      'firstName',
+      _messages,
+    );
+    if (firstName == null || firstName is Undefined)
+      state.required(path, 'firstName', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return CamelKeys(firstName: firstName as String);
   }
 
   @override
-  CamelKeys fromMap(Map<String, dynamic> m) {
-    return CamelKeys(firstName: m['firstName'] as String);
+  CamelKeys fromMap(Map<String, dynamic> map) {
+    return CamelKeys(firstName: map['firstName'] as String);
   }
 
   @override
-  Map<String, dynamic> toMap(CamelKeys o) {
-    String f0 = o.firstName;
-    return <String, dynamic>{'firstName': f0};
+  Map<String, dynamic> toMap(CamelKeys dto) {
+    return <String, dynamic>{'firstName': dto.firstName};
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeCamelKeys(object as CamelKeys, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeCamelKeys(object as CamelKeys, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -2296,10 +2474,10 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [CamelKeys], as `toMap()` gives it.
-void $writeCamelKeys(CamelKeys o, JsonWriter w) {
-  w.run(_$CamelKeysDto._j0);
-  w.string(o.firstName);
-  w.run(_$CamelKeysDto._j1);
+void $writeCamelKeys(CamelKeys dto, JsonWriter writer) {
+  writer.run(_$CamelKeysDto._firstNameKey);
+  writer.string(dto.firstName);
+  writer.run(_$CamelKeysDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [UpdateUser].
@@ -2309,7 +2487,7 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser>
     implements JsonObjectWriter {
   const _$UpdateUserDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   @override
   Type get type => UpdateUser;
@@ -2321,67 +2499,78 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser>
   bool get usesRequiredWhen => false;
 
   @override
-  UpdateUser? convert(Object? input, DtoState s, List<Object> p) {
+  UpdateUser? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // bio: Maybe<String?>
-    Object? c0;
-    c0 = s.string(s.read(input, 'bio'), p, 'bio', _m);
+    Object? bio = state.string(
+      state.read(input, 'bio'),
+      path,
+      'bio',
+      _messages,
+    );
     // age: Maybe<int>
-    Object? c1;
-    c1 = s.integer(s.read(input, 'age'), p, 'age', _m);
-    if (c1 == null || s.sentEmpty(c1, input, 'age')) s.required(p, 'age', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is String) {
-      if (!(c0.runes.length <= 5)) {
-        s.fail(
-          p,
+    Object? age = state.integer(
+      state.read(input, 'age'),
+      path,
+      'age',
+      _messages,
+    );
+    if (age == null || state.sentEmpty(age, input, 'age'))
+      state.required(path, 'age', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (bio is String) {
+      if (!(bio.runes.length <= 5)) {
+        state.fail(
+          path,
           'bio',
           IssueCodes.maxLength,
           DefaultMessages.maxLength,
-          c0,
+          bio,
           params: const <String, Object?>{'max': 5},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return UpdateUser(
-      bio: c0 is Undefined
+      bio: bio is Undefined
           ? const Maybe<String?>.missing()
-          : Maybe<String?>(c0 as String?),
-      age: c1 is Undefined ? const Maybe<int>.missing() : Maybe<int>(c1 as int),
+          : Maybe<String?>(bio as String?),
+      age: age is Undefined
+          ? const Maybe<int>.missing()
+          : Maybe<int>(age as int),
     );
   }
 
   @override
-  UpdateUser fromMap(Map<String, dynamic> m) {
+  UpdateUser fromMap(Map<String, dynamic> map) {
     return UpdateUser(
-      bio: m.containsKey('bio')
-          ? Maybe<String?>(m['bio'] == null ? null : (m['bio'] as String))
+      bio: map.containsKey('bio')
+          ? Maybe<String?>(map['bio'] == null ? null : (map['bio'] as String))
           : const Maybe<String?>.missing(),
-      age: m.containsKey('age')
-          ? Maybe<int>((m['age'] as num).toInt())
+      age: map.containsKey('age')
+          ? Maybe<int>((map['age'] as num).toInt())
           : const Maybe<int>.missing(),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(UpdateUser o) {
-    Maybe<String?> f0 = o.bio;
-    Maybe<int> f1 = o.age;
+  Map<String, dynamic> toMap(UpdateUser dto) {
     return <String, dynamic>{
-      if (f0 case Maybe<String?>(isPresent: true, value: String? g0)) 'bio': g0,
-      if (f1 case Maybe<int>(isPresent: true, value: int g1)) 'age': g1,
+      if (dto.bio case Maybe<String?>(isPresent: true, value: String? bio))
+        'bio': bio,
+      if (dto.age case Maybe<int>(isPresent: true, value: int age)) 'age': age,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeUpdateUser(object as UpdateUser, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeUpdateUser(object as UpdateUser, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -2399,17 +2588,17 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser>
 }
 
 /// Writes the JSON of [UpdateUser], as `toMap()` gives it.
-void $writeUpdateUser(UpdateUser o, JsonWriter w) {
-  w.startObject();
-  if (o.bio case Maybe<String?>(isPresent: true, value: String? g0)) {
-    w.key('bio');
-    w.string(g0);
+void $writeUpdateUser(UpdateUser dto, JsonWriter writer) {
+  writer.startObject();
+  if (dto.bio case Maybe<String?>(isPresent: true, value: String? bio)) {
+    writer.key('bio');
+    writer.string(bio);
   }
-  if (o.age case Maybe<int>(isPresent: true, value: int g1)) {
-    w.key('age');
-    w.integer(g1);
+  if (dto.age case Maybe<int>(isPresent: true, value: int age)) {
+    writer.key('age');
+    writer.integer(age);
   }
-  w.endObject();
+  writer.endObject();
 }
 
 /// The checks, the converter and the JSON Schema of [MoreRules].
@@ -2418,7 +2607,7 @@ const DtoSchema<MoreRules> $MoreRulesDto = _$MoreRulesDto();
 class _$MoreRulesDto extends DtoSchema<MoreRules> implements JsonObjectWriter {
   const _$MoreRulesDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   @override
   Type get type => MoreRules;
@@ -2427,287 +2616,369 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> implements JsonObjectWriter {
   String get name => 'MoreRules';
 
   @override
-  MoreRules? convert(Object? input, DtoState s, List<Object> p) {
+  MoreRules? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // password: String?
-    Object? c0;
-    c0 = s.string(s.read(input, 'password'), p, 'password', _m);
+    Object? password = state.string(
+      state.read(input, 'password'),
+      path,
+      'password',
+      _messages,
+    );
     // emailAgain: String?
-    Object? c1;
-    c1 = s.string(s.read(input, 'email_again'), p, 'email_again', _m);
+    Object? emailAgain = state.string(
+      state.read(input, 'email_again'),
+      path,
+      'email_again',
+      _messages,
+    );
     // email: String?
-    Object? c2;
-    c2 = s.string(s.read(input, 'email'), p, 'email', _m);
+    Object? email = state.string(
+      state.read(input, 'email'),
+      path,
+      'email',
+      _messages,
+    );
     // type: String?
-    Object? c3;
-    c3 = s.string(s.read(input, 'type'), p, 'type', _m);
+    Object? type = state.string(
+      state.read(input, 'type'),
+      path,
+      'type',
+      _messages,
+    );
     // company: String?
-    Object? c4;
-    c4 = s.string(s.read(input, 'company'), p, 'company', _m);
+    Object? company = state.string(
+      state.read(input, 'company'),
+      path,
+      'company',
+      _messages,
+    );
     // countryCode: Maybe<String>
-    Object? c5;
-    c5 = s.string(s.read(input, 'country_code'), p, 'country_code', _m);
-    if (c5 == null || s.sentEmpty(c5, input, 'country_code'))
-      s.required(p, 'country_code', _m);
+    Object? countryCode = state.string(
+      state.read(input, 'country_code'),
+      path,
+      'country_code',
+      _messages,
+    );
+    if (countryCode == null ||
+        state.sentEmpty(countryCode, input, 'country_code'))
+      state.required(path, 'country_code', _messages);
     // phone: String?
-    Object? c6;
-    c6 = s.string(s.read(input, 'phone'), p, 'phone', _m);
+    Object? phone = state.string(
+      state.read(input, 'phone'),
+      path,
+      'phone',
+      _messages,
+    );
     // meta: String?
-    Object? c7;
-    c7 = s.string(s.read(input, 'meta'), p, 'meta', _m);
+    Object? meta = state.string(
+      state.read(input, 'meta'),
+      path,
+      'meta',
+      _messages,
+    );
     // role: Role?
-    Object? c8;
-    c8 = s.enumName(s.read(input, 'role'), p, 'role', _m, const <String>[
-      'admin',
-      'user',
-    ]);
-    if (c8 is String) {
-      c8 = switch (c8) {
+    Object? role = state.enumName(
+      state.read(input, 'role'),
+      path,
+      'role',
+      _messages,
+      const <String>['admin', 'user'],
+    );
+    if (role is String) {
+      role = switch (role) {
         'admin' => Role.admin,
         _ => Role.user,
       };
     }
     // adminCode: String?
-    Object? c9;
-    c9 = s.string(s.read(input, 'admin_code'), p, 'admin_code', _m);
+    Object? adminCode = state.string(
+      state.read(input, 'admin_code'),
+      path,
+      'admin_code',
+      _messages,
+    );
     // tags: List<String>?
-    Object? c10;
-    c10 = s.list(s.read(input, 'tags'), p, 'tags', _m);
-    if (c10 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'tags'];
+    Object? tags = state.list(
+      state.read(input, 'tags'),
+      path,
+      'tags',
+      _messages,
+    );
+    if (tags is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'tags'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c10.length; i0++) {
-        Object? x0;
-        x0 = s.string(c10[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < tags.length; i0++) {
+        Object? x0 = state.string(tags[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c10 = s.issues.length != b0 ? invalid : o0;
+      tags = state.issues.length != b0 ? invalid : o0;
     }
     // pin: String?
-    Object? c11;
-    c11 = s.string(s.read(input, 'pin'), p, 'pin', _m);
+    Object? pin = state.string(
+      state.read(input, 'pin'),
+      path,
+      'pin',
+      _messages,
+    );
     // code: String?
-    Object? c12;
-    c12 = s.string(s.read(input, 'code'), p, 'code', _m);
+    Object? code = state.string(
+      state.read(input, 'code'),
+      path,
+      'code',
+      _messages,
+    );
     // day: String?
-    Object? c13;
-    c13 = s.string(s.read(input, 'day'), p, 'day', _m);
+    Object? day = state.string(
+      state.read(input, 'day'),
+      path,
+      'day',
+      _messages,
+    );
     // secret: String?
-    Object? c14;
-    c14 = s.string(s.read(input, 'secret'), p, 'secret', _m);
+    Object? secret = state.string(
+      state.read(input, 'secret'),
+      path,
+      'secret',
+      _messages,
+    );
     // planNote: String?
-    Object? c15;
-    c15 = s.string(s.read(input, 'plan_note'), p, 'plan_note', _m);
+    Object? planNote = state.string(
+      state.read(input, 'plan_note'),
+      path,
+      'plan_note',
+      _messages,
+    );
     // plan: String?
-    Object? c16;
-    c16 = s.string(
-      s.read(input, 'plan'),
-      p,
+    Object? plan = state.string(
+      state.read(input, 'plan'),
+      path,
       'plan',
-      _m,
+      _messages,
       trim: true,
       textCase: 1,
     );
-    s.requiredWhen(
+    state.requiredWhen(
       const RequiredIf('type', 'company'),
-      c4,
+      company,
       input,
-      p,
+      path,
       'company',
-      _m,
+      _messages,
     );
-    s.requiredWhen(
+    state.requiredWhen(
       const RequiredWith(<String>['phone']),
-      c5,
+      countryCode,
       input,
-      p,
+      path,
       'country_code',
-      _m,
+      _messages,
     );
-    s.requiredWhen(
+    state.requiredWhen(
       const RequiredIf('role', Role.admin),
-      c9,
+      adminCode,
       input,
-      p,
+      path,
       'admin_code',
-      _m,
+      _messages,
     );
-    s.requiredWhen(
+    state.requiredWhen(
       const RequiredWith(<String>['tag_source']),
-      c10,
+      tags,
       input,
-      p,
+      path,
       'tags',
-      _m,
+      _messages,
     );
-    s.requiredWhen(
+    state.requiredWhen(
       const RequiredIf('plan', 'pro'),
-      c15,
+      planNote,
       input,
-      p,
+      path,
       'plan_note',
-      _m,
+      _messages,
     );
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is String) {
-      if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
-        s.failRule(const Confirmed(), p, 'password', c0, _m);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (password is String) {
+      if (!(const Confirmed().check(
+        password,
+        state.context(path, 'password', password),
+      ))) {
+        state.failRule(
+          const Confirmed(),
+          path,
+          'password',
+          password,
+          _messages,
+        );
       }
     }
-    if (c1 is String) {
-      if (!(const Same('email').check(c1, s.context(p, 'email_again', c1)))) {
-        s.failRule(const Same('email'), p, 'email_again', c1, _m);
+    if (emailAgain is String) {
+      if (!(const Same('email')
+          .check(emailAgain, state.context(path, 'email_again', emailAgain)))) {
+        state.failRule(
+          const Same('email'),
+          path,
+          'email_again',
+          emailAgain,
+          _messages,
+        );
       }
     }
-    if (c7 is String) {
-      if (!(const Json().check(c7, s.context(p, 'meta', c7)))) {
-        s.failRule(const Json(), p, 'meta', c7, _m);
+    if (meta is String) {
+      if (!(const Json().check(meta, state.context(path, 'meta', meta)))) {
+        state.failRule(const Json(), path, 'meta', meta, _messages);
       }
     }
-    if (c11 is String) {
-      if (!(const Digits(4).check(c11, s.context(p, 'pin', c11)))) {
-        s.failRule(const Digits(4), p, 'pin', c11, _m);
+    if (pin is String) {
+      if (!(const Digits(4).check(pin, state.context(path, 'pin', pin)))) {
+        state.failRule(const Digits(4), path, 'pin', pin, _messages);
       }
     }
-    if (c12 is String) {
-      if (!(const DigitsBetween(4, 6).check(c12, s.context(p, 'code', c12)))) {
-        s.failRule(const DigitsBetween(4, 6), p, 'code', c12, _m);
+    if (code is String) {
+      if (!(const DigitsBetween(
+        4,
+        6,
+      ).check(code, state.context(path, 'code', code)))) {
+        state.failRule(
+          const DigitsBetween(4, 6),
+          path,
+          'code',
+          code,
+          _messages,
+        );
       }
     }
-    if (c13 is String) {
+    if (day is String) {
       if (!(const DateFormatted('Y-m-d')
-          .check(c13, s.context(p, 'day', c13)))) {
-        s.failRule(const DateFormatted('Y-m-d'), p, 'day', c13, _m);
+          .check(day, state.context(path, 'day', day)))) {
+        state.failRule(
+          const DateFormatted('Y-m-d'),
+          path,
+          'day',
+          day,
+          _messages,
+        );
       }
     }
-    if (c14 is String) {
+    if (secret is String) {
       if (!(const Password(
         mixedCase: true,
         numbers: true,
         symbols: true,
-      ).check(c14, s.context(p, 'secret', c14)))) {
-        s.failRule(
+      ).check(secret, state.context(path, 'secret', secret)))) {
+        state.failRule(
           const Password(mixedCase: true, numbers: true, symbols: true),
-          p,
+          path,
           'secret',
-          c14,
-          _m,
+          secret,
+          _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return MoreRules(
-      password: c0 is Undefined ? null : c0 as String?,
-      emailAgain: c1 is Undefined ? null : c1 as String?,
-      email: c2 is Undefined ? null : c2 as String?,
-      type: c3 is Undefined ? null : c3 as String?,
-      company: c4 is Undefined ? null : c4 as String?,
-      countryCode: c5 is Undefined
+      password: password is Undefined ? null : password as String?,
+      emailAgain: emailAgain is Undefined ? null : emailAgain as String?,
+      email: email is Undefined ? null : email as String?,
+      type: type is Undefined ? null : type as String?,
+      company: company is Undefined ? null : company as String?,
+      countryCode: countryCode is Undefined
           ? const Maybe<String>.missing()
-          : Maybe<String>(c5 as String),
-      phone: c6 is Undefined ? null : c6 as String?,
-      meta: c7 is Undefined ? null : c7 as String?,
-      role: c8 is Undefined ? null : c8 as Role?,
-      adminCode: c9 is Undefined ? null : c9 as String?,
-      tags: c10 is Undefined ? null : c10 as List<String>?,
-      pin: c11 is Undefined ? null : c11 as String?,
-      code: c12 is Undefined ? null : c12 as String?,
-      day: c13 is Undefined ? null : c13 as String?,
-      secret: c14 is Undefined ? null : c14 as String?,
-      planNote: c15 is Undefined ? null : c15 as String?,
-      plan: c16 is Undefined ? null : c16 as String?,
+          : Maybe<String>(countryCode as String),
+      phone: phone is Undefined ? null : phone as String?,
+      meta: meta is Undefined ? null : meta as String?,
+      role: role is Undefined ? null : role as Role?,
+      adminCode: adminCode is Undefined ? null : adminCode as String?,
+      tags: tags is Undefined ? null : tags as List<String>?,
+      pin: pin is Undefined ? null : pin as String?,
+      code: code is Undefined ? null : code as String?,
+      day: day is Undefined ? null : day as String?,
+      secret: secret is Undefined ? null : secret as String?,
+      planNote: planNote is Undefined ? null : planNote as String?,
+      plan: plan is Undefined ? null : plan as String?,
     );
   }
 
   @override
-  MoreRules fromMap(Map<String, dynamic> m) {
+  MoreRules fromMap(Map<String, dynamic> map) {
     return MoreRules(
-      password: m['password'] == null ? null : (m['password'] as String),
-      emailAgain: m['email_again'] == null
+      password: map['password'] == null ? null : (map['password'] as String),
+      emailAgain: map['email_again'] == null
           ? null
-          : (m['email_again'] as String),
-      email: m['email'] == null ? null : (m['email'] as String),
-      type: m['type'] == null ? null : (m['type'] as String),
-      company: m['company'] == null ? null : (m['company'] as String),
-      countryCode: m.containsKey('country_code')
-          ? Maybe<String>(m['country_code'] as String)
+          : (map['email_again'] as String),
+      email: map['email'] == null ? null : (map['email'] as String),
+      type: map['type'] == null ? null : (map['type'] as String),
+      company: map['company'] == null ? null : (map['company'] as String),
+      countryCode: map.containsKey('country_code')
+          ? Maybe<String>(map['country_code'] as String)
           : const Maybe<String>.missing(),
-      phone: m['phone'] == null ? null : (m['phone'] as String),
-      meta: m['meta'] == null ? null : (m['meta'] as String),
-      role: m['role'] == null
+      phone: map['phone'] == null ? null : (map['phone'] as String),
+      meta: map['meta'] == null ? null : (map['meta'] as String),
+      role: map['role'] == null
           ? null
-          : (Role.values.byName(m['role'] as String)),
-      adminCode: m['admin_code'] == null ? null : (m['admin_code'] as String),
-      tags: m['tags'] == null
+          : (Role.values.byName(map['role'] as String)),
+      adminCode: map['admin_code'] == null
+          ? null
+          : (map['admin_code'] as String),
+      tags: map['tags'] == null
           ? null
           : (<String>[
-              for (Object? x0 in m['tags'] as List<dynamic>) x0 as String,
+              for (Object? x0 in map['tags'] as List<dynamic>) x0 as String,
             ]),
-      pin: m['pin'] == null ? null : (m['pin'] as String),
-      code: m['code'] == null ? null : (m['code'] as String),
-      day: m['day'] == null ? null : (m['day'] as String),
-      secret: m['secret'] == null ? null : (m['secret'] as String),
-      planNote: m['plan_note'] == null ? null : (m['plan_note'] as String),
-      plan: m['plan'] == null ? null : (m['plan'] as String),
+      pin: map['pin'] == null ? null : (map['pin'] as String),
+      code: map['code'] == null ? null : (map['code'] as String),
+      day: map['day'] == null ? null : (map['day'] as String),
+      secret: map['secret'] == null ? null : (map['secret'] as String),
+      planNote: map['plan_note'] == null ? null : (map['plan_note'] as String),
+      plan: map['plan'] == null ? null : (map['plan'] as String),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(MoreRules o) {
-    String? f0 = o.password;
-    String? f1 = o.emailAgain;
-    String? f2 = o.email;
-    String? f3 = o.type;
-    String? f4 = o.company;
-    Maybe<String> f5 = o.countryCode;
-    String? f6 = o.phone;
-    String? f7 = o.meta;
-    Role? f8 = o.role;
-    String? f9 = o.adminCode;
-    List<String>? f10 = o.tags;
-    String? f11 = o.pin;
-    String? f12 = o.code;
-    String? f13 = o.day;
-    String? f14 = o.secret;
-    String? f15 = o.planNote;
-    String? f16 = o.plan;
+  Map<String, dynamic> toMap(MoreRules dto) {
+    Role? role = dto.role;
     return <String, dynamic>{
-      'password': f0,
-      'email_again': f1,
-      'email': f2,
-      'type': f3,
-      'company': f4,
-      if (f5 case Maybe<String>(isPresent: true, value: String g5))
-        'country_code': g5,
-      'phone': f6,
-      'meta': f7,
-      'role': f8 == null ? null : f8.name,
-      'admin_code': f9,
-      'tags': f10,
-      'pin': f11,
-      'code': f12,
-      'day': f13,
-      'secret': f14,
-      'plan_note': f15,
-      'plan': f16,
+      'password': dto.password,
+      'email_again': dto.emailAgain,
+      'email': dto.email,
+      'type': dto.type,
+      'company': dto.company,
+      if (dto.countryCode case Maybe<String>(
+        isPresent: true,
+        value: String countryCode,
+      ))
+        'country_code': countryCode,
+      'phone': dto.phone,
+      'meta': dto.meta,
+      'role': role == null ? null : role.name,
+      'admin_code': dto.adminCode,
+      'tags': dto.tags,
+      'pin': dto.pin,
+      'code': dto.code,
+      'day': dto.day,
+      'secret': dto.secret,
+      'plan_note': dto.planNote,
+      'plan': dto.plan,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeMoreRules(object as MoreRules, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeMoreRules(object as MoreRules, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
-    Map<String, dynamic> j = <String, dynamic>{
+    Map<String, dynamic> schema = <String, dynamic>{
       'type': 'object',
       'title': 'MoreRules',
       'properties': <String, dynamic>{
@@ -2764,32 +3035,32 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> implements JsonObjectWriter {
         },
       },
     };
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'password',
     ], const Confirmed().toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'email_again',
     ], const Same('email').toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'meta',
     ], const Json().toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'pin',
     ], const Digits(4).toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'code',
     ], const DigitsBetween(4, 6).toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'day',
     ], const DateFormatted('Y-m-d').toJsonSchema());
     JsonSchemaTools.merge(
-      j,
+      schema,
       <String>['properties', 'secret'],
       const Password(
         mixedCase: true,
@@ -2797,50 +3068,53 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> implements JsonObjectWriter {
         symbols: true,
       ).toJsonSchema(),
     );
-    return j;
+    return schema;
   }
 }
 
 /// Writes the JSON of [MoreRules], as `toMap()` gives it.
-void $writeMoreRules(MoreRules o, JsonWriter w) {
-  w.startObject();
-  w.key('password');
-  w.string(o.password);
-  w.key('email_again');
-  w.string(o.emailAgain);
-  w.key('email');
-  w.string(o.email);
-  w.key('type');
-  w.string(o.type);
-  w.key('company');
-  w.string(o.company);
-  if (o.countryCode case Maybe<String>(isPresent: true, value: String g5)) {
-    w.key('country_code');
-    w.string(g5);
+void $writeMoreRules(MoreRules dto, JsonWriter writer) {
+  writer.startObject();
+  writer.key('password');
+  writer.string(dto.password);
+  writer.key('email_again');
+  writer.string(dto.emailAgain);
+  writer.key('email');
+  writer.string(dto.email);
+  writer.key('type');
+  writer.string(dto.type);
+  writer.key('company');
+  writer.string(dto.company);
+  if (dto.countryCode case Maybe<String>(
+    isPresent: true,
+    value: String countryCode,
+  )) {
+    writer.key('country_code');
+    writer.string(countryCode);
   }
-  w.key('phone');
-  w.string(o.phone);
-  w.key('meta');
-  w.string(o.meta);
-  w.key('role');
-  w.string(o.role?.name);
-  w.key('admin_code');
-  w.string(o.adminCode);
-  w.key('tags');
-  w.value(o.tags);
-  w.key('pin');
-  w.string(o.pin);
-  w.key('code');
-  w.string(o.code);
-  w.key('day');
-  w.string(o.day);
-  w.key('secret');
-  w.string(o.secret);
-  w.key('plan_note');
-  w.string(o.planNote);
-  w.key('plan');
-  w.string(o.plan);
-  w.endObject();
+  writer.key('phone');
+  writer.string(dto.phone);
+  writer.key('meta');
+  writer.string(dto.meta);
+  writer.key('role');
+  writer.string(dto.role?.name);
+  writer.key('admin_code');
+  writer.string(dto.adminCode);
+  writer.key('tags');
+  writer.value(dto.tags);
+  writer.key('pin');
+  writer.string(dto.pin);
+  writer.key('code');
+  writer.string(dto.code);
+  writer.key('day');
+  writer.string(dto.day);
+  writer.key('secret');
+  writer.string(dto.secret);
+  writer.key('plan_note');
+  writer.string(dto.planNote);
+  writer.key('plan');
+  writer.string(dto.plan);
+  writer.endObject();
 }
 
 /// The checks, the converter and the JSON Schema of [StrictPassword].
@@ -2850,14 +3124,14 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword>
     implements JsonObjectWriter {
   const _$StrictPasswordDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   static const Set<String> _keys = <String>{
     'password',
     'password_confirmation',
   };
-  static final JsonRun _j0 = JsonRun('{"password":');
-  static final JsonRun _j1 = JsonRun('}');
+  static final JsonRun _passwordKey = JsonRun('{"password":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => StrictPassword;
@@ -2869,55 +3143,69 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword>
   bool get usesRequiredWhen => false;
 
   @override
-  StrictPassword? convert(Object? input, DtoState s, List<Object> p) {
+  StrictPassword? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     for (Object? k in input.keys) {
       if (!_keys.contains(k)) {
-        s.fail(
-          p,
+        state.fail(
+          path,
           '$k',
           IssueCodes.unrecognizedKeys,
           DefaultMessages.notAllowed,
           input[k],
-          messages: _m,
+          messages: _messages,
         );
       }
     }
     // password: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'password'), p, 'password', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'password', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is String) {
-      if (!(const Confirmed().check(c0, s.context(p, 'password', c0)))) {
-        s.failRule(const Confirmed(), p, 'password', c0, _m);
+    Object? password = state.string(
+      state.read(input, 'password'),
+      path,
+      'password',
+      _messages,
+    );
+    if (password == null || password is Undefined)
+      state.required(path, 'password', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (password is String) {
+      if (!(const Confirmed().check(
+        password,
+        state.context(path, 'password', password),
+      ))) {
+        state.failRule(
+          const Confirmed(),
+          path,
+          'password',
+          password,
+          _messages,
+        );
       }
     }
-    if (s.issues.length != e) return null;
-    return StrictPassword(password: c0 as String);
+    if (state.issues.length != issuesBefore) return null;
+    return StrictPassword(password: password as String);
   }
 
   @override
-  StrictPassword fromMap(Map<String, dynamic> m) {
-    return StrictPassword(password: m['password'] as String);
+  StrictPassword fromMap(Map<String, dynamic> map) {
+    return StrictPassword(password: map['password'] as String);
   }
 
   @override
-  Map<String, dynamic> toMap(StrictPassword o) {
-    String f0 = o.password;
-    return <String, dynamic>{'password': f0};
+  Map<String, dynamic> toMap(StrictPassword dto) {
+    return <String, dynamic>{'password': dto.password};
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeStrictPassword(object as StrictPassword, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeStrictPassword(object as StrictPassword, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
-    Map<String, dynamic> j = <String, dynamic>{
+    Map<String, dynamic> schema = <String, dynamic>{
       'type': 'object',
       'title': 'StrictPassword',
       'properties': <String, dynamic>{
@@ -2926,17 +3214,17 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword>
       'required': <dynamic>['password'],
       'additionalProperties': false,
     };
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'password',
     ], const Confirmed().toJsonSchema());
-    return j;
+    return schema;
   }
 }
 
 /// Writes the JSON of [StrictPassword], as `toMap()` gives it.
-void $writeStrictPassword(StrictPassword o, JsonWriter w) {
-  w.run(_$StrictPasswordDto._j0);
-  w.string(o.password);
-  w.run(_$StrictPasswordDto._j1);
+void $writeStrictPassword(StrictPassword dto, JsonWriter writer) {
+  writer.run(_$StrictPasswordDto._passwordKey);
+  writer.string(dto.password);
+  writer.run(_$StrictPasswordDto._end);
 }

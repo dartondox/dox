@@ -15,25 +15,25 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
     implements JsonObjectWriter {
   const _$LaravelRulesDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static const Map<String, String> _a = <String, String>{
+  static const Map<String, String> _attributes = <String, String>{
     'first_name': 'first name',
   };
 
-  static final JsonRun _j0 = JsonRun('{"first_name":');
-  static final JsonRun _j1 = JsonRun(',"age":');
-  static final JsonRun _j2 = JsonRun(',"terms":');
-  static final JsonRun _j3 = JsonRun(',"start":');
-  static final JsonRun _j4 = JsonRun(',"end":');
-  static final JsonRun _j5 = JsonRun(',"type":');
-  static final JsonRun _j6 = JsonRun(',"company":');
-  static final JsonRun _j7 = JsonRun(',"vat":');
-  static final JsonRun _j8 = JsonRun(',"debug":');
-  static final JsonRun _j9 = JsonRun(',"nick":');
-  static final JsonRun _j10 = JsonRun(',"id":');
-  static final JsonRun _j11 = JsonRun(',"max":');
-  static final JsonRun _j12 = JsonRun('}');
+  static final JsonRun _firstNameKey = JsonRun('{"first_name":');
+  static final JsonRun _ageKey = JsonRun(',"age":');
+  static final JsonRun _termsKey = JsonRun(',"terms":');
+  static final JsonRun _startKey = JsonRun(',"start":');
+  static final JsonRun _endKey = JsonRun(',"end":');
+  static final JsonRun _typeKey = JsonRun(',"type":');
+  static final JsonRun _companyKey = JsonRun(',"company":');
+  static final JsonRun _vatKey = JsonRun(',"vat":');
+  static final JsonRun _debugKey = JsonRun(',"debug":');
+  static final JsonRun _nickKey = JsonRun(',"nick":');
+  static final JsonRun _idKey = JsonRun(',"id":');
+  static final JsonRun _maxKey = JsonRun(',"max":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => LaravelRules;
@@ -42,188 +42,256 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
   String get name => 'LaravelRules';
 
   @override
-  LaravelRules? convert(Object? input, DtoState s, List<Object> p) {
-    s.attributes(p, _a);
+  LaravelRules? convert(Object? input, DtoState state, List<Object> path) {
+    state.attributes(path, _attributes);
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // firstName: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'first_name'), p, 'first_name', _m, trim: true);
-    if (c0 == null || c0 is Undefined) s.required(p, 'first_name', _m);
+    Object? firstName = state.string(
+      state.read(input, 'first_name'),
+      path,
+      'first_name',
+      _messages,
+      trim: true,
+    );
+    if (firstName == null || firstName is Undefined)
+      state.required(path, 'first_name', _messages);
     // age: int
-    Object? c1;
-    c1 = s.integer(s.read(input, 'age'), p, 'age', _m, coerce: true);
-    if (c1 == null || c1 is Undefined) s.required(p, 'age', _m);
+    Object? age = state.integer(
+      state.read(input, 'age'),
+      path,
+      'age',
+      _messages,
+      coerce: true,
+    );
+    if (age == null || age is Undefined) state.required(path, 'age', _messages);
     // terms: bool
-    Object? c2;
-    c2 = s.boolean(s.read(input, 'terms'), p, 'terms', _m, coerce: true);
-    if (c2 == null || c2 is Undefined) s.required(p, 'terms', _m);
+    Object? terms = state.boolean(
+      state.read(input, 'terms'),
+      path,
+      'terms',
+      _messages,
+      coerce: true,
+    );
+    if (terms == null || terms is Undefined)
+      state.required(path, 'terms', _messages);
     // start: DateTime
-    Object? c3;
-    c3 = s.date(s.read(input, 'start'), p, 'start', _m);
-    if (c3 == null || c3 is Undefined) s.required(p, 'start', _m);
+    Object? start = state.date(
+      state.read(input, 'start'),
+      path,
+      'start',
+      _messages,
+    );
+    if (start == null || start is Undefined)
+      state.required(path, 'start', _messages);
     // end: DateTime
-    Object? c4;
-    c4 = s.date(s.read(input, 'end'), p, 'end', _m);
-    if (c4 == null || c4 is Undefined) s.required(p, 'end', _m);
+    Object? end = state.date(state.read(input, 'end'), path, 'end', _messages);
+    if (end == null || end is Undefined) state.required(path, 'end', _messages);
     // type: String?
-    Object? c5;
-    c5 = s.string(s.read(input, 'type'), p, 'type', _m, trim: true);
+    Object? type = state.string(
+      state.read(input, 'type'),
+      path,
+      'type',
+      _messages,
+      trim: true,
+    );
     // company: String?
-    Object? c6;
-    c6 = s.string(s.read(input, 'company'), p, 'company', _m, trim: true);
+    Object? company = state.string(
+      state.read(input, 'company'),
+      path,
+      'company',
+      _messages,
+      trim: true,
+    );
     // vat: String?
-    Object? c7;
-    bool x7 = const ExcludeIf('type', 'person').appliesTo(input);
-    if (x7) {
-      c7 = undefined;
+    Object? vat;
+    bool vatExcluded = const ExcludeIf('type', 'person').appliesTo(input);
+    if (vatExcluded) {
+      vat = undefined;
     } else {
-      c7 = s.string(s.read(input, 'vat'), p, 'vat', _m, trim: true);
+      vat = state.string(
+        state.read(input, 'vat'),
+        path,
+        'vat',
+        _messages,
+        trim: true,
+      );
     }
     // debug: String?
-    Object? c8;
-    c8 = s.string(s.read(input, 'debug'), p, 'debug', _m, trim: true);
-    // nick: String?
-    Object? c9;
-    c9 = s.string(s.read(input, 'nick'), p, 'nick', _m, trim: true);
-    // id: String?
-    Object? c10;
-    c10 = s.string(s.read(input, 'id'), p, 'id', _m, trim: true);
-    // max: int?
-    Object? c11;
-    c11 = s.integer(s.read(input, 'max'), p, 'max', _m, coerce: true);
-    s.requiredWhen(
-      const RequiredUnless('type', 'person'),
-      c6,
-      input,
-      p,
-      'company',
-      _m,
+    Object? debug = state.string(
+      state.read(input, 'debug'),
+      path,
+      'debug',
+      _messages,
+      trim: true,
     );
-    s.requiredWhen(const Prohibited(), c8, input, p, 'debug', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c2 is bool) {
-      if (!(const Accepted().check(c2, s.context(p, 'terms', c2)))) {
-        s.failRule(const Accepted(), p, 'terms', c2, _m);
+    // nick: String?
+    Object? nick = state.string(
+      state.read(input, 'nick'),
+      path,
+      'nick',
+      _messages,
+      trim: true,
+    );
+    // id: String?
+    Object? id = state.string(
+      state.read(input, 'id'),
+      path,
+      'id',
+      _messages,
+      trim: true,
+    );
+    // max: int?
+    Object? max = state.integer(
+      state.read(input, 'max'),
+      path,
+      'max',
+      _messages,
+      coerce: true,
+    );
+    state.requiredWhen(
+      const RequiredUnless('type', 'person'),
+      company,
+      input,
+      path,
+      'company',
+      _messages,
+    );
+    state.requiredWhen(
+      const Prohibited(),
+      debug,
+      input,
+      path,
+      'debug',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (terms is bool) {
+      if (!(const Accepted().check(
+        terms,
+        state.context(path, 'terms', terms),
+      ))) {
+        state.failRule(const Accepted(), path, 'terms', terms, _messages);
       }
     }
-    if (c4 is DateTime) {
-      if (!(c3 is! DateTime || c4.isAfter(c3))) {
-        s.fail(
-          p,
+    if (end is DateTime) {
+      if (!(start is! DateTime || end.isAfter(start))) {
+        state.fail(
+          path,
           'end',
           IssueCodes.after,
           DefaultMessages.after,
-          c4,
+          end,
           params: const <String, Object?>{'date': 'start'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c7 is String) {
-      if (!(c7.runes.length >= 3)) {
-        s.fail(
-          p,
+    if (vat is String) {
+      if (!(vat.runes.length >= 3)) {
+        state.fail(
+          path,
           'vat',
           IssueCodes.minLength,
           DefaultMessages.minLength,
-          c7,
+          vat,
           params: const <String, Object?>{'min': 3},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c9 is String) {
+    if (nick is String) {
       if (!(const Different('first_name')
-          .check(c9, s.context(p, 'nick', c9)))) {
-        s.failRule(const Different('first_name'), p, 'nick', c9, _m);
+          .check(nick, state.context(path, 'nick', nick)))) {
+        state.failRule(
+          const Different('first_name'),
+          path,
+          'nick',
+          nick,
+          _messages,
+        );
       }
     }
-    if (c10 is String) {
-      if (!(const Ulid().check(c10, s.context(p, 'id', c10)))) {
-        s.failRule(const Ulid(), p, 'id', c10, _m);
+    if (id is String) {
+      if (!(const Ulid().check(id, state.context(path, 'id', id)))) {
+        state.failRule(const Ulid(), path, 'id', id, _messages);
       }
     }
-    if (c11 is int) {
+    if (max is int) {
       if (!(const GreaterThanField('age')
-          .check(c11, s.context(p, 'max', c11)))) {
-        s.failRule(const GreaterThanField('age'), p, 'max', c11, _m);
+          .check(max, state.context(path, 'max', max)))) {
+        state.failRule(
+          const GreaterThanField('age'),
+          path,
+          'max',
+          max,
+          _messages,
+        );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return LaravelRules(
-      firstName: c0 as String,
-      age: c1 as int,
-      terms: c2 as bool,
-      start: c3 as DateTime,
-      end: c4 as DateTime,
-      type: c5 is Undefined ? null : c5 as String?,
-      company: c6 is Undefined ? null : c6 as String?,
-      vat: c7 is Undefined ? null : c7 as String?,
-      debug: c8 is Undefined ? null : c8 as String?,
-      nick: c9 is Undefined ? null : c9 as String?,
-      id: c10 is Undefined ? null : c10 as String?,
-      max: c11 is Undefined ? null : c11 as int?,
+      firstName: firstName as String,
+      age: age as int,
+      terms: terms as bool,
+      start: start as DateTime,
+      end: end as DateTime,
+      type: type is Undefined ? null : type as String?,
+      company: company is Undefined ? null : company as String?,
+      vat: vat is Undefined ? null : vat as String?,
+      debug: debug is Undefined ? null : debug as String?,
+      nick: nick is Undefined ? null : nick as String?,
+      id: id is Undefined ? null : id as String?,
+      max: max is Undefined ? null : max as int?,
     );
   }
 
   @override
-  LaravelRules fromMap(Map<String, dynamic> m) {
+  LaravelRules fromMap(Map<String, dynamic> map) {
     return LaravelRules(
-      firstName: m['first_name'] as String,
-      age: (m['age'] as num).toInt(),
-      terms: m['terms'] as bool,
-      start: DateTime.parse(m['start'] as String).toUtc(),
-      end: DateTime.parse(m['end'] as String).toUtc(),
-      type: m['type'] == null ? null : (m['type'] as String),
-      company: m['company'] == null ? null : (m['company'] as String),
-      vat: m['vat'] == null ? null : (m['vat'] as String),
-      debug: m['debug'] == null ? null : (m['debug'] as String),
-      nick: m['nick'] == null ? null : (m['nick'] as String),
-      id: m['id'] == null ? null : (m['id'] as String),
-      max: m['max'] == null ? null : ((m['max'] as num).toInt()),
+      firstName: map['first_name'] as String,
+      age: (map['age'] as num).toInt(),
+      terms: map['terms'] as bool,
+      start: DateTime.parse(map['start'] as String).toUtc(),
+      end: DateTime.parse(map['end'] as String).toUtc(),
+      type: map['type'] == null ? null : (map['type'] as String),
+      company: map['company'] == null ? null : (map['company'] as String),
+      vat: map['vat'] == null ? null : (map['vat'] as String),
+      debug: map['debug'] == null ? null : (map['debug'] as String),
+      nick: map['nick'] == null ? null : (map['nick'] as String),
+      id: map['id'] == null ? null : (map['id'] as String),
+      max: map['max'] == null ? null : ((map['max'] as num).toInt()),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(LaravelRules o) {
-    String f0 = o.firstName;
-    int f1 = o.age;
-    bool f2 = o.terms;
-    DateTime f3 = o.start;
-    DateTime f4 = o.end;
-    String? f5 = o.type;
-    String? f6 = o.company;
-    String? f7 = o.vat;
-    String? f8 = o.debug;
-    String? f9 = o.nick;
-    String? f10 = o.id;
-    int? f11 = o.max;
+  Map<String, dynamic> toMap(LaravelRules dto) {
     return <String, dynamic>{
-      'first_name': f0,
-      'age': f1,
-      'terms': f2,
-      'start': f3.toIso8601String(),
-      'end': f4.toIso8601String(),
-      'type': f5,
-      'company': f6,
-      'vat': f7,
-      'debug': f8,
-      'nick': f9,
-      'id': f10,
-      'max': f11,
+      'first_name': dto.firstName,
+      'age': dto.age,
+      'terms': dto.terms,
+      'start': dto.start.toIso8601String(),
+      'end': dto.end.toIso8601String(),
+      'type': dto.type,
+      'company': dto.company,
+      'vat': dto.vat,
+      'debug': dto.debug,
+      'nick': dto.nick,
+      'id': dto.id,
+      'max': dto.max,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeLaravelRules(object as LaravelRules, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeLaravelRules(object as LaravelRules, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
-    Map<String, dynamic> j = <String, dynamic>{
+    Map<String, dynamic> schema = <String, dynamic>{
       'type': 'object',
       'title': 'LaravelRules',
       'properties': <String, dynamic>{
@@ -257,51 +325,51 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
       },
       'required': <dynamic>['first_name', 'age', 'terms', 'start', 'end'],
     };
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'terms',
     ], const Accepted().toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'nick',
     ], const Different('first_name').toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'id',
     ], const Ulid().toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'max',
     ], const GreaterThanField('age').toJsonSchema());
-    return j;
+    return schema;
   }
 }
 
 /// Writes the JSON of [LaravelRules], as `toMap()` gives it.
-void $writeLaravelRules(LaravelRules o, JsonWriter w) {
-  w.run(_$LaravelRulesDto._j0);
-  w.string(o.firstName);
-  w.run(_$LaravelRulesDto._j1);
-  w.integer(o.age);
-  w.run(_$LaravelRulesDto._j2);
-  w.boolean(o.terms);
-  w.run(_$LaravelRulesDto._j3);
-  w.dateTime(o.start);
-  w.run(_$LaravelRulesDto._j4);
-  w.dateTime(o.end);
-  w.run(_$LaravelRulesDto._j5);
-  w.string(o.type);
-  w.run(_$LaravelRulesDto._j6);
-  w.string(o.company);
-  w.run(_$LaravelRulesDto._j7);
-  w.string(o.vat);
-  w.run(_$LaravelRulesDto._j8);
-  w.string(o.debug);
-  w.run(_$LaravelRulesDto._j9);
-  w.string(o.nick);
-  w.run(_$LaravelRulesDto._j10);
-  w.string(o.id);
-  w.run(_$LaravelRulesDto._j11);
-  w.integer(o.max);
-  w.run(_$LaravelRulesDto._j12);
+void $writeLaravelRules(LaravelRules dto, JsonWriter writer) {
+  writer.run(_$LaravelRulesDto._firstNameKey);
+  writer.string(dto.firstName);
+  writer.run(_$LaravelRulesDto._ageKey);
+  writer.integer(dto.age);
+  writer.run(_$LaravelRulesDto._termsKey);
+  writer.boolean(dto.terms);
+  writer.run(_$LaravelRulesDto._startKey);
+  writer.dateTime(dto.start);
+  writer.run(_$LaravelRulesDto._endKey);
+  writer.dateTime(dto.end);
+  writer.run(_$LaravelRulesDto._typeKey);
+  writer.string(dto.type);
+  writer.run(_$LaravelRulesDto._companyKey);
+  writer.string(dto.company);
+  writer.run(_$LaravelRulesDto._vatKey);
+  writer.string(dto.vat);
+  writer.run(_$LaravelRulesDto._debugKey);
+  writer.string(dto.debug);
+  writer.run(_$LaravelRulesDto._nickKey);
+  writer.string(dto.nick);
+  writer.run(_$LaravelRulesDto._idKey);
+  writer.string(dto.id);
+  writer.run(_$LaravelRulesDto._maxKey);
+  writer.integer(dto.max);
+  writer.run(_$LaravelRulesDto._end);
 }

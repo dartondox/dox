@@ -14,11 +14,11 @@ const DtoSchema<Address> $AddressDto = _$AddressDto();
 class _$AddressDto extends DtoSchema<Address> implements JsonObjectWriter {
   const _$AddressDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"city":');
-  static final JsonRun _j1 = JsonRun(',"post_code":');
-  static final JsonRun _j2 = JsonRun('}');
+  static final JsonRun _cityKey = JsonRun('{"city":');
+  static final JsonRun _postCodeKey = JsonRun(',"post_code":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => Address;
@@ -33,61 +33,70 @@ class _$AddressDto extends DtoSchema<Address> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  Address? convert(Object? input, DtoState s, List<Object> p) {
+  Address? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // city: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'city'), p, 'city', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'city', _m);
+    Object? city = state.string(
+      state.read(input, 'city'),
+      path,
+      'city',
+      _messages,
+    );
+    if (city == null || city is Undefined)
+      state.required(path, 'city', _messages);
     // postCode: String
-    Object? c1;
-    c1 = s.string(s.read(input, 'post_code'), p, 'post_code', _m);
-    if (c1 == null || c1 is Undefined) s.required(p, 'post_code', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c1 is String) {
-      if (!(c1.runes.length == 5)) {
-        s.fail(
-          p,
+    Object? postCode = state.string(
+      state.read(input, 'post_code'),
+      path,
+      'post_code',
+      _messages,
+    );
+    if (postCode == null || postCode is Undefined)
+      state.required(path, 'post_code', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (postCode is String) {
+      if (!(postCode.runes.length == 5)) {
+        state.fail(
+          path,
           'post_code',
           IssueCodes.length,
           DefaultMessages.length,
-          c1,
+          postCode,
           params: const <String, Object?>{'length': 5},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
-    return Address(city: c0 as String, postCode: c1 as String);
+    if (state.issues.length != issuesBefore) return null;
+    return Address(city: city as String, postCode: postCode as String);
   }
 
   @override
-  void crossCheck(Address o, DtoState s, List<Object> p) {
-    o.validate(DtoErrors(s, p));
+  void crossCheck(Address dto, DtoState state, List<Object> path) {
+    dto.validate(DtoErrors(state, path));
   }
 
   @override
-  Address fromMap(Map<String, dynamic> m) {
+  Address fromMap(Map<String, dynamic> map) {
     return Address(
-      city: m['city'] as String,
-      postCode: m['post_code'] as String,
+      city: map['city'] as String,
+      postCode: map['post_code'] as String,
     );
   }
 
   @override
-  Map<String, dynamic> toMap(Address o) {
-    String f0 = o.city;
-    String f1 = o.postCode;
-    return <String, dynamic>{'city': f0, 'post_code': f1};
+  Map<String, dynamic> toMap(Address dto) {
+    return <String, dynamic>{'city': dto.city, 'post_code': dto.postCode};
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeAddress(object as Address, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeAddress(object as Address, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -107,12 +116,12 @@ class _$AddressDto extends DtoSchema<Address> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [Address], as `toMap()` gives it.
-void $writeAddress(Address o, JsonWriter w) {
-  w.run(_$AddressDto._j0);
-  w.string(o.city);
-  w.run(_$AddressDto._j1);
-  w.string(o.postCode);
-  w.run(_$AddressDto._j2);
+void $writeAddress(Address dto, JsonWriter writer) {
+  writer.run(_$AddressDto._cityKey);
+  writer.string(dto.city);
+  writer.run(_$AddressDto._postCodeKey);
+  writer.string(dto.postCode);
+  writer.run(_$AddressDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [OrderItem].
@@ -121,11 +130,11 @@ const DtoSchema<OrderItem> $OrderItemDto = _$OrderItemDto();
 class _$OrderItemDto extends DtoSchema<OrderItem> implements JsonObjectWriter {
   const _$OrderItemDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"name":');
-  static final JsonRun _j1 = JsonRun(',"quantity":');
-  static final JsonRun _j2 = JsonRun('}');
+  static final JsonRun _nameKey = JsonRun('{"name":');
+  static final JsonRun _quantityKey = JsonRun(',"quantity":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => OrderItem;
@@ -137,56 +146,65 @@ class _$OrderItemDto extends DtoSchema<OrderItem> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  OrderItem? convert(Object? input, DtoState s, List<Object> p) {
+  OrderItem? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // name: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'name'), p, 'name', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'name', _m);
+    Object? name = state.string(
+      state.read(input, 'name'),
+      path,
+      'name',
+      _messages,
+    );
+    if (name == null || name is Undefined)
+      state.required(path, 'name', _messages);
     // quantity: int
-    Object? c1;
-    c1 = s.integer(s.read(input, 'quantity'), p, 'quantity', _m);
-    if (c1 == null || c1 is Undefined) s.required(p, 'quantity', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c1 is int) {
-      if (!(c1 > 0)) {
-        s.fail(
-          p,
+    Object? quantity = state.integer(
+      state.read(input, 'quantity'),
+      path,
+      'quantity',
+      _messages,
+    );
+    if (quantity == null || quantity is Undefined)
+      state.required(path, 'quantity', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (quantity is int) {
+      if (!(quantity > 0)) {
+        state.fail(
+          path,
           'quantity',
           IssueCodes.greaterThan,
           DefaultMessages.greaterThan,
-          c1,
+          quantity,
           params: const <String, Object?>{'min': 0},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
-    return OrderItem(name: c0 as String, quantity: c1 as int);
+    if (state.issues.length != issuesBefore) return null;
+    return OrderItem(name: name as String, quantity: quantity as int);
   }
 
   @override
-  OrderItem fromMap(Map<String, dynamic> m) {
+  OrderItem fromMap(Map<String, dynamic> map) {
     return OrderItem(
-      name: m['name'] as String,
-      quantity: (m['quantity'] as num).toInt(),
+      name: map['name'] as String,
+      quantity: (map['quantity'] as num).toInt(),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(OrderItem o) {
-    String f0 = o.name;
-    int f1 = o.quantity;
-    return <String, dynamic>{'name': f0, 'quantity': f1};
+  Map<String, dynamic> toMap(OrderItem dto) {
+    return <String, dynamic>{'name': dto.name, 'quantity': dto.quantity};
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeOrderItem(object as OrderItem, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeOrderItem(object as OrderItem, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -202,12 +220,12 @@ class _$OrderItemDto extends DtoSchema<OrderItem> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [OrderItem], as `toMap()` gives it.
-void $writeOrderItem(OrderItem o, JsonWriter w) {
-  w.run(_$OrderItemDto._j0);
-  w.string(o.name);
-  w.run(_$OrderItemDto._j1);
-  w.integer(o.quantity);
-  w.run(_$OrderItemDto._j2);
+void $writeOrderItem(OrderItem dto, JsonWriter writer) {
+  writer.run(_$OrderItemDto._nameKey);
+  writer.string(dto.name);
+  writer.run(_$OrderItemDto._quantityKey);
+  writer.integer(dto.quantity);
+  writer.run(_$OrderItemDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [CreateOrder].
@@ -217,12 +235,12 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder>
     implements JsonObjectWriter {
   const _$CreateOrderDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"address":');
-  static final JsonRun _j1 = JsonRun(',"items":[');
-  static final JsonRun _j2 = JsonRun('],"billing":');
-  static final JsonRun _j3 = JsonRun('}');
+  static final JsonRun _addressKey = JsonRun('{"address":');
+  static final JsonRun _itemsKey = JsonRun(',"items":[');
+  static final JsonRun _billingKey = JsonRun('],"billing":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => CreateOrder;
@@ -237,115 +255,132 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder>
   bool get usesRequiredWhen => false;
 
   @override
-  CreateOrder? convert(Object? input, DtoState s, List<Object> p) {
+  CreateOrder? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // address: Address
-    Object? c0;
-    c0 = s.object(s.read(input, 'address'), p, 'address', _m);
-    if (c0 is Map) {
-      c0 = $AddressDto.convert(c0, s, <Object>[...p, 'address']) ?? invalid;
+    Object? address = state.object(
+      state.read(input, 'address'),
+      path,
+      'address',
+      _messages,
+    );
+    if (address is Map) {
+      address =
+          $AddressDto.convert(address, state, <Object>[...path, 'address']) ??
+          invalid;
     }
-    if (c0 == null || c0 is Undefined) s.required(p, 'address', _m);
+    if (address == null || address is Undefined)
+      state.required(path, 'address', _messages);
     // items: List<OrderItem>
-    Object? c1;
-    c1 = s.list(s.read(input, 'items'), p, 'items', _m);
-    if (c1 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'items'];
+    Object? items = state.list(
+      state.read(input, 'items'),
+      path,
+      'items',
+      _messages,
+    );
+    if (items is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'items'];
       List<OrderItem> o0 = <OrderItem>[];
-      for (int i0 = 0; i0 < c1.length; i0++) {
-        Object? x0;
-        x0 = s.object(c1[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < items.length; i0++) {
+        Object? x0 = state.object(items[i0], q0, i0, _messages);
         if (x0 is Map) {
-          x0 = $OrderItemDto.convert(x0, s, <Object>[...q0, i0]) ?? invalid;
+          x0 = $OrderItemDto.convert(x0, state, <Object>[...q0, i0]) ?? invalid;
         }
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as OrderItem);
         }
       }
-      c1 = s.issues.length != b0 ? invalid : o0;
+      items = state.issues.length != b0 ? invalid : o0;
     }
-    if (c1 == null || c1 is Undefined || s.emptyList(c1)) {
-      s.required(p, 'items', _m);
-      c1 = invalid;
+    if (items == null || items is Undefined || state.emptyList(items)) {
+      state.required(path, 'items', _messages);
+      items = invalid;
     }
     // billing: Address?
-    Object? c2;
-    c2 = s.object(s.read(input, 'billing'), p, 'billing', _m);
-    if (c2 is Map) {
-      c2 = $AddressDto.convert(c2, s, <Object>[...p, 'billing']) ?? invalid;
+    Object? billing = state.object(
+      state.read(input, 'billing'),
+      path,
+      'billing',
+      _messages,
+    );
+    if (billing is Map) {
+      billing =
+          $AddressDto.convert(billing, state, <Object>[...path, 'billing']) ??
+          invalid;
     }
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c1 is List<OrderItem>) {
-      if (!(c1.length >= 1)) {
-        s.fail(
-          p,
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (items is List<OrderItem>) {
+      if (!(items.length >= 1)) {
+        state.fail(
+          path,
           'items',
           IssueCodes.minItems,
           DefaultMessages.minItems,
-          c1,
+          items,
           params: const <String, Object?>{'min': 1},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return CreateOrder(
-      address: c0 as Address,
-      items: c1 as List<OrderItem>,
-      billing: c2 is Undefined ? null : c2 as Address?,
+      address: address as Address,
+      items: items as List<OrderItem>,
+      billing: billing is Undefined ? null : billing as Address?,
     );
   }
 
   @override
-  void crossCheck(CreateOrder o, DtoState s, List<Object> p) {
+  void crossCheck(CreateOrder dto, DtoState state, List<Object> path) {
     {
-      Address f = o.address;
-      $AddressDto.crossCheck(f, s, <Object>[...p, 'address']);
+      Address value = dto.address;
+      $AddressDto.crossCheck(value, state, <Object>[...path, 'address']);
     }
     {
-      Address? f = o.billing;
-      if (f != null) {
-        $AddressDto.crossCheck(f, s, <Object>[...p, 'billing']);
+      Address? value = dto.billing;
+      if (value != null) {
+        $AddressDto.crossCheck(value, state, <Object>[...path, 'billing']);
       }
     }
   }
 
   @override
-  CreateOrder fromMap(Map<String, dynamic> m) {
+  CreateOrder fromMap(Map<String, dynamic> map) {
     return CreateOrder(
-      address: $AddressDto.fromMap(m['address'] as Map<String, dynamic>),
+      address: $AddressDto.fromMap(map['address'] as Map<String, dynamic>),
       items: <OrderItem>[
-        for (Object? x0 in m['items'] as List<dynamic>)
+        for (Object? x0 in map['items'] as List<dynamic>)
           $OrderItemDto.fromMap(x0 as Map<String, dynamic>),
       ],
-      billing: m['billing'] == null
+      billing: map['billing'] == null
           ? null
-          : ($AddressDto.fromMap(m['billing'] as Map<String, dynamic>)),
+          : ($AddressDto.fromMap(map['billing'] as Map<String, dynamic>)),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(CreateOrder o) {
-    Address f0 = o.address;
-    List<OrderItem> f1 = o.items;
-    Address? f2 = o.billing;
+  Map<String, dynamic> toMap(CreateOrder dto) {
+    Address? billing = dto.billing;
     return <String, dynamic>{
-      'address': $AddressDto.toMap(f0),
-      'items': <dynamic>[for (OrderItem x0 in f1) $OrderItemDto.toMap(x0)],
-      'billing': f2 == null ? null : $AddressDto.toMap(f2),
+      'address': $AddressDto.toMap(dto.address),
+      'items': <dynamic>[
+        for (OrderItem x0 in dto.items) $OrderItemDto.toMap(x0),
+      ],
+      'billing': billing == null ? null : $AddressDto.toMap(billing),
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeCreateOrder(object as CreateOrder, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeCreateOrder(object as CreateOrder, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -398,24 +433,24 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder>
 }
 
 /// Writes the JSON of [CreateOrder], as `toMap()` gives it.
-void $writeCreateOrder(CreateOrder o, JsonWriter w) {
-  w.run(_$CreateOrderDto._j0);
-  $writeAddress(o.address, w);
-  w.run(_$CreateOrderDto._j1);
+void $writeCreateOrder(CreateOrder dto, JsonWriter writer) {
+  writer.run(_$CreateOrderDto._addressKey);
+  $writeAddress(dto.address, writer);
+  writer.run(_$CreateOrderDto._itemsKey);
   {
-    List<OrderItem> l1 = o.items;
-    for (int i = 0; i < l1.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      $writeOrderItem(l1[i], w);
+    List<OrderItem> items = dto.items;
+    for (int i = 0; i < items.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      $writeOrderItem(items[i], writer);
     }
   }
-  w.run(_$CreateOrderDto._j2);
-  if (o.billing case final $v?) {
-    $writeAddress($v, w);
+  writer.run(_$CreateOrderDto._billingKey);
+  if (dto.billing case final $v?) {
+    $writeAddress($v, writer);
   } else {
-    w.value(null);
+    writer.value(null);
   }
-  w.run(_$CreateOrderDto._j3);
+  writer.run(_$CreateOrderDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [SignUp].
@@ -424,13 +459,15 @@ const DtoSchema<SignUp> $SignUpDto = _$SignUpDto();
 class _$SignUpDto extends DtoSchema<SignUp> implements JsonObjectWriter {
   const _$SignUpDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"password":');
-  static final JsonRun _j1 = JsonRun(',"password_confirmation":');
-  static final JsonRun _j2 = JsonRun(',"starts_at":');
-  static final JsonRun _j3 = JsonRun(',"ends_at":');
-  static final JsonRun _j4 = JsonRun('}');
+  static final JsonRun _passwordKey = JsonRun('{"password":');
+  static final JsonRun _passwordConfirmationKey = JsonRun(
+    ',"password_confirmation":',
+  );
+  static final JsonRun _startsAtKey = JsonRun(',"starts_at":');
+  static final JsonRun _endsAtKey = JsonRun(',"ends_at":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => SignUp;
@@ -445,91 +482,102 @@ class _$SignUpDto extends DtoSchema<SignUp> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  SignUp? convert(Object? input, DtoState s, List<Object> p) {
+  SignUp? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // password: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'password'), p, 'password', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'password', _m);
-    // passwordConfirmation: String
-    Object? c1;
-    c1 = s.string(
-      s.read(input, 'password_confirmation'),
-      p,
-      'password_confirmation',
-      _m,
+    Object? password = state.string(
+      state.read(input, 'password'),
+      path,
+      'password',
+      _messages,
     );
-    if (c1 == null || c1 is Undefined)
-      s.required(p, 'password_confirmation', _m);
+    if (password == null || password is Undefined)
+      state.required(path, 'password', _messages);
+    // passwordConfirmation: String
+    Object? passwordConfirmation = state.string(
+      state.read(input, 'password_confirmation'),
+      path,
+      'password_confirmation',
+      _messages,
+    );
+    if (passwordConfirmation == null || passwordConfirmation is Undefined)
+      state.required(path, 'password_confirmation', _messages);
     // startsAt: DateTime?
-    Object? c2;
-    c2 = s.date(s.read(input, 'starts_at'), p, 'starts_at', _m);
+    Object? startsAt = state.date(
+      state.read(input, 'starts_at'),
+      path,
+      'starts_at',
+      _messages,
+    );
     // endsAt: DateTime?
-    Object? c3;
-    c3 = s.date(s.read(input, 'ends_at'), p, 'ends_at', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is String) {
-      if (!(c0.runes.length >= 8)) {
-        s.fail(
-          p,
+    Object? endsAt = state.date(
+      state.read(input, 'ends_at'),
+      path,
+      'ends_at',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (password is String) {
+      if (!(password.runes.length >= 8)) {
+        state.fail(
+          path,
           'password',
           IssueCodes.minLength,
           DefaultMessages.minLength,
-          c0,
+          password,
           params: const <String, Object?>{'min': 8},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return SignUp(
-      password: c0 as String,
-      passwordConfirmation: c1 as String,
-      startsAt: c2 is Undefined ? null : c2 as DateTime?,
-      endsAt: c3 is Undefined ? null : c3 as DateTime?,
+      password: password as String,
+      passwordConfirmation: passwordConfirmation as String,
+      startsAt: startsAt is Undefined ? null : startsAt as DateTime?,
+      endsAt: endsAt is Undefined ? null : endsAt as DateTime?,
     );
   }
 
   @override
-  void crossCheck(SignUp o, DtoState s, List<Object> p) {
-    o.validate(DtoErrors(s, p));
+  void crossCheck(SignUp dto, DtoState state, List<Object> path) {
+    dto.validate(DtoErrors(state, path));
   }
 
   @override
-  SignUp fromMap(Map<String, dynamic> m) {
+  SignUp fromMap(Map<String, dynamic> map) {
     return SignUp(
-      password: m['password'] as String,
-      passwordConfirmation: m['password_confirmation'] as String,
-      startsAt: m['starts_at'] == null
+      password: map['password'] as String,
+      passwordConfirmation: map['password_confirmation'] as String,
+      startsAt: map['starts_at'] == null
           ? null
-          : (DateTime.parse(m['starts_at'] as String).toUtc()),
-      endsAt: m['ends_at'] == null
+          : (DateTime.parse(map['starts_at'] as String).toUtc()),
+      endsAt: map['ends_at'] == null
           ? null
-          : (DateTime.parse(m['ends_at'] as String).toUtc()),
+          : (DateTime.parse(map['ends_at'] as String).toUtc()),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(SignUp o) {
-    String f0 = o.password;
-    String f1 = o.passwordConfirmation;
-    DateTime? f2 = o.startsAt;
-    DateTime? f3 = o.endsAt;
+  Map<String, dynamic> toMap(SignUp dto) {
+    DateTime? startsAt = dto.startsAt;
+    DateTime? endsAt = dto.endsAt;
     return <String, dynamic>{
-      'password': f0,
-      'password_confirmation': f1,
-      'starts_at': f2 == null ? null : f2.toIso8601String(),
-      'ends_at': f3 == null ? null : f3.toIso8601String(),
+      'password': dto.password,
+      'password_confirmation': dto.passwordConfirmation,
+      'starts_at': startsAt == null ? null : startsAt.toIso8601String(),
+      'ends_at': endsAt == null ? null : endsAt.toIso8601String(),
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeSignUp(object as SignUp, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeSignUp(object as SignUp, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -553,16 +601,16 @@ class _$SignUpDto extends DtoSchema<SignUp> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [SignUp], as `toMap()` gives it.
-void $writeSignUp(SignUp o, JsonWriter w) {
-  w.run(_$SignUpDto._j0);
-  w.string(o.password);
-  w.run(_$SignUpDto._j1);
-  w.string(o.passwordConfirmation);
-  w.run(_$SignUpDto._j2);
-  w.dateTime(o.startsAt);
-  w.run(_$SignUpDto._j3);
-  w.dateTime(o.endsAt);
-  w.run(_$SignUpDto._j4);
+void $writeSignUp(SignUp dto, JsonWriter writer) {
+  writer.run(_$SignUpDto._passwordKey);
+  writer.string(dto.password);
+  writer.run(_$SignUpDto._passwordConfirmationKey);
+  writer.string(dto.passwordConfirmation);
+  writer.run(_$SignUpDto._startsAtKey);
+  writer.dateTime(dto.startsAt);
+  writer.run(_$SignUpDto._endsAtKey);
+  writer.dateTime(dto.endsAt);
+  writer.run(_$SignUpDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [AsyncCheck].
@@ -572,10 +620,10 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck>
     implements JsonObjectWriter {
   const _$AsyncCheckDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"code":');
-  static final JsonRun _j1 = JsonRun('}');
+  static final JsonRun _codeKey = JsonRun('{"code":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => AsyncCheck;
@@ -593,40 +641,49 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck>
   bool get isAsync => true;
 
   @override
-  AsyncCheck? convert(Object? input, DtoState s, List<Object> p) {
+  AsyncCheck? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // code: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'code'), p, 'code', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'code', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
-    return AsyncCheck(code: c0 as String);
+    Object? code = state.string(
+      state.read(input, 'code'),
+      path,
+      'code',
+      _messages,
+    );
+    if (code == null || code is Undefined)
+      state.required(path, 'code', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return AsyncCheck(code: code as String);
   }
 
   @override
-  Future<void> crossCheck(AsyncCheck o, DtoState s, List<Object> p) async {
-    await o.validate(DtoErrors(s, p));
+  Future<void> crossCheck(
+    AsyncCheck dto,
+    DtoState state,
+    List<Object> path,
+  ) async {
+    await dto.validate(DtoErrors(state, path));
   }
 
   @override
-  AsyncCheck fromMap(Map<String, dynamic> m) {
-    return AsyncCheck(code: m['code'] as String);
+  AsyncCheck fromMap(Map<String, dynamic> map) {
+    return AsyncCheck(code: map['code'] as String);
   }
 
   @override
-  Map<String, dynamic> toMap(AsyncCheck o) {
-    String f0 = o.code;
-    return <String, dynamic>{'code': f0};
+  Map<String, dynamic> toMap(AsyncCheck dto) {
+    return <String, dynamic>{'code': dto.code};
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeAsyncCheck(object as AsyncCheck, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeAsyncCheck(object as AsyncCheck, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -641,8 +698,8 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck>
 }
 
 /// Writes the JSON of [AsyncCheck], as `toMap()` gives it.
-void $writeAsyncCheck(AsyncCheck o, JsonWriter w) {
-  w.run(_$AsyncCheckDto._j0);
-  w.string(o.code);
-  w.run(_$AsyncCheckDto._j1);
+void $writeAsyncCheck(AsyncCheck dto, JsonWriter writer) {
+  writer.run(_$AsyncCheckDto._codeKey);
+  writer.string(dto.code);
+  writer.run(_$AsyncCheckDto._end);
 }

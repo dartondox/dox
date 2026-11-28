@@ -15,12 +15,12 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar>
     implements JsonObjectWriter {
   const _$UploadAvatarDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"avatar":');
-  static final JsonRun _j1 = JsonRun(',"documents":');
-  static final JsonRun _j2 = JsonRun(',"title":');
-  static final JsonRun _j3 = JsonRun('}');
+  static final JsonRun _avatarKey = JsonRun('{"avatar":');
+  static final JsonRun _documentsKey = JsonRun(',"documents":');
+  static final JsonRun _titleKey = JsonRun(',"title":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => UploadAvatar;
@@ -32,125 +32,139 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar>
   bool get usesRequiredWhen => false;
 
   @override
-  UploadAvatar? convert(Object? input, DtoState s, List<Object> p) {
+  UploadAvatar? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // avatar: RequestFile
-    Object? c0;
-    c0 = s.file(s.read(input, 'avatar'), p, 'avatar', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'avatar', _m);
+    Object? avatar = state.file(
+      state.read(input, 'avatar'),
+      path,
+      'avatar',
+      _messages,
+    );
+    if (avatar == null || avatar is Undefined)
+      state.required(path, 'avatar', _messages);
     // documents: List<RequestFile>
-    Object? c1;
-    c1 = s.list(s.read(input, 'documents'), p, 'documents', _m);
-    if (c1 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'documents'];
+    Object? documents = state.list(
+      state.read(input, 'documents'),
+      path,
+      'documents',
+      _messages,
+    );
+    if (documents is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'documents'];
       List<RequestFile> o0 = <RequestFile>[];
-      for (int i0 = 0; i0 < c1.length; i0++) {
-        Object? x0;
-        x0 = s.file(c1[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < documents.length; i0++) {
+        Object? x0 = state.file(documents[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as RequestFile);
         }
       }
-      c1 = s.issues.length != b0 ? invalid : o0;
+      documents = state.issues.length != b0 ? invalid : o0;
     }
-    if (c1 == null) s.required(p, 'documents', _m);
+    if (documents == null) state.required(path, 'documents', _messages);
     // title: String?
-    Object? c2;
-    c2 = s.string(s.read(input, 'title'), p, 'title', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is RequestFile) {
-      if (!(FileTypes.matches(c0, SchemaConstants.imageExtensions))) {
-        s.fail(
-          p,
+    Object? title = state.string(
+      state.read(input, 'title'),
+      path,
+      'title',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (avatar is RequestFile) {
+      if (!(FileTypes.matches(avatar, SchemaConstants.imageExtensions))) {
+        state.fail(
+          path,
           'avatar',
           IssueCodes.image,
           DefaultMessages.image,
-          c0,
-          messages: _m,
+          avatar,
+          messages: _messages,
         );
-      } else if (!(c0.length <= 1024)) {
-        s.fail(
-          p,
+      } else if (!(avatar.length <= 1024)) {
+        state.fail(
+          path,
           'avatar',
           IssueCodes.maxSize,
           DefaultMessages.maxSize,
-          c0,
+          avatar,
           params: const <String, Object?>{'max': '1KB'},
-          messages: _m,
+          messages: _messages,
         );
       }
     }
-    if (c1 is List<RequestFile>) {
-      if (!(c1.length <= 2)) {
-        s.fail(
-          p,
+    if (documents is List<RequestFile>) {
+      if (!(documents.length <= 2)) {
+        state.fail(
+          path,
           'documents',
           IssueCodes.maxItems,
           DefaultMessages.maxItems,
-          c1,
+          documents,
           params: const <String, Object?>{'max': 2},
-          messages: _m,
+          messages: _messages,
         );
       } else {
-        List<Object> q = <Object>[...p, 'documents'];
-        for (int i = 0; i < c1.length; i++) {
-          RequestFile v = c1[i];
+        List<Object> q = <Object>[...path, 'documents'];
+        for (int i = 0; i < documents.length; i++) {
+          RequestFile v = documents[i];
           if (!(FileTypes.matches(v, const <String>['pdf', 'docx']))) {
-            s.fail(
+            state.fail(
               q,
               i,
               IssueCodes.mimes,
               DefaultMessages.mimes,
               v,
               params: const <String, Object?>{'types': 'pdf, docx'},
-              messages: _m,
+              messages: _messages,
             );
           }
         }
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return UploadAvatar(
-      avatar: c0 as RequestFile,
-      documents: c1 is Undefined
+      avatar: avatar as RequestFile,
+      documents: documents is Undefined
           ? const <RequestFile>[]
-          : c1 as List<RequestFile>,
-      title: c2 is Undefined ? null : c2 as String?,
+          : documents as List<RequestFile>,
+      title: title is Undefined ? null : title as String?,
     );
   }
 
   @override
-  UploadAvatar fromMap(Map<String, dynamic> m) {
+  UploadAvatar fromMap(Map<String, dynamic> map) {
     return UploadAvatar(
-      avatar: m['avatar'] as RequestFile,
-      documents: m.containsKey('documents')
+      avatar: map['avatar'] as RequestFile,
+      documents: map.containsKey('documents')
           ? <RequestFile>[
-              for (Object? x0 in m['documents'] as List<dynamic>)
+              for (Object? x0 in map['documents'] as List<dynamic>)
                 x0 as RequestFile,
             ]
           : const <RequestFile>[],
-      title: m['title'] == null ? null : (m['title'] as String),
+      title: map['title'] == null ? null : (map['title'] as String),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(UploadAvatar o) {
-    RequestFile f0 = o.avatar;
-    List<RequestFile> f1 = o.documents;
-    String? f2 = o.title;
-    return <String, dynamic>{'avatar': f0, 'documents': f1, 'title': f2};
+  Map<String, dynamic> toMap(UploadAvatar dto) {
+    return <String, dynamic>{
+      'avatar': dto.avatar,
+      'documents': dto.documents,
+      'title': dto.title,
+    };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeUploadAvatar(object as UploadAvatar, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeUploadAvatar(object as UploadAvatar, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -183,12 +197,12 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar>
 }
 
 /// Writes the JSON of [UploadAvatar], as `toMap()` gives it.
-void $writeUploadAvatar(UploadAvatar o, JsonWriter w) {
-  w.run(_$UploadAvatarDto._j0);
-  w.value(o.avatar);
-  w.run(_$UploadAvatarDto._j1);
-  w.value(o.documents);
-  w.run(_$UploadAvatarDto._j2);
-  w.string(o.title);
-  w.run(_$UploadAvatarDto._j3);
+void $writeUploadAvatar(UploadAvatar dto, JsonWriter writer) {
+  writer.run(_$UploadAvatarDto._avatarKey);
+  writer.value(dto.avatar);
+  writer.run(_$UploadAvatarDto._documentsKey);
+  writer.value(dto.documents);
+  writer.run(_$UploadAvatarDto._titleKey);
+  writer.string(dto.title);
+  writer.run(_$UploadAvatarDto._end);
 }

@@ -48,6 +48,22 @@ void main() {
       );
     });
 
+    test('a nullable list that toMap() changes, and an X in a type name', () {
+      NullableView full = NullableView(
+        num: 1,
+        days: <DateTime>[DateTime.utc(2024, 1, 2)],
+        roles: <Role>[Role.admin],
+        owns: const <OwnJson>[OwnJson(id: 3)],
+        xray: const Xray(id: 1),
+        items: const <Xray>[Xray(id: 2)],
+      );
+      _same($NullableViewDto, full);
+      _same(
+        $NullableViewDto,
+        const NullableView(num: 2, xray: Xray(id: 1), items: <Xray>[]),
+      );
+    });
+
     test('in a list and in a map', () {
       List<ProductView> products = <ProductView>[
         for (int i = 0; i < 50; i++)
