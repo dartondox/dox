@@ -229,7 +229,73 @@ class _Loop implements JsonWritable {
   }
 }
 
+/// Writes a run, a bool and a number with the writer: the SDK uses
+/// [toJson], which gives the same JSON.
+class _Runs implements JsonWritable {
+  _Runs(this.n);
+  final int n;
+
+  static final JsonRun _open = JsonRun('{"key with a long name":');
+  static final JsonRun _flag = JsonRun(',"f":');
+
+  @override
+  void writeJson(JsonWriter writer) {
+    writer.run(_open);
+    writer.integer(n);
+    writer.run(_flag);
+    writer.boolean(n.isOdd);
+    writer.endObject();
+  }
+
+  Map<String, dynamic> toJson() {
+    return <String, dynamic>{'key with a long name': n, 'f': n.isOdd};
+  }
+}
+
 void main() {
+  /// The writers do not check bounds: each one makes room first. So each
+  /// kind of write is put at each place around the end of the first
+  /// buffer (4096 bytes) and of the second (8192), with a new encoder,
+  /// where the buffer must grow in the middle of the write.
+  test('each write at the end of the buffer', () {
+    List<Object?> values = <Object?>[
+      'a',
+      'short',
+      'exactly8',
+      'a plain text of more than eight characters',
+      'a "quote" and a \\ and a \n',
+      'é 😀 မြန်မာ',
+      '\u0001\u001f',
+      '\ud800',
+      0,
+      7,
+      -7,
+      1234567,
+      -9223372036854775807 - 1,
+      9223372036854775807,
+      true,
+      false,
+      null,
+      _Runs(5),
+      _Runs(-123456789),
+      <Object?>[1, 'x', _Runs(2)],
+    ];
+    for (int size in <int>[4096, 8192]) {
+      for (int k = size - 48; k < size + 8; k++) {
+        String pad = 'p' * k;
+        for (Object? value in values) {
+          Object? list = <Object?>[pad, value];
+          JsonBytesEncoder encoder = JsonBytesEncoder(advanceEncode);
+          expect(
+            utf8.decode(encoder.convert(list)),
+            jsonEncode(list, toEncodable: advanceEncode),
+            reason: 'pad $k, value $value',
+          );
+        }
+      }
+    }
+  });
+
   group('JsonBytesEncoder |', () {
     test('same bytes and same kind of error as the SDK, random values', () {
       _Values values = _Values();

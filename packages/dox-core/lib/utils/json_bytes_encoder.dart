@@ -210,6 +210,7 @@ class JsonBytesEncoder implements JsonWriter {
     _buffer[_length++] = 0x7D;
   }
 
+  @pragma('vm:prefer-inline')
   @override
   void string(String? value) {
     if (value == null) {
@@ -219,6 +220,7 @@ class JsonBytesEncoder implements JsonWriter {
     }
   }
 
+  @pragma('vm:prefer-inline')
   @override
   void integer(int? value) {
     if (value == null) {
@@ -307,6 +309,9 @@ class JsonBytesEncoder implements JsonWriter {
   /// Writes whole words: the bytes after the run are written over by the
   /// next write.
   /// Most runs are a key with its comma: 1 or 2 words, with no loop.
+  @pragma('vm:prefer-inline')
+  // the room for every write below is made at the start of this method
+  @pragma('vm:unsafe:no-bounds-checks')
   @override
   void run(JsonRun run) {
     Int64List words = run.words;
@@ -492,6 +497,8 @@ class JsonBytesEncoder implements JsonWriter {
 
   /// Writes the digits of [value], with no `String` in between. It
   /// writes two digits in each step, from [_pairs].
+  // the room for every write below is made at the start of this method
+  @pragma('vm:unsafe:no-bounds-checks')
   void _writeInt(int value) {
     if (value < 0) {
       // the lowest int has no positive twin
@@ -554,6 +561,8 @@ class JsonBytesEncoder implements JsonWriter {
 
   /// Writes [text] in quotes. Plain ASCII, the usual case, is copied with
   /// one check per character.
+  // the room for every write below is made at the start of this method
+  @pragma('vm:unsafe:no-bounds-checks')
   void _writeString(String text) {
     int count = text.length;
     _reserve(count + 2);

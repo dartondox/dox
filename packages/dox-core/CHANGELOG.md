@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Faster: the JSON encoder inlines `string()`, `integer()` and `run()` into the generated code, and three writers do not check bounds. Each of these three makes room for all its bytes first, in the same method. On the HttpArena data, a `@Dto` list encodes in 2.8 µs, not 3.4 µs. On the same data and machine, `JSON.stringify` of Bun takes 3.3 µs.
 - Faster: the JSON encoder writes a whole number two digits at a time, and it writes a `JsonRun` 8 bytes at a time. With the new dox_builder, a `@Dto` in a response is 2.2 times faster to encode. Run `dart run build_runner build` to get the new code.
 - Faster: a query with no `%`, `+` or `[` (for example `?page=2&sort=name`) is split with no decoding. The map is the same as `Uri.queryParameters`. `input()`, `integer()` and the other readers of one key look in the body, then in the query, and make no merged map. The body still wins over the query. On the HttpArena json-h2c test (2 cores), this gives 3% more requests a second.
 - Fix: a cookie that the native server refuses (for example a line break in its domain) made the request get no answer. The first answer failed because of the cookie, and the plain 500 that Dox then sends kept the cookie and failed the same way. The plain 500 now also removes the cookies, so the client gets the 500.
