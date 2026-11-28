@@ -64,7 +64,7 @@ export 'http/request/request_file.dart';
 
 /// Response
 export 'http/response/dox_cookie.dart';
-export 'http/response/dox_response.dart';
+export 'http/response/dox_response.dart' hide textBytesOf;
 export 'http/response/serializer.dart';
 export 'http/response/stream_file.dart';
 

@@ -1,5 +1,8 @@
 ## Unreleased
 
+- New: `DoxResponse.contentBytes(bytes)` sets a body of UTF-8 text that is already encoded. Dox sends the bytes as they are, with no second encode. It gets the same content type as a `String` body. `getContent()` gives the text. It decodes the bytes the first time that you call it. `content()` replaces the bytes. dox_view uses this for `view()`.
+- New: `DoxResponse.getContentBytes()` gives the body as UTF-8 bytes. For a `contentBytes()` body, it gives those bytes. For a `String` body, it encodes the text. For all other bodies, it gives null.
+- New: `ETag.ofUtf8(bytes)` gives the same tag as `ETag.of` of the text in the bytes, with no decode. The `ETag` middleware uses it for a `contentBytes()` body, so a page has the same tag as before.
 - Fix: a query with an escape that is not UTF-8 (for example `?a=%ff`) gave a 500. Now `req.query` and a `@Dto` that reads the query give a 400. `ValidateSignature` gives a 403, because Dox never signs a URL like this.
 - Faster: the JSON encoder inlines `string()`, `integer()` and `run()` into the generated code, and three writers do not check bounds. Each of these three makes room for all its bytes first, in the same method. On the HttpArena data, a `@Dto` list encodes in 2.8 µs, not 3.4 µs. On the same data and machine, `JSON.stringify` of Bun takes 3.3 µs.
 - Faster: the JSON encoder writes a whole number two digits at a time, and it writes a `JsonRun` 8 bytes at a time. With the new dox_builder, a `@Dto` in a response is 2.2 times faster to encode. Run `dart run build_runner build` to get the new code.

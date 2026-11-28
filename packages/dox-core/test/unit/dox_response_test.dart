@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_http_native/dox_http_native.dart';
@@ -12,6 +14,9 @@ class _Res implements HttpResponse {
   final NativeHeaders headers = NativeHeaders.empty();
 
   int closed = 0;
+
+  @override
+  Encoding encoding = utf8;
 
   @override
   Future<dynamic> close() async => closed++;
@@ -64,5 +69,61 @@ void main() {
     req.response.headers.forEach((String _, List<String> _) => count++);
     expect(count, 0);
     expect(req.response.closed, 1);
+  });
+
+  group('contentBytes', () {
+    test('getContent gives the text, decoded one time', () {
+      DoxResponse res = DoxResponse(null)
+          .contentBytes(utf8.encode('caf\u00E9'));
+      expect(res.getContent(), 'caf\u00E9');
+      expect(identical(res.getContent(), res.getContent()), isTrue);
+    });
+
+    test('getContentBytes: the bytes, a String encoded, else null', () {
+      Uint8List bytes = utf8.encode('x\u2014');
+      expect(
+        identical(
+          DoxResponse(null).contentBytes(bytes).getContentBytes(),
+          bytes,
+        ),
+        isTrue,
+      );
+      expect(
+        DoxResponse('caf\u00E9').getContentBytes(),
+        utf8.encode('caf\u00E9'),
+      );
+      expect(DoxResponse('abc').getContentBytes(), utf8.encode('abc'));
+      expect(DoxResponse(<String, int>{'a': 1}).getContentBytes(), isNull);
+      expect(DoxResponse(null).getContentBytes(), isNull);
+    });
+
+    test('htmlStrings: sent as text/html, like a String body', () {
+      Dox().initialize(
+        AppConfig(appKey: testAppKey, flags: CoreFlags(htmlStrings: true)),
+      );
+      for (DoxResponse res in <DoxResponse>[
+        DoxResponse('<p>a</p>'),
+        DoxResponse(null).contentBytes(utf8.encode('<p>a</p>')),
+      ]) {
+        _Req req = _Req();
+        req.response.headers.set(
+          HttpHeaders.contentTypeHeader,
+          'text/plain; charset=utf-8',
+        );
+        res.process(req);
+        expect(
+          req.response.headers.value(HttpHeaders.contentTypeHeader),
+          startsWith('text/html'),
+        );
+      }
+    });
+
+    test('content() after contentBytes() drops the bytes', () {
+      DoxResponse res = DoxResponse(null)
+          .contentBytes(utf8.encode('old'))
+          .content('new');
+      expect(res.getContent(), 'new');
+      expect(res.getContentBytes(), utf8.encode('new'));
+    });
   });
 }

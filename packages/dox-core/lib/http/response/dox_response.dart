@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_response_handler.dart';
@@ -17,6 +19,12 @@ class DoxResponse {
   Set<String>? _replaced;
   int? _statusCode;
   ContentType? _contentType;
+
+  /// a UTF-8 text body that is already encoded, set by [contentBytes]
+  Uint8List? _textBytes;
+
+  /// the text of [_textBytes], made by the first [getContent]
+  String? _decoded;
 
   /// cookies and their expire flag. the header is made in [process],
   /// when Dox knows if the request came over https.
@@ -62,15 +70,47 @@ class DoxResponse {
   /// ```
   DoxResponse content(dynamic content) {
     _contentData = content;
+    _textBytes = null;
+    _decoded = null;
     return this;
   }
 
-  /// Get original content data
+  /// Set a text body that is already encoded as UTF-8. The bytes are
+  /// sent as they are, with no second encode. Like a `String` body, it
+  /// is sent as `text/html` with `CoreFlags.htmlStrings` when no content
+  /// type is set. [getContent] gives the text, so a middleware that
+  /// reads a `String` body works the same.
+  /// ```
+  /// res.contentBytes(utf8.encode('<p>Hello</p>'));
+  /// ```
+  DoxResponse contentBytes(Uint8List utf8Text) {
+    _contentData = null;
+    _textBytes = utf8Text;
+    _decoded = null;
+    return this;
+  }
+
+  /// Get original content data. For a body set with [contentBytes], the
+  /// text of the bytes.
   /// ```
   /// res.getContent();
   /// ```
   dynamic getContent() {
-    return _contentData;
+    Uint8List? bytes = _textBytes;
+    if (bytes == null) return _contentData;
+    return _decoded ??= utf8.decode(bytes, allowMalformed: true);
+  }
+
+  /// The body as UTF-8 bytes: the bytes of [contentBytes], or a `String`
+  /// body encoded. Null when the body is not text, eg. JSON or a file.
+  /// ```
+  /// res.getContentBytes();
+  /// ```
+  Uint8List? getContentBytes() {
+    Uint8List? bytes = _textBytes;
+    if (bytes != null) return bytes;
+    dynamic content = _contentData;
+    return content is String ? utf8Bytes(content) : null;
   }
 
   /// set stream data to response
@@ -178,7 +218,7 @@ class DoxResponse {
     }
     if (_contentType != null) {
       request.response.headers.contentType = _contentType;
-    } else if (content is String &&
+    } else if ((content is String || _textBytes != null) &&
         !(_headerMap?.keys.any(_isContentType) ?? false)) {
       htmlForText(request.response);
     }
@@ -198,7 +238,11 @@ class DoxResponse {
         );
       }
     }
-    return responseDataHandler(_contentData, request);
+    Uint8List? textBytes = _textBytes;
+    return responseDataHandler(
+      textBytes == null ? _contentData : TextBytes(textBytes),
+      request,
+    );
   }
 }
 
@@ -277,3 +321,7 @@ bool _hasControlChar(String s) {
   }
   return false;
 }
+
+/// the bytes of a body set with `contentBytes`, null for any other body.
+/// For internal use: `dox_core.dart` does not export it.
+Uint8List? textBytesOf(DoxResponse res) => res._textBytes;

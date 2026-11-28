@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/http/http_response_handler.dart';
+import 'package:dox_core/http/response/dox_response.dart' show textBytesOf;
 import 'package:dox_core/server/dox_server.dart';
 
 /// Adds an `ETag` header to GET and HEAD answers, and answers
@@ -33,9 +36,13 @@ class ETag implements IDoxNextMiddleware {
     if (status != null && status != HttpStatus.ok) return res;
     if (_skip(res, req.httpRequest.response.headers)) return res;
 
-    Object? content = res.getContent();
+    Uint8List? textBytes = textBytesOf(res);
+    Object? content = textBytes == null ? res.getContent() : null;
     String tag;
-    if (content is String) {
+    if (textBytes != null) {
+      // the same tag as the text would get, with no decode
+      tag = ETag.ofUtf8(textBytes);
+    } else if (content is String) {
       tag = ETag.of(content.codeUnits);
     } else if (_isJson(content)) {
       List<int> bytes = encodeJson(content);
@@ -61,9 +68,71 @@ class ETag implements IDoxNextMiddleware {
     for (int i = 0; i < units.length; i++) {
       hash = (hash ^ units[i]) * 0x100000001b3;
     }
+    return _tag(hash, units.length);
+  }
+
+  /// The same tag as [of] gives for the UTF-16 code units of the text in
+  /// the UTF-8 [bytes], with no decode. Bytes that are not valid UTF-8
+  /// are decoded like `utf8.decode` with `allowMalformed`.
+  static String ofUtf8(List<int> bytes) {
+    int hash = 0xcbf29ce484222325;
+    int units = 0;
+    int length = bytes.length;
+    int i = 0;
+    while (i < length) {
+      int b = bytes[i];
+      if (b < 0x80) {
+        hash = (hash ^ b) * 0x100000001b3;
+        units++;
+        i++;
+        continue;
+      }
+      int size = b >= 0xC2 && b < 0xE0
+          ? 2
+          : b >= 0xE0 && b < 0xF0
+          ? 3
+          : b >= 0xF0 && b < 0xF5
+          ? 4
+          : 0;
+      int code = size == 2
+          ? b & 0x1F
+          : size == 3
+          ? b & 0x0F
+          : b & 0x07;
+      if (size == 0 || i + size > length) return _ofMalformed(bytes);
+      for (int k = 1; k < size; k++) {
+        int next = bytes[i + k];
+        if (next & 0xC0 != 0x80) return _ofMalformed(bytes);
+        code = (code << 6) | (next & 0x3F);
+      }
+      // too long a form, a surrogate, or past U+10FFFF
+      if ((size == 3 && code < 0x800) ||
+          (size == 4 && (code < 0x10000 || code > 0x10FFFF)) ||
+          (code >= 0xD800 && code <= 0xDFFF)) {
+        return _ofMalformed(bytes);
+      }
+      i += size;
+      if (code > 0xFFFF) {
+        code -= 0x10000;
+        hash = (hash ^ (0xD800 | (code >> 10))) * 0x100000001b3;
+        hash = (hash ^ (0xDC00 | (code & 0x3FF))) * 0x100000001b3;
+        units += 2;
+      } else {
+        hash = (hash ^ code) * 0x100000001b3;
+        units++;
+      }
+    }
+    return _tag(hash, units);
+  }
+
+  static String _ofMalformed(List<int> bytes) {
+    return of(utf8.decode(bytes, allowMalformed: true).codeUnits);
+  }
+
+  static String _tag(int hash, int length) {
     String high = ((hash >> 32) & 0xffffffff).toRadixString(16);
     String low = (hash & 0xffffffff).toRadixString(16);
-    return 'W/"${units.length.toRadixString(16)}-'
+    return 'W/"${length.toRadixString(16)}-'
         '${high.padLeft(8, '0')}${low.padLeft(8, '0')}"';
   }
 
