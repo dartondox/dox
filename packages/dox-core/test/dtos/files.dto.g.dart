@@ -17,6 +17,11 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar>
 
   static const Map<String, String> _m = <String, String>{};
 
+  static final JsonRun _j0 = JsonRun('{"avatar":');
+  static final JsonRun _j1 = JsonRun(',"documents":');
+  static final JsonRun _j2 = JsonRun(',"title":');
+  static final JsonRun _j3 = JsonRun('}');
+
   @override
   Type get type => UploadAvatar;
 
@@ -144,18 +149,8 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar>
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    UploadAvatar o = object as UploadAvatar;
-    w.startObject();
-    w.key('avatar');
-    w.value(o.avatar);
-    w.key('documents');
-    w.value(o.documents);
-    w.key('title');
-    w.string(o.title);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeUploadAvatar(object as UploadAvatar, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -185,4 +180,15 @@ class _$UploadAvatarDto extends DtoSchema<UploadAvatar>
       'required': <dynamic>['avatar'],
     };
   }
+}
+
+/// Writes the JSON of [UploadAvatar], as `toMap()` gives it.
+void $writeUploadAvatar(UploadAvatar o, JsonWriter w) {
+  w.run(_$UploadAvatarDto._j0);
+  w.value(o.avatar);
+  w.run(_$UploadAvatarDto._j1);
+  w.value(o.documents);
+  w.run(_$UploadAvatarDto._j2);
+  w.string(o.title);
+  w.run(_$UploadAvatarDto._j3);
 }

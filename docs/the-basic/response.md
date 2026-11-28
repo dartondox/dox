@@ -69,9 +69,12 @@ The writer has these methods:
 | `string(value)` | a text, or `null` |
 | `integer(value)` | a whole number, or `null` |
 | `dateTime(value)` | a date as ISO 8601 text, or `null` |
-| `value(value)` | any other value: a `double`, a `bool`, a `List`, a `Map` or an object |
+| `boolean(value)` | `true`, `false` or `null` |
+| `value(value)` | any other value: a `double`, a `List`, a `Map` or an object |
 
 Write one value after each `key()`. The writer adds the commas.
+
+The writer also has `run()`. It writes a fixed part of JSON with no check and no comma. The generated code of a DTO uses it. Do not use it in your own code: use `key()`.
 
 You do not write this method for a model or for a [DTO](dto.md#returning-a-dto). The generator writes it.
 

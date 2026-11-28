@@ -17,6 +17,12 @@ class _$CreatePostDto extends DtoSchema<CreatePost>
 
   static const Map<String, String> _m = <String, String>{};
 
+  static final JsonRun _j0 = JsonRun('{"slug":');
+  static final JsonRun _j1 = JsonRun(',"scores":[');
+  static final JsonRun _j2 = JsonRun('],"handle":');
+  static final JsonRun _j3 = JsonRun(',"handles":[');
+  static final JsonRun _j4 = JsonRun(']}');
+
   @override
   Type get type => CreatePost;
 
@@ -153,20 +159,8 @@ class _$CreatePostDto extends DtoSchema<CreatePost>
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    CreatePost o = object as CreatePost;
-    w.startObject();
-    w.key('slug');
-    w.string(o.slug);
-    w.key('scores');
-    w.value(o.scores);
-    w.key('handle');
-    w.string(o.handle);
-    w.key('handles');
-    w.value(o.handles);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeCreatePost(object as CreatePost, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     Map<String, dynamic> j = <String, dynamic>{
@@ -210,6 +204,31 @@ class _$CreatePostDto extends DtoSchema<CreatePost>
     ], const NotTaken().toJsonSchema());
     return j;
   }
+}
+
+/// Writes the JSON of [CreatePost], as `toMap()` gives it.
+void $writeCreatePost(CreatePost o, JsonWriter w) {
+  w.run(_$CreatePostDto._j0);
+  w.string(o.slug);
+  w.run(_$CreatePostDto._j1);
+  {
+    List<int> l1 = o.scores;
+    for (int i = 0; i < l1.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.integer(l1[i]);
+    }
+  }
+  w.run(_$CreatePostDto._j2);
+  w.string(o.handle);
+  w.run(_$CreatePostDto._j3);
+  {
+    List<String> l3 = o.handles;
+    for (int i = 0; i < l3.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.string(l3[i]);
+    }
+  }
+  w.run(_$CreatePostDto._j4);
 }
 
 /// The checks, the converter and the JSON Schema of [ListPosts].
@@ -327,24 +346,8 @@ class _$ListPostsDto extends DtoSchema<ListPosts> implements JsonObjectWriter {
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    ListPosts o = object as ListPosts;
-    w.startObject();
-    w.key('page');
-    w.integer(o.page);
-    if (o.days case Maybe<int>(isPresent: true, value: int g1)) {
-      w.key('days');
-      w.integer(g1);
-    }
-    w.key('handle');
-    w.string(o.handle);
-    w.key('color');
-    w.string(o.color);
-    w.key('note');
-    w.string(o.note);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeListPosts(object as ListPosts, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     Map<String, dynamic> j = <String, dynamic>{
@@ -379,4 +382,22 @@ class _$ListPostsDto extends DtoSchema<ListPosts> implements JsonObjectWriter {
     ], const HexColor(short: true).toJsonSchema());
     return j;
   }
+}
+
+/// Writes the JSON of [ListPosts], as `toMap()` gives it.
+void $writeListPosts(ListPosts o, JsonWriter w) {
+  w.startObject();
+  w.key('page');
+  w.integer(o.page);
+  if (o.days case Maybe<int>(isPresent: true, value: int g1)) {
+    w.key('days');
+    w.integer(g1);
+  }
+  w.key('handle');
+  w.string(o.handle);
+  w.key('color');
+  w.string(o.color);
+  w.key('note');
+  w.string(o.note);
+  w.endObject();
 }

@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Faster: the JSON encoder writes a whole number two digits at a time, and it writes a `JsonRun` 8 bytes at a time. With the new dox_builder, a `@Dto` in a response is 2.2 times faster to encode. Run `dart run build_runner build` to get the new code.
 - Fix: a cookie that the native server refuses (for example a line break in its domain) made the request get no answer. The first answer failed because of the cookie, and the plain 500 that Dox then sends kept the cookie and failed the same way. The plain 500 now also removes the cookies, so the client gets the 500.
 - New: `CoreFlags.sdkJsonEncoder` (off by default). Dox then encodes JSON with `JsonUtf8Encoder` of the Dart SDK, as it did before it had its own encoder. The JSON is the same, but it is slower. Turn it on only if you think that the Dox encoder gives a wrong response. A class that only has `writeJson()` then also needs a `toJson()`. `CoreFlags.all()` does not turn it on.
 - New: `AppConfig(compressLevel:)`, the gzip level of `compress`, from 1 (fast) to 12 (small). The default is 1. With dox_http_native, gzip now uses libdeflate: for a 6.7 kB JSON body, it goes from 35.7 µs to 13.5 µs, and the body is 1,421 bytes, not 1,271 bytes. Set `compressLevel: 6` to get about the same size as before. The server does not start with a level that is not 1 to 12.

@@ -16,6 +16,10 @@ class _$AddressDto extends DtoSchema<Address> implements JsonObjectWriter {
 
   static const Map<String, String> _m = <String, String>{};
 
+  static final JsonRun _j0 = JsonRun('{"city":');
+  static final JsonRun _j1 = JsonRun(',"post_code":');
+  static final JsonRun _j2 = JsonRun('}');
+
   @override
   Type get type => Address;
 
@@ -82,16 +86,8 @@ class _$AddressDto extends DtoSchema<Address> implements JsonObjectWriter {
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    Address o = object as Address;
-    w.startObject();
-    w.key('city');
-    w.string(o.city);
-    w.key('post_code');
-    w.string(o.postCode);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeAddress(object as Address, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -110,6 +106,15 @@ class _$AddressDto extends DtoSchema<Address> implements JsonObjectWriter {
   }
 }
 
+/// Writes the JSON of [Address], as `toMap()` gives it.
+void $writeAddress(Address o, JsonWriter w) {
+  w.run(_$AddressDto._j0);
+  w.string(o.city);
+  w.run(_$AddressDto._j1);
+  w.string(o.postCode);
+  w.run(_$AddressDto._j2);
+}
+
 /// The checks, the converter and the JSON Schema of [OrderItem].
 const DtoSchema<OrderItem> $OrderItemDto = _$OrderItemDto();
 
@@ -117,6 +122,10 @@ class _$OrderItemDto extends DtoSchema<OrderItem> implements JsonObjectWriter {
   const _$OrderItemDto();
 
   static const Map<String, String> _m = <String, String>{};
+
+  static final JsonRun _j0 = JsonRun('{"name":');
+  static final JsonRun _j1 = JsonRun(',"quantity":');
+  static final JsonRun _j2 = JsonRun('}');
 
   @override
   Type get type => OrderItem;
@@ -176,16 +185,8 @@ class _$OrderItemDto extends DtoSchema<OrderItem> implements JsonObjectWriter {
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    OrderItem o = object as OrderItem;
-    w.startObject();
-    w.key('name');
-    w.string(o.name);
-    w.key('quantity');
-    w.integer(o.quantity);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeOrderItem(object as OrderItem, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -200,6 +201,15 @@ class _$OrderItemDto extends DtoSchema<OrderItem> implements JsonObjectWriter {
   }
 }
 
+/// Writes the JSON of [OrderItem], as `toMap()` gives it.
+void $writeOrderItem(OrderItem o, JsonWriter w) {
+  w.run(_$OrderItemDto._j0);
+  w.string(o.name);
+  w.run(_$OrderItemDto._j1);
+  w.integer(o.quantity);
+  w.run(_$OrderItemDto._j2);
+}
+
 /// The checks, the converter and the JSON Schema of [CreateOrder].
 const DtoSchema<CreateOrder> $CreateOrderDto = _$CreateOrderDto();
 
@@ -208,6 +218,11 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder>
   const _$CreateOrderDto();
 
   static const Map<String, String> _m = <String, String>{};
+
+  static final JsonRun _j0 = JsonRun('{"address":');
+  static final JsonRun _j1 = JsonRun(',"items":[');
+  static final JsonRun _j2 = JsonRun('],"billing":');
+  static final JsonRun _j3 = JsonRun('}');
 
   @override
   Type get type => CreateOrder;
@@ -329,18 +344,8 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder>
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    CreateOrder o = object as CreateOrder;
-    w.startObject();
-    w.key('address');
-    w.value(o.address);
-    w.key('items');
-    w.value(o.items);
-    w.key('billing');
-    w.value(o.billing);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeCreateOrder(object as CreateOrder, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -392,6 +397,23 @@ class _$CreateOrderDto extends DtoSchema<CreateOrder>
   }
 }
 
+/// Writes the JSON of [CreateOrder], as `toMap()` gives it.
+void $writeCreateOrder(CreateOrder o, JsonWriter w) {
+  w.run(_$CreateOrderDto._j0);
+  $writeAddress(o.address, w);
+  w.run(_$CreateOrderDto._j1);
+  {
+    List<OrderItem> l1 = o.items;
+    for (int i = 0; i < l1.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      $writeOrderItem(l1[i], w);
+    }
+  }
+  w.run(_$CreateOrderDto._j2);
+  w.value(o.billing);
+  w.run(_$CreateOrderDto._j3);
+}
+
 /// The checks, the converter and the JSON Schema of [SignUp].
 const DtoSchema<SignUp> $SignUpDto = _$SignUpDto();
 
@@ -399,6 +421,12 @@ class _$SignUpDto extends DtoSchema<SignUp> implements JsonObjectWriter {
   const _$SignUpDto();
 
   static const Map<String, String> _m = <String, String>{};
+
+  static final JsonRun _j0 = JsonRun('{"password":');
+  static final JsonRun _j1 = JsonRun(',"password_confirmation":');
+  static final JsonRun _j2 = JsonRun(',"starts_at":');
+  static final JsonRun _j3 = JsonRun(',"ends_at":');
+  static final JsonRun _j4 = JsonRun('}');
 
   @override
   Type get type => SignUp;
@@ -496,20 +524,8 @@ class _$SignUpDto extends DtoSchema<SignUp> implements JsonObjectWriter {
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    SignUp o = object as SignUp;
-    w.startObject();
-    w.key('password');
-    w.string(o.password);
-    w.key('password_confirmation');
-    w.string(o.passwordConfirmation);
-    w.key('starts_at');
-    w.dateTime(o.startsAt);
-    w.key('ends_at');
-    w.dateTime(o.endsAt);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeSignUp(object as SignUp, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -532,6 +548,19 @@ class _$SignUpDto extends DtoSchema<SignUp> implements JsonObjectWriter {
   }
 }
 
+/// Writes the JSON of [SignUp], as `toMap()` gives it.
+void $writeSignUp(SignUp o, JsonWriter w) {
+  w.run(_$SignUpDto._j0);
+  w.string(o.password);
+  w.run(_$SignUpDto._j1);
+  w.string(o.passwordConfirmation);
+  w.run(_$SignUpDto._j2);
+  w.dateTime(o.startsAt);
+  w.run(_$SignUpDto._j3);
+  w.dateTime(o.endsAt);
+  w.run(_$SignUpDto._j4);
+}
+
 /// The checks, the converter and the JSON Schema of [AsyncCheck].
 const DtoSchema<AsyncCheck> $AsyncCheckDto = _$AsyncCheckDto();
 
@@ -540,6 +569,9 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck>
   const _$AsyncCheckDto();
 
   static const Map<String, String> _m = <String, String>{};
+
+  static final JsonRun _j0 = JsonRun('{"code":');
+  static final JsonRun _j1 = JsonRun('}');
 
   @override
   Type get type => AsyncCheck;
@@ -589,14 +621,8 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck>
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    AsyncCheck o = object as AsyncCheck;
-    w.startObject();
-    w.key('code');
-    w.string(o.code);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeAsyncCheck(object as AsyncCheck, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -608,4 +634,11 @@ class _$AsyncCheckDto extends DtoSchema<AsyncCheck>
       'required': <dynamic>['code'],
     };
   }
+}
+
+/// Writes the JSON of [AsyncCheck], as `toMap()` gives it.
+void $writeAsyncCheck(AsyncCheck o, JsonWriter w) {
+  w.run(_$AsyncCheckDto._j0);
+  w.string(o.code);
+  w.run(_$AsyncCheckDto._j1);
 }

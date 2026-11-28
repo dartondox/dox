@@ -1423,14 +1423,21 @@ class View {
         expect(
           out,
           contains(
-            '@overridevoidwriteObject(Objectobject,JsonWriterw){'
-            'Viewo=objectasView;'
+            '@overridevoidwriteObject(Objectobject,JsonWriterw)=>'
+            r'$writeView(objectasView,w);',
+          ),
+        );
+        // a Maybe field: each key is written with w.key()
+        expect(
+          out,
+          contains(
+            r'void$writeView(Viewo,JsonWriterw){'
             'w.startObject();'
             "w.key('id');w.integer(o.id);"
             "w.key('first_name');w.string(o.firstName);"
             "w.key('note');w.string(o.note);"
             "w.key('price');w.value(o.price);"
-            "w.key('active');w.value(o.active);"
+            "w.key('active');w.boolean(o.active);"
             "w.key('sold_at');w.dateTime(o.soldAt);"
             "w.key('role');w.string(o.role.name);"
             "w.key('other');w.string(o.other?.name);"
@@ -1438,8 +1445,8 @@ class View {
             // a date in a list: the value of toMap()
             "w.key('dates');w.value(<dynamic>[for(DateTimex0ino.dates)"
             'x0.toIso8601String()]);'
-            // a nested DTO: the encoder finds its writer
-            "w.key('inner');w.value(o.inner);"
+            // a nested DTO: its function is called
+            "w.key('inner');\$writeInner(o.inner,w);"
             "w.key('inners');w.value(o.inners);"
             // a nested DTO with its own toJson(): the map of its schema
             "w.key('own');w.value(\$OwnJsonDto.toMap(o.own));"
@@ -1491,7 +1498,139 @@ class Holder {
         // inside another DTO it is the map of its schema, as in toMap()
         expect(
           out,
-          contains(r"w.key('inner');w.value($FromMixinDto.toMap(o.inner));"),
+          contains(
+            r'w.run(_$HolderDto._j0);w.value($FromMixinDto.toMap(o.inner));',
+          ),
+        );
+      });
+
+      test('a nested DTO of a file with no JsonRun: the encoder finds '
+          'its writer', () async {
+        String out = (await _generate(
+          '''
+@Dto()
+class Outer {
+  final Inner inner;
+  final List<Inner> all;
+  const Outer({required this.inner, required this.all});
+}
+''',
+          imports: "$import\nimport 'other.dart';",
+          packages: annotation,
+          files: <String, String>{
+            // dox_validation only: this file gets no $writeInner
+            'a|lib/other.dart': '''
+import 'package:dox_validation/dox_validation.dart';
+@Dto()
+class Inner {
+  final String name;
+  const Inner({required this.name});
+}
+''',
+          },
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(out, isNot(contains(r'$writeInner')));
+        expect(
+          out,
+          contains(
+            r'w.run(_$OuterDto._j0);w.value(o.inner);'
+            r'w.run(_$OuterDto._j1);w.value(o.all);',
+          ),
+        );
+      });
+
+      test('no Maybe field: the fixed parts are runs', () async {
+        String out = (await _generate(
+          r'''
+enum Role { admin, user }
+
+@Dto()
+class Rating {
+  final int score;
+  const Rating({required this.score});
+}
+
+@Dto()
+class Item {
+  final int id;
+  final List<String> tags;
+  final Rating rating;
+  final Rating? best;
+  final List<Rating> all;
+  final List<List<int>> grid;
+  final bool active;
+  final List<Role> roles;
+
+  const Item({
+    required this.id,
+    required this.tags,
+    required this.rating,
+    required this.all,
+    required this.grid,
+    required this.active,
+    required this.roles,
+    this.best,
+  });
+}
+
+@Dto()
+class Page {
+  final List<Item>? items;
+  final int count;
+  const Page({required this.count, this.items});
+}
+''',
+          imports: import,
+          packages: annotation,
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(
+          out,
+          contains(
+            r'void$writeItem(Itemo,JsonWriterw){'
+            r'w.run(_$ItemDto._j0);w.integer(o.id);'
+            // a list of texts: a loop, with no look up
+            r'w.run(_$ItemDto._j1);'
+            '{List<String>l1=o.tags;for(inti=0;i<l1.length;i++)'
+            '{if(i>0)w.run(JsonRun.comma);w.string(l1[i]);}}'
+            // a nested DTO: its function is called
+            r'w.run(_$ItemDto._j2);$writeRating(o.rating,w);'
+            // a nested DTO that can be null: the encoder finds its writer
+            r'w.run(_$ItemDto._j3);w.value(o.best);'
+            r'w.run(_$ItemDto._j4);'
+            '{List<Rating>l4=o.all;for(inti=0;i<l4.length;i++)'
+            r'{if(i>0)w.run(JsonRun.comma);$writeRating(l4[i],w);}}'
+            // a list of lists: the encoder writes it
+            r'w.run(_$ItemDto._j5);w.value(o.grid);'
+            r'w.run(_$ItemDto._j6);w.boolean(o.active);'
+            r'w.run(_$ItemDto._j7);'
+            '{List<Role>l7=o.roles;for(inti=0;i<l7.length;i++)'
+            '{if(i>0)w.run(JsonRun.comma);w.string(l7[i].name);}}'
+            r'w.run(_$ItemDto._j8);}',
+          ),
+        );
+        // a closing bracket and the next key are one run
+        expect(
+          out,
+          contains(
+            'staticfinalJsonRun_j0=JsonRun(\'{"id":\');'
+            'staticfinalJsonRun_j1=JsonRun(\',"tags":[\');'
+            'staticfinalJsonRun_j2=JsonRun(\'],"rating":\');'
+            'staticfinalJsonRun_j3=JsonRun(\',"best":\');'
+            'staticfinalJsonRun_j4=JsonRun(\',"all":[\');'
+            'staticfinalJsonRun_j5=JsonRun(\'],"grid":\');'
+            'staticfinalJsonRun_j6=JsonRun(\',"active":\');'
+            'staticfinalJsonRun_j7=JsonRun(\',"roles":[\');'
+            'staticfinalJsonRun_j8=JsonRun(\']}\');',
+          ),
+        );
+        // a list that can be null: the encoder writes it
+        expect(
+          out,
+          contains(
+            r'void$writePage(Pageo,JsonWriterw){w.run(_$PageDto._j0);'
+            r'w.value(o.items);w.run(_$PageDto._j1);w.integer(o.count);'
+            r'w.run(_$PageDto._j2);}',
+          ),
         );
       });
 

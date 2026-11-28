@@ -135,10 +135,15 @@ class JsonBytesEncoder implements JsonWriter {
     }
   }
 
-  /// Makes room for [count] more bytes.
+  /// Makes room for [count] more bytes. It is called for each write, so
+  /// the check is inlined and the rare growth is not.
+  @pragma('vm:prefer-inline')
   void _reserve(int count) {
-    int needed = _length + count;
-    if (needed <= _buffer.length) return;
+    if (_length + count > _buffer.length) _grow(_length + count);
+  }
+
+  @pragma('vm:never-inline')
+  void _grow(int needed) {
     int size = _buffer.length * 2;
     while (size < needed) {
       size *= 2;
@@ -284,7 +289,40 @@ class JsonBytesEncoder implements JsonWriter {
   }
 
   @override
+  void boolean(bool? value) {
+    run(switch (value) {
+      true => _true,
+      false => _false,
+      null => _null,
+    });
+  }
+
+  static final JsonRun _true = JsonRun('true');
+  static final JsonRun _false = JsonRun('false');
+  static final JsonRun _null = JsonRun('null');
+
+  @override
   void value(Object? value) => _writeObject(value);
+
+  /// Writes whole words: the bytes after the run are written over by the
+  /// next write.
+  /// Most runs are a key with its comma: 1 or 2 words, with no loop.
+  @override
+  void run(JsonRun run) {
+    Int64List words = run.words;
+    int count = words.length;
+    _reserve(count * 8);
+    ByteData data = _data;
+    int at = _length;
+    data.setInt64(at, words[0], Endian.little);
+    if (count > 1) {
+      data.setInt64(at + 8, words[1], Endian.little);
+      for (int i = 2; i < count; i++) {
+        data.setInt64(at + i * 8, words[i], Endian.little);
+      }
+    }
+    _length = at + run.length;
+  }
 
   /// Writes a number, a `String`, a `bool`, `null`, a `List` or a `Map`.
   /// Returns false for any other value, and for a map with a key that is
@@ -452,7 +490,8 @@ class JsonBytesEncoder implements JsonWriter {
     _length = at;
   }
 
-  /// Writes the digits of [value], with no `String` in between.
+  /// Writes the digits of [value], with no `String` in between. It
+  /// writes two digits in each step, from [_pairs].
   void _writeInt(int value) {
     if (value < 0) {
       // the lowest int has no positive twin
@@ -466,23 +505,52 @@ class JsonBytesEncoder implements JsonWriter {
     } else {
       _reserve(19);
     }
+    Uint8List buffer = _buffer;
     if (value < 10) {
-      _buffer[_length++] = _zero + value;
+      buffer[_length++] = _zero + value;
       return;
     }
-    int digits = 0;
-    for (int rest = value; rest > 0; rest ~/= 10) {
-      digits++;
-    }
-    Uint8List buffer = _buffer;
-    int at = _length + digits;
+    int at = _length + _digits(value);
     _length = at;
-    while (value > 0) {
-      int next = value ~/ 10;
-      buffer[--at] = _zero + (value - next * 10);
+    Uint8List pairs = _pairs;
+    while (value >= 100) {
+      int next = value ~/ 100;
+      int pair = (value - next * 100) * 2;
+      buffer[--at] = pairs[pair + 1];
+      buffer[--at] = pairs[pair];
       value = next;
     }
+    if (value >= 10) {
+      buffer[--at] = pairs[value * 2 + 1];
+      buffer[--at] = pairs[value * 2];
+    } else {
+      buffer[--at] = _zero + value;
+    }
   }
+
+  /// the count of digits of [value], which is 10 or more
+  static int _digits(int value) {
+    if (value < 100) return 2;
+    if (value < 1000) return 3;
+    if (value < 10000) return 4;
+    if (value < 100000) return 5;
+    if (value < 1000000) return 6;
+    int digits = 7;
+    for (int rest = value ~/ 10000000; rest > 0; rest ~/= 10) {
+      digits++;
+    }
+    return digits;
+  }
+
+  /// the two digits of 0 to 99: `00`, `01` ... `99`
+  static final Uint8List _pairs = () {
+    Uint8List pairs = Uint8List(200);
+    for (int i = 0; i < 100; i++) {
+      pairs[i * 2] = _zero + i ~/ 10;
+      pairs[i * 2 + 1] = _zero + i % 10;
+    }
+    return pairs;
+  }();
 
   /// Writes [text] in quotes. Plain ASCII, the usual case, is copied with
   /// one check per character.
@@ -543,8 +611,11 @@ class JsonBytesEncoder implements JsonWriter {
       i++;
     }
     _length = at;
-    if (i < count) _writeEscaped(text, i);
-    _reserve(1);
+    if (i < count) {
+      _writeEscaped(text, i);
+      _reserve(1);
+    }
+    // plain text: the room for the quote was made above
     _buffer[_length++] = _quote;
   }
 

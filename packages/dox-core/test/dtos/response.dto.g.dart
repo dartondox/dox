@@ -74,6 +74,13 @@ class _$ProductViewDto extends DtoSchema<ProductView>
 
   static const Map<String, String> _m = <String, String>{};
 
+  static final JsonRun _j0 = JsonRun('{"id":');
+  static final JsonRun _j1 = JsonRun(',"product_name":');
+  static final JsonRun _j2 = JsonRun(',"price":');
+  static final JsonRun _j3 = JsonRun(',"in_stock":');
+  static final JsonRun _j4 = JsonRun(',"sold_at":');
+  static final JsonRun _j5 = JsonRun('}');
+
   @override
   Type get type => ProductView;
 
@@ -150,22 +157,8 @@ class _$ProductViewDto extends DtoSchema<ProductView>
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    ProductView o = object as ProductView;
-    w.startObject();
-    w.key('id');
-    w.integer(o.id);
-    w.key('product_name');
-    w.string(o.productName);
-    w.key('price');
-    w.value(o.price);
-    w.key('in_stock');
-    w.value(o.inStock);
-    w.key('sold_at');
-    w.dateTime(o.soldAt);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeProductView(object as ProductView, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -186,6 +179,21 @@ class _$ProductViewDto extends DtoSchema<ProductView>
   }
 }
 
+/// Writes the JSON of [ProductView], as `toMap()` gives it.
+void $writeProductView(ProductView o, JsonWriter w) {
+  w.run(_$ProductViewDto._j0);
+  w.integer(o.id);
+  w.run(_$ProductViewDto._j1);
+  w.string(o.productName);
+  w.run(_$ProductViewDto._j2);
+  w.value(o.price);
+  w.run(_$ProductViewDto._j3);
+  w.boolean(o.inStock);
+  w.run(_$ProductViewDto._j4);
+  w.dateTime(o.soldAt);
+  w.run(_$ProductViewDto._j5);
+}
+
 /// The checks, the converter and the JSON Schema of [MixedView].
 const DtoSchema<MixedView> $MixedViewDto = _$MixedViewDto();
 
@@ -193,6 +201,17 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   const _$MixedViewDto();
 
   static const Map<String, String> _m = <String, String>{};
+
+  static final JsonRun _j0 = JsonRun('{"dates":[');
+  static final JsonRun _j1 = JsonRun('],"roles":[');
+  static final JsonRun _j2 = JsonRun('],"days":');
+  static final JsonRun _j3 = JsonRun(',"grid":');
+  static final JsonRun _j4 = JsonRun(',"own":');
+  static final JsonRun _j5 = JsonRun(',"owns":');
+  static final JsonRun _j6 = JsonRun(',"product":');
+  static final JsonRun _j7 = JsonRun(',"products":[');
+  static final JsonRun _j8 = JsonRun('],"by_name":');
+  static final JsonRun _j9 = JsonRun('}');
 
   @override
   Type get type => MixedView;
@@ -507,35 +526,8 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) {
-    MixedView o = object as MixedView;
-    w.startObject();
-    w.key('dates');
-    w.value(<dynamic>[for (DateTime x0 in o.dates) x0.toIso8601String()]);
-    w.key('roles');
-    w.value(<dynamic>[for (Role x0 in o.roles) x0.name]);
-    w.key('days');
-    w.value(<String, dynamic>{
-      for (MapEntry<String, DateTime> x0 in o.days.entries)
-        x0.key: x0.value.toIso8601String(),
-    });
-    w.key('grid');
-    w.value(<dynamic>[
-      for (List<Role> x0 in o.grid) <dynamic>[for (Role x1 in x0) x1.name],
-    ]);
-    w.key('own');
-    w.value($OwnJsonDto.toMap(o.own));
-    w.key('owns');
-    w.value(<dynamic>[for (OwnJson x0 in o.owns) $OwnJsonDto.toMap(x0)]);
-    w.key('product');
-    w.value(o.product);
-    w.key('products');
-    w.value(o.products);
-    w.key('by_name');
-    w.value(o.byName);
-    w.endObject();
-  }
-
+  void writeObject(Object object, JsonWriter w) =>
+      $writeMixedView(object as MixedView, w);
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -629,4 +621,404 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
       },
     };
   }
+}
+
+/// Writes the JSON of [MixedView], as `toMap()` gives it.
+void $writeMixedView(MixedView o, JsonWriter w) {
+  w.run(_$MixedViewDto._j0);
+  {
+    List<DateTime> l0 = o.dates;
+    for (int i = 0; i < l0.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.dateTime(l0[i]);
+    }
+  }
+  w.run(_$MixedViewDto._j1);
+  {
+    List<Role> l1 = o.roles;
+    for (int i = 0; i < l1.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.string(l1[i].name);
+    }
+  }
+  w.run(_$MixedViewDto._j2);
+  w.value(<String, dynamic>{
+    for (MapEntry<String, DateTime> x0 in o.days.entries)
+      x0.key: x0.value.toIso8601String(),
+  });
+  w.run(_$MixedViewDto._j3);
+  w.value(<dynamic>[
+    for (List<Role> x0 in o.grid) <dynamic>[for (Role x1 in x0) x1.name],
+  ]);
+  w.run(_$MixedViewDto._j4);
+  w.value($OwnJsonDto.toMap(o.own));
+  w.run(_$MixedViewDto._j5);
+  w.value(<dynamic>[for (OwnJson x0 in o.owns) $OwnJsonDto.toMap(x0)]);
+  w.run(_$MixedViewDto._j6);
+  w.value(o.product);
+  w.run(_$MixedViewDto._j7);
+  {
+    List<ProductView> l7 = o.products;
+    for (int i = 0; i < l7.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      $writeProductView(l7[i], w);
+    }
+  }
+  w.run(_$MixedViewDto._j8);
+  w.value(o.byName);
+  w.run(_$MixedViewDto._j9);
+}
+
+/// The checks, the converter and the JSON Schema of [RunsView].
+const DtoSchema<RunsView> $RunsViewDto = _$RunsViewDto();
+
+class _$RunsViewDto extends DtoSchema<RunsView> implements JsonObjectWriter {
+  const _$RunsViewDto();
+
+  static const Map<String, String> _m = <String, String>{};
+
+  static final JsonRun _j0 = JsonRun('{"id":');
+  static final JsonRun _j1 = JsonRun(',"tags":[');
+  static final JsonRun _j2 = JsonRun('],"notes":[');
+  static final JsonRun _j3 = JsonRun('],"numbers":[');
+  static final JsonRun _j4 = JsonRun('],"flags":[');
+  static final JsonRun _j5 = JsonRun('],"main":');
+  static final JsonRun _j6 = JsonRun(',"products":[');
+  static final JsonRun _j7 = JsonRun('],"a \\"key\\" é \\\\ \$x":');
+  static final JsonRun _j8 = JsonRun(',"active":');
+  static final JsonRun _j9 = JsonRun('}');
+
+  @override
+  Type get type => RunsView;
+
+  @override
+  String get name => 'RunsView';
+
+  @override
+  bool get usesRequiredWhen => false;
+
+  @override
+  RunsView? convert(Object? input, DtoState s, List<Object> p) {
+    if (input is! Map) {
+      s.notObject(input, p, _m);
+      return null;
+    }
+    int e = s.issues.length;
+    // id: int
+    Object? c0;
+    c0 = s.integer(s.read(input, 'id'), p, 'id', _m);
+    if (c0 == null || c0 is Undefined) s.required(p, 'id', _m);
+    // tags: List<String>
+    Object? c1;
+    c1 = s.list(s.read(input, 'tags'), p, 'tags', _m);
+    if (c1 is List) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'tags'];
+      List<String> o0 = <String>[];
+      for (int i0 = 0; i0 < c1.length; i0++) {
+        Object? x0;
+        x0 = s.string(c1[i0], q0, i0, _m);
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, i0, _m);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as String);
+        }
+      }
+      c1 = s.issues.length != b0 ? invalid : o0;
+    }
+    if (c1 == null || c1 is Undefined || s.emptyList(c1)) {
+      s.required(p, 'tags', _m);
+      c1 = invalid;
+    }
+    // notes: List<String?>
+    Object? c2;
+    c2 = s.list(s.read(input, 'notes'), p, 'notes', _m);
+    if (c2 is List) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'notes'];
+      List<String?> o0 = <String?>[];
+      for (int i0 = 0; i0 < c2.length; i0++) {
+        Object? x0;
+        x0 = s.string(c2[i0], q0, i0, _m);
+        if (x0 == null || x0 is Undefined) {
+          o0.add(null);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as String?);
+        }
+      }
+      c2 = s.issues.length != b0 ? invalid : o0;
+    }
+    if (c2 == null || c2 is Undefined || s.emptyList(c2)) {
+      s.required(p, 'notes', _m);
+      c2 = invalid;
+    }
+    // numbers: List<int>
+    Object? c3;
+    c3 = s.list(s.read(input, 'numbers'), p, 'numbers', _m);
+    if (c3 is List) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'numbers'];
+      List<int> o0 = <int>[];
+      for (int i0 = 0; i0 < c3.length; i0++) {
+        Object? x0;
+        x0 = s.integer(c3[i0], q0, i0, _m);
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, i0, _m);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as int);
+        }
+      }
+      c3 = s.issues.length != b0 ? invalid : o0;
+    }
+    if (c3 == null || c3 is Undefined || s.emptyList(c3)) {
+      s.required(p, 'numbers', _m);
+      c3 = invalid;
+    }
+    // flags: List<bool>
+    Object? c4;
+    c4 = s.list(s.read(input, 'flags'), p, 'flags', _m);
+    if (c4 is List) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'flags'];
+      List<bool> o0 = <bool>[];
+      for (int i0 = 0; i0 < c4.length; i0++) {
+        Object? x0;
+        x0 = s.boolean(c4[i0], q0, i0, _m);
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, i0, _m);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as bool);
+        }
+      }
+      c4 = s.issues.length != b0 ? invalid : o0;
+    }
+    if (c4 == null || c4 is Undefined || s.emptyList(c4)) {
+      s.required(p, 'flags', _m);
+      c4 = invalid;
+    }
+    // main: ProductView
+    Object? c5;
+    c5 = s.object(s.read(input, 'main'), p, 'main', _m);
+    if (c5 is Map) {
+      c5 = $ProductViewDto.convert(c5, s, <Object>[...p, 'main']) ?? invalid;
+    }
+    if (c5 == null || c5 is Undefined) s.required(p, 'main', _m);
+    // products: List<ProductView>
+    Object? c6;
+    c6 = s.list(s.read(input, 'products'), p, 'products', _m);
+    if (c6 is List) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'products'];
+      List<ProductView> o0 = <ProductView>[];
+      for (int i0 = 0; i0 < c6.length; i0++) {
+        Object? x0;
+        x0 = s.object(c6[i0], q0, i0, _m);
+        if (x0 is Map) {
+          x0 = $ProductViewDto.convert(x0, s, <Object>[...q0, i0]) ?? invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, i0, _m);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as ProductView);
+        }
+      }
+      c6 = s.issues.length != b0 ? invalid : o0;
+    }
+    if (c6 == null || c6 is Undefined || s.emptyList(c6)) {
+      s.required(p, 'products', _m);
+      c6 = invalid;
+    }
+    // odd: String
+    Object? c7;
+    c7 = s.string(s.read(input, 'a "key" é \\ \$x'), p, 'a "key" é \\ \$x', _m);
+    if (c7 == null || c7 is Undefined) s.required(p, 'a "key" é \\ \$x', _m);
+    // active: bool
+    Object? c8;
+    c8 = s.boolean(s.read(input, 'active'), p, 'active', _m);
+    if (c8 == null || c8 is Undefined) s.required(p, 'active', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
+    if (s.issues.length != e) return null;
+    return RunsView(
+      id: c0 as int,
+      tags: c1 as List<String>,
+      notes: c2 as List<String?>,
+      numbers: c3 as List<int>,
+      flags: c4 as List<bool>,
+      main: c5 as ProductView,
+      products: c6 as List<ProductView>,
+      odd: c7 as String,
+      active: c8 as bool,
+    );
+  }
+
+  @override
+  RunsView fromMap(Map<String, dynamic> m) {
+    return RunsView(
+      id: (m['id'] as num).toInt(),
+      tags: <String>[
+        for (Object? x0 in m['tags'] as List<dynamic>) x0 as String,
+      ],
+      notes: <String?>[
+        for (Object? x0 in m['notes'] as List<dynamic>)
+          x0 == null ? null : (x0 as String),
+      ],
+      numbers: <int>[
+        for (Object? x0 in m['numbers'] as List<dynamic>) (x0 as num).toInt(),
+      ],
+      flags: <bool>[for (Object? x0 in m['flags'] as List<dynamic>) x0 as bool],
+      main: $ProductViewDto.fromMap(m['main'] as Map<String, dynamic>),
+      products: <ProductView>[
+        for (Object? x0 in m['products'] as List<dynamic>)
+          $ProductViewDto.fromMap(x0 as Map<String, dynamic>),
+      ],
+      odd: m['a "key" é \\ \$x'] as String,
+      active: m['active'] as bool,
+    );
+  }
+
+  @override
+  Map<String, dynamic> toMap(RunsView o) {
+    int f0 = o.id;
+    List<String> f1 = o.tags;
+    List<String?> f2 = o.notes;
+    List<int> f3 = o.numbers;
+    List<bool> f4 = o.flags;
+    ProductView f5 = o.main;
+    List<ProductView> f6 = o.products;
+    String f7 = o.odd;
+    bool f8 = o.active;
+    return <String, dynamic>{
+      'id': f0,
+      'tags': f1,
+      'notes': f2,
+      'numbers': f3,
+      'flags': f4,
+      'main': $ProductViewDto.toMap(f5),
+      'products': <dynamic>[
+        for (ProductView x0 in f6) $ProductViewDto.toMap(x0),
+      ],
+      'a "key" é \\ \$x': f7,
+      'active': f8,
+    };
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter w) =>
+      $writeRunsView(object as RunsView, w);
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    return <String, dynamic>{
+      'type': 'object',
+      'title': 'RunsView',
+      'properties': <String, dynamic>{
+        'id': <String, dynamic>{'type': 'integer'},
+        'tags': <String, dynamic>{
+          'type': 'array',
+          'items': <String, dynamic>{'type': 'string'},
+        },
+        'notes': <String, dynamic>{
+          'type': 'array',
+          'items': <String, dynamic>{
+            'type': <dynamic>['string', 'null'],
+          },
+        },
+        'numbers': <String, dynamic>{
+          'type': 'array',
+          'items': <String, dynamic>{'type': 'integer'},
+        },
+        'flags': <String, dynamic>{
+          'type': 'array',
+          'items': <String, dynamic>{'type': 'boolean'},
+        },
+        'main': <String, dynamic>{'\$ref': '#/\$defs/ProductView'},
+        'products': <String, dynamic>{
+          'type': 'array',
+          'items': <String, dynamic>{'\$ref': '#/\$defs/ProductView'},
+        },
+        'a "key" é \\ \$x': <String, dynamic>{'type': 'string'},
+        'active': <String, dynamic>{'type': 'boolean'},
+      },
+      'required': <dynamic>[
+        'id',
+        'tags',
+        'notes',
+        'numbers',
+        'flags',
+        'main',
+        'products',
+        'a "key" é \\ \$x',
+        'active',
+      ],
+      '\$defs': <String, dynamic>{
+        'ProductView': <String, dynamic>{
+          'type': 'object',
+          'title': 'ProductView',
+          'properties': <String, dynamic>{
+            'id': <String, dynamic>{'type': 'integer'},
+            'product_name': <String, dynamic>{'type': 'string'},
+            'price': <String, dynamic>{'type': 'number'},
+            'in_stock': <String, dynamic>{'type': 'boolean'},
+            'sold_at': <String, dynamic>{
+              'type': <dynamic>['string', 'null'],
+              'format': 'date-time',
+            },
+          },
+          'required': <dynamic>['id', 'product_name', 'price', 'in_stock'],
+        },
+      },
+    };
+  }
+}
+
+/// Writes the JSON of [RunsView], as `toMap()` gives it.
+void $writeRunsView(RunsView o, JsonWriter w) {
+  w.run(_$RunsViewDto._j0);
+  w.integer(o.id);
+  w.run(_$RunsViewDto._j1);
+  {
+    List<String> l1 = o.tags;
+    for (int i = 0; i < l1.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.string(l1[i]);
+    }
+  }
+  w.run(_$RunsViewDto._j2);
+  {
+    List<String?> l2 = o.notes;
+    for (int i = 0; i < l2.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.string(l2[i]);
+    }
+  }
+  w.run(_$RunsViewDto._j3);
+  {
+    List<int> l3 = o.numbers;
+    for (int i = 0; i < l3.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.integer(l3[i]);
+    }
+  }
+  w.run(_$RunsViewDto._j4);
+  {
+    List<bool> l4 = o.flags;
+    for (int i = 0; i < l4.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      w.boolean(l4[i]);
+    }
+  }
+  w.run(_$RunsViewDto._j5);
+  $writeProductView(o.main, w);
+  w.run(_$RunsViewDto._j6);
+  {
+    List<ProductView> l6 = o.products;
+    for (int i = 0; i < l6.length; i++) {
+      if (i > 0) w.run(JsonRun.comma);
+      $writeProductView(l6[i], w);
+    }
+  }
+  w.run(_$RunsViewDto._j7);
+  w.string(o.odd);
+  w.run(_$RunsViewDto._j8);
+  w.boolean(o.active);
+  w.run(_$RunsViewDto._j9);
 }

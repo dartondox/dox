@@ -223,5 +223,78 @@ void main() {
         _same($AllTypesDto, all);
       }
     });
+
+    /// RunsView has no Maybe field: its fixed parts are runs, and its
+    /// lists and its nested DTO are written with direct calls.
+    test('random DTOs that are written with runs', () {
+      Random random = Random(5);
+      const List<String> texts = <String>[
+        '',
+        'plain',
+        'a "quote" \\ and \n \u0001',
+        'မြန်မာစာ 😀',
+        'a text that is longer than thirty two characters in total',
+      ];
+      String text() => texts[random.nextInt(texts.length)];
+      int number() => switch (random.nextInt(6)) {
+        0 => -9223372036854775807 - 1,
+        1 => 9223372036854775807,
+        2 => random.nextInt(100) - 50,
+        3 => -random.nextInt(1 << 32),
+        _ => random.nextInt(1 << 32) * random.nextInt(1 << 20),
+      };
+      ProductView product() => ProductView(
+        id: number(),
+        productName: text(),
+        price: random.nextInt(10000) / 100,
+        inStock: random.nextBool(),
+        soldAt: random.nextBool() ? null : DateTime.utc(2024, 1, 2),
+      );
+      for (int i = 0; i < 2000; i++) {
+        RunsView view = RunsView(
+          id: number(),
+          tags: <String>[for (int k = random.nextInt(4); k > 0; k--) text()],
+          notes: <String?>[
+            for (int k = random.nextInt(4); k > 0; k--)
+              random.nextBool() ? null : text(),
+          ],
+          numbers: <int>[for (int k = random.nextInt(5); k > 0; k--) number()],
+          flags: <bool>[
+            for (int k = random.nextInt(3); k > 0; k--) random.nextBool(),
+          ],
+          main: product(),
+          products: <ProductView>[
+            for (int k = random.nextInt(4); k > 0; k--) product(),
+          ],
+          odd: text(),
+          active: random.nextBool(),
+        );
+        _same($RunsViewDto, view);
+      }
+      expect(
+        _bytes(
+          RunsView(
+            id: 1,
+            tags: <String>['a', 'b'],
+            notes: <String?>[null],
+            numbers: <int>[],
+            flags: <bool>[true],
+            main: const ProductView(
+              id: 2,
+              productName: 'p',
+              price: 1,
+              inStock: false,
+            ),
+            products: <ProductView>[],
+            odd: 'o',
+            active: true,
+          ),
+        ),
+        '{"id":1,"tags":["a","b"],"notes":[null],"numbers":[],'
+        '"flags":[true],"main":{"id":2,"product_name":"p","price":1.0,'
+        '"in_stock":false,"sold_at":null},"products":[],'
+        r'"a \"key\" é \\ $x":"o","active":true}',
+      );
+    });
   });
 }
