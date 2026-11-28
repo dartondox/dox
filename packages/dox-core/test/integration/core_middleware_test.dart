@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:async';
 
 import 'package:crypto/crypto.dart' show Hmac, sha256;
@@ -86,6 +87,22 @@ class CoreRouter extends Router {
 
     // etag
     Route.get('/etag/text', <dynamic>[const ETag(), (DoxRequest req) => 'hi']);
+    Route.get('/etag/bytes', <dynamic>[
+      const ETag(),
+      (DoxRequest req) => response().contentBytes(utf8.encode(_mixed)),
+    ]);
+    Route.get('/etag/mixed', <dynamic>[
+      const ETag(),
+      (DoxRequest req) => _mixed,
+    ]);
+    Route.get(
+      '/bytes/plain',
+      (DoxRequest req) => response().contentBytes(utf8.encode(_mixed)),
+    );
+    Route.get('/bytes/replaced', <dynamic>[
+      _appendBang,
+      (DoxRequest req) => response().contentBytes(utf8.encode(_mixed)),
+    ]);
     Route.get('/etag/json', <dynamic>[
       const ETag(),
       (DoxRequest req) => <String, dynamic>{
@@ -162,6 +179,16 @@ Future<void> waitFor(bool Function() done) async {
   for (int i = 0; i < 100 && !done(); i++) {
     await Future<void>.delayed(const Duration(milliseconds: 10));
   }
+}
+
+/// text with ASCII, 2, 3 and 4 byte characters, and HTML to escape
+const String _mixed =
+    '<p>Tom & "Ann" \u2014 caf\u00E9 \u65E5\u672C \u{1F600}</p>';
+
+/// a middleware that reads the text of the answer and adds `!`
+Future<DoxResponse> _appendBang(DoxRequest req, Next next) async {
+  DoxResponse res = await next();
+  return res.content('${res.getContent()}!');
 }
 
 void main() {
@@ -247,6 +274,35 @@ void main() {
   });
 
   group('ETag', () {
+    test('a byte body gets the same tag as the same text', () async {
+      TestResponse text = (await client.get('/etag/mixed')).expectBody(_mixed);
+      TestResponse bytes = (await client.get('/etag/bytes')).expectBody(_mixed);
+      expect(bytes.header('etag'), text.header('etag'));
+      expect(bytes.header('content-type'), text.header('content-type'));
+      (await client.get(
+        '/etag/bytes',
+        headers: <String, String>{'If-None-Match': text.header('etag')!},
+      )).expectStatus(304).expectBody('');
+    });
+
+    test('ofUtf8 gives the tag of the decoded text, also for bad bytes', () {
+      List<List<int>> cases = <List<int>>[
+        <int>[],
+        utf8.encode(_mixed),
+        utf8.encode('a\u{1F600}b \u00FF \u0800 \uFFFF'),
+        <int>[0xFF, 0x41, 0xC0, 0x80, 0xE0, 0x80],
+        <int>[0xED, 0xA0, 0x80, 0xF4, 0x90, 0x80, 0x80, 0xF0, 0x9F],
+        <int>[0xE2, 0x82, 0x41, 0xC3],
+      ];
+      for (List<int> bytes in cases) {
+        expect(
+          ETag.ofUtf8(bytes),
+          ETag.of(utf8.decode(bytes, allowMalformed: true).codeUnits),
+          reason: '$bytes',
+        );
+      }
+    });
+
     test('a text answer gets a weak ETag, then 304', () async {
       TestResponse first = (await client.get('/etag/text')).expectBody('hi');
       String tag = first.header('etag')!;
@@ -429,6 +485,20 @@ void main() {
       await waitFor(() => terminated.length == 2);
       expect(terminated.last, 'terminate /end-broken 200');
       expect(reportedErrors.single, isA<StateError>());
+    });
+  });
+
+  group('contentBytes', () {
+    test('the bytes go out with the type a String body gets', () async {
+      TestResponse text = await client.get('/etag/mixed');
+      TestResponse res = (await client.get('/bytes/plain')).expectStatus(200);
+      res.expectBody(_mixed);
+      expect(res.header('content-type'), text.header('content-type'));
+      expect(res.header('content-length'), text.header('content-length'));
+    });
+
+    test('a middleware reads the text and can replace it', () async {
+      (await client.get('/bytes/replaced')).expectBody('$_mixed!');
     });
   });
 }

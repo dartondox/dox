@@ -111,6 +111,15 @@ class JsonBytes {
   final List<int> bytes;
 }
 
+/// A text body that is already UTF-8 (`DoxResponse.contentBytes`). It is
+/// sent as it is, with the content type of the response. For internal
+/// use.
+class TextBytes {
+  const TextBytes(this.bytes);
+
+  final Uint8List bytes;
+}
+
 /// Handle response for different types of data
 /// such as string, stream, file, Model, List, encodable.
 void responseDataHandler(dynamic payload, HttpRequest request) {
@@ -191,6 +200,13 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     bytes = encoding is Utf8Codec
         ? utf8Bytes(payload)
         : encoding.encode(payload);
+  } else if (payload is TextBytes) {
+    // a charset that is not UTF-8 encodes the text again, as a String
+    // body does
+    Encoding encoding = res.encoding;
+    bytes = encoding is Utf8Codec
+        ? payload.bytes
+        : encoding.encode(utf8.decode(payload.bytes, allowMalformed: true));
   } else if (payload is JsonBytes) {
     bytes = payload.bytes;
     res.headers.contentType = ContentType.json;
