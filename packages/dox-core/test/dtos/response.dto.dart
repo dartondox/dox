@@ -74,6 +74,9 @@ class MixedView {
   final List<ProductView>? maybeProducts;
   final Map<String, ProductView>? maybeByName;
   final List<DateTime>? maybeDates;
+  final Map<String, ProductView?> sparse;
+  final Map<String, DateTime?> sparseDays;
+  final Map<String, XRay> xrays;
 
   const MixedView({
     required this.dates,
@@ -88,7 +91,17 @@ class MixedView {
     this.maybeProducts,
     this.maybeByName,
     this.maybeDates,
+    this.sparse = const <String, ProductView?>{},
+    this.sparseDays = const <String, DateTime?>{},
+    this.xrays = const <String, XRay>{},
   });
+}
+
+/// A name with a capital X, in a map of [MixedView].
+@Dto()
+class XRay {
+  final int id;
+  const XRay({required this.id});
 }
 
 /// Lists and a nested DTO that the generated code writes directly, and a

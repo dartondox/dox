@@ -1257,23 +1257,29 @@ class DtoWriter {
 
   /// [value] (of [type]) as a JSON-like value.
   String _toValue(DtoType type, String value, int depth) {
+    DtoType? item = type.item;
+    String x = 'x$depth';
     String? code = switch (type.kind) {
-      DtoKind.date => 'X.toIso8601String()',
-      DtoKind.enumName => 'X.name',
-      DtoKind.dto => '${_ref(type)}.toMap(X)',
+      DtoKind.date => '$value.toIso8601String()',
+      DtoKind.enumName => '$value.name',
+      DtoKind.dto => '${_ref(type)}.toMap($value)',
       DtoKind.list =>
-        _identity(type.item!)
+        _identity(item!)
             ? null
-            : '<dynamic>[for (${type.item!.code} x$depth in X) ${_toValue(type.item!, 'x$depth', depth + 1)}]',
+            : '<dynamic>[for (${item.code} $x in $value) '
+                  '${_toValue(item, x, depth + 1)}]',
+      // `MapEntry.value` does not promote to non-null: a switch gives a
+      // local that does
       DtoKind.map =>
-        _identity(type.item!)
+        _identity(item!)
             ? null
-            : '<String, dynamic>{for (MapEntry<String, ${type.item!.code}> x$depth in X.entries) x$depth.key: ${_toValue(type.item!, 'x$depth.value', depth + 1)}}',
+            : '<String, dynamic>{for (MapEntry<String, ${item.code}> $x '
+                  'in $value.entries) $x.key: '
+                  '${item.nullable ? 'switch ($x.value) { ${item.code} v$depth => ${_toValue(item, 'v$depth', depth + 1)} }' : _toValue(item, '$x.value', depth + 1)}}',
       _ => null,
     };
     if (code == null) return value;
-    String result = code.replaceAll('X', value);
-    return type.nullable ? '$value == null ? null : $result' : result;
+    return type.nullable ? '$value == null ? null : $code' : code;
   }
 
   bool _identity(DtoType item) {

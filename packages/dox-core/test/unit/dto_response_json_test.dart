@@ -155,6 +155,9 @@ void main() {
         maybeProducts: <ProductView>[secret],
         maybeByName: <String, ProductView>{'p': secret},
         maybeDates: <DateTime>[DateTime.utc(2024)],
+        sparse: <String, ProductView?>{'p': secret, 'q': null},
+        sparseDays: <String, DateTime?>{'a': DateTime.utc(2024), 'b': null},
+        xrays: const <String, XRay>{'x': XRay(id: 9)},
       );
       _same($MixedViewDto, mixed);
       expect(_bytes(mixed), isNot(contains('secret')));

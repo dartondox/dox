@@ -33,5 +33,6 @@ const List<DtoSchema<Object>> testDtos = <DtoSchema<Object>>[
   $ProductViewDto,
   $SecretProductViewDto,
   $MixedViewDto,
+  $XRayDto,
   $RunsViewDto,
 ];
