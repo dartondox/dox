@@ -68,24 +68,35 @@ void runRoute(HttpRequest req, RouteMatch match, {RequestBody? body}) {
     if (now != null) {
       _run(req, _doxRequest(req, route, params, now, contentType));
     } else {
-      HttpBody.read(req, contentType).then(
-        (RequestBody body) {
-          try {
-            _run(req, _doxRequest(req, route, params, body, contentType));
-          } catch (error, stackTrace) {
-            httpErrorHandler(req, error, stackTrace);
-          }
-        },
-        onError: (Object error, StackTrace stackTrace) {
-          _failed(req, route, params, contentType, error, stackTrace);
-        },
-      );
+      _readThenRun(req, route, params, contentType!);
     }
 
     /// form data do not support isolate or multithread
   } catch (error, stackTrace) {
     _failed(req, route, params, contentType, error, stackTrace);
   }
+}
+
+/// read the body that needs a wait, then run the route. Its own function:
+/// the closures here would make a context on every [runRoute] call.
+void _readThenRun(
+  HttpRequest req,
+  RouteData route,
+  Map<String, dynamic>? params,
+  ContentType contentType,
+) {
+  HttpBody.read(req, contentType).then(
+    (RequestBody body) {
+      try {
+        _run(req, _doxRequest(req, route, params, body, contentType));
+      } catch (error, stackTrace) {
+        httpErrorHandler(req, error, stackTrace);
+      }
+    },
+    onError: (Object error, StackTrace stackTrace) {
+      _failed(req, route, params, contentType, error, stackTrace);
+    },
+  );
 }
 
 /// an error before the request was made (the body failed to read).
@@ -318,17 +329,7 @@ void _run(HttpRequest req, DoxRequest doxReq) {
     rethrow;
   }
   if (result is Future<dynamic>) {
-    /// one Future: `then` with `onError`, not `then().onError()`
-    result.then(
-      (dynamic value) {
-        _send(req, value);
-        _handled(req);
-      },
-      onError: (Object error, StackTrace stackTrace) {
-        httpErrorHandler(req, error, stackTrace);
-        _handled(req);
-      },
-    );
+    _sendWhenDone(req, result);
   } else {
     try {
       httpResponseHandler(result, req);
@@ -336,6 +337,22 @@ void _run(HttpRequest req, DoxRequest doxReq) {
       _handled(req);
     }
   }
+}
+
+/// send the value of [result] when it completes. Its own function: the
+/// closures here would make a context on every [_run] call.
+void _sendWhenDone(HttpRequest req, Future<dynamic> result) {
+  /// one Future: `then` with `onError`, not `then().onError()`
+  result.then(
+    (dynamic value) {
+      _send(req, value);
+      _handled(req);
+    },
+    onError: (Object error, StackTrace stackTrace) {
+      httpErrorHandler(req, error, stackTrace);
+      _handled(req);
+    },
+  );
 }
 
 /// like [_run], then call `terminate` of [ends] once the answer is sent

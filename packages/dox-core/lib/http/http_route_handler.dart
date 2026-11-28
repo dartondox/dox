@@ -51,20 +51,30 @@ RouteMatch? httpRouteHandler(
       responseDataHandler(null, req);
     } else if (Route().statics.isNotEmpty &&
         (req.method == 'GET' || req.method == 'HEAD')) {
-      /// a file of `Route.staticFiles`, else 404
-      httpStaticHandler(req, Route().statics).then(
-        (bool sent) {
-          if (!sent) _notFound(req, host, method, body);
-        },
-        onError: (Object error, StackTrace stackTrace) {
-          httpErrorHandler(req, error, stackTrace);
-        },
-      );
+      _staticOrNotFound(req, host, method, body);
     } else {
       _notFound(req, host, method, body);
     }
   }
   return match;
+}
+
+/// a file of `Route.staticFiles`, else 404. Its own function: the
+/// closures here would make a context on every [httpRouteHandler] call.
+void _staticOrNotFound(
+  HttpRequest req,
+  String? host,
+  String? method,
+  RequestBody? body,
+) {
+  httpStaticHandler(req, Route().statics).then(
+    (bool sent) {
+      if (!sent) _notFound(req, host, method, body);
+    },
+    onError: (Object error, StackTrace stackTrace) {
+      httpErrorHandler(req, error, stackTrace);
+    },
+  );
 }
 
 /// same path as a thrown 404, so the app ExceptionHandler and
@@ -210,7 +220,8 @@ class _MethodRoutes {
   /// it can match the same url (no param route or domain route before it
   /// matches the path). then a map lookup gives the same answer as the
   /// scan.
-  final Map<String, RouteData> exact = <String, RouteData>{};
+  /// The value is the match itself: a record made once, not per request.
+  final Map<String, RouteMatch> exact = <String, RouteMatch>{};
 
   /// first path segment -> the routes that can match a url starting with
   /// it, in order. a route whose first segment is a param is in every
@@ -227,7 +238,7 @@ class _MethodRoutes {
       String path = route.path.trim();
       if (route.pattern == null && route.domain == null) {
         if (!before.any((RouteData r) => _canMatch(r, path))) {
-          exact.putIfAbsent(path, () => route);
+          exact.putIfAbsent(path, () => (route: route, params: null));
         }
       } else {
         before.add(route);
@@ -315,8 +326,8 @@ RouteMatch? _getMatchRoute(String inputRoute, String method, String? domain) {
   if (group == null) return null;
 
   inputRoute = sanitizeRoutePath(inputRoute).trim();
-  RouteData? exact = group.exact[inputRoute];
-  if (exact != null) return (route: exact, params: null);
+  RouteMatch? exact = group.exact[inputRoute];
+  if (exact != null) return exact;
   String? host = domain?.toLowerCase();
   String? hostName = host == null ? null : _withoutPort(host);
 

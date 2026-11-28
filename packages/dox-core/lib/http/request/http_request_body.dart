@@ -66,6 +66,10 @@ class RequestBody {
   final List<MapEntry<String, Object>>? parts;
 }
 
+/// The map of [body], or null when it is an empty body that made no map
+/// yet. Not exported.
+Map<String, dynamic>? madeBodyMap(RequestBody body) => body._map;
+
 /// For tests only (not exported): false while an empty body has not made
 /// its map yet.
 bool debugBodyMapMade(RequestBody body) => body._map != null;
