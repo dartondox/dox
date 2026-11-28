@@ -72,6 +72,104 @@ void main() {
       expect(res.headers['x-key'], 'ABCD');
     });
 
+    /// a plain query is split with no decoding: it must give the map of
+    /// Uri.splitQueryString, in the same order
+    test('query: the same map as Uri.splitQueryString', () async {
+      Route.get('/query_map', (DoxRequest req) {
+        return <String, dynamic>{'query': req.query};
+      });
+      List<String> queries = <String>[
+        'a=1',
+        'a=1&b=2',
+        'a=1&a=2',
+        'b=2&a=1&b=3',
+        'a',
+        'a&b=',
+        '=x&c=3',
+        'a=1&&b=2',
+        'x=1=2',
+        '&',
+        'a=',
+        'k=v&',
+        // not plain: decoded, as before
+        'a=%20b',
+        'a=b+c',
+        'name=%E1%80%99',
+        'q=1%262',
+        'list[]=1&list[]=2',
+      ];
+      for (String query in queries) {
+        http.Response res = await http.get(
+          Uri.parse('$baseUrl/query_map?$query'),
+        );
+        Map<String, dynamic> want = query.contains('[')
+            ? <String, dynamic>{
+                'list': <String>['1', '2'],
+              }
+            : Uri.splitQueryString(query);
+        Map<String, dynamic> got =
+            (jsonDecode(res.body) as Map<String, dynamic>)['query'];
+        expect(got, want, reason: query);
+        expect(got.keys.toList(), want.keys.toList(), reason: query);
+      }
+    });
+
+    test('input: a body key wins over a query key', () async {
+      Route.post('/query_body', (DoxRequest req) {
+        return <String, dynamic>{
+          'm': req.input('m'),
+          'int_m': req.integer('m'),
+          'only_query': req.input('q'),
+          'none': req.input('none'),
+          'all_m': req.all()['m'],
+        };
+      });
+      http.Response res = await http.post(
+        Uri.parse('$baseUrl/query_body?m=2&q=7'),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{'m': 1}),
+      );
+      expect(jsonDecode(res.body), <String, dynamic>{
+        'm': 1,
+        'int_m': 1,
+        'only_query': '7',
+        'none': null,
+        'all_m': 1,
+      });
+    });
+
+    test('input, has and all agree after a change to the maps', () async {
+      Route.post('/query_change', (DoxRequest req) {
+        Map<String, dynamic> before = <String, dynamic>{
+          'input': req.input('m'),
+          'has': req.has('m'),
+        };
+        req.all()['k'] = 'v';
+        req.body = <String, dynamic>{'late': 'x'};
+        return <String, dynamic>{
+          'before': before,
+          'k': req.input('k'),
+          'has_k': req.has('k'),
+          'late': req.input('late'),
+          'has_late': req.has('late'),
+          'all_late': req.all()['late'],
+        };
+      });
+      http.Response res = await http.post(
+        Uri.parse('$baseUrl/query_change?m=2'),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{'m': 1}),
+      );
+      expect(jsonDecode(res.body), <String, dynamic>{
+        'before': <String, dynamic>{'input': 1, 'has': true},
+        'k': 'v',
+        'has_k': true,
+        'late': null,
+        'has_late': false,
+        'all_late': null,
+      });
+    });
+
     test('requestBody tells invalid JSON from no body', () async {
       Route.post('/body_kind', (DoxRequest req) {
         RequestBody body = req.requestBody;
