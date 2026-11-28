@@ -818,7 +818,8 @@ class DtoReader {
       if (plain && library != null) {
         String prefix = prefixOf(element, library);
         for (String function in <String>['\$write$name', '\$${name}ToMap']) {
-          if (generatedPrefix(library, element, function) != prefix) {
+          if (generatedPrefix(library, element, function, prefix: prefix) !=
+              prefix) {
             plain = false;
           }
         }
@@ -839,7 +840,8 @@ class DtoReader {
   bool _seesDtoCode(InterfaceElement element, LibraryElement library) {
     String name = element.displayName;
     String prefix = prefixOf(element, library);
-    return visiblePrefix(library, element, '\$${name}Dto') == prefix;
+    return visiblePrefix(library, element, '\$${name}Dto', prefix: prefix) ==
+        prefix;
   }
 
   bool _implements(InterfaceType type, String name) {

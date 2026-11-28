@@ -101,18 +101,22 @@ String prefixOf(Element element, LibraryElement? library) {
 /// For a `@Serialize()` class ([serialize]), the file of [target] must
 /// also see the classes that its code uses ([seesSerializeCode]), else
 /// the generator makes no code for it.
+///
+/// With [prefix], only the imports with that prefix count (see
+/// [visiblePrefix]).
 String? generatedPrefix(
   LibraryElement library,
   InterfaceElement target,
   String name, {
   bool serialize = true,
+  String? prefix,
 }) {
   LibraryElement home = target.library;
   if (!hasGeneratedPart(home)) return null;
   if (serialize && !seesSerializeCode(home.firstFragment)) return null;
   if (home == library) return '';
   if (_packageOf(home.uri) != _packageOf(library.uri)) return null;
-  return visiblePrefix(library, target, name);
+  return visiblePrefix(library, target, name, prefix: prefix);
 }
 
 /// The prefix (like `p.`, or empty) of the name [name] of the library of
@@ -120,20 +124,28 @@ String? generatedPrefix(
 /// Only the directives are read (the name can be one that a builder makes
 /// in this build): an import or an export with `show` or `hide` gives
 /// [name] only when it passes them.
+///
+/// With [prefix] (like `o.`, or empty for no prefix), only the imports
+/// with that prefix count, and the result is [prefix] or null. Code that
+/// writes the class with the prefix of [prefixOf] asks this way, so the
+/// name goes with the same prefix as the class.
 String? visiblePrefix(
   LibraryElement library,
   InterfaceElement target,
-  String name,
-) {
+  String name, {
+  String? prefix,
+}) {
   LibraryElement home = target.library;
   if (home == library) return '';
   for (LibraryFragment fragment in library.fragments) {
     for (LibraryImport import in fragment.libraryImports) {
+      String? found = import.prefix?.element.name;
+      String text = found == null ? '' : '$found.';
+      if (prefix != null && text != prefix) continue;
       LibraryElement? imported = import.importedLibrary;
       if (imported == null || !_passes(import.combinators, name)) continue;
       if (!_exports(imported, home, name, <LibraryElement>{})) continue;
-      String? prefix = import.prefix?.element.name;
-      return prefix == null ? '' : '$prefix.';
+      return text;
     }
   }
   return null;

@@ -1417,7 +1417,12 @@ class DtoWriter {
         _package(e.library.uri) == _package(dto.element.library.uri) &&
             seesDtoWriter(e.library.firstFragment) &&
             // the `$write` function must be in scope, like the class
-            visiblePrefix(dto.element.library, e, '\$write${e.displayName}') ==
+            visiblePrefix(
+                  dto.element.library,
+                  e,
+                  '\$write${e.displayName}',
+                  prefix: type.prefix,
+                ) ==
                 type.prefix,
       _ => false,
     };
