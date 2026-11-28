@@ -1,8 +1,8 @@
 ## Unreleased
 
 - New: the annotation `@Serialize()` and the interface `SerializeWriter`. `@Serialize()` on a `Serializer` subclass or on a plain class makes dox_builder write fast JSON code for the class. A `SerializeWriter` is the JSON writer of one class. dox_core finds it by the type of the object.
-- New: `JsonWriter.boolean()`, `JsonWriter.run()` and `JsonRun`. A `JsonRun` is a fixed part of JSON (for example `,"name":`) as bytes. `run()` writes it 8 bytes at a time. The generated code of a `@Dto` uses them.
-- New: `JsonWriter`, `JsonWritable` and `JsonObjectWriter`. A class that implements `JsonWritable` writes its own JSON with a `JsonWriter` (`startObject`, `key`, `string`, `integer`, `dateTime`, `value`, `endObject`), with no `Map` in between. The JSON encoder of dox_core is the writer. The generator of dox_builder makes `writeJson()` for a model and a `JsonObjectWriter` for a `@Dto`. They are here so that a package below dox_core, like dox_orm, can use them.
+- New: `JsonWriter.boolean()`, `JsonWriter.run()` and `JsonRun`. A `JsonRun` is a fixed part of JSON (for example `,"name":`) as bytes. `run()` writes it 8 bytes at a time. The generated code of a `@Serialize()` class uses them.
+- New: `JsonWriter`, `JsonWritable` and `JsonObjectWriter`. A class that implements `JsonWritable` writes its own JSON with a `JsonWriter` (`startObject`, `key`, `string`, `integer`, `dateTime`, `value`, `endObject`), with no `Map` in between. The JSON encoder of dox_core is the writer. The generator of dox_builder makes `writeJson()` for a model and a `JsonObjectWriter` for a `@Dto` and a `@Serialize()` class. They are here so that a package below dox_core, like dox_orm, can use them.
 
 ## 3.2.0
 

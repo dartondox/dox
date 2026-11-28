@@ -1398,10 +1398,11 @@ class DtoWriter {
     runs.code(_writeOnce(type, value, local, typeCode));
   }
 
-  /// `true` when the nested DTO [type] has a `$write` function that this
-  /// build makes: it has no `toJson()`, it is in the same package, and its
-  /// file sees the classes the function needs. A DTO of another package
-  /// can come from an older dox_builder. Else the encoder finds its writer.
+  /// `true` when the nested plain `@Serialize()` class [type] has a
+  /// `$write` function that this build makes: it has no `toJson()`, it is
+  /// in the same package, and its file sees the classes the function
+  /// needs. A class of another package can come from an older
+  /// dox_builder. Else the encoder finds its writer.
   ///
   /// A direct call does not look for a cycle. A DTO that holds itself
   /// (`List<Node> children`) with cyclic data ends in a stack overflow,

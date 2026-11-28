@@ -37,8 +37,8 @@ abstract interface class JsonWriter {
 
   /// Writes the bytes of [run] as they are, with no check and no comma.
   ///
-  /// It is for generated code: the generator of `@Dto` puts the fixed
-  /// parts of the JSON of a DTO (like `{"id":` and `,"name":`) into runs.
+  /// It is for generated code: the generator of `@Serialize()` puts the
+  /// fixed parts of the JSON (like `{"id":` and `,"name":`) into runs.
   /// A run must be a part of valid JSON at that place.
   void run(JsonRun run);
 }
@@ -114,8 +114,9 @@ abstract interface class JsonWritable {
 
 /// Writes the JSON of the objects of another class.
 ///
-/// The generator of `@Dto` makes one for a DTO. The JSON encoder of
-/// dox_core then writes a DTO in a response with no `Map` in between.
+/// The generator of `@Dto` makes one for a DTO: it gives the map of
+/// `toMap()` to the writer. The writer of a `@Serialize()` class writes
+/// its JSON with no `Map` in between.
 abstract interface class JsonObjectWriter {
   /// Writes [object] with [writer].
   void writeObject(Object object, JsonWriter writer);

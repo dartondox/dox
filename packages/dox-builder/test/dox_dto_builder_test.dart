@@ -1617,6 +1617,53 @@ class OwnJson {
           expect(out, isNot(contains(r'$write')));
         },
       );
+
+      const String source = '''
+@Dto()
+class Inner {
+  final int id;
+  const Inner({required this.id});
+}
+''';
+
+      test('a toJson() from a mixin: no writeObject()', () async {
+        String out = (await _generate(
+          r'''
+mixin Loud {
+  Map<String, dynamic> toJson() => <String, dynamic>{};
+}
+
+@Dto()
+class FromMixin with Loud {
+  final int id;
+  FromMixin({required this.id});
+}
+''',
+          imports: "import 'package:dox_annotation/dox_annotation.dart';",
+          packages: annotation,
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(
+          out,
+          contains(r'class_$FromMixinDtoextendsDtoSchema<FromMixin>{'),
+        );
+        expect(out, isNot(contains('writeObject')));
+      });
+
+      test('an older dox_annotation: no writeObject()', () async {
+        String out = await _generate(source);
+        expect(out, isNot(contains('ERROR')));
+        expect(out, isNot(contains('writeObject')));
+        expect(out, isNot(contains('JsonObjectWriter')));
+      });
+
+      test('a class of the app with the same name: no writeObject()', () async {
+        String out = await _generate('''
+class JsonWriter {}
+class JsonObjectWriter {}
+$source
+''');
+        expect(out, isNot(contains('writeObject')));
+      });
     });
   });
 }

@@ -280,9 +280,9 @@ void main() {
       }
     });
 
-    /// RunsView has no Maybe field: its fixed parts are runs, and its
-    /// lists and its nested DTO are written with direct calls.
-    test('random DTOs that are written with runs', () {
+    /// RunsView has no Maybe field, lists and a nested DTO: the JSON of
+    /// toMap() is the same with the Dox and the SDK encoder.
+    test('random DTOs: the same JSON as the SDK encoder', () {
       Random random = Random(5);
       const List<String> texts = <String>[
         '',
