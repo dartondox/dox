@@ -20,8 +20,9 @@ class DoxRequest implements IDoxRequest {
   @override
   final HttpRequest httpRequest;
 
+  /// made from [httpRequest] on first use, unless the constructor got one
   @override
-  late Uri uri;
+  late Uri uri = httpRequest.uri;
 
   final String? _givenIp;
   final String _givenScheme;
@@ -189,7 +190,7 @@ class DoxRequest implements IDoxRequest {
 
   DoxRequest({
     required this.route,
-    required this.uri,
+    Uri? uri,
     Map<String, dynamic>? body,
     this.contentType,
     String? clientIp,
@@ -204,7 +205,9 @@ class DoxRequest implements IDoxRequest {
        _body = body,
        requestBody =
            requestBody ??
-           (body == null ? RequestBody.empty() : RequestBody(body));
+           (body == null ? RequestBody.empty() : RequestBody(body)) {
+    if (uri != null) this.uri = uri;
+  }
 
   /// get route identifier
   @override

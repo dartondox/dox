@@ -28,12 +28,13 @@ RouteMatch? httpRouteHandler(
   /// read Host once. only domain routes need it.
   _routeIndex();
   String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
-  RouteMatch? match = _getMatchRoute(req.uri.path, method ?? req.method, host);
+  String path = requestPath(req);
+  RouteMatch? match = _getMatchRoute(path, method ?? req.method, host);
 
   /// HEAD runs the GET route when there is no HEAD route.
   /// the server sends the status and headers, with no body.
   if (match == null && req.method == 'HEAD') {
-    match = _getMatchRoute(req.uri.path, 'GET', host);
+    match = _getMatchRoute(path, 'GET', host);
   }
 
   if (match == null) {
@@ -41,7 +42,7 @@ RouteMatch? httpRouteHandler(
     /// use cors setting of the route the browser is asking about.
     if (req.method == HttpRequestMethod.OPTIONS.name) {
       RouteData? target = _getMatchRoute(
-        req.uri.path,
+        path,
         req.headers.value('access-control-request-method') ?? '',
         host,
       )?.route;
@@ -88,17 +89,15 @@ void _notFound(
       return;
     }
   }
-  List<String> allow = _allowedMethods(req.uri.path, host);
+  String path = requestPath(req);
+  List<String> allow = _allowedMethods(path, host);
   httpErrorHandler(
     req,
     allow.isEmpty
-        ? NotFoundHttpException(
-            message: '${req.method} ${req.uri.path} not found',
-          )
+        ? NotFoundHttpException(message: '${req.method} $path not found')
         : MethodNotAllowedHttpException(
             allow,
-            message:
-                '${method ?? req.method} is not allowed for ${req.uri.path}',
+            message: '${method ?? req.method} is not allowed for $path',
           ),
     StackTrace.empty,
   );
@@ -124,7 +123,7 @@ bool _anyWhen(List<RouteData> fallbacks) {
 /// GET and HEAD only, one with `when` takes what `when` allows. null when
 /// none. a prefix with a param, like `/{tenant}`, gives its params.
 RouteMatch? _fallbackFor(HttpRequest req, String? host) {
-  String path = sanitizeRoutePath(req.uri.path);
+  String path = sanitizeRoutePath(requestPath(req));
   bool getOrHead = req.method == 'GET' || req.method == 'HEAD';
   String? hostLower = host?.toLowerCase();
   String? hostName = hostLower == null ? null : _withoutPort(hostLower);
@@ -174,8 +173,9 @@ RegExp _prefixPattern(RegExp pattern) {
 bool httpPathHasRoute(HttpRequest req) {
   Map<String, _MethodRoutes> index = _routeIndex();
   String? host = _hasDomain ? req.headers.value(HttpHeaders.hostHeader) : null;
+  String path = requestPath(req);
   for (String method in index.keys) {
-    if (_getMatchRoute(req.uri.path, method, host) != null) return true;
+    if (_getMatchRoute(path, method, host) != null) return true;
   }
   return false;
 }
