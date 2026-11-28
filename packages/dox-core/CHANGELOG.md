@@ -1,5 +1,8 @@
 ## Unreleased
 
+- Faster: the router reads the path of a request with no `Uri`. Before, each request made a `Uri` for its path, and the router read the path up to three times. On the HttpArena pipelined test (2 server cores), Dox does approximately 4% to 5% more requests a second. The path, the route and the 404 message do not change. This needs `NativeRequest.path`, which comes in the next dox_http_native release.
+- Faster: `DoxRequest.uri` is made on first use, not for each request. The `uri` parameter of the `DoxRequest` constructor is now optional. If you give it, the request uses it, as before.
+- Faster: a `String` body is sent before the checks for the other body types. The route path check reads the code units directly and does not use `String.contains`.
 - New: fast JSON for `@Serialize()` classes. Run `dart run build_runner build` with the new dox_builder and set `AppConfig(container: registerContainer)`. A `@Serialize()` serializer writes its JSON with no map. A plain `@Serialize()` class can be returned from a controller. The JSON is the same with and without `CoreFlags.sdkJsonEncoder`. On the HttpArena item data (1 and 50 items), a `@Serialize()` serializer takes 0.22 µs and 5.9 µs, and a plain `@Serialize()` class takes 0.19 µs and 6.3 µs. On the same data and machine, `JSON.stringify` of Bun takes 0.17 µs and 11.4 µs (with the UTF-8 bytes).
 - New: `IocContainer.jsonWriter()` and `IocContainer.jsonWriterOf()` keep the JSON writers of `@Serialize()` classes. `Serializer.listOf()`, `Serializer.hasItem()` and `Serializer.itemOf()` give the data of a serializer to the generated code.
 - Faster: a `Serializer` makes no list for one item. The JSON of `toJson()` does not change.

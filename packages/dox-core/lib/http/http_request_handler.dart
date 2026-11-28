@@ -10,6 +10,7 @@ import 'package:dox_core/http/http_route_handler.dart';
 import 'package:dox_core/http/request/http_request_body.dart';
 import 'package:dox_core/http/request/upload_temp_files.dart';
 import 'package:dox_core/router/route_data.dart';
+import 'package:dox_core/utils/utils.dart';
 
 /// this is a class which get matched routes and
 /// pass http request to route middleware and controllers
@@ -154,7 +155,7 @@ void _runOverridden(
 
 /// hand the request to a mounted handler. it writes the response itself.
 bool _mounted(HttpRequest req, Map<String, RawRequestHandler> mounts) {
-  String path = req.uri.path;
+  String path = requestPath(req);
 
   /// `//` is one `/` here, so `/admin//secure` cannot skip a mount at
   /// `/admin/secure`. the handler still gets the path as it came.
@@ -414,7 +415,6 @@ DoxRequest _doxRequest(
 ) {
   DoxRequest doxReq = DoxRequest(
     route: route,
-    uri: req.uri,
     requestBody: body,
     contentType: contentType,
     httpHeaders: req.headers,

@@ -125,6 +125,13 @@ class TextBytes {
 void responseDataHandler(dynamic payload, HttpRequest request) {
   HttpResponse res = request.response;
 
+  /// text is the usual body: send it before the type checks below. None
+  /// of them can match a String.
+  if (payload is String) {
+    _sendText(payload, res);
+    return;
+  }
+
   if (payload == null) {
     endResponse(res);
     return;
@@ -196,10 +203,9 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
   /// if payload is Map or List, parse into json
   /// and response as json
   if (payload is String) {
-    Encoding encoding = res.encoding;
-    bytes = encoding is Utf8Codec
-        ? utf8Bytes(payload)
-        : encoding.encode(payload);
+    // an error or a date that became text
+    _sendText(payload, res);
+    return;
   } else if (payload is TextBytes) {
     // a charset that is not UTF-8 encodes the text again, as a String
     // body does
@@ -247,6 +253,17 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
     view.takeBody();
     giveBackJsonBytes(bytes);
   }
+}
+
+/// sends [text] in the charset of [res]
+void _sendText(String text, HttpResponse res) {
+  Encoding encoding = res.encoding;
+  List<int> bytes = encoding is Utf8Codec
+      ? utf8Bytes(text)
+      : encoding.encode(text);
+  if (!Dox().config.compress) res.contentLength = bytes.length;
+  res.add(bytes);
+  endResponse(res);
 }
 
 /// true when the head of [res] already went out (a flush or a streamed
