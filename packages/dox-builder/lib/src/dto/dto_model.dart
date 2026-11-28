@@ -379,6 +379,89 @@ class DtoReader {
     return annotations.has(element, 'Dto');
   }
 
+  /// True when [element] has `@Serialize()`.
+  bool isSerialize(Element element) {
+    return annotations.has(element, 'Serialize');
+  }
+
+  /// True when [element] extends `Serializer` of dox_core.
+  static bool isSerializer(InterfaceElement element) {
+    return serializerType(element) != null;
+  }
+
+  /// The `Serializer<T>` above [element], or null.
+  static InterfaceType? serializerType(InterfaceElement element) {
+    for (InterfaceType above in element.allSupertypes) {
+      InterfaceElement parent = above.element;
+      if (parent.name == 'Serializer' &&
+          parent.library.uri.toString().startsWith('package:dox_core/')) {
+        return above;
+      }
+    }
+    return null;
+  }
+
+  /// Why the plain `@Serialize()` class [element] gets no JSON writer, or
+  /// null when it gets one. A class with no `@Serialize()` gets none.
+  String? plainProblem(ClassElement element) {
+    if (!isSerialize(element)) return 'it has no @Serialize()';
+    if (isSerializer(element)) return 'it is a Serializer';
+    if (isDto(element)) {
+      return 'it is a @Dto, which writes its JSON already';
+    }
+    InterfaceType? parent = element.supertype;
+    if ((parent != null && !parent.isDartCoreObject) ||
+        element.mixins.isNotEmpty) {
+      return 'it extends another class or has a mixin, and only its own '
+          'fields would be in the JSON';
+    }
+    if (element.isAbstract) {
+      return 'it is abstract, and the JSON encoder finds a writer by the '
+          'class of the object';
+    }
+    if (element.typeParameters.isNotEmpty) return 'it is generic';
+    if (element.isPrivate) return 'it is private';
+    if (hasMethod(element, 'toJson')) return 'it has its own toJson()';
+    return null;
+  }
+
+  /// The fields of the plain `@Serialize()` class [element]: its public
+  /// final instance fields, in their order. The key is `@Name`, else the
+  /// field name in snake_case. [skipped] gets the fields that are not
+  /// final.
+  DtoClass readPlain(ClassElement element, List<String> skipped) {
+    DtoClass dto = DtoClass(element);
+    for (FieldElement field in element.fields) {
+      if (field.isStatic || !field.isOriginDeclaration || field.isPrivate) {
+        continue;
+      }
+      if (!field.isFinal) {
+        skipped.add(field.displayName);
+        continue;
+      }
+      String where = '${element.displayName}.${field.displayName}';
+      DtoType type = typeOf(
+        field.type,
+        where,
+        <String>[],
+        library: field.library,
+        output: true,
+      )!;
+      dto.fields.add(
+        DtoField(
+          element: field,
+          name: field.displayName,
+          key: keyOf(field, snake: true),
+          type: type,
+          maybe: false,
+          defaultCode: null,
+          positional: false,
+        ),
+      );
+    }
+    return dto;
+  }
+
   /// The input key of [field]: `@Name`, else the Dart name in snake_case
   /// (or as is with `@Dto(keyCase: KeyCase.field)`).
   String keyOf(FieldElement field, {required bool snake}) {
@@ -636,11 +719,16 @@ class DtoReader {
   /// The [DtoType] of [type], or null (with an error) when it is not
   /// supported.
   /// Types are written for [library], with its import prefixes.
+  ///
+  /// With [output] (the fields of a plain `@Serialize()` class), a plain
+  /// `@Serialize()` class is a nested DTO too, and a type that a DTO can
+  /// not read (like a model) is [DtoKind.any]: the JSON encoder writes it.
   DtoType? typeOf(
     DartType type,
     String where,
     List<String> errors, {
     LibraryElement? library,
+    bool output = false,
   }) {
     DtoType make(DtoKind kind, {DtoType? item, List<String>? enumNames}) {
       return DtoType(
@@ -653,6 +741,7 @@ class DtoReader {
     }
 
     if (type is DynamicType) return make(DtoKind.any);
+    if (output && type is! InterfaceType) return make(DtoKind.any);
     if (type is! InterfaceType) {
       errors.add(
         'The type ${type.getDisplayString()} of $where is not '
@@ -685,11 +774,13 @@ class DtoReader {
         '$where (item)',
         errors,
         library: library,
+        output: output,
       );
       return item == null ? null : make(DtoKind.list, item: item);
     }
     if (type.isDartCoreMap) {
       if (!type.typeArguments.first.isDartCoreString) {
+        if (output) return make(DtoKind.any);
         errors.add('The map keys of $where must be String.');
         return null;
       }
@@ -699,10 +790,42 @@ class DtoReader {
               value.nullabilitySuffix == NullabilitySuffix.question)) {
         return make(DtoKind.anyMap);
       }
-      DtoType? item = typeOf(value, '$where (value)', errors, library: library);
+      DtoType? item = typeOf(
+        value,
+        '$where (value)',
+        errors,
+        library: library,
+        output: output,
+      );
       return item == null ? null : make(DtoKind.map, item: item);
     }
-    if (isDto(element)) return make(DtoKind.dto);
+    if (isDto(element)) {
+      // the generated `$NameDto` and `$writeName` must be in scope here
+      if (library == null || _seesDtoCode(element, library)) {
+        return make(DtoKind.dto);
+      }
+      if (output) return make(DtoKind.any);
+      errors.add(
+        'The type $name of $where is a @Dto, but its generated code is '
+        'hidden here (an import or an export with show or hide). Import its '
+        'file with no show or hide.',
+      );
+      return null;
+    }
+    if (output) {
+      bool plain = element is ClassElement && plainProblem(element) == null;
+      // the generated functions of the class must be in scope here
+      if (plain && library != null) {
+        String prefix = prefixOf(element, library);
+        for (String function in <String>['\$write$name', '\$${name}ToMap']) {
+          if (generatedPrefix(library, element, function, prefix: prefix) !=
+              prefix) {
+            plain = false;
+          }
+        }
+      }
+      return make(plain ? DtoKind.dto : DtoKind.any);
+    }
     if (_implements(type, 'FileInput')) return make(DtoKind.file);
     errors.add(
       'The type ${type.getDisplayString()} of $where is not supported. '
@@ -710,6 +833,15 @@ class DtoReader {
       'or a List or Map of them.',
     );
     return null;
+  }
+
+  /// `true` when [library] sees the generated `$NameDto` of the DTO
+  /// [element] the same way as the class
+  bool _seesDtoCode(InterfaceElement element, LibraryElement library) {
+    String name = element.displayName;
+    String prefix = prefixOf(element, library);
+    return visiblePrefix(library, element, '\$${name}Dto', prefix: prefix) ==
+        prefix;
   }
 
   bool _implements(InterfaceType type, String name) {

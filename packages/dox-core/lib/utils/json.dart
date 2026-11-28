@@ -13,12 +13,46 @@ final JsonBytesEncoder _jsonBytesEncoder = JsonBytesEncoder(
   writerOf: _dtoWriter,
 );
 
-/// The schema of a DTO (`AppConfig(dtos: dtos)`) that can write the JSON
-/// of [object], or null. A DTO class with its own `toJson()` has none.
+/// The writer of the JSON of [object], or null: the schema of a DTO
+/// (`AppConfig(dtos: dtos)`), else the writer of a `@Serialize()` class
+/// (`AppConfig(container: registerContainer)`). A DTO class with its own
+/// `toJson()` has none.
+///
+/// The writer of each class is kept, so a class costs one look-up: a
+/// serializer, a DTO, and a class with none (like `DateTime`).
 JsonObjectWriter? _dtoWriter(Object object) {
-  DtoSchema<Object>? schema = Dox().dtos.ofType(object.runtimeType);
-  return schema is JsonObjectWriter ? schema as JsonObjectWriter : null;
+  Type type = object.runtimeType;
+  JsonObjectWriter? known = _writers[type];
+  if (known != null) return identical(known, _noWriter) ? null : known;
+  JsonObjectWriter? found = _findWriter(type);
+  _writers[type] = found ?? _noWriter;
+  return found;
 }
+
+JsonObjectWriter? _findWriter(Type type) {
+  DtoSchema<Object>? schema = Dox().dtos.ofType(type);
+  if (schema != null) {
+    return schema is JsonObjectWriter ? schema as JsonObjectWriter : null;
+  }
+  return Dox().ioc.jsonWriterOf(type);
+}
+
+/// the writer of each class that the encoder looked for
+final Map<Type, JsonObjectWriter> _writers = <Type, JsonObjectWriter>{};
+
+/// in [_writers] for a class with no writer
+const JsonObjectWriter _noWriter = _NoWriter();
+
+class _NoWriter implements JsonObjectWriter {
+  const _NoWriter();
+
+  @override
+  void writeObject(Object object, JsonWriter writer) {}
+}
+
+/// Forgets the writers that the encoder found. `Dox().initialize()` and
+/// the container call it when the DTOs or the writers change.
+void forgetJsonWriters() => _writers.clear();
 
 /// `CoreFlags.sdkJsonEncoder` of this isolate. `Dox().initialize` sets
 /// it, so an encode does not read the flags each time.
@@ -140,5 +174,8 @@ dynamic advanceEncode(dynamic object) {
   if (schema != null && schema is JsonObjectWriter) {
     return schema.toMap(object as Object);
   }
+  // a plain `@Serialize()` class has no toJson(): its writer makes the map
+  SerializeWriter? writer = Dox().ioc.jsonWriterOf(object.runtimeType);
+  if (writer != null) return writer.toJsonValue(object as Object);
   return object.toJson();
 }

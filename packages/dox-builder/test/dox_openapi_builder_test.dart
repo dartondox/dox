@@ -314,9 +314,16 @@ Future<String> _generate(Map<String, String> sources) async {
       'dox_annotation|lib/dox_annotation.dart': '''
 export 'src/dox_model.dart';
 export 'src/openapi_annotation.dart';
+export 'src/serialize.dart';
 ''',
       'dox_annotation|lib/src/dox_model.dart': _annotationFile(
         'dox_model.dart',
+      ),
+      'dox_annotation|lib/src/serialize.dart': _annotationFile(
+        'serialize.dart',
+      ),
+      'dox_annotation|lib/src/json_writer.dart': _annotationFile(
+        'json_writer.dart',
       ),
       'dox_validation|lib/src/dto/dto_annotations.dart': File.fromUri(
         // dox_validation lives in its own repo: find it through the package config
@@ -646,6 +653,47 @@ class Routes {
 'properties': <String, dynamic>{
 'id': <String, dynamic>{'type': 'integer'},
 'title': <String, dynamic>{'type': <dynamic>['string', 'null']}}}'''),
+        ),
+      );
+    });
+
+    test('a plain @Serialize() class: its JSON fields', () async {
+      String plain = await _generate(<String, String>{
+        'a|lib/info.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+@Serialize()
+class Info {
+  final int loginCount;
+  @Name('seen')
+  final DateTime? lastSeen;
+  final List<String> roles;
+  int counter = 0;
+
+  Info(this.loginCount, this.lastSeen, this.roles);
+}
+
+class InfoController {
+  Info show(DoxRequest req) => Info(1, null, <String>[]);
+}
+
+class Routes {
+  void register() {
+    Route.get('/info', (InfoController c) => c.show);
+  }
+}
+''',
+      });
+      expect(
+        plain,
+        contains(
+          _flat('''
+'Info': <String, dynamic>{'type': 'object',
+'properties': <String, dynamic>{
+'login_count': <String, dynamic>{'type': 'integer'},
+'seen': <String, dynamic>{'type': <dynamic>['string', 'null'], 'format': 'date-time'},
+'roles': <String, dynamic>{'type': 'array', 'items': <String, dynamic>{'type': 'string'}}},
+'required': <dynamic>['login_count', 'seen', 'roles']}'''),
         ),
       );
     });

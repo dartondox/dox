@@ -7,7 +7,10 @@ import 'package:dart_style/dart_style.dart';
 import 'package:glob/glob.dart';
 import 'package:source_gen/source_gen.dart';
 
+import '../dto/dto_model.dart';
 import '../openapi/annotation_reader.dart';
+import '../schema/json_schema_reader.dart';
+import '../serialize/serialize_reader.dart';
 import '../util.dart';
 
 /// How a class goes into the container.
@@ -59,6 +62,17 @@ class ModelEntry {
   String get name => element.displayName;
 }
 
+/// One `@Serialize()` class with a JSON writer: `$NameWriter` goes into
+/// the container.
+class JsonWriterEntry {
+  JsonWriterEntry(this.element, this.library);
+
+  final ClassElement element;
+  final String library;
+
+  String get name => element.displayName;
+}
+
 /// Writes `lib/generated/container.g.dart`: one function that puts every class of
 /// the app into the Dox container. Give it to the app:
 /// `AppConfig(container: registerContainer)`.
@@ -67,7 +81,8 @@ class ModelEntry {
 /// - classes with `@Inject()`,
 /// - classes that extend `Router` (their routes are registered at start),
 /// - classes that extend `DoxProvider` (their `setup()` runs at start),
-/// - classes with `@DoxModel()` (route model binding).
+/// - classes with `@DoxModel()` (route model binding),
+/// - classes with `@Serialize()` that get a JSON writer.
 ///
 /// Constructor parameters come from the container, by type. A parameter
 /// of an abstract type gets the one container class that implements it.
@@ -95,6 +110,8 @@ class DoxContainerBuilder implements Builder {
     Resolver resolver = buildStep.resolver;
     List<ContainerEntry> entries = <ContainerEntry>[];
     List<ModelEntry> models = <ModelEntry>[];
+    List<JsonWriterEntry> writers = <JsonWriterEntry>[];
+    SerializeReader serialize = SerializeReader(AstLoader(resolver));
     List<AssetId> ids = await buildStep
         .findAssets(Glob('lib/**.dart'))
         .toList();
@@ -112,15 +129,30 @@ class DoxContainerBuilder implements Builder {
         if (entry != null) entries.add(entry);
         ModelEntry? model = _model(element, uri);
         if (model != null) models.add(model);
+        _warnSubSerializer(element, uri);
+        if (await serialize.hasWriter(element) &&
+            seesSerializeCode(library.firstFragment)) {
+          // the writer is in the part: no part, no writer to register
+          String part =
+              '${id.pathSegments.last.replaceFirst(RegExp(r'\.dart$'), '')}.g.dart';
+          if (hasGeneratedPart(library)) {
+            writers.add(JsonWriterEntry(element, uri));
+          } else {
+            log.warning(
+              '@Serialize() ${element.displayName} ($uri) gets no JSON '
+              "writer: its file has no part. Add `part '$part';`.",
+            );
+          }
+        }
       }
     }
-    if (entries.isEmpty && models.isEmpty) return;
+    if (entries.isEmpty && models.isEmpty && writers.isEmpty) return;
     for (ContainerEntry entry in entries) {
       _readConstructor(entry, entries);
     }
     _checkCycles(entries);
     _warnSameNames(entries);
-    String code = ContainerWriter(entries, models).write();
+    String code = ContainerWriter(entries, models, writers).write();
     DartFormatter formatter = DartFormatter(
       languageVersion: DartFormatter.latestLanguageVersion,
     );
@@ -137,6 +169,7 @@ class DoxContainerBuilder implements Builder {
     'implements',
     'with',
     'doxmodel',
+    'serialize',
   ];
 
   ContainerEntry? _entry(ClassElement element, String library) {
@@ -186,6 +219,26 @@ class DoxContainerBuilder implements Builder {
     DartType? key = model.getField('primaryKeyType')?.toTypeValue();
     String keyType = key is InterfaceType ? key.element.displayName : 'int';
     return ModelEntry(element, library, keyType);
+  }
+
+  /// A serializer that extends a `@Serialize()` serializer has no fast
+  /// writer of its own. Its JSON is right (Dox finds a writer by the exact
+  /// class, so it uses the map of `toJson()`), but it is slow.
+  void _warnSubSerializer(ClassElement element, String library) {
+    const DtoReader reader = DtoReader();
+    if (reader.isSerialize(element)) return;
+    for (InterfaceType above in element.allSupertypes) {
+      InterfaceElement parent = above.element;
+      if (parent is! ClassElement || !reader.isSerialize(parent)) continue;
+      if (!DtoReader.isSerializer(parent)) continue;
+      log.warning(
+        '${element.displayName} ($library) extends the @Serialize() '
+        'serializer ${parent.displayName}, but it has no @Serialize(), so '
+        'it writes the map of its toJson(). Add @Serialize() to make it '
+        'fast.',
+      );
+      return;
+    }
   }
 
   /// container.g.dart is another library: it can not see a private class
@@ -342,10 +395,15 @@ class DoxContainerBuilder implements Builder {
 
 /// Writes the code of `lib/generated/container.g.dart`.
 class ContainerWriter {
-  ContainerWriter(this.entries, this.models);
+  ContainerWriter(
+    this.entries,
+    this.models, [
+    this.writers = const <JsonWriterEntry>[],
+  ]);
 
   final List<ContainerEntry> entries;
   final List<ModelEntry> models;
+  final List<JsonWriterEntry> writers;
 
   /// import uri -> prefix (`i1`, `i2`, ...)
   final Map<String, String> _prefixes = <String, String>{};
@@ -362,6 +420,9 @@ class ContainerWriter {
     for (ModelEntry model in models) {
       _prefix(model.library);
     }
+    for (JsonWriterEntry writer in writers) {
+      _prefix(writer.library);
+    }
     StringBuffer out = StringBuffer()
       ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
       ..writeln('// Made by dox_builder. Run `dart run build_runner build`.')
@@ -375,8 +436,9 @@ class ContainerWriter {
       ..writeln()
       ..writeln('/// Puts every class of the app into the container: the')
       ..writeln(
-        '/// `@Inject()` classes, routers, providers and model binders.',
+        '/// `@Inject()` classes, routers, providers, model binders and the',
       )
+      ..writeln('/// JSON writers of the `@Serialize()` classes.')
       ..writeln('/// Use it in `AppConfig(container: registerContainer)`.')
       ..writeln('void registerContainer(IocContainer c) {');
     for (ContainerEntry entry in entries) {
@@ -384,6 +446,11 @@ class ContainerWriter {
     }
     for (ModelEntry model in models) {
       _writeModel(out, model);
+    }
+    for (JsonWriterEntry writer in writers) {
+      out.writeln(
+        'c.jsonWriter(${_prefixes[writer.library]}.\$${writer.name}Writer);',
+      );
     }
     out.writeln('}');
     return out.toString();

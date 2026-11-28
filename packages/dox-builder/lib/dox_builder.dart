@@ -8,6 +8,7 @@ import 'package:dox_builder/src/dto/dto_registry_builder.dart';
 import 'package:dox_builder/src/env_builder.dart';
 import 'package:dox_builder/src/job/job_registry_builder.dart';
 import 'package:dox_builder/src/openapi/openapi_builder.dart';
+import 'package:dox_builder/src/serialize/serialize_generator.dart';
 import 'package:source_gen/source_gen.dart';
 
 export 'src/container/container_builder.dart';
@@ -19,13 +20,17 @@ export 'src/job/job_registry_builder.dart';
 export 'src/schema/dto_schema.dart';
 export 'src/schema/json_schema_reader.dart';
 export 'src/schema/model_schema.dart';
+export 'src/serialize/serialize_generator.dart';
+export 'src/serialize/serialize_reader.dart';
+export 'src/serialize/serializer_writer.dart';
 
-/// Models (`@DoxModel`), DTOs (`@Dto`) and env classes (`@DoxEnv`) go into
-/// the `.g.dart` part.
+/// Models (`@DoxModel`), DTOs (`@Dto`), env classes (`@DoxEnv`) and the
+/// JSON writers of `@Serialize()` classes go into the `.g.dart` part.
 Builder buildDoxModel(BuilderOptions options) => SharedPartBuilder(<Generator>[
   DoxModelBuilder(),
   const DoxDtoGenerator(),
   DoxEnvBuilder(),
+  const DoxSerializeGenerator(),
 ], 'dox_model_generator');
 
 /// Writes `lib/generated/dtos.g.dart` with every DTO of the app.

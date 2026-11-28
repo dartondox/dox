@@ -1354,6 +1354,96 @@ class Inner {
       expect(out, contains('Map<String, o.Status>?'));
       expect(out, isNot(contains(' Inner ')));
     });
+
+    // origin/main builds these: the class keeps the prefix of prefixOf()
+    Map<String, (String, String)> imports = <String, (String, String)>{
+      'a prefixed import, then the plain one': (
+        "import 'other.dart' as o2;\nimport 'other.dart';",
+        '',
+      ),
+      'a prefixed barrel, then the plain file': (
+        "import 'barrel.dart' as b;\nimport 'other.dart';",
+        '',
+      ),
+      'only a prefixed import': ("import 'other.dart' as o;", 'o.'),
+    };
+    for (MapEntry<String, (String, String)> shape in imports.entries) {
+      test('a nested DTO: ${shape.key}', () async {
+        String type = '${shape.value.$2}Inner';
+        String out = await _generate(
+          '''
+@Dto()
+class Outer {
+  final $type inner;
+  const Outer({required this.inner});
+}
+''',
+          imports:
+              "import 'package:dox_annotation/dox_annotation.dart';\n"
+              '${shape.value.$1}',
+          packages: <String, String>{
+            'dox_annotation|lib/dox_annotation.dart':
+                "export 'src/json_writer.dart';",
+            'dox_annotation|lib/src/json_writer.dart': File(
+              '../dox-annotation/lib/src/json_writer.dart',
+            ).readAsStringSync(),
+          },
+          files: <String, String>{
+            'a|lib/barrel.dart': "export 'other.dart';",
+            'a|lib/other.dart': '''
+import 'package:dox_validation/dox_validation.dart';
+import 'package:dox_annotation/dox_annotation.dart';
+
+part 'other.g.dart';
+
+@Dto()
+class Inner {
+  final String name;
+  const Inner({required this.name});
+}
+''',
+          },
+        );
+        String p = shape.value.$2;
+        expect(out, isNot(startsWith('ERROR')));
+        expect(out, contains('$p\$InnerDto.convert('));
+        expect(out, contains('$p\$InnerDto.fromMap('));
+        expect(out, contains('$p\$InnerDto.toMap('));
+        // the JSON writer calls the nested writer directly
+        expect(out, contains('$p\$writeInner(dto.inner, writer);'));
+      });
+    }
+
+    test('a nested DTO imported with show: a clear error', () async {
+      String out = await _generate(
+        '''
+@Dto()
+class Outer {
+  final Inner inner;
+  const Outer({required this.inner});
+}
+''',
+        imports: "import 'other.dart' show Inner;",
+        files: <String, String>{
+          'a|lib/other.dart': '''
+import 'package:dox_validation/dox_validation.dart';
+@Dto()
+class Inner {
+  final String name;
+  const Inner({required this.name});
+}
+''',
+        },
+      );
+      expect(out, startsWith('ERROR'));
+      expect(
+        out,
+        contains(
+          'The type Inner of Outer.inner is a @Dto, but its generated code '
+          'is hidden here',
+        ),
+      );
+    });
   });
 
   group('DTO registry |', () {

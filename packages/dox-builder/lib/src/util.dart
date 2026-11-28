@@ -90,6 +90,119 @@ String prefixOf(Element element, LibraryElement? library) {
   return prefix == null ? '' : '$prefix.';
 }
 
+/// The prefix (like `p.`, or empty) to call the generated function [name]
+/// of the part of [target] from [library], or null when [library] can
+/// not see it: [target] is in another package, its file has no
+/// `part '<file>.g.dart';` (so the function is not made), or no import
+/// gives the name. An import or an export with `show` or `hide` gives the
+/// name only when the name passes it. The generated function is not in
+/// the element model yet, so the directives are read, not the names.
+///
+/// For a `@Serialize()` class ([serialize]), the file of [target] must
+/// also see the classes that its code uses ([seesSerializeCode]), else
+/// the generator makes no code for it.
+///
+/// With [prefix], only the imports with that prefix count (see
+/// [visiblePrefix]).
+String? generatedPrefix(
+  LibraryElement library,
+  InterfaceElement target,
+  String name, {
+  bool serialize = true,
+  String? prefix,
+}) {
+  LibraryElement home = target.library;
+  if (!hasGeneratedPart(home)) return null;
+  if (serialize && !seesSerializeCode(home.firstFragment)) return null;
+  if (home == library) return '';
+  if (_packageOf(home.uri) != _packageOf(library.uri)) return null;
+  return visiblePrefix(library, target, name, prefix: prefix);
+}
+
+/// The prefix (like `p.`, or empty) of the name [name] of the library of
+/// [target] in [library], or null when no import of [library] gives it.
+/// Only the directives are read (the name can be one that a builder makes
+/// in this build): an import or an export with `show` or `hide` gives
+/// [name] only when it passes them.
+///
+/// With [prefix] (like `o.`, or empty for no prefix), only the imports
+/// with that prefix count, and the result is [prefix] or null. Code that
+/// writes the class with the prefix of [prefixOf] asks this way, so the
+/// name goes with the same prefix as the class.
+String? visiblePrefix(
+  LibraryElement library,
+  InterfaceElement target,
+  String name, {
+  String? prefix,
+}) {
+  LibraryElement home = target.library;
+  if (home == library) return '';
+  for (LibraryFragment fragment in library.fragments) {
+    for (LibraryImport import in fragment.libraryImports) {
+      String? found = import.prefix?.element.name;
+      String text = found == null ? '' : '$found.';
+      if (prefix != null && text != prefix) continue;
+      LibraryElement? imported = import.importedLibrary;
+      if (imported == null || !_passes(import.combinators, name)) continue;
+      if (!_exports(imported, home, name, <LibraryElement>{})) continue;
+      return text;
+    }
+  }
+  return null;
+}
+
+/// `true` when [library] has the part `<file>.g.dart` of its own file,
+/// where the generated code of dox_builder goes.
+bool hasGeneratedPart(LibraryElement library) {
+  String file = library.uri.pathSegments.lastOrNull ?? '';
+  String part = '${file.replaceFirst(RegExp(r'\.dart$'), '')}.g.dart';
+  for (PartInclude include in library.firstFragment.partIncludes) {
+    DirectiveUri uri = include.uri;
+    if (uri is DirectiveUriWithRelativeUriString &&
+        uri.relativeUriString.split('/').last == part) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// `true` when [from] is [home], or exports [name] of [home]
+bool _exports(
+  LibraryElement from,
+  LibraryElement home,
+  String name,
+  Set<LibraryElement> seen,
+) {
+  if (from == home) return true;
+  if (!seen.add(from)) return false;
+  for (LibraryFragment fragment in from.fragments) {
+    for (LibraryExport export in fragment.libraryExports) {
+      LibraryElement? exported = export.exportedLibrary;
+      if (exported == null || !_passes(export.combinators, name)) continue;
+      if (_exports(exported, home, name, seen)) return true;
+    }
+  }
+  return false;
+}
+
+bool _passes(List<NamespaceCombinator> combinators, String name) {
+  for (NamespaceCombinator combinator in combinators) {
+    if (combinator is ShowElementCombinator &&
+        !combinator.shownNames.contains(name)) {
+      return false;
+    }
+    if (combinator is HideElementCombinator &&
+        combinator.hiddenNames.contains(name)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+String _packageOf(Uri uri) {
+  return '${uri.scheme}:${uri.pathSegments.firstOrNull}';
+}
+
 /// A quick check of the text of a Dart file, before it is resolved
 /// (resolving is slow). True when the text has one of [words] (any case),
 /// or a `part` directive (a part file can hold the code).
@@ -123,6 +236,14 @@ bool seesDtoWriter(LibraryFragment library) {
   return seesAnnotationClass(library, 'JsonObjectWriter') &&
       seesAnnotationClass(library, 'JsonWriter') &&
       seesAnnotationClass(library, 'JsonRun');
+}
+
+/// `true` when [library] sees the classes that the code of `@Serialize()`
+/// uses. The generator makes the code only then, and other files call it
+/// only then: one test for both, so they can not disagree.
+bool seesSerializeCode(LibraryFragment library) {
+  return seesDtoWriter(library) &&
+      seesAnnotationClass(library, 'SerializeWriter');
 }
 
 /// `true` when [element] has the method [name]: its own, or one from a

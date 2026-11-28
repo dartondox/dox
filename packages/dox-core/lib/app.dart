@@ -14,7 +14,8 @@ import 'package:dox_core/isolate/isolate_spawner.dart';
 import 'package:dox_core/isolate/snapshot_locator.dart';
 import 'package:dox_core/router/route_data.dart';
 import 'package:dox_core/server/dox_server.dart';
-import 'package:dox_core/utils/json.dart' show useSdkJsonEncoder;
+import 'package:dox_core/utils/json.dart'
+    show forgetJsonWriters, useSdkJsonEncoder;
 import 'package:dox_core/utils/log_buffer.dart';
 import 'package:dox_core/utils/processors.dart';
 import 'package:dox_core/utils/strict_mode.dart';
@@ -138,6 +139,7 @@ class Dox {
       );
     }
     _dtos = null;
+    forgetJsonWriters();
     ioc.clear();
     appConfig.container?.call(ioc);
   }
