@@ -169,7 +169,10 @@ class DoxRequest implements IDoxRequest {
   late final Map<String, dynamic> _cookies = _getCookies();
 
   /// query and body together, made on first use
-  late Map<String, dynamic> _allRequest = <String, dynamic>{...query, ...body};
+  Map<String, dynamic>? _all;
+  Map<String, dynamic> get _allRequest =>
+      _all ??= <String, dynamic>{...query, ...body};
+  set _allRequest(Map<String, dynamic> map) => _all = map;
 
   /// The body as it was read, for DTOs. `body` is its map.
   final RequestBody requestBody;
@@ -481,11 +484,8 @@ class DoxRequest implements IDoxRequest {
   /// the value of [key] in the input. a key that is there as it is wins,
   /// else a dot key reads inside maps and lists.
   ({bool found, dynamic value}) _find(String key) {
-    // the body wins, as in [_allRequest]: one key needs no merged map
-    Map<String, dynamic> body = this.body;
-    if (body.containsKey(key)) return (found: true, value: body[key]);
-    Map<String, dynamic> query = this.query;
-    if (query.containsKey(key)) return (found: true, value: query[key]);
+    ({bool found, dynamic value}) plain = _plain(key);
+    if (plain.found) return plain;
     if (!key.contains('.')) return (found: false, value: null);
     dynamic current = _allRequest;
     for (String part in key.split('.')) {
@@ -504,6 +504,17 @@ class DoxRequest implements IDoxRequest {
     return (found: true, value: current);
   }
 
+  /// [key] in [_allRequest] as it is. before the merged map is made, the
+  /// body and the query give the same answer, so one key needs no merge.
+  ({bool found, dynamic value}) _plain(String key) {
+    Map<String, dynamic>? all = _all;
+    if (all != null) return (found: all.containsKey(key), value: all[key]);
+    Map<String, dynamic> body = this.body;
+    if (body.containsKey(key)) return (found: true, value: body[key]);
+    Map<String, dynamic> query = this.query;
+    return (found: query.containsKey(key), value: query[key]);
+  }
+
   /// Check if input is present
   /// ```
   /// req.has('email')
@@ -513,7 +524,7 @@ class DoxRequest implements IDoxRequest {
   @override
   bool has(String key) {
     if (Dox().flags.hasKeyOnly) return exists(key);
-    dynamic val = _allRequest[key];
+    dynamic val = _plain(key).value;
     if (val == null) {
       return false;
     }

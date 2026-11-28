@@ -138,6 +138,38 @@ void main() {
       });
     });
 
+    test('input, has and all agree after a change to the maps', () async {
+      Route.post('/query_change', (DoxRequest req) {
+        Map<String, dynamic> before = <String, dynamic>{
+          'input': req.input('m'),
+          'has': req.has('m'),
+        };
+        req.all()['k'] = 'v';
+        req.body = <String, dynamic>{'late': 'x'};
+        return <String, dynamic>{
+          'before': before,
+          'k': req.input('k'),
+          'has_k': req.has('k'),
+          'late': req.input('late'),
+          'has_late': req.has('late'),
+          'all_late': req.all()['late'],
+        };
+      });
+      http.Response res = await http.post(
+        Uri.parse('$baseUrl/query_change?m=2'),
+        headers: <String, String>{'content-type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{'m': 1}),
+      );
+      expect(jsonDecode(res.body), <String, dynamic>{
+        'before': <String, dynamic>{'input': 1, 'has': true},
+        'k': 'v',
+        'has_k': true,
+        'late': null,
+        'has_late': false,
+        'all_late': null,
+      });
+    });
+
     test('requestBody tells invalid JSON from no body', () async {
       Route.post('/body_kind', (DoxRequest req) {
         RequestBody body = req.requestBody;
