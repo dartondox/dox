@@ -1,5 +1,6 @@
 ## Unreleased
 
+- Fix: a query with an escape that is not UTF-8 (for example `?a=%ff`) gave a 500. Now `req.query` and a `@Dto` that reads the query give a 400. `ValidateSignature` gives a 403, because Dox never signs a URL like this.
 - Faster: the JSON encoder inlines `string()`, `integer()` and `run()` into the generated code, and three writers do not check bounds. Each of these three makes room for all its bytes first, in the same method. On the HttpArena data, a `@Dto` list encodes in 2.8 µs, not 3.4 µs. On the same data and machine, `JSON.stringify` of Bun takes 3.3 µs.
 - Faster: the JSON encoder writes a whole number two digits at a time, and it writes a `JsonRun` 8 bytes at a time. With the new dox_builder, a `@Dto` in a response is 2.2 times faster to encode. Run `dart run build_runner build` to get the new code.
 - Faster: a query with no `%`, `+` or `[` (for example `?page=2&sort=name`) is split with no decoding. The map is the same as `Uri.queryParameters`. `input()`, `integer()` and the other readers of one key look in the body, then in the query, and make no merged map. The body still wins over the query. On the HttpArena json-h2c test (2 cores), this gives 3% more requests a second.

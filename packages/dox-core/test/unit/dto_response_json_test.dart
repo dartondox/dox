@@ -134,6 +134,37 @@ void main() {
       expect(_bytes(const CamelKeys(firstName: 'a')), '{"firstName":"a"}');
     });
 
+    test('a subclass in a DTO field: only the declared fields', () {
+      ProductView secret = const SecretProductView(
+        id: 1,
+        productName: 'p',
+        price: 1,
+        inStock: true,
+        secret: 'hidden',
+      );
+      MixedView mixed = MixedView(
+        dates: const <DateTime>[],
+        roles: const <Role>[],
+        days: const <String, DateTime>{},
+        grid: const <List<Role>>[],
+        own: const OwnJson(id: 1),
+        owns: const <OwnJson>[],
+        product: secret,
+        products: <ProductView>[secret],
+        byName: <String, ProductView>{'p': secret},
+        maybeProducts: <ProductView>[secret],
+        maybeByName: <String, ProductView>{'p': secret},
+        maybeDates: <DateTime>[DateTime.utc(2024)],
+        sparse: <String, ProductView?>{'p': secret, 'q': null},
+        sparseDays: <String, DateTime?>{'a': DateTime.utc(2024), 'b': null},
+        xrays: const <String, XRay>{'x': XRay(id: 9)},
+      );
+      _same($MixedViewDto, mixed);
+      expect(_bytes(mixed), isNot(contains('secret')));
+      // on its own, it is written with all of its fields
+      expect(_bytes(secret), contains('"secret":"hidden"'));
+    });
+
     test('dates and enums in lists and maps, and DTOs in a map', () {
       ProductView product = const ProductView(
         id: 1,

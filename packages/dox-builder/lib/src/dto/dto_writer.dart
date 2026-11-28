@@ -1201,8 +1201,11 @@ class DtoWriter {
       DtoKind.boolean => 'w.boolean($value);',
       DtoKind.date => 'w.dateTime($value);',
       DtoKind.enumName => 'w.string($value${dot}name);',
-      DtoKind.dto when !type.nullable && _hasWriteFunction(type) =>
-        '${_writeRef(type)}($value, w);',
+      DtoKind.dto when _hasWriteFunction(type) =>
+        type.nullable
+            ? 'if ($value case final \$v?) { ${_writeRef(type)}(\$v, w); } '
+                  'else { w.value(null); }'
+            : '${_writeRef(type)}($value, w);',
       _ => null,
     };
   }
@@ -1216,8 +1219,23 @@ class DtoWriter {
       DtoKind.integer => 'w.integer($value);',
       DtoKind.date => 'w.dateTime($value);',
       DtoKind.enumName => 'w.string($value${dot}name);',
-      _ when _encoderWrites(type) => 'w.value($value);',
+      _ when _encoderWrites(type) && !_holdsDto(type) => 'w.value($value);',
+      // a field read does not promote to non-null: read it into a local
+      _ when type.nullable =>
+        '{ ${type.code} \$n = $value; '
+            'w.value(${_toValue(type, r'$n', 0)}); }',
       _ => 'w.value(${_toValue(type, value, 0)});',
+    };
+  }
+
+  /// `true` when [type] is a DTO or holds one. The encoder writes a DTO
+  /// with the writer of its class at run time, so a subclass would put
+  /// its extra fields in the JSON. toMap() of the declared class does not.
+  bool _holdsDto(DtoType type) {
+    return switch (type.kind) {
+      DtoKind.dto => true,
+      DtoKind.list || DtoKind.map => _holdsDto(type.item!),
+      _ => false,
     };
   }
 
@@ -1240,23 +1258,29 @@ class DtoWriter {
 
   /// [value] (of [type]) as a JSON-like value.
   String _toValue(DtoType type, String value, int depth) {
+    DtoType? item = type.item;
+    String x = 'x$depth';
     String? code = switch (type.kind) {
-      DtoKind.date => 'X.toIso8601String()',
-      DtoKind.enumName => 'X.name',
-      DtoKind.dto => '${_ref(type)}.toMap(X)',
+      DtoKind.date => '$value.toIso8601String()',
+      DtoKind.enumName => '$value.name',
+      DtoKind.dto => '${_ref(type)}.toMap($value)',
       DtoKind.list =>
-        _identity(type.item!)
+        _identity(item!)
             ? null
-            : '<dynamic>[for (${type.item!.code} x$depth in X) ${_toValue(type.item!, 'x$depth', depth + 1)}]',
+            : '<dynamic>[for (${item.code} $x in $value) '
+                  '${_toValue(item, x, depth + 1)}]',
+      // `MapEntry.value` does not promote to non-null: a switch gives a
+      // local that does
       DtoKind.map =>
-        _identity(type.item!)
+        _identity(item!)
             ? null
-            : '<String, dynamic>{for (MapEntry<String, ${type.item!.code}> x$depth in X.entries) x$depth.key: ${_toValue(type.item!, 'x$depth.value', depth + 1)}}',
+            : '<String, dynamic>{for (MapEntry<String, ${item.code}> $x '
+                  'in $value.entries) $x.key: '
+                  '${item.nullable ? 'switch ($x.value) { ${item.code} v$depth => ${_toValue(item, 'v$depth', depth + 1)} }' : _toValue(item, '$x.value', depth + 1)}}',
       _ => null,
     };
     if (code == null) return value;
-    String result = code.replaceAll('X', value);
-    return type.nullable ? '$value == null ? null : $result' : result;
+    return type.nullable ? '$value == null ? null : $code' : code;
   }
 
   bool _identity(DtoType item) {

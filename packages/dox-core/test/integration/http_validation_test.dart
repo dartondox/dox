@@ -145,6 +145,8 @@ void main() {
         'page': 2,
         'tags': <String>['a', 'b'],
       });
+      // a query that is not UTF-8 is 400, not 500
+      expect((await get('/search?q=%ff')).statusCode, 400);
       http.Response bad = await get('/search?page=x');
       expect(bad.statusCode, 422);
       expect(json(bad), <String, dynamic>{

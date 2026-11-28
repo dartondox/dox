@@ -322,6 +322,8 @@ void main() {
       (await client.get(url.replaceFirst('/5?', '/6?'))).expectStatus(403);
       (await client.get('/signed/5')).expectStatus(403);
       (await client.get('/signed/5?signature=abc')).expectStatus(403);
+      // an escape that is not UTF-8: 403, not 500
+      (await client.get('/signed/5?signature=abc&a=%ff')).expectStatus(403);
       (await client.get('$url&extra=1')).expectStatus(403);
     });
 
