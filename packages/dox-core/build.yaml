@@ -6,6 +6,7 @@ targets:
       - lib/**
       - test/dtos/**
       - test/env/**
+      - test/serialize/**
       - benchmark/**
       - $package$
     builders:
@@ -16,6 +17,7 @@ targets:
           - lib/**
           - test/dtos/**
           - test/env/**
+          - test/serialize/**
           - benchmark/**
       dox_builder:openapi:
         enabled: false

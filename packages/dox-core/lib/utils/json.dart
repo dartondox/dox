@@ -13,11 +13,17 @@ final JsonBytesEncoder _jsonBytesEncoder = JsonBytesEncoder(
   writerOf: _dtoWriter,
 );
 
-/// The schema of a DTO (`AppConfig(dtos: dtos)`) that can write the JSON
-/// of [object], or null. A DTO class with its own `toJson()` has none.
+/// The writer of the JSON of [object], or null: the schema of a DTO
+/// (`AppConfig(dtos: dtos)`), else the writer of a `@Serialize()` class
+/// (`AppConfig(container: registerContainer)`). A DTO class with its own
+/// `toJson()` has none.
 JsonObjectWriter? _dtoWriter(Object object) {
-  DtoSchema<Object>? schema = Dox().dtos.ofType(object.runtimeType);
-  return schema is JsonObjectWriter ? schema as JsonObjectWriter : null;
+  Type type = object.runtimeType;
+  DtoSchema<Object>? schema = Dox().dtos.ofType(type);
+  if (schema != null) {
+    return schema is JsonObjectWriter ? schema as JsonObjectWriter : null;
+  }
+  return Dox().ioc.jsonWriterOf(type);
 }
 
 /// `CoreFlags.sdkJsonEncoder` of this isolate. `Dox().initialize` sets
@@ -140,5 +146,8 @@ dynamic advanceEncode(dynamic object) {
   if (schema != null && schema is JsonObjectWriter) {
     return schema.toMap(object as Object);
   }
+  // a plain `@Serialize()` class has no toJson(): its writer makes the map
+  SerializeWriter? writer = Dox().ioc.jsonWriterOf(object.runtimeType);
+  if (writer != null) return writer.toJsonValue(object as Object);
   return object.toJson();
 }

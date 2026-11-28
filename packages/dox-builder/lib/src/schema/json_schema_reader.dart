@@ -5,6 +5,7 @@ import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
 
+import '../dto/dto_model.dart';
 import '../openapi/annotation_reader.dart';
 import '../openapi/ast_finders.dart';
 import 'dto_schema.dart';
@@ -196,6 +197,9 @@ class JsonSchemaReader {
     if (model.isModel(element)) {
       return _component(name, element, _modelKind);
     }
+    if (_plain.plainProblem(element) == null) {
+      return _component(name, element, _plainKind);
+    }
     if (name == 'Pagination') {
       components[name] = _pagination;
       return ref(name);
@@ -209,6 +213,25 @@ class JsonSchemaReader {
 
   static const int _dtoKind = 0;
   static const int _modelKind = 1;
+  static const int _plainKind = 2;
+
+  static const DtoReader _plain = DtoReader();
+
+  /// the schema of a plain `@Serialize()` class: its JSON fields
+  Future<Map<String, dynamic>> _plainSchema(ClassElement element) async {
+    Map<String, dynamic> properties = <String, dynamic>{};
+    List<String> required = <String>[];
+    for (DtoField field in _plain.readPlain(element, <String>[]).fields) {
+      properties[field.key] =
+          await of(field.element.type) ?? <String, dynamic>{};
+      required.add(field.key);
+    }
+    return <String, dynamic>{
+      'type': 'object',
+      'properties': properties,
+      if (required.isNotEmpty) 'required': required,
+    };
+  }
 
   /// adds the schema of [element] once, and returns a `$ref` to it.
   /// a placeholder is set first, so classes that point to each other
@@ -230,9 +253,11 @@ class JsonSchemaReader {
     _owners[name] = element;
     if (!components.containsKey(name)) {
       components[name] = <String, dynamic>{};
-      components[name] = kind == _dtoKind
-          ? await dto.of(element, this)
-          : await model.of(element, this);
+      components[name] = switch (kind) {
+        _dtoKind => await dto.of(element, this),
+        _plainKind => await _plainSchema(element),
+        _ => await model.of(element, this),
+      };
     }
     return ref(name);
   }

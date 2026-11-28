@@ -41,6 +41,7 @@ class IocContainer {
   final List<Type> _providers = <Type>[];
   final Map<Type, RouteBinder<Object>> _modelBinders =
       <Type, RouteBinder<Object>>{};
+  final Map<Type, SerializeWriter> _jsonWriters = <Type, SerializeWriter>{};
 
   /// One instance of [T] per container (per isolate), made on first use.
   /// ```
@@ -123,6 +124,18 @@ class IocContainer {
     _modelBinders[T] = find;
   }
 
+  /// [writer] writes the JSON of its class. `lib/generated/container.g.dart`
+  /// calls this for every `@Serialize()` class. The JSON encoder finds
+  /// the writer by the type of the object.
+  void jsonWriter(SerializeWriter writer) {
+    _jsonWriters[writer.type] = writer;
+  }
+
+  /// The [jsonWriter] of the class [type], or null.
+  SerializeWriter? jsonWriterOf(Type type) {
+    return _jsonWriters[type];
+  }
+
   /// The routers, made from the container, in the order they were added.
   List<Router> get routers {
     return <Router>[for (Type type in _routers) getByType(type) as Router];
@@ -142,6 +155,7 @@ class IocContainer {
     _routers.clear();
     _providers.clear();
     _modelBinders.clear();
+    _jsonWriters.clear();
   }
 
   /// The instance of [type]. Same as [get], for a [Type] value.

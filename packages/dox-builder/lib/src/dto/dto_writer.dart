@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../openapi/dart_literal.dart';
 import '../util.dart';
@@ -47,7 +48,21 @@ class DtoWriter {
     this.literal = const DartLiteral(),
     this.runtimeFlags = false,
     this.jsonWriter = false,
-  });
+  }) : _serialize = false;
+
+  /// The code of a plain `@Serialize()` class: only its JSON writer and
+  /// its map, see [writeSerialize].
+  DtoWriter.serialize(this.dto, {this.literal = const DartLiteral()})
+    : flags = const _NoFlags(),
+      jsonSchema = const <String, dynamic>{},
+      runtimeFlags = false,
+      jsonWriter = true,
+      _serialize = true;
+
+  /// true for [DtoWriter.serialize]
+  final bool _serialize;
+
+  static const DtoReader _reader = DtoReader();
 
   final DtoClass dto;
   final DtoFlagsSource flags;
@@ -69,6 +84,47 @@ class DtoWriter {
   /// A DTO with its own `toJson()` keeps it: dox_core calls that method.
   /// The method can also come from a class or a mixin above the DTO.
   bool get _writesJson => jsonWriter && !hasMethod(dto.element, 'toJson');
+
+  /// The code of a plain `@Serialize()` class: a `SerializeWriter` for
+  /// the JSON encoder, the function `$writeName` that writes the JSON,
+  /// and the function `$NameToMap` that gives the same JSON as a map, for
+  /// the encoder of the Dart SDK.
+  String writeSerialize() {
+    String name = dto.name;
+    String writer = _writeFunction();
+    StringBuffer out = StringBuffer()
+      ..writeln('/// The JSON writer of [$name]. Dox gets it from')
+      ..writeln('/// `lib/generated/container.g.dart`.')
+      ..writeln('const SerializeWriter \$${name}Writer = $_class();')
+      ..writeln()
+      ..writeln('class $_class implements SerializeWriter {')
+      ..writeln('const $_class();')
+      ..writeln();
+    for (String line in _statics) {
+      out.writeln(line);
+    }
+    out
+      ..writeln()
+      ..writeln('@override')
+      ..writeln('Type get type => $name;')
+      ..writeln()
+      ..writeln('@override')
+      ..writeln(
+        'void writeObject(Object object, JsonWriter writer) => '
+        '\$write$name(object as $name, writer);',
+      )
+      ..writeln()
+      ..writeln('@override')
+      ..writeln(
+        'Object? toJsonValue(Object object) => '
+        '\$${name}ToMap(object as $name);',
+      )
+      ..writeln('}')
+      ..writeln()
+      ..writeln(writer)
+      ..writeln(_toMap());
+    return out.toString();
+  }
 
   final List<String> _statics = <String>[];
   int _regexes = 0;
@@ -161,7 +217,8 @@ class DtoWriter {
     return names;
   }
 
-  String get _class => '_\$${dto.name}Dto';
+  String get _class =>
+      _serialize ? '_\$${dto.name}Writer' : '_\$${dto.name}Dto';
 
   String _ref(DtoType type) {
     return '${type.prefix}\$${type.name}Dto';
@@ -1199,9 +1256,16 @@ class DtoWriter {
   }
 
   String _toMap() {
-    StringBuffer out = StringBuffer()
-      ..writeln('@override')
-      ..writeln('Map<String, dynamic> toMap(${dto.name} dto) {');
+    StringBuffer out = StringBuffer();
+    if (_serialize) {
+      out
+        ..writeln('/// The JSON of [${dto.name}] as a map.')
+        ..writeln('Map<String, dynamic> \$${dto.name}ToMap(${dto.name} dto) {');
+    } else {
+      out
+        ..writeln('@override')
+        ..writeln('Map<String, dynamic> toMap(${dto.name} dto) {');
+    }
     Set<String> taken = <String>{'dto', ..._emittedNames, ..._foreignNames};
     List<String> entries = <String>[];
     for (DtoField field in dto.fields) {
@@ -1449,7 +1513,10 @@ class DtoWriter {
     String? code = switch (type.kind) {
       DtoKind.date => '$value.toIso8601String()',
       DtoKind.enumName => '$value.name',
-      DtoKind.dto => '${_ref(type)}.toMap($value)',
+      DtoKind.dto =>
+        _isPlain(type)
+            ? '${type.prefix}\$${type.name}ToMap($value)'
+            : '${_ref(type)}.toMap($value)',
       DtoKind.list =>
         _identity(item!)
             ? null
@@ -1467,6 +1534,12 @@ class DtoWriter {
     };
     if (code == null) return value;
     return type.nullable ? '$value == null ? null : $code' : code;
+  }
+
+  /// `true` when the nested DTO [type] is a plain `@Serialize()` class
+  bool _isPlain(DtoType type) {
+    DartType dart = type.type;
+    return dart is InterfaceType && !_reader.isDto(dart.element);
   }
 
   bool _identity(DtoType item) {
@@ -1510,6 +1583,15 @@ class DtoWriter {
   }
 }
 
+class _NoFlags implements DtoFlagsSource {
+  const _NoFlags();
+
+  @override
+  DtoFlags flagsOf(DtoType type) {
+    return const DtoFlags(checks: false, checksAsync: false, async: false);
+  }
+}
+
 class _Check {
   const _Check(this.condition, this.fail);
 
@@ -1519,11 +1601,44 @@ class _Check {
 
 /// Puts the fixed parts of the JSON of a DTO together into runs, between
 /// the lines of code that write the values.
-class _JsonRuns {
-  _JsonRuns(this.writer, this.out);
+class _JsonRuns extends JsonRuns {
+  _JsonRuns(DtoWriter writer, StringBuffer out)
+    : super(
+        writer._class,
+        out,
+        writer._statics,
+        writer._runNames,
+        literal: writer.literal,
+      );
+}
 
-  final DtoWriter writer;
+/// Puts fixed parts of JSON together into `JsonRun`s, between the lines
+/// of code that write the values. Each run is a `static final` of the
+/// class [owner], named after the field of the key it ends with
+/// (`_idKey`), else `_end`.
+class JsonRuns {
+  JsonRuns(
+    this.owner,
+    this.out,
+    this.statics,
+    this.names, {
+    this.literal = const DartLiteral(),
+    this.writer = 'writer',
+  });
+
+  /// the name of the `JsonWriter` in the code
+  final String writer;
+
+  /// the class that keeps the runs
+  final String owner;
   final StringBuffer out;
+
+  /// gets the `static final JsonRun` lines
+  final List<String> statics;
+
+  /// the names of the runs so far
+  final Set<String> names;
+  final DartLiteral literal;
   final StringBuffer _text = StringBuffer();
 
   /// The field of the last key in the run, for its name.
@@ -1547,14 +1662,14 @@ class _JsonRuns {
     if (_text.isEmpty) return;
     String base = _field == null ? '_end' : '_${_field}Key';
     String name = base;
-    for (int n = 2; !writer._runNames.add(name); n++) {
+    for (int n = 2; !names.add(name); n++) {
       name = '$base$n';
     }
-    writer._statics.add(
+    statics.add(
       'static final JsonRun $name = '
-      'JsonRun(${writer.literal.string(_text.toString())});',
+      'JsonRun(${literal.string(_text.toString())});',
     );
-    out.writeln('writer.run(${writer._class}.$name);');
+    out.writeln('$writer.run($owner.$name);');
     _text.clear();
     _field = null;
   }
