@@ -625,6 +625,39 @@ class A {
       );
     });
 
+    test('a field named like a type, and an X in a type name', () async {
+      String output = await _generate('''
+@Dto()
+class Xray {
+  final int id;
+  const Xray({required this.id});
+}
+
+@Dto()
+class HasXray {
+  final int num;
+  @In(<int>[1, 2])
+  final int level;
+  final Xray xray;
+  final List<Xray> items;
+  final List<DateTime>? days;
+  const HasXray({
+    required this.num,
+    required this.level,
+    required this.xray,
+    required this.items,
+    this.days,
+  });
+}''');
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      // `num` is a type of the generated code, so the local is not `num`
+      expect(output, contains('Object? numValue = state.integer('));
+      expect(output, contains('const <num>{1, 2}'));
+      // the X of a type name stays
+      expect(output, contains(r'$XrayDto.toMap(dto.xray)'));
+      expect(output, contains('Xray x0 in dto.items'));
+    });
+
     test('@OrDefault drops the issues of its field', () async {
       String output = await _generate('''
 @Dto()
@@ -1553,6 +1586,27 @@ class View {
             'writer.endObject();}',
           ),
         );
+      });
+
+      test('a nullable list that toMap() changes is read once', () async {
+        String out = (await _generate(
+          '''
+enum Role { admin, user }
+
+@Dto()
+class Days {
+  final int id;
+  final List<DateTime>? days;
+  final List<Role>? roles;
+  const Days({required this.id, this.days, this.roles});
+}
+''',
+          imports: import,
+          packages: annotation,
+        )).replaceAll(RegExp(r'\s'), '');
+        expect(out, contains('{List<DateTime>?days=dto.days;writer.value('));
+        expect(out, contains('{List<Role>?roles=dto.roles;writer.value('));
+        expect(out, isNot(contains('writer.value(dto.days==null')));
       });
 
       test('a DTO with its own toJson(): not made', () async {

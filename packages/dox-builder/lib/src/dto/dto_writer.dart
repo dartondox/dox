@@ -77,6 +77,39 @@ class DtoWriter {
 
   /// Names that `convert()` declares or uses. A field local must not
   /// take one of them.
+  static const Set<String> _emittedNames = <String>{
+    'num',
+    'int',
+    'double',
+    'bool',
+    'String',
+    'Object',
+    'List',
+    'Map',
+    'MapEntry',
+    'Set',
+    'DateTime',
+    'RegExp',
+    'Undefined',
+    'Invalid',
+    'Maybe',
+    'IssueCodes',
+    'DefaultMessages',
+    'Patterns',
+    'JsonRun',
+    'JsonWriter',
+    'DtoState',
+    'DtoErrors',
+    'DtoChecks',
+    'DtoSchema',
+    'FileTypes',
+    'ImageSize',
+    'SchemaConstants',
+    'JsonSchemaTools',
+    'Type',
+    'Source',
+  };
+
   static const Set<String> _convertNames = <String>{
     'input',
     'state',
@@ -238,7 +271,11 @@ class DtoWriter {
   List<String> _locals = <String>[];
 
   String _convert() {
-    Set<String> taken = <String>{..._convertNames, ..._foreignNames};
+    Set<String> taken = <String>{
+      ..._emittedNames,
+      ..._convertNames,
+      ..._foreignNames,
+    };
     _locals = <String>[
       for (DtoField field in dto.fields) safeLocal(field.name, taken),
     ];
@@ -1163,7 +1200,7 @@ class DtoWriter {
     StringBuffer out = StringBuffer()
       ..writeln('@override')
       ..writeln('Map<String, dynamic> toMap(${dto.name} dto) {');
-    Set<String> taken = <String>{'dto', ..._foreignNames};
+    Set<String> taken = <String>{'dto', ..._emittedNames, ..._foreignNames};
     List<String> entries = <String>[];
     for (DtoField field in dto.fields) {
       String key = _keyLiteral(field);
@@ -1219,7 +1256,13 @@ class DtoWriter {
         'void \$write${dto.name}(${dto.name} dto, JsonWriter writer) {',
       );
     // the locals of the list loops and of the `Maybe` values
-    Set<String> taken = <String>{'dto', 'writer', 'i', ..._foreignNames};
+    Set<String> taken = <String>{
+      'dto',
+      'writer',
+      'i',
+      ..._emittedNames,
+      ..._foreignNames,
+    };
     List<String> locals = <String>[
       for (DtoField field in dto.fields) safeLocal(field.name, taken),
     ];
@@ -1236,7 +1279,13 @@ class DtoWriter {
             '{ $key ${_writeOne(field.type, locals[i])} }',
           );
         } else {
-          out.writeln('$key ${_writeOne(field.type, 'dto.${field.name}')}');
+          String write = _writeOnce(
+            field.type,
+            'dto.${field.name}',
+            locals[i],
+            field.fieldCode,
+          );
+          out.writeln('$key $write');
         }
       }
       out.writeln('writer.endObject();');
@@ -1245,7 +1294,13 @@ class DtoWriter {
       for (int i = 0; i < dto.fields.length; i++) {
         DtoField field = dto.fields[i];
         runs.text('${i > 0 ? ',' : ''}${jsonEncode(field.key)}:', field.name);
-        _writeFast(runs, field.type, 'dto.${field.name}', locals[i]);
+        _writeFast(
+          runs,
+          field.type,
+          'dto.${field.name}',
+          locals[i],
+          field.fieldCode,
+        );
       }
       runs
         ..text('}')
@@ -1257,7 +1312,13 @@ class DtoWriter {
 
   /// Writes [value] (of [type]) with [runs]: a list and a nested DTO get
   /// direct calls. Other values go to [_writeValue].
-  void _writeFast(_JsonRuns runs, DtoType type, String value, String local) {
+  void _writeFast(
+    _JsonRuns runs,
+    DtoType type,
+    String value,
+    String local,
+    String typeCode,
+  ) {
     String? item = type.kind == DtoKind.list && !type.nullable
         ? _writeItem(type.item!, '$local[i]')
         : null;
@@ -1272,7 +1333,7 @@ class DtoWriter {
         ..text(']');
       return;
     }
-    runs.code(_writeOne(type, value));
+    runs.code(_writeOnce(type, value, local, typeCode));
   }
 
   /// `true` when the nested DTO [type] has a `$write` function that this
@@ -1295,6 +1356,15 @@ class DtoWriter {
 
   static String _package(Uri uri) {
     return '${uri.scheme}:${uri.pathSegments.firstOrNull}';
+  }
+
+  /// [_writeOne] for a field read. When the call reads [value] two times
+  /// (a nullable list that is converted), the value is read once into
+  /// [local] of [typeCode].
+  String _writeOnce(DtoType type, String value, String local, String typeCode) {
+    String call = _writeOne(type, value);
+    if (value.allMatches(call).length < 2) return call;
+    return '{ $typeCode $local = $value; ${_writeOne(type, local)} }';
   }
 
   /// The direct call for [value] (of [type]), else the call of
@@ -1353,22 +1423,21 @@ class DtoWriter {
   /// [value] (of [type]) as a JSON-like value.
   String _toValue(DtoType type, String value, int depth) {
     String? code = switch (type.kind) {
-      DtoKind.date => 'X.toIso8601String()',
-      DtoKind.enumName => 'X.name',
-      DtoKind.dto => '${_ref(type)}.toMap(X)',
+      DtoKind.date => '$value.toIso8601String()',
+      DtoKind.enumName => '$value.name',
+      DtoKind.dto => '${_ref(type)}.toMap($value)',
       DtoKind.list =>
         _identity(type.item!)
             ? null
-            : '<dynamic>[for (${type.item!.code} x$depth in X) ${_toValue(type.item!, 'x$depth', depth + 1)}]',
+            : '<dynamic>[for (${type.item!.code} x$depth in $value) ${_toValue(type.item!, 'x$depth', depth + 1)}]',
       DtoKind.map =>
         _identity(type.item!)
             ? null
-            : '<String, dynamic>{for (MapEntry<String, ${type.item!.code}> x$depth in X.entries) x$depth.key: ${_toValue(type.item!, 'x$depth.value', depth + 1)}}',
+            : '<String, dynamic>{for (MapEntry<String, ${type.item!.code}> x$depth in $value.entries) x$depth.key: ${_toValue(type.item!, 'x$depth.value', depth + 1)}}',
       _ => null,
     };
     if (code == null) return value;
-    String result = code.replaceAll('X', value);
-    return type.nullable ? '$value == null ? null : $result' : result;
+    return type.nullable ? '$value == null ? null : $code' : code;
   }
 
   bool _identity(DtoType item) {

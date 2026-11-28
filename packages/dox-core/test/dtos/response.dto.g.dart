@@ -1108,3 +1108,391 @@ void $writeRunsView(RunsView dto, JsonWriter writer) {
   writer.boolean(dto.active);
   writer.run(_$RunsViewDto._end);
 }
+
+/// The checks, the converter and the JSON Schema of [Xray].
+const DtoSchema<Xray> $XrayDto = _$XrayDto();
+
+class _$XrayDto extends DtoSchema<Xray> implements JsonObjectWriter {
+  const _$XrayDto();
+
+  static const Map<String, String> _messages = <String, String>{};
+
+  static final JsonRun _idKey = JsonRun('{"id":');
+  static final JsonRun _end = JsonRun('}');
+
+  @override
+  Type get type => Xray;
+
+  @override
+  String get name => 'Xray';
+
+  @override
+  bool get usesRequiredWhen => false;
+
+  @override
+  Xray? convert(Object? input, DtoState state, List<Object> path) {
+    if (input is! Map) {
+      state.notObject(input, path, _messages);
+      return null;
+    }
+    int issuesBefore = state.issues.length;
+    // id: int
+    Object? id = state.integer(state.read(input, 'id'), path, 'id', _messages);
+    if (id == null || id is Undefined) state.required(path, 'id', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return Xray(id: id as int);
+  }
+
+  @override
+  Xray fromMap(Map<String, dynamic> map) {
+    return Xray(id: (map['id'] as num).toInt());
+  }
+
+  @override
+  Map<String, dynamic> toMap(Xray dto) {
+    return <String, dynamic>{'id': dto.id};
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeXray(object as Xray, writer);
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    return <String, dynamic>{
+      'type': 'object',
+      'title': 'Xray',
+      'properties': <String, dynamic>{
+        'id': <String, dynamic>{'type': 'integer'},
+      },
+      'required': <dynamic>['id'],
+    };
+  }
+}
+
+/// Writes the JSON of [Xray], as `toMap()` gives it.
+void $writeXray(Xray dto, JsonWriter writer) {
+  writer.run(_$XrayDto._idKey);
+  writer.integer(dto.id);
+  writer.run(_$XrayDto._end);
+}
+
+/// The checks, the converter and the JSON Schema of [NullableView].
+const DtoSchema<NullableView> $NullableViewDto = _$NullableViewDto();
+
+class _$NullableViewDto extends DtoSchema<NullableView>
+    implements JsonObjectWriter {
+  const _$NullableViewDto();
+
+  static const Map<String, String> _messages = <String, String>{};
+
+  static final JsonRun _numKey = JsonRun('{"num":');
+  static final JsonRun _daysKey = JsonRun(',"days":');
+  static final JsonRun _rolesKey = JsonRun(',"roles":');
+  static final JsonRun _ownsKey = JsonRun(',"owns":');
+  static final JsonRun _xrayKey = JsonRun(',"xray":');
+  static final JsonRun _itemsKey = JsonRun(',"items":[');
+  static final JsonRun _end = JsonRun(']}');
+
+  @override
+  Type get type => NullableView;
+
+  @override
+  String get name => 'NullableView';
+
+  @override
+  bool get usesRequiredWhen => false;
+
+  @override
+  NullableView? convert(Object? input, DtoState state, List<Object> path) {
+    if (input is! Map) {
+      state.notObject(input, path, _messages);
+      return null;
+    }
+    int issuesBefore = state.issues.length;
+    // num: int
+    Object? numValue = state.integer(
+      state.read(input, 'num'),
+      path,
+      'num',
+      _messages,
+    );
+    if (numValue == null || numValue is Undefined)
+      state.required(path, 'num', _messages);
+    // days: List<DateTime>?
+    Object? days = state.list(
+      state.read(input, 'days'),
+      path,
+      'days',
+      _messages,
+    );
+    if (days is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'days'];
+      List<DateTime> o0 = <DateTime>[];
+      for (int i0 = 0; i0 < days.length; i0++) {
+        Object? x0 = state.date(days[i0], q0, i0, _messages);
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, i0, _messages);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as DateTime);
+        }
+      }
+      days = state.issues.length != b0 ? invalid : o0;
+    }
+    // roles: List<Role>?
+    Object? roles = state.list(
+      state.read(input, 'roles'),
+      path,
+      'roles',
+      _messages,
+    );
+    if (roles is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'roles'];
+      List<Role> o0 = <Role>[];
+      for (int i0 = 0; i0 < roles.length; i0++) {
+        Object? x0 = state.enumName(
+          roles[i0],
+          q0,
+          i0,
+          _messages,
+          const <String>['admin', 'user'],
+        );
+        if (x0 is String) {
+          x0 = switch (x0) {
+            'admin' => Role.admin,
+            _ => Role.user,
+          };
+        }
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, i0, _messages);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as Role);
+        }
+      }
+      roles = state.issues.length != b0 ? invalid : o0;
+    }
+    // owns: List<OwnJson>?
+    Object? owns = state.list(
+      state.read(input, 'owns'),
+      path,
+      'owns',
+      _messages,
+    );
+    if (owns is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'owns'];
+      List<OwnJson> o0 = <OwnJson>[];
+      for (int i0 = 0; i0 < owns.length; i0++) {
+        Object? x0 = state.object(owns[i0], q0, i0, _messages);
+        if (x0 is Map) {
+          x0 = $OwnJsonDto.convert(x0, state, <Object>[...q0, i0]) ?? invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, i0, _messages);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as OwnJson);
+        }
+      }
+      owns = state.issues.length != b0 ? invalid : o0;
+    }
+    // xray: Xray
+    Object? xray = state.object(
+      state.read(input, 'xray'),
+      path,
+      'xray',
+      _messages,
+    );
+    if (xray is Map) {
+      xray =
+          $XrayDto.convert(xray, state, <Object>[...path, 'xray']) ?? invalid;
+    }
+    if (xray == null || xray is Undefined)
+      state.required(path, 'xray', _messages);
+    // items: List<Xray>
+    Object? items = state.list(
+      state.read(input, 'items'),
+      path,
+      'items',
+      _messages,
+    );
+    if (items is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'items'];
+      List<Xray> o0 = <Xray>[];
+      for (int i0 = 0; i0 < items.length; i0++) {
+        Object? x0 = state.object(items[i0], q0, i0, _messages);
+        if (x0 is Map) {
+          x0 = $XrayDto.convert(x0, state, <Object>[...q0, i0]) ?? invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, i0, _messages);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as Xray);
+        }
+      }
+      items = state.issues.length != b0 ? invalid : o0;
+    }
+    if (items == null || items is Undefined || state.emptyList(items)) {
+      state.required(path, 'items', _messages);
+      items = invalid;
+    }
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return NullableView(
+      num: numValue as int,
+      xray: xray as Xray,
+      items: items as List<Xray>,
+      days: days is Undefined ? null : days as List<DateTime>?,
+      roles: roles is Undefined ? null : roles as List<Role>?,
+      owns: owns is Undefined ? null : owns as List<OwnJson>?,
+    );
+  }
+
+  @override
+  NullableView fromMap(Map<String, dynamic> map) {
+    return NullableView(
+      num: (map['num'] as num).toInt(),
+      xray: $XrayDto.fromMap(map['xray'] as Map<String, dynamic>),
+      items: <Xray>[
+        for (Object? x0 in map['items'] as List<dynamic>)
+          $XrayDto.fromMap(x0 as Map<String, dynamic>),
+      ],
+      days: map['days'] == null
+          ? null
+          : (<DateTime>[
+              for (Object? x0 in map['days'] as List<dynamic>)
+                DateTime.parse(x0 as String).toUtc(),
+            ]),
+      roles: map['roles'] == null
+          ? null
+          : (<Role>[
+              for (Object? x0 in map['roles'] as List<dynamic>)
+                Role.values.byName(x0 as String),
+            ]),
+      owns: map['owns'] == null
+          ? null
+          : (<OwnJson>[
+              for (Object? x0 in map['owns'] as List<dynamic>)
+                $OwnJsonDto.fromMap(x0 as Map<String, dynamic>),
+            ]),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toMap(NullableView dto) {
+    List<DateTime>? days = dto.days;
+    List<Role>? roles = dto.roles;
+    List<OwnJson>? owns = dto.owns;
+    return <String, dynamic>{
+      'num': dto.num,
+      'days': days == null
+          ? null
+          : <dynamic>[for (DateTime x0 in days) x0.toIso8601String()],
+      'roles': roles == null ? null : <dynamic>[for (Role x0 in roles) x0.name],
+      'owns': owns == null
+          ? null
+          : <dynamic>[for (OwnJson x0 in owns) $OwnJsonDto.toMap(x0)],
+      'xray': $XrayDto.toMap(dto.xray),
+      'items': <dynamic>[for (Xray x0 in dto.items) $XrayDto.toMap(x0)],
+    };
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeNullableView(object as NullableView, writer);
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    return <String, dynamic>{
+      'type': 'object',
+      'title': 'NullableView',
+      'properties': <String, dynamic>{
+        'num': <String, dynamic>{'type': 'integer'},
+        'days': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{'type': 'string', 'format': 'date-time'},
+        },
+        'roles': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{
+            'type': 'string',
+            'enum': <dynamic>['admin', 'user'],
+          },
+        },
+        'owns': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{'\$ref': '#/\$defs/OwnJson'},
+        },
+        'xray': <String, dynamic>{'\$ref': '#/\$defs/Xray'},
+        'items': <String, dynamic>{
+          'type': 'array',
+          'items': <String, dynamic>{'\$ref': '#/\$defs/Xray'},
+        },
+      },
+      'required': <dynamic>['num', 'xray', 'items'],
+      '\$defs': <String, dynamic>{
+        'OwnJson': <String, dynamic>{
+          'type': 'object',
+          'title': 'OwnJson',
+          'properties': <String, dynamic>{
+            'id': <String, dynamic>{'type': 'integer'},
+          },
+          'required': <dynamic>['id'],
+        },
+        'Xray': <String, dynamic>{
+          'type': 'object',
+          'title': 'Xray',
+          'properties': <String, dynamic>{
+            'id': <String, dynamic>{'type': 'integer'},
+          },
+          'required': <dynamic>['id'],
+        },
+      },
+    };
+  }
+}
+
+/// Writes the JSON of [NullableView], as `toMap()` gives it.
+void $writeNullableView(NullableView dto, JsonWriter writer) {
+  writer.run(_$NullableViewDto._numKey);
+  writer.integer(dto.num);
+  writer.run(_$NullableViewDto._daysKey);
+  {
+    List<DateTime>? days = dto.days;
+    writer.value(
+      days == null
+          ? null
+          : <dynamic>[for (DateTime x0 in days) x0.toIso8601String()],
+    );
+  }
+  writer.run(_$NullableViewDto._rolesKey);
+  {
+    List<Role>? roles = dto.roles;
+    writer.value(
+      roles == null ? null : <dynamic>[for (Role x0 in roles) x0.name],
+    );
+  }
+  writer.run(_$NullableViewDto._ownsKey);
+  {
+    List<OwnJson>? owns = dto.owns;
+    writer.value(
+      owns == null
+          ? null
+          : <dynamic>[for (OwnJson x0 in owns) $OwnJsonDto.toMap(x0)],
+    );
+  }
+  writer.run(_$NullableViewDto._xrayKey);
+  $writeXray(dto.xray, writer);
+  writer.run(_$NullableViewDto._itemsKey);
+  {
+    List<Xray> items = dto.items;
+    for (int i = 0; i < items.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      $writeXray(items[i], writer);
+    }
+  }
+  writer.run(_$NullableViewDto._end);
+}

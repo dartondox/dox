@@ -9,6 +9,8 @@ import 'rules.dto.dart';
 /// Every test DTO, like `lib/generated/dtos.g.dart` in an app.
 const List<DtoSchema<Object>> testDtos = <DtoSchema<Object>>[
   $CreateUserDto,
+  $NullableViewDto,
+  $XrayDto,
   $TextRulesDto,
   $ChangeTextDto,
   $NumberRulesDto,

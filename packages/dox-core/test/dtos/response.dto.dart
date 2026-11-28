@@ -86,3 +86,32 @@ class RunsView {
     required this.active,
   });
 }
+
+/// A DTO with a capital X in a type name (`toMap()` must keep it).
+@Dto()
+class Xray {
+  final int id;
+
+  const Xray({required this.id});
+}
+
+/// Nullable lists that toMap() changes, a nested DTO with an X in its
+/// name, and a field with the name of a type (`num`).
+@Dto()
+class NullableView {
+  final int num;
+  final List<DateTime>? days;
+  final List<Role>? roles;
+  final List<OwnJson>? owns;
+  final Xray xray;
+  final List<Xray> items;
+
+  const NullableView({
+    required this.num,
+    required this.xray,
+    required this.items,
+    this.days,
+    this.roles,
+    this.owns,
+  });
+}
