@@ -359,7 +359,10 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   static final JsonRun _j6 = JsonRun(',"product":');
   static final JsonRun _j7 = JsonRun(',"products":[');
   static final JsonRun _j8 = JsonRun('],"by_name":');
-  static final JsonRun _j9 = JsonRun('}');
+  static final JsonRun _j9 = JsonRun(',"maybe_products":');
+  static final JsonRun _j10 = JsonRun(',"maybe_by_name":');
+  static final JsonRun _j11 = JsonRun(',"maybe_dates":');
+  static final JsonRun _j12 = JsonRun('}');
 
   @override
   Type get type => MixedView;
@@ -579,6 +582,67 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
       c8 = s.issues.length != b0 ? invalid : o0;
     }
     if (c8 == null || c8 is Undefined) s.required(p, 'by_name', _m);
+    // maybeProducts: List<ProductView>?
+    Object? c9;
+    c9 = s.list(s.read(input, 'maybe_products'), p, 'maybe_products', _m);
+    if (c9 is List) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'maybe_products'];
+      List<ProductView> o0 = <ProductView>[];
+      for (int i0 = 0; i0 < c9.length; i0++) {
+        Object? x0;
+        x0 = s.object(c9[i0], q0, i0, _m);
+        if (x0 is Map) {
+          x0 = $ProductViewDto.convert(x0, s, <Object>[...q0, i0]) ?? invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, i0, _m);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as ProductView);
+        }
+      }
+      c9 = s.issues.length != b0 ? invalid : o0;
+    }
+    // maybeByName: Map<String, ProductView>?
+    Object? c10;
+    c10 = s.object(s.read(input, 'maybe_by_name'), p, 'maybe_by_name', _m);
+    if (c10 is Map) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'maybe_by_name'];
+      Map<String, ProductView> o0 = <String, ProductView>{};
+      for (MapEntry<dynamic, dynamic> n0 in c10.entries) {
+        String k0 = '${n0.key}';
+        Object? x0;
+        x0 = s.object(n0.value, q0, k0, _m);
+        if (x0 is Map) {
+          x0 = $ProductViewDto.convert(x0, s, <Object>[...q0, k0]) ?? invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, k0, _m);
+        } else if (x0 is! Invalid) {
+          o0[k0] = x0 as ProductView;
+        }
+      }
+      c10 = s.issues.length != b0 ? invalid : o0;
+    }
+    // maybeDates: List<DateTime>?
+    Object? c11;
+    c11 = s.list(s.read(input, 'maybe_dates'), p, 'maybe_dates', _m);
+    if (c11 is List) {
+      int b0 = s.issues.length;
+      List<Object> q0 = <Object>[...p, 'maybe_dates'];
+      List<DateTime> o0 = <DateTime>[];
+      for (int i0 = 0; i0 < c11.length; i0++) {
+        Object? x0;
+        x0 = s.date(c11[i0], q0, i0, _m);
+        if (x0 == null || x0 is Undefined) {
+          s.required(q0, i0, _m);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as DateTime);
+        }
+      }
+      c11 = s.issues.length != b0 ? invalid : o0;
+    }
     if (s.issues.length != e && !s.allErrors) return null;
     if (s.issues.length != e) return null;
     return MixedView(
@@ -591,6 +655,9 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
       products: c7 as List<ProductView>,
       byName: c8 as Map<String, ProductView>,
       product: c6 is Undefined ? null : c6 as ProductView?,
+      maybeProducts: c9 is Undefined ? null : c9 as List<ProductView>?,
+      maybeByName: c10 is Undefined ? null : c10 as Map<String, ProductView>?,
+      maybeDates: c11 is Undefined ? null : c11 as List<DateTime>?,
     );
   }
 
@@ -636,6 +703,27 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
       product: m['product'] == null
           ? null
           : ($ProductViewDto.fromMap(m['product'] as Map<String, dynamic>)),
+      maybeProducts: m['maybe_products'] == null
+          ? null
+          : (<ProductView>[
+              for (Object? x0 in m['maybe_products'] as List<dynamic>)
+                $ProductViewDto.fromMap(x0 as Map<String, dynamic>),
+            ]),
+      maybeByName: m['maybe_by_name'] == null
+          ? null
+          : (<String, ProductView>{
+              for (MapEntry<dynamic, dynamic> x0
+                  in (m['maybe_by_name'] as Map<dynamic, dynamic>).entries)
+                x0.key as String: $ProductViewDto.fromMap(
+                  x0.value as Map<String, dynamic>,
+                ),
+            }),
+      maybeDates: m['maybe_dates'] == null
+          ? null
+          : (<DateTime>[
+              for (Object? x0 in m['maybe_dates'] as List<dynamic>)
+                DateTime.parse(x0 as String).toUtc(),
+            ]),
     );
   }
 
@@ -650,6 +738,9 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
     ProductView? f6 = o.product;
     List<ProductView> f7 = o.products;
     Map<String, ProductView> f8 = o.byName;
+    List<ProductView>? f9 = o.maybeProducts;
+    Map<String, ProductView>? f10 = o.maybeByName;
+    List<DateTime>? f11 = o.maybeDates;
     return <String, dynamic>{
       'dates': <dynamic>[for (DateTime x0 in f0) x0.toIso8601String()],
       'roles': <dynamic>[for (Role x0 in f1) x0.name],
@@ -670,6 +761,18 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
         for (MapEntry<String, ProductView> x0 in f8.entries)
           x0.key: $ProductViewDto.toMap(x0.value),
       },
+      'maybe_products': f9 == null
+          ? null
+          : <dynamic>[for (ProductView x0 in f9) $ProductViewDto.toMap(x0)],
+      'maybe_by_name': f10 == null
+          ? null
+          : <String, dynamic>{
+              for (MapEntry<String, ProductView> x0 in f10.entries)
+                x0.key: $ProductViewDto.toMap(x0.value),
+            },
+      'maybe_dates': f11 == null
+          ? null
+          : <dynamic>[for (DateTime x0 in f11) x0.toIso8601String()],
     };
   }
 
@@ -730,6 +833,20 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
           'additionalProperties': <String, dynamic>{
             '\$ref': '#/\$defs/ProductView',
           },
+        },
+        'maybe_products': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{'\$ref': '#/\$defs/ProductView'},
+        },
+        'maybe_by_name': <String, dynamic>{
+          'type': <dynamic>['object', 'null'],
+          'additionalProperties': <String, dynamic>{
+            '\$ref': '#/\$defs/ProductView',
+          },
+        },
+        'maybe_dates': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{'type': 'string', 'format': 'date-time'},
         },
       },
       'required': <dynamic>[
@@ -822,6 +939,34 @@ void $writeMixedView(MixedView o, JsonWriter w) {
       x0.key: $ProductViewDto.toMap(x0.value),
   });
   w.run(_$MixedViewDto._j9);
+  {
+    List<ProductView>? n = o.maybeProducts;
+    w.value(
+      n == null
+          ? null
+          : <dynamic>[for (ProductView x0 in n) $ProductViewDto.toMap(x0)],
+    );
+  }
+  w.run(_$MixedViewDto._j10);
+  {
+    Map<String, ProductView>? n = o.maybeByName;
+    w.value(
+      n == null
+          ? null
+          : <String, dynamic>{
+              for (MapEntry<String, ProductView> x0 in n.entries)
+                x0.key: $ProductViewDto.toMap(x0.value),
+            },
+    );
+  }
+  w.run(_$MixedViewDto._j11);
+  {
+    List<DateTime>? n = o.maybeDates;
+    w.value(
+      n == null ? null : <dynamic>[for (DateTime x0 in n) x0.toIso8601String()],
+    );
+  }
+  w.run(_$MixedViewDto._j12);
 }
 
 /// The checks, the converter and the JSON Schema of [RunsView].

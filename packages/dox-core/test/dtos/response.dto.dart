@@ -71,6 +71,9 @@ class MixedView {
   final ProductView? product;
   final List<ProductView> products;
   final Map<String, ProductView> byName;
+  final List<ProductView>? maybeProducts;
+  final Map<String, ProductView>? maybeByName;
+  final List<DateTime>? maybeDates;
 
   const MixedView({
     required this.dates,
@@ -82,6 +85,9 @@ class MixedView {
     required this.products,
     required this.byName,
     this.product,
+    this.maybeProducts,
+    this.maybeByName,
+    this.maybeDates,
   });
 }
 

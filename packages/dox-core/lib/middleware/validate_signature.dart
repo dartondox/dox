@@ -41,7 +41,14 @@ class ValidateSignature implements IDoxMiddleware {
 
   /// True when [req] has a valid `signature` that has not expired.
   static bool hasValidSignature(DoxRequest req, {bool absolute = true}) {
-    String? signature = req.uri.queryParameters['signature'];
+    Map<String, String> params;
+    try {
+      params = req.uri.queryParameters;
+    } on FormatException {
+      // an escape that is not UTF-8, like `%ff`: Dox never signs one
+      return false;
+    }
+    String? signature = params['signature'];
     if (signature == null) return false;
     String query = req.uri.query.split('&').where(_notSignature).join('&');
     String path = req.uri.path;
@@ -50,7 +57,7 @@ class ValidateSignature implements IDoxMiddleware {
       url = '${req.scheme()}://${req.header('host') ?? ''}$url';
     }
     if (!_signedBy(url, signature)) return false;
-    String? expires = req.uri.queryParameters['expires'];
+    String? expires = params['expires'];
     if (expires == null) return true;
     int? at = int.tryParse(expires);
     return at != null && DateTime.now().millisecondsSinceEpoch ~/ 1000 <= at;

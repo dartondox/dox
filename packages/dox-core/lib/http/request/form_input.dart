@@ -106,11 +106,17 @@ class FormInput {
   /// The input of a query string, with repeated keys.
   Map<String, dynamic> query(Uri uri) => parse(queryPairs(uri));
 
-  /// The (key, value) pairs of the query string of [uri].
+  /// The (key, value) pairs of the query string of [uri]. An escape
+  /// that is not UTF-8, like `%ff`, throws a [BadRequestException].
   List<MapEntry<String, Object>> queryPairs(Uri uri) {
+    Map<String, List<String>> all;
+    try {
+      all = uri.queryParametersAll;
+    } on FormatException {
+      throw BadRequestException(message: 'The query string is not valid');
+    }
     List<MapEntry<String, Object>> pairs = <MapEntry<String, Object>>[];
-    for (MapEntry<String, List<String>> entry
-        in uri.queryParametersAll.entries) {
+    for (MapEntry<String, List<String>> entry in all.entries) {
       for (String value in entry.value) {
         pairs.add(MapEntry<String, Object>(entry.key, value));
       }

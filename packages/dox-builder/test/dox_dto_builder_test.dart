@@ -1514,7 +1514,8 @@ class Holder {
 class Outer {
   final Inner inner;
   final List<Inner> all;
-  const Outer({required this.inner, required this.all});
+  final Inner? maybe;
+  const Outer({required this.inner, required this.all, this.maybe});
 }
 ''',
           imports: "$import\nimport 'other.dart';",
@@ -1537,7 +1538,10 @@ class Inner {
           contains(
             r'w.run(_$OuterDto._j0);w.value($InnerDto.toMap(o.inner));'
             r'w.run(_$OuterDto._j1);'
-            r'w.value(<dynamic>[for(Innerx0ino.all)$InnerDto.toMap(x0)]);',
+            r'w.value(<dynamic>[for(Innerx0ino.all)$InnerDto.toMap(x0)]);'
+            // a field read does not promote to non-null: a local
+            r'w.run(_$OuterDto._j2);{Inner?n=o.maybe;'
+            r'w.value(n==null?null:$InnerDto.toMap(n));}',
           ),
         );
       });
@@ -1633,8 +1637,8 @@ class Page {
           out,
           contains(
             r'void$writePage(Pageo,JsonWriterw){w.run(_$PageDto._j0);'
-            r'w.value(o.items==null?null:<dynamic>[for(Itemx0ino.items)'
-            r'$ItemDto.toMap(x0)],);'
+            r'{List<Item>?n=o.items;w.value(n==null?null:'
+            r'<dynamic>[for(Itemx0inn)$ItemDto.toMap(x0)],);}'
             r'w.run(_$PageDto._j1);w.integer(o.count);'
             r'w.run(_$PageDto._j2);}',
           ),

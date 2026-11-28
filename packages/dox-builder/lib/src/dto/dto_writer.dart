@@ -1220,6 +1220,9 @@ class DtoWriter {
       DtoKind.date => 'w.dateTime($value);',
       DtoKind.enumName => 'w.string($value${dot}name);',
       _ when _encoderWrites(type) && !_holdsDto(type) => 'w.value($value);',
+      // a field read does not promote to non-null: read it into a local
+      _ when type.nullable =>
+        '{ ${type.code} n = $value; w.value(${_toValue(type, 'n', 0)}); }',
       _ => 'w.value(${_toValue(type, value, 0)});',
     };
   }

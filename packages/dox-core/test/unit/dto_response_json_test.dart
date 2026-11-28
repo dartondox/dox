@@ -152,6 +152,9 @@ void main() {
         product: secret,
         products: <ProductView>[secret],
         byName: <String, ProductView>{'p': secret},
+        maybeProducts: <ProductView>[secret],
+        maybeByName: <String, ProductView>{'p': secret},
+        maybeDates: <DateTime>[DateTime.utc(2024)],
       );
       _same($MixedViewDto, mixed);
       expect(_bytes(mixed), isNot(contains('secret')));
