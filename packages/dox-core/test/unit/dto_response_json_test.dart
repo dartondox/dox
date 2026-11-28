@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:dox_core/dox_core.dart';
@@ -27,7 +28,15 @@ void main() {
       Dox().initialize(AppConfig(appKey: testAppKey, dtos: testDtos));
     });
 
-    test('the generated schema writes the object', () {
+    test('the generated DTO files write the JSON of toMap()', () {
+      for (String name in <String>['response', 'nested', 'rules', 'custom']) {
+        String code = File('test/dtos/$name.dto.g.dart').readAsStringSync();
+        expect(code, isNot(contains('JsonRun')), reason: name);
+        expect(code, isNot(contains(r'$write')), reason: name);
+      }
+    });
+
+    test('a DTO writes the map of toMap()', () {
       expect($ProductViewDto, isA<JsonObjectWriter>());
       ProductView product = ProductView(
         id: 7,

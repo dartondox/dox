@@ -72,13 +72,6 @@ class _$ProductViewDto extends DtoSchema<ProductView>
 
   static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _idKey = JsonRun('{"id":');
-  static final JsonRun _productNameKey = JsonRun(',"product_name":');
-  static final JsonRun _priceKey = JsonRun(',"price":');
-  static final JsonRun _inStockKey = JsonRun(',"in_stock":');
-  static final JsonRun _soldAtKey = JsonRun(',"sold_at":');
-  static final JsonRun _end = JsonRun('}');
-
   @override
   Type get type => ProductView;
 
@@ -170,7 +163,7 @@ class _$ProductViewDto extends DtoSchema<ProductView>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeProductView(object as ProductView, writer);
+      writer.value(toMap(object as ProductView));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -192,21 +185,6 @@ class _$ProductViewDto extends DtoSchema<ProductView>
   }
 }
 
-/// Writes the JSON of [ProductView], as `toMap()` gives it.
-void $writeProductView(ProductView dto, JsonWriter writer) {
-  writer.run(_$ProductViewDto._idKey);
-  writer.integer(dto.id);
-  writer.run(_$ProductViewDto._productNameKey);
-  writer.string(dto.productName);
-  writer.run(_$ProductViewDto._priceKey);
-  writer.value(dto.price);
-  writer.run(_$ProductViewDto._inStockKey);
-  writer.boolean(dto.inStock);
-  writer.run(_$ProductViewDto._soldAtKey);
-  writer.dateTime(dto.soldAt);
-  writer.run(_$ProductViewDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [SecretProductView].
 const DtoSchema<SecretProductView> $SecretProductViewDto =
     _$SecretProductViewDto();
@@ -216,14 +194,6 @@ class _$SecretProductViewDto extends DtoSchema<SecretProductView>
   const _$SecretProductViewDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _idKey = JsonRun('{"id":');
-  static final JsonRun _productNameKey = JsonRun(',"product_name":');
-  static final JsonRun _priceKey = JsonRun(',"price":');
-  static final JsonRun _inStockKey = JsonRun(',"in_stock":');
-  static final JsonRun _soldAtKey = JsonRun(',"sold_at":');
-  static final JsonRun _secretKey = JsonRun(',"secret":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => SecretProductView;
@@ -328,7 +298,7 @@ class _$SecretProductViewDto extends DtoSchema<SecretProductView>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeSecretProductView(object as SecretProductView, writer);
+      writer.value(toMap(object as SecretProductView));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -357,23 +327,6 @@ class _$SecretProductViewDto extends DtoSchema<SecretProductView>
   }
 }
 
-/// Writes the JSON of [SecretProductView], as `toMap()` gives it.
-void $writeSecretProductView(SecretProductView dto, JsonWriter writer) {
-  writer.run(_$SecretProductViewDto._idKey);
-  writer.integer(dto.id);
-  writer.run(_$SecretProductViewDto._productNameKey);
-  writer.string(dto.productName);
-  writer.run(_$SecretProductViewDto._priceKey);
-  writer.value(dto.price);
-  writer.run(_$SecretProductViewDto._inStockKey);
-  writer.boolean(dto.inStock);
-  writer.run(_$SecretProductViewDto._soldAtKey);
-  writer.dateTime(dto.soldAt);
-  writer.run(_$SecretProductViewDto._secretKey);
-  writer.string(dto.secret);
-  writer.run(_$SecretProductViewDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [MixedView].
 const DtoSchema<MixedView> $MixedViewDto = _$MixedViewDto();
 
@@ -381,23 +334,6 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   const _$MixedViewDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _datesKey = JsonRun('{"dates":[');
-  static final JsonRun _rolesKey = JsonRun('],"roles":[');
-  static final JsonRun _daysKey = JsonRun('],"days":');
-  static final JsonRun _gridKey = JsonRun(',"grid":');
-  static final JsonRun _ownKey = JsonRun(',"own":');
-  static final JsonRun _ownsKey = JsonRun(',"owns":');
-  static final JsonRun _productKey = JsonRun(',"product":');
-  static final JsonRun _productsKey = JsonRun(',"products":[');
-  static final JsonRun _byNameKey = JsonRun('],"by_name":');
-  static final JsonRun _maybeProductsKey = JsonRun(',"maybe_products":');
-  static final JsonRun _maybeByNameKey = JsonRun(',"maybe_by_name":');
-  static final JsonRun _maybeDatesKey = JsonRun(',"maybe_dates":');
-  static final JsonRun _sparseKey = JsonRun(',"sparse":');
-  static final JsonRun _sparseDaysKey = JsonRun(',"sparse_days":');
-  static final JsonRun _xraysKey = JsonRun(',"xrays":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => MixedView;
@@ -1008,7 +944,7 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeMixedView(object as MixedView, writer);
+      writer.value(toMap(object as MixedView));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1150,110 +1086,6 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [MixedView], as `toMap()` gives it.
-void $writeMixedView(MixedView dto, JsonWriter writer) {
-  writer.run(_$MixedViewDto._datesKey);
-  {
-    List<DateTime> dates = dto.dates;
-    for (int i = 0; i < dates.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.dateTime(dates[i]);
-    }
-  }
-  writer.run(_$MixedViewDto._rolesKey);
-  {
-    List<Role> roles = dto.roles;
-    for (int i = 0; i < roles.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.string(roles[i].name);
-    }
-  }
-  writer.run(_$MixedViewDto._daysKey);
-  writer.value(<String, dynamic>{
-    for (MapEntry<String, DateTime> x0 in dto.days.entries)
-      x0.key: x0.value.toIso8601String(),
-  });
-  writer.run(_$MixedViewDto._gridKey);
-  writer.value(<dynamic>[
-    for (List<Role> x0 in dto.grid) <dynamic>[for (Role x1 in x0) x1.name],
-  ]);
-  writer.run(_$MixedViewDto._ownKey);
-  writer.value($OwnJsonDto.toMap(dto.own));
-  writer.run(_$MixedViewDto._ownsKey);
-  writer.value(<dynamic>[for (OwnJson x0 in dto.owns) $OwnJsonDto.toMap(x0)]);
-  writer.run(_$MixedViewDto._productKey);
-  if (dto.product case final $v?) {
-    $writeProductView($v, writer);
-  } else {
-    writer.value(null);
-  }
-  writer.run(_$MixedViewDto._productsKey);
-  {
-    List<ProductView> products = dto.products;
-    for (int i = 0; i < products.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      $writeProductView(products[i], writer);
-    }
-  }
-  writer.run(_$MixedViewDto._byNameKey);
-  writer.value(<String, dynamic>{
-    for (MapEntry<String, ProductView> x0 in dto.byName.entries)
-      x0.key: $ProductViewDto.toMap(x0.value),
-  });
-  writer.run(_$MixedViewDto._maybeProductsKey);
-  {
-    List<ProductView>? maybeProducts = dto.maybeProducts;
-    writer.value(
-      maybeProducts == null
-          ? null
-          : <dynamic>[
-              for (ProductView x0 in maybeProducts) $ProductViewDto.toMap(x0),
-            ],
-    );
-  }
-  writer.run(_$MixedViewDto._maybeByNameKey);
-  {
-    Map<String, ProductView>? maybeByName = dto.maybeByName;
-    writer.value(
-      maybeByName == null
-          ? null
-          : <String, dynamic>{
-              for (MapEntry<String, ProductView> x0 in maybeByName.entries)
-                x0.key: $ProductViewDto.toMap(x0.value),
-            },
-    );
-  }
-  writer.run(_$MixedViewDto._maybeDatesKey);
-  {
-    List<DateTime>? maybeDates = dto.maybeDates;
-    writer.value(
-      maybeDates == null
-          ? null
-          : <dynamic>[for (DateTime x0 in maybeDates) x0.toIso8601String()],
-    );
-  }
-  writer.run(_$MixedViewDto._sparseKey);
-  writer.value(<String, dynamic>{
-    for (MapEntry<String, ProductView?> x0 in dto.sparse.entries)
-      x0.key: switch (x0.value) {
-        ProductView? v0 => v0 == null ? null : $ProductViewDto.toMap(v0),
-      },
-  });
-  writer.run(_$MixedViewDto._sparseDaysKey);
-  writer.value(<String, dynamic>{
-    for (MapEntry<String, DateTime?> x0 in dto.sparseDays.entries)
-      x0.key: switch (x0.value) {
-        DateTime? v0 => v0 == null ? null : v0.toIso8601String(),
-      },
-  });
-  writer.run(_$MixedViewDto._xraysKey);
-  writer.value(<String, dynamic>{
-    for (MapEntry<String, XRay> x0 in dto.xrays.entries)
-      x0.key: $XRayDto.toMap(x0.value),
-  });
-  writer.run(_$MixedViewDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [XRay].
 const DtoSchema<XRay> $XRayDto = _$XRayDto();
 
@@ -1261,9 +1093,6 @@ class _$XRayDto extends DtoSchema<XRay> implements JsonObjectWriter {
   const _$XRayDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _idKey = JsonRun('{"id":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => XRay;
@@ -1301,7 +1130,7 @@ class _$XRayDto extends DtoSchema<XRay> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeXRay(object as XRay, writer);
+      writer.value(toMap(object as XRay));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1316,13 +1145,6 @@ class _$XRayDto extends DtoSchema<XRay> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [XRay], as `toMap()` gives it.
-void $writeXRay(XRay dto, JsonWriter writer) {
-  writer.run(_$XRayDto._idKey);
-  writer.integer(dto.id);
-  writer.run(_$XRayDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [RunsView].
 const DtoSchema<RunsView> $RunsViewDto = _$RunsViewDto();
 
@@ -1330,17 +1152,6 @@ class _$RunsViewDto extends DtoSchema<RunsView> implements JsonObjectWriter {
   const _$RunsViewDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _idKey = JsonRun('{"id":');
-  static final JsonRun _tagsKey = JsonRun(',"tags":[');
-  static final JsonRun _notesKey = JsonRun('],"notes":[');
-  static final JsonRun _numbersKey = JsonRun('],"numbers":[');
-  static final JsonRun _flagsKey = JsonRun('],"flags":[');
-  static final JsonRun _mainKey = JsonRun('],"main":');
-  static final JsonRun _productsKey = JsonRun(',"products":[');
-  static final JsonRun _oddKey = JsonRun('],"a \\"key\\" é \\\\ \$x":');
-  static final JsonRun _activeKey = JsonRun(',"active":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => RunsView;
@@ -1586,7 +1397,7 @@ class _$RunsViewDto extends DtoSchema<RunsView> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeRunsView(object as RunsView, writer);
+      writer.value(toMap(object as RunsView));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1653,59 +1464,6 @@ class _$RunsViewDto extends DtoSchema<RunsView> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [RunsView], as `toMap()` gives it.
-void $writeRunsView(RunsView dto, JsonWriter writer) {
-  writer.run(_$RunsViewDto._idKey);
-  writer.integer(dto.id);
-  writer.run(_$RunsViewDto._tagsKey);
-  {
-    List<String> tags = dto.tags;
-    for (int i = 0; i < tags.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.string(tags[i]);
-    }
-  }
-  writer.run(_$RunsViewDto._notesKey);
-  {
-    List<String?> notes = dto.notes;
-    for (int i = 0; i < notes.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.string(notes[i]);
-    }
-  }
-  writer.run(_$RunsViewDto._numbersKey);
-  {
-    List<int> numbers = dto.numbers;
-    for (int i = 0; i < numbers.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.integer(numbers[i]);
-    }
-  }
-  writer.run(_$RunsViewDto._flagsKey);
-  {
-    List<bool> flags = dto.flags;
-    for (int i = 0; i < flags.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.boolean(flags[i]);
-    }
-  }
-  writer.run(_$RunsViewDto._mainKey);
-  $writeProductView(dto.main, writer);
-  writer.run(_$RunsViewDto._productsKey);
-  {
-    List<ProductView> products = dto.products;
-    for (int i = 0; i < products.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      $writeProductView(products[i], writer);
-    }
-  }
-  writer.run(_$RunsViewDto._oddKey);
-  writer.string(dto.odd);
-  writer.run(_$RunsViewDto._activeKey);
-  writer.boolean(dto.active);
-  writer.run(_$RunsViewDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [Xray].
 const DtoSchema<Xray> $XrayDto = _$XrayDto();
 
@@ -1713,9 +1471,6 @@ class _$XrayDto extends DtoSchema<Xray> implements JsonObjectWriter {
   const _$XrayDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _idKey = JsonRun('{"id":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => Xray;
@@ -1753,7 +1508,7 @@ class _$XrayDto extends DtoSchema<Xray> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeXray(object as Xray, writer);
+      writer.value(toMap(object as Xray));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1768,13 +1523,6 @@ class _$XrayDto extends DtoSchema<Xray> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [Xray], as `toMap()` gives it.
-void $writeXray(Xray dto, JsonWriter writer) {
-  writer.run(_$XrayDto._idKey);
-  writer.integer(dto.id);
-  writer.run(_$XrayDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [NullableView].
 const DtoSchema<NullableView> $NullableViewDto = _$NullableViewDto();
 
@@ -1783,14 +1531,6 @@ class _$NullableViewDto extends DtoSchema<NullableView>
   const _$NullableViewDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _numKey = JsonRun('{"num":');
-  static final JsonRun _daysKey = JsonRun(',"days":');
-  static final JsonRun _rolesKey = JsonRun(',"roles":');
-  static final JsonRun _ownsKey = JsonRun(',"owns":');
-  static final JsonRun _xrayKey = JsonRun(',"xray":');
-  static final JsonRun _itemsKey = JsonRun(',"items":[');
-  static final JsonRun _end = JsonRun(']}');
 
   @override
   Type get type => NullableView;
@@ -1999,7 +1739,7 @@ class _$NullableViewDto extends DtoSchema<NullableView>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeNullableView(object as NullableView, writer);
+      writer.value(toMap(object as NullableView));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -2050,46 +1790,4 @@ class _$NullableViewDto extends DtoSchema<NullableView>
       },
     };
   }
-}
-
-/// Writes the JSON of [NullableView], as `toMap()` gives it.
-void $writeNullableView(NullableView dto, JsonWriter writer) {
-  writer.run(_$NullableViewDto._numKey);
-  writer.integer(dto.num);
-  writer.run(_$NullableViewDto._daysKey);
-  {
-    List<DateTime>? days = dto.days;
-    writer.value(
-      days == null
-          ? null
-          : <dynamic>[for (DateTime x0 in days) x0.toIso8601String()],
-    );
-  }
-  writer.run(_$NullableViewDto._rolesKey);
-  {
-    List<Role>? roles = dto.roles;
-    writer.value(
-      roles == null ? null : <dynamic>[for (Role x0 in roles) x0.name],
-    );
-  }
-  writer.run(_$NullableViewDto._ownsKey);
-  {
-    List<OwnJson>? owns = dto.owns;
-    writer.value(
-      owns == null
-          ? null
-          : <dynamic>[for (OwnJson x0 in owns) $OwnJsonDto.toMap(x0)],
-    );
-  }
-  writer.run(_$NullableViewDto._xrayKey);
-  $writeXray(dto.xray, writer);
-  writer.run(_$NullableViewDto._itemsKey);
-  {
-    List<Xray> items = dto.items;
-    for (int i = 0; i < items.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      $writeXray(items[i], writer);
-    }
-  }
-  writer.run(_$NullableViewDto._end);
 }

@@ -1409,8 +1409,6 @@ class Inner {
         expect(out, contains('$p\$InnerDto.convert('));
         expect(out, contains('$p\$InnerDto.fromMap('));
         expect(out, contains('$p\$InnerDto.toMap('));
-        // the JSON writer calls the nested writer directly
-        expect(out, contains('$p\$writeInner(dto.inner, writer);'));
       });
     }
 
@@ -1561,7 +1559,7 @@ abstract class A implements Rule<String> {}
         outputs: <String, Object>{},
       );
     });
-    group('writeObject |', () {
+    group('no JSON writer |', () {
       /// a dox_annotation with JsonWriter and JsonObjectWriter
       final Map<String, String> annotation = <String, String>{
         'dox_annotation|lib/dox_annotation.dart':
@@ -1570,16 +1568,24 @@ abstract class A implements Rule<String> {}
           '../dox-annotation/lib/src/json_writer.dart',
         ).readAsStringSync(),
       };
-      const String import =
-          "import 'package:dox_annotation/dox_annotation.dart';";
 
-      const String source = '''
-enum Role { admin, user }
-
+      test(
+        'a DTO writeObject() gives toMap(), with no \$write function',
+        () async {
+          String out = await _generate(
+            '''
 @Dto()
 class Inner {
   final int id;
   const Inner({required this.id});
+}
+
+@Dto()
+class Outer {
+  final Inner inner;
+  final List<Inner> all;
+  final Inner? maybe;
+  const Outer({required this.inner, required this.all, this.maybe});
 }
 
 @Dto()
@@ -1588,318 +1594,29 @@ class OwnJson {
   const OwnJson({required this.id});
   Map<String, dynamic> toJson() => <String, dynamic>{};
 }
-
-@Dto()
-class View {
-  final int id;
-  final String firstName;
-  final String? note;
-  final double price;
-  final bool active;
-  final DateTime? soldAt;
-  final Role role;
-  final Role? other;
-  final List<int> numbers;
-  final List<DateTime> dates;
-  final Inner inner;
-  final List<Inner> inners;
-  final OwnJson own;
-  final List<OwnJson> owns;
-  final Maybe<int> age;
-
-  const View({
-    required this.id,
-    required this.firstName,
-    required this.price,
-    required this.active,
-    required this.role,
-    required this.numbers,
-    required this.dates,
-    required this.inner,
-    required this.inners,
-    required this.own,
-    required this.owns,
-    this.note,
-    this.soldAt,
-    this.other,
-    this.age = const Maybe<int>.missing(),
-  });
-}
-''';
-
-      test('each field is written with the writer of its type', () async {
-        String out = (await _generate(
-          source,
-          imports: import,
-          packages: annotation,
-        )).replaceAll(RegExp(r'\s'), '');
-        expect(
-          out,
-          contains(
-            r'class_$ViewDtoextendsDtoSchema<View>implementsJsonObjectWriter{',
-          ),
-        );
-        expect(
-          out,
-          contains(
-            '@overridevoidwriteObject(Objectobject,JsonWriterwriter)=>'
-            r'$writeView(objectasView,writer);',
-          ),
-        );
-        // a Maybe field: each key is written with writer.key()
-        expect(
-          out,
-          contains(
-            r'void$writeView(Viewdto,JsonWriterwriter){'
-            'writer.startObject();'
-            "writer.key('id');writer.integer(dto.id);"
-            "writer.key('first_name');writer.string(dto.firstName);"
-            "writer.key('note');writer.string(dto.note);"
-            "writer.key('price');writer.value(dto.price);"
-            "writer.key('active');writer.boolean(dto.active);"
-            "writer.key('sold_at');writer.dateTime(dto.soldAt);"
-            "writer.key('role');writer.string(dto.role.name);"
-            "writer.key('other');writer.string(dto.other?.name);"
-            "writer.key('numbers');writer.value(dto.numbers);"
-            // a date in a list: the value of toMap()
-            "writer.key('dates');writer.value(<dynamic>[for(DateTimex0indto.dates)"
-            'x0.toIso8601String()]);'
-            // a nested DTO: its function is called
-            "writer.key('inner');\$writeInner(dto.inner,writer);"
-            // a list of DTOs: toMap() of the declared class
-            "writer.key('inners');writer.value(<dynamic>[for(Innerx0indto.inners)"
-            r'$InnerDto.toMap(x0)]);'
-            // a nested DTO with its own toJson(): the map of its schema
-            "writer.key('own');writer.value(\$OwnJsonDto.toMap(dto.own));"
-            "writer.key('owns');writer.value(<dynamic>[for(OwnJsonx0indto.owns)"
-            '\$OwnJsonDto.toMap(x0)]);'
-            "if(dto.agecaseMaybe<int>(isPresent:true,value:intage))"
-            "{writer.key('age');writer.integer(age);}"
-            'writer.endObject();}',
-          ),
-        );
-      });
-
-      test('a nullable list that toMap() changes is read once', () async {
-        String out = (await _generate(
-          '''
-enum Role { admin, user }
-
-@Dto()
-class Days {
-  final int id;
-  final List<DateTime>? days;
-  final List<Role>? roles;
-  const Days({required this.id, this.days, this.roles});
-}
 ''',
-          imports: import,
-          packages: annotation,
-        )).replaceAll(RegExp(r'\s'), '');
-        expect(out, contains('{List<DateTime>?days=dto.days;writer.value('));
-        expect(out, contains('{List<Role>?roles=dto.roles;writer.value('));
-        expect(out, isNot(contains('writer.value(dto.days==null')));
-      });
-
-      test('a DTO with its own toJson(): not made', () async {
-        String out = (await _generate(
-          source,
-          imports: import,
-          packages: annotation,
-        )).replaceAll(RegExp(r'\s'), '');
-        expect(out, contains(r'class_$OwnJsonDtoextendsDtoSchema<OwnJson>{'));
-        expect('writeObject('.allMatches(out).length, 2);
-      });
-
-      test('a toJson() from a mixin: not made', () async {
-        String out = (await _generate(
-          r'''
-mixin Loud {
-  Map<String, dynamic> toJson() => <String, dynamic>{};
-}
-
-@Dto()
-class FromMixin with Loud {
-  final int id;
-  FromMixin({required this.id});
-}
-
-@Dto()
-class Holder {
-  final FromMixin inner;
-  const Holder({required this.inner});
-}
-''',
-          imports: import,
-          packages: annotation,
-        )).replaceAll(RegExp(r'\s'), '');
-        expect(
-          out,
-          contains(r'class_$FromMixinDtoextendsDtoSchema<FromMixin>{'),
-        );
-        // inside another DTO it is the map of its schema, as in toMap()
-        expect(
-          out,
-          contains(
-            r'writer.run(_$HolderDto._innerKey);writer.value($FromMixinDto.toMap(dto.inner));',
-          ),
-        );
-      });
-
-      test('a nested DTO of a file with no JsonRun: toMap() of the '
-          'declared class', () async {
-        String out = (await _generate(
-          '''
-@Dto()
-class Outer {
-  final Inner inner;
-  final List<Inner> all;
-  final Inner? maybe;
-  const Outer({required this.inner, required this.all, this.maybe});
-}
-''',
-          imports: "$import\nimport 'other.dart';",
-          packages: annotation,
-          files: <String, String>{
-            // dox_validation only: this file gets no $writeInner
-            'a|lib/other.dart': '''
-import 'package:dox_validation/dox_validation.dart';
-@Dto()
-class Inner {
-  final String name;
-  const Inner({required this.name});
-}
-''',
-          },
-        )).replaceAll(RegExp(r'\s'), '');
-        expect(out, isNot(contains(r'$writeInner')));
-        expect(
-          out,
-          contains(
-            r'writer.run(_$OuterDto._innerKey);writer.value($InnerDto.toMap(dto.inner));'
-            r'writer.run(_$OuterDto._allKey);'
-            r'writer.value(<dynamic>[for(Innerx0indto.all)$InnerDto.toMap(x0)]);'
-            // a field read does not promote to non-null: a local
-            r'writer.run(_$OuterDto._maybeKey);{Inner?maybe=dto.maybe;'
-            r'writer.value(maybe==null?null:$InnerDto.toMap(maybe));}',
-          ),
-        );
-      });
-
-      test('no Maybe field: the fixed parts are runs', () async {
-        String out = (await _generate(
-          r'''
-enum Role { admin, user }
-
-@Dto()
-class Rating {
-  final int score;
-  const Rating({required this.score});
-}
-
-@Dto()
-class Item {
-  final int id;
-  final List<String> tags;
-  final Rating rating;
-  final Rating? best;
-  final List<Rating> all;
-  final List<List<int>> grid;
-  final bool active;
-  final List<Role> roles;
-
-  const Item({
-    required this.id,
-    required this.tags,
-    required this.rating,
-    required this.all,
-    required this.grid,
-    required this.active,
-    required this.roles,
-    this.best,
-  });
-}
-
-@Dto()
-class Page {
-  final List<Item>? items;
-  final int count;
-  const Page({required this.count, this.items});
-}
-''',
-          imports: import,
-          packages: annotation,
-        )).replaceAll(RegExp(r'\s'), '');
-        expect(
-          out,
-          contains(
-            r'void$writeItem(Itemdto,JsonWriterwriter){'
-            r'writer.run(_$ItemDto._idKey);writer.integer(dto.id);'
-            // a list of texts: a loop, with no look up
-            r'writer.run(_$ItemDto._tagsKey);'
-            '{List<String>tags=dto.tags;for(inti=0;i<tags.length;i++)'
-            '{if(i>0)writer.run(JsonRun.comma);writer.string(tags[i]);}}'
-            // a nested DTO: its function is called
-            r'writer.run(_$ItemDto._ratingKey);$writeRating(dto.rating,writer);'
-            // a nested DTO that can be null: its function is called, so a
-            // subclass value gets the fields of the declared class only
-            r'writer.run(_$ItemDto._bestKey);'
-            r'if(dto.bestcasefinal$v?){$writeRating($v,writer);}else{writer.value(null);}'
-            r'writer.run(_$ItemDto._allKey);'
-            '{List<Rating>all=dto.all;for(inti=0;i<all.length;i++)'
-            r'{if(i>0)writer.run(JsonRun.comma);$writeRating(all[i],writer);}}'
-            // a list of lists: the encoder writes it
-            r'writer.run(_$ItemDto._gridKey);writer.value(dto.grid);'
-            r'writer.run(_$ItemDto._activeKey);writer.boolean(dto.active);'
-            r'writer.run(_$ItemDto._rolesKey);'
-            '{List<Role>roles=dto.roles;for(inti=0;i<roles.length;i++)'
-            '{if(i>0)writer.run(JsonRun.comma);writer.string(roles[i].name);}}'
-            r'writer.run(_$ItemDto._end);}',
-          ),
-        );
-        // a closing bracket and the next key are one run
-        expect(
-          out,
-          contains(
-            'staticfinalJsonRun_idKey=JsonRun(\'{"id":\');'
-            'staticfinalJsonRun_tagsKey=JsonRun(\',"tags":[\');'
-            'staticfinalJsonRun_ratingKey=JsonRun(\'],"rating":\');'
-            'staticfinalJsonRun_bestKey=JsonRun(\',"best":\');'
-            'staticfinalJsonRun_allKey=JsonRun(\',"all":[\');'
-            'staticfinalJsonRun_gridKey=JsonRun(\'],"grid":\');'
-            'staticfinalJsonRun_activeKey=JsonRun(\',"active":\');'
-            'staticfinalJsonRun_rolesKey=JsonRun(\',"roles":[\');'
-            'staticfinalJsonRun_end=JsonRun(\']}\');',
-          ),
-        );
-        // a list of DTOs that can be null: toMap() of the declared class
-        expect(
-          out,
-          contains(
-            r'void$writePage(Pagedto,JsonWriterwriter){writer.run(_$PageDto._itemsKey);'
-            r'{List<Item>?items=dto.items;writer.value(items==null?null:'
-            r'<dynamic>[for(Itemx0initems)$ItemDto.toMap(x0)],);}'
-            r'writer.run(_$PageDto._countKey);writer.integer(dto.count);'
-            r'writer.run(_$PageDto._end);}',
-          ),
-        );
-      });
-
-      test('an older dox_annotation: not made', () async {
-        String out = await _generate(source);
-        expect(out, isNot(contains('ERROR')));
-        expect(out, isNot(contains('writeObject')));
-        expect(out, isNot(contains('JsonObjectWriter')));
-      });
-
-      test('a class of the app with the same name: not made', () async {
-        String out = await _generate('''
-class JsonWriter {}
-class JsonObjectWriter {}
-$source
-''');
-        expect(out, isNot(contains('writeObject')));
-      });
+            imports: "import 'package:dox_annotation/dox_annotation.dart';",
+            packages: annotation,
+          );
+          expect(out, isNot(startsWith('ERROR')));
+          expect(
+            out,
+            contains(
+              r'class _$OuterDto extends DtoSchema<Outer> '
+              'implements JsonObjectWriter {',
+            ),
+          );
+          expect(out, contains(r'$InnerDto.toMap(dto.inner)'));
+          expect(out, contains('writer.value(toMap(object as Outer))'));
+          // a DTO with its own toJson() keeps it
+          expect(
+            out,
+            contains(r'class _$OwnJsonDto extends DtoSchema<OwnJson> {'),
+          );
+          expect(out, isNot(contains('JsonRun')));
+          expect(out, isNot(contains(r'$write')));
+        },
+      );
     });
   });
 }

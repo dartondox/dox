@@ -247,7 +247,7 @@ The client gets this JSON:
 {"id": 1, "product_name": "Book", "sold_at": null}
 ```
 
-Dox writes the fields directly into the bytes of the response and makes no `Map`. Thus a DTO is a fast type to return.
+Dox makes the JSON with `toMap()` of the DTO. A DTO is for input. For fast JSON output, use [`@Serialize()`](serializer.md#fast-json-with-serialize).
 
 These rules apply:
 

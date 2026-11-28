@@ -17,13 +17,6 @@ class _$CreateUserDto extends DtoSchema<CreateUser>
 
   static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _nameKey = JsonRun('{"name":');
-  static final JsonRun _emailKey = JsonRun(',"email":');
-  static final JsonRun _ageKey = JsonRun(',"age":');
-  static final JsonRun _roleKey = JsonRun(',"role":');
-  static final JsonRun _tagsKey = JsonRun(',"tags":[');
-  static final JsonRun _end = JsonRun(']}');
-
   @override
   Type get type => CreateUser;
 
@@ -195,7 +188,7 @@ class _$CreateUserDto extends DtoSchema<CreateUser>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeCreateUser(object as CreateUser, writer);
+      writer.value(toMap(object as CreateUser));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -230,27 +223,6 @@ class _$CreateUserDto extends DtoSchema<CreateUser>
   }
 }
 
-/// Writes the JSON of [CreateUser], as `toMap()` gives it.
-void $writeCreateUser(CreateUser dto, JsonWriter writer) {
-  writer.run(_$CreateUserDto._nameKey);
-  writer.string(dto.name);
-  writer.run(_$CreateUserDto._emailKey);
-  writer.string(dto.email);
-  writer.run(_$CreateUserDto._ageKey);
-  writer.integer(dto.age);
-  writer.run(_$CreateUserDto._roleKey);
-  writer.string(dto.role.name);
-  writer.run(_$CreateUserDto._tagsKey);
-  {
-    List<String> tags = dto.tags;
-    for (int i = 0; i < tags.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.string(tags[i]);
-    }
-  }
-  writer.run(_$CreateUserDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [TextRules].
 const DtoSchema<TextRules> $TextRulesDto = _$TextRulesDto();
 
@@ -260,24 +232,6 @@ class _$TextRulesDto extends DtoSchema<TextRules> implements JsonObjectWriter {
   static const Map<String, String> _messages = <String, String>{};
 
   static final RegExp _r0 = RegExp('^(?:[a-z]+)\$');
-  static final JsonRun _lenKey = JsonRun('{"len":');
-  static final JsonRun _exactKey = JsonRun(',"exact":');
-  static final JsonRun _lenMinKey = JsonRun(',"len_min":');
-  static final JsonRun _minLenKey = JsonRun(',"min_len":');
-  static final JsonRun _maxLenKey = JsonRun(',"max_len":');
-  static final JsonRun _emailKey = JsonRun(',"email":');
-  static final JsonRun _urlKey = JsonRun(',"url":');
-  static final JsonRun _uuidKey = JsonRun(',"uuid":');
-  static final JsonRun _ipKey = JsonRun(',"ip":');
-  static final JsonRun _regexKey = JsonRun(',"regex":');
-  static final JsonRun _inListKey = JsonRun(',"in_list":');
-  static final JsonRun _notInKey = JsonRun(',"not_in":');
-  static final JsonRun _startsKey = JsonRun(',"starts":');
-  static final JsonRun _endsKey = JsonRun(',"ends":');
-  static final JsonRun _alphaKey = JsonRun(',"alpha":');
-  static final JsonRun _alnumKey = JsonRun(',"alnum":');
-  static final JsonRun _dashKey = JsonRun(',"dash":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => TextRules;
@@ -692,7 +646,7 @@ class _$TextRulesDto extends DtoSchema<TextRules> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeTextRules(object as TextRules, writer);
+      writer.value(toMap(object as TextRules));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -780,45 +734,6 @@ class _$TextRulesDto extends DtoSchema<TextRules> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [TextRules], as `toMap()` gives it.
-void $writeTextRules(TextRules dto, JsonWriter writer) {
-  writer.run(_$TextRulesDto._lenKey);
-  writer.string(dto.len);
-  writer.run(_$TextRulesDto._exactKey);
-  writer.string(dto.exact);
-  writer.run(_$TextRulesDto._lenMinKey);
-  writer.string(dto.lenMin);
-  writer.run(_$TextRulesDto._minLenKey);
-  writer.string(dto.minLen);
-  writer.run(_$TextRulesDto._maxLenKey);
-  writer.string(dto.maxLen);
-  writer.run(_$TextRulesDto._emailKey);
-  writer.string(dto.email);
-  writer.run(_$TextRulesDto._urlKey);
-  writer.string(dto.url);
-  writer.run(_$TextRulesDto._uuidKey);
-  writer.string(dto.uuid);
-  writer.run(_$TextRulesDto._ipKey);
-  writer.string(dto.ip);
-  writer.run(_$TextRulesDto._regexKey);
-  writer.string(dto.regex);
-  writer.run(_$TextRulesDto._inListKey);
-  writer.string(dto.inList);
-  writer.run(_$TextRulesDto._notInKey);
-  writer.string(dto.notIn);
-  writer.run(_$TextRulesDto._startsKey);
-  writer.string(dto.starts);
-  writer.run(_$TextRulesDto._endsKey);
-  writer.string(dto.ends);
-  writer.run(_$TextRulesDto._alphaKey);
-  writer.string(dto.alpha);
-  writer.run(_$TextRulesDto._alnumKey);
-  writer.string(dto.alnum);
-  writer.run(_$TextRulesDto._dashKey);
-  writer.string(dto.dash);
-  writer.run(_$TextRulesDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [ChangeText].
 const DtoSchema<ChangeText> $ChangeTextDto = _$ChangeTextDto();
 
@@ -827,13 +742,6 @@ class _$ChangeTextDto extends DtoSchema<ChangeText>
   const _$ChangeTextDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _trimmedKey = JsonRun('{"trimmed":');
-  static final JsonRun _lowerKey = JsonRun(',"lower":');
-  static final JsonRun _upperKey = JsonRun(',"upper":');
-  static final JsonRun _keepKey = JsonRun(',"keep":');
-  static final JsonRun _blankKey = JsonRun(',"blank":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => ChangeText;
@@ -927,7 +835,7 @@ class _$ChangeTextDto extends DtoSchema<ChangeText>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeChangeText(object as ChangeText, writer);
+      writer.value(toMap(object as ChangeText));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -955,21 +863,6 @@ class _$ChangeTextDto extends DtoSchema<ChangeText>
   }
 }
 
-/// Writes the JSON of [ChangeText], as `toMap()` gives it.
-void $writeChangeText(ChangeText dto, JsonWriter writer) {
-  writer.run(_$ChangeTextDto._trimmedKey);
-  writer.string(dto.trimmed);
-  writer.run(_$ChangeTextDto._lowerKey);
-  writer.string(dto.lower);
-  writer.run(_$ChangeTextDto._upperKey);
-  writer.string(dto.upper);
-  writer.run(_$ChangeTextDto._keepKey);
-  writer.string(dto.keep);
-  writer.run(_$ChangeTextDto._blankKey);
-  writer.string(dto.blank);
-  writer.run(_$ChangeTextDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [NumberRules].
 const DtoSchema<NumberRules> $NumberRulesDto = _$NumberRulesDto();
 
@@ -978,16 +871,6 @@ class _$NumberRulesDto extends DtoSchema<NumberRules>
   const _$NumberRulesDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _minKey = JsonRun('{"min":');
-  static final JsonRun _maxKey = JsonRun(',"max":');
-  static final JsonRun _rangeKey = JsonRun(',"range":');
-  static final JsonRun _positiveKey = JsonRun(',"positive":');
-  static final JsonRun _gtKey = JsonRun(',"gt":');
-  static final JsonRun _ltKey = JsonRun(',"lt":');
-  static final JsonRun _inNumKey = JsonRun(',"in_num":');
-  static final JsonRun _notInNumKey = JsonRun(',"not_in_num":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => NumberRules;
@@ -1202,7 +1085,7 @@ class _$NumberRulesDto extends DtoSchema<NumberRules>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeNumberRules(object as NumberRules, writer);
+      writer.value(toMap(object as NumberRules));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1250,27 +1133,6 @@ class _$NumberRulesDto extends DtoSchema<NumberRules>
   }
 }
 
-/// Writes the JSON of [NumberRules], as `toMap()` gives it.
-void $writeNumberRules(NumberRules dto, JsonWriter writer) {
-  writer.run(_$NumberRulesDto._minKey);
-  writer.integer(dto.min);
-  writer.run(_$NumberRulesDto._maxKey);
-  writer.integer(dto.max);
-  writer.run(_$NumberRulesDto._rangeKey);
-  writer.value(dto.range);
-  writer.run(_$NumberRulesDto._positiveKey);
-  writer.integer(dto.positive);
-  writer.run(_$NumberRulesDto._gtKey);
-  writer.value(dto.gt);
-  writer.run(_$NumberRulesDto._ltKey);
-  writer.value(dto.lt);
-  writer.run(_$NumberRulesDto._inNumKey);
-  writer.integer(dto.inNum);
-  writer.run(_$NumberRulesDto._notInNumKey);
-  writer.integer(dto.notInNum);
-  writer.run(_$NumberRulesDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [ListRules].
 const DtoSchema<ListRules> $ListRulesDto = _$ListRulesDto();
 
@@ -1278,12 +1140,6 @@ class _$ListRulesDto extends DtoSchema<ListRules> implements JsonObjectWriter {
   const _$ListRulesDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _minItemsKey = JsonRun('{"min_items":');
-  static final JsonRun _maxItemsKey = JsonRun(',"max_items":');
-  static final JsonRun _uniqueKey = JsonRun(',"unique":');
-  static final JsonRun _emailsKey = JsonRun(',"emails":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => ListRules;
@@ -1489,7 +1345,7 @@ class _$ListRulesDto extends DtoSchema<ListRules> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeListRules(object as ListRules, writer);
+      writer.value(toMap(object as ListRules));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1521,19 +1377,6 @@ class _$ListRulesDto extends DtoSchema<ListRules> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [ListRules], as `toMap()` gives it.
-void $writeListRules(ListRules dto, JsonWriter writer) {
-  writer.run(_$ListRulesDto._minItemsKey);
-  writer.value(dto.minItems);
-  writer.run(_$ListRulesDto._maxItemsKey);
-  writer.value(dto.maxItems);
-  writer.run(_$ListRulesDto._uniqueKey);
-  writer.value(dto.unique);
-  writer.run(_$ListRulesDto._emailsKey);
-  writer.value(dto.emails);
-  writer.run(_$ListRulesDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [DateRules].
 const DtoSchema<DateRules> $DateRulesDto = _$DateRulesDto();
 
@@ -1546,9 +1389,6 @@ class _$DateRulesDto extends DtoSchema<DateRules> implements JsonObjectWriter {
     946684800000000,
     isUtc: true,
   );
-  static final JsonRun _afterKey = JsonRun('{"after":');
-  static final JsonRun _beforeKey = JsonRun(',"before":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => DateRules;
@@ -1638,7 +1478,7 @@ class _$DateRulesDto extends DtoSchema<DateRules> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeDateRules(object as DateRules, writer);
+      writer.value(toMap(object as DateRules));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1659,15 +1499,6 @@ class _$DateRulesDto extends DtoSchema<DateRules> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [DateRules], as `toMap()` gives it.
-void $writeDateRules(DateRules dto, JsonWriter writer) {
-  writer.run(_$DateRulesDto._afterKey);
-  writer.dateTime(dto.after);
-  writer.run(_$DateRulesDto._beforeKey);
-  writer.dateTime(dto.before);
-  writer.run(_$DateRulesDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [AllTypes].
 const DtoSchema<AllTypes> $AllTypesDto = _$AllTypesDto();
 
@@ -1675,19 +1506,6 @@ class _$AllTypesDto extends DtoSchema<AllTypes> implements JsonObjectWriter {
   const _$AllTypesDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _sKey = JsonRun('{"s":');
-  static final JsonRun _iKey = JsonRun(',"i":');
-  static final JsonRun _dKey = JsonRun(',"d":');
-  static final JsonRun _nKey = JsonRun(',"n":');
-  static final JsonRun _bKey = JsonRun(',"b":');
-  static final JsonRun _dtKey = JsonRun(',"dt":');
-  static final JsonRun _roleKey = JsonRun(',"role":');
-  static final JsonRun _listKey = JsonRun(',"list":');
-  static final JsonRun _mapKey = JsonRun(',"map":');
-  static final JsonRun _anyKey = JsonRun(',"any":');
-  static final JsonRun _rawKey = JsonRun(',"raw":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => AllTypes;
@@ -1858,7 +1676,7 @@ class _$AllTypesDto extends DtoSchema<AllTypes> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeAllTypes(object as AllTypes, writer);
+      writer.value(toMap(object as AllTypes));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -1911,33 +1729,6 @@ class _$AllTypesDto extends DtoSchema<AllTypes> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [AllTypes], as `toMap()` gives it.
-void $writeAllTypes(AllTypes dto, JsonWriter writer) {
-  writer.run(_$AllTypesDto._sKey);
-  writer.string(dto.s);
-  writer.run(_$AllTypesDto._iKey);
-  writer.integer(dto.i);
-  writer.run(_$AllTypesDto._dKey);
-  writer.value(dto.d);
-  writer.run(_$AllTypesDto._nKey);
-  writer.value(dto.n);
-  writer.run(_$AllTypesDto._bKey);
-  writer.boolean(dto.b);
-  writer.run(_$AllTypesDto._dtKey);
-  writer.dateTime(dto.dt);
-  writer.run(_$AllTypesDto._roleKey);
-  writer.string(dto.role?.name);
-  writer.run(_$AllTypesDto._listKey);
-  writer.value(dto.list);
-  writer.run(_$AllTypesDto._mapKey);
-  writer.value(dto.map);
-  writer.run(_$AllTypesDto._anyKey);
-  writer.value(dto.any);
-  writer.run(_$AllTypesDto._rawKey);
-  writer.value(dto.raw);
-  writer.run(_$AllTypesDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [SearchUsers].
 const DtoSchema<SearchUsers> $SearchUsersDto = _$SearchUsersDto();
 
@@ -1946,11 +1737,6 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers>
   const _$SearchUsersDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _qKey = JsonRun('{"q":');
-  static final JsonRun _pageKey = JsonRun(',"page":');
-  static final JsonRun _tagsKey = JsonRun(',"tags":[');
-  static final JsonRun _end = JsonRun(']}');
 
   @override
   Type get type => SearchUsers;
@@ -2032,7 +1818,7 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeSearchUsers(object as SearchUsers, writer);
+      writer.value(toMap(object as SearchUsers));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -2054,23 +1840,6 @@ class _$SearchUsersDto extends DtoSchema<SearchUsers>
   }
 }
 
-/// Writes the JSON of [SearchUsers], as `toMap()` gives it.
-void $writeSearchUsers(SearchUsers dto, JsonWriter writer) {
-  writer.run(_$SearchUsersDto._qKey);
-  writer.string(dto.q);
-  writer.run(_$SearchUsersDto._pageKey);
-  writer.integer(dto.page);
-  writer.run(_$SearchUsersDto._tagsKey);
-  {
-    List<String> tags = dto.tags;
-    for (int i = 0; i < tags.length; i++) {
-      if (i > 0) writer.run(JsonRun.comma);
-      writer.string(tags[i]);
-    }
-  }
-  writer.run(_$SearchUsersDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [StrictInput].
 const DtoSchema<StrictInput> $StrictInputDto = _$StrictInputDto();
 
@@ -2081,8 +1850,6 @@ class _$StrictInputDto extends DtoSchema<StrictInput>
   static const Map<String, String> _messages = <String, String>{};
 
   static const Set<String> _keys = <String>{'name'};
-  static final JsonRun _nameKey = JsonRun('{"name":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => StrictInput;
@@ -2138,7 +1905,7 @@ class _$StrictInputDto extends DtoSchema<StrictInput>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeStrictInput(object as StrictInput, writer);
+      writer.value(toMap(object as StrictInput));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -2154,13 +1921,6 @@ class _$StrictInputDto extends DtoSchema<StrictInput>
   }
 }
 
-/// Writes the JSON of [StrictInput], as `toMap()` gives it.
-void $writeStrictInput(StrictInput dto, JsonWriter writer) {
-  writer.run(_$StrictInputDto._nameKey);
-  writer.string(dto.name);
-  writer.run(_$StrictInputDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [WithMessages].
 const DtoSchema<WithMessages> $WithMessagesDto = _$WithMessagesDto();
 
@@ -2173,12 +1933,6 @@ class _$WithMessagesDto extends DtoSchema<WithMessages>
     'required': 'Please fill in {field}',
     'integer': 'The {field} must be a number',
   };
-
-  static final JsonRun _emailKey = JsonRun('{"email":');
-  static final JsonRun _nameKey = JsonRun(',"name":');
-  static final JsonRun _ageKey = JsonRun(',"age":');
-  static final JsonRun _nickKey = JsonRun(',"nick":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => WithMessages;
@@ -2274,7 +2028,7 @@ class _$WithMessagesDto extends DtoSchema<WithMessages>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeWithMessages(object as WithMessages, writer);
+      writer.value(toMap(object as WithMessages));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -2297,19 +2051,6 @@ class _$WithMessagesDto extends DtoSchema<WithMessages>
   }
 }
 
-/// Writes the JSON of [WithMessages], as `toMap()` gives it.
-void $writeWithMessages(WithMessages dto, JsonWriter writer) {
-  writer.run(_$WithMessagesDto._emailKey);
-  writer.string(dto.email);
-  writer.run(_$WithMessagesDto._nameKey);
-  writer.string(dto.name);
-  writer.run(_$WithMessagesDto._ageKey);
-  writer.integer(dto.age);
-  writer.run(_$WithMessagesDto._nickKey);
-  writer.string(dto.nick);
-  writer.run(_$WithMessagesDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [SignUpKeys].
 const DtoSchema<SignUpKeys> $SignUpKeysDto = _$SignUpKeysDto();
 
@@ -2318,10 +2059,6 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys>
   const _$SignUpKeysDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _firstNameKey = JsonRun('{"first_name":');
-  static final JsonRun _emailKey = JsonRun(',"emailAddress":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => SignUpKeys;
@@ -2380,7 +2117,7 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeSignUpKeys(object as SignUpKeys, writer);
+      writer.value(toMap(object as SignUpKeys));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -2396,15 +2133,6 @@ class _$SignUpKeysDto extends DtoSchema<SignUpKeys>
   }
 }
 
-/// Writes the JSON of [SignUpKeys], as `toMap()` gives it.
-void $writeSignUpKeys(SignUpKeys dto, JsonWriter writer) {
-  writer.run(_$SignUpKeysDto._firstNameKey);
-  writer.string(dto.firstName);
-  writer.run(_$SignUpKeysDto._emailKey);
-  writer.string(dto.email);
-  writer.run(_$SignUpKeysDto._end);
-}
-
 /// The checks, the converter and the JSON Schema of [CamelKeys].
 const DtoSchema<CamelKeys> $CamelKeysDto = _$CamelKeysDto();
 
@@ -2412,9 +2140,6 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> implements JsonObjectWriter {
   const _$CamelKeysDto();
 
   static const Map<String, String> _messages = <String, String>{};
-
-  static final JsonRun _firstNameKey = JsonRun('{"firstName":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => CamelKeys;
@@ -2458,7 +2183,7 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeCamelKeys(object as CamelKeys, writer);
+      writer.value(toMap(object as CamelKeys));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -2471,13 +2196,6 @@ class _$CamelKeysDto extends DtoSchema<CamelKeys> implements JsonObjectWriter {
       'required': <dynamic>['firstName'],
     };
   }
-}
-
-/// Writes the JSON of [CamelKeys], as `toMap()` gives it.
-void $writeCamelKeys(CamelKeys dto, JsonWriter writer) {
-  writer.run(_$CamelKeysDto._firstNameKey);
-  writer.string(dto.firstName);
-  writer.run(_$CamelKeysDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [UpdateUser].
@@ -2569,7 +2287,7 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeUpdateUser(object as UpdateUser, writer);
+      writer.value(toMap(object as UpdateUser));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -2585,20 +2303,6 @@ class _$UpdateUserDto extends DtoSchema<UpdateUser>
       },
     };
   }
-}
-
-/// Writes the JSON of [UpdateUser], as `toMap()` gives it.
-void $writeUpdateUser(UpdateUser dto, JsonWriter writer) {
-  writer.startObject();
-  if (dto.bio case Maybe<String?>(isPresent: true, value: String? bio)) {
-    writer.key('bio');
-    writer.string(bio);
-  }
-  if (dto.age case Maybe<int>(isPresent: true, value: int age)) {
-    writer.key('age');
-    writer.integer(age);
-  }
-  writer.endObject();
 }
 
 /// The checks, the converter and the JSON Schema of [MoreRules].
@@ -2974,7 +2678,7 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeMoreRules(object as MoreRules, writer);
+      writer.value(toMap(object as MoreRules));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -3072,51 +2776,6 @@ class _$MoreRulesDto extends DtoSchema<MoreRules> implements JsonObjectWriter {
   }
 }
 
-/// Writes the JSON of [MoreRules], as `toMap()` gives it.
-void $writeMoreRules(MoreRules dto, JsonWriter writer) {
-  writer.startObject();
-  writer.key('password');
-  writer.string(dto.password);
-  writer.key('email_again');
-  writer.string(dto.emailAgain);
-  writer.key('email');
-  writer.string(dto.email);
-  writer.key('type');
-  writer.string(dto.type);
-  writer.key('company');
-  writer.string(dto.company);
-  if (dto.countryCode case Maybe<String>(
-    isPresent: true,
-    value: String countryCode,
-  )) {
-    writer.key('country_code');
-    writer.string(countryCode);
-  }
-  writer.key('phone');
-  writer.string(dto.phone);
-  writer.key('meta');
-  writer.string(dto.meta);
-  writer.key('role');
-  writer.string(dto.role?.name);
-  writer.key('admin_code');
-  writer.string(dto.adminCode);
-  writer.key('tags');
-  writer.value(dto.tags);
-  writer.key('pin');
-  writer.string(dto.pin);
-  writer.key('code');
-  writer.string(dto.code);
-  writer.key('day');
-  writer.string(dto.day);
-  writer.key('secret');
-  writer.string(dto.secret);
-  writer.key('plan_note');
-  writer.string(dto.planNote);
-  writer.key('plan');
-  writer.string(dto.plan);
-  writer.endObject();
-}
-
 /// The checks, the converter and the JSON Schema of [StrictPassword].
 const DtoSchema<StrictPassword> $StrictPasswordDto = _$StrictPasswordDto();
 
@@ -3130,8 +2789,6 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword>
     'password',
     'password_confirmation',
   };
-  static final JsonRun _passwordKey = JsonRun('{"password":');
-  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => StrictPassword;
@@ -3201,7 +2858,7 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeStrictPassword(object as StrictPassword, writer);
+      writer.value(toMap(object as StrictPassword));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -3220,11 +2877,4 @@ class _$StrictPasswordDto extends DtoSchema<StrictPassword>
     ], const Confirmed().toJsonSchema());
     return schema;
   }
-}
-
-/// Writes the JSON of [StrictPassword], as `toMap()` gives it.
-void $writeStrictPassword(StrictPassword dto, JsonWriter writer) {
-  writer.run(_$StrictPasswordDto._passwordKey);
-  writer.string(dto.password);
-  writer.run(_$StrictPasswordDto._end);
 }

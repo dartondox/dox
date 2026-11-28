@@ -21,20 +21,6 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
     'first_name': 'first name',
   };
 
-  static final JsonRun _firstNameKey = JsonRun('{"first_name":');
-  static final JsonRun _ageKey = JsonRun(',"age":');
-  static final JsonRun _termsKey = JsonRun(',"terms":');
-  static final JsonRun _startKey = JsonRun(',"start":');
-  static final JsonRun _endKey = JsonRun(',"end":');
-  static final JsonRun _typeKey = JsonRun(',"type":');
-  static final JsonRun _companyKey = JsonRun(',"company":');
-  static final JsonRun _vatKey = JsonRun(',"vat":');
-  static final JsonRun _debugKey = JsonRun(',"debug":');
-  static final JsonRun _nickKey = JsonRun(',"nick":');
-  static final JsonRun _idKey = JsonRun(',"id":');
-  static final JsonRun _maxKey = JsonRun(',"max":');
-  static final JsonRun _end = JsonRun('}');
-
   @override
   Type get type => LaravelRules;
 
@@ -287,7 +273,7 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeLaravelRules(object as LaravelRules, writer);
+      writer.value(toMap(object as LaravelRules));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -343,33 +329,4 @@ class _$LaravelRulesDto extends DtoSchema<LaravelRules>
     ], const GreaterThanField('age').toJsonSchema());
     return schema;
   }
-}
-
-/// Writes the JSON of [LaravelRules], as `toMap()` gives it.
-void $writeLaravelRules(LaravelRules dto, JsonWriter writer) {
-  writer.run(_$LaravelRulesDto._firstNameKey);
-  writer.string(dto.firstName);
-  writer.run(_$LaravelRulesDto._ageKey);
-  writer.integer(dto.age);
-  writer.run(_$LaravelRulesDto._termsKey);
-  writer.boolean(dto.terms);
-  writer.run(_$LaravelRulesDto._startKey);
-  writer.dateTime(dto.start);
-  writer.run(_$LaravelRulesDto._endKey);
-  writer.dateTime(dto.end);
-  writer.run(_$LaravelRulesDto._typeKey);
-  writer.string(dto.type);
-  writer.run(_$LaravelRulesDto._companyKey);
-  writer.string(dto.company);
-  writer.run(_$LaravelRulesDto._vatKey);
-  writer.string(dto.vat);
-  writer.run(_$LaravelRulesDto._debugKey);
-  writer.string(dto.debug);
-  writer.run(_$LaravelRulesDto._nickKey);
-  writer.string(dto.nick);
-  writer.run(_$LaravelRulesDto._idKey);
-  writer.string(dto.id);
-  writer.run(_$LaravelRulesDto._maxKey);
-  writer.integer(dto.max);
-  writer.run(_$LaravelRulesDto._end);
 }

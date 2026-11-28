@@ -56,7 +56,7 @@ class DtoWriter {
     : flags = const _NoFlags(),
       jsonSchema = const <String, dynamic>{},
       runtimeFlags = false,
-      jsonWriter = true,
+      jsonWriter = false,
       _serialize = true;
 
   /// true for [DtoWriter.serialize]
@@ -77,8 +77,8 @@ class DtoWriter {
   final bool runtimeFlags;
 
   /// `true` when the dox_annotation of the app has `JsonObjectWriter`.
-  /// Then the schema gets `writeObject()`, and dox_core writes the DTO
-  /// in a response with no map. An older dox_annotation does not get it.
+  /// Then the schema gets `writeObject()`, and dox_core finds the DTO in
+  /// a response. An older dox_annotation does not get it.
   final bool jsonWriter;
 
   /// A DTO with its own `toJson()` keeps it: dox_core calls that method.
@@ -229,8 +229,6 @@ class DtoWriter {
     DtoFlags flags = own;
     String name = dto.name;
     String convert = _convert();
-    // before the statics are written: it adds the runs of the JSON
-    String writer = _writesJson ? _writeFunction() : '';
     String cross = flags.checks ? _crossCheck(flags) : '';
     String async = flags.async ? _checkAsync() : '';
     StringBuffer out = StringBuffer()
@@ -312,8 +310,7 @@ class DtoWriter {
       ..writeln(_toMap())
       ..writeln(_writesJson ? _writeObject() : '')
       ..writeln(_toJsonSchema())
-      ..writeln('}')
-      ..writeln(writer);
+      ..writeln('}');
     return out.toString();
   }
 
@@ -1295,13 +1292,12 @@ class DtoWriter {
     return out.toString();
   }
 
-  /// `writeObject()` writes the JSON of toMap() with no map in between.
-  /// The JSON encoder of dox_core calls it for a DTO in a response. It
-  /// calls the function of [_writeFunction].
+  /// `writeObject()` gives the map of toMap() to the JSON encoder. A DTO
+  /// is for input: use `@Serialize()` for fast JSON output.
   String _writeObject() {
     return '@override\n'
         'void writeObject(Object object, JsonWriter writer) => '
-        '\$write${dto.name}(object as ${dto.name}, writer);\n';
+        'writer.value(toMap(object as ${dto.name}));\n';
   }
 
   /// The name of the function that writes the JSON of the DTO [type].
@@ -1463,11 +1459,6 @@ class DtoWriter {
         '{ ${type.nonNullCode}? \$v = $value; '
             'if (\$v != null && \$v.runtimeType == ${type.nonNullCode}) '
             '{ ${_writeRef(type)}(\$v, writer); } else { writer.value(\$v); } }',
-      DtoKind.dto when _hasWriteFunction(type) =>
-        type.nullable
-            ? 'if ($value case final \$v?) { ${_writeRef(type)}(\$v, writer); } '
-                  'else { writer.value(null); }'
-            : '${_writeRef(type)}($value, writer);',
       _ => null,
     };
   }
