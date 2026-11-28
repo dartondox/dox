@@ -18,6 +18,12 @@ class _Res implements HttpResponse {
   @override
   Encoding encoding = utf8;
 
+  /// the bytes of the body
+  List<int>? sent;
+
+  @override
+  void add(List<int> data) => sent = data;
+
   @override
   Future<dynamic> close() async => closed++;
 
@@ -115,6 +121,18 @@ void main() {
           req.response.headers.value(HttpHeaders.contentTypeHeader),
           startsWith('text/html'),
         );
+      }
+    });
+
+    test('a charset that is not UTF-8 encodes the text, like a String', () {
+      for (DoxResponse res in <DoxResponse>[
+        DoxResponse('caf\u00E9'),
+        DoxResponse(null).contentBytes(utf8.encode('caf\u00E9')),
+      ]) {
+        _Req req = _Req();
+        req.response.encoding = latin1;
+        res.process(req);
+        expect(req.response.sent, latin1.encode('caf\u00E9'));
       }
     });
 

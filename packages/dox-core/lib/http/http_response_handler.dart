@@ -201,7 +201,12 @@ void responseDataHandler(dynamic payload, HttpRequest request) {
         ? utf8Bytes(payload)
         : encoding.encode(payload);
   } else if (payload is TextBytes) {
-    bytes = payload.bytes;
+    // a charset that is not UTF-8 encodes the text again, as a String
+    // body does
+    Encoding encoding = res.encoding;
+    bytes = encoding is Utf8Codec
+        ? payload.bytes
+        : encoding.encode(utf8.decode(payload.bytes, allowMalformed: true));
   } else if (payload is JsonBytes) {
     bytes = payload.bytes;
     res.headers.contentType = ContentType.json;
