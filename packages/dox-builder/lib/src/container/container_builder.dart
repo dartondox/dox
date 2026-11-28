@@ -131,12 +131,11 @@ class DoxContainerBuilder implements Builder {
         if (model != null) models.add(model);
         _warnSubSerializer(element, uri);
         if (await serialize.hasWriter(element) &&
-            seesAnnotationClass(library.firstFragment, 'SerializeWriter')) {
+            seesSerializeCode(library.firstFragment)) {
           // the writer is in the part: no part, no writer to register
           String part =
               '${id.pathSegments.last.replaceFirst(RegExp(r'\.dart$'), '')}.g.dart';
-          if (RegExp('part\\s+[\'"]${RegExp.escape(part)}[\'"]')
-              .hasMatch(text)) {
+          if (hasGeneratedPart(library)) {
             writers.add(JsonWriterEntry(element, uri));
           } else {
             log.warning(

@@ -1354,6 +1354,37 @@ class Inner {
       expect(out, contains('Map<String, o.Status>?'));
       expect(out, isNot(contains(' Inner ')));
     });
+
+    test('a nested DTO imported with show: a clear error', () async {
+      String out = await _generate(
+        '''
+@Dto()
+class Outer {
+  final Inner inner;
+  const Outer({required this.inner});
+}
+''',
+        imports: "import 'other.dart' show Inner;",
+        files: <String, String>{
+          'a|lib/other.dart': '''
+import 'package:dox_validation/dox_validation.dart';
+@Dto()
+class Inner {
+  final String name;
+  const Inner({required this.name});
+}
+''',
+        },
+      );
+      expect(out, startsWith('ERROR'));
+      expect(
+        out,
+        contains(
+          'The type Inner of Outer.inner is a @Dto, but its generated code '
+          'is hidden here',
+        ),
+      );
+    });
   });
 
   group('DTO registry |', () {

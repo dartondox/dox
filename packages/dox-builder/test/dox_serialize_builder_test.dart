@@ -687,6 +687,105 @@ class PlainNoPart {
       expect(out, contains('writer.value(dto.p);'));
     });
 
+    test('a file that does not see SerializeWriter: no call into it', () async {
+      final (String out, String _) = await _generate(
+        '''
+import 'thing.dart';
+
+class Box {
+  Box(this.t, this.p);
+  final Thing t;
+  final PlainB p;
+}
+
+@Serialize()
+class BoxSer extends Serializer<Box> {
+  BoxSer(super.data);
+  @override
+  Map<String, dynamic> convert(Box m) =>
+      <String, dynamic>{'t': ThingSer(m.t), 'p': m.p};
+}
+
+@Serialize()
+class Holder {
+  final PlainB p;
+  const Holder(this.p);
+}
+''',
+        files: <String, String>{
+          'a|lib/thing.dart': '''
+import 'package:dox_core/dox_core.dart' show Serializer, Serialize;
+
+part 'thing.g.dart';
+
+class Thing {
+  Thing(this.name);
+  final String name;
+}
+
+@Serialize()
+class ThingSer extends Serializer<Thing> {
+  ThingSer(super.data);
+  @override
+  Map<String, dynamic> convert(Thing m) => <String, dynamic>{'n': m.name};
+}
+
+@Serialize()
+class PlainB {
+  final int id;
+  const PlainB(this.id);
+}
+''',
+        },
+      );
+      expect(out, isNot(contains(r'$writeThingSer')));
+      expect(out, isNot(contains(r'$writePlainB')));
+      expect(out, isNot(contains(r'$PlainBToMap')));
+      expect(out, contains('writer.value(ThingSer(m.t));'));
+      expect(out, contains('writer.value(dto.p);'));
+    });
+
+    test('the part is found by the directive, not the text', () async {
+      final (String out, String logs) = await _container(
+        '''
+@Serialize()
+class Plain {
+  final int id;
+  const Plain(this.id);
+}
+''',
+        files: <String, String>{
+          'a|lib/user.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+part 'generated/user.g.dart';
+
+@Serialize()
+class User {
+  final int id;
+  const User(this.id);
+}
+''',
+          'a|lib/generated/user.g.dart': "part of '../user.dart';",
+          'a|lib/note.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+// part 'note.g.dart';
+
+@Serialize()
+class Note {
+  final int id;
+  const Note(this.id);
+}
+''',
+        },
+      );
+      expect(out, contains(r'$UserWriter'));
+      expect(out, isNot(contains('Note')));
+      expect(logs, contains("Add `part 'note.g.dart';`"));
+      expect(logs, isNot(contains("Add `part 'user.g.dart';`")));
+    });
+
     test('no part in the file: no writer in the container', () async {
       final (String out, String logs) = await _container(
         '''

@@ -1415,7 +1415,10 @@ class DtoWriter {
     return switch (type.type.element) {
       InterfaceElement e =>
         _package(e.library.uri) == _package(dto.element.library.uri) &&
-            seesDtoWriter(e.library.firstFragment),
+            seesDtoWriter(e.library.firstFragment) &&
+            // the `$write` function must be in scope, like the class
+            visiblePrefix(dto.element.library, e, '\$write${e.displayName}') ==
+                type.prefix,
       _ => false,
     };
   }

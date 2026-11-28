@@ -799,7 +799,19 @@ class DtoReader {
       );
       return item == null ? null : make(DtoKind.map, item: item);
     }
-    if (isDto(element)) return make(DtoKind.dto);
+    if (isDto(element)) {
+      // the generated `$NameDto` and `$writeName` must be in scope here
+      if (library == null || _seesDtoCode(element, library)) {
+        return make(DtoKind.dto);
+      }
+      if (output) return make(DtoKind.any);
+      errors.add(
+        'The type $name of $where is a @Dto, but its generated code is '
+        'hidden here (an import or an export with show or hide). Import its '
+        'file with no show or hide.',
+      );
+      return null;
+    }
     if (output) {
       bool plain = element is ClassElement && plainProblem(element) == null;
       // the generated functions of the class must be in scope here
@@ -820,6 +832,14 @@ class DtoReader {
       'or a List or Map of them.',
     );
     return null;
+  }
+
+  /// `true` when [library] sees the generated `$NameDto` of the DTO
+  /// [element] the same way as the class
+  bool _seesDtoCode(InterfaceElement element, LibraryElement library) {
+    String name = element.displayName;
+    String prefix = prefixOf(element, library);
+    return visiblePrefix(library, element, '\$${name}Dto') == prefix;
   }
 
   bool _implements(InterfaceType type, String name) {

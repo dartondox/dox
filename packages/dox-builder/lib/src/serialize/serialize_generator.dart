@@ -32,16 +32,15 @@ class DoxSerializeGenerator extends Generator {
       AstLoader(buildStep.resolver),
       reader: reader,
     );
-    bool sees = seesAnnotationClass(
-      library.element.firstFragment,
-      'SerializeWriter',
-    );
+    bool sees = seesSerializeCode(library.element.firstFragment);
     List<String> parts = <String>[];
     for (ClassElement element in classes) {
       String name = element.displayName;
       String? problem;
       if (!sees) {
-        problem = 'the dox_annotation of the app has no SerializeWriter';
+        problem =
+            'its file does not see SerializeWriter, JsonWriter, JsonRun and '
+            'JsonObjectWriter (an old dox_annotation, or an import with show)';
       } else if (DtoReader.isSerializer(element)) {
         SerializerRead read = await serialize.serializer(element);
         SerializerPlan? plan = read.plan;

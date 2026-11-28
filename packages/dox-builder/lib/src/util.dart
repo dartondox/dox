@@ -94,18 +94,39 @@ String prefixOf(Element element, LibraryElement? library) {
 /// of the part of [target] from [library], or null when [library] can
 /// not see it: [target] is in another package, its file has no
 /// `part '<file>.g.dart';` (so the function is not made), or no import
-/// gives the name. An import or an export with `show` or `hide` gives the name only
-/// when the name passes it. The generated function is not in the element
-/// model yet, so the directives are read, not the names.
+/// gives the name. An import or an export with `show` or `hide` gives the
+/// name only when the name passes it. The generated function is not in
+/// the element model yet, so the directives are read, not the names.
+///
+/// For a `@Serialize()` class ([serialize]), the file of [target] must
+/// also see the classes that its code uses ([seesSerializeCode]), else
+/// the generator makes no code for it.
 String? generatedPrefix(
+  LibraryElement library,
+  InterfaceElement target,
+  String name, {
+  bool serialize = true,
+}) {
+  LibraryElement home = target.library;
+  if (!hasGeneratedPart(home)) return null;
+  if (serialize && !seesSerializeCode(home.firstFragment)) return null;
+  if (home == library) return '';
+  if (_packageOf(home.uri) != _packageOf(library.uri)) return null;
+  return visiblePrefix(library, target, name);
+}
+
+/// The prefix (like `p.`, or empty) of the name [name] of the library of
+/// [target] in [library], or null when no import of [library] gives it.
+/// Only the directives are read (the name can be one that a builder makes
+/// in this build): an import or an export with `show` or `hide` gives
+/// [name] only when it passes them.
+String? visiblePrefix(
   LibraryElement library,
   InterfaceElement target,
   String name,
 ) {
   LibraryElement home = target.library;
-  if (!hasGeneratedPart(home)) return null;
   if (home == library) return '';
-  if (_packageOf(home.uri) != _packageOf(library.uri)) return null;
   for (LibraryFragment fragment in library.fragments) {
     for (LibraryImport import in fragment.libraryImports) {
       LibraryElement? imported = import.importedLibrary;
@@ -203,6 +224,14 @@ bool seesDtoWriter(LibraryFragment library) {
   return seesAnnotationClass(library, 'JsonObjectWriter') &&
       seesAnnotationClass(library, 'JsonWriter') &&
       seesAnnotationClass(library, 'JsonRun');
+}
+
+/// `true` when [library] sees the classes that the code of `@Serialize()`
+/// uses. The generator makes the code only then, and other files call it
+/// only then: one test for both, so they can not disagree.
+bool seesSerializeCode(LibraryFragment library) {
+  return seesDtoWriter(library) &&
+      seesAnnotationClass(library, 'SerializeWriter');
 }
 
 /// `true` when [element] has the method [name]: its own, or one from a
