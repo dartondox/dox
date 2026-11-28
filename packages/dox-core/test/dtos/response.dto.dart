@@ -32,6 +32,32 @@ class ProductView {
   });
 }
 
+/// A [ProductView] with one more field. In a field declared as
+/// [ProductView], only the fields of [ProductView] are in the JSON.
+@Dto()
+class SecretProductView implements ProductView {
+  @override
+  final int id;
+  @override
+  final String productName;
+  @override
+  final double price;
+  @override
+  final bool inStock;
+  @override
+  final DateTime? soldAt;
+  final String secret;
+
+  const SecretProductView({
+    required this.id,
+    required this.productName,
+    required this.price,
+    required this.inStock,
+    required this.secret,
+    this.soldAt,
+  });
+}
+
 /// Values that toMap() changes before they are JSON: dates and enums in
 /// lists and maps, and a nested DTO with its own toJson().
 @Dto()

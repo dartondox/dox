@@ -410,7 +410,11 @@ void $writeCreateOrder(CreateOrder o, JsonWriter w) {
     }
   }
   w.run(_$CreateOrderDto._j2);
-  w.value(o.billing);
+  if (o.billing case final v?) {
+    $writeAddress(v, w);
+  } else {
+    w.value(null);
+  }
   w.run(_$CreateOrderDto._j3);
 }
 

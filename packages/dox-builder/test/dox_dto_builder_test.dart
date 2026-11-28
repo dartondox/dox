@@ -1447,7 +1447,9 @@ class View {
             'x0.toIso8601String()]);'
             // a nested DTO: its function is called
             "w.key('inner');\$writeInner(o.inner,w);"
-            "w.key('inners');w.value(o.inners);"
+            // a list of DTOs: toMap() of the declared class
+            "w.key('inners');w.value(<dynamic>[for(Innerx0ino.inners)"
+            r'$InnerDto.toMap(x0)]);'
             // a nested DTO with its own toJson(): the map of its schema
             "w.key('own');w.value(\$OwnJsonDto.toMap(o.own));"
             "w.key('owns');w.value(<dynamic>[for(OwnJsonx0ino.owns)"
@@ -1504,8 +1506,8 @@ class Holder {
         );
       });
 
-      test('a nested DTO of a file with no JsonRun: the encoder finds '
-          'its writer', () async {
+      test('a nested DTO of a file with no JsonRun: toMap() of the '
+          'declared class', () async {
         String out = (await _generate(
           '''
 @Dto()
@@ -1533,8 +1535,9 @@ class Inner {
         expect(
           out,
           contains(
-            r'w.run(_$OuterDto._j0);w.value(o.inner);'
-            r'w.run(_$OuterDto._j1);w.value(o.all);',
+            r'w.run(_$OuterDto._j0);w.value($InnerDto.toMap(o.inner));'
+            r'w.run(_$OuterDto._j1);'
+            r'w.value(<dynamic>[for(Innerx0ino.all)$InnerDto.toMap(x0)]);',
           ),
         );
       });
@@ -1594,8 +1597,10 @@ class Page {
             '{if(i>0)w.run(JsonRun.comma);w.string(l1[i]);}}'
             // a nested DTO: its function is called
             r'w.run(_$ItemDto._j2);$writeRating(o.rating,w);'
-            // a nested DTO that can be null: the encoder finds its writer
-            r'w.run(_$ItemDto._j3);w.value(o.best);'
+            // a nested DTO that can be null: its function is called, so a
+            // subclass value gets the fields of the declared class only
+            r'w.run(_$ItemDto._j3);'
+            r'if(o.bestcasefinalv?){$writeRating(v,w);}else{w.value(null);}'
             r'w.run(_$ItemDto._j4);'
             '{List<Rating>l4=o.all;for(inti=0;i<l4.length;i++)'
             r'{if(i>0)w.run(JsonRun.comma);$writeRating(l4[i],w);}}'
@@ -1623,12 +1628,14 @@ class Page {
             'staticfinalJsonRun_j8=JsonRun(\']}\');',
           ),
         );
-        // a list that can be null: the encoder writes it
+        // a list of DTOs that can be null: toMap() of the declared class
         expect(
           out,
           contains(
             r'void$writePage(Pageo,JsonWriterw){w.run(_$PageDto._j0);'
-            r'w.value(o.items);w.run(_$PageDto._j1);w.integer(o.count);'
+            r'w.value(o.items==null?null:<dynamic>[for(Itemx0ino.items)'
+            r'$ItemDto.toMap(x0)],);'
+            r'w.run(_$PageDto._j1);w.integer(o.count);'
             r'w.run(_$PageDto._j2);}',
           ),
         );

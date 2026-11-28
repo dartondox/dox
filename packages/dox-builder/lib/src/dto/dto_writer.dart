@@ -1201,8 +1201,11 @@ class DtoWriter {
       DtoKind.boolean => 'w.boolean($value);',
       DtoKind.date => 'w.dateTime($value);',
       DtoKind.enumName => 'w.string($value${dot}name);',
-      DtoKind.dto when !type.nullable && _hasWriteFunction(type) =>
-        '${_writeRef(type)}($value, w);',
+      DtoKind.dto when _hasWriteFunction(type) =>
+        type.nullable
+            ? 'if ($value case final v?) { ${_writeRef(type)}(v, w); } '
+                  'else { w.value(null); }'
+            : '${_writeRef(type)}($value, w);',
       _ => null,
     };
   }
@@ -1216,8 +1219,19 @@ class DtoWriter {
       DtoKind.integer => 'w.integer($value);',
       DtoKind.date => 'w.dateTime($value);',
       DtoKind.enumName => 'w.string($value${dot}name);',
-      _ when _encoderWrites(type) => 'w.value($value);',
+      _ when _encoderWrites(type) && !_holdsDto(type) => 'w.value($value);',
       _ => 'w.value(${_toValue(type, value, 0)});',
+    };
+  }
+
+  /// `true` when [type] is a DTO or holds one. The encoder writes a DTO
+  /// with the writer of its class at run time, so a subclass would put
+  /// its extra fields in the JSON. toMap() of the declared class does not.
+  bool _holdsDto(DtoType type) {
+    return switch (type.kind) {
+      DtoKind.dto => true,
+      DtoKind.list || DtoKind.map => _holdsDto(type.item!),
+      _ => false,
     };
   }
 

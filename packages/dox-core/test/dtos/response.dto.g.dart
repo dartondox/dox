@@ -194,6 +194,154 @@ void $writeProductView(ProductView o, JsonWriter w) {
   w.run(_$ProductViewDto._j5);
 }
 
+/// The checks, the converter and the JSON Schema of [SecretProductView].
+const DtoSchema<SecretProductView> $SecretProductViewDto =
+    _$SecretProductViewDto();
+
+class _$SecretProductViewDto extends DtoSchema<SecretProductView>
+    implements JsonObjectWriter {
+  const _$SecretProductViewDto();
+
+  static const Map<String, String> _m = <String, String>{};
+
+  static final JsonRun _j0 = JsonRun('{"id":');
+  static final JsonRun _j1 = JsonRun(',"product_name":');
+  static final JsonRun _j2 = JsonRun(',"price":');
+  static final JsonRun _j3 = JsonRun(',"in_stock":');
+  static final JsonRun _j4 = JsonRun(',"sold_at":');
+  static final JsonRun _j5 = JsonRun(',"secret":');
+  static final JsonRun _j6 = JsonRun('}');
+
+  @override
+  Type get type => SecretProductView;
+
+  @override
+  String get name => 'SecretProductView';
+
+  @override
+  bool get usesRequiredWhen => false;
+
+  @override
+  SecretProductView? convert(Object? input, DtoState s, List<Object> p) {
+    if (input is! Map) {
+      s.notObject(input, p, _m);
+      return null;
+    }
+    int e = s.issues.length;
+    // id: int
+    Object? c0;
+    c0 = s.integer(s.read(input, 'id'), p, 'id', _m);
+    if (c0 == null || c0 is Undefined) s.required(p, 'id', _m);
+    // productName: String
+    Object? c1;
+    c1 = s.string(s.read(input, 'product_name'), p, 'product_name', _m);
+    if (c1 == null || c1 is Undefined) s.required(p, 'product_name', _m);
+    // price: double
+    Object? c2;
+    c2 = s.decimal(s.read(input, 'price'), p, 'price', _m);
+    if (c2 == null || c2 is Undefined) s.required(p, 'price', _m);
+    // inStock: bool
+    Object? c3;
+    c3 = s.boolean(s.read(input, 'in_stock'), p, 'in_stock', _m);
+    if (c3 == null || c3 is Undefined) s.required(p, 'in_stock', _m);
+    // soldAt: DateTime?
+    Object? c4;
+    c4 = s.date(s.read(input, 'sold_at'), p, 'sold_at', _m);
+    // secret: String
+    Object? c5;
+    c5 = s.string(s.read(input, 'secret'), p, 'secret', _m);
+    if (c5 == null || c5 is Undefined) s.required(p, 'secret', _m);
+    if (s.issues.length != e && !s.allErrors) return null;
+    if (s.issues.length != e) return null;
+    return SecretProductView(
+      id: c0 as int,
+      productName: c1 as String,
+      price: c2 as double,
+      inStock: c3 as bool,
+      secret: c5 as String,
+      soldAt: c4 is Undefined ? null : c4 as DateTime?,
+    );
+  }
+
+  @override
+  SecretProductView fromMap(Map<String, dynamic> m) {
+    return SecretProductView(
+      id: (m['id'] as num).toInt(),
+      productName: m['product_name'] as String,
+      price: (m['price'] as num).toDouble(),
+      inStock: m['in_stock'] as bool,
+      secret: m['secret'] as String,
+      soldAt: m['sold_at'] == null
+          ? null
+          : (DateTime.parse(m['sold_at'] as String).toUtc()),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toMap(SecretProductView o) {
+    int f0 = o.id;
+    String f1 = o.productName;
+    double f2 = o.price;
+    bool f3 = o.inStock;
+    DateTime? f4 = o.soldAt;
+    String f5 = o.secret;
+    return <String, dynamic>{
+      'id': f0,
+      'product_name': f1,
+      'price': f2,
+      'in_stock': f3,
+      'sold_at': f4 == null ? null : f4.toIso8601String(),
+      'secret': f5,
+    };
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter w) =>
+      $writeSecretProductView(object as SecretProductView, w);
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    return <String, dynamic>{
+      'type': 'object',
+      'title': 'SecretProductView',
+      'properties': <String, dynamic>{
+        'id': <String, dynamic>{'type': 'integer'},
+        'product_name': <String, dynamic>{'type': 'string'},
+        'price': <String, dynamic>{'type': 'number'},
+        'in_stock': <String, dynamic>{'type': 'boolean'},
+        'sold_at': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+          'format': 'date-time',
+        },
+        'secret': <String, dynamic>{'type': 'string'},
+      },
+      'required': <dynamic>[
+        'id',
+        'product_name',
+        'price',
+        'in_stock',
+        'secret',
+      ],
+    };
+  }
+}
+
+/// Writes the JSON of [SecretProductView], as `toMap()` gives it.
+void $writeSecretProductView(SecretProductView o, JsonWriter w) {
+  w.run(_$SecretProductViewDto._j0);
+  w.integer(o.id);
+  w.run(_$SecretProductViewDto._j1);
+  w.string(o.productName);
+  w.run(_$SecretProductViewDto._j2);
+  w.value(o.price);
+  w.run(_$SecretProductViewDto._j3);
+  w.boolean(o.inStock);
+  w.run(_$SecretProductViewDto._j4);
+  w.dateTime(o.soldAt);
+  w.run(_$SecretProductViewDto._j5);
+  w.string(o.secret);
+  w.run(_$SecretProductViewDto._j6);
+}
+
 /// The checks, the converter and the JSON Schema of [MixedView].
 const DtoSchema<MixedView> $MixedViewDto = _$MixedViewDto();
 
@@ -655,7 +803,11 @@ void $writeMixedView(MixedView o, JsonWriter w) {
   w.run(_$MixedViewDto._j5);
   w.value(<dynamic>[for (OwnJson x0 in o.owns) $OwnJsonDto.toMap(x0)]);
   w.run(_$MixedViewDto._j6);
-  w.value(o.product);
+  if (o.product case final v?) {
+    $writeProductView(v, w);
+  } else {
+    w.value(null);
+  }
   w.run(_$MixedViewDto._j7);
   {
     List<ProductView> l7 = o.products;
@@ -665,7 +817,10 @@ void $writeMixedView(MixedView o, JsonWriter w) {
     }
   }
   w.run(_$MixedViewDto._j8);
-  w.value(o.byName);
+  w.value(<String, dynamic>{
+    for (MapEntry<String, ProductView> x0 in o.byName.entries)
+      x0.key: $ProductViewDto.toMap(x0.value),
+  });
   w.run(_$MixedViewDto._j9);
 }
 

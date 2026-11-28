@@ -132,12 +132,22 @@ class DoxRequest implements IDoxRequest {
 
   /// the query string, read on first use. bracket keys nest, like the
   /// body: `?tags[]=a&tags[]=b` gives `{'tags': ['a', 'b']}`.
-  late Map<String, dynamic> query =
-      _plainQuery(uri.query) ??
-      const FormInput().nested(
+  /// A bad escape, like `?a=%ff` (not UTF-8), throws a
+  /// [BadRequestException]: Dox answers with 400.
+  late Map<String, dynamic> query = _readQuery(uri);
+
+  static Map<String, dynamic> _readQuery(Uri uri) {
+    Map<String, dynamic>? plain = _plainQuery(uri.query);
+    if (plain != null) return plain;
+    try {
+      return const FormInput().nested(
         uri.queryParameters,
         () => const FormInput().queryPairs(uri),
       );
+    } on FormatException {
+      throw BadRequestException(message: 'The query string is not valid');
+    }
+  }
 
   /// The map of a query with no `%`, `+` or `[`: it needs no decoding and
   /// has no nested keys, so a split gives the map of `Uri.queryParameters`
