@@ -51,6 +51,7 @@ void main() {
       req.param['x'] = 'set';
       return before;
     });
+    Route.get('/fix/query', (DoxRequest req) => req.query);
     await startHttpServer(
       AppConfig(appKey: testAppKey, serverPort: 0, totalIsolate: 1),
     );
@@ -72,6 +73,11 @@ void main() {
     expect((await send('GET', '/fix/users/a%ff')).$1, 404);
     // Uri reads a bad % code as a plain %
     expect(await send('GET', '/fix/users/a%zz'), (200, '{"name":"a%zz"}'));
+  });
+
+  test('a query that is not UTF-8 is 400', () async {
+    expect((await send('GET', '/fix/query?a=%ff')).$1, 400);
+    expect(await send('GET', '/fix/query?a=%C3%A9'), (200, '{"a":"é"}'));
   });
 
   test('req.headers joins repeated values with a comma', () async {

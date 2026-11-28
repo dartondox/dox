@@ -1362,15 +1362,15 @@ class DtoWriter {
   /// (a nullable list that is converted), the value is read once into
   /// [local] of [typeCode].
   String _writeOnce(DtoType type, String value, String local, String typeCode) {
-    String call = _writeOne(type, value);
+    String call = _writeOne(type, value, local: local);
     if (value.allMatches(call).length < 2) return call;
     return '{ $typeCode $local = $value; ${_writeOne(type, local)} }';
   }
 
   /// The direct call for [value] (of [type]), else the call of
   /// [_writeValue].
-  String _writeOne(DtoType type, String value) {
-    return _writeItem(type, value) ?? _writeValue(type, value);
+  String _writeOne(DtoType type, String value, {String local = r'$n'}) {
+    return _writeItem(type, value) ?? _writeValue(type, value, local: local);
   }
 
   /// The direct call for [value] (of [type]), or `null` when there is
@@ -1383,23 +1383,43 @@ class DtoWriter {
       DtoKind.boolean => 'writer.boolean($value);',
       DtoKind.date => 'writer.dateTime($value);',
       DtoKind.enumName => 'writer.string($value${dot}name);',
-      DtoKind.dto when !type.nullable && _hasWriteFunction(type) =>
-        '${_writeRef(type)}($value, writer);',
+      DtoKind.dto when _hasWriteFunction(type) =>
+        type.nullable
+            ? 'if ($value case final \$v?) { ${_writeRef(type)}(\$v, writer); } '
+                  'else { writer.value(null); }'
+            : '${_writeRef(type)}($value, writer);',
       _ => null,
     };
   }
 
   /// The writer call for [value] (of [type]). It gives the JSON of
-  /// [_toValue].
-  String _writeValue(DtoType type, String value) {
+  /// [_toValue]. A nullable value that toMap() changes is read once into
+  /// [local] first.
+  String _writeValue(DtoType type, String value, {String local = r'$n'}) {
     String dot = type.nullable ? '?.' : '.';
     return switch (type.kind) {
       DtoKind.string => 'writer.string($value);',
       DtoKind.integer => 'writer.integer($value);',
       DtoKind.date => 'writer.dateTime($value);',
       DtoKind.enumName => 'writer.string($value${dot}name);',
-      _ when _encoderWrites(type) => 'writer.value($value);',
+      _ when _encoderWrites(type) && !_holdsDto(type) =>
+        'writer.value($value);',
+      // a field read does not promote to non-null: read it into a local
+      _ when type.nullable =>
+        '{ ${type.code} $local = $value; '
+            'writer.value(${_toValue(type, local, 0)}); }',
       _ => 'writer.value(${_toValue(type, value, 0)});',
+    };
+  }
+
+  /// `true` when [type] is a DTO or holds one. The encoder writes a DTO
+  /// with the writer of its class at run time, so a subclass would put
+  /// its extra fields in the JSON. toMap() of the declared class does not.
+  bool _holdsDto(DtoType type) {
+    return switch (type.kind) {
+      DtoKind.dto => true,
+      DtoKind.list || DtoKind.map => _holdsDto(type.item!),
+      _ => false,
     };
   }
 
@@ -1422,18 +1442,25 @@ class DtoWriter {
 
   /// [value] (of [type]) as a JSON-like value.
   String _toValue(DtoType type, String value, int depth) {
+    DtoType? item = type.item;
+    String x = 'x$depth';
     String? code = switch (type.kind) {
       DtoKind.date => '$value.toIso8601String()',
       DtoKind.enumName => '$value.name',
       DtoKind.dto => '${_ref(type)}.toMap($value)',
       DtoKind.list =>
-        _identity(type.item!)
+        _identity(item!)
             ? null
-            : '<dynamic>[for (${type.item!.code} x$depth in $value) ${_toValue(type.item!, 'x$depth', depth + 1)}]',
+            : '<dynamic>[for (${item.code} $x in $value) '
+                  '${_toValue(item, x, depth + 1)}]',
+      // `MapEntry.value` does not promote to non-null: a switch gives a
+      // local that does
       DtoKind.map =>
-        _identity(type.item!)
+        _identity(item!)
             ? null
-            : '<String, dynamic>{for (MapEntry<String, ${type.item!.code}> x$depth in $value.entries) x$depth.key: ${_toValue(type.item!, 'x$depth.value', depth + 1)}}',
+            : '<String, dynamic>{for (MapEntry<String, ${item.code}> $x '
+                  'in $value.entries) $x.key: '
+                  '${item.nullable ? 'switch ($x.value) { ${item.code} v$depth => ${_toValue(item, 'v$depth', depth + 1)} }' : _toValue(item, '$x.value', depth + 1)}}',
       _ => null,
     };
     if (code == null) return value;

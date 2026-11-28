@@ -207,6 +207,173 @@ void $writeProductView(ProductView dto, JsonWriter writer) {
   writer.run(_$ProductViewDto._end);
 }
 
+/// The checks, the converter and the JSON Schema of [SecretProductView].
+const DtoSchema<SecretProductView> $SecretProductViewDto =
+    _$SecretProductViewDto();
+
+class _$SecretProductViewDto extends DtoSchema<SecretProductView>
+    implements JsonObjectWriter {
+  const _$SecretProductViewDto();
+
+  static const Map<String, String> _messages = <String, String>{};
+
+  static final JsonRun _idKey = JsonRun('{"id":');
+  static final JsonRun _productNameKey = JsonRun(',"product_name":');
+  static final JsonRun _priceKey = JsonRun(',"price":');
+  static final JsonRun _inStockKey = JsonRun(',"in_stock":');
+  static final JsonRun _soldAtKey = JsonRun(',"sold_at":');
+  static final JsonRun _secretKey = JsonRun(',"secret":');
+  static final JsonRun _end = JsonRun('}');
+
+  @override
+  Type get type => SecretProductView;
+
+  @override
+  String get name => 'SecretProductView';
+
+  @override
+  bool get usesRequiredWhen => false;
+
+  @override
+  SecretProductView? convert(Object? input, DtoState state, List<Object> path) {
+    if (input is! Map) {
+      state.notObject(input, path, _messages);
+      return null;
+    }
+    int issuesBefore = state.issues.length;
+    // id: int
+    Object? id = state.integer(state.read(input, 'id'), path, 'id', _messages);
+    if (id == null || id is Undefined) state.required(path, 'id', _messages);
+    // productName: String
+    Object? productName = state.string(
+      state.read(input, 'product_name'),
+      path,
+      'product_name',
+      _messages,
+    );
+    if (productName == null || productName is Undefined)
+      state.required(path, 'product_name', _messages);
+    // price: double
+    Object? price = state.decimal(
+      state.read(input, 'price'),
+      path,
+      'price',
+      _messages,
+    );
+    if (price == null || price is Undefined)
+      state.required(path, 'price', _messages);
+    // inStock: bool
+    Object? inStock = state.boolean(
+      state.read(input, 'in_stock'),
+      path,
+      'in_stock',
+      _messages,
+    );
+    if (inStock == null || inStock is Undefined)
+      state.required(path, 'in_stock', _messages);
+    // soldAt: DateTime?
+    Object? soldAt = state.date(
+      state.read(input, 'sold_at'),
+      path,
+      'sold_at',
+      _messages,
+    );
+    // secret: String
+    Object? secret = state.string(
+      state.read(input, 'secret'),
+      path,
+      'secret',
+      _messages,
+    );
+    if (secret == null || secret is Undefined)
+      state.required(path, 'secret', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return SecretProductView(
+      id: id as int,
+      productName: productName as String,
+      price: price as double,
+      inStock: inStock as bool,
+      secret: secret as String,
+      soldAt: soldAt is Undefined ? null : soldAt as DateTime?,
+    );
+  }
+
+  @override
+  SecretProductView fromMap(Map<String, dynamic> map) {
+    return SecretProductView(
+      id: (map['id'] as num).toInt(),
+      productName: map['product_name'] as String,
+      price: (map['price'] as num).toDouble(),
+      inStock: map['in_stock'] as bool,
+      secret: map['secret'] as String,
+      soldAt: map['sold_at'] == null
+          ? null
+          : (DateTime.parse(map['sold_at'] as String).toUtc()),
+    );
+  }
+
+  @override
+  Map<String, dynamic> toMap(SecretProductView dto) {
+    DateTime? soldAt = dto.soldAt;
+    return <String, dynamic>{
+      'id': dto.id,
+      'product_name': dto.productName,
+      'price': dto.price,
+      'in_stock': dto.inStock,
+      'sold_at': soldAt == null ? null : soldAt.toIso8601String(),
+      'secret': dto.secret,
+    };
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeSecretProductView(object as SecretProductView, writer);
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    return <String, dynamic>{
+      'type': 'object',
+      'title': 'SecretProductView',
+      'properties': <String, dynamic>{
+        'id': <String, dynamic>{'type': 'integer'},
+        'product_name': <String, dynamic>{'type': 'string'},
+        'price': <String, dynamic>{'type': 'number'},
+        'in_stock': <String, dynamic>{'type': 'boolean'},
+        'sold_at': <String, dynamic>{
+          'type': <dynamic>['string', 'null'],
+          'format': 'date-time',
+        },
+        'secret': <String, dynamic>{'type': 'string'},
+      },
+      'required': <dynamic>[
+        'id',
+        'product_name',
+        'price',
+        'in_stock',
+        'secret',
+      ],
+    };
+  }
+}
+
+/// Writes the JSON of [SecretProductView], as `toMap()` gives it.
+void $writeSecretProductView(SecretProductView dto, JsonWriter writer) {
+  writer.run(_$SecretProductViewDto._idKey);
+  writer.integer(dto.id);
+  writer.run(_$SecretProductViewDto._productNameKey);
+  writer.string(dto.productName);
+  writer.run(_$SecretProductViewDto._priceKey);
+  writer.value(dto.price);
+  writer.run(_$SecretProductViewDto._inStockKey);
+  writer.boolean(dto.inStock);
+  writer.run(_$SecretProductViewDto._soldAtKey);
+  writer.dateTime(dto.soldAt);
+  writer.run(_$SecretProductViewDto._secretKey);
+  writer.string(dto.secret);
+  writer.run(_$SecretProductViewDto._end);
+}
+
 /// The checks, the converter and the JSON Schema of [MixedView].
 const DtoSchema<MixedView> $MixedViewDto = _$MixedViewDto();
 
@@ -224,6 +391,12 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   static final JsonRun _productKey = JsonRun(',"product":');
   static final JsonRun _productsKey = JsonRun(',"products":[');
   static final JsonRun _byNameKey = JsonRun('],"by_name":');
+  static final JsonRun _maybeProductsKey = JsonRun(',"maybe_products":');
+  static final JsonRun _maybeByNameKey = JsonRun(',"maybe_by_name":');
+  static final JsonRun _maybeDatesKey = JsonRun(',"maybe_dates":');
+  static final JsonRun _sparseKey = JsonRun(',"sparse":');
+  static final JsonRun _sparseDaysKey = JsonRun(',"sparse_days":');
+  static final JsonRun _xraysKey = JsonRun(',"xrays":');
   static final JsonRun _end = JsonRun('}');
 
   @override
@@ -495,6 +668,157 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
     }
     if (byName == null || byName is Undefined)
       state.required(path, 'by_name', _messages);
+    // maybeProducts: List<ProductView>?
+    Object? maybeProducts = state.list(
+      state.read(input, 'maybe_products'),
+      path,
+      'maybe_products',
+      _messages,
+    );
+    if (maybeProducts is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'maybe_products'];
+      List<ProductView> o0 = <ProductView>[];
+      for (int i0 = 0; i0 < maybeProducts.length; i0++) {
+        Object? x0 = state.object(maybeProducts[i0], q0, i0, _messages);
+        if (x0 is Map) {
+          x0 =
+              $ProductViewDto.convert(x0, state, <Object>[...q0, i0]) ??
+              invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, i0, _messages);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as ProductView);
+        }
+      }
+      maybeProducts = state.issues.length != b0 ? invalid : o0;
+    }
+    // maybeByName: Map<String, ProductView>?
+    Object? maybeByName = state.object(
+      state.read(input, 'maybe_by_name'),
+      path,
+      'maybe_by_name',
+      _messages,
+    );
+    if (maybeByName is Map) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'maybe_by_name'];
+      Map<String, ProductView> o0 = <String, ProductView>{};
+      for (MapEntry<dynamic, dynamic> n0 in maybeByName.entries) {
+        String k0 = '${n0.key}';
+        Object? x0 = state.object(n0.value, q0, k0, _messages);
+        if (x0 is Map) {
+          x0 =
+              $ProductViewDto.convert(x0, state, <Object>[...q0, k0]) ??
+              invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, k0, _messages);
+        } else if (x0 is! Invalid) {
+          o0[k0] = x0 as ProductView;
+        }
+      }
+      maybeByName = state.issues.length != b0 ? invalid : o0;
+    }
+    // maybeDates: List<DateTime>?
+    Object? maybeDates = state.list(
+      state.read(input, 'maybe_dates'),
+      path,
+      'maybe_dates',
+      _messages,
+    );
+    if (maybeDates is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'maybe_dates'];
+      List<DateTime> o0 = <DateTime>[];
+      for (int i0 = 0; i0 < maybeDates.length; i0++) {
+        Object? x0 = state.date(maybeDates[i0], q0, i0, _messages);
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, i0, _messages);
+        } else if (x0 is! Invalid) {
+          o0.add(x0 as DateTime);
+        }
+      }
+      maybeDates = state.issues.length != b0 ? invalid : o0;
+    }
+    // sparse: Map<String, ProductView?>
+    Object? sparse = state.object(
+      state.read(input, 'sparse'),
+      path,
+      'sparse',
+      _messages,
+    );
+    if (sparse is Map) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'sparse'];
+      Map<String, ProductView?> o0 = <String, ProductView?>{};
+      for (MapEntry<dynamic, dynamic> n0 in sparse.entries) {
+        String k0 = '${n0.key}';
+        Object? x0 = state.object(n0.value, q0, k0, _messages);
+        if (x0 is Map) {
+          x0 =
+              $ProductViewDto.convert(x0, state, <Object>[...q0, k0]) ??
+              invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          o0[k0] = null;
+        } else if (x0 is! Invalid) {
+          o0[k0] = x0 as ProductView?;
+        }
+      }
+      sparse = state.issues.length != b0 ? invalid : o0;
+    }
+    if (sparse == null) state.required(path, 'sparse', _messages);
+    // sparseDays: Map<String, DateTime?>
+    Object? sparseDays = state.object(
+      state.read(input, 'sparse_days'),
+      path,
+      'sparse_days',
+      _messages,
+    );
+    if (sparseDays is Map) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'sparse_days'];
+      Map<String, DateTime?> o0 = <String, DateTime?>{};
+      for (MapEntry<dynamic, dynamic> n0 in sparseDays.entries) {
+        String k0 = '${n0.key}';
+        Object? x0 = state.date(n0.value, q0, k0, _messages);
+        if (x0 == null || x0 is Undefined) {
+          o0[k0] = null;
+        } else if (x0 is! Invalid) {
+          o0[k0] = x0 as DateTime?;
+        }
+      }
+      sparseDays = state.issues.length != b0 ? invalid : o0;
+    }
+    if (sparseDays == null) state.required(path, 'sparse_days', _messages);
+    // xrays: Map<String, XRay>
+    Object? xrays = state.object(
+      state.read(input, 'xrays'),
+      path,
+      'xrays',
+      _messages,
+    );
+    if (xrays is Map) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'xrays'];
+      Map<String, XRay> o0 = <String, XRay>{};
+      for (MapEntry<dynamic, dynamic> n0 in xrays.entries) {
+        String k0 = '${n0.key}';
+        Object? x0 = state.object(n0.value, q0, k0, _messages);
+        if (x0 is Map) {
+          x0 = $XRayDto.convert(x0, state, <Object>[...q0, k0]) ?? invalid;
+        }
+        if (x0 == null || x0 is Undefined) {
+          state.required(q0, k0, _messages);
+        } else if (x0 is! Invalid) {
+          o0[k0] = x0 as XRay;
+        }
+      }
+      xrays = state.issues.length != b0 ? invalid : o0;
+    }
+    if (xrays == null) state.required(path, 'xrays', _messages);
     if (state.issues.length != issuesBefore && !state.allErrors) return null;
     if (state.issues.length != issuesBefore) return null;
     return MixedView(
@@ -507,6 +831,24 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
       products: products as List<ProductView>,
       byName: byName as Map<String, ProductView>,
       product: product is Undefined ? null : product as ProductView?,
+      maybeProducts: maybeProducts is Undefined
+          ? null
+          : maybeProducts as List<ProductView>?,
+      maybeByName: maybeByName is Undefined
+          ? null
+          : maybeByName as Map<String, ProductView>?,
+      maybeDates: maybeDates is Undefined
+          ? null
+          : maybeDates as List<DateTime>?,
+      sparse: sparse is Undefined
+          ? const <String, ProductView?>{}
+          : sparse as Map<String, ProductView?>,
+      sparseDays: sparseDays is Undefined
+          ? const <String, DateTime?>{}
+          : sparseDays as Map<String, DateTime?>,
+      xrays: xrays is Undefined
+          ? const <String, XRay>{}
+          : xrays as Map<String, XRay>,
     );
   }
 
@@ -552,12 +894,65 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
       product: map['product'] == null
           ? null
           : ($ProductViewDto.fromMap(map['product'] as Map<String, dynamic>)),
+      maybeProducts: map['maybe_products'] == null
+          ? null
+          : (<ProductView>[
+              for (Object? x0 in map['maybe_products'] as List<dynamic>)
+                $ProductViewDto.fromMap(x0 as Map<String, dynamic>),
+            ]),
+      maybeByName: map['maybe_by_name'] == null
+          ? null
+          : (<String, ProductView>{
+              for (MapEntry<dynamic, dynamic> x0
+                  in (map['maybe_by_name'] as Map<dynamic, dynamic>).entries)
+                x0.key as String: $ProductViewDto.fromMap(
+                  x0.value as Map<String, dynamic>,
+                ),
+            }),
+      maybeDates: map['maybe_dates'] == null
+          ? null
+          : (<DateTime>[
+              for (Object? x0 in map['maybe_dates'] as List<dynamic>)
+                DateTime.parse(x0 as String).toUtc(),
+            ]),
+      sparse: map.containsKey('sparse')
+          ? <String, ProductView?>{
+              for (MapEntry<dynamic, dynamic> x0
+                  in (map['sparse'] as Map<dynamic, dynamic>).entries)
+                x0.key as String: x0.value == null
+                    ? null
+                    : ($ProductViewDto.fromMap(
+                        x0.value as Map<String, dynamic>,
+                      )),
+            }
+          : const <String, ProductView?>{},
+      sparseDays: map.containsKey('sparse_days')
+          ? <String, DateTime?>{
+              for (MapEntry<dynamic, dynamic> x0
+                  in (map['sparse_days'] as Map<dynamic, dynamic>).entries)
+                x0.key as String: x0.value == null
+                    ? null
+                    : (DateTime.parse(x0.value as String).toUtc()),
+            }
+          : const <String, DateTime?>{},
+      xrays: map.containsKey('xrays')
+          ? <String, XRay>{
+              for (MapEntry<dynamic, dynamic> x0
+                  in (map['xrays'] as Map<dynamic, dynamic>).entries)
+                x0.key as String: $XRayDto.fromMap(
+                  x0.value as Map<String, dynamic>,
+                ),
+            }
+          : const <String, XRay>{},
     );
   }
 
   @override
   Map<String, dynamic> toMap(MixedView dto) {
     ProductView? product = dto.product;
+    List<ProductView>? maybeProducts = dto.maybeProducts;
+    Map<String, ProductView>? maybeByName = dto.maybeByName;
+    List<DateTime>? maybeDates = dto.maybeDates;
     return <String, dynamic>{
       'dates': <dynamic>[for (DateTime x0 in dto.dates) x0.toIso8601String()],
       'roles': <dynamic>[for (Role x0 in dto.roles) x0.name],
@@ -577,6 +972,36 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
       'by_name': <String, dynamic>{
         for (MapEntry<String, ProductView> x0 in dto.byName.entries)
           x0.key: $ProductViewDto.toMap(x0.value),
+      },
+      'maybe_products': maybeProducts == null
+          ? null
+          : <dynamic>[
+              for (ProductView x0 in maybeProducts) $ProductViewDto.toMap(x0),
+            ],
+      'maybe_by_name': maybeByName == null
+          ? null
+          : <String, dynamic>{
+              for (MapEntry<String, ProductView> x0 in maybeByName.entries)
+                x0.key: $ProductViewDto.toMap(x0.value),
+            },
+      'maybe_dates': maybeDates == null
+          ? null
+          : <dynamic>[for (DateTime x0 in maybeDates) x0.toIso8601String()],
+      'sparse': <String, dynamic>{
+        for (MapEntry<String, ProductView?> x0 in dto.sparse.entries)
+          x0.key: switch (x0.value) {
+            ProductView? v0 => v0 == null ? null : $ProductViewDto.toMap(v0),
+          },
+      },
+      'sparse_days': <String, dynamic>{
+        for (MapEntry<String, DateTime?> x0 in dto.sparseDays.entries)
+          x0.key: switch (x0.value) {
+            DateTime? v0 => v0 == null ? null : v0.toIso8601String(),
+          },
+      },
+      'xrays': <String, dynamic>{
+        for (MapEntry<String, XRay> x0 in dto.xrays.entries)
+          x0.key: $XRayDto.toMap(x0.value),
       },
     };
   }
@@ -640,6 +1065,43 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
             '\$ref': '#/\$defs/ProductView',
           },
         },
+        'maybe_products': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{'\$ref': '#/\$defs/ProductView'},
+        },
+        'maybe_by_name': <String, dynamic>{
+          'type': <dynamic>['object', 'null'],
+          'additionalProperties': <String, dynamic>{
+            '\$ref': '#/\$defs/ProductView',
+          },
+        },
+        'maybe_dates': <String, dynamic>{
+          'type': <dynamic>['array', 'null'],
+          'items': <String, dynamic>{'type': 'string', 'format': 'date-time'},
+        },
+        'sparse': <String, dynamic>{
+          'type': 'object',
+          'additionalProperties': <String, dynamic>{
+            'anyOf': <dynamic>[
+              <String, dynamic>{'\$ref': '#/\$defs/ProductView'},
+              <String, dynamic>{'type': 'null'},
+            ],
+          },
+          'default': <String, dynamic>{},
+        },
+        'sparse_days': <String, dynamic>{
+          'type': 'object',
+          'additionalProperties': <String, dynamic>{
+            'type': <dynamic>['string', 'null'],
+            'format': 'date-time',
+          },
+          'default': <String, dynamic>{},
+        },
+        'xrays': <String, dynamic>{
+          'type': 'object',
+          'additionalProperties': <String, dynamic>{'\$ref': '#/\$defs/XRay'},
+          'default': <String, dynamic>{},
+        },
       },
       'required': <dynamic>[
         'dates',
@@ -674,6 +1136,14 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
             },
           },
           'required': <dynamic>['id', 'product_name', 'price', 'in_stock'],
+        },
+        'XRay': <String, dynamic>{
+          'type': 'object',
+          'title': 'XRay',
+          'properties': <String, dynamic>{
+            'id': <String, dynamic>{'type': 'integer'},
+          },
+          'required': <dynamic>['id'],
         },
       },
     };
@@ -712,7 +1182,11 @@ void $writeMixedView(MixedView dto, JsonWriter writer) {
   writer.run(_$MixedViewDto._ownsKey);
   writer.value(<dynamic>[for (OwnJson x0 in dto.owns) $OwnJsonDto.toMap(x0)]);
   writer.run(_$MixedViewDto._productKey);
-  writer.value(dto.product);
+  if (dto.product case final $v?) {
+    $writeProductView($v, writer);
+  } else {
+    writer.value(null);
+  }
   writer.run(_$MixedViewDto._productsKey);
   {
     List<ProductView> products = dto.products;
@@ -722,8 +1196,131 @@ void $writeMixedView(MixedView dto, JsonWriter writer) {
     }
   }
   writer.run(_$MixedViewDto._byNameKey);
-  writer.value(dto.byName);
+  writer.value(<String, dynamic>{
+    for (MapEntry<String, ProductView> x0 in dto.byName.entries)
+      x0.key: $ProductViewDto.toMap(x0.value),
+  });
+  writer.run(_$MixedViewDto._maybeProductsKey);
+  {
+    List<ProductView>? maybeProducts = dto.maybeProducts;
+    writer.value(
+      maybeProducts == null
+          ? null
+          : <dynamic>[
+              for (ProductView x0 in maybeProducts) $ProductViewDto.toMap(x0),
+            ],
+    );
+  }
+  writer.run(_$MixedViewDto._maybeByNameKey);
+  {
+    Map<String, ProductView>? maybeByName = dto.maybeByName;
+    writer.value(
+      maybeByName == null
+          ? null
+          : <String, dynamic>{
+              for (MapEntry<String, ProductView> x0 in maybeByName.entries)
+                x0.key: $ProductViewDto.toMap(x0.value),
+            },
+    );
+  }
+  writer.run(_$MixedViewDto._maybeDatesKey);
+  {
+    List<DateTime>? maybeDates = dto.maybeDates;
+    writer.value(
+      maybeDates == null
+          ? null
+          : <dynamic>[for (DateTime x0 in maybeDates) x0.toIso8601String()],
+    );
+  }
+  writer.run(_$MixedViewDto._sparseKey);
+  writer.value(<String, dynamic>{
+    for (MapEntry<String, ProductView?> x0 in dto.sparse.entries)
+      x0.key: switch (x0.value) {
+        ProductView? v0 => v0 == null ? null : $ProductViewDto.toMap(v0),
+      },
+  });
+  writer.run(_$MixedViewDto._sparseDaysKey);
+  writer.value(<String, dynamic>{
+    for (MapEntry<String, DateTime?> x0 in dto.sparseDays.entries)
+      x0.key: switch (x0.value) {
+        DateTime? v0 => v0 == null ? null : v0.toIso8601String(),
+      },
+  });
+  writer.run(_$MixedViewDto._xraysKey);
+  writer.value(<String, dynamic>{
+    for (MapEntry<String, XRay> x0 in dto.xrays.entries)
+      x0.key: $XRayDto.toMap(x0.value),
+  });
   writer.run(_$MixedViewDto._end);
+}
+
+/// The checks, the converter and the JSON Schema of [XRay].
+const DtoSchema<XRay> $XRayDto = _$XRayDto();
+
+class _$XRayDto extends DtoSchema<XRay> implements JsonObjectWriter {
+  const _$XRayDto();
+
+  static const Map<String, String> _messages = <String, String>{};
+
+  static final JsonRun _idKey = JsonRun('{"id":');
+  static final JsonRun _end = JsonRun('}');
+
+  @override
+  Type get type => XRay;
+
+  @override
+  String get name => 'XRay';
+
+  @override
+  bool get usesRequiredWhen => false;
+
+  @override
+  XRay? convert(Object? input, DtoState state, List<Object> path) {
+    if (input is! Map) {
+      state.notObject(input, path, _messages);
+      return null;
+    }
+    int issuesBefore = state.issues.length;
+    // id: int
+    Object? id = state.integer(state.read(input, 'id'), path, 'id', _messages);
+    if (id == null || id is Undefined) state.required(path, 'id', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return XRay(id: id as int);
+  }
+
+  @override
+  XRay fromMap(Map<String, dynamic> map) {
+    return XRay(id: (map['id'] as num).toInt());
+  }
+
+  @override
+  Map<String, dynamic> toMap(XRay dto) {
+    return <String, dynamic>{'id': dto.id};
+  }
+
+  @override
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeXRay(object as XRay, writer);
+
+  @override
+  Map<String, dynamic> toJsonSchema() {
+    return <String, dynamic>{
+      'type': 'object',
+      'title': 'XRay',
+      'properties': <String, dynamic>{
+        'id': <String, dynamic>{'type': 'integer'},
+      },
+      'required': <dynamic>['id'],
+    };
+  }
+}
+
+/// Writes the JSON of [XRay], as `toMap()` gives it.
+void $writeXRay(XRay dto, JsonWriter writer) {
+  writer.run(_$XRayDto._idKey);
+  writer.integer(dto.id);
+  writer.run(_$XRayDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [RunsView].

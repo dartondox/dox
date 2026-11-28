@@ -1576,7 +1576,9 @@ class View {
             'x0.toIso8601String()]);'
             // a nested DTO: its function is called
             "writer.key('inner');\$writeInner(dto.inner,writer);"
-            "writer.key('inners');writer.value(dto.inners);"
+            // a list of DTOs: toMap() of the declared class
+            "writer.key('inners');writer.value(<dynamic>[for(Innerx0indto.inners)"
+            r'$InnerDto.toMap(x0)]);'
             // a nested DTO with its own toJson(): the map of its schema
             "writer.key('own');writer.value(\$OwnJsonDto.toMap(dto.own));"
             "writer.key('owns');writer.value(<dynamic>[for(OwnJsonx0indto.owns)"
@@ -1654,15 +1656,16 @@ class Holder {
         );
       });
 
-      test('a nested DTO of a file with no JsonRun: the encoder finds '
-          'its writer', () async {
+      test('a nested DTO of a file with no JsonRun: toMap() of the '
+          'declared class', () async {
         String out = (await _generate(
           '''
 @Dto()
 class Outer {
   final Inner inner;
   final List<Inner> all;
-  const Outer({required this.inner, required this.all});
+  final Inner? maybe;
+  const Outer({required this.inner, required this.all, this.maybe});
 }
 ''',
           imports: "$import\nimport 'other.dart';",
@@ -1683,8 +1686,12 @@ class Inner {
         expect(
           out,
           contains(
-            r'writer.run(_$OuterDto._innerKey);writer.value(dto.inner);'
-            r'writer.run(_$OuterDto._allKey);writer.value(dto.all);',
+            r'writer.run(_$OuterDto._innerKey);writer.value($InnerDto.toMap(dto.inner));'
+            r'writer.run(_$OuterDto._allKey);'
+            r'writer.value(<dynamic>[for(Innerx0indto.all)$InnerDto.toMap(x0)]);'
+            // a field read does not promote to non-null: a local
+            r'writer.run(_$OuterDto._maybeKey);{Inner?maybe=dto.maybe;'
+            r'writer.value(maybe==null?null:$InnerDto.toMap(maybe));}',
           ),
         );
       });
@@ -1744,8 +1751,10 @@ class Page {
             '{if(i>0)writer.run(JsonRun.comma);writer.string(tags[i]);}}'
             // a nested DTO: its function is called
             r'writer.run(_$ItemDto._ratingKey);$writeRating(dto.rating,writer);'
-            // a nested DTO that can be null: the encoder finds its writer
-            r'writer.run(_$ItemDto._bestKey);writer.value(dto.best);'
+            // a nested DTO that can be null: its function is called, so a
+            // subclass value gets the fields of the declared class only
+            r'writer.run(_$ItemDto._bestKey);'
+            r'if(dto.bestcasefinal$v?){$writeRating($v,writer);}else{writer.value(null);}'
             r'writer.run(_$ItemDto._allKey);'
             '{List<Rating>all=dto.all;for(inti=0;i<all.length;i++)'
             r'{if(i>0)writer.run(JsonRun.comma);$writeRating(all[i],writer);}}'
@@ -1773,12 +1782,14 @@ class Page {
             'staticfinalJsonRun_end=JsonRun(\']}\');',
           ),
         );
-        // a list that can be null: the encoder writes it
+        // a list of DTOs that can be null: toMap() of the declared class
         expect(
           out,
           contains(
             r'void$writePage(Pagedto,JsonWriterwriter){writer.run(_$PageDto._itemsKey);'
-            r'writer.value(dto.items);writer.run(_$PageDto._countKey);writer.integer(dto.count);'
+            r'{List<Item>?items=dto.items;writer.value(items==null?null:'
+            r'<dynamic>[for(Itemx0initems)$ItemDto.toMap(x0)],);}'
+            r'writer.run(_$PageDto._countKey);writer.integer(dto.count);'
             r'writer.run(_$PageDto._end);}',
           ),
         );

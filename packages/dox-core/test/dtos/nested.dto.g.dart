@@ -445,7 +445,11 @@ void $writeCreateOrder(CreateOrder dto, JsonWriter writer) {
     }
   }
   writer.run(_$CreateOrderDto._billingKey);
-  writer.value(dto.billing);
+  if (dto.billing case final $v?) {
+    $writeAddress($v, writer);
+  } else {
+    writer.value(null);
+  }
   writer.run(_$CreateOrderDto._end);
 }
 
