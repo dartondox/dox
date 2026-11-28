@@ -5,6 +5,7 @@ import 'package:dox_core/dox_core.dart';
 import 'package:dox_core/utils/json.dart' show advanceEncode, useSdkJsonEncoder;
 import 'package:test/test.dart';
 
+import '../serialize/nopart.dart';
 import '../serialize/serialize.dart';
 import '../utils/test_app_key.dart';
 
@@ -242,6 +243,13 @@ void main() {
       String want = _mapJson(PostTags(post));
       expect(want, '{"tags":[],"author":{"name":"a"}}');
       _same(PostTags(post), want);
+    });
+
+    test('classes of a file with no part go to the encoder', () {
+      BoxSer box = BoxSer(Item('i'));
+      String want = _mapJson(box);
+      expect(want, '{"item":{"n":"i"},"items":[{"n":"i"}],"p":{"p":{"id":1}}}');
+      _same(box, want);
     });
 
     test('a subclass of a plain class is written by its own class', () {

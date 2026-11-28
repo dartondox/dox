@@ -625,6 +625,68 @@ class InnerS extends Serializer<Inner> {
       expect(out, contains('writer.value(Inner(m.id));'));
     });
 
+    test('a class in a file with no part: no direct call', () async {
+      final (String out, String _) = await _generate(
+        '''
+import 'nopart.dart';
+
+class Box {
+  Box(this.item, this.items, this.p);
+  final Item item;
+  final List<Item> items;
+  final PlainNoPart p;
+}
+
+@Serialize()
+class BoxSer extends Serializer<Box> {
+  BoxSer(super.data);
+  @override
+  Map<String, dynamic> convert(Box m) => <String, dynamic>{
+    'item': ItemSer(m.item),
+    'items': ItemSer(m.items),
+    'p': m.p,
+  };
+}
+
+@Serialize()
+class PlainHolder {
+  final PlainNoPart p;
+  const PlainHolder(this.p);
+}
+''',
+        files: <String, String>{
+          'a|lib/nopart.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+class Item {
+  Item(this.name);
+  final String name;
+}
+
+@Serialize()
+class ItemSer extends Serializer<Item> {
+  ItemSer(super.data);
+  @override
+  Map<String, dynamic> convert(Item m) => <String, dynamic>{'n': m.name};
+}
+
+@Serialize()
+class PlainNoPart {
+  final int id;
+  const PlainNoPart(this.id);
+}
+''',
+        },
+      );
+      expect(out, isNot(contains(r'$writeItemSer')));
+      expect(out, isNot(contains(r'$writePlainNoPart')));
+      expect(out, isNot(contains(r'$PlainNoPartToMap')));
+      expect(out, contains('writer.value(ItemSer(m.item));'));
+      expect(out, contains('writer.value(ItemSer(m.items));'));
+      expect(out, contains('writer.value(m.p);'));
+      expect(out, contains('writer.value(dto.p);'));
+    });
+
     test('no part in the file: no writer in the container', () async {
       final (String out, String logs) = await _container(
         '''

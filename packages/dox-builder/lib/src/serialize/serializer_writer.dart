@@ -250,7 +250,7 @@ class SerializerWriter {
   }
 
   /// Writes `Name(x)` of a serializer with an inline plan with no
-  /// serializer object: `$writeNameItem(x, writer)` for one item, a loop
+  /// serializer object: `$writeName$item(x, writer)` for one item, a loop
   /// for a list. Returns false for any other value.
   Future<bool> _inline(JsonRuns runs, Expression node, String field) async {
     Expression made = node.unParenthesized;

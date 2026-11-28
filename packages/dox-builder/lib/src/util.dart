@@ -92,8 +92,9 @@ String prefixOf(Element element, LibraryElement? library) {
 
 /// The prefix (like `p.`, or empty) to call the generated function [name]
 /// of the part of [target] from [library], or null when [library] can
-/// not see it: [target] is in another package, or no import gives the
-/// name. An import or an export with `show` or `hide` gives the name only
+/// not see it: [target] is in another package, its file has no
+/// `part '<file>.g.dart';` (so the function is not made), or no import
+/// gives the name. An import or an export with `show` or `hide` gives the name only
 /// when the name passes it. The generated function is not in the element
 /// model yet, so the directives are read, not the names.
 String? generatedPrefix(
@@ -102,6 +103,7 @@ String? generatedPrefix(
   String name,
 ) {
   LibraryElement home = target.library;
+  if (!hasGeneratedPart(home)) return null;
   if (home == library) return '';
   if (_packageOf(home.uri) != _packageOf(library.uri)) return null;
   for (LibraryFragment fragment in library.fragments) {
@@ -114,6 +116,21 @@ String? generatedPrefix(
     }
   }
   return null;
+}
+
+/// `true` when [library] has the part `<file>.g.dart` of its own file,
+/// where the generated code of dox_builder goes.
+bool hasGeneratedPart(LibraryElement library) {
+  String file = library.uri.pathSegments.lastOrNull ?? '';
+  String part = '${file.replaceFirst(RegExp(r'\.dart$'), '')}.g.dart';
+  for (PartInclude include in library.firstFragment.partIncludes) {
+    DirectiveUri uri = include.uri;
+    if (uri is DirectiveUriWithRelativeUriString &&
+        uri.relativeUriString.split('/').last == part) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /// `true` when [from] is [home], or exports [name] of [home]

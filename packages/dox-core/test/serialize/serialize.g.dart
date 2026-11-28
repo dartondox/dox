@@ -762,3 +762,92 @@ void $writeAuthor(Author dto, JsonWriter writer) {
 Map<String, dynamic> $AuthorToMap(Author dto) {
   return <String, dynamic>{'name': dto.name};
 }
+
+/// The JSON writer of [BoxSer]. Dox gets it from
+/// `lib/generated/container.g.dart`.
+const SerializeWriter $BoxSerWriter = _$BoxSerWriter();
+
+class _$BoxSerWriter implements SerializeWriter {
+  const _$BoxSerWriter();
+
+  static final JsonRun _itemKey = JsonRun('{"item":');
+  static final JsonRun _itemsKey = JsonRun(',"items":');
+  static final JsonRun _pKey = JsonRun(',"p":');
+  static final JsonRun _end = JsonRun('}');
+  static final JsonRun _listStart = JsonRun('[');
+  static final JsonRun _listEnd = JsonRun(']');
+
+  @override
+  Type get type => BoxSer;
+
+  @override
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeBoxSer(object as BoxSer, writer);
+
+  @override
+  Object? toJsonValue(Object object) => (object as BoxSer).toJson();
+}
+
+/// Writes the JSON of [BoxSer], as `toJson()` gives it.
+void $writeBoxSer(BoxSer serializer, JsonWriter writer) {
+  List<Item>? items = Serializer.listOf(serializer);
+  if (items == null) {
+    if (Serializer.hasItem(serializer)) {
+      $writeBoxSer$item(Serializer.itemOf(serializer), writer);
+    } else {
+      writer.value(null);
+    }
+    return;
+  }
+  writer.run(_$BoxSerWriter._listStart);
+  for (int i = 0; i < items.length; i++) {
+    if (i > 0) writer.run(JsonRun.comma);
+    $writeBoxSer$item(items[i], writer);
+  }
+  writer.run(_$BoxSerWriter._listEnd);
+}
+
+/// Writes the map of `convert()` of [BoxSer].
+void $writeBoxSer$item(Item m, JsonWriter writer) {
+  writer.run(_$BoxSerWriter._itemKey);
+  writer.value(ItemSer(m));
+  writer.run(_$BoxSerWriter._itemsKey);
+  writer.value(ItemSer(<Item>[m]));
+  writer.run(_$BoxSerWriter._pKey);
+  $writePlainHolder(PlainHolder(PlainNoPart(1)), writer);
+  writer.run(_$BoxSerWriter._end);
+}
+
+/// The JSON writer of [PlainHolder]. Dox gets it from
+/// `lib/generated/container.g.dart`.
+const SerializeWriter $PlainHolderWriter = _$PlainHolderWriter();
+
+class _$PlainHolderWriter implements SerializeWriter {
+  const _$PlainHolderWriter();
+
+  static final JsonRun _pKey = JsonRun('{"p":');
+  static final JsonRun _end = JsonRun('}');
+
+  @override
+  Type get type => PlainHolder;
+
+  @override
+  void writeObject(Object object, JsonWriter writer) =>
+      $writePlainHolder(object as PlainHolder, writer);
+
+  @override
+  Object? toJsonValue(Object object) =>
+      $PlainHolderToMap(object as PlainHolder);
+}
+
+/// Writes the JSON of [PlainHolder], as `toMap()` gives it.
+void $writePlainHolder(PlainHolder dto, JsonWriter writer) {
+  writer.run(_$PlainHolderWriter._pKey);
+  writer.value(dto.p);
+  writer.run(_$PlainHolderWriter._end);
+}
+
+/// The JSON of [PlainHolder] as a map.
+Map<String, dynamic> $PlainHolderToMap(PlainHolder dto) {
+  return <String, dynamic>{'p': dto.p};
+}

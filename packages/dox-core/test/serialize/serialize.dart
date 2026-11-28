@@ -1,5 +1,7 @@
 import 'package:dox_core/dox_core.dart';
 
+import 'nopart.dart';
+
 part 'serialize.g.dart';
 
 /// Puts the JSON writers of this file into the container, like
@@ -17,6 +19,8 @@ void registerSerializeWriters(IocContainer c) {
   c.jsonWriter($ParentSWriter);
   c.jsonWriter($ChildFastSWriter);
   c.jsonWriter($AuthorWriter);
+  c.jsonWriter($BoxSerWriter);
+  c.jsonWriter($PlainHolderWriter);
 }
 
 enum Level { basic, pro }
@@ -388,4 +392,26 @@ class SpecialAuthor extends Author {
     'name': name,
     'badge': badge,
   };
+}
+
+/// It uses classes of a file with no part: they go to the encoder.
+@Serialize()
+class BoxSer extends Serializer<Item> {
+  BoxSer(super.data);
+
+  @override
+  Map<String, dynamic> convert(Item m) {
+    return <String, dynamic>{
+      'item': ItemSer(m),
+      'items': ItemSer(<Item>[m]),
+      'p': PlainHolder(PlainNoPart(1)),
+    };
+  }
+}
+
+@Serialize()
+class PlainHolder {
+  final PlainNoPart p;
+
+  const PlainHolder(this.p);
 }

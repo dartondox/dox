@@ -31,7 +31,7 @@ class SerializerPlan {
   /// object: `convert()` uses no member of the class, the constructor
   /// only passes `data` on (`Name(super.data)`), and the class has no
   /// field that is set when it is made. The other serializer then calls
-  /// `$writeNameItem(x, writer)` directly.
+  /// `$writeName$item(x, writer)` directly.
   final bool inline;
 
   /// the serializer class
