@@ -231,7 +231,7 @@ bool seesAnnotationClass(LibraryFragment library, String name) {
 }
 
 /// `true` when [library] sees the classes of dox_annotation that the
-/// `writeObject()` and the `$write` function of a DTO use.
+/// `writeObject()` and the `$write` function of `@Serialize()` use.
 bool seesDtoWriter(LibraryFragment library) {
   return seesAnnotationClass(library, 'JsonObjectWriter') &&
       seesAnnotationClass(library, 'JsonWriter') &&

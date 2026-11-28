@@ -16,9 +16,6 @@ class _$RvCityDto extends DtoSchema<RvCity> implements JsonObjectWriter {
 
   static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _nameKey = JsonRun('{"name":');
-  static final JsonRun _end = JsonRun('}');
-
   @override
   Type get type => RvCity;
 
@@ -61,7 +58,7 @@ class _$RvCityDto extends DtoSchema<RvCity> implements JsonObjectWriter {
 
   @override
   void writeObject(Object object, JsonWriter writer) =>
-      $writeRvCity(object as RvCity, writer);
+      writer.value(toMap(object as RvCity));
 
   @override
   Map<String, dynamic> toJsonSchema() {
@@ -74,11 +71,4 @@ class _$RvCityDto extends DtoSchema<RvCity> implements JsonObjectWriter {
       'required': <dynamic>['name'],
     };
   }
-}
-
-/// Writes the JSON of [RvCity], as `toMap()` gives it.
-void $writeRvCity(RvCity dto, JsonWriter writer) {
-  writer.run(_$RvCityDto._nameKey);
-  writer.string(dto.name);
-  writer.run(_$RvCityDto._end);
 }

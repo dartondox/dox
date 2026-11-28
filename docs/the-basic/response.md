@@ -74,9 +74,9 @@ The writer has these methods:
 
 Write one value after each `key()`. The writer adds the commas.
 
-The writer also has `run()`. It writes a fixed part of JSON with no check and no comma. The generated code of a DTO uses it. Do not use it in your own code: use `key()`.
+The writer also has `run()`. It writes a fixed part of JSON with no check and no comma. The generated code of a `@Serialize()` class uses it. Do not use it in your own code: use `key()`.
 
-You do not write this method for a model or for a [DTO](dto.md#returning-a-dto). The generator writes it.
+You do not write this method for a model. The generator writes it. For a plain class, use [`@Serialize()`](serializer.md#fast-json-with-serialize): the generator writes its JSON code.
 
 `JSON.stringify()` and `jsonEncode()` do not call `writeJson()`. If you use them with the class, also give it a `toJson()`.
 

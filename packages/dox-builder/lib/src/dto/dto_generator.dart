@@ -25,8 +25,7 @@ class DoxDtoGenerator extends Generator {
         .getter;
     bool runtimeFlags =
         state is ClassElement && state.getGetter('allErrors') != null;
-    // writeObject() needs a dox_annotation with JsonObjectWriter and
-    // JsonRun
+    // writeObject() needs a dox_annotation with JsonObjectWriter
     LibraryFragment scope = library.element.firstFragment;
     bool jsonWriter = seesDtoWriter(scope);
     for (ClassElement element in library.classes) {

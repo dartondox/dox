@@ -525,6 +525,39 @@ class Both {
       expect(out, contains('// Both: no JSON writer'));
     });
 
+    test('a nested @Dto in a plain class: toMap() of its schema', () async {
+      final (String out, String logs) = await _generate('''
+@Dto()
+class Inner {
+  final int id;
+  const Inner({required this.id});
+}
+
+@Serialize()
+class Outer {
+  final Inner one;
+  final Inner? maybe;
+  final List<Inner> all;
+  const Outer({required this.one, this.maybe, required this.all});
+}
+''');
+      String code = out.replaceAll(RegExp(r'\s'), '');
+      expect(logs, isNot(contains('Outer gets no fast JSON writer')));
+      expect(code, contains(r'writer.value($InnerDto.toMap(dto.one));'));
+      expect(
+        code,
+        contains(r'writer.value(maybe==null?null:$InnerDto.toMap(maybe));'),
+      );
+      expect(
+        code,
+        contains(
+          r'writer.value(<dynamic>[for(Innerx0indto.all)$InnerDto.toMap(x0)]);',
+        ),
+      );
+      expect(code, isNot(contains(r'$writeInner(')));
+      expect(code, contains(r'constSerializeWriter$OuterWriter'));
+    });
+
     test('a plain class that extends another class: no writer', () async {
       final (String out, String logs) = await _generate('''
 @Serialize()

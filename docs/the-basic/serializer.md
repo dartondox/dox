@@ -183,7 +183,7 @@ A plain class with its own `toJson()` keeps `toJson()`. An abstract class and a 
 
 The file of the class must have its `part` line. If it does not, the build log shows a warning, and the container gets no writer for the class.
 
-A class that extends another class, or that has a mixin, gets no fast code. A class with `@Dto()` and `@Serialize()` also gets no fast code: the `@Dto` already writes its JSON.
+A class that extends another class, or that has a mixin, gets no fast code. A class with `@Dto()` and `@Serialize()` also gets no fast code. A `@Dto` writes its JSON with `toMap()`.
 
 ### Use the encoder of the Dart SDK
 

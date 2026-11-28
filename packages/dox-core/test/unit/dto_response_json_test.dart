@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:dox_core/dox_core.dart';
@@ -27,7 +28,15 @@ void main() {
       Dox().initialize(AppConfig(appKey: testAppKey, dtos: testDtos));
     });
 
-    test('the generated schema writes the object', () {
+    test('the generated DTO files write the JSON of toMap()', () {
+      for (String name in <String>['response', 'nested', 'rules', 'custom']) {
+        String code = File('test/dtos/$name.dto.g.dart').readAsStringSync();
+        expect(code, isNot(contains('JsonRun')), reason: name);
+        expect(code, isNot(contains(r'$write')), reason: name);
+      }
+    });
+
+    test('a DTO writes the map of toMap()', () {
       expect($ProductViewDto, isA<JsonObjectWriter>());
       ProductView product = ProductView(
         id: 7,
@@ -271,9 +280,9 @@ void main() {
       }
     });
 
-    /// RunsView has no Maybe field: its fixed parts are runs, and its
-    /// lists and its nested DTO are written with direct calls.
-    test('random DTOs that are written with runs', () {
+    /// RunsView has no Maybe field, lists and a nested DTO: the JSON of
+    /// toMap() is the same with the Dox and the SDK encoder.
+    test('random DTOs: the same JSON as the SDK encoder', () {
       Random random = Random(5);
       const List<String> texts = <String>[
         '',

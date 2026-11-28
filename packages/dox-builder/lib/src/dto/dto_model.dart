@@ -407,7 +407,7 @@ class DtoReader {
     if (!isSerialize(element)) return 'it has no @Serialize()';
     if (isSerializer(element)) return 'it is a Serializer';
     if (isDto(element)) {
-      return 'it is a @Dto, which writes its JSON already';
+      return 'it is a @Dto: a class takes @Dto or @Serialize(), not both';
     }
     InterfaceType? parent = element.supertype;
     if ((parent != null && !parent.isDartCoreObject) ||
@@ -800,7 +800,7 @@ class DtoReader {
       return item == null ? null : make(DtoKind.map, item: item);
     }
     if (isDto(element)) {
-      // the generated `$NameDto` and `$writeName` must be in scope here
+      // the generated `$NameDto` must be in scope here
       if (library == null || _seesDtoCode(element, library)) {
         return make(DtoKind.dto);
       }
