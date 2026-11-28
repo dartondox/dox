@@ -1540,8 +1540,8 @@ class Inner {
             r'w.run(_$OuterDto._j1);'
             r'w.value(<dynamic>[for(Innerx0ino.all)$InnerDto.toMap(x0)]);'
             // a field read does not promote to non-null: a local
-            r'w.run(_$OuterDto._j2);{Inner?n=o.maybe;'
-            r'w.value(n==null?null:$InnerDto.toMap(n));}',
+            r'w.run(_$OuterDto._j2);{Inner?$n=o.maybe;'
+            r'w.value($n==null?null:$InnerDto.toMap($n));}',
           ),
         );
       });
@@ -1604,7 +1604,7 @@ class Page {
             // a nested DTO that can be null: its function is called, so a
             // subclass value gets the fields of the declared class only
             r'w.run(_$ItemDto._j3);'
-            r'if(o.bestcasefinalv?){$writeRating(v,w);}else{w.value(null);}'
+            r'if(o.bestcasefinal$v?){$writeRating($v,w);}else{w.value(null);}'
             r'w.run(_$ItemDto._j4);'
             '{List<Rating>l4=o.all;for(inti=0;i<l4.length;i++)'
             r'{if(i>0)w.run(JsonRun.comma);$writeRating(l4[i],w);}}'
@@ -1637,8 +1637,8 @@ class Page {
           out,
           contains(
             r'void$writePage(Pageo,JsonWriterw){w.run(_$PageDto._j0);'
-            r'{List<Item>?n=o.items;w.value(n==null?null:'
-            r'<dynamic>[for(Itemx0inn)$ItemDto.toMap(x0)],);}'
+            r'{List<Item>?$n=o.items;w.value($n==null?null:'
+            r'<dynamic>[for(Itemx0in$n)$ItemDto.toMap(x0)],);}'
             r'w.run(_$PageDto._j1);w.integer(o.count);'
             r'w.run(_$PageDto._j2);}',
           ),

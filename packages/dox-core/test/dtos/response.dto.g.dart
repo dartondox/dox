@@ -1077,8 +1077,8 @@ void $writeMixedView(MixedView o, JsonWriter w) {
   w.run(_$MixedViewDto._j5);
   w.value(<dynamic>[for (OwnJson x0 in o.owns) $OwnJsonDto.toMap(x0)]);
   w.run(_$MixedViewDto._j6);
-  if (o.product case final v?) {
-    $writeProductView(v, w);
+  if (o.product case final $v?) {
+    $writeProductView($v, w);
   } else {
     w.value(null);
   }
@@ -1097,30 +1097,32 @@ void $writeMixedView(MixedView o, JsonWriter w) {
   });
   w.run(_$MixedViewDto._j9);
   {
-    List<ProductView>? n = o.maybeProducts;
+    List<ProductView>? $n = o.maybeProducts;
     w.value(
-      n == null
+      $n == null
           ? null
-          : <dynamic>[for (ProductView x0 in n) $ProductViewDto.toMap(x0)],
+          : <dynamic>[for (ProductView x0 in $n) $ProductViewDto.toMap(x0)],
     );
   }
   w.run(_$MixedViewDto._j10);
   {
-    Map<String, ProductView>? n = o.maybeByName;
+    Map<String, ProductView>? $n = o.maybeByName;
     w.value(
-      n == null
+      $n == null
           ? null
           : <String, dynamic>{
-              for (MapEntry<String, ProductView> x0 in n.entries)
+              for (MapEntry<String, ProductView> x0 in $n.entries)
                 x0.key: $ProductViewDto.toMap(x0.value),
             },
     );
   }
   w.run(_$MixedViewDto._j11);
   {
-    List<DateTime>? n = o.maybeDates;
+    List<DateTime>? $n = o.maybeDates;
     w.value(
-      n == null ? null : <dynamic>[for (DateTime x0 in n) x0.toIso8601String()],
+      $n == null
+          ? null
+          : <dynamic>[for (DateTime x0 in $n) x0.toIso8601String()],
     );
   }
   w.run(_$MixedViewDto._j12);

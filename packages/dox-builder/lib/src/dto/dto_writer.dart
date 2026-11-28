@@ -1203,7 +1203,7 @@ class DtoWriter {
       DtoKind.enumName => 'w.string($value${dot}name);',
       DtoKind.dto when _hasWriteFunction(type) =>
         type.nullable
-            ? 'if ($value case final v?) { ${_writeRef(type)}(v, w); } '
+            ? 'if ($value case final \$v?) { ${_writeRef(type)}(\$v, w); } '
                   'else { w.value(null); }'
             : '${_writeRef(type)}($value, w);',
       _ => null,
@@ -1222,7 +1222,8 @@ class DtoWriter {
       _ when _encoderWrites(type) && !_holdsDto(type) => 'w.value($value);',
       // a field read does not promote to non-null: read it into a local
       _ when type.nullable =>
-        '{ ${type.code} n = $value; w.value(${_toValue(type, 'n', 0)}); }',
+        '{ ${type.code} \$n = $value; '
+            'w.value(${_toValue(type, r'$n', 0)}); }',
       _ => 'w.value(${_toValue(type, value, 0)});',
     };
   }
