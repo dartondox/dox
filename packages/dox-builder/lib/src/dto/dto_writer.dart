@@ -1449,6 +1449,12 @@ class DtoWriter {
       DtoKind.boolean => 'writer.boolean($value);',
       DtoKind.date => 'writer.dateTime($value);',
       DtoKind.enumName => 'writer.string($value${dot}name);',
+      // a subclass at run time is written by its own writer, the same as
+      // the map of toMap() and the encoder of the SDK
+      DtoKind.dto when _isPlain(type) && _hasWriteFunction(type) =>
+        '{ ${type.nonNullCode}? \$v = $value; '
+            'if (\$v != null && \$v.runtimeType == ${type.nonNullCode}) '
+            '{ ${_writeRef(type)}(\$v, writer); } else { writer.value(\$v); } }',
       DtoKind.dto when _hasWriteFunction(type) =>
         type.nullable
             ? 'if ($value case final \$v?) { ${_writeRef(type)}(\$v, writer); } '
@@ -1515,7 +1521,8 @@ class DtoWriter {
       DtoKind.enumName => '$value.name',
       DtoKind.dto =>
         _isPlain(type)
-            ? '${type.prefix}\$${type.name}ToMap($value)'
+            ? '($value.runtimeType == ${type.nonNullCode} '
+                  '? ${type.prefix}\$${type.name}ToMap($value) : $value)'
             : '${_ref(type)}.toMap($value)',
       DtoKind.list =>
         _identity(item!)

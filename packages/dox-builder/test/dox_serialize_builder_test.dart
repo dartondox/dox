@@ -24,9 +24,15 @@ class Serializer<T> {
   static T itemOf<T>(Serializer<T> serializer) => throw 0;
 }
 class IocContainer {}
+class Dto {
+  const Dto();
+}
 ''';
 
-Map<String, String> _sources(String source) {
+Map<String, String> _sources(
+  String source, {
+  Map<String, String> files = const <String, String>{},
+}) {
   String annotation(String name) {
     return File('../dox-annotation/lib/src/$name').readAsStringSync();
   }
@@ -39,27 +45,50 @@ export 'src/serialize.dart';
     'dox_annotation|lib/src/json_writer.dart': annotation('json_writer.dart'),
     'dox_annotation|lib/src/serialize.dart': annotation('serialize.dart'),
     'dox_core|lib/dox_core.dart': _core,
+    ...files,
     'a|lib/a.dart':
         '''
 import 'package:dox_core/dox_core.dart';
-
+${_imports(source)}
 part 'a.g.dart';
 
-$source
+${_body(source)}
 ''',
   };
 }
 
-/// The generated part of [source], and the build logs.
-Future<(String, String)> _generate(String source) async {
+/// the import lines of [source], to put above the part line
+String _imports(String source) {
+  return source
+      .split('\n')
+      .where((String line) => line.startsWith('import '))
+      .join('\n');
+}
+
+String _body(String source) {
+  return source
+      .split('\n')
+      .where((String line) => !line.startsWith('import '))
+      .join('\n');
+}
+
+/// The generated part of [source], and the build logs. [files] are more
+/// files of the app; each one with `@Serialize` gets its own part.
+Future<(String, String)> _generate(
+  String source, {
+  Map<String, String> files = const <String, String>{},
+}) async {
   String output = '';
   List<String> logs = <String>[];
   await testBuilder(
     buildDoxModel(BuilderOptions.empty),
-    _sources(source),
+    _sources(source, files: files),
     rootPackage: 'a',
     onLog: (log) => logs.add(log.message),
     outputs: <String, Object>{
+      for (String file in files.keys)
+        if (files[file]!.contains('@Serialize'))
+          file.replaceFirst('.dart', '.dox_model_generator.g.part'): anything,
       'a|lib/a.dox_model_generator.g.part': decodedMatches(
         predicate<String>((String text) {
           output = text;
@@ -72,12 +101,15 @@ Future<(String, String)> _generate(String source) async {
 }
 
 /// The generated `container.g.dart` of [source], and the build logs.
-Future<(String, String)> _container(String source) async {
+Future<(String, String)> _container(
+  String source, {
+  Map<String, String> files = const <String, String>{},
+}) async {
   String output = '';
   List<String> logs = <String>[];
   await testBuilder(
     buildDoxContainer(BuilderOptions.empty),
-    _sources(source),
+    _sources(source, files: files),
     rootPackage: 'a',
     onLog: (log) => logs.add(log.message),
     outputs: <String, Object>{
@@ -123,7 +155,7 @@ String _post(String name, String body) {
   return '''
 $_models
 @Serialize()
-class $name extends Serializer<Post> with _\$$name {
+class $name extends Serializer<Post> {
   $name(super.data);
 
   @override
@@ -159,18 +191,9 @@ class PostSerializer extends Serializer<Post> {
         flat,
         contains(
           _flat('''
-void \$writePostSerializerItem(Post m, JsonWriter writer) {
+void \$writePostSerializer\$item(Post m, JsonWriter writer) {
   writer.run(_\$PostSerializerWriter._end);
 }'''),
-        ),
-      );
-      expect(
-        flat,
-        contains(
-          _flat(
-            'mixin _\$PostSerializer on Serializer<Post> implements '
-            'JsonWritable',
-          ),
         ),
       );
       expect(
@@ -188,7 +211,7 @@ void \$writePostSerializerItem(Post m, JsonWriter writer) {
       final (String out, String logs) = await _generate('''
 $_models
 @Serialize()
-class UserInfo extends Serializer<User> with _\$UserInfo {
+class UserInfo extends Serializer<User> {
   UserInfo(super.data);
 
   static const String top = 'top';
@@ -213,7 +236,7 @@ class UserInfo extends Serializer<User> with _\$UserInfo {
 }
 
 @Serialize()
-class PostSerializer extends Serializer<Post> with _\$PostSerializer {
+class PostSerializer extends Serializer<Post> {
   PostSerializer(super.data);
 
   @override
@@ -223,7 +246,7 @@ class PostSerializer extends Serializer<Post> with _\$PostSerializer {
       expect(logs, isNot(contains('@Serialize()')));
       String flat = _flat(out);
       for (String line in <String>[
-        'void _\$writeUserInfoItem(UserInfo serializer, User m, '
+        'void _\$writeUserInfo\$item(UserInfo serializer, User m, '
             'JsonWriter writer) {',
         'bool recent = m.createdAt.isAfter(DateTime.utc(2024));',
         "static final JsonRun _dataKey = JsonRun('{\"data\":');",
@@ -236,7 +259,7 @@ class PostSerializer extends Serializer<Post> with _\$PostSerializer {
         "JsonRun('],\"rating\":{\"score\":');",
         'writer.value(m.score / 2);',
         "JsonRun('},\"posts\":[');",
-        '\$writePostSerializerItem(postsValue[i], writer);',
+        '\$writePostSerializer\$item(postsValue[i], writer);',
         'writer.value(serializer);',
       ]) {
         expect(flat, contains(_flat(line)), reason: line);
@@ -294,7 +317,6 @@ class PostSerializer extends Serializer<Post> with _\$PostSerializer {
           ),
         );
         expect(out, contains('// Shape: no JSON writer, ${shape.value.$2}'));
-        expect(out, contains(r'mixin _$Shape {}'));
         expect(out, isNot(contains(r'$writeShape')));
       });
     }
@@ -354,10 +376,14 @@ class Extra {
         "JsonRun(',\"seen\":');",
         'writer.dateTime(dto.lastSeen);',
         'writer.string(dto.level.name);',
-        '\$writeAddress(dto.home, writer);',
-        '\$writeAddress(others[i], writer);',
+        // a subclass at run time goes to the encoder
+        '{ Address? \$v = dto.home; '
+            'if (\$v != null && \$v.runtimeType == Address) '
+            '{ \$writeAddress(\$v, writer); } else { writer.value(\$v); } }',
+        '{ Address? \$v = others[i]; ',
         'Map<String, dynamic> \$ExtraToMap(Extra dto) {',
-        "'home': \$AddressToMap(dto.home),",
+        'Address home = dto.home;',
+        "'home': (home.runtimeType == Address ? \$AddressToMap(home) : home),",
         "'seen': lastSeen == null ? null : lastSeen.toIso8601String(),",
         'Object? toJsonValue(Object object) => \$ExtraToMap(object as Extra);',
       ]) {
@@ -422,8 +448,209 @@ class Plain {
       expect(
         logs,
         contains(
-          'Sub (package:a/a.dart) extends the @Serialize() serializer Fast',
+          'Sub (package:a/a.dart) extends the @Serialize() serializer Fast, '
+          'but it has no @Serialize()',
         ),
+      );
+    });
+  });
+
+  group('review fixes', () {
+    test('a serializer gets no writeJson() that a subclass gets', () async {
+      final (String out, String _) = await _generate(
+        _post('Base', "return <String, dynamic>{'a': m.title};"),
+      );
+      // Dox finds the writer by the exact class: a subclass never gets it
+      expect(out, contains('Type get type => Base;'));
+      expect(out, isNot(contains('mixin')));
+      expect(out, isNot(contains('writeJson')));
+    });
+
+    test('a class between changes the data: the object is made', () async {
+      final (String out, String _) = await _generate('''
+$_models
+class BaseS<T> extends Serializer<T> {
+  BaseS(dynamic data) : super(data ?? <T>[]);
+}
+
+@Serialize()
+class TagS extends BaseS<Tag> {
+  TagS(super.data);
+  @override
+  Map<String, dynamic> convert(Tag m) => <String, dynamic>{'n': m.name};
+}
+
+@Serialize()
+class PostS extends Serializer<Post> {
+  PostS(super.data);
+  @override
+  Map<String, dynamic> convert(Post m) =>
+      <String, dynamic>{'first': TagS(m.tags.firstOrNull)};
+}
+''');
+      expect(out, contains(r'$writeTagS(TagS(m.tags.firstOrNull), writer);'));
+      expect(out, isNot(contains(r'void $writeTagS$item(')));
+    });
+
+    test('a plain class named NameItem does not clash', () async {
+      final (String out, String _) = await _generate('''
+$_models
+@Serialize()
+class Order extends Serializer<Post> {
+  Order(super.data);
+  @override
+  Map<String, dynamic> convert(Post m) => <String, dynamic>{'t': m.title};
+}
+
+@Serialize()
+class OrderItem {
+  final int id;
+  const OrderItem(this.id);
+}
+''');
+      expect(RegExp(r'void \$writeOrderItem\(').allMatches(out).length, 1);
+      expect(out, contains(r'void $writeOrder$item('));
+    });
+
+    test('@Dto and @Serialize on one class: no writer', () async {
+      final (String out, String logs) = await _generate('''
+@Dto()
+@Serialize()
+class Both {
+  final int id;
+  const Both({required this.id});
+}
+''');
+      expect(logs, contains('Both gets no fast JSON writer: it is a @Dto'));
+      expect(out, contains('// Both: no JSON writer'));
+    });
+
+    test('a plain class that extends another class: no writer', () async {
+      final (String out, String logs) = await _generate('''
+@Serialize()
+class Author {
+  final String name;
+  const Author(this.name);
+}
+
+@Serialize()
+class Special extends Author {
+  final String badge;
+  const Special(super.name, this.badge);
+}
+''');
+      expect(
+        logs,
+        contains('Special gets no fast JSON writer: it extends another class'),
+      );
+      expect(out, contains(r'void $writeAuthor('));
+      expect(out, isNot(contains(r'void $writeSpecial(')));
+    });
+
+    test('a plain class value: its class is checked at run time', () async {
+      final (String out, String _) = await _generate('''
+$_models
+@Serialize()
+class Extra {
+  final int score;
+  const Extra(this.score);
+  factory Extra.of(Post p) => Extra(p.tags.length);
+}
+
+@Serialize()
+class PostS extends Serializer<Post> {
+  PostS(super.data);
+  @override
+  Map<String, dynamic> convert(Post m) =>
+      <String, dynamic>{'extra': Extra.of(m)};
+}
+''');
+      expect(
+        _flat(out),
+        contains(
+          _flat(
+            r'{ Extra? $v = Extra.of(m); '
+            r'if ($v != null && $v.runtimeType == Extra) '
+            r'{ $writeExtra($v, writer); } else { writer.value($v); } }',
+          ),
+        ),
+      );
+    });
+
+    test('an export with show hides the generated functions', () async {
+      final (String out, String _) = await _generate(
+        '''
+import 'barrel.dart';
+
+@Serialize()
+class Holder {
+  final Inner inner;
+  const Holder(this.inner);
+}
+
+@Serialize()
+class PostS extends Serializer<Inner> {
+  PostS(super.data);
+  @override
+  Map<String, dynamic> convert(Inner m) =>
+      <String, dynamic>{'a': Inner(m.id), 'b': InnerS(m)};
+}
+''',
+        files: <String, String>{
+          'a|lib/barrel.dart': "export 'inner.dart' show Inner, InnerS;",
+          'a|lib/inner.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+part 'inner.g.dart';
+
+@Serialize()
+class Inner {
+  final int id;
+  const Inner(this.id);
+}
+
+@Serialize()
+class InnerS extends Serializer<Inner> {
+  InnerS(super.data);
+  @override
+  Map<String, dynamic> convert(Inner m) => <String, dynamic>{'id': m.id};
+}
+''',
+        },
+      );
+      expect(out, isNot(contains(r'$writeInner(')));
+      expect(out, isNot(contains(r'$InnerToMap(')));
+      expect(out, isNot(contains(r'$writeInnerS')));
+      expect(out, contains('writer.value(dto.inner);'));
+      expect(out, contains('writer.value(Inner(m.id));'));
+    });
+
+    test('no part in the file: no writer in the container', () async {
+      final (String out, String logs) = await _container(
+        '''
+@Serialize()
+class Plain {
+  final int id;
+  const Plain(this.id);
+}
+''',
+        files: <String, String>{
+          'a|lib/nopart.dart': '''
+import 'package:dox_core/dox_core.dart';
+
+@Serialize()
+class Lost {
+  final int id;
+  const Lost(this.id);
+}
+''',
+        },
+      );
+      expect(out, contains(r'$PlainWriter'));
+      expect(out, isNot(contains('Lost')));
+      expect(
+        logs,
+        contains("its file has no part. Add `part 'nopart.g.dart';`"),
       );
     });
   });

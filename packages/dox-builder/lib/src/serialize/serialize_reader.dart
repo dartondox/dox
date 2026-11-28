@@ -186,9 +186,16 @@ class SerializeReader {
     );
   }
 
-  /// `true` when making [element] only keeps its data: the unnamed
-  /// constructor is `Name(super.data);`, and no field gets a value.
+  /// `true` when making [element] only keeps its data: it extends
+  /// `Serializer` itself (a class between can change the data in its
+  /// constructor), the unnamed constructor is `Name(super.data);`, and no
+  /// field gets a value.
   Future<bool> _forwards(ClassElement element) async {
+    InterfaceElement? parent = element.supertype?.element;
+    if (parent == null ||
+        DtoReader.serializerType(element)?.element != parent) {
+      return false;
+    }
     for (FieldElement field in element.fields) {
       if (!field.isStatic && field.isOriginDeclaration) return false;
     }

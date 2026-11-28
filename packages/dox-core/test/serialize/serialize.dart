@@ -12,6 +12,11 @@ void registerSerializeWriters(IocContainer c) {
   c.jsonWriter($TagLabelWriter);
   c.jsonWriter($LabelOnlyWriter);
   c.jsonWriter($EmptySerializerWriter);
+  c.jsonWriter($TagNamesWriter);
+  c.jsonWriter($PostTagsWriter);
+  c.jsonWriter($ParentSWriter);
+  c.jsonWriter($ChildFastSWriter);
+  c.jsonWriter($AuthorWriter);
 }
 
 enum Level { basic, pro }
@@ -128,7 +133,7 @@ class ExtraUserData {
 /// A serializer with locals, a model, a plain class, a nested map, a
 /// nested serializer and a private tear-off.
 @Serialize()
-class UserInfo extends Serializer<User> with _$UserInfo {
+class UserInfo extends Serializer<User> {
   UserInfo(super.data, {this.now});
 
   final DateTime? now;
@@ -168,7 +173,7 @@ class UserInfo extends Serializer<User> with _$UserInfo {
 }
 
 @Serialize()
-class PostSerializer extends Serializer<Post> with _$PostSerializer {
+class PostSerializer extends Serializer<Post> {
   PostSerializer(super.data);
 
   @override
@@ -181,7 +186,7 @@ class PostSerializer extends Serializer<Post> with _$PostSerializer {
   }
 }
 
-/// a serializer that is written with no look-up but with no mixin
+/// a serializer that another one writes with no object
 @Serialize()
 class TagLabel extends Serializer<Tag> {
   TagLabel(super.data);
@@ -192,7 +197,7 @@ class TagLabel extends Serializer<Tag> {
 
 /// It uses a member, so a value `LabelOnly(x)` makes the object.
 @Serialize()
-class LabelOnly extends Serializer<Tag> with _$LabelOnly {
+class LabelOnly extends Serializer<Tag> {
   LabelOnly(super.data, this.mark);
 
   final String mark;
@@ -205,7 +210,7 @@ class LabelOnly extends Serializer<Tag> with _$LabelOnly {
 
 /// The template of `dox make:serializer`.
 @Serialize()
-class EmptySerializer extends Serializer<Post> with _$EmptySerializer {
+class EmptySerializer extends Serializer<Post> {
   EmptySerializer(super.data);
 
   @override
@@ -219,7 +224,7 @@ class EmptySerializer extends Serializer<Post> with _$EmptySerializer {
 // ---------------------------------------------------------------------------
 
 @Serialize()
-class WithIf extends Serializer<Post> with _$WithIf {
+class WithIf extends Serializer<Post> {
   WithIf(super.data);
 
   @override
@@ -232,7 +237,7 @@ class WithIf extends Serializer<Post> with _$WithIf {
 }
 
 @Serialize()
-class WithFor extends Serializer<Post> with _$WithFor {
+class WithFor extends Serializer<Post> {
   WithFor(super.data);
 
   @override
@@ -242,7 +247,7 @@ class WithFor extends Serializer<Post> with _$WithFor {
 }
 
 @Serialize()
-class WithSpread extends Serializer<Post> with _$WithSpread {
+class WithSpread extends Serializer<Post> {
   WithSpread(super.data);
 
   @override
@@ -255,7 +260,7 @@ class WithSpread extends Serializer<Post> with _$WithSpread {
 }
 
 @Serialize()
-class WithKey extends Serializer<Post> with _$WithKey {
+class WithKey extends Serializer<Post> {
   WithKey(super.data);
 
   @override
@@ -265,7 +270,7 @@ class WithKey extends Serializer<Post> with _$WithKey {
 }
 
 @Serialize()
-class WithIfStatement extends Serializer<Post> with _$WithIfStatement {
+class WithIfStatement extends Serializer<Post> {
   WithIfStatement(super.data);
 
   @override
@@ -278,7 +283,7 @@ class WithIfStatement extends Serializer<Post> with _$WithIfStatement {
 }
 
 @Serialize()
-class WithMapVariable extends Serializer<Post> with _$WithMapVariable {
+class WithMapVariable extends Serializer<Post> {
   WithMapVariable(super.data);
 
   @override
@@ -296,4 +301,91 @@ class OwnJson {
   const OwnJson(this.id);
 
   Map<String, dynamic> toJson() => <String, dynamic>{'my_id': id};
+}
+
+// ---------------------------------------------------------------------------
+// Review cases
+// ---------------------------------------------------------------------------
+
+/// Not @Serialize: its constructor changes the data.
+class BaseTags<T> extends Serializer<T> {
+  BaseTags(dynamic data) : super(data ?? <T>[]);
+}
+
+@Serialize()
+class TagNames extends BaseTags<Tag> {
+  TagNames(super.data);
+
+  @override
+  Map<String, dynamic> convert(Tag m) => <String, dynamic>{'n': m.name};
+}
+
+@Serialize()
+class PostTags extends Serializer<Post> {
+  PostTags(super.data);
+
+  @override
+  Map<String, dynamic> convert(Post m) {
+    return <String, dynamic>{
+      'tags': TagNames(m.tags.isEmpty ? null : m.tags.first),
+      'author': m.title == 'special'
+          ? SpecialAuthor('b', 'gold')
+          : const Author('a'),
+    };
+  }
+}
+
+@Serialize()
+class ParentS extends Serializer<Tag> {
+  ParentS(super.data);
+
+  @override
+  Map<String, dynamic> convert(Tag m) => <String, dynamic>{'parent': m.name};
+}
+
+/// no @Serialize: the map of its toJson()
+class ChildS extends ParentS {
+  ChildS(super.data);
+
+  @override
+  Map<String, dynamic> convert(Tag m) => <String, dynamic>{'child': m.name};
+}
+
+/// @Serialize, but a shape with no writer
+@Serialize()
+class ChildIfS extends ParentS {
+  ChildIfS(super.data);
+
+  @override
+  Map<String, dynamic> convert(Tag m) {
+    return <String, dynamic>{if (m.name != null) 'child_if': m.name};
+  }
+}
+
+/// @Serialize with its own writer
+@Serialize()
+class ChildFastS extends ParentS {
+  ChildFastS(super.data);
+
+  @override
+  Map<String, dynamic> convert(Tag m) => <String, dynamic>{'fast': m.name};
+}
+
+@Serialize()
+class Author {
+  final String name;
+
+  const Author(this.name);
+}
+
+/// not @Serialize: its toJson() gives its JSON
+class SpecialAuthor extends Author {
+  SpecialAuthor(super.name, this.badge);
+
+  final String badge;
+
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'name': name,
+    'badge': badge,
+  };
 }

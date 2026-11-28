@@ -90,6 +90,69 @@ String prefixOf(Element element, LibraryElement? library) {
   return prefix == null ? '' : '$prefix.';
 }
 
+/// The prefix (like `p.`, or empty) to call the generated function [name]
+/// of the part of [target] from [library], or null when [library] can
+/// not see it: [target] is in another package, or no import gives the
+/// name. An import or an export with `show` or `hide` gives the name only
+/// when the name passes it. The generated function is not in the element
+/// model yet, so the directives are read, not the names.
+String? generatedPrefix(
+  LibraryElement library,
+  InterfaceElement target,
+  String name,
+) {
+  LibraryElement home = target.library;
+  if (home == library) return '';
+  if (_packageOf(home.uri) != _packageOf(library.uri)) return null;
+  for (LibraryFragment fragment in library.fragments) {
+    for (LibraryImport import in fragment.libraryImports) {
+      LibraryElement? imported = import.importedLibrary;
+      if (imported == null || !_passes(import.combinators, name)) continue;
+      if (!_exports(imported, home, name, <LibraryElement>{})) continue;
+      String? prefix = import.prefix?.element.name;
+      return prefix == null ? '' : '$prefix.';
+    }
+  }
+  return null;
+}
+
+/// `true` when [from] is [home], or exports [name] of [home]
+bool _exports(
+  LibraryElement from,
+  LibraryElement home,
+  String name,
+  Set<LibraryElement> seen,
+) {
+  if (from == home) return true;
+  if (!seen.add(from)) return false;
+  for (LibraryFragment fragment in from.fragments) {
+    for (LibraryExport export in fragment.libraryExports) {
+      LibraryElement? exported = export.exportedLibrary;
+      if (exported == null || !_passes(export.combinators, name)) continue;
+      if (_exports(exported, home, name, seen)) return true;
+    }
+  }
+  return false;
+}
+
+bool _passes(List<NamespaceCombinator> combinators, String name) {
+  for (NamespaceCombinator combinator in combinators) {
+    if (combinator is ShowElementCombinator &&
+        !combinator.shownNames.contains(name)) {
+      return false;
+    }
+    if (combinator is HideElementCombinator &&
+        combinator.hiddenNames.contains(name)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+String _packageOf(Uri uri) {
+  return '${uri.scheme}:${uri.pathSegments.firstOrNull}';
+}
+
 /// A quick check of the text of a Dart file, before it is resolved
 /// (resolving is slow). True when the text has one of [words] (any case),
 /// or a `part` directive (a part file can hold the code).

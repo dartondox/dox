@@ -1,4 +1,5 @@
 import 'package:dox_core/dox_core.dart';
+import 'package:dox_core/utils/json.dart' show forgetJsonWriters;
 
 /// Makes one object for the container. It gets the container, so it can
 /// ask for the objects it needs.
@@ -129,6 +130,7 @@ class IocContainer {
   /// the writer by the type of the object.
   void jsonWriter(SerializeWriter writer) {
     _jsonWriters[writer.type] = writer;
+    forgetJsonWriters();
   }
 
   /// The [jsonWriter] of the class [type], or null.
@@ -156,6 +158,7 @@ class IocContainer {
     _providers.clear();
     _modelBinders.clear();
     _jsonWriters.clear();
+    forgetJsonWriters();
   }
 
   /// The instance of [type]. Same as [get], for a [Type] value.

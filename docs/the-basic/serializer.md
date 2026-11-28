@@ -87,7 +87,7 @@ A serializer makes a map for each value. Then the JSON encoder reads the map. `@
 
 ### Make a serializer fast
 
-Add `@Serialize()`, the `part` line and `with _$Name` to the serializer. Then run `dart run build_runner build`:
+Add `@Serialize()` and the `part` line to the serializer. Then run `dart run build_runner build`:
 
 ```dart title="lib/app/serializers/user_info.serializer.dart"
 import 'package:dox_core/dox_core.dart';
@@ -95,7 +95,7 @@ import 'package:dox_core/dox_core.dart';
 part 'user_info.serializer.g.dart';
 
 @Serialize()
-class UserInfo extends Serializer<User> with _$UserInfo {
+class UserInfo extends Serializer<User> {
   UserInfo(super.data);
 
   @override
@@ -125,9 +125,11 @@ class UserInfo extends Serializer<User> with _$UserInfo {
 
 The generated code runs each local variable and each value one time, in the same order as `convert()`.
 
+This order is the order in one `convert()`. It is not the order across nested serializers. `toJson()` runs all the values of the outer map first, and then the `convert()` of each nested serializer. The generated code runs the `convert()` of a nested serializer at the place of its key. Thus, if two values change the same data (for example, a counter), the JSON can be different. Do not change data in `convert()`.
+
 Put a nested serializer in the map as it is, like `PostSerializer(m.posts)`. Do not call `toJson()` on it. Then the nested serializer is fast too.
 
-`with _$Name` is optional. Without it, the serializer is also fast, but Dox finds its writer at run time. That takes approximately 30 ns more for each response. `lib/generated/container.g.dart` gives the writers to Dox, so set `AppConfig(container: registerContainer)`.
+`lib/generated/container.g.dart` gives the writers to Dox, so set `AppConfig(container: registerContainer)`. Without it, the serializer writes its map, as before. The JSON is the same, but it is slow.
 
 ### Shapes that keep the map
 
@@ -143,7 +145,7 @@ These shapes keep the map:
 - `super` in `convert()`.
 - A serializer with its own `toJson()`.
 
-A class that extends a `@Serialize()` serializer must also have `@Serialize()` and `with _$Name`. If it does not, its JSON comes from the `convert()` of the parent class. The build log shows a warning for this.
+Dox finds a writer by the class of the object. A class that extends a `@Serialize()` serializer does not get the writer of its parent class. Without its own `@Serialize()`, it writes the map of its own `toJson()`. The JSON is correct, but it is slow. The build log shows a warning for this.
 
 ### Write a plain class as JSON
 
@@ -177,7 +179,11 @@ A controller can return the class, or a list of it. A serializer can use it as a
 
 A plain class with its own `toJson()` keeps `toJson()`. An abstract class and a generic class get no fast code.
 
-`lib/generated/container.g.dart` gives the writers to Dox, so set `AppConfig(container: registerContainer)`. Without it, a plain class in a response is an error.
+`lib/generated/container.g.dart` gives the writers to Dox, so set `AppConfig(container: registerContainer)`. A plain class has no `toJson()`. Thus, without the container, Dox can not write it, and a response with it gives an error 500. `JSON.bytes()` and `JSON.stringify()` throw a `JsonUnsupportedObjectError`. A plain class in a fast serializer is written also without the container, because the serializer calls its writer directly.
+
+The file of the class must have its `part` line. If it does not, the build log shows a warning, and the container gets no writer for the class.
+
+A class that extends another class, or that has a mixin, gets no fast code. A class with `@Dto()` and `@Serialize()` also gets no fast code: the `@Dto` already writes its JSON.
 
 ### Use the encoder of the Dart SDK
 

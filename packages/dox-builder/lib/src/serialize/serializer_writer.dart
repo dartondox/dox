@@ -58,7 +58,8 @@ class SerializerWriter {
   Future<String> write() async {
     String name = plan.name;
     bool inline = plan.inline;
-    String item = inline ? '\$write${name}Item' : '_\$write${name}Item';
+    // `$item`: no class name has a `$`, so no other function has this name
+    String item = '${inline ? '' : '_'}\$write$name\$item';
     String self = inline ? '' : 'serializer, ';
     StringBuffer body = StringBuffer();
     for (VariableDeclarationStatement local in plan.locals) {
@@ -76,20 +77,11 @@ class SerializerWriter {
     runs.flush();
     String listStart = _run('_listStart', '[');
     String listEnd = _run('_listEnd', ']');
+    // Dox finds the writer by the exact class of the object, so a subclass
+    // with its own convert() never gets it. A mixin on the class with a
+    // writeJson() would skip the look-up, but it must check the class of
+    // the object too, and that costs the same as the look-up.
     StringBuffer out = StringBuffer()
-      ..writeln('/// Add `with _\$$name` to [$name]: the JSON encoder then')
-      ..writeln('/// calls [writeJson], with no look-up of the writer.')
-      ..writeln(
-        'mixin _\$$name on Serializer<${plan.payloadType}> '
-        'implements JsonWritable {',
-      )
-      ..writeln('@override')
-      ..writeln(
-        'void writeJson(JsonWriter writer) => '
-        '\$write$name(this as $name, writer);',
-      )
-      ..writeln('}')
-      ..writeln()
       ..writeln('/// The JSON writer of [$name]. Dox gets it from')
       ..writeln('/// `lib/generated/container.g.dart`.')
       ..writeln('const SerializeWriter \$${name}Writer = $_class();')
@@ -216,12 +208,17 @@ class SerializerWriter {
     if (await _inline(runs, node, field)) return;
     String? direct = await _directCall(node, type);
     if (direct != null) {
-      runs.code(
-        nullable
-            ? 'if ($wrapped case final $v?) { $direct($v, $w); } '
-                  'else { $w.value(null); }'
-            : '$direct($code, $w);',
-      );
+      if (_makesExact(node)) {
+        runs.code('$direct($code, $w);');
+      } else {
+        // a subclass at run time has its own writer: the encoder finds it
+        String exact = typeCode(type, _library).replaceFirst('?', '');
+        runs.code(
+          '{ $exact? $v = $code; '
+          'if ($v != null && $v.runtimeType == $exact) { $direct($v, $w); } '
+          'else { $w.value($v); } }',
+        );
+      }
       return;
     }
     if (_isJsonWritable(type)) {
@@ -258,7 +255,9 @@ class SerializerWriter {
   Future<bool> _inline(JsonRuns runs, Expression node, String field) async {
     Expression made = node.unParenthesized;
     if (made is! InstanceCreationExpression) return false;
-    if (made.constructorName.name != null) return false;
+    if (made.constructorName.name != null || !_makesExact(made)) {
+      return false;
+    }
     DartType type = made.staticType!;
     if (type is! InterfaceType) return false;
     InterfaceElement element = type.element;
@@ -270,12 +269,16 @@ class SerializerWriter {
     if (nested == null || !nested.inline) return false;
     NodeList<Argument> args = made.argumentList.arguments;
     if (args.length != 1 || args.first is NamedArgument) return false;
-    String? prefix = _visiblePrefix(element);
+    String? prefix = generatedPrefix(
+      _library,
+      element,
+      '\$write${element.displayName}\$item',
+    );
     if (prefix == null) return false;
     Expression arg = args.first.argumentExpression;
     DartType? data = arg.staticType;
     if (data == null) return false;
-    String call = '$prefix\$write${element.displayName}Item';
+    String call = '$prefix\$write${element.displayName}\$item';
     String code = _copier.copy(arg);
     String w = _writer;
     TypeSystem types = _library.typeSystem;
@@ -312,46 +315,29 @@ class SerializerWriter {
     return false;
   }
 
+  /// `true` when [node] makes an object of exactly its static type: a
+  /// generative constructor. A factory can give a subclass.
+  static bool _makesExact(Expression node) {
+    Expression made = node.unParenthesized;
+    return made is InstanceCreationExpression &&
+        made.constructorName.element?.isFactory == false;
+  }
+
   /// The `$write` function of the `@Serialize()` class of [type], to call
   /// directly for the value [node], or null.
   ///
-  /// A plain class is written by its static type, like a nested DTO. A
-  /// serializer only when [node] makes it (`PostSerializer(m.posts)`): a
-  /// subclass could have another `convert()`.
+  /// A serializer only when [node] makes it (`PostSerializer(m.posts)`): a
+  /// subclass could have another `convert()`. The caller checks the class
+  /// of a plain class value at run time.
   Future<String?> _directCall(Expression node, InterfaceType type) async {
     InterfaceElement element = type.element;
     if (element is! ClassElement) return null;
     if (!await reader.hasWriter(element)) return null;
-    if (DtoReader.isSerializer(element) &&
-        node.unParenthesized is! InstanceCreationExpression) {
-      return null;
-    }
-    String? prefix = _visiblePrefix(element);
+    if (DtoReader.isSerializer(element) && !_makesExact(node)) return null;
+    String name = '\$write${element.displayName}';
+    String? prefix = generatedPrefix(_library, element, name);
     if (prefix == null) return null;
-    return '$prefix\$write${element.displayName}';
-  }
-
-  /// The prefix to call the `$write` function of [element] from this
-  /// library, or null when the library can not see it: another package,
-  /// or an import with `show` or `hide`.
-  String? _visiblePrefix(ClassElement element) {
-    if (element.library == _library) return '';
-    if (_package(element.library.uri) != _package(_library.uri)) return null;
-    for (LibraryFragment fragment in _library.fragments) {
-      for (LibraryImport import in fragment.libraryImports) {
-        if (import.namespace.definedNames2[element.displayName] != element) {
-          continue;
-        }
-        if (import.combinators.isNotEmpty) continue;
-        String? prefix = import.prefix?.element.name;
-        return prefix == null ? '' : '$prefix.';
-      }
-    }
-    return null;
-  }
-
-  static String _package(Uri uri) {
-    return '${uri.scheme}:${uri.pathSegments.firstOrNull}';
+    return '$prefix$name';
   }
 
   /// The writer method of a text, a whole number, a `bool` or a date. Its

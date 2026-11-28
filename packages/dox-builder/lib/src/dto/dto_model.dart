@@ -406,6 +406,15 @@ class DtoReader {
   String? plainProblem(ClassElement element) {
     if (!isSerialize(element)) return 'it has no @Serialize()';
     if (isSerializer(element)) return 'it is a Serializer';
+    if (isDto(element)) {
+      return 'it is a @Dto, which writes its JSON already';
+    }
+    InterfaceType? parent = element.supertype;
+    if ((parent != null && !parent.isDartCoreObject) ||
+        element.mixins.isNotEmpty) {
+      return 'it extends another class or has a mixin, and only its own '
+          'fields would be in the JSON';
+    }
     if (element.isAbstract) {
       return 'it is abstract, and the JSON encoder finds a writer by the '
           'class of the object';
@@ -793,6 +802,15 @@ class DtoReader {
     if (isDto(element)) return make(DtoKind.dto);
     if (output) {
       bool plain = element is ClassElement && plainProblem(element) == null;
+      // the generated functions of the class must be in scope here
+      if (plain && library != null) {
+        String prefix = prefixOf(element, library);
+        for (String function in <String>['\$write$name', '\$${name}ToMap']) {
+          if (generatedPrefix(library, element, function) != prefix) {
+            plain = false;
+          }
+        }
+      }
       return make(plain ? DtoKind.dto : DtoKind.any);
     }
     if (_implements(type, 'FileInput')) return make(DtoKind.file);

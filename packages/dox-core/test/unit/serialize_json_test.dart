@@ -57,7 +57,7 @@ void main() {
         _user(account: Account(3, null), lastPost: Post('last', <Tag>[])),
         now: DateTime.utc(2024, 5, 18),
       );
-      expect(info, isA<JsonWritable>());
+      expect(Dox().ioc.jsonWriterOf(UserInfo), $UserInfoWriter);
       String want = _mapJson(info);
       expect(
         want,
@@ -111,9 +111,8 @@ void main() {
       expect(jsonEncode(body, toEncodable: advanceEncode), want);
     });
 
-    test('a serializer with no mixin is found in the container', () {
+    test('a serializer at the top is found in the container', () {
       TagLabel label = TagLabel(<Tag>[Tag('a')]);
-      expect(label, isNot(isA<JsonWritable>()));
       expect(Dox().ioc.jsonWriterOf(TagLabel), $TagLabelWriter);
       _same(label, '[{"tag":"a"}]');
     });
@@ -145,7 +144,6 @@ void main() {
       test(shape.key, () {
         expect(part, contains('// ${shape.key}: no JSON writer'));
         expect(part, isNot(contains('\$write${shape.key}(')));
-        expect(shape.value, isNot(isA<JsonWritable>()));
         _same(shape.value, _mapJson(shape.value));
       });
     }
@@ -199,12 +197,58 @@ void main() {
       }, '{"list":[{"city":"a","zip_code":null},{"city":"b","zip_code":"z"}]}');
     });
 
+    test('a writer added after an encode is used', () {
+      Dox().ioc.clear();
+      expect(
+        () => JSON.bytes(const Address(city: 'a')),
+        throwsA(isA<JsonUnsupportedObjectError>()),
+      );
+      Dox().ioc.jsonWriter($AddressWriter);
+      _same(const Address(city: 'a'), '{"city":"a","zip_code":null}');
+    });
+
     test('with no writer in the container it is an error', () {
       Dox().ioc.clear();
       expect(
         () => JSON.bytes(const Address(city: 'a')),
         throwsA(isA<JsonUnsupportedObjectError>()),
       );
+    });
+  });
+
+  group('@Serialize() review cases |', () {
+    Tag tag = Tag('t');
+
+    test('a subclass with no @Serialize() writes its own map', () {
+      expect(_mapJson(ChildS(tag)), '{"child":"t"}');
+      _same(ChildS(tag), '{"child":"t"}');
+      _same(ChildS(<Tag>[tag]), '[{"child":"t"}]');
+      _same(ParentS(tag), '{"parent":"t"}');
+    });
+
+    test('a @Serialize() subclass with no writer writes its own map', () {
+      expect(_mapJson(ChildIfS(tag)), '{"child_if":"t"}');
+      _same(ChildIfS(tag), '{"child_if":"t"}');
+    });
+
+    test('a @Serialize() subclass gets its own writer', () {
+      _same(ChildFastS(tag), '{"fast":"t"}');
+    });
+
+    test('a class between that changes the data: the object is made', () {
+      expect(_mapJson(TagNames(null)), '[]');
+      _same(TagNames(null), '[]');
+      Post post = Post('p', <Tag>[]);
+      String want = _mapJson(PostTags(post));
+      expect(want, '{"tags":[],"author":{"name":"a"}}');
+      _same(PostTags(post), want);
+    });
+
+    test('a subclass of a plain class is written by its own class', () {
+      Post post = Post('special', <Tag>[tag]);
+      String want = _mapJson(PostTags(post));
+      expect(want, '{"tags":{"n":"t"},"author":{"name":"b","badge":"gold"}}');
+      _same(PostTags(post), want);
     });
   });
 }

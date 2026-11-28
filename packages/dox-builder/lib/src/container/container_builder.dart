@@ -132,7 +132,18 @@ class DoxContainerBuilder implements Builder {
         _warnSubSerializer(element, uri);
         if (await serialize.hasWriter(element) &&
             seesAnnotationClass(library.firstFragment, 'SerializeWriter')) {
-          writers.add(JsonWriterEntry(element, uri));
+          // the writer is in the part: no part, no writer to register
+          String part =
+              '${id.pathSegments.last.replaceFirst(RegExp(r'\.dart$'), '')}.g.dart';
+          if (RegExp('part\\s+[\'"]${RegExp.escape(part)}[\'"]')
+              .hasMatch(text)) {
+            writers.add(JsonWriterEntry(element, uri));
+          } else {
+            log.warning(
+              '@Serialize() ${element.displayName} ($uri) gets no JSON '
+              "writer: its file has no part. Add `part '$part';`.",
+            );
+          }
         }
       }
     }
@@ -211,9 +222,9 @@ class DoxContainerBuilder implements Builder {
     return ModelEntry(element, library, keyType);
   }
 
-  /// A serializer that extends a `@Serialize()` serializer gets its
-  /// `writeJson()` from `with _$Name`, so its JSON would come from the
-  /// `convert()` of the class above.
+  /// A serializer that extends a `@Serialize()` serializer has no fast
+  /// writer of its own. Its JSON is right (Dox finds a writer by the exact
+  /// class, so it uses the map of `toJson()`), but it is slow.
   void _warnSubSerializer(ClassElement element, String library) {
     const DtoReader reader = DtoReader();
     if (reader.isSerialize(element)) return;
@@ -223,9 +234,9 @@ class DoxContainerBuilder implements Builder {
       if (!DtoReader.isSerializer(parent)) continue;
       log.warning(
         '${element.displayName} ($library) extends the @Serialize() '
-        'serializer ${parent.displayName}. Add @Serialize() and '
-        '`with _\$${element.displayName}` to it too, else its JSON comes '
-        'from the convert() of ${parent.displayName}.',
+        'serializer ${parent.displayName}, but it has no @Serialize(), so '
+        'it writes the map of its toJson(). Add @Serialize() to make it '
+        'fast.',
       );
       return;
     }

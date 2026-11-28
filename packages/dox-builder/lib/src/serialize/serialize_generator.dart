@@ -14,8 +14,8 @@ import 'serializer_writer.dart';
 ///
 /// A class that gets no writer keeps its map (`toJson()` of a
 /// serializer), and the build logs a warning with the reason. Its part
-/// still gets a comment (and an empty mixin `_$Name` for a serializer),
-/// so the `part` line and `with _$Name` of the file always compile.
+/// still gets a comment, so the `part` line of the file always finds a
+/// file.
 class DoxSerializeGenerator extends Generator {
   const DoxSerializeGenerator({this.reader = const DtoReader()});
 
@@ -72,11 +72,9 @@ class DoxSerializeGenerator extends Generator {
       parts.add(
         '// $name: no JSON writer, ${problem?.replaceAll('\n', ' ')}.\n',
       );
-      // `with _$Name` on the class still compiles
-      if (DtoReader.isSerializer(element)) parts.add('mixin _\$$name {}\n');
     }
-    // the mixin of a serializer is not used when the class has no `with`
-    return '// ignore_for_file: type=lint, unused_element\n\n'
+    // a value checked for its class at run time can not be null
+    return '// ignore_for_file: type=lint, unnecessary_null_comparison\n\n'
         '${parts.join('\n')}';
   }
 }
