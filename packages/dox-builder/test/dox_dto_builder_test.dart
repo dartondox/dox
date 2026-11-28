@@ -158,48 +158,49 @@ void main() {
     });
 
     test('snake_case keys and text changes', () {
-      expect(
-        out,
-        contains(
-          "s.string(s.read(input, 'first_name'), p, 'first_name', _m, trim: true)",
-        ),
-      );
+      expect(out, contains('Object? firstName = state.string('));
+      expect(out, contains("state.read(input, 'first_name'),"));
+      expect(out, contains('trim: true,'));
     });
 
     test('straight-line rules', () {
-      expect(out, contains('c0.runes.length >= 3 && c0.runes.length <= 50'));
+      expect(
+        out,
+        contains('firstName.runes.length >= 3 && firstName.runes.length <= 50'),
+      );
       expect(out, contains('IssueCodes.lengthBetween'));
-      expect(out, contains('Patterns.email.hasMatch(c1)'));
+      expect(out, contains('Patterns.email.hasMatch(email)'));
       expect(
         out,
         contains("static final RegExp _r0 = RegExp('^(?:[a-z]+)\\\$');"),
       );
-      expect(
-        out,
-        contains('const Slug().check(c4, s.context(p, \'slug\', c4))'),
-      );
+      expect(out, contains("state.context(path, 'slug', slug)"));
       expect(out, contains("'admin' => Role.admin,"));
     });
 
     test('list rules check the list, value rules each item', () {
-      expect(out, contains('if (!(c5.length <= 5))'));
+      expect(out, contains('if (!(emails.length <= 5))'));
       expect(out, contains('Patterns.email.hasMatch(v)'));
     });
 
     test('messages, async rules, validate() and Maybe', () {
       expect(out, contains("'required': 'Fill in {field}'"));
+      expect(out, contains('String value = dto.email;'));
       expect(
         out,
         contains(
-          "await s.asyncRule(const Unique('users'), f, p, 'email', _m);",
+          "await state.asyncRule(\n        const Unique('users'),\n        value,",
         ),
       );
-      expect(out, contains('o.validate(DtoErrors(s, p));'));
-      expect(out, contains('Maybe<String?>(c6 as String?)'));
+      expect(out, contains('dto.validate(DtoErrors(state, path));'));
+      expect(out, contains('Maybe<String?>(bio as String?)'));
     });
 
     test('defaults and the JSON Schema', () {
-      expect(out, contains('role: c3 is Undefined ? Role.user : c3 as Role'));
+      expect(
+        out,
+        contains('role: role is Undefined ? Role.user : role as Role'),
+      );
       expect(out, contains("'title': 'CreateUser'"));
       expect(out, contains("'description': 'The name.'"));
       // @Describe: the text is escaped for a Dart string.
@@ -290,20 +291,20 @@ class C {
         expect(
           code,
           contains(
-            "s.requiredWhen(constRequiredIf('type','company'),c1,input,p,'company',_m,);",
+            "state.requiredWhen(constRequiredIf('type','company'),company,input,path,'company',_messages,);",
           ),
         );
         expect(
           code,
           contains(
-            "s.requiredWhen(constRequiredWith(<String>['type']),c2,input,p,'size',_m,);",
+            "state.requiredWhen(constRequiredWith(<String>['type']),size,input,path,'size',_messages,);",
           ),
         );
         // the rules run after all fields are converted, so a rule can
         // read a field that comes after it
         expect(
-          code.indexOf('s.requiredWhen('),
-          greaterThan(code.indexOf('Object?c2;')),
+          code.indexOf('state.requiredWhen('),
+          greaterThan(code.indexOf('Object?size=')),
         );
         // A has the rules and B nests A: both keep the converted values.
         // C has none, so only C says it does not use them.
@@ -351,14 +352,14 @@ class C {
       expect(b, contains('boolgethasChecks=>true;'));
       expect(
         b,
-        contains(r"$ADto.crossCheck(x1,s,<Object>[...p,'rows',i0,i1]);"),
+        contains(r"$ADto.crossCheck(x1,state,<Object>[...path,'rows',i0,i1]);"),
       );
       String c = code.substring(code.indexOf(r'class_$CDto'));
       expect(c, contains('boolgethasChecks=>true;'));
       expect(
         c,
         contains(
-          r"if(x1!=null){$ADto.crossCheck(x1,s,<Object>[...p,'groups',e0.key,i1]);",
+          r"if(x1!=null){$ADto.crossCheck(x1,state,<Object>[...path,'groups',e0.key,i1",
         ),
       );
     });
@@ -461,7 +462,7 @@ class A {
   const A({this.note});
 }''');
       expect(output, isNot(startsWith('ERROR')), reason: output);
-      expect(output, contains("s.read(input, 'note', emptyToNull: true)"));
+      expect(output, contains("state.read(input, 'note', emptyToNull: true)"));
     });
 
     group('ValidationFlags |', () {
@@ -490,7 +491,10 @@ class A {
         expect(code, isNot(contains('allErrors')));
         expect(code, isNot(contains('emptyList')));
         expect(code, isNot(contains('sentEmpty')));
-        expect(code, contains('if(s.issues.length!=e)returnnull;'));
+        expect(
+          code,
+          contains('if(state.issues.length!=issuesBefore)returnnull;'),
+        );
       });
 
       test('a dox_validation with the flags reads them at run time', () async {
@@ -500,28 +504,30 @@ class A {
         // dtoAllErrors: the rules run, then the code stops
         expect(
           code,
-          contains('if(s.issues.length!=e&&!s.allErrors)returnnull;'),
+          contains(
+            'if(state.issues.length!=issuesBefore&&!state.allErrors)returnnull;',
+          ),
         );
         expect(
-          code.indexOf('if(s.issues.length!=e)returnnull;'),
+          code.indexOf('if(state.issues.length!=issuesBefore)returnnull;'),
           greaterThan(code.indexOf('MinLength')),
         );
         // dtoRejectEmptyList: only the required list
         expect(
           code,
           contains(
-            "if(c1==null||c1isUndefined||s.emptyList(c1)){s.required(p,'tags',_m);c1=invalid;}",
+            "if(tags==null||tagsisUndefined||state.emptyList(tags)){state.required(path,'tags',_messages);tags=invalid;}",
           ),
         );
         expect(RegExp(r'emptyList\(').allMatches(code), hasLength(1));
         // a list with a bad item is bad: no empty check, no list rules
-        expect(code, contains('intb0=s.issues.length;'));
-        expect(code, contains('c1=s.issues.length!=b0?invalid:o0;'));
+        expect(code, contains('intb0=state.issues.length;'));
+        expect(code, contains('tags=state.issues.length!=b0?invalid:o0;'));
         // dtoMaybeRejectsEmpty
         expect(
           code,
           contains(
-            "if(c2==null||s.sentEmpty(c2,input,'nick'))s.required(p,'nick',_m);",
+            "if(nick==null||state.sentEmpty(nick,input,'nick'))state.required(path,'nick',_messages);",
           ),
         );
       });
@@ -532,8 +538,8 @@ class A {
           imports: "import 'state.dart';",
           files: <String, String>{'a|lib/state.dart': newState},
         )).replaceAll(RegExp(r'\s+'), '');
-        expect(code, contains('s.allErrors'));
-        expect(code, contains('s.emptyList(c1)'));
+        expect(code, contains('state.allErrors'));
+        expect(code, contains('state.emptyList(tags)'));
       });
 
       test('a hidden or prefixed DtoState gives the old code', () async {
@@ -559,7 +565,7 @@ class A {
   const A({required this.scores});
 }
 $newState''')).replaceAll(RegExp(r'\s+'), '');
-        expect(code, contains('c0=s.issues.length!=b0?invalid:o0;'));
+        expect(code, contains('scores=state.issues.length!=b0?invalid:o0;'));
       });
 
       test('a DTO with no rules still stops before it builds', () async {
@@ -573,10 +579,50 @@ $newState''')).replaceAll(RegExp(r'\s+'), '');
         expect(
           code,
           contains(
-            'if(s.issues.length!=e&&!s.allErrors)returnnull;if(s.issues.length!=e)returnnull;returnA(',
+            'if(state.issues.length!=issuesBefore&&!state.allErrors)returnnull;if(state.issues.length!=issuesBefore)returnnull;returnA(',
           ),
         );
       });
+    });
+
+    test('a field local has the name of its field, or a suffix', () async {
+      String output = await _generate('''
+@Dto()
+class A {
+  final String name;
+  final String state;
+  final String path;
+  final int x0;
+  final String invalid;
+  final DateTime? sentAt;
+  const A({
+    required this.name,
+    required this.state,
+    required this.path,
+    required this.x0,
+    required this.invalid,
+    this.sentAt,
+  });
+}''');
+      expect(output, isNot(startsWith('ERROR')), reason: output);
+      // the name of the field, declared with its first value
+      expect(output, contains('Object? name = state.string('));
+      // a field with the name of a parameter, a generated local or a
+      // constant of dox_validation gets a suffix
+      expect(output, contains('Object? stateValue = state.string('));
+      expect(output, contains('Object? pathValue = state.string('));
+      expect(output, contains('Object? x0Value = state.integer('));
+      expect(output, contains('Object? invalidValue = state.string('));
+      expect(output, contains('name: name as String,'));
+      expect(output, contains('state: stateValue as String,'));
+      // toMap(): no temp for a plain value, one when the value is read two
+      // times
+      expect(output, contains("'name': dto.name"));
+      expect(output, contains('DateTime? sentAt = dto.sentAt;'));
+      expect(
+        output,
+        contains('sentAt == null ? null : sentAt.toIso8601String()'),
+      );
     });
 
     test('@OrDefault drops the issues of its field', () async {
@@ -591,11 +637,19 @@ class A {
 }''');
       expect(output, isNot(startsWith('ERROR')), reason: output);
       String code = output.replaceAll(RegExp(r'\s+'), '');
-      expect(code, contains('intf0=s.issues.length;'));
-      expect(code, contains('if(s.dropIssuesAfter(f0))c0=undefined;'));
-      expect(code, contains('intr0=s.issues.length;'));
-      expect(code, contains('if(s.dropIssuesAfter(r0))c0=undefined;'));
-      expect(code, contains('c0isUndefined?30:c0asint'));
+      expect(code, contains('intdaysIssuesBefore=state.issues.length;'));
+      expect(
+        code,
+        contains('if(state.dropIssuesAfter(daysIssuesBefore))days=undefined;'),
+      );
+      expect(code, contains('intdaysIssuesBeforeRules=state.issues.length;'));
+      expect(
+        code,
+        contains(
+          'if(state.dropIssuesAfter(daysIssuesBeforeRules))days=undefined;',
+        ),
+      );
+      expect(code, contains('daysisUndefined?30:daysasint'));
     });
 
     test('@OrDefault on a Maybe field builds', () async {
@@ -609,8 +663,11 @@ class A {
 }''');
       expect(output, isNot(startsWith('ERROR')), reason: output);
       String code = output.replaceAll(RegExp(r'\s+'), '');
-      expect(code, contains('if(s.dropIssuesAfter(f0))c0=undefined;'));
-      expect(code, contains('c0isUndefined?constMaybe<int>.missing()'));
+      expect(
+        code,
+        contains('if(state.dropIssuesAfter(daysIssuesBefore))days=undefined;'),
+      );
+      expect(code, contains('daysisUndefined?constMaybe<int>.missing()'));
     });
 
     test('@OrDefault on a required field stops the build', () async {
@@ -771,17 +828,22 @@ class A {
       expect(c, isNot(contains('trim:true')));
       expect(c, isNot(contains('coerce')));
       expect(c, isNot(contains('_a')));
-      expect(c, isNot(contains('s.attributes')));
+      expect(c, isNot(contains('state.attributes')));
     });
 
     test('@Dto(trim: true) trims each text field and item', () async {
       String c = await code(plain.replaceFirst('@Dto()', '@Dto(trim: true)'));
       expect(
         c,
-        contains("s.string(s.read(input,'name'),p,'name',_m,trim:true)"),
+        contains(
+          "state.string(state.read(input,'name'),path,'name',_messages,trim:true",
+        ),
       );
-      expect(c, contains('s.string(c1[i0],q0,i0,_m,trim:true)'));
-      expect(c, contains("s.integer(s.read(input,'age'),p,'age',_m)"));
+      expect(c, contains('state.string(tags[i0],q0,i0,_messages,trim:true)'));
+      expect(
+        c,
+        contains("state.integer(state.read(input,'age'),path,'age',_messages"),
+      );
       // with emptyStringsToNull, blank text is null too
       c = await code(
         plain.replaceFirst(
@@ -789,7 +851,10 @@ class A {
           '@Dto(trim: true, emptyStringsToNull: true)',
         ),
       );
-      expect(c, contains("s.read(input,'name',emptyToNull:true,trim:true)"));
+      expect(
+        c,
+        contains("state.read(input,'name',emptyToNull:true,trim:true)"),
+      );
     });
 
     test('@Dto(coerce: true) reads JSON text as numbers and bools', () async {
@@ -805,18 +870,30 @@ class A {
 }''');
       expect(
         c,
-        contains("s.integer(s.read(input,'age'),p,'age',_m,coerce:true)"),
+        contains(
+          "state.integer(state.read(input,'age'),path,'age',_messages,coerce:true",
+        ),
       );
       expect(
         c,
-        contains("s.decimal(s.read(input,'price'),p,'price',_m,coerce:true)"),
+        contains(
+          "state.decimal(state.read(input,'price'),path,'price',_messages,coerce:true",
+        ),
       );
       expect(
         c,
-        contains("s.number(s.read(input,'size'),p,'size',_m,coerce:true)"),
+        contains(
+          "state.number(state.read(input,'size'),path,'size',_messages,coerce:true",
+        ),
       );
-      expect(c, contains('s.boolean(c3[i0],q0,i0,_m,coerce:true)'));
-      expect(c, contains("s.string(s.read(input,'name'),p,'name',_m)"));
+      expect(
+        c,
+        contains('state.boolean(flags[i0],q0,i0,_messages,coerce:true)'),
+      );
+      expect(
+        c,
+        contains("state.string(state.read(input,'name'),path,'name',_messages"),
+      );
     });
 
     test('@Dto(attributes:) names the fields in messages', () async {
@@ -829,13 +906,13 @@ class A {
       expect(
         c,
         contains(
-          "staticconstMap<String,String>_a=<String,String>{'first_name':'firstname',};",
+          "staticconstMap<String,String>_attributes=<String,String>{'first_name':'firstname',};",
         ),
       );
       expect(
         c,
         contains(
-          'convert(Object?input,DtoStates,List<Object>p){s.attributes(p,_a);if(inputis!Map)',
+          'convert(Object?input,DtoStatestate,List<Object>path){state.attributes(path,_attributes);if(inputis!Map)',
         ),
       );
     });
@@ -860,23 +937,25 @@ class A {
 
   const A({required this.start, required this.end, this.days, this.at = const Maybe.missing()});
 }''');
-      expect(c, contains('if(!(c0is!DateTime||c1.isAfter(c0))){'));
+      expect(c, contains('if(!(startis!DateTime||end.isAfter(start))){'));
       expect(c, contains("params:const<String,Object?>{'date':'start'}"));
       expect(
         c,
         contains(
-          'c1.isBefore(DateTime.utc(s.now.year,s.now.month,s.now.day+1)',
+          'end.isBefore(DateTime.utc(state.now.year,state.now.month,state.now.day+1)',
         ),
       );
       expect(
         c,
-        contains('!v.isBefore(DateTime.utc(s.now.year,s.now.month,s.now.day))'),
+        contains(
+          '!v.isBefore(DateTime.utc(state.now.year,state.now.month,state.now.day',
+        ),
       );
       expect(
         c,
         contains('IssueCodes.afterOrEqual,DefaultMessages.afterOrEqual'),
       );
-      expect(c, contains('if(!(c1is!DateTime||!v.isAfter(c1))){'));
+      expect(c, contains('if(!(endis!DateTime||!v.isAfter(end))){'));
       expect(
         c,
         contains('IssueCodes.beforeOrEqual,DefaultMessages.beforeOrEqual'),
@@ -885,10 +964,12 @@ class A {
         c,
         contains('staticfinalDateTime_d0=DateTime.fromMicrosecondsSinceEpoch('),
       );
-      expect(c, contains('!c3.isBefore(_d0)'));
+      expect(c, contains('!at.isBefore(_d0)'));
       expect(
         c,
-        contains('c3.isAfter(DateTime.utc(s.now.year,s.now.month,s.now.day-1)'),
+        contains(
+          'at.isAfter(DateTime.utc(state.now.year,state.now.month,state.now.day-1)',
+        ),
       );
     });
 
@@ -942,23 +1023,32 @@ class A {
       expect(
         c,
         contains(
-          "s.requiredWhen(constRequiredUnless('type','guest'),c2,input,p,'phone',_m,);",
+          "state.requiredWhen(constRequiredUnless('type','guest'),phone,input,path,'phone',_messages,);",
         ),
-      );
-      expect(
-        c,
-        contains("s.requiredWhen(constRequiredWithout(<String>['email']),c2"),
       );
       expect(
         c,
         contains(
-          "s.requiredWhen(constRequiredWithoutAll(<String>['email','phone']),c3",
+          "state.requiredWhen(constRequiredWithout(<String>['email']),phone",
         ),
       );
-      expect(c, contains("s.requiredWhen(constFilled(),c3,input,p,'fax',_m)"));
       expect(
         c,
-        contains("s.requiredWhen(constPresent(),c4,input,p,'note',_m)"),
+        contains(
+          "state.requiredWhen(constRequiredWithoutAll(<String>['email','phone']),fax",
+        ),
+      );
+      expect(
+        c,
+        contains(
+          "state.requiredWhen(constFilled(),fax,input,path,'fax',_messages)",
+        ),
+      );
+      expect(
+        c,
+        contains(
+          "state.requiredWhen(constPresent(),note,input,path,'note',_messages)",
+        ),
       );
       expect(c, isNot(contains('boolgetusesRequiredWhen=>false;')));
     });
@@ -998,15 +1088,17 @@ class A {
       expect(
         c,
         contains(
-          "Object?c1;boolx1=constExcludeIf('type','person').appliesTo(input)||constExcludeUnless('type',<String>['company','shop',]).appliesTo(input);if(x1){c1=undefined;}else{c1=s.string(s.read(input,'vat'),p,'vat',_m);}",
+          "Object?vat;boolvatExcluded=constExcludeIf('type','person').appliesTo(input)||constExcludeUnless('type',<String>['company','shop',]).appliesTo(input);if(vatExcluded){vat=undefined;}else{vat=state.string(state.read(input,'vat'),path,'vat',_messages);}",
         ),
       );
       expect(
         c,
-        contains("if(!x1)s.requiredWhen(constRequiredIf('type','shop'),c1"),
+        contains(
+          "if(!vatExcluded)state.requiredWhen(constRequiredIf('type','shop'),vat",
+        ),
       );
       // the rules see `undefined`, so they do not run
-      expect(c, contains('if(c1isString){'));
+      expect(c, contains('if(vatisString){'));
       await expectError('''
 @Dto()
 class A {
@@ -1071,25 +1163,29 @@ class A {
 }''');
       expect(
         c,
-        contains("constDifferent('old').check(c1,s.context(p,'tags',c1))"),
+        contains(
+          "constDifferent('old').check(tags,state.context(path,'tags',tags))",
+        ),
       );
       // @Prohibited reads the raw key, for every value
       expect(
         c,
-        contains("s.requiredWhen(constProhibited(),c2,input,p,'gone',_m)"),
+        contains(
+          "state.requiredWhen(constProhibited(),gone,input,path,'gone',_messages",
+        ),
       );
       expect(
         c,
         contains(
-          "s.requiredWhen(constProhibitedIf('old','x'),c2,input,p,'gone',_m",
+          "state.requiredWhen(constProhibitedIf('old','x'),gone,input,path,'gone',_messages",
         ),
       );
       // a rule that does not read a key still checks each item
-      expect(c, contains("constAccepted().check(v,s.context(q,i,v))"));
+      expect(c, contains("constAccepted().check(v,state.context(q,i,v))"));
       expect(
         c,
         contains(
-          "constGreaterThanField('min').check(c3,s.context(p,'max',c3))",
+          "constGreaterThanField('min').check(max,state.context(path,'max',max))",
         ),
       );
       await expectError('''
@@ -1153,11 +1249,11 @@ class A {
   const A({required this.a});
 }''');
       expect(out, isNot(startsWith('ERROR')), reason: out);
-      expect(out, contains('c0.length >= 1024'));
+      expect(out, contains('a.length >= 1024'));
       expect(out, contains('IssueCodes.minSize'));
       expect(out, contains("params: const <String, Object?>{'min': '1KB'}"));
       // the output is formatted, so check the parts
-      expect(out, contains('FileTypes.matchesMimeTypes(c0'));
+      expect(out, contains('FileTypes.matchesMimeTypes(a'));
       expect(out, contains("'image/png',"));
       expect(out, contains('IssueCodes.mimeTypes'));
       expect(out, contains('ImageSize.fits('));
@@ -1423,38 +1519,38 @@ class View {
         expect(
           out,
           contains(
-            '@overridevoidwriteObject(Objectobject,JsonWriterw)=>'
-            r'$writeView(objectasView,w);',
+            '@overridevoidwriteObject(Objectobject,JsonWriterwriter)=>'
+            r'$writeView(objectasView,writer);',
           ),
         );
-        // a Maybe field: each key is written with w.key()
+        // a Maybe field: each key is written with writer.key()
         expect(
           out,
           contains(
-            r'void$writeView(Viewo,JsonWriterw){'
-            'w.startObject();'
-            "w.key('id');w.integer(o.id);"
-            "w.key('first_name');w.string(o.firstName);"
-            "w.key('note');w.string(o.note);"
-            "w.key('price');w.value(o.price);"
-            "w.key('active');w.boolean(o.active);"
-            "w.key('sold_at');w.dateTime(o.soldAt);"
-            "w.key('role');w.string(o.role.name);"
-            "w.key('other');w.string(o.other?.name);"
-            "w.key('numbers');w.value(o.numbers);"
+            r'void$writeView(Viewdto,JsonWriterwriter){'
+            'writer.startObject();'
+            "writer.key('id');writer.integer(dto.id);"
+            "writer.key('first_name');writer.string(dto.firstName);"
+            "writer.key('note');writer.string(dto.note);"
+            "writer.key('price');writer.value(dto.price);"
+            "writer.key('active');writer.boolean(dto.active);"
+            "writer.key('sold_at');writer.dateTime(dto.soldAt);"
+            "writer.key('role');writer.string(dto.role.name);"
+            "writer.key('other');writer.string(dto.other?.name);"
+            "writer.key('numbers');writer.value(dto.numbers);"
             // a date in a list: the value of toMap()
-            "w.key('dates');w.value(<dynamic>[for(DateTimex0ino.dates)"
+            "writer.key('dates');writer.value(<dynamic>[for(DateTimex0indto.dates)"
             'x0.toIso8601String()]);'
             // a nested DTO: its function is called
-            "w.key('inner');\$writeInner(o.inner,w);"
-            "w.key('inners');w.value(o.inners);"
+            "writer.key('inner');\$writeInner(dto.inner,writer);"
+            "writer.key('inners');writer.value(dto.inners);"
             // a nested DTO with its own toJson(): the map of its schema
-            "w.key('own');w.value(\$OwnJsonDto.toMap(o.own));"
-            "w.key('owns');w.value(<dynamic>[for(OwnJsonx0ino.owns)"
+            "writer.key('own');writer.value(\$OwnJsonDto.toMap(dto.own));"
+            "writer.key('owns');writer.value(<dynamic>[for(OwnJsonx0indto.owns)"
             '\$OwnJsonDto.toMap(x0)]);'
-            "if(o.agecaseMaybe<int>(isPresent:true,value:intg14))"
-            "{w.key('age');w.integer(g14);}"
-            'w.endObject();}',
+            "if(dto.agecaseMaybe<int>(isPresent:true,value:intage))"
+            "{writer.key('age');writer.integer(age);}"
+            'writer.endObject();}',
           ),
         );
       });
@@ -1499,7 +1595,7 @@ class Holder {
         expect(
           out,
           contains(
-            r'w.run(_$HolderDto._j0);w.value($FromMixinDto.toMap(o.inner));',
+            r'writer.run(_$HolderDto._innerKey);writer.value($FromMixinDto.toMap(dto.inner));',
           ),
         );
       });
@@ -1533,8 +1629,8 @@ class Inner {
         expect(
           out,
           contains(
-            r'w.run(_$OuterDto._j0);w.value(o.inner);'
-            r'w.run(_$OuterDto._j1);w.value(o.all);',
+            r'writer.run(_$OuterDto._innerKey);writer.value(dto.inner);'
+            r'writer.run(_$OuterDto._allKey);writer.value(dto.all);',
           ),
         );
       });
@@ -1586,50 +1682,50 @@ class Page {
         expect(
           out,
           contains(
-            r'void$writeItem(Itemo,JsonWriterw){'
-            r'w.run(_$ItemDto._j0);w.integer(o.id);'
+            r'void$writeItem(Itemdto,JsonWriterwriter){'
+            r'writer.run(_$ItemDto._idKey);writer.integer(dto.id);'
             // a list of texts: a loop, with no look up
-            r'w.run(_$ItemDto._j1);'
-            '{List<String>l1=o.tags;for(inti=0;i<l1.length;i++)'
-            '{if(i>0)w.run(JsonRun.comma);w.string(l1[i]);}}'
+            r'writer.run(_$ItemDto._tagsKey);'
+            '{List<String>tags=dto.tags;for(inti=0;i<tags.length;i++)'
+            '{if(i>0)writer.run(JsonRun.comma);writer.string(tags[i]);}}'
             // a nested DTO: its function is called
-            r'w.run(_$ItemDto._j2);$writeRating(o.rating,w);'
+            r'writer.run(_$ItemDto._ratingKey);$writeRating(dto.rating,writer);'
             // a nested DTO that can be null: the encoder finds its writer
-            r'w.run(_$ItemDto._j3);w.value(o.best);'
-            r'w.run(_$ItemDto._j4);'
-            '{List<Rating>l4=o.all;for(inti=0;i<l4.length;i++)'
-            r'{if(i>0)w.run(JsonRun.comma);$writeRating(l4[i],w);}}'
+            r'writer.run(_$ItemDto._bestKey);writer.value(dto.best);'
+            r'writer.run(_$ItemDto._allKey);'
+            '{List<Rating>all=dto.all;for(inti=0;i<all.length;i++)'
+            r'{if(i>0)writer.run(JsonRun.comma);$writeRating(all[i],writer);}}'
             // a list of lists: the encoder writes it
-            r'w.run(_$ItemDto._j5);w.value(o.grid);'
-            r'w.run(_$ItemDto._j6);w.boolean(o.active);'
-            r'w.run(_$ItemDto._j7);'
-            '{List<Role>l7=o.roles;for(inti=0;i<l7.length;i++)'
-            '{if(i>0)w.run(JsonRun.comma);w.string(l7[i].name);}}'
-            r'w.run(_$ItemDto._j8);}',
+            r'writer.run(_$ItemDto._gridKey);writer.value(dto.grid);'
+            r'writer.run(_$ItemDto._activeKey);writer.boolean(dto.active);'
+            r'writer.run(_$ItemDto._rolesKey);'
+            '{List<Role>roles=dto.roles;for(inti=0;i<roles.length;i++)'
+            '{if(i>0)writer.run(JsonRun.comma);writer.string(roles[i].name);}}'
+            r'writer.run(_$ItemDto._end);}',
           ),
         );
         // a closing bracket and the next key are one run
         expect(
           out,
           contains(
-            'staticfinalJsonRun_j0=JsonRun(\'{"id":\');'
-            'staticfinalJsonRun_j1=JsonRun(\',"tags":[\');'
-            'staticfinalJsonRun_j2=JsonRun(\'],"rating":\');'
-            'staticfinalJsonRun_j3=JsonRun(\',"best":\');'
-            'staticfinalJsonRun_j4=JsonRun(\',"all":[\');'
-            'staticfinalJsonRun_j5=JsonRun(\'],"grid":\');'
-            'staticfinalJsonRun_j6=JsonRun(\',"active":\');'
-            'staticfinalJsonRun_j7=JsonRun(\',"roles":[\');'
-            'staticfinalJsonRun_j8=JsonRun(\']}\');',
+            'staticfinalJsonRun_idKey=JsonRun(\'{"id":\');'
+            'staticfinalJsonRun_tagsKey=JsonRun(\',"tags":[\');'
+            'staticfinalJsonRun_ratingKey=JsonRun(\'],"rating":\');'
+            'staticfinalJsonRun_bestKey=JsonRun(\',"best":\');'
+            'staticfinalJsonRun_allKey=JsonRun(\',"all":[\');'
+            'staticfinalJsonRun_gridKey=JsonRun(\'],"grid":\');'
+            'staticfinalJsonRun_activeKey=JsonRun(\',"active":\');'
+            'staticfinalJsonRun_rolesKey=JsonRun(\',"roles":[\');'
+            'staticfinalJsonRun_end=JsonRun(\']}\');',
           ),
         );
         // a list that can be null: the encoder writes it
         expect(
           out,
           contains(
-            r'void$writePage(Pageo,JsonWriterw){w.run(_$PageDto._j0);'
-            r'w.value(o.items);w.run(_$PageDto._j1);w.integer(o.count);'
-            r'w.run(_$PageDto._j2);}',
+            r'void$writePage(Pagedto,JsonWriterwriter){writer.run(_$PageDto._itemsKey);'
+            r'writer.value(dto.items);writer.run(_$PageDto._countKey);writer.integer(dto.count);'
+            r'writer.run(_$PageDto._end);}',
           ),
         );
       });

@@ -14,7 +14,7 @@ const DtoSchema<OwnJson> $OwnJsonDto = _$OwnJsonDto();
 class _$OwnJsonDto extends DtoSchema<OwnJson> {
   const _$OwnJsonDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   @override
   Type get type => OwnJson;
@@ -26,30 +26,28 @@ class _$OwnJsonDto extends DtoSchema<OwnJson> {
   bool get usesRequiredWhen => false;
 
   @override
-  OwnJson? convert(Object? input, DtoState s, List<Object> p) {
+  OwnJson? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // id: int
-    Object? c0;
-    c0 = s.integer(s.read(input, 'id'), p, 'id', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'id', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
-    return OwnJson(id: c0 as int);
+    Object? id = state.integer(state.read(input, 'id'), path, 'id', _messages);
+    if (id == null || id is Undefined) state.required(path, 'id', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
+    return OwnJson(id: id as int);
   }
 
   @override
-  OwnJson fromMap(Map<String, dynamic> m) {
-    return OwnJson(id: (m['id'] as num).toInt());
+  OwnJson fromMap(Map<String, dynamic> map) {
+    return OwnJson(id: (map['id'] as num).toInt());
   }
 
   @override
-  Map<String, dynamic> toMap(OwnJson o) {
-    int f0 = o.id;
-    return <String, dynamic>{'id': f0};
+  Map<String, dynamic> toMap(OwnJson dto) {
+    return <String, dynamic>{'id': dto.id};
   }
 
   @override
@@ -72,14 +70,14 @@ class _$ProductViewDto extends DtoSchema<ProductView>
     implements JsonObjectWriter {
   const _$ProductViewDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"id":');
-  static final JsonRun _j1 = JsonRun(',"product_name":');
-  static final JsonRun _j2 = JsonRun(',"price":');
-  static final JsonRun _j3 = JsonRun(',"in_stock":');
-  static final JsonRun _j4 = JsonRun(',"sold_at":');
-  static final JsonRun _j5 = JsonRun('}');
+  static final JsonRun _idKey = JsonRun('{"id":');
+  static final JsonRun _productNameKey = JsonRun(',"product_name":');
+  static final JsonRun _priceKey = JsonRun(',"price":');
+  static final JsonRun _inStockKey = JsonRun(',"in_stock":');
+  static final JsonRun _soldAtKey = JsonRun(',"sold_at":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => ProductView;
@@ -91,74 +89,89 @@ class _$ProductViewDto extends DtoSchema<ProductView>
   bool get usesRequiredWhen => false;
 
   @override
-  ProductView? convert(Object? input, DtoState s, List<Object> p) {
+  ProductView? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // id: int
-    Object? c0;
-    c0 = s.integer(s.read(input, 'id'), p, 'id', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'id', _m);
+    Object? id = state.integer(state.read(input, 'id'), path, 'id', _messages);
+    if (id == null || id is Undefined) state.required(path, 'id', _messages);
     // productName: String
-    Object? c1;
-    c1 = s.string(s.read(input, 'product_name'), p, 'product_name', _m);
-    if (c1 == null || c1 is Undefined) s.required(p, 'product_name', _m);
+    Object? productName = state.string(
+      state.read(input, 'product_name'),
+      path,
+      'product_name',
+      _messages,
+    );
+    if (productName == null || productName is Undefined)
+      state.required(path, 'product_name', _messages);
     // price: double
-    Object? c2;
-    c2 = s.decimal(s.read(input, 'price'), p, 'price', _m);
-    if (c2 == null || c2 is Undefined) s.required(p, 'price', _m);
+    Object? price = state.decimal(
+      state.read(input, 'price'),
+      path,
+      'price',
+      _messages,
+    );
+    if (price == null || price is Undefined)
+      state.required(path, 'price', _messages);
     // inStock: bool
-    Object? c3;
-    c3 = s.boolean(s.read(input, 'in_stock'), p, 'in_stock', _m);
-    if (c3 == null || c3 is Undefined) s.required(p, 'in_stock', _m);
+    Object? inStock = state.boolean(
+      state.read(input, 'in_stock'),
+      path,
+      'in_stock',
+      _messages,
+    );
+    if (inStock == null || inStock is Undefined)
+      state.required(path, 'in_stock', _messages);
     // soldAt: DateTime?
-    Object? c4;
-    c4 = s.date(s.read(input, 'sold_at'), p, 'sold_at', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
+    Object? soldAt = state.date(
+      state.read(input, 'sold_at'),
+      path,
+      'sold_at',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
     return ProductView(
-      id: c0 as int,
-      productName: c1 as String,
-      price: c2 as double,
-      inStock: c3 as bool,
-      soldAt: c4 is Undefined ? null : c4 as DateTime?,
+      id: id as int,
+      productName: productName as String,
+      price: price as double,
+      inStock: inStock as bool,
+      soldAt: soldAt is Undefined ? null : soldAt as DateTime?,
     );
   }
 
   @override
-  ProductView fromMap(Map<String, dynamic> m) {
+  ProductView fromMap(Map<String, dynamic> map) {
     return ProductView(
-      id: (m['id'] as num).toInt(),
-      productName: m['product_name'] as String,
-      price: (m['price'] as num).toDouble(),
-      inStock: m['in_stock'] as bool,
-      soldAt: m['sold_at'] == null
+      id: (map['id'] as num).toInt(),
+      productName: map['product_name'] as String,
+      price: (map['price'] as num).toDouble(),
+      inStock: map['in_stock'] as bool,
+      soldAt: map['sold_at'] == null
           ? null
-          : (DateTime.parse(m['sold_at'] as String).toUtc()),
+          : (DateTime.parse(map['sold_at'] as String).toUtc()),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(ProductView o) {
-    int f0 = o.id;
-    String f1 = o.productName;
-    double f2 = o.price;
-    bool f3 = o.inStock;
-    DateTime? f4 = o.soldAt;
+  Map<String, dynamic> toMap(ProductView dto) {
+    DateTime? soldAt = dto.soldAt;
     return <String, dynamic>{
-      'id': f0,
-      'product_name': f1,
-      'price': f2,
-      'in_stock': f3,
-      'sold_at': f4 == null ? null : f4.toIso8601String(),
+      'id': dto.id,
+      'product_name': dto.productName,
+      'price': dto.price,
+      'in_stock': dto.inStock,
+      'sold_at': soldAt == null ? null : soldAt.toIso8601String(),
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeProductView(object as ProductView, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeProductView(object as ProductView, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -180,18 +193,18 @@ class _$ProductViewDto extends DtoSchema<ProductView>
 }
 
 /// Writes the JSON of [ProductView], as `toMap()` gives it.
-void $writeProductView(ProductView o, JsonWriter w) {
-  w.run(_$ProductViewDto._j0);
-  w.integer(o.id);
-  w.run(_$ProductViewDto._j1);
-  w.string(o.productName);
-  w.run(_$ProductViewDto._j2);
-  w.value(o.price);
-  w.run(_$ProductViewDto._j3);
-  w.boolean(o.inStock);
-  w.run(_$ProductViewDto._j4);
-  w.dateTime(o.soldAt);
-  w.run(_$ProductViewDto._j5);
+void $writeProductView(ProductView dto, JsonWriter writer) {
+  writer.run(_$ProductViewDto._idKey);
+  writer.integer(dto.id);
+  writer.run(_$ProductViewDto._productNameKey);
+  writer.string(dto.productName);
+  writer.run(_$ProductViewDto._priceKey);
+  writer.value(dto.price);
+  writer.run(_$ProductViewDto._inStockKey);
+  writer.boolean(dto.inStock);
+  writer.run(_$ProductViewDto._soldAtKey);
+  writer.dateTime(dto.soldAt);
+  writer.run(_$ProductViewDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [MixedView].
@@ -200,18 +213,18 @@ const DtoSchema<MixedView> $MixedViewDto = _$MixedViewDto();
 class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   const _$MixedViewDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"dates":[');
-  static final JsonRun _j1 = JsonRun('],"roles":[');
-  static final JsonRun _j2 = JsonRun('],"days":');
-  static final JsonRun _j3 = JsonRun(',"grid":');
-  static final JsonRun _j4 = JsonRun(',"own":');
-  static final JsonRun _j5 = JsonRun(',"owns":');
-  static final JsonRun _j6 = JsonRun(',"product":');
-  static final JsonRun _j7 = JsonRun(',"products":[');
-  static final JsonRun _j8 = JsonRun('],"by_name":');
-  static final JsonRun _j9 = JsonRun('}');
+  static final JsonRun _datesKey = JsonRun('{"dates":[');
+  static final JsonRun _rolesKey = JsonRun('],"roles":[');
+  static final JsonRun _daysKey = JsonRun('],"days":');
+  static final JsonRun _gridKey = JsonRun(',"grid":');
+  static final JsonRun _ownKey = JsonRun(',"own":');
+  static final JsonRun _ownsKey = JsonRun(',"owns":');
+  static final JsonRun _productKey = JsonRun(',"product":');
+  static final JsonRun _productsKey = JsonRun(',"products":[');
+  static final JsonRun _byNameKey = JsonRun('],"by_name":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => MixedView;
@@ -223,44 +236,56 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  MixedView? convert(Object? input, DtoState s, List<Object> p) {
+  MixedView? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // dates: List<DateTime>
-    Object? c0;
-    c0 = s.list(s.read(input, 'dates'), p, 'dates', _m);
-    if (c0 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'dates'];
+    Object? dates = state.list(
+      state.read(input, 'dates'),
+      path,
+      'dates',
+      _messages,
+    );
+    if (dates is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'dates'];
       List<DateTime> o0 = <DateTime>[];
-      for (int i0 = 0; i0 < c0.length; i0++) {
-        Object? x0;
-        x0 = s.date(c0[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < dates.length; i0++) {
+        Object? x0 = state.date(dates[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as DateTime);
         }
       }
-      c0 = s.issues.length != b0 ? invalid : o0;
+      dates = state.issues.length != b0 ? invalid : o0;
     }
-    if (c0 == null || c0 is Undefined || s.emptyList(c0)) {
-      s.required(p, 'dates', _m);
-      c0 = invalid;
+    if (dates == null || dates is Undefined || state.emptyList(dates)) {
+      state.required(path, 'dates', _messages);
+      dates = invalid;
     }
     // roles: List<Role>
-    Object? c1;
-    c1 = s.list(s.read(input, 'roles'), p, 'roles', _m);
-    if (c1 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'roles'];
+    Object? roles = state.list(
+      state.read(input, 'roles'),
+      path,
+      'roles',
+      _messages,
+    );
+    if (roles is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'roles'];
       List<Role> o0 = <Role>[];
-      for (int i0 = 0; i0 < c1.length; i0++) {
-        Object? x0;
-        x0 = s.enumName(c1[i0], q0, i0, _m, const <String>['admin', 'user']);
+      for (int i0 = 0; i0 < roles.length; i0++) {
+        Object? x0 = state.enumName(
+          roles[i0],
+          q0,
+          i0,
+          _messages,
+          const <String>['admin', 'user'],
+        );
         if (x0 is String) {
           x0 = switch (x0) {
             'admin' => Role.admin,
@@ -268,57 +293,66 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
           };
         }
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as Role);
         }
       }
-      c1 = s.issues.length != b0 ? invalid : o0;
+      roles = state.issues.length != b0 ? invalid : o0;
     }
-    if (c1 == null || c1 is Undefined || s.emptyList(c1)) {
-      s.required(p, 'roles', _m);
-      c1 = invalid;
+    if (roles == null || roles is Undefined || state.emptyList(roles)) {
+      state.required(path, 'roles', _messages);
+      roles = invalid;
     }
     // days: Map<String, DateTime>
-    Object? c2;
-    c2 = s.object(s.read(input, 'days'), p, 'days', _m);
-    if (c2 is Map) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'days'];
+    Object? days = state.object(
+      state.read(input, 'days'),
+      path,
+      'days',
+      _messages,
+    );
+    if (days is Map) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'days'];
       Map<String, DateTime> o0 = <String, DateTime>{};
-      for (MapEntry<dynamic, dynamic> n0 in c2.entries) {
+      for (MapEntry<dynamic, dynamic> n0 in days.entries) {
         String k0 = '${n0.key}';
-        Object? x0;
-        x0 = s.date(n0.value, q0, k0, _m);
+        Object? x0 = state.date(n0.value, q0, k0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, k0, _m);
+          state.required(q0, k0, _messages);
         } else if (x0 is! Invalid) {
           o0[k0] = x0 as DateTime;
         }
       }
-      c2 = s.issues.length != b0 ? invalid : o0;
+      days = state.issues.length != b0 ? invalid : o0;
     }
-    if (c2 == null || c2 is Undefined) s.required(p, 'days', _m);
+    if (days == null || days is Undefined)
+      state.required(path, 'days', _messages);
     // grid: List<List<Role>>
-    Object? c3;
-    c3 = s.list(s.read(input, 'grid'), p, 'grid', _m);
-    if (c3 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'grid'];
+    Object? grid = state.list(
+      state.read(input, 'grid'),
+      path,
+      'grid',
+      _messages,
+    );
+    if (grid is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'grid'];
       List<List<Role>> o0 = <List<Role>>[];
-      for (int i0 = 0; i0 < c3.length; i0++) {
-        Object? x0;
-        x0 = s.list(c3[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < grid.length; i0++) {
+        Object? x0 = state.list(grid[i0], q0, i0, _messages);
         if (x0 is List) {
-          int b1 = s.issues.length;
+          int b1 = state.issues.length;
           List<Object> q1 = <Object>[...q0, i0];
           List<Role> o1 = <Role>[];
           for (int i1 = 0; i1 < x0.length; i1++) {
-            Object? x1;
-            x1 = s.enumName(x0[i1], q1, i1, _m, const <String>[
-              'admin',
-              'user',
-            ]);
+            Object? x1 = state.enumName(
+              x0[i1],
+              q1,
+              i1,
+              _messages,
+              const <String>['admin', 'user'],
+            );
             if (x1 is String) {
               x1 = switch (x1) {
                 'admin' => Role.admin,
@@ -326,208 +360,231 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
               };
             }
             if (x1 == null || x1 is Undefined) {
-              s.required(q1, i1, _m);
+              state.required(q1, i1, _messages);
             } else if (x1 is! Invalid) {
               o1.add(x1 as Role);
             }
           }
-          x0 = s.issues.length != b1 ? invalid : o1;
+          x0 = state.issues.length != b1 ? invalid : o1;
         }
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as List<Role>);
         }
       }
-      c3 = s.issues.length != b0 ? invalid : o0;
+      grid = state.issues.length != b0 ? invalid : o0;
     }
-    if (c3 == null || c3 is Undefined || s.emptyList(c3)) {
-      s.required(p, 'grid', _m);
-      c3 = invalid;
+    if (grid == null || grid is Undefined || state.emptyList(grid)) {
+      state.required(path, 'grid', _messages);
+      grid = invalid;
     }
     // own: OwnJson
-    Object? c4;
-    c4 = s.object(s.read(input, 'own'), p, 'own', _m);
-    if (c4 is Map) {
-      c4 = $OwnJsonDto.convert(c4, s, <Object>[...p, 'own']) ?? invalid;
+    Object? own = state.object(
+      state.read(input, 'own'),
+      path,
+      'own',
+      _messages,
+    );
+    if (own is Map) {
+      own =
+          $OwnJsonDto.convert(own, state, <Object>[...path, 'own']) ?? invalid;
     }
-    if (c4 == null || c4 is Undefined) s.required(p, 'own', _m);
+    if (own == null || own is Undefined) state.required(path, 'own', _messages);
     // owns: List<OwnJson>
-    Object? c5;
-    c5 = s.list(s.read(input, 'owns'), p, 'owns', _m);
-    if (c5 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'owns'];
+    Object? owns = state.list(
+      state.read(input, 'owns'),
+      path,
+      'owns',
+      _messages,
+    );
+    if (owns is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'owns'];
       List<OwnJson> o0 = <OwnJson>[];
-      for (int i0 = 0; i0 < c5.length; i0++) {
-        Object? x0;
-        x0 = s.object(c5[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < owns.length; i0++) {
+        Object? x0 = state.object(owns[i0], q0, i0, _messages);
         if (x0 is Map) {
-          x0 = $OwnJsonDto.convert(x0, s, <Object>[...q0, i0]) ?? invalid;
+          x0 = $OwnJsonDto.convert(x0, state, <Object>[...q0, i0]) ?? invalid;
         }
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as OwnJson);
         }
       }
-      c5 = s.issues.length != b0 ? invalid : o0;
+      owns = state.issues.length != b0 ? invalid : o0;
     }
-    if (c5 == null || c5 is Undefined || s.emptyList(c5)) {
-      s.required(p, 'owns', _m);
-      c5 = invalid;
+    if (owns == null || owns is Undefined || state.emptyList(owns)) {
+      state.required(path, 'owns', _messages);
+      owns = invalid;
     }
     // product: ProductView?
-    Object? c6;
-    c6 = s.object(s.read(input, 'product'), p, 'product', _m);
-    if (c6 is Map) {
-      c6 = $ProductViewDto.convert(c6, s, <Object>[...p, 'product']) ?? invalid;
+    Object? product = state.object(
+      state.read(input, 'product'),
+      path,
+      'product',
+      _messages,
+    );
+    if (product is Map) {
+      product =
+          $ProductViewDto.convert(product, state, <Object>[
+            ...path,
+            'product',
+          ]) ??
+          invalid;
     }
     // products: List<ProductView>
-    Object? c7;
-    c7 = s.list(s.read(input, 'products'), p, 'products', _m);
-    if (c7 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'products'];
+    Object? products = state.list(
+      state.read(input, 'products'),
+      path,
+      'products',
+      _messages,
+    );
+    if (products is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'products'];
       List<ProductView> o0 = <ProductView>[];
-      for (int i0 = 0; i0 < c7.length; i0++) {
-        Object? x0;
-        x0 = s.object(c7[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < products.length; i0++) {
+        Object? x0 = state.object(products[i0], q0, i0, _messages);
         if (x0 is Map) {
-          x0 = $ProductViewDto.convert(x0, s, <Object>[...q0, i0]) ?? invalid;
+          x0 =
+              $ProductViewDto.convert(x0, state, <Object>[...q0, i0]) ??
+              invalid;
         }
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as ProductView);
         }
       }
-      c7 = s.issues.length != b0 ? invalid : o0;
+      products = state.issues.length != b0 ? invalid : o0;
     }
-    if (c7 == null || c7 is Undefined || s.emptyList(c7)) {
-      s.required(p, 'products', _m);
-      c7 = invalid;
+    if (products == null ||
+        products is Undefined ||
+        state.emptyList(products)) {
+      state.required(path, 'products', _messages);
+      products = invalid;
     }
     // byName: Map<String, ProductView>
-    Object? c8;
-    c8 = s.object(s.read(input, 'by_name'), p, 'by_name', _m);
-    if (c8 is Map) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'by_name'];
+    Object? byName = state.object(
+      state.read(input, 'by_name'),
+      path,
+      'by_name',
+      _messages,
+    );
+    if (byName is Map) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'by_name'];
       Map<String, ProductView> o0 = <String, ProductView>{};
-      for (MapEntry<dynamic, dynamic> n0 in c8.entries) {
+      for (MapEntry<dynamic, dynamic> n0 in byName.entries) {
         String k0 = '${n0.key}';
-        Object? x0;
-        x0 = s.object(n0.value, q0, k0, _m);
+        Object? x0 = state.object(n0.value, q0, k0, _messages);
         if (x0 is Map) {
-          x0 = $ProductViewDto.convert(x0, s, <Object>[...q0, k0]) ?? invalid;
+          x0 =
+              $ProductViewDto.convert(x0, state, <Object>[...q0, k0]) ??
+              invalid;
         }
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, k0, _m);
+          state.required(q0, k0, _messages);
         } else if (x0 is! Invalid) {
           o0[k0] = x0 as ProductView;
         }
       }
-      c8 = s.issues.length != b0 ? invalid : o0;
+      byName = state.issues.length != b0 ? invalid : o0;
     }
-    if (c8 == null || c8 is Undefined) s.required(p, 'by_name', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
+    if (byName == null || byName is Undefined)
+      state.required(path, 'by_name', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
     return MixedView(
-      dates: c0 as List<DateTime>,
-      roles: c1 as List<Role>,
-      days: c2 as Map<String, DateTime>,
-      grid: c3 as List<List<Role>>,
-      own: c4 as OwnJson,
-      owns: c5 as List<OwnJson>,
-      products: c7 as List<ProductView>,
-      byName: c8 as Map<String, ProductView>,
-      product: c6 is Undefined ? null : c6 as ProductView?,
+      dates: dates as List<DateTime>,
+      roles: roles as List<Role>,
+      days: days as Map<String, DateTime>,
+      grid: grid as List<List<Role>>,
+      own: own as OwnJson,
+      owns: owns as List<OwnJson>,
+      products: products as List<ProductView>,
+      byName: byName as Map<String, ProductView>,
+      product: product is Undefined ? null : product as ProductView?,
     );
   }
 
   @override
-  MixedView fromMap(Map<String, dynamic> m) {
+  MixedView fromMap(Map<String, dynamic> map) {
     return MixedView(
       dates: <DateTime>[
-        for (Object? x0 in m['dates'] as List<dynamic>)
+        for (Object? x0 in map['dates'] as List<dynamic>)
           DateTime.parse(x0 as String).toUtc(),
       ],
       roles: <Role>[
-        for (Object? x0 in m['roles'] as List<dynamic>)
+        for (Object? x0 in map['roles'] as List<dynamic>)
           Role.values.byName(x0 as String),
       ],
       days: <String, DateTime>{
         for (MapEntry<dynamic, dynamic> x0
-            in (m['days'] as Map<dynamic, dynamic>).entries)
+            in (map['days'] as Map<dynamic, dynamic>).entries)
           x0.key as String: DateTime.parse(x0.value as String).toUtc(),
       },
       grid: <List<Role>>[
-        for (Object? x0 in m['grid'] as List<dynamic>)
+        for (Object? x0 in map['grid'] as List<dynamic>)
           <Role>[
             for (Object? x1 in x0 as List<dynamic>)
               Role.values.byName(x1 as String),
           ],
       ],
-      own: $OwnJsonDto.fromMap(m['own'] as Map<String, dynamic>),
+      own: $OwnJsonDto.fromMap(map['own'] as Map<String, dynamic>),
       owns: <OwnJson>[
-        for (Object? x0 in m['owns'] as List<dynamic>)
+        for (Object? x0 in map['owns'] as List<dynamic>)
           $OwnJsonDto.fromMap(x0 as Map<String, dynamic>),
       ],
       products: <ProductView>[
-        for (Object? x0 in m['products'] as List<dynamic>)
+        for (Object? x0 in map['products'] as List<dynamic>)
           $ProductViewDto.fromMap(x0 as Map<String, dynamic>),
       ],
       byName: <String, ProductView>{
         for (MapEntry<dynamic, dynamic> x0
-            in (m['by_name'] as Map<dynamic, dynamic>).entries)
+            in (map['by_name'] as Map<dynamic, dynamic>).entries)
           x0.key as String: $ProductViewDto.fromMap(
             x0.value as Map<String, dynamic>,
           ),
       },
-      product: m['product'] == null
+      product: map['product'] == null
           ? null
-          : ($ProductViewDto.fromMap(m['product'] as Map<String, dynamic>)),
+          : ($ProductViewDto.fromMap(map['product'] as Map<String, dynamic>)),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(MixedView o) {
-    List<DateTime> f0 = o.dates;
-    List<Role> f1 = o.roles;
-    Map<String, DateTime> f2 = o.days;
-    List<List<Role>> f3 = o.grid;
-    OwnJson f4 = o.own;
-    List<OwnJson> f5 = o.owns;
-    ProductView? f6 = o.product;
-    List<ProductView> f7 = o.products;
-    Map<String, ProductView> f8 = o.byName;
+  Map<String, dynamic> toMap(MixedView dto) {
+    ProductView? product = dto.product;
     return <String, dynamic>{
-      'dates': <dynamic>[for (DateTime x0 in f0) x0.toIso8601String()],
-      'roles': <dynamic>[for (Role x0 in f1) x0.name],
+      'dates': <dynamic>[for (DateTime x0 in dto.dates) x0.toIso8601String()],
+      'roles': <dynamic>[for (Role x0 in dto.roles) x0.name],
       'days': <String, dynamic>{
-        for (MapEntry<String, DateTime> x0 in f2.entries)
+        for (MapEntry<String, DateTime> x0 in dto.days.entries)
           x0.key: x0.value.toIso8601String(),
       },
       'grid': <dynamic>[
-        for (List<Role> x0 in f3) <dynamic>[for (Role x1 in x0) x1.name],
+        for (List<Role> x0 in dto.grid) <dynamic>[for (Role x1 in x0) x1.name],
       ],
-      'own': $OwnJsonDto.toMap(f4),
-      'owns': <dynamic>[for (OwnJson x0 in f5) $OwnJsonDto.toMap(x0)],
-      'product': f6 == null ? null : $ProductViewDto.toMap(f6),
+      'own': $OwnJsonDto.toMap(dto.own),
+      'owns': <dynamic>[for (OwnJson x0 in dto.owns) $OwnJsonDto.toMap(x0)],
+      'product': product == null ? null : $ProductViewDto.toMap(product),
       'products': <dynamic>[
-        for (ProductView x0 in f7) $ProductViewDto.toMap(x0),
+        for (ProductView x0 in dto.products) $ProductViewDto.toMap(x0),
       ],
       'by_name': <String, dynamic>{
-        for (MapEntry<String, ProductView> x0 in f8.entries)
+        for (MapEntry<String, ProductView> x0 in dto.byName.entries)
           x0.key: $ProductViewDto.toMap(x0.value),
       },
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeMixedView(object as MixedView, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeMixedView(object as MixedView, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -624,49 +681,49 @@ class _$MixedViewDto extends DtoSchema<MixedView> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [MixedView], as `toMap()` gives it.
-void $writeMixedView(MixedView o, JsonWriter w) {
-  w.run(_$MixedViewDto._j0);
+void $writeMixedView(MixedView dto, JsonWriter writer) {
+  writer.run(_$MixedViewDto._datesKey);
   {
-    List<DateTime> l0 = o.dates;
-    for (int i = 0; i < l0.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.dateTime(l0[i]);
+    List<DateTime> dates = dto.dates;
+    for (int i = 0; i < dates.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.dateTime(dates[i]);
     }
   }
-  w.run(_$MixedViewDto._j1);
+  writer.run(_$MixedViewDto._rolesKey);
   {
-    List<Role> l1 = o.roles;
-    for (int i = 0; i < l1.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.string(l1[i].name);
+    List<Role> roles = dto.roles;
+    for (int i = 0; i < roles.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.string(roles[i].name);
     }
   }
-  w.run(_$MixedViewDto._j2);
-  w.value(<String, dynamic>{
-    for (MapEntry<String, DateTime> x0 in o.days.entries)
+  writer.run(_$MixedViewDto._daysKey);
+  writer.value(<String, dynamic>{
+    for (MapEntry<String, DateTime> x0 in dto.days.entries)
       x0.key: x0.value.toIso8601String(),
   });
-  w.run(_$MixedViewDto._j3);
-  w.value(<dynamic>[
-    for (List<Role> x0 in o.grid) <dynamic>[for (Role x1 in x0) x1.name],
+  writer.run(_$MixedViewDto._gridKey);
+  writer.value(<dynamic>[
+    for (List<Role> x0 in dto.grid) <dynamic>[for (Role x1 in x0) x1.name],
   ]);
-  w.run(_$MixedViewDto._j4);
-  w.value($OwnJsonDto.toMap(o.own));
-  w.run(_$MixedViewDto._j5);
-  w.value(<dynamic>[for (OwnJson x0 in o.owns) $OwnJsonDto.toMap(x0)]);
-  w.run(_$MixedViewDto._j6);
-  w.value(o.product);
-  w.run(_$MixedViewDto._j7);
+  writer.run(_$MixedViewDto._ownKey);
+  writer.value($OwnJsonDto.toMap(dto.own));
+  writer.run(_$MixedViewDto._ownsKey);
+  writer.value(<dynamic>[for (OwnJson x0 in dto.owns) $OwnJsonDto.toMap(x0)]);
+  writer.run(_$MixedViewDto._productKey);
+  writer.value(dto.product);
+  writer.run(_$MixedViewDto._productsKey);
   {
-    List<ProductView> l7 = o.products;
-    for (int i = 0; i < l7.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      $writeProductView(l7[i], w);
+    List<ProductView> products = dto.products;
+    for (int i = 0; i < products.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      $writeProductView(products[i], writer);
     }
   }
-  w.run(_$MixedViewDto._j8);
-  w.value(o.byName);
-  w.run(_$MixedViewDto._j9);
+  writer.run(_$MixedViewDto._byNameKey);
+  writer.value(dto.byName);
+  writer.run(_$MixedViewDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [RunsView].
@@ -675,18 +732,18 @@ const DtoSchema<RunsView> $RunsViewDto = _$RunsViewDto();
 class _$RunsViewDto extends DtoSchema<RunsView> implements JsonObjectWriter {
   const _$RunsViewDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"id":');
-  static final JsonRun _j1 = JsonRun(',"tags":[');
-  static final JsonRun _j2 = JsonRun('],"notes":[');
-  static final JsonRun _j3 = JsonRun('],"numbers":[');
-  static final JsonRun _j4 = JsonRun('],"flags":[');
-  static final JsonRun _j5 = JsonRun('],"main":');
-  static final JsonRun _j6 = JsonRun(',"products":[');
-  static final JsonRun _j7 = JsonRun('],"a \\"key\\" é \\\\ \$x":');
-  static final JsonRun _j8 = JsonRun(',"active":');
-  static final JsonRun _j9 = JsonRun('}');
+  static final JsonRun _idKey = JsonRun('{"id":');
+  static final JsonRun _tagsKey = JsonRun(',"tags":[');
+  static final JsonRun _notesKey = JsonRun('],"notes":[');
+  static final JsonRun _numbersKey = JsonRun('],"numbers":[');
+  static final JsonRun _flagsKey = JsonRun('],"flags":[');
+  static final JsonRun _mainKey = JsonRun('],"main":');
+  static final JsonRun _productsKey = JsonRun(',"products":[');
+  static final JsonRun _oddKey = JsonRun('],"a \\"key\\" é \\\\ \$x":');
+  static final JsonRun _activeKey = JsonRun(',"active":');
+  static final JsonRun _end = JsonRun('}');
 
   @override
   Type get type => RunsView;
@@ -698,213 +755,242 @@ class _$RunsViewDto extends DtoSchema<RunsView> implements JsonObjectWriter {
   bool get usesRequiredWhen => false;
 
   @override
-  RunsView? convert(Object? input, DtoState s, List<Object> p) {
+  RunsView? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // id: int
-    Object? c0;
-    c0 = s.integer(s.read(input, 'id'), p, 'id', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'id', _m);
+    Object? id = state.integer(state.read(input, 'id'), path, 'id', _messages);
+    if (id == null || id is Undefined) state.required(path, 'id', _messages);
     // tags: List<String>
-    Object? c1;
-    c1 = s.list(s.read(input, 'tags'), p, 'tags', _m);
-    if (c1 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'tags'];
+    Object? tags = state.list(
+      state.read(input, 'tags'),
+      path,
+      'tags',
+      _messages,
+    );
+    if (tags is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'tags'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c1.length; i0++) {
-        Object? x0;
-        x0 = s.string(c1[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < tags.length; i0++) {
+        Object? x0 = state.string(tags[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c1 = s.issues.length != b0 ? invalid : o0;
+      tags = state.issues.length != b0 ? invalid : o0;
     }
-    if (c1 == null || c1 is Undefined || s.emptyList(c1)) {
-      s.required(p, 'tags', _m);
-      c1 = invalid;
+    if (tags == null || tags is Undefined || state.emptyList(tags)) {
+      state.required(path, 'tags', _messages);
+      tags = invalid;
     }
     // notes: List<String?>
-    Object? c2;
-    c2 = s.list(s.read(input, 'notes'), p, 'notes', _m);
-    if (c2 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'notes'];
+    Object? notes = state.list(
+      state.read(input, 'notes'),
+      path,
+      'notes',
+      _messages,
+    );
+    if (notes is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'notes'];
       List<String?> o0 = <String?>[];
-      for (int i0 = 0; i0 < c2.length; i0++) {
-        Object? x0;
-        x0 = s.string(c2[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < notes.length; i0++) {
+        Object? x0 = state.string(notes[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
           o0.add(null);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String?);
         }
       }
-      c2 = s.issues.length != b0 ? invalid : o0;
+      notes = state.issues.length != b0 ? invalid : o0;
     }
-    if (c2 == null || c2 is Undefined || s.emptyList(c2)) {
-      s.required(p, 'notes', _m);
-      c2 = invalid;
+    if (notes == null || notes is Undefined || state.emptyList(notes)) {
+      state.required(path, 'notes', _messages);
+      notes = invalid;
     }
     // numbers: List<int>
-    Object? c3;
-    c3 = s.list(s.read(input, 'numbers'), p, 'numbers', _m);
-    if (c3 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'numbers'];
+    Object? numbers = state.list(
+      state.read(input, 'numbers'),
+      path,
+      'numbers',
+      _messages,
+    );
+    if (numbers is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'numbers'];
       List<int> o0 = <int>[];
-      for (int i0 = 0; i0 < c3.length; i0++) {
-        Object? x0;
-        x0 = s.integer(c3[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < numbers.length; i0++) {
+        Object? x0 = state.integer(numbers[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as int);
         }
       }
-      c3 = s.issues.length != b0 ? invalid : o0;
+      numbers = state.issues.length != b0 ? invalid : o0;
     }
-    if (c3 == null || c3 is Undefined || s.emptyList(c3)) {
-      s.required(p, 'numbers', _m);
-      c3 = invalid;
+    if (numbers == null || numbers is Undefined || state.emptyList(numbers)) {
+      state.required(path, 'numbers', _messages);
+      numbers = invalid;
     }
     // flags: List<bool>
-    Object? c4;
-    c4 = s.list(s.read(input, 'flags'), p, 'flags', _m);
-    if (c4 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'flags'];
+    Object? flags = state.list(
+      state.read(input, 'flags'),
+      path,
+      'flags',
+      _messages,
+    );
+    if (flags is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'flags'];
       List<bool> o0 = <bool>[];
-      for (int i0 = 0; i0 < c4.length; i0++) {
-        Object? x0;
-        x0 = s.boolean(c4[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < flags.length; i0++) {
+        Object? x0 = state.boolean(flags[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as bool);
         }
       }
-      c4 = s.issues.length != b0 ? invalid : o0;
+      flags = state.issues.length != b0 ? invalid : o0;
     }
-    if (c4 == null || c4 is Undefined || s.emptyList(c4)) {
-      s.required(p, 'flags', _m);
-      c4 = invalid;
+    if (flags == null || flags is Undefined || state.emptyList(flags)) {
+      state.required(path, 'flags', _messages);
+      flags = invalid;
     }
     // main: ProductView
-    Object? c5;
-    c5 = s.object(s.read(input, 'main'), p, 'main', _m);
-    if (c5 is Map) {
-      c5 = $ProductViewDto.convert(c5, s, <Object>[...p, 'main']) ?? invalid;
+    Object? main = state.object(
+      state.read(input, 'main'),
+      path,
+      'main',
+      _messages,
+    );
+    if (main is Map) {
+      main =
+          $ProductViewDto.convert(main, state, <Object>[...path, 'main']) ??
+          invalid;
     }
-    if (c5 == null || c5 is Undefined) s.required(p, 'main', _m);
+    if (main == null || main is Undefined)
+      state.required(path, 'main', _messages);
     // products: List<ProductView>
-    Object? c6;
-    c6 = s.list(s.read(input, 'products'), p, 'products', _m);
-    if (c6 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'products'];
+    Object? products = state.list(
+      state.read(input, 'products'),
+      path,
+      'products',
+      _messages,
+    );
+    if (products is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'products'];
       List<ProductView> o0 = <ProductView>[];
-      for (int i0 = 0; i0 < c6.length; i0++) {
-        Object? x0;
-        x0 = s.object(c6[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < products.length; i0++) {
+        Object? x0 = state.object(products[i0], q0, i0, _messages);
         if (x0 is Map) {
-          x0 = $ProductViewDto.convert(x0, s, <Object>[...q0, i0]) ?? invalid;
+          x0 =
+              $ProductViewDto.convert(x0, state, <Object>[...q0, i0]) ??
+              invalid;
         }
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as ProductView);
         }
       }
-      c6 = s.issues.length != b0 ? invalid : o0;
+      products = state.issues.length != b0 ? invalid : o0;
     }
-    if (c6 == null || c6 is Undefined || s.emptyList(c6)) {
-      s.required(p, 'products', _m);
-      c6 = invalid;
+    if (products == null ||
+        products is Undefined ||
+        state.emptyList(products)) {
+      state.required(path, 'products', _messages);
+      products = invalid;
     }
     // odd: String
-    Object? c7;
-    c7 = s.string(s.read(input, 'a "key" é \\ \$x'), p, 'a "key" é \\ \$x', _m);
-    if (c7 == null || c7 is Undefined) s.required(p, 'a "key" é \\ \$x', _m);
+    Object? odd = state.string(
+      state.read(input, 'a "key" é \\ \$x'),
+      path,
+      'a "key" é \\ \$x',
+      _messages,
+    );
+    if (odd == null || odd is Undefined)
+      state.required(path, 'a "key" é \\ \$x', _messages);
     // active: bool
-    Object? c8;
-    c8 = s.boolean(s.read(input, 'active'), p, 'active', _m);
-    if (c8 == null || c8 is Undefined) s.required(p, 'active', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (s.issues.length != e) return null;
+    Object? active = state.boolean(
+      state.read(input, 'active'),
+      path,
+      'active',
+      _messages,
+    );
+    if (active == null || active is Undefined)
+      state.required(path, 'active', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (state.issues.length != issuesBefore) return null;
     return RunsView(
-      id: c0 as int,
-      tags: c1 as List<String>,
-      notes: c2 as List<String?>,
-      numbers: c3 as List<int>,
-      flags: c4 as List<bool>,
-      main: c5 as ProductView,
-      products: c6 as List<ProductView>,
-      odd: c7 as String,
-      active: c8 as bool,
+      id: id as int,
+      tags: tags as List<String>,
+      notes: notes as List<String?>,
+      numbers: numbers as List<int>,
+      flags: flags as List<bool>,
+      main: main as ProductView,
+      products: products as List<ProductView>,
+      odd: odd as String,
+      active: active as bool,
     );
   }
 
   @override
-  RunsView fromMap(Map<String, dynamic> m) {
+  RunsView fromMap(Map<String, dynamic> map) {
     return RunsView(
-      id: (m['id'] as num).toInt(),
+      id: (map['id'] as num).toInt(),
       tags: <String>[
-        for (Object? x0 in m['tags'] as List<dynamic>) x0 as String,
+        for (Object? x0 in map['tags'] as List<dynamic>) x0 as String,
       ],
       notes: <String?>[
-        for (Object? x0 in m['notes'] as List<dynamic>)
+        for (Object? x0 in map['notes'] as List<dynamic>)
           x0 == null ? null : (x0 as String),
       ],
       numbers: <int>[
-        for (Object? x0 in m['numbers'] as List<dynamic>) (x0 as num).toInt(),
+        for (Object? x0 in map['numbers'] as List<dynamic>) (x0 as num).toInt(),
       ],
-      flags: <bool>[for (Object? x0 in m['flags'] as List<dynamic>) x0 as bool],
-      main: $ProductViewDto.fromMap(m['main'] as Map<String, dynamic>),
+      flags: <bool>[
+        for (Object? x0 in map['flags'] as List<dynamic>) x0 as bool,
+      ],
+      main: $ProductViewDto.fromMap(map['main'] as Map<String, dynamic>),
       products: <ProductView>[
-        for (Object? x0 in m['products'] as List<dynamic>)
+        for (Object? x0 in map['products'] as List<dynamic>)
           $ProductViewDto.fromMap(x0 as Map<String, dynamic>),
       ],
-      odd: m['a "key" é \\ \$x'] as String,
-      active: m['active'] as bool,
+      odd: map['a "key" é \\ \$x'] as String,
+      active: map['active'] as bool,
     );
   }
 
   @override
-  Map<String, dynamic> toMap(RunsView o) {
-    int f0 = o.id;
-    List<String> f1 = o.tags;
-    List<String?> f2 = o.notes;
-    List<int> f3 = o.numbers;
-    List<bool> f4 = o.flags;
-    ProductView f5 = o.main;
-    List<ProductView> f6 = o.products;
-    String f7 = o.odd;
-    bool f8 = o.active;
+  Map<String, dynamic> toMap(RunsView dto) {
     return <String, dynamic>{
-      'id': f0,
-      'tags': f1,
-      'notes': f2,
-      'numbers': f3,
-      'flags': f4,
-      'main': $ProductViewDto.toMap(f5),
+      'id': dto.id,
+      'tags': dto.tags,
+      'notes': dto.notes,
+      'numbers': dto.numbers,
+      'flags': dto.flags,
+      'main': $ProductViewDto.toMap(dto.main),
       'products': <dynamic>[
-        for (ProductView x0 in f6) $ProductViewDto.toMap(x0),
+        for (ProductView x0 in dto.products) $ProductViewDto.toMap(x0),
       ],
-      'a "key" é \\ \$x': f7,
-      'active': f8,
+      'a "key" é \\ \$x': dto.odd,
+      'active': dto.active,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeRunsView(object as RunsView, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeRunsView(object as RunsView, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
     return <String, dynamic>{
@@ -971,54 +1057,54 @@ class _$RunsViewDto extends DtoSchema<RunsView> implements JsonObjectWriter {
 }
 
 /// Writes the JSON of [RunsView], as `toMap()` gives it.
-void $writeRunsView(RunsView o, JsonWriter w) {
-  w.run(_$RunsViewDto._j0);
-  w.integer(o.id);
-  w.run(_$RunsViewDto._j1);
+void $writeRunsView(RunsView dto, JsonWriter writer) {
+  writer.run(_$RunsViewDto._idKey);
+  writer.integer(dto.id);
+  writer.run(_$RunsViewDto._tagsKey);
   {
-    List<String> l1 = o.tags;
-    for (int i = 0; i < l1.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.string(l1[i]);
+    List<String> tags = dto.tags;
+    for (int i = 0; i < tags.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.string(tags[i]);
     }
   }
-  w.run(_$RunsViewDto._j2);
+  writer.run(_$RunsViewDto._notesKey);
   {
-    List<String?> l2 = o.notes;
-    for (int i = 0; i < l2.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.string(l2[i]);
+    List<String?> notes = dto.notes;
+    for (int i = 0; i < notes.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.string(notes[i]);
     }
   }
-  w.run(_$RunsViewDto._j3);
+  writer.run(_$RunsViewDto._numbersKey);
   {
-    List<int> l3 = o.numbers;
-    for (int i = 0; i < l3.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.integer(l3[i]);
+    List<int> numbers = dto.numbers;
+    for (int i = 0; i < numbers.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.integer(numbers[i]);
     }
   }
-  w.run(_$RunsViewDto._j4);
+  writer.run(_$RunsViewDto._flagsKey);
   {
-    List<bool> l4 = o.flags;
-    for (int i = 0; i < l4.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.boolean(l4[i]);
+    List<bool> flags = dto.flags;
+    for (int i = 0; i < flags.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.boolean(flags[i]);
     }
   }
-  w.run(_$RunsViewDto._j5);
-  $writeProductView(o.main, w);
-  w.run(_$RunsViewDto._j6);
+  writer.run(_$RunsViewDto._mainKey);
+  $writeProductView(dto.main, writer);
+  writer.run(_$RunsViewDto._productsKey);
   {
-    List<ProductView> l6 = o.products;
-    for (int i = 0; i < l6.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      $writeProductView(l6[i], w);
+    List<ProductView> products = dto.products;
+    for (int i = 0; i < products.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      $writeProductView(products[i], writer);
     }
   }
-  w.run(_$RunsViewDto._j7);
-  w.string(o.odd);
-  w.run(_$RunsViewDto._j8);
-  w.boolean(o.active);
-  w.run(_$RunsViewDto._j9);
+  writer.run(_$RunsViewDto._oddKey);
+  writer.string(dto.odd);
+  writer.run(_$RunsViewDto._activeKey);
+  writer.boolean(dto.active);
+  writer.run(_$RunsViewDto._end);
 }

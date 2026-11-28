@@ -15,13 +15,13 @@ class _$CreatePostDto extends DtoSchema<CreatePost>
     implements JsonObjectWriter {
   const _$CreatePostDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
-  static final JsonRun _j0 = JsonRun('{"slug":');
-  static final JsonRun _j1 = JsonRun(',"scores":[');
-  static final JsonRun _j2 = JsonRun('],"handle":');
-  static final JsonRun _j3 = JsonRun(',"handles":[');
-  static final JsonRun _j4 = JsonRun(']}');
+  static final JsonRun _slugKey = JsonRun('{"slug":');
+  static final JsonRun _scoresKey = JsonRun(',"scores":[');
+  static final JsonRun _handleKey = JsonRun('],"handle":');
+  static final JsonRun _handlesKey = JsonRun(',"handles":[');
+  static final JsonRun _end = JsonRun(']}');
 
   @override
   Type get type => CreatePost;
@@ -36,134 +36,164 @@ class _$CreatePostDto extends DtoSchema<CreatePost>
   bool get isAsync => true;
 
   @override
-  CreatePost? convert(Object? input, DtoState s, List<Object> p) {
+  CreatePost? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // slug: String
-    Object? c0;
-    c0 = s.string(s.read(input, 'slug'), p, 'slug', _m);
-    if (c0 == null || c0 is Undefined) s.required(p, 'slug', _m);
+    Object? slug = state.string(
+      state.read(input, 'slug'),
+      path,
+      'slug',
+      _messages,
+    );
+    if (slug == null || slug is Undefined)
+      state.required(path, 'slug', _messages);
     // scores: List<int>
-    Object? c1;
-    c1 = s.list(s.read(input, 'scores'), p, 'scores', _m);
-    if (c1 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'scores'];
+    Object? scores = state.list(
+      state.read(input, 'scores'),
+      path,
+      'scores',
+      _messages,
+    );
+    if (scores is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'scores'];
       List<int> o0 = <int>[];
-      for (int i0 = 0; i0 < c1.length; i0++) {
-        Object? x0;
-        x0 = s.integer(c1[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < scores.length; i0++) {
+        Object? x0 = state.integer(scores[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as int);
         }
       }
-      c1 = s.issues.length != b0 ? invalid : o0;
+      scores = state.issues.length != b0 ? invalid : o0;
     }
-    if (c1 == null) s.required(p, 'scores', _m);
+    if (scores == null) state.required(path, 'scores', _messages);
     // handle: String?
-    Object? c2;
-    c2 = s.string(s.read(input, 'handle'), p, 'handle', _m);
+    Object? handle = state.string(
+      state.read(input, 'handle'),
+      path,
+      'handle',
+      _messages,
+    );
     // handles: List<String>
-    Object? c3;
-    c3 = s.list(s.read(input, 'handles'), p, 'handles', _m);
-    if (c3 is List) {
-      int b0 = s.issues.length;
-      List<Object> q0 = <Object>[...p, 'handles'];
+    Object? handles = state.list(
+      state.read(input, 'handles'),
+      path,
+      'handles',
+      _messages,
+    );
+    if (handles is List) {
+      int b0 = state.issues.length;
+      List<Object> q0 = <Object>[...path, 'handles'];
       List<String> o0 = <String>[];
-      for (int i0 = 0; i0 < c3.length; i0++) {
-        Object? x0;
-        x0 = s.string(c3[i0], q0, i0, _m);
+      for (int i0 = 0; i0 < handles.length; i0++) {
+        Object? x0 = state.string(handles[i0], q0, i0, _messages);
         if (x0 == null || x0 is Undefined) {
-          s.required(q0, i0, _m);
+          state.required(q0, i0, _messages);
         } else if (x0 is! Invalid) {
           o0.add(x0 as String);
         }
       }
-      c3 = s.issues.length != b0 ? invalid : o0;
+      handles = state.issues.length != b0 ? invalid : o0;
     }
-    if (c3 == null) s.required(p, 'handles', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    if (c0 is String) {
-      if (!(const Slug().check(c0, s.context(p, 'slug', c0)))) {
-        s.failRule(const Slug(), p, 'slug', c0, _m);
+    if (handles == null) state.required(path, 'handles', _messages);
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    if (slug is String) {
+      if (!(const Slug().check(slug, state.context(path, 'slug', slug)))) {
+        state.failRule(const Slug(), path, 'slug', slug, _messages);
       }
     }
-    if (c1 is List<int>) {
-      List<Object> q = <Object>[...p, 'scores'];
-      for (int i = 0; i < c1.length; i++) {
-        int v = c1[i];
-        if (!(const MinValue(5).check(v, s.context(q, i, v)))) {
-          s.failRule(const MinValue(5), q, i, v, _m);
+    if (scores is List<int>) {
+      List<Object> q = <Object>[...path, 'scores'];
+      for (int i = 0; i < scores.length; i++) {
+        int v = scores[i];
+        if (!(const MinValue(5).check(v, state.context(q, i, v)))) {
+          state.failRule(const MinValue(5), q, i, v, _messages);
         }
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return CreatePost(
-      slug: c0 as String,
-      scores: c1 is Undefined ? const <int>[] : c1 as List<int>,
-      handle: c2 is Undefined ? null : c2 as String?,
-      handles: c3 is Undefined ? const <String>[] : c3 as List<String>,
+      slug: slug as String,
+      scores: scores is Undefined ? const <int>[] : scores as List<int>,
+      handle: handle is Undefined ? null : handle as String?,
+      handles: handles is Undefined
+          ? const <String>[]
+          : handles as List<String>,
     );
   }
 
   @override
-  Future<void> checkAsync(CreatePost o, DtoState s, List<Object> p) async {
+  Future<void> checkAsync(
+    CreatePost dto,
+    DtoState state,
+    List<Object> path,
+  ) async {
     {
-      String? f = o.handle;
-      if (f != null) {
-        await s.asyncRule(const NotTaken(), f, p, 'handle', _m);
+      String? value = dto.handle;
+      if (value != null) {
+        await state.asyncRule(
+          const NotTaken(),
+          value,
+          path,
+          'handle',
+          _messages,
+        );
       }
     }
     {
-      List<String> f = o.handles;
-      await s.asyncItems(const NotTaken(), f, p, 'handles', _m);
+      List<String> value = dto.handles;
+      await state.asyncItems(
+        const NotTaken(),
+        value,
+        path,
+        'handles',
+        _messages,
+      );
     }
   }
 
   @override
-  CreatePost fromMap(Map<String, dynamic> m) {
+  CreatePost fromMap(Map<String, dynamic> map) {
     return CreatePost(
-      slug: m['slug'] as String,
-      scores: m.containsKey('scores')
+      slug: map['slug'] as String,
+      scores: map.containsKey('scores')
           ? <int>[
-              for (Object? x0 in m['scores'] as List<dynamic>)
+              for (Object? x0 in map['scores'] as List<dynamic>)
                 (x0 as num).toInt(),
             ]
           : const <int>[],
-      handle: m['handle'] == null ? null : (m['handle'] as String),
-      handles: m.containsKey('handles')
+      handle: map['handle'] == null ? null : (map['handle'] as String),
+      handles: map.containsKey('handles')
           ? <String>[
-              for (Object? x0 in m['handles'] as List<dynamic>) x0 as String,
+              for (Object? x0 in map['handles'] as List<dynamic>) x0 as String,
             ]
           : const <String>[],
     );
   }
 
   @override
-  Map<String, dynamic> toMap(CreatePost o) {
-    String f0 = o.slug;
-    List<int> f1 = o.scores;
-    String? f2 = o.handle;
-    List<String> f3 = o.handles;
+  Map<String, dynamic> toMap(CreatePost dto) {
     return <String, dynamic>{
-      'slug': f0,
-      'scores': f1,
-      'handle': f2,
-      'handles': f3,
+      'slug': dto.slug,
+      'scores': dto.scores,
+      'handle': dto.handle,
+      'handles': dto.handles,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeCreatePost(object as CreatePost, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeCreatePost(object as CreatePost, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
-    Map<String, dynamic> j = <String, dynamic>{
+    Map<String, dynamic> schema = <String, dynamic>{
       'type': 'object',
       'title': 'CreatePost',
       'properties': <String, dynamic>{
@@ -184,51 +214,51 @@ class _$CreatePostDto extends DtoSchema<CreatePost>
       },
       'required': <dynamic>['slug'],
     };
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'slug',
     ], const Slug().toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'scores',
       'items',
     ], const MinValue(5).toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'handle',
     ], const NotTaken().toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'handles',
       'items',
     ], const NotTaken().toJsonSchema());
-    return j;
+    return schema;
   }
 }
 
 /// Writes the JSON of [CreatePost], as `toMap()` gives it.
-void $writeCreatePost(CreatePost o, JsonWriter w) {
-  w.run(_$CreatePostDto._j0);
-  w.string(o.slug);
-  w.run(_$CreatePostDto._j1);
+void $writeCreatePost(CreatePost dto, JsonWriter writer) {
+  writer.run(_$CreatePostDto._slugKey);
+  writer.string(dto.slug);
+  writer.run(_$CreatePostDto._scoresKey);
   {
-    List<int> l1 = o.scores;
-    for (int i = 0; i < l1.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.integer(l1[i]);
+    List<int> scores = dto.scores;
+    for (int i = 0; i < scores.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.integer(scores[i]);
     }
   }
-  w.run(_$CreatePostDto._j2);
-  w.string(o.handle);
-  w.run(_$CreatePostDto._j3);
+  writer.run(_$CreatePostDto._handleKey);
+  writer.string(dto.handle);
+  writer.run(_$CreatePostDto._handlesKey);
   {
-    List<String> l3 = o.handles;
-    for (int i = 0; i < l3.length; i++) {
-      if (i > 0) w.run(JsonRun.comma);
-      w.string(l3[i]);
+    List<String> handles = dto.handles;
+    for (int i = 0; i < handles.length; i++) {
+      if (i > 0) writer.run(JsonRun.comma);
+      writer.string(handles[i]);
     }
   }
-  w.run(_$CreatePostDto._j4);
+  writer.run(_$CreatePostDto._end);
 }
 
 /// The checks, the converter and the JSON Schema of [ListPosts].
@@ -237,7 +267,7 @@ const DtoSchema<ListPosts> $ListPostsDto = _$ListPostsDto();
 class _$ListPostsDto extends DtoSchema<ListPosts> implements JsonObjectWriter {
   const _$ListPostsDto();
 
-  static const Map<String, String> _m = <String, String>{};
+  static const Map<String, String> _messages = <String, String>{};
 
   @override
   Type get type => ListPosts;
@@ -252,105 +282,140 @@ class _$ListPostsDto extends DtoSchema<ListPosts> implements JsonObjectWriter {
   bool get isAsync => true;
 
   @override
-  ListPosts? convert(Object? input, DtoState s, List<Object> p) {
+  ListPosts? convert(Object? input, DtoState state, List<Object> path) {
     if (input is! Map) {
-      s.notObject(input, p, _m);
+      state.notObject(input, path, _messages);
       return null;
     }
-    int e = s.issues.length;
+    int issuesBefore = state.issues.length;
     // page: int
-    Object? c0;
-    int f0 = s.issues.length;
-    c0 = s.integer(s.read(input, 'page', emptyToNull: true), p, 'page', _m);
-    if (c0 == null) s.required(p, 'page', _m);
-    if (s.dropIssuesAfter(f0)) c0 = undefined;
+    int pageIssuesBefore = state.issues.length;
+    Object? page = state.integer(
+      state.read(input, 'page', emptyToNull: true),
+      path,
+      'page',
+      _messages,
+    );
+    if (page == null) state.required(path, 'page', _messages);
+    if (state.dropIssuesAfter(pageIssuesBefore)) page = undefined;
     // days: Maybe<int>
-    Object? c1;
-    int f1 = s.issues.length;
-    c1 = s.integer(s.read(input, 'days', emptyToNull: true), p, 'days', _m);
-    if (c1 == null || s.sentEmpty(c1, input, 'days')) s.required(p, 'days', _m);
-    if (s.dropIssuesAfter(f1)) c1 = undefined;
+    int daysIssuesBefore = state.issues.length;
+    Object? days = state.integer(
+      state.read(input, 'days', emptyToNull: true),
+      path,
+      'days',
+      _messages,
+    );
+    if (days == null || state.sentEmpty(days, input, 'days'))
+      state.required(path, 'days', _messages);
+    if (state.dropIssuesAfter(daysIssuesBefore)) days = undefined;
     // handle: String?
-    Object? c2;
-    int f2 = s.issues.length;
-    c2 = s.string(s.read(input, 'handle', emptyToNull: true), p, 'handle', _m);
-    if (s.dropIssuesAfter(f2)) c2 = undefined;
+    int handleIssuesBefore = state.issues.length;
+    Object? handle = state.string(
+      state.read(input, 'handle', emptyToNull: true),
+      path,
+      'handle',
+      _messages,
+    );
+    if (state.dropIssuesAfter(handleIssuesBefore)) handle = undefined;
     // color: String?
-    Object? c3;
-    c3 = s.string(s.read(input, 'color', emptyToNull: true), p, 'color', _m);
+    Object? color = state.string(
+      state.read(input, 'color', emptyToNull: true),
+      path,
+      'color',
+      _messages,
+    );
     // note: String?
-    Object? c4;
-    c4 = s.string(s.read(input, 'note', emptyToNull: true), p, 'note', _m);
-    if (s.issues.length != e && !s.allErrors) return null;
-    int r0 = s.issues.length;
-    if (c0 is int) {
-      if (!(const MinValue(1).check(c0, s.context(p, 'page', c0)))) {
-        s.failRule(const MinValue(1), p, 'page', c0, _m);
+    Object? note = state.string(
+      state.read(input, 'note', emptyToNull: true),
+      path,
+      'note',
+      _messages,
+    );
+    if (state.issues.length != issuesBefore && !state.allErrors) return null;
+    int pageIssuesBeforeRules = state.issues.length;
+    if (page is int) {
+      if (!(const MinValue(1).check(page, state.context(path, 'page', page)))) {
+        state.failRule(const MinValue(1), path, 'page', page, _messages);
       }
     }
-    if (s.dropIssuesAfter(r0)) c0 = undefined;
-    if (c3 is String) {
-      if (!(const HexColor(short: true).check(c3, s.context(p, 'color', c3)))) {
-        s.failRule(const HexColor(short: true), p, 'color', c3, _m);
+    if (state.dropIssuesAfter(pageIssuesBeforeRules)) page = undefined;
+    if (color is String) {
+      if (!(const HexColor(short: true)
+          .check(color, state.context(path, 'color', color)))) {
+        state.failRule(
+          const HexColor(short: true),
+          path,
+          'color',
+          color,
+          _messages,
+        );
       }
     }
-    if (s.issues.length != e) return null;
+    if (state.issues.length != issuesBefore) return null;
     return ListPosts(
-      page: c0 is Undefined ? 1 : c0 as int,
-      days: c1 is Undefined
+      page: page is Undefined ? 1 : page as int,
+      days: days is Undefined
           ? const Maybe<int>.missing()
-          : Maybe<int>(c1 as int),
-      handle: c2 is Undefined ? null : c2 as String?,
-      color: c3 is Undefined ? null : c3 as String?,
-      note: c4 is Undefined ? null : c4 as String?,
+          : Maybe<int>(days as int),
+      handle: handle is Undefined ? null : handle as String?,
+      color: color is Undefined ? null : color as String?,
+      note: note is Undefined ? null : note as String?,
     );
   }
 
   @override
-  Future<void> checkAsync(ListPosts o, DtoState s, List<Object> p) async {
+  Future<void> checkAsync(
+    ListPosts dto,
+    DtoState state,
+    List<Object> path,
+  ) async {
     {
-      String? f = o.handle;
-      if (f != null) {
-        await s.asyncRule(const NotTaken(), f, p, 'handle', _m);
+      String? value = dto.handle;
+      if (value != null) {
+        await state.asyncRule(
+          const NotTaken(),
+          value,
+          path,
+          'handle',
+          _messages,
+        );
       }
     }
   }
 
   @override
-  ListPosts fromMap(Map<String, dynamic> m) {
+  ListPosts fromMap(Map<String, dynamic> map) {
     return ListPosts(
-      page: m.containsKey('page') ? (m['page'] as num).toInt() : 1,
-      days: m.containsKey('days')
-          ? Maybe<int>((m['days'] as num).toInt())
+      page: map.containsKey('page') ? (map['page'] as num).toInt() : 1,
+      days: map.containsKey('days')
+          ? Maybe<int>((map['days'] as num).toInt())
           : const Maybe<int>.missing(),
-      handle: m['handle'] == null ? null : (m['handle'] as String),
-      color: m['color'] == null ? null : (m['color'] as String),
-      note: m['note'] == null ? null : (m['note'] as String),
+      handle: map['handle'] == null ? null : (map['handle'] as String),
+      color: map['color'] == null ? null : (map['color'] as String),
+      note: map['note'] == null ? null : (map['note'] as String),
     );
   }
 
   @override
-  Map<String, dynamic> toMap(ListPosts o) {
-    int f0 = o.page;
-    Maybe<int> f1 = o.days;
-    String? f2 = o.handle;
-    String? f3 = o.color;
-    String? f4 = o.note;
+  Map<String, dynamic> toMap(ListPosts dto) {
     return <String, dynamic>{
-      'page': f0,
-      if (f1 case Maybe<int>(isPresent: true, value: int g1)) 'days': g1,
-      'handle': f2,
-      'color': f3,
-      'note': f4,
+      'page': dto.page,
+      if (dto.days case Maybe<int>(isPresent: true, value: int days))
+        'days': days,
+      'handle': dto.handle,
+      'color': dto.color,
+      'note': dto.note,
     };
   }
 
   @override
-  void writeObject(Object object, JsonWriter w) =>
-      $writeListPosts(object as ListPosts, w);
+  void writeObject(Object object, JsonWriter writer) =>
+      $writeListPosts(object as ListPosts, writer);
+
   @override
   Map<String, dynamic> toJsonSchema() {
-    Map<String, dynamic> j = <String, dynamic>{
+    Map<String, dynamic> schema = <String, dynamic>{
       'type': 'object',
       'title': 'ListPosts',
       'properties': <String, dynamic>{
@@ -368,36 +433,36 @@ class _$ListPostsDto extends DtoSchema<ListPosts> implements JsonObjectWriter {
         },
       },
     };
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'page',
     ], const MinValue(1).toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'handle',
     ], const NotTaken().toJsonSchema());
-    JsonSchemaTools.merge(j, <String>[
+    JsonSchemaTools.merge(schema, <String>[
       'properties',
       'color',
     ], const HexColor(short: true).toJsonSchema());
-    return j;
+    return schema;
   }
 }
 
 /// Writes the JSON of [ListPosts], as `toMap()` gives it.
-void $writeListPosts(ListPosts o, JsonWriter w) {
-  w.startObject();
-  w.key('page');
-  w.integer(o.page);
-  if (o.days case Maybe<int>(isPresent: true, value: int g1)) {
-    w.key('days');
-    w.integer(g1);
+void $writeListPosts(ListPosts dto, JsonWriter writer) {
+  writer.startObject();
+  writer.key('page');
+  writer.integer(dto.page);
+  if (dto.days case Maybe<int>(isPresent: true, value: int days)) {
+    writer.key('days');
+    writer.integer(days);
   }
-  w.key('handle');
-  w.string(o.handle);
-  w.key('color');
-  w.string(o.color);
-  w.key('note');
-  w.string(o.note);
-  w.endObject();
+  writer.key('handle');
+  writer.string(dto.handle);
+  writer.key('color');
+  writer.string(dto.color);
+  writer.key('note');
+  writer.string(dto.note);
+  writer.endObject();
 }

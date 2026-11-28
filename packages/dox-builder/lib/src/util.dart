@@ -134,3 +134,29 @@ bool hasMethod(InterfaceElement element, String name) {
   }
   return false;
 }
+
+final Set<String> _dartKeywords =
+    ('abstract as assert async await break case catch class const continue covariant default deferred do dynamic else enum export extends extension external factory false final finally for get hide if implements import in interface is late library mixin new null of on operator part required rethrow return set show static super switch sync this throw true try typedef var void while with yield')
+        .split(' ')
+        .toSet();
+
+/// The name of a generated local variable for [name], like a field. The
+/// name stays as it is, unless it is in [taken], a Dart keyword, or a short
+/// name with digits like `x0` (the generator uses those). Then it gets the
+/// suffix `Value`, and a number when that is taken too. The result is added
+/// to [taken].
+String safeLocal(String name, Set<String> taken) {
+  RegExp generated = RegExp(r'^[a-z]\d+$');
+  String result = name;
+  for (
+    int n = 1;
+    taken.contains(result) ||
+        _dartKeywords.contains(result) ||
+        generated.hasMatch(result);
+    n++
+  ) {
+    result = n == 1 ? '${name}Value' : '${name}Value$n';
+  }
+  taken.add(result);
+  return result;
+}
