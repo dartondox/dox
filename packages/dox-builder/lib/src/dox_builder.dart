@@ -673,7 +673,8 @@ class DoxModelBuilder extends GeneratorForAnnotation<DoxModel> {
         bool all = hide.isEmpty;
         $className instance = this as $className;
         w.startObject();
-        $content        w.endObject();
+        ${content.trimRight()}
+        w.endObject();
       }
     """;
   }
